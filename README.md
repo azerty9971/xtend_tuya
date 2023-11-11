@@ -6,7 +6,7 @@ This Custom Integration is there to add the missing entities in Tuya's integrati
 The reason why this is not merged in the main Tuya integration is that the way this is done is not officially supported by HomeAssistant (AKA this integration is using hacks to do its job)
 
 # Installation
-Clone the repository and put all the files using SSH to your /homeassistant/custom_components folder (final folder will look like: /root/homeassistant/custom_components/xtend_tuya)<br/>
+Clone the repository and put all the files using SSH to your /homeassistant/custom_components folder (final folder will look like: /homeassistant/custom_components/xtend_tuya)<br/>
 Once this is done, restart your HomeAssistant instance, go to Settings -> Devices and integrations -> Add integration -> type "Tuya" and select Xtended Tuya<br/>
 The fields don't have a text because the translations are missing but here is the order (this is all the same as the regular Tuya integration):<br/>
 1 - Country<br/>
