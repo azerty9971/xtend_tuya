@@ -80,8 +80,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
                 and entry.data[CONF_COUNTRY_CODE]   == config_entry.data[CONF_COUNTRY_CODE]
                 and entry.data[CONF_APP_TYPE]       == config_entry.data[CONF_APP_TYPE]
             ):
-                api = hass.data[DOMAIN_ORIG][config].device_manager.api
-                tuya_mq = hass.data[DOMAIN_ORIG][config].device_manager.mq
+                tuya_device_manager = hass.data[DOMAIN_ORIG][config].device_manager
+                api = tuya_device_manager.api
+                tuya_mq = tuya_device_manager.mq
                 reuse_config = True
                 break
     
@@ -129,7 +130,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     device_manager = DeviceManager(api, tuya_mq)
     home_manager = TuyaHomeManager(api, tuya_mq, device_manager)
     listener = DeviceListener(hass, device_manager, device_ids)
-    device_manager.add_device_listener(listener)
+    if reuse_config == False:
+        device_manager.add_device_listener(listener)
+    else:
+        tuya_device_manager.add_device_listener(listener)
         
     hass.data[DOMAIN][entry.entry_id] = HomeAssistantTuyaData(
         device_listener=listener,
@@ -236,7 +240,7 @@ class DeviceManager(TuyaDeviceManager):
                         if "code" in item and "value" in item and item["code"] == virtual_state.key:
                             item["value"] += device.status[virtual_state.key]
                             item_val = item["value"]
-                            # LOGGER.warning(f"Applying virtual state device_id -> {device_id} device_status-> {device.status[virtual_state.key]} status-> {item_val} VS-> {virtual_state}")
+                            LOGGER.debug(f"Applying virtual state device_id -> {device_id} device_status-> {device.status[virtual_state.key]} status-> {item_val} VS-> {virtual_state}")
                         
 
         for item in status:
