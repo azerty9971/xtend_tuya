@@ -1,6 +1,9 @@
 # xtend_tuya
 HomeAssistant eXtend Tuya's integration
 
+# Current status
+I've just seen that the metrics are not always correct, I'm currently in the process of fixing this so stay tuned for an update (should come very soon)
+
 # Purpose
 This Custom Integration is there to add the missing entities in Tuya's integration.<br/>
 The reason why this is not merged in the main Tuya integration is that the way this is done is not officially supported by HomeAssistant (AKA this integration is using hacks to do its job)
