@@ -2,7 +2,7 @@
 HomeAssistant eXtend Tuya's integration
 
 # Current status
-I've just seen that the metrics are not always correct, I'm currently in the process of fixing this so stay tuned for an update (should come very soon)
+The custom component is working as expected
 
 # Purpose
 This Custom Integration is there to add the missing entities in Tuya's integration.<br/>
