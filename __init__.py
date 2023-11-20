@@ -80,7 +80,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
                 and entry.data[CONF_COUNTRY_CODE]   == config_entry.data[CONF_COUNTRY_CODE]
                 and entry.data[CONF_APP_TYPE]       == config_entry.data[CONF_APP_TYPE]
             ):
-                tuya_device_manager = hass.data[DOMAIN_ORIG][config].device_manager
+                orig_config = hass.data[DOMAIN_ORIG][config]
+                tuya_device_manager = orig_config.device_manager
                 api = tuya_device_manager.api
                 tuya_mq = tuya_device_manager.mq
                 reuse_config = True
@@ -130,11 +131,16 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     device_manager = DeviceManager(api, tuya_mq)
     home_manager = TuyaHomeManager(api, tuya_mq, device_manager)
     listener = DeviceListener(hass, device_manager, device_ids)
-    if reuse_config == False:
-        device_manager.add_device_listener(listener)
-    else:
-        tuya_device_manager.add_device_listener(listener)
-        
+    LOGGER.debug(f"MQ status before -> {tuya_mq.message_listeners}")
+    if reuse_config == True:
+        # Remove the original message queue listener because otherwise we could have a race condition where the modified state
+        # is overwritten by the original code
+        tuya_device_manager.remove_device_listener(orig_config.device_listener)
+        tuya_mq.remove_message_listener(tuya_device_manager.on_message)
+        device_manager.set_overriden_device_manager(tuya_device_manager)
+    device_manager.add_device_listener(listener)
+    LOGGER.debug(f"MQ status after -> {tuya_mq.message_listeners}")
+
     hass.data[DOMAIN][entry.entry_id] = HomeAssistantTuyaData(
         device_listener=listener,
         device_manager=device_manager,
@@ -211,6 +217,7 @@ class DeviceManager(TuyaDeviceManager):
         mq: TuyaOpenMQ
     ) -> None:
         super().__init__(api, mq)
+        self.other_device_manager = None
     
     @staticmethod
     def get_category_virtual_states(category: str) -> list[DescriptionVirtualState]:
@@ -224,13 +231,23 @@ class DeviceManager(TuyaDeviceManager):
                         to_return.append(found_virtual_state)
         return to_return
     
+    def set_overriden_device_manager(self, other_device_manager: TuyaDeviceManager) -> None:
+        self.other_device_manager = other_device_manager
+
+    def on_message(self, msg: str):
+        #If we override another device manager, first call its on_message method
+        if self.other_device_manager is not None:
+            self.other_device_manager.on_message(msg)
+        super().on_message(msg)
+
     def _on_device_report(self, device_id: str, status: list):
         device = self.device_map.get(device_id, None)
         if not device:
             return
 
         virtual_states = DeviceManager.get_category_virtual_states(device.category)
-        LOGGER.debug(f"BEFORE device_id -> {device_id} device_status-> {device.status} status-> {status} VS-> {virtual_states}")
+        show_debug = False
+        
         for virtual_state in virtual_states:
             if virtual_state.virtual_state_value == VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD:
                 if virtual_state.key not in device.status or device.status[virtual_state.key] is None:
@@ -238,9 +255,12 @@ class DeviceManager(TuyaDeviceManager):
                 if virtual_state.key in device.status:
                     for item in status:
                         if "code" in item and "value" in item and item["code"] == virtual_state.key:
+                            #if show_debug == False:
+                            #    LOGGER.debug(f"BEFORE device_id -> {device_id} device_status-> {device.status} status-> {status} VS-> {virtual_states}")
+                            #    show_debug = True
                             item["value"] += device.status[virtual_state.key]
                             item_val = item["value"]
-                            LOGGER.debug(f"Applying virtual state device_id -> {device_id} device_status-> {device.status[virtual_state.key]} status-> {item_val} VS-> {virtual_state}")
+                            #LOGGER.debug(f"Applying virtual state device_id -> {device_id} device_status-> {device.status[virtual_state.key]} status-> {item_val} VS-> {virtual_state}")
                         
 
         for item in status:
@@ -248,7 +268,17 @@ class DeviceManager(TuyaDeviceManager):
                 code = item["code"]
                 value = item["value"]
                 device.status[code] = value
-        LOGGER.debug(f"AFTER device_id -> {device_id} device_status-> {device.status} status-> {status}")
+        if self.other_device_manager is not None:
+            device_other = self.other_device_manager.device_map.get(device_id, None)
+            if not device:
+                return
+            for item in status:
+                if "code" in item and "value" in item and item["value"] is not None:
+                    code = item["code"]
+                    value = item["value"]
+                    device_other.status[code] = value
+        #if show_debug == True:
+        #    LOGGER.debug(f"AFTER device_id -> {device_id} device_status-> {device.status} status-> {status}")
         super()._on_device_report(device_id, [])
 
 class DeviceListener(TuyaDeviceListener):
@@ -268,11 +298,6 @@ class DeviceListener(TuyaDeviceListener):
     def update_device(self, device: TuyaDevice) -> None:
         """Update device status."""
         if device.id in self.device_ids:
-            LOGGER.debug(
-                "Received update for device %s: %s",
-                device.id,
-                self.device_manager.device_map[device.id].status,
-            )
             dispatcher_send(self.hass, f"{TUYA_HA_SIGNAL_UPDATE_ENTITY}_{device.id}")
 
     def add_device(self, device: TuyaDevice) -> None:
