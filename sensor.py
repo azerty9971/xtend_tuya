@@ -43,6 +43,8 @@ from .util import ConfigMapper
 
 import copy
 
+UNIT_TIMES = "times"
+
 @dataclass
 class TuyaSensorEntityDescription(SensorEntityDescription):
     """Describes Tuya sensor entity."""
@@ -66,6 +68,32 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
             device_class=SensorDeviceClass.ENERGY,
             state_class=SensorStateClass.TOTAL_INCREASING,
             native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+            entity_registry_enabled_default=True,
+        ),
+    ),
+    # Automatic cat litter box
+    # Note: Undocumented
+    "msp": (
+        TuyaSensorEntityDescription(
+            key=DPCode.CAT_WEIGHT,
+            translation_key="cat_weight",
+            device_class=SensorDeviceClass.WEIGHT,
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_registry_enabled_default=True,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.EXCRETION_TIMES_DAY,
+            translation_key="excretion_times_day",
+            native_unit_of_measurement=UNIT_TIMES,
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_category=EntityCategory.DIAGNOSTIC,
+            entity_registry_enabled_default=True,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.EXCRETION_TIME_DAY,
+            translation_key="excretion_time_day",
+            device_class=SensorDeviceClass.DURATION,
+            state_class=SensorStateClass.MEASUREMENT,
             entity_registry_enabled_default=True,
         ),
     ),

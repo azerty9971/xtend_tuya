@@ -25,6 +25,17 @@ from .util import ConfigMapper
 # default instruction set of each category end up being a Switch.
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
 SWITCHES: dict[str, tuple[SwitchEntityDescription, ...]] = {
+    # Automatic cat litter box
+    # Note: Undocumented
+    "msp": (
+        SwitchEntityDescription(
+            key=DPCode.DEODORIZATION,
+            translation_key="deodorization",
+            device_class=SwitchDeviceClass.SWITCH,
+            icon="mdi:bacteria",
+            entity_category=EntityCategory.CONFIG,
+        )
+    )
 }
 
 
