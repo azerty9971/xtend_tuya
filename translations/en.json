@@ -437,6 +437,93 @@
       "excretion_time_day": {
         "name": "Duration of excretion"
       },
+      "deodorization": {
+        "name": "Deodorization"
+      },
+      "Clean": {
+        "name": "Clean"
+      },
+      "empty": {
+        "name": "Empty"
+      },
+      "trash_status": {
+        "name": "Trash status"
+      },
+      "monitoring": {
+        "name": "Monitoring"
+      },
+      "Induction_Clean": {
+        "name": "Induction clean"
+      },
+      "clean_time": {
+        "name": "Clean time"
+      },
+      "clean_time_switch": {
+        "name": "Clean time switch"
+      },
+      "Clean_taste": {
+        "name": "Clean taste"
+      },
+      "Clean_tasteSwitch": {
+        "name": "Clean taste switch"
+      },
+      "not_disturb": {
+        "name": "Not disturb"
+      },
+      "Clean_notice": {
+        "name": "Clean notice"
+      },
+      "toilet_notice": {
+        "name": "Toilet notice"
+      },
+      "Net_notice": {
+        "name": "Net notice"
+      },
+      "child_lock": {
+        "name": "Child lock"
+      },
+      "calibration": {
+        "name": "Calibration"
+      },
+      "unit": {
+        "name": "Unit"
+      },
+      "induction_delay": {
+        "name": "Induction delay"
+      },
+      "induction_interval": {
+        "name": "Induction interval"
+      },
+      "store_full_notify": {
+        "name": "Store full notify"
+      },
+      "odourless": {
+        "name": "Odourless"
+      },
+      "smart_clean": {
+        "name": "Smart clean"
+      },
+      "not_disturb_Switch": {
+        "name": "Not disturb switch"
+      },
+      "usage_times": {
+        "name": "Usage times"
+      },
+      "capacity_calibration": {
+        "name": "Capacity calibration"
+      },
+      "sand_surface_calibration": {
+        "name": "Sand surface calibration"
+      },
+      "auto_deordrizer": {
+        "name": "Auto deordrizer"
+      },
+      "detection_sensitivity": {
+        "name": "Detection sensitivity"
+      },
+      "number": {
+        "name": "Number"
+      },
 
       
       "battery": {
@@ -615,6 +702,61 @@
       "deodorization": {
         "name": "Deodorization"
       },
+      "Clean": {
+        "name": "Clean"
+      },
+      "empty": {
+        "name": "Empty"
+      },
+      "Induction_Clean": {
+        "name": "Induction Clean"
+      },
+      "clean_time": {
+        "name": "Clean time"
+      },
+      "clean_time_switch": {
+        "name": "Clean time switch"
+      },
+      "Clean_taste": {
+        "name": "Clean taste"
+      },
+      "Clean_tasteSwitch": {
+        "name": "Clean taste Switch"
+      },
+      "not_disturb": {
+        "name": "Not disturb"
+      },
+      "Clean_notice": {
+        "name": "Clean notice"
+      },
+      "toilet_notice": {
+        "name": "Toilet notice"
+      },
+      "Net_notice": {
+        "name": "Net notice"
+      },
+      "calibration": {
+        "name": "Calibration"
+      },
+      "unit": {
+        "name": "Unit"
+      },
+      "store_full_notify": {
+        "name": "Store full notify"
+      },
+      "odourless": {
+        "name": "Odourless"
+      },
+      "smart_clean": {
+        "name": "Smart clean"
+      },
+      "not_disturb_Switch": {
+        "name": "Not disturb Switch"
+      },
+      "auto_deordrizer": {
+        "name": "Auto deordrizer"
+      },
+
 
       "start": {
         "name": "Start"

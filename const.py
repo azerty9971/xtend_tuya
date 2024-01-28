@@ -142,6 +142,7 @@ class DPCode(StrEnum):
     BRIGHTNESS_MIN_3 = "brightness_min_3"
     C_F = "c_f"  # Temperature unit switching
     CALIBRATION = "calibration"
+    CAPACITY_CALIBRATION = "capacity_calibration"
     CAT_WEIGHT = "cat_weight"
     CH2O_STATE = "ch2o_state"
     CH2O_VALUE = "ch2o_value"
@@ -191,6 +192,7 @@ class DPCode(StrEnum):
     DEHUMIDITY_SET_ENUM = "dehumidify_set_enum"
     DEHUMIDITY_SET_VALUE = "dehumidify_set_value"
     DEODORIZATION = "deodorization"
+    DETECTION_SENSITIVITY = "detection_sensitivity"
     DISINFECTION = "disinfection"
     DO_NOT_DISTURB = "do_not_disturb"
     DOORCONTACT_STATE = "doorcontact_state"  # Status of door window sensor
@@ -233,6 +235,8 @@ class DPCode(StrEnum):
     HUMIDITY_SET = "humidity_set"  # Humidity setting
     HUMIDITY_VALUE = "humidity_value"  # Humidity
     INDUCTION_CLEAN = "Induction_Clean"
+    INDUCTION_DELAY = "induction_delay"
+    INDUCTION_INTERVAL = "induction_interval"
     IPC_WORK_MODE = "ipc_work_mode"
     LED_TYPE_1 = "led_type_1"
     LED_TYPE_2 = "led_type_2"
@@ -246,6 +250,7 @@ class DPCode(StrEnum):
     MACH_OPERATE = "mach_operate"
     MANUAL_FEED = "manual_feed"
     MATERIAL = "material"  # Material
+    MONITORING = "monitoring"
     MODE = "mode"  # Working mode / Mode
     MOODLIGHTING = "moodlighting"  # Mood light
     MOTION_RECORD = "motion_record"
@@ -258,6 +263,7 @@ class DPCode(StrEnum):
     NET_NOTICE = "Net_notice"
     NOT_DISTURB = "not_disturb"
     NOT_DISTURB_SWITCH = "not_disturb_Switch"
+    NUMBER = "number"
     OPPOSITE = "opposite"
     PAUSE = "pause"
     PERCENT_CONTROL = "percent_control"
@@ -295,6 +301,7 @@ class DPCode(StrEnum):
     RESET_MAP = "reset_map"
     RESET_ROLL_BRUSH = "reset_roll_brush"
     ROLL_BRUSH = "roll_brush"
+    SAND_SURFACE_CALIBRATION = "sand_surface_calibration"
     SEEK = "seek"
     SENSITIVITY = "sensitivity"  # Sensitivity
     SENSOR_HUMIDITY = "sensor_humidity"
@@ -371,10 +378,12 @@ class DPCode(StrEnum):
     TOTAL_FORWARD_ENERGY = "total_forward_energy"
     TOTAL_TIME = "total_time"
     TOTAL_PM = "total_pm"
+    TRASH_STATUS = "trash_status"
     TVOC = "tvoc"
     UNIT = "unit"
     UPPER_TEMP = "upper_temp"
     UPPER_TEMP_F = "upper_temp_f"
+    USAGE_TIMES = "usage_times"
     UV = "uv"  # UV sterilization
     VA_BATTERY = "va_battery"
     VA_HUMIDITY = "va_humidity"
