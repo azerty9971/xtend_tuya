@@ -31,11 +31,15 @@ SWITCHES: dict[str, tuple[SwitchEntityDescription, ...]] = {
         SwitchEntityDescription(
             key=DPCode.DEODORIZATION,
             translation_key="deodorization",
-            device_class=SwitchDeviceClass.SWITCH,
-            icon="mdi:bacteria",
             entity_category=EntityCategory.CONFIG,
-        )
-    )
+            icon="mdi:bacteria",
+        ),
+        SwitchEntityDescription(
+            key=DPCode.CHILD_LOCK,
+            translation_key="child_lock",
+            entity_category=EntityCategory.CONFIG,
+        ),
+    ),
 }
 
 

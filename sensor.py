@@ -86,7 +86,6 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
             translation_key="excretion_times_day",
             native_unit_of_measurement=UNIT_TIMES,
             state_class=SensorStateClass.MEASUREMENT,
-            entity_category=EntityCategory.DIAGNOSTIC,
             entity_registry_enabled_default=True,
         ),
         TuyaSensorEntityDescription(
