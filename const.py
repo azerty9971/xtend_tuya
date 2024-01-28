@@ -115,6 +115,7 @@ class DPCode(StrEnum):
     ANION = "anion"  # Ionizer unit
     ARM_DOWN_PERCENT = "arm_down_percent"
     ARM_UP_PERCENT = "arm_up_percent"
+    AUTO_DEORDRIZER = "auto_deordrizer"
     BASIC_ANTI_FLICKER = "basic_anti_flicker"
     BASIC_DEVICE_VOLUME = "basic_device_volume"
     BASIC_FLIP = "basic_flip"
@@ -140,6 +141,7 @@ class DPCode(StrEnum):
     BRIGHTNESS_MIN_2 = "brightness_min_2"
     BRIGHTNESS_MIN_3 = "brightness_min_3"
     C_F = "c_f"  # Temperature unit switching
+    CALIBRATION = "calibration"
     CAT_WEIGHT = "cat_weight"
     CH2O_STATE = "ch2o_state"
     CH2O_VALUE = "ch2o_value"
@@ -147,8 +149,13 @@ class DPCode(StrEnum):
     CH4_SENSOR_VALUE = "ch4_sensor_value"
     CHILD_LOCK = "child_lock"  # Child lock
     CISTERN = "cistern"
+    CLEAN = "Clean"
     CLEAN_AREA = "clean_area"
+    CLEAN_NOTICE = "Clean_notice"
+    CLEAN_TASTE = "Clean_taste"
+    CLEAN_TASTE_SWITCH = "Clean_tasteSwitch"
     CLEAN_TIME = "clean_time"
+    CLEAN_TIME_SWITCH = "clean_time_switch"
     CLICK_SUSTAIN_TIME = "click_sustain_time"
     CLOUD_RECIPE_NUMBER = "cloud_recipe_number"
     CLOSED_OPENED_KIT = "closed_opened_kit"
@@ -193,6 +200,7 @@ class DPCode(StrEnum):
     ECO2 = "eco2"
     EDGE_BRUSH = "edge_brush"
     ELECTRICITY_LEFT = "electricity_left"
+    EMPTY = "empty"
     EXCRETION_TIME_DAY = "excretion_time_day"
     EXCRETION_TIMES_DAY = "excretion_times_day"
     FAN_BEEP = "fan_beep"  # Sound
@@ -224,6 +232,7 @@ class DPCode(StrEnum):
     HUMIDITY_INDOOR = "humidity_indoor"  # Indoor humidity
     HUMIDITY_SET = "humidity_set"  # Humidity setting
     HUMIDITY_VALUE = "humidity_value"  # Humidity
+    INDUCTION_CLEAN = "Induction_Clean"
     IPC_WORK_MODE = "ipc_work_mode"
     LED_TYPE_1 = "led_type_1"
     LED_TYPE_2 = "led_type_2"
@@ -246,6 +255,9 @@ class DPCode(StrEnum):
     MOVEMENT_DETECT_PIC = "movement_detect_pic"
     MUFFLING = "muffling"  # Muffling
     NEAR_DETECTION = "near_detection"
+    NET_NOTICE = "Net_notice"
+    NOT_DISTURB = "not_disturb"
+    NOT_DISTURB_SWITCH = "not_disturb_Switch"
     OPPOSITE = "opposite"
     PAUSE = "pause"
     PERCENT_CONTROL = "percent_control"
@@ -271,6 +283,7 @@ class DPCode(StrEnum):
     PRESSURE_STATE = "pressure_state"
     PRESSURE_VALUE = "pressure_value"
     PUMP_RESET = "pump_reset"  # Water pump reset
+    ODOURLESS = "odourless"
     OXYGEN = "oxygen"  # Oxygen bar
     RECORD_MODE = "record_mode"
     RECORD_SWITCH = "record_switch"  # Recording switch
@@ -292,6 +305,7 @@ class DPCode(StrEnum):
     SITUATION_SET = "situation_set"
     SLEEP = "sleep"  # Sleep function
     SLOW_FEED = "slow_feed"
+    SMART_CLEAN = "smart_clean"
     SMOKE_SENSOR_STATE = "smoke_sensor_state"
     SMOKE_SENSOR_STATUS = "smoke_sensor_status"
     SMOKE_SENSOR_VALUE = "smoke_sensor_value"
@@ -302,6 +316,7 @@ class DPCode(StrEnum):
     START = "start"  # Start
     STATUS = "status"
     STERILIZATION = "sterilization"  # Sterilization
+    STORE_FULL_NOTIFY = "store_full_notify"
     SUCTION = "suction"
     SWING = "swing"  # Swing mode
     SWITCH = "switch"  # Switch
@@ -349,6 +364,7 @@ class DPCode(StrEnum):
     TEMP_VALUE_V2 = "temp_value_v2"
     TEMPER_ALARM = "temper_alarm"  # Tamper alarm
     TIME_TOTAL = "time_total"
+    TOILET_NOTICE = "toilet_notice"
     TOTAL_CLEAN_AREA = "total_clean_area"
     TOTAL_CLEAN_COUNT = "total_clean_count"
     TOTAL_CLEAN_TIME = "total_clean_time"
@@ -356,6 +372,7 @@ class DPCode(StrEnum):
     TOTAL_TIME = "total_time"
     TOTAL_PM = "total_pm"
     TVOC = "tvoc"
+    UNIT = "unit"
     UPPER_TEMP = "upper_temp"
     UPPER_TEMP_F = "upper_temp_f"
     UV = "uv"  # UV sterilization
