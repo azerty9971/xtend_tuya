@@ -1,10 +1,11 @@
 """Support for Tuya Cover."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Any
 
-from tuya_iot import TuyaDevice, TuyaDeviceManager
+from tuya_sharing import CustomerDevice, Manager
 
 from homeassistant.components.cover import (
     ATTR_POSITION,
@@ -22,10 +23,9 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from . import HomeAssistantTuyaData
 from .base import IntegerTypeData, TuyaEntity
 from .const import DOMAIN, TUYA_DISCOVERY_NEW, DPCode, DPType
-from .util import ConfigMapper
 
 
-@dataclass
+@dataclass(frozen=True)
 class TuyaCoverEntityDescription(CoverEntityDescription):
     """Describe an Tuya cover entity."""
 
@@ -39,6 +39,106 @@ class TuyaCoverEntityDescription(CoverEntityDescription):
 
 
 COVERS: dict[str, tuple[TuyaCoverEntityDescription, ...]] = {
+    # Curtain
+    # Note: Multiple curtains isn't documented
+    # https://developer.tuya.com/en/docs/iot/categorycl?id=Kaiuz1hnpo7df
+    "cl": (
+        TuyaCoverEntityDescription(
+            key=DPCode.CONTROL,
+            translation_key="curtain",
+            current_state=DPCode.SITUATION_SET,
+            current_position=(DPCode.PERCENT_CONTROL, DPCode.PERCENT_STATE),
+            set_position=DPCode.PERCENT_CONTROL,
+            device_class=CoverDeviceClass.CURTAIN,
+        ),
+        TuyaCoverEntityDescription(
+            key=DPCode.CONTROL_2,
+            translation_key="curtain_2",
+            current_position=DPCode.PERCENT_STATE_2,
+            set_position=DPCode.PERCENT_CONTROL_2,
+            device_class=CoverDeviceClass.CURTAIN,
+        ),
+        TuyaCoverEntityDescription(
+            key=DPCode.CONTROL_3,
+            translation_key="curtain_3",
+            current_position=DPCode.PERCENT_STATE_3,
+            set_position=DPCode.PERCENT_CONTROL_3,
+            device_class=CoverDeviceClass.CURTAIN,
+        ),
+        TuyaCoverEntityDescription(
+            key=DPCode.MACH_OPERATE,
+            translation_key="curtain",
+            current_position=DPCode.POSITION,
+            set_position=DPCode.POSITION,
+            device_class=CoverDeviceClass.CURTAIN,
+            open_instruction_value="FZ",
+            close_instruction_value="ZZ",
+            stop_instruction_value="STOP",
+        ),
+        # switch_1 is an undocumented code that behaves identically to control
+        # It is used by the Kogan Smart Blinds Driver
+        TuyaCoverEntityDescription(
+            key=DPCode.SWITCH_1,
+            translation_key="blind",
+            current_position=DPCode.PERCENT_CONTROL,
+            set_position=DPCode.PERCENT_CONTROL,
+            device_class=CoverDeviceClass.BLIND,
+        ),
+    ),
+    # Garage Door Opener
+    # https://developer.tuya.com/en/docs/iot/categoryckmkzq?id=Kaiuz0ipcboee
+    "ckmkzq": (
+        TuyaCoverEntityDescription(
+            key=DPCode.SWITCH_1,
+            translation_key="door",
+            current_state=DPCode.DOORCONTACT_STATE,
+            current_state_inverse=True,
+            device_class=CoverDeviceClass.GARAGE,
+        ),
+        TuyaCoverEntityDescription(
+            key=DPCode.SWITCH_2,
+            translation_key="door_2",
+            current_state=DPCode.DOORCONTACT_STATE_2,
+            current_state_inverse=True,
+            device_class=CoverDeviceClass.GARAGE,
+        ),
+        TuyaCoverEntityDescription(
+            key=DPCode.SWITCH_3,
+            translation_key="door_3",
+            current_state=DPCode.DOORCONTACT_STATE_3,
+            current_state_inverse=True,
+            device_class=CoverDeviceClass.GARAGE,
+        ),
+    ),
+    # Curtain Switch
+    # https://developer.tuya.com/en/docs/iot/category-clkg?id=Kaiuz0gitil39
+    "clkg": (
+        TuyaCoverEntityDescription(
+            key=DPCode.CONTROL,
+            translation_key="curtain",
+            current_position=DPCode.PERCENT_CONTROL,
+            set_position=DPCode.PERCENT_CONTROL,
+            device_class=CoverDeviceClass.CURTAIN,
+        ),
+        TuyaCoverEntityDescription(
+            key=DPCode.CONTROL_2,
+            translation_key="curtain_2",
+            current_position=DPCode.PERCENT_CONTROL_2,
+            set_position=DPCode.PERCENT_CONTROL_2,
+            device_class=CoverDeviceClass.CURTAIN,
+        ),
+    ),
+    # Curtain Robot
+    # Note: Not documented
+    "jdcljqr": (
+        TuyaCoverEntityDescription(
+            key=DPCode.CONTROL,
+            translation_key="curtain",
+            current_position=DPCode.PERCENT_STATE,
+            set_position=DPCode.PERCENT_CONTROL,
+            device_class=CoverDeviceClass.CURTAIN,
+        ),
+    ),
 }
 
 
@@ -46,29 +146,27 @@ async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
     """Set up Tuya cover dynamically through Tuya discovery."""
-    hass_data: HomeAssistantTuyaData = ConfigMapper.get_tuya_data(hass, entry)
+    hass_data: HomeAssistantTuyaData = hass.data[DOMAIN][entry.entry_id]
 
     @callback
     def async_discover_device(device_ids: list[str]) -> None:
         """Discover and add a discovered tuya cover."""
         entities: list[TuyaCoverEntity] = []
         for device_id in device_ids:
-            device = hass_data.device_manager.device_map[device_id]
+            device = hass_data.manager.device_map[device_id]
             if descriptions := COVERS.get(device.category):
-                for description in descriptions:
+                entities.extend(
+                    TuyaCoverEntity(device, hass_data.manager, description)
+                    for description in descriptions
                     if (
                         description.key in device.function
                         or description.key in device.status_range
-                    ):
-                        entities.append(
-                            TuyaCoverEntity(
-                                device, hass_data.device_manager, description
-                            )
-                        )
+                    )
+                )
 
         async_add_entities(entities)
 
-    async_discover_device([*hass_data.device_manager.device_map])
+    async_discover_device([*hass_data.manager.device_map])
 
     entry.async_on_unload(
         async_dispatcher_connect(hass, TUYA_DISCOVERY_NEW, async_discover_device)
@@ -85,8 +183,8 @@ class TuyaCoverEntity(TuyaEntity, CoverEntity):
 
     def __init__(
         self,
-        device: TuyaDevice,
-        device_manager: TuyaDeviceManager,
+        device: CustomerDevice,
+        device_manager: Manager,
         description: TuyaCoverEntityDescription,
     ) -> None:
         """Init Tuya Cover."""
