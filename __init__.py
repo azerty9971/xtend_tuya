@@ -320,12 +320,22 @@ class DeviceManager(Manager):
                 code = item["code"]
                 value = item["value"]
                 device.status[code] = value
+            elif "dpId" in item and "value" in item:
+                dp_id_item = device.local_strategy[item["dpId"]]
+                code = dp_id_item["status_code"]
+                value = item["value"]
+                device.status[code] = value
         if self.other_device_manager is not None:
             device_other = self.other_device_manager.device_map.get(device_id, None)
             if device:
                 for item in status:
                     if "code" in item and "value" in item and item["value"] is not None:
                         code = item["code"]
+                        value = item["value"]
+                        device_other.status[code] = value
+                    elif "dpId" in item and "value" in item:
+                        dp_id_item = device.local_strategy[item["dpId"]]
+                        code = dp_id_item["status_code"]
                         value = item["value"]
                         device_other.status[code] = value
         
