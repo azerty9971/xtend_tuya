@@ -2,7 +2,7 @@
   "domain": "xtend_tuya",
   "name": "Xtended Tuya",
   "codeowners": ["@azerty9971"],
-  "config_flow": false,
+  "config_flow": true,
   "dependencies": ["ffmpeg", "tuya"],
   "dhcp": [
     {
