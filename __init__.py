@@ -63,8 +63,6 @@ from .sensor import (
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Async setup hass config entry."""
     hass.data.setdefault(DOMAIN, {})
-    
-    LOGGER.debug(f"config_entry -> {vars(entry)}")
 
     #Prevent multiple API connection (these are automatically closed on Tuya's side ...)
     reuse_config = False
@@ -75,6 +73,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             if entry.title  == config_entry.title:
                 entry.data = config_entry.data
                 orig_config = hass.data[DOMAIN_ORIG][config]
+                LOGGER.debug(f"orig_config -> {vars(orig_config)}")
                 tuya_device_manager = orig_config.device_manager
                 api = tuya_device_manager.api
                 tuya_mq = tuya_device_manager.mq
