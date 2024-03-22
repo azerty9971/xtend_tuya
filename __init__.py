@@ -112,7 +112,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             identifiers={(DOMAIN_ORIG, device.id), (DOMAIN, device.id)},
             manufacturer="Tuya",
             name=device.name,
-            model=f"{device.product_name} (unsupported)",
+            model=f"{device.product_name}",
         )
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
