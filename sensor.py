@@ -36,6 +36,7 @@ from .const import (
     DPCode,
     DPType,
     UnitOfMeasurement,
+    VirtualStates,
 )
 
 
@@ -45,6 +46,7 @@ class TuyaSensorEntityDescription(SensorEntityDescription):
 
     subkey: str | None = None
 
+    virtualstate: VirtualStates | None = None
 
 # Commonly used battery sensors, that are re-used in the sensors down below.
 BATTERY_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
