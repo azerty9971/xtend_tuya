@@ -69,7 +69,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         for config in tuya_data:
             config_entry = hass.config_entries.async_get_entry(config)
             if config_entry not in hass.data[DOMAIN_ORIG]:
-                orig_config = hass.data[DOMAIN_ORIG][config]
+                orig_config = hass.data[DOMAIN_ORIG][config_entry]
                 tuya_device_manager = orig_config.device_manager
                 api = tuya_device_manager.api
                 tuya_mq = tuya_device_manager.mq
