@@ -82,6 +82,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
                 tuya_device_manager = orig_config.manager
                 tuya_mq = tuya_device_manager.mq
                 manager.set_overriden_device_manager(tuya_device_manager)
+                tuya_device_manager.remove_device_listener(orig_config.device_listener)
                 tuya_mq.remove_message_listener(tuya_device_manager.on_message)
                 break
 
