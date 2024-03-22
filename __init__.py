@@ -301,8 +301,9 @@ class DeviceManager(Manager):
                             item["value"] += device.status[virtual_state.key]
                             item_val = item["value"]
                             LOGGER.debug(f"Applying virtual state device_id -> {device_id} device_status-> {device.status[virtual_state.key]} status-> {item_val} VS-> {virtual_state}")
-                        if "dpId" in item and "value" in item:
+                        elif "dpId" in item and "value" in item:
                             dp_id_item = device.local_strategy[item["dpId"]]
+                            LOGGER.debug(f"device local strategy -> {device.local_strategy}, dp_id_item -> {dp_id_item}")
                             strategy_name = dp_id_item["value_convert"]
                             config_item = dp_id_item["config_item"]
                             dp_item = (dp_id_item["status_code"], item["value"])
