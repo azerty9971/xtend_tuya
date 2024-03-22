@@ -279,6 +279,8 @@ class DeviceManager(Manager):
 
 
     def _on_device_report(self, device_id: str, status: list):
+        
+        LOGGER.debug(f"Custom device report -> {device_id} status-> {status}")
         device = self.device_map.get(device_id, None)
         if not device:
             return
