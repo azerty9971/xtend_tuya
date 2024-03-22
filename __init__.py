@@ -35,10 +35,6 @@ from .const import (
     DescriptionVirtualState,
 )
 
-from .sensor import (
-    SENSORS,
-)
-
 # Suppress logs from the library, it logs unneeded on error
 logging.getLogger("tuya_sharing").setLevel(logging.CRITICAL)
 
@@ -49,6 +45,9 @@ class HomeAssistantTuyaData(NamedTuple):
     manager: Manager
     listener: SharingDeviceListener
 
+from .sensor import (
+    SENSORS,
+)
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Async setup hass config entry."""
