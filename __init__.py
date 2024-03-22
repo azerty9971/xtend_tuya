@@ -72,16 +72,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         tuya_data = hass.data[DOMAIN_ORIG]
         for config in tuya_data:
             config_entry = hass.config_entries.async_get_entry(config)
-            if (
-                entry.data[CONF_ENDPOINT]           == config_entry.data[CONF_ENDPOINT]
-                and entry.data[CONF_ACCESS_ID]      == config_entry.data[CONF_ACCESS_ID]
-                and entry.data[CONF_ACCESS_SECRET]  == config_entry.data[CONF_ACCESS_SECRET]
-                and entry.data[CONF_AUTH_TYPE]      == config_entry.data[CONF_AUTH_TYPE]
-                and entry.data[CONF_USERNAME]       == config_entry.data[CONF_USERNAME]
-                and entry.data[CONF_PASSWORD]       == config_entry.data[CONF_PASSWORD]
-                and entry.data[CONF_COUNTRY_CODE]   == config_entry.data[CONF_COUNTRY_CODE]
-                and entry.data[CONF_APP_TYPE]       == config_entry.data[CONF_APP_TYPE]
-            ):
+            if entry.title  == config_entry.title:
+                entry.data = config_entry.data
                 orig_config = hass.data[DOMAIN_ORIG][config]
                 tuya_device_manager = orig_config.device_manager
                 api = tuya_device_manager.api
