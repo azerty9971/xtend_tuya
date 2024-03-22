@@ -26,11 +26,6 @@ from .base import EnumTypeData, IntegerTypeData, TuyaEntity
 from .const import DOMAIN, TUYA_DISCOVERY_NEW, DPCode, DPType
 
 TUYA_SUPPORT_TYPE = {
-    "fs",  # Fan
-    "fsd",  # Fan with Light
-    "fskg",  # Fan wall switch
-    "kj",  # Air Purifier
-    "cs",  # Dehumidifier
 }
 
 

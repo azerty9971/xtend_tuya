@@ -18,43 +18,6 @@ from .const import DOMAIN, TUYA_DISCOVERY_NEW, DPCode
 # All descriptions can be found here.
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
 BUTTONS: dict[str, tuple[ButtonEntityDescription, ...]] = {
-    # Robot Vacuum
-    # https://developer.tuya.com/en/docs/iot/fsd?id=K9gf487ck1tlo
-    "sd": (
-        ButtonEntityDescription(
-            key=DPCode.RESET_DUSTER_CLOTH,
-            translation_key="reset_duster_cloth",
-            entity_category=EntityCategory.CONFIG,
-        ),
-        ButtonEntityDescription(
-            key=DPCode.RESET_EDGE_BRUSH,
-            translation_key="reset_edge_brush",
-            entity_category=EntityCategory.CONFIG,
-        ),
-        ButtonEntityDescription(
-            key=DPCode.RESET_FILTER,
-            translation_key="reset_filter",
-            entity_category=EntityCategory.CONFIG,
-        ),
-        ButtonEntityDescription(
-            key=DPCode.RESET_MAP,
-            translation_key="reset_map",
-            entity_category=EntityCategory.CONFIG,
-        ),
-        ButtonEntityDescription(
-            key=DPCode.RESET_ROLL_BRUSH,
-            translation_key="reset_roll_brush",
-            entity_category=EntityCategory.CONFIG,
-        ),
-    ),
-    # Wake Up Light II
-    # Not documented
-    "hxd": (
-        ButtonEntityDescription(
-            key=DPCode.SWITCH_USB6,
-            translation_key="snooze",
-        ),
-    ),
 }
 
 

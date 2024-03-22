@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from enum import StrEnum
+from enum import StrEnum, IntFlag
 import logging
 
 from homeassistant.components.sensor import SensorDeviceClass
@@ -27,7 +27,8 @@ from homeassistant.const import (
     UnitOfVolume,
 )
 
-DOMAIN = "tuya"
+DOMAIN = "xtend_tuya"
+DOMAIN_ORIG = "tuya"
 LOGGER = logging.getLogger(__package__)
 
 CONF_APP_TYPE = "tuya_app_type"
@@ -68,6 +69,17 @@ PLATFORMS = [
     Platform.VACUUM,
 ]
 
+class VirtualStates(IntFlag):
+    """Virtual states"""
+    STATE_SUMMED_IN_REPORTING_PAYLOAD           = 0X0001,   #Spoof the state value to make it a total instead of an incremental value
+
+@dataclass
+class DescriptionVirtualState:
+    """Describes the VirtualStates linked to a specific Description Key."""
+    
+    key: str
+    virtual_state_name: str
+    virtual_state_value: str
 
 class WorkMode(StrEnum):
     """Work modes."""
