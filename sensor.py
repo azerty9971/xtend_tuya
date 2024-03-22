@@ -41,7 +41,7 @@ from .const import (
     VirtualStates,
 )
 
-
+@dataclass(frozen=True)
 class TuyaSensorEntityDescription(SensorEntityDescription):
     """Describes Tuya sensor entity."""
 
