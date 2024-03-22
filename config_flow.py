@@ -18,6 +18,7 @@ from .const import (
     CONF_PASSWORD,
     CONF_USERNAME,
     DOMAIN,
+    DOMAIN_ORIG,
     LOGGER,
     SMARTLIFE_APP,
     TUYA_COUNTRIES,
@@ -85,61 +86,13 @@ class TuyaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def async_step_user(self, user_input=None):
         """Step user."""
-        errors = {}
-        placeholders = {}
-
-        if user_input is not None:
-            response, data = await self.hass.async_add_executor_job(
-                self._try_login, user_input
-            )
-
-            if response.get(TUYA_RESPONSE_SUCCESS, False):
-                if endpoint := response.get(TUYA_RESPONSE_RESULT, {}).get(
-                    TUYA_RESPONSE_PLATFORM_URL
-                ):
-                    data[CONF_ENDPOINT] = endpoint
-
-                data[CONF_AUTH_TYPE] = data[CONF_AUTH_TYPE].value
-
+        if DOMAIN_ORIG in self.hass.data:
+            tuya_data = self.hass.data[DOMAIN_ORIG]
+            for config in tuya_data:
+                config_entry = self.hass.config_entries.async_get_entry(config)
                 return self.async_create_entry(
-                    title=user_input[CONF_USERNAME],
-                    data=data,
+                    title=config_entry.data[CONF_USERNAME],
+                    data=config_entry.data,
                 )
-            errors["base"] = "login_error"
-            placeholders = {
-                TUYA_RESPONSE_CODE: response.get(TUYA_RESPONSE_CODE),
-                TUYA_RESPONSE_MSG: response.get(TUYA_RESPONSE_MSG),
-            }
-
-        if user_input is None:
-            user_input = {}
-
-        return self.async_show_form(
-            step_id="user",
-            data_schema=vol.Schema(
-                {
-                    vol.Required(
-                        CONF_COUNTRY_CODE,
-                        default=user_input.get(CONF_COUNTRY_CODE, "United States"),
-                    ): vol.In(
-                        # We don't pass a dict {code:name} because country codes can be duplicate.
-                        [country.name for country in TUYA_COUNTRIES]
-                    ),
-                    vol.Required(
-                        CONF_ACCESS_ID, default=user_input.get(CONF_ACCESS_ID, "")
-                    ): str,
-                    vol.Required(
-                        CONF_ACCESS_SECRET,
-                        default=user_input.get(CONF_ACCESS_SECRET, ""),
-                    ): str,
-                    vol.Required(
-                        CONF_USERNAME, default=user_input.get(CONF_USERNAME, "")
-                    ): str,
-                    vol.Required(
-                        CONF_PASSWORD, default=user_input.get(CONF_PASSWORD, "")
-                    ): str,
-                }
-            ),
-            errors=errors,
-            description_placeholders=placeholders,
-        )
+        
+        return self.async_abort(reason="tuya_not_configured")
