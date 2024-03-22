@@ -306,14 +306,12 @@ class DeviceManager(Manager):
                             LOGGER.debug(f"Applying virtual state device_id -> {device_id} device_status-> {device.status[virtual_state.key]} status-> {item_val} VS-> {virtual_state}")
                         elif "dpId" in item and "value" in item:
                             dp_id_item = device.local_strategy[item["dpId"]]
-                            LOGGER.debug(f"device local strategy -> {device.local_strategy}, dp_id_item -> {dp_id_item}")
-                            strategy_name = dp_id_item["value_convert"]
-                            config_item = dp_id_item["config_item"]
-                            dp_item = (dp_id_item["status_code"], item["value"])
-                            code, value = strategy.convert(strategy_name, dp_item, config_item)
+                            LOGGER.debug(f"device local strategy -> {device.local_strategy}, dp_id_item -> {dp_id_item} device_status-> {device.status}")
+                            code = dp_id_item["status_code"]
+                            value = item["value"]
                             if code == virtual_state.key:
                                 LOGGER.debug(f"dpId logic before -> {device_id} device_status-> {device.status} status-> {status}")
-                                device.status[code] += value
+                                item["value"] += device.status[virtual_state.key]
                                 LOGGER.debug(f"dpId logic after -> {device_id} device_status-> {device.status} status-> {status}")
                         
         LOGGER.debug(f"Next step")
