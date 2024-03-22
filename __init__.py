@@ -64,6 +64,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Async setup hass config entry."""
     hass.data.setdefault(DOMAIN, {})
     
+    LOGGER.debug(f"config_entry -> {vars(entry)}")
+
     #Prevent multiple API connection (these are automatically closed on Tuya's side ...)
     reuse_config = False
     if DOMAIN_ORIG in hass.data:
