@@ -27,10 +27,6 @@ from .const import DOMAIN, TUYA_DISCOVERY_NEW, DPCode
 SWITCHES: dict[str, tuple[SwitchEntityDescription, ...]] = {
 }
 
-# Socket (duplicate of `pc`)
-# https://developer.tuya.com/en/docs/iot/s?id=K9gf7o5prgf7s
-SWITCHES["cz"] = SWITCHES["pc"]
-
 
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
