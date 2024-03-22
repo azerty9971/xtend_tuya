@@ -286,11 +286,11 @@ class DeviceManager(Manager):
                     for item in status:
                         if "code" in item and "value" in item and item["code"] == virtual_state.key:
                             #if show_debug == False:
-                            #    LOGGER.debug(f"BEFORE device_id -> {device_id} device_status-> {device.status} status-> {status} VS-> {virtual_states}")
+                            LOGGER.debug(f"BEFORE device_id -> {device_id} device_status-> {device.status} status-> {status} VS-> {virtual_states}")
                             #    show_debug = True
                             item["value"] += device.status[virtual_state.key]
-                            #item_val = item["value"]
-                            #LOGGER.debug(f"Applying virtual state device_id -> {device_id} device_status-> {device.status[virtual_state.key]} status-> {item_val} VS-> {virtual_state}")
+                            item_val = item["value"]
+                            LOGGER.debug(f"Applying virtual state device_id -> {device_id} device_status-> {device.status[virtual_state.key]} status-> {item_val} VS-> {virtual_state}")
                         
 
         for item in status:
@@ -300,13 +300,12 @@ class DeviceManager(Manager):
                 device.status[code] = value
         if self.other_device_manager is not None:
             device_other = self.other_device_manager.device_map.get(device_id, None)
-            if not device:
-                return
-            for item in status:
-                if "code" in item and "value" in item and item["value"] is not None:
-                    code = item["code"]
-                    value = item["value"]
-                    device_other.status[code] = value
+            if device:
+                for item in status:
+                    if "code" in item and "value" in item and item["value"] is not None:
+                        code = item["code"]
+                        value = item["value"]
+                        device_other.status[code] = value
         #if show_debug == True:
-        #    LOGGER.debug(f"AFTER device_id -> {device_id} device_status-> {device.status} status-> {status}")
+        LOGGER.debug(f"AFTER device_id -> {device_id} device_status-> {device.status} status-> {status}")
         super()._on_device_report(device_id, [])
