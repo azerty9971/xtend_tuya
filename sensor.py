@@ -36,6 +36,7 @@ from .const import (
     DEVICE_CLASS_UNITS,
     DOMAIN,
     TUYA_DISCOVERY_NEW,
+    LOGGER,
     DPCode,
     DPType,
     UnitOfMeasurement,
@@ -249,5 +250,7 @@ class TuyaSensorEntity(TuyaEntity, RestoreSensor):
         """Call when entity about to be added to hass."""
         await super().async_added_to_hass()
         state = await self.async_get_last_sensor_data()
+        LOGGER.debug("async_added_to_hass: {state}")
         if state:
-            self._attr_native_value = cast(float, state.native_value)
+            self.device.status[self.entity_description.key] = cast(float, state.native_value)
+        super().async_added_to_hass()
