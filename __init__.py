@@ -280,13 +280,14 @@ class DeviceManager(Manager):
 
     def _on_device_report(self, device_id: str, status: list):
         device = self.device_map.get(device_id, None)
-        LOGGER.debug(f"Custom device report -> {device_id} status-> {status} device_map -> {self.device_map}")
+        LOGGER.debug(f"Custom device report -> {device_id} status-> {status}")
         if not device:
             return
-
+        LOGGER.debug(f"Device found!")
         virtual_states = DeviceManager.get_category_virtual_states(device.category)
         #show_debug = False
         
+        LOGGER.debug(f"Found virtualstates -> {virtual_states}")
         for virtual_state in virtual_states:
             if virtual_state.virtual_state_value == VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD:
                 if virtual_state.key not in device.status or device.status[virtual_state.key] is None:
@@ -311,7 +312,7 @@ class DeviceManager(Manager):
                                 device.status[code] += value
                                 LOGGER.debug(f"dpId logic after -> {device_id} device_status-> {device.status} status-> {status}")
                         
-
+        LOGGER.debug(f"Next step")
         for item in status:
             if "code" in item and "value" in item and item["value"] is not None:
                 code = item["code"]
@@ -325,6 +326,7 @@ class DeviceManager(Manager):
                         code = item["code"]
                         value = item["value"]
                         device_other.status[code] = value
+        
         #if show_debug == True:
         LOGGER.debug(f"AFTER device_id -> {device_id} device_status-> {device.status} status-> {status}")
         super()._on_device_report(device_id, [])
