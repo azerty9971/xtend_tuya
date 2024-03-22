@@ -283,14 +283,14 @@ class DeviceManager(Manager):
         status[0]["dpId"] = 17
         #ENDDEBUG
         device = self.device_map.get(device_id, None)
-        LOGGER.debug(f"Custom device report -> {device_id} status-> {status}")
+        #LOGGER.debug(f"Custom device report -> {device_id} status-> {status}")
         if not device:
             return
-        LOGGER.debug(f"Device found!")
+        #LOGGER.debug(f"Device found!")
         virtual_states = DeviceManager.get_category_virtual_states(device.category)
         #show_debug = False
         
-        LOGGER.debug(f"Found virtualstates -> {virtual_states}")
+        #LOGGER.debug(f"Found virtualstates -> {virtual_states}")
         for virtual_state in virtual_states:
             if virtual_state.virtual_state_value == VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD:
                 if virtual_state.key not in device.status or device.status[virtual_state.key] is None:
@@ -298,23 +298,21 @@ class DeviceManager(Manager):
                 if virtual_state.key in device.status:
                     for item in status:
                         if "code" in item and "value" in item and item["code"] == virtual_state.key:
-                            #if show_debug == False:
-                            LOGGER.debug(f"BEFORE device_id -> {device_id} device_status-> {device.status} status-> {status} VS-> {virtual_states}")
-                            #    show_debug = True
+                            #LOGGER.debug(f"BEFORE device_id -> {device_id} device_status-> {device.status} status-> {status} VS-> {virtual_states}")
                             item["value"] += device.status[virtual_state.key]
                             item_val = item["value"]
-                            LOGGER.debug(f"Applying virtual state device_id -> {device_id} device_status-> {device.status[virtual_state.key]} status-> {item_val} VS-> {virtual_state}")
+                            #LOGGER.debug(f"Applying virtual state device_id -> {device_id} device_status-> {device.status[virtual_state.key]} status-> {item_val} VS-> {virtual_state}")
                         elif "dpId" in item and "value" in item:
                             dp_id_item = device.local_strategy[item["dpId"]]
-                            LOGGER.debug(f"device local strategy -> {device.local_strategy}, dp_id_item -> {dp_id_item} device_status-> {device.status}")
+                            #LOGGER.debug(f"device local strategy -> {device.local_strategy}, dp_id_item -> {dp_id_item} device_status-> {device.status}")
                             code = dp_id_item["status_code"]
                             value = item["value"]
                             if code == virtual_state.key:
-                                LOGGER.debug(f"dpId logic before -> {device_id} device_status-> {device.status} status-> {status}")
+                                #LOGGER.debug(f"dpId logic before -> {device_id} device_status-> {device.status} status-> {status}")
                                 item["value"] += device.status[virtual_state.key]
-                                LOGGER.debug(f"dpId logic after -> {device_id} device_status-> {device.status} status-> {status}")
+                                #LOGGER.debug(f"dpId logic after -> {device_id} device_status-> {device.status} status-> {status}")
                         
-        LOGGER.debug(f"Next step")
+        #LOGGER.debug(f"Next step")
         for item in status:
             if "code" in item and "value" in item and item["value"] is not None:
                 code = item["code"]
@@ -340,5 +338,5 @@ class DeviceManager(Manager):
                         device_other.status[code] = value
         
         #if show_debug == True:
-        LOGGER.debug(f"AFTER device_id -> {device_id} device_status-> {device.status} status-> {status}")
+        #LOGGER.debug(f"AFTER device_id -> {device_id} device_status-> {device.status} status-> {status}")
         super()._on_device_report(device_id, [])
