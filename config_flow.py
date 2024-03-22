@@ -90,9 +90,9 @@ class TuyaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             tuya_data = self.hass.data[DOMAIN_ORIG]
             for config in tuya_data:
                 config_entry = self.hass.config_entries.async_get_entry(config)
-                LOGGER.debug(f"config_entry -> {vars(config_entry)}")
+                """LOGGER.debug(f"config_entry -> {vars(config_entry)}")"""
                 return self.async_create_entry(
-                    title=config_entry.data[CONF_USERNAME],
+                    title=config_entry.title,
                     data=config_entry.data,
                 )
         
