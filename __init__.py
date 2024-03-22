@@ -63,113 +63,54 @@ from .sensor import (
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Async setup hass config entry."""
     hass.data.setdefault(DOMAIN, {})
-    
-    #Prevent multiple API connection (these are automatically closed on Tuya's side ...)
-    reuse_config = False
+    LOGGER.debug(f"ConfigEntry -> {vars(entry)}")
     if DOMAIN_ORIG in hass.data:
         tuya_data = hass.data[DOMAIN_ORIG]
         for config in tuya_data:
             config_entry = hass.config_entries.async_get_entry(config)
-            if (
-                entry.data[CONF_ENDPOINT]           == config_entry.data[CONF_ENDPOINT]
-                and entry.data[CONF_ACCESS_ID]      == config_entry.data[CONF_ACCESS_ID]
-                and entry.data[CONF_ACCESS_SECRET]  == config_entry.data[CONF_ACCESS_SECRET]
-                and entry.data[CONF_AUTH_TYPE]      == config_entry.data[CONF_AUTH_TYPE]
-                and entry.data[CONF_USERNAME]       == config_entry.data[CONF_USERNAME]
-                and entry.data[CONF_PASSWORD]       == config_entry.data[CONF_PASSWORD]
-                and entry.data[CONF_COUNTRY_CODE]   == config_entry.data[CONF_COUNTRY_CODE]
-                and entry.data[CONF_APP_TYPE]       == config_entry.data[CONF_APP_TYPE]
-            ):
+            if config not in hass.data[DOMAIN]:
                 orig_config = hass.data[DOMAIN_ORIG][config]
                 tuya_device_manager = orig_config.device_manager
                 api = tuya_device_manager.api
                 tuya_mq = tuya_device_manager.mq
-                reuse_config = True
-                break
-    
-    if reuse_config == False:
-        # Project type has been renamed to auth type in the upstream Tuya IoT SDK.
-        # This migrates existing config entries to reflect that name change.
-        if CONF_PROJECT_TYPE in entry.data:
-            data = {**entry.data, CONF_AUTH_TYPE: entry.data[CONF_PROJECT_TYPE]}
-            data.pop(CONF_PROJECT_TYPE)
-            hass.config_entries.async_update_entry(entry, data=data)
 
-        auth_type = AuthType(entry.data[CONF_AUTH_TYPE])
-        api = TuyaOpenAPI(
-            endpoint=entry.data[CONF_ENDPOINT],
-            access_id=entry.data[CONF_ACCESS_ID],
-            access_secret=entry.data[CONF_ACCESS_SECRET],
-            auth_type=auth_type,
-        )
+                device_ids: set[str] = set()
+                device_manager = DeviceManager(api, tuya_mq)
+                home_manager = TuyaHomeManager(api, tuya_mq, device_manager)
+                listener = DeviceListener(hass, device_manager, device_ids)
 
-        api.set_dev_channel("hass")
-
-        try:
-            if auth_type == AuthType.CUSTOM:
-                response = await hass.async_add_executor_job(
-                    api.connect, entry.data[CONF_USERNAME], entry.data[CONF_PASSWORD]
+                tuya_device_manager.remove_device_listener(orig_config.device_listener)
+                tuya_mq.remove_message_listener(tuya_device_manager.on_message)
+                device_manager.set_overriden_device_manager(tuya_device_manager)
+                device_manager.add_device_listener(listener)
+                hass.data[DOMAIN][config] = HomeAssistantTuyaData(
+                    device_listener=listener,
+                    device_manager=device_manager,
+                    home_manager=home_manager,
                 )
-            else:
-                response = await hass.async_add_executor_job(
-                    api.connect,
-                    entry.data[CONF_USERNAME],
-                    entry.data[CONF_PASSWORD],
-                    entry.data[CONF_COUNTRY_CODE],
-                    entry.data[CONF_APP_TYPE],
-                )
-        except requests.exceptions.RequestException as err:
-            raise ConfigEntryNotReady(err) from err
+                # Get devices & clean up device entities
+                await hass.async_add_executor_job(home_manager.update_device_cache)
+                await cleanup_device_registry(hass, device_manager)
 
-        if response.get("success", False) is False:
-            raise ConfigEntryNotReady(response)
+                # Migrate old unique_ids to the new format
+                async_migrate_entities_unique_ids(hass, entry, device_manager)
 
-        tuya_mq = TuyaOpenMQ(api)
-        tuya_mq.start()
+                # Register known device IDs
+                device_registry = dr.async_get(hass)
+                for device in device_manager.device_map.values():
+                    if registered_device := device_registry.async_get_device(
+                        identifiers={(DOMAIN_ORIG, device.id)}
+                    ):
+                        device_registry.async_get_or_create(
+                            config_entry_id=entry.entry_id,
+                            identifiers={(DOMAIN_ORIG, device.id), (DOMAIN, device.id)},
+                            manufacturer="Tuya",
+                            name=device.name,
+                            model=registered_device.model,
+                        )
+                        device_ids.add(device.id)
 
-    device_ids: set[str] = set()
-    device_manager = DeviceManager(api, tuya_mq)
-    home_manager = TuyaHomeManager(api, tuya_mq, device_manager)
-    listener = DeviceListener(hass, device_manager, device_ids)
-    LOGGER.debug(f"MQ status before -> {tuya_mq.message_listeners}")
-    if reuse_config == True:
-        # Remove the original message queue listener because otherwise we could have a race condition where the modified state
-        # is overwritten by the original code
-        tuya_device_manager.remove_device_listener(orig_config.device_listener)
-        tuya_mq.remove_message_listener(tuya_device_manager.on_message)
-        device_manager.set_overriden_device_manager(tuya_device_manager)
-    device_manager.add_device_listener(listener)
-    LOGGER.debug(f"MQ status after -> {tuya_mq.message_listeners}")
-
-    hass.data[DOMAIN][entry.entry_id] = HomeAssistantTuyaData(
-        device_listener=listener,
-        device_manager=device_manager,
-        home_manager=home_manager,
-    )
-
-    # Get devices & clean up device entities
-    await hass.async_add_executor_job(home_manager.update_device_cache)
-    await cleanup_device_registry(hass, device_manager)
-
-    # Migrate old unique_ids to the new format
-    async_migrate_entities_unique_ids(hass, entry, device_manager)
-
-    # Register known device IDs
-    device_registry = dr.async_get(hass)
-    for device in device_manager.device_map.values():
-        if registered_device := device_registry.async_get_device(
-            identifiers={(DOMAIN_ORIG, device.id)}
-        ):
-            device_registry.async_get_or_create(
-                config_entry_id=entry.entry_id,
-                identifiers={(DOMAIN_ORIG, device.id), (DOMAIN, device.id)},
-                manufacturer="Tuya",
-                name=device.name,
-                model=registered_device.model,
-            )
-            device_ids.add(device.id)
-
-    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+                await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     return True
 
 
