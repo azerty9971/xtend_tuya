@@ -1,11 +1,12 @@
 """Support for the Tuya lights."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
 import json
 from typing import Any, cast
 
-from tuya_iot import TuyaDevice, TuyaDeviceManager
+from tuya_sharing import CustomerDevice, Manager
 
 from homeassistant.components.light import (
     ATTR_BRIGHTNESS,
@@ -14,6 +15,7 @@ from homeassistant.components.light import (
     ColorMode,
     LightEntity,
     LightEntityDescription,
+    filter_supported_color_modes,
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import EntityCategory
@@ -24,7 +26,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from . import HomeAssistantTuyaData
 from .base import IntegerTypeData, TuyaEntity
 from .const import DOMAIN, TUYA_DISCOVERY_NEW, DPCode, DPType, WorkMode
-from .util import remap_value, ConfigMapper
+from .util import remap_value
 
 
 @dataclass
@@ -49,7 +51,7 @@ DEFAULT_COLOR_TYPE_DATA_V2 = ColorTypeData(
 )
 
 
-@dataclass
+@dataclass(frozen=True)
 class TuyaLightEntityDescription(LightEntityDescription):
     """Describe an Tuya light entity."""
 
@@ -66,6 +68,7 @@ class TuyaLightEntityDescription(LightEntityDescription):
 
 LIGHTS: dict[str, tuple[TuyaLightEntityDescription, ...]] = {
 }
+
 
 @dataclass
 class ColorData:
@@ -94,26 +97,24 @@ async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
     """Set up tuya light dynamically through tuya discovery."""
-    hass_data: HomeAssistantTuyaData = ConfigMapper.get_tuya_data(hass, entry)
+    hass_data: HomeAssistantTuyaData = hass.data[DOMAIN][entry.entry_id]
 
     @callback
     def async_discover_device(device_ids: list[str]):
         """Discover and add a discovered tuya light."""
         entities: list[TuyaLightEntity] = []
         for device_id in device_ids:
-            device = hass_data.device_manager.device_map[device_id]
+            device = hass_data.manager.device_map[device_id]
             if descriptions := LIGHTS.get(device.category):
-                for description in descriptions:
-                    if description.key in device.status:
-                        entities.append(
-                            TuyaLightEntity(
-                                device, hass_data.device_manager, description
-                            )
-                        )
+                entities.extend(
+                    TuyaLightEntity(device, hass_data.manager, description)
+                    for description in descriptions
+                    if description.key in device.status
+                )
 
         async_add_entities(entities)
 
-    async_discover_device([*hass_data.device_manager.device_map])
+    async_discover_device([*hass_data.manager.device_map])
 
     entry.async_on_unload(
         async_dispatcher_connect(hass, TUYA_DISCOVERY_NEW, async_discover_device)
@@ -132,18 +133,19 @@ class TuyaLightEntity(TuyaEntity, LightEntity):
     _color_data_type: ColorTypeData | None = None
     _color_mode: DPCode | None = None
     _color_temp: IntegerTypeData | None = None
+    _fixed_color_mode: ColorMode | None = None
 
     def __init__(
         self,
-        device: TuyaDevice,
-        device_manager: TuyaDeviceManager,
+        device: CustomerDevice,
+        device_manager: Manager,
         description: TuyaLightEntityDescription,
     ) -> None:
         """Init TuyaHaLight."""
         super().__init__(device, device_manager)
         self.entity_description = description
         self._attr_unique_id = f"{super().unique_id}{description.key}"
-        self._attr_supported_color_modes: set[ColorMode] = set()
+        color_modes: set[ColorMode] = {ColorMode.ONOFF}
 
         # Determine DPCodes
         self._color_mode_dpcode = self.find_dpcode(
@@ -154,7 +156,7 @@ class TuyaLightEntity(TuyaEntity, LightEntity):
             description.brightness, dptype=DPType.INTEGER, prefer_function=True
         ):
             self._brightness = int_type
-            self._attr_supported_color_modes.add(ColorMode.BRIGHTNESS)
+            color_modes.add(ColorMode.BRIGHTNESS)
             self._brightness_max = self.find_dpcode(
                 description.brightness_max, dptype=DPType.INTEGER
             )
@@ -166,13 +168,13 @@ class TuyaLightEntity(TuyaEntity, LightEntity):
             description.color_temp, dptype=DPType.INTEGER, prefer_function=True
         ):
             self._color_temp = int_type
-            self._attr_supported_color_modes.add(ColorMode.COLOR_TEMP)
+            color_modes.add(ColorMode.COLOR_TEMP)
 
         if (
             dpcode := self.find_dpcode(description.color_data, prefer_function=True)
         ) and self.get_dptype(dpcode) == DPType.JSON:
             self._color_data_dpcode = dpcode
-            self._attr_supported_color_modes.add(ColorMode.HS)
+            color_modes.add(ColorMode.HS)
             if dpcode in self.device.function:
                 values = cast(str, self.device.function[dpcode].values)
             else:
@@ -193,8 +195,10 @@ class TuyaLightEntity(TuyaEntity, LightEntity):
                 ):
                     self._color_data_type = DEFAULT_COLOR_TYPE_DATA_V2
 
-        if not self._attr_supported_color_modes:
-            self._attr_supported_color_modes = {ColorMode.ONOFF}
+        self._attr_supported_color_modes = filter_supported_color_modes(color_modes)
+        if len(self._attr_supported_color_modes) == 1:
+            # If the light supports only a single color mode, set it now
+            self._fixed_color_mode = next(iter(self._attr_supported_color_modes))
 
     @property
     def is_on(self) -> bool:
@@ -388,18 +392,19 @@ class TuyaLightEntity(TuyaEntity, LightEntity):
     @property
     def color_mode(self) -> ColorMode:
         """Return the color_mode of the light."""
-        # We consider it to be in HS color mode, when work mode is anything
+        if self._fixed_color_mode:
+            # The light supports only a single color mode, return it
+            return self._fixed_color_mode
+
+        # The light supports both color temperature and HS, determine which mode the
+        # light is in. We consider it to be in HS color mode, when work mode is anything
         # else than "white".
         if (
             self._color_mode_dpcode
             and self.device.status.get(self._color_mode_dpcode) != WorkMode.WHITE
         ):
             return ColorMode.HS
-        if self._color_temp:
-            return ColorMode.COLOR_TEMP
-        if self._brightness:
-            return ColorMode.BRIGHTNESS
-        return ColorMode.ONOFF
+        return ColorMode.COLOR_TEMP
 
     def _get_color_data(self) -> ColorData | None:
         """Get current color data from device."""
