@@ -8,7 +8,8 @@ from typing import Any
 from tuya_sharing import LoginControl
 import voluptuous as vol
 
-from homeassistant.config_entries import ConfigEntry, ConfigFlow, ConfigFlowResult
+from homeassistant.config_entries import ConfigEntry, ConfigFlow
+from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import selector
 
 from .const import (
@@ -41,7 +42,7 @@ class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
 
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
-    ) -> ConfigFlowResult:
+    ) -> FlowResult:
         """Step user."""
         if DOMAIN_ORIG in self.hass.data:
             tuya_data = self.hass.data[DOMAIN_ORIG]
@@ -57,7 +58,7 @@ class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
 
     async def async_step_scan(
         self, user_input: dict[str, Any] | None = None
-    ) -> ConfigFlowResult:
+    ) -> FlowResult:
         """Step scan."""
         if user_input is None:
             return self.async_show_form(
@@ -128,7 +129,7 @@ class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
             data=entry_data,
         )
 
-    async def async_step_reauth(self, _: Mapping[str, Any]) -> ConfigFlowResult:
+    async def async_step_reauth(self, _: Mapping[str, Any]) -> FlowResult:
         """Handle initiation of re-authentication with Tuya."""
         self.__reauth_entry = self.hass.config_entries.async_get_entry(
             self.context["entry_id"]
@@ -145,7 +146,7 @@ class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
 
     async def async_step_reauth_user_code(
         self, user_input: dict[str, Any] | None = None
-    ) -> ConfigFlowResult:
+    ) -> FlowResult:
         """Handle re-authentication with a Tuya."""
         errors = {}
         placeholders = {}
