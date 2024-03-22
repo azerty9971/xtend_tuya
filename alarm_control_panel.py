@@ -47,14 +47,6 @@ STATE_MAPPING: dict[str, str] = {
 # All descriptions can be found here:
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
 ALARM: dict[str, tuple[AlarmControlPanelEntityDescription, ...]] = {
-    # Alarm Host
-    # https://developer.tuya.com/en/docs/iot/categorymal?id=Kaiuz33clqxaf
-    "mal": (
-        AlarmControlPanelEntityDescription(
-            key=DPCode.MASTER_MODE,
-            name="Alarm",
-        ),
-    )
 }
 
 

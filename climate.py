@@ -48,36 +48,6 @@ class TuyaClimateEntityDescription(ClimateEntityDescription):
 
 
 CLIMATE_DESCRIPTIONS: dict[str, TuyaClimateEntityDescription] = {
-    # Air conditioner
-    # https://developer.tuya.com/en/docs/iot/categorykt?id=Kaiuz0z71ov2n
-    "kt": TuyaClimateEntityDescription(
-        key="kt",
-        switch_only_hvac_mode=HVACMode.COOL,
-    ),
-    # Heater
-    # https://developer.tuya.com/en/docs/iot/f?id=K9gf46epy4j82
-    "qn": TuyaClimateEntityDescription(
-        key="qn",
-        switch_only_hvac_mode=HVACMode.HEAT,
-    ),
-    # Heater
-    # https://developer.tuya.com/en/docs/iot/categoryrs?id=Kaiuz0nfferyx
-    "rs": TuyaClimateEntityDescription(
-        key="rs",
-        switch_only_hvac_mode=HVACMode.HEAT,
-    ),
-    # Thermostat
-    # https://developer.tuya.com/en/docs/iot/f?id=K9gf45ld5l0t9
-    "wk": TuyaClimateEntityDescription(
-        key="wk",
-        switch_only_hvac_mode=HVACMode.HEAT_COOL,
-    ),
-    # Thermostatic Radiator Valve
-    # Not documented
-    "wkf": TuyaClimateEntityDescription(
-        key="wkf",
-        switch_only_hvac_mode=HVACMode.HEAT,
-    ),
 }
 
 
