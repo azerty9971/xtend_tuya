@@ -67,7 +67,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     listener = DeviceListener(hass, manager)
     manager.add_device_listener(listener)
 
-    reuse_config = False
+    #reuse_config = False
     if DOMAIN_ORIG in hass.data:
         tuya_data = hass.data[DOMAIN_ORIG]
         for config in tuya_data:
@@ -269,6 +269,14 @@ class DeviceManager(Manager):
         if self.other_device_manager is not None:
             self.other_device_manager.on_message(msg)
         super().on_message(msg)
+
+    def refresh_mq(self):
+        if self.other_device_manager is not None:
+            self.mq = self.other_device_manager.mq
+            self.mq.add_message_listener(self.on_message)
+            return
+        super().refresh_mq()
+
 
     def _on_device_report(self, device_id: str, status: list):
         device = self.device_map.get(device_id, None)
