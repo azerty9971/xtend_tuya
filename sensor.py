@@ -63,7 +63,7 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
     # Switch
     # https://developer.tuya.com/en/docs/iot/s?id=K9gf7o5prgf7s
     "kg": (
-        TuyaSensorEntityDescriptionRestored(
+        TuyaSensorEntityDescription(
             key=DPCode.ADD_ELE,
             virtualstate=VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD,
             translation_key="add_ele",
@@ -77,7 +77,7 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
     # IoT Switch
     # Note: Undocumented
     "tdq": (
-        TuyaSensorEntityDescriptionRestored(
+        TuyaSensorEntityDescription(
             key=DPCode.ADD_ELE,
             virtualstate=VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD,
             translation_key="add_ele",
