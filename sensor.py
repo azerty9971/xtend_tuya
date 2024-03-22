@@ -12,6 +12,7 @@ from homeassistant.components.sensor import (
     SensorEntity,
     SensorEntityDescription,
     SensorStateClass,
+    RestoreSensor,
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
@@ -41,13 +42,14 @@ from .const import (
 )
 
 
-@dataclass(frozen=True)
 class TuyaSensorEntityDescription(SensorEntityDescription):
     """Describes Tuya sensor entity."""
 
     subkey: str | None = None
 
     virtualstate: VirtualStates | None = None
+
+    restoredata: bool = False
 
 # Commonly used battery sensors, that are re-used in the sensors down below.
 BATTERY_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
@@ -61,7 +63,7 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
     # Switch
     # https://developer.tuya.com/en/docs/iot/s?id=K9gf7o5prgf7s
     "kg": (
-        TuyaSensorEntityDescription(
+        TuyaSensorEntityDescriptionRestored(
             key=DPCode.ADD_ELE,
             virtualstate=VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD,
             translation_key="add_ele",
@@ -69,12 +71,13 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
             state_class=SensorStateClass.TOTAL_INCREASING,
             native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
             entity_registry_enabled_default=True,
+            restoredata=True,
         ),
     ),
     # IoT Switch
     # Note: Undocumented
     "tdq": (
-        TuyaSensorEntityDescription(
+        TuyaSensorEntityDescriptionRestored(
             key=DPCode.ADD_ELE,
             virtualstate=VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD,
             translation_key="add_ele",
@@ -82,6 +85,7 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
             state_class=SensorStateClass.TOTAL_INCREASING,
             native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
             entity_registry_enabled_default=True,
+            restoredata=True,
         ),
     ),
 }
@@ -122,7 +126,7 @@ async def async_setup_entry(
     )
 
 
-class TuyaSensorEntity(TuyaEntity, SensorEntity):
+class TuyaSensorEntity(TuyaEntity, RestoreSensor):
     """Tuya Sensor Entity."""
 
     entity_description: TuyaSensorEntityDescription
@@ -237,3 +241,12 @@ class TuyaSensorEntity(TuyaEntity, SensorEntity):
 
         # Valid string or enum value
         return value
+    
+    async def async_added_to_hass(self) -> None:
+        if self.entity_description.restoredata == False:
+            return
+        """Call when entity about to be added to hass."""
+        await super().async_added_to_hass()
+        state = await self.async_get_last_sensor_data()
+        if state:
+            self._attr_native_value = cast(float, state.native_value)
