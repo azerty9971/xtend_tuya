@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import cast
 
 from tuya_sharing import CustomerDevice, Manager
 from tuya_sharing.device import DeviceStatusRange
