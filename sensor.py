@@ -245,10 +245,10 @@ class TuyaSensorEntity(TuyaEntity, RestoreSensor):
         return value
     
     async def async_added_to_hass(self) -> None:
-        if self.entity_description.restoredata == False:
-            return
         """Call when entity about to be added to hass."""
         await super().async_added_to_hass()
+        if self.entity_description.restoredata == False:
+            return
         state = await self.async_get_last_sensor_data()
         LOGGER.debug(f"async_added_to_hass: {state}")
         # Scale integer/float value
@@ -257,4 +257,3 @@ class TuyaSensorEntity(TuyaEntity, RestoreSensor):
             state.native_value = scaled_value_back
         if state:
             self.device.status[self.entity_description.key] = cast(float, state.native_value)
-        super().async_added_to_hass()
