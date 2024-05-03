@@ -39,7 +39,8 @@
       "macaddress": "D81F12*"
     }
   ],
-  "documentation": "https://www.home-assistant.io/integrations/tuya",
+  "documentation": "https://github.com/azerty9971/xtend_tuya",
+  "issue_tracker": "https://github.com/azerty9971/xtend_tuya/issues",
   "integration_type": "hub",
   "iot_class": "cloud_push",
   "loggers": ["tuya_iot"],
