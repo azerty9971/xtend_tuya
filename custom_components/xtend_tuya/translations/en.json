@@ -440,7 +440,7 @@
       "deodorization": {
         "name": "Deodorization"
       },
-      "Clean": {
+      "clean": {
         "name": "Clean"
       },
       "empty": {
@@ -452,7 +452,7 @@
       "monitoring": {
         "name": "Monitoring"
       },
-      "Induction_Clean": {
+      "induction_clean": {
         "name": "Induction clean"
       },
       "clean_time": {
@@ -461,22 +461,22 @@
       "clean_time_switch": {
         "name": "Clean time switch"
       },
-      "Clean_taste": {
+      "clean_taste": {
         "name": "Clean taste"
       },
-      "Clean_tasteSwitch": {
+      "clean_tasteswitch": {
         "name": "Clean taste switch"
       },
       "not_disturb": {
         "name": "Not disturb"
       },
-      "Clean_notice": {
+      "clean_notice": {
         "name": "Clean notice"
       },
       "toilet_notice": {
         "name": "Toilet notice"
       },
-      "Net_notice": {
+      "net_notice": {
         "name": "Net notice"
       },
       "child_lock": {
@@ -717,22 +717,22 @@
       "clean_time_switch": {
         "name": "Clean time switch"
       },
-      "Clean_taste": {
+      "clean_taste": {
         "name": "Clean taste"
       },
-      "Clean_tasteSwitch": {
+      "clean_tasteswitch": {
         "name": "Clean taste Switch"
       },
       "not_disturb": {
         "name": "Not disturb"
       },
-      "Clean_notice": {
+      "clean_notice": {
         "name": "Clean notice"
       },
       "toilet_notice": {
         "name": "Toilet notice"
       },
-      "Net_notice": {
+      "net_notice": {
         "name": "Net notice"
       },
       "calibration": {
