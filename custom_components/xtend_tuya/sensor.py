@@ -139,7 +139,7 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
             key=DPCode.MONITORING,
             translation_key="monitoring",
             state_class=SensorStateClass.MEASUREMENT,
-            entity_registry_enabled_default=True,
+            entity_registry_enabled_default=False,
         ),
         TuyaSensorEntityDescription(
             key=DPCode.INDUCTION_CLEAN,
@@ -165,13 +165,13 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
             key=DPCode.CLEAN_TASTE,
             translation_key="clean_taste",
             state_class=SensorStateClass.MEASUREMENT,
-            entity_registry_enabled_default=True,
+            entity_registry_enabled_default=False,
         ),
         TuyaSensorEntityDescription(
             key=DPCode.CLEAN_TASTE_SWITCH,
             translation_key="clean_tasteswitch",
             state_class=SensorStateClass.MEASUREMENT,
-            entity_registry_enabled_default=True,
+            entity_registry_enabled_default=False,
         ),
         TuyaSensorEntityDescription(
             key=DPCode.NOT_DISTURB,
@@ -195,7 +195,7 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
             key=DPCode.NET_NOTICE,
             translation_key="net_notice",
             state_class=SensorStateClass.MEASUREMENT,
-            entity_registry_enabled_default=True,
+            entity_registry_enabled_default=False,
         ),
         TuyaSensorEntityDescription(
             key=DPCode.CHILD_LOCK,
@@ -239,7 +239,7 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
             key=DPCode.ODOURLESS,
             translation_key="odourless",
             state_class=SensorStateClass.MEASUREMENT,
-            entity_registry_enabled_default=True,
+            entity_registry_enabled_default=False,
         ),
         TuyaSensorEntityDescription(
             key=DPCode.SMART_CLEAN,
@@ -287,7 +287,7 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
             key=DPCode.NUMBER,
             translation_key="number",
             state_class=SensorStateClass.MEASUREMENT,
-            entity_registry_enabled_default=True,
+            entity_registry_enabled_default=False,
         ),
     ),
     # IoT Switch

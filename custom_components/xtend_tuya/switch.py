@@ -36,7 +36,7 @@ SWITCHES: dict[str, tuple[SwitchEntityDescription, ...]] = {
         ),
         SwitchEntityDescription(
             key=DPCode.CLEAN,
-            translation_key="Clean",
+            translation_key="clean",
             entity_category=EntityCategory.CONFIG,
         ),
         SwitchEntityDescription(
@@ -46,7 +46,7 @@ SWITCHES: dict[str, tuple[SwitchEntityDescription, ...]] = {
         ),
         SwitchEntityDescription(
             key=DPCode.INDUCTION_CLEAN,
-            translation_key="Induction_Clean",
+            translation_key="induction_clean",
             entity_category=EntityCategory.CONFIG,
         ),
         SwitchEntityDescription(
@@ -61,12 +61,13 @@ SWITCHES: dict[str, tuple[SwitchEntityDescription, ...]] = {
         ),
         SwitchEntityDescription(
             key=DPCode.CLEAN_TASTE,
-            translation_key="Clean_taste",
+            translation_key="clean_taste",
             entity_category=EntityCategory.CONFIG,
+            entity_registry_enabled_default=False,
         ),
         SwitchEntityDescription(
             key=DPCode.CLEAN_TASTE_SWITCH,
-            translation_key="Clean_tasteSwitch",
+            translation_key="clean_tasteswitch",
             entity_category=EntityCategory.CONFIG,
         ),
         SwitchEntityDescription(
@@ -76,23 +77,26 @@ SWITCHES: dict[str, tuple[SwitchEntityDescription, ...]] = {
         ),
         SwitchEntityDescription(
             key=DPCode.CLEAN_NOTICE,
-            translation_key="Clean_notice",
+            translation_key="clean_notice",
             entity_category=EntityCategory.CONFIG,
         ),
         SwitchEntityDescription(
             key=DPCode.TOILET_NOTICE,
             translation_key="toilet_notice",
             entity_category=EntityCategory.CONFIG,
+            icon="mdi:toilet"
         ),
         SwitchEntityDescription(
             key=DPCode.NET_NOTICE,
-            translation_key="Net_notice",
+            translation_key="net_notice",
             entity_category=EntityCategory.CONFIG,
+            entity_registry_enabled_default=False,
         ),
         SwitchEntityDescription(
             key=DPCode.CHILD_LOCK,
             translation_key="child_lock",
             entity_category=EntityCategory.CONFIG,
+            icon="mdi:human-child"
         ),
         SwitchEntityDescription(
             key=DPCode.CALIBRATION,
@@ -103,11 +107,13 @@ SWITCHES: dict[str, tuple[SwitchEntityDescription, ...]] = {
             key=DPCode.UNIT,
             translation_key="unit",
             entity_category=EntityCategory.CONFIG,
+            entity_registry_enabled_default=False,
         ),
         SwitchEntityDescription(
             key=DPCode.STORE_FULL_NOTIFY,
             translation_key="store_full_notify",
             entity_category=EntityCategory.CONFIG,
+            entity_registry_enabled_default=False,
         ),
         SwitchEntityDescription(
             key=DPCode.ODOURLESS,
@@ -121,7 +127,7 @@ SWITCHES: dict[str, tuple[SwitchEntityDescription, ...]] = {
         ),
         SwitchEntityDescription(
             key=DPCode.NOT_DISTURB_SWITCH,
-            translation_key="not_disturb_Switch",
+            translation_key="not_disturb_switch",
             entity_category=EntityCategory.CONFIG,
         ),
         SwitchEntityDescription(
