@@ -503,7 +503,7 @@
       "smart_clean": {
         "name": "Smart clean"
       },
-      "not_disturb_Switch": {
+      "not_disturb_switch": {
         "name": "Not disturb switch"
       },
       "usage_times": {
@@ -750,7 +750,7 @@
       "smart_clean": {
         "name": "Smart clean"
       },
-      "not_disturb_Switch": {
+      "not_disturb_switch": {
         "name": "Not disturb Switch"
       },
       "auto_deordrizer": {
