@@ -26,7 +26,6 @@ from .const import (
     TUYA_RESPONSE_RESULT,
     TUYA_RESPONSE_SUCCESS,
     TUYA_SCHEMA,
-    LOGGER,
 )
 
 
@@ -50,7 +49,7 @@ class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
         for config_entry in tuya_data:
             xt_tuya_config_already_exists = False
             for xt_tuya_config in xt_tuya_data:
-                if xt_config_tuya_config.title == config_entry.title:
+                if xt_tuya_config.title == config_entry.title:
                     xt_tuya_config_already_exists = True
                     break;
             if xt_tuya_config_already_exists == False:
