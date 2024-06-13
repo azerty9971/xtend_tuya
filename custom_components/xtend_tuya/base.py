@@ -1,4 +1,5 @@
 """Tuya Home Assistant Base Device Model."""
+
 from __future__ import annotations
 
 import base64
@@ -7,13 +8,13 @@ import json
 import struct
 from typing import Any, Literal, Self, overload
 
-from tuya_iot import TuyaDevice, TuyaDeviceManager
+from tuya_sharing import CustomerDevice, Manager
 
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity import Entity
 
-from .const import DOMAIN, DOMAIN_ORIG, LOGGER, TUYA_HA_SIGNAL_UPDATE_ENTITY, DPCode, DPType
+from .const import DOMAIN, LOGGER, TUYA_HA_SIGNAL_UPDATE_ENTITY, DPCode, DPType
 from .util import remap_value
 
 
@@ -111,7 +112,6 @@ class ElectricityTypeData:
     electriccurrent: str | None = None
     power: str | None = None
     voltage: str | None = None
-    add_ele: str | None = None
 
     @classmethod
     def from_json(cls, data: str) -> Self:
@@ -125,9 +125,8 @@ class ElectricityTypeData:
         voltage = struct.unpack(">H", raw[0:2])[0] / 10.0
         electriccurrent = struct.unpack(">L", b"\x00" + raw[2:5])[0] / 1000.0
         power = struct.unpack(">L", b"\x00" + raw[5:8])[0] / 1000.0
-        add_ele = struct.unpack(">L", b"\x00" + raw[8:11])[0] / 1000.0
         return cls(
-            electriccurrent=str(electriccurrent), power=str(power), voltage=str(voltage), add_ele=str(add_ele)
+            electriccurrent=str(electriccurrent), power=str(power), voltage=str(voltage)
         )
 
 
@@ -137,9 +136,11 @@ class TuyaEntity(Entity):
     _attr_has_entity_name = True
     _attr_should_poll = False
 
-    def __init__(self, device: TuyaDevice, device_manager: TuyaDeviceManager) -> None:
+    def __init__(self, device: CustomerDevice, device_manager: Manager) -> None:
         """Init TuyaHaEntity."""
         self._attr_unique_id = f"tuya.{device.id}"
+        # TuyaEntity initialize mq can subscribe
+        device.set_up = True
         self.device = device
         self.device_manager = device_manager
 
@@ -147,7 +148,7 @@ class TuyaEntity(Entity):
     def device_info(self) -> DeviceInfo:
         """Return a device description for device registry."""
         return DeviceInfo(
-            identifiers={(DOMAIN_ORIG, self.device.id)},
+            identifiers={(DOMAIN, self.device.id)},
             manufacturer="Tuya",
             name=self.device.name,
             model=f"{self.device.product_name} ({self.device.product_id})",
