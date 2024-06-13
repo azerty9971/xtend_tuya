@@ -1,9 +1,10 @@
 """Support for Tuya binary sensors."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
 
-from tuya_iot import TuyaDevice, TuyaDeviceManager
+from tuya_sharing import CustomerDevice, Manager
 
 from homeassistant.components.binary_sensor import (
     BinarySensorDeviceClass,
@@ -19,10 +20,9 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from . import HomeAssistantTuyaData
 from .base import TuyaEntity
 from .const import DOMAIN, TUYA_DISCOVERY_NEW, DPCode
-from .util import ConfigMapper
 
 
-@dataclass
+@dataclass(frozen=True)
 class TuyaBinarySensorEntityDescription(BinarySensorEntityDescription):
     """Describes a Tuya binary sensor."""
 
@@ -31,6 +31,15 @@ class TuyaBinarySensorEntityDescription(BinarySensorEntityDescription):
 
     # Value or values to consider binary sensor to be "on"
     on_value: bool | float | int | str | set[bool | float | int | str] = True
+
+
+# Commonly used sensors
+TAMPER_BINARY_SENSOR = TuyaBinarySensorEntityDescription(
+    key=DPCode.TEMPER_ALARM,
+    name="Tamper",
+    device_class=BinarySensorDeviceClass.TAMPER,
+    entity_category=EntityCategory.DIAGNOSTIC,
+)
 
 
 # All descriptions can be found here. Mostly the Boolean data types in the
@@ -45,27 +54,27 @@ async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
     """Set up Tuya binary sensor dynamically through Tuya discovery."""
-    hass_data: HomeAssistantTuyaData = ConfigMapper.get_tuya_data(hass, entry)
+    hass_data: HomeAssistantTuyaData = hass.data[DOMAIN][entry.entry_id]
 
     @callback
     def async_discover_device(device_ids: list[str]) -> None:
         """Discover and add a discovered Tuya binary sensor."""
         entities: list[TuyaBinarySensorEntity] = []
         for device_id in device_ids:
-            device = hass_data.device_manager.device_map[device_id]
+            device = hass_data.manager.device_map[device_id]
             if descriptions := BINARY_SENSORS.get(device.category):
                 for description in descriptions:
                     dpcode = description.dpcode or description.key
                     if dpcode in device.status:
                         entities.append(
                             TuyaBinarySensorEntity(
-                                device, hass_data.device_manager, description
+                                device, hass_data.manager, description
                             )
                         )
 
         async_add_entities(entities)
 
-    async_discover_device([*hass_data.device_manager.device_map])
+    async_discover_device([*hass_data.manager.device_map])
 
     entry.async_on_unload(
         async_dispatcher_connect(hass, TUYA_DISCOVERY_NEW, async_discover_device)
@@ -79,8 +88,8 @@ class TuyaBinarySensorEntity(TuyaEntity, BinarySensorEntity):
 
     def __init__(
         self,
-        device: TuyaDevice,
-        device_manager: TuyaDeviceManager,
+        device: CustomerDevice,
+        device_manager: Manager,
         description: TuyaBinarySensorEntityDescription,
     ) -> None:
         """Init Tuya binary sensor."""

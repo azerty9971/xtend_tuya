@@ -1,16 +1,19 @@
 """Support for Tuya sensors."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import cast
 
-from tuya_iot import TuyaDevice, TuyaDeviceManager
-from tuya_iot.device import TuyaDeviceStatusRange
+from tuya_sharing import CustomerDevice, Manager
+from tuya_sharing.device import DeviceStatusRange
 
 from homeassistant.components.sensor import (
     SensorDeviceClass,
     SensorEntity,
     SensorEntityDescription,
     SensorStateClass,
+    RestoreSensor,
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
@@ -32,14 +35,13 @@ from .base import ElectricityTypeData, EnumTypeData, IntegerTypeData, TuyaEntity
 from .const import (
     DEVICE_CLASS_UNITS,
     DOMAIN,
-    DOMAIN_ORIG,
     TUYA_DISCOVERY_NEW,
+    LOGGER,
     DPCode,
     DPType,
     UnitOfMeasurement,
     VirtualStates,
 )
-from .util import ConfigMapper
 
 import copy
 
@@ -52,6 +54,12 @@ class TuyaSensorEntityDescription(SensorEntityDescription):
     subkey: str | None = None
 
     virtualstate: VirtualStates | None = None
+
+    restoredata: bool = False
+
+# Commonly used battery sensors, that are re-used in the sensors down below.
+BATTERY_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
+)
 
 # All descriptions can be found here. Mostly the Integer data types in the
 # default status set of each category (that don't have a set instruction)
@@ -69,6 +77,7 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
             state_class=SensorStateClass.TOTAL_INCREASING,
             native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
             entity_registry_enabled_default=True,
+            restoredata=True,
         ),
     ),
     # Automatic cat litter box
@@ -299,56 +308,55 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
 # Socket (duplicate of `kg`)
 # https://developer.tuya.com/en/docs/iot/s?id=K9gf7o5prgf7s
 SENSORS["cz"] = SENSORS["kg"]
+SENSORS["wkcz"] = SENSORS["kg"]
+SENSORS["tdq"] = SENSORS["kg"]
 
 # Power Socket (duplicate of `kg`)
 # https://developer.tuya.com/en/docs/iot/s?id=K9gf7o5prgf7s
 SENSORS["pc"] = SENSORS["kg"]
 
-
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
     """Set up Tuya sensor dynamically through Tuya discovery."""
-    hass_data: HomeAssistantTuyaData = ConfigMapper.get_tuya_data(hass, entry)
+    hass_data: HomeAssistantTuyaData = hass.data[DOMAIN][entry.entry_id]
 
     @callback
     def async_discover_device(device_ids: list[str]) -> None:
         """Discover and add a discovered Tuya sensor."""
         entities: list[TuyaSensorEntity] = []
         for device_id in device_ids:
-            device = hass_data.device_manager.device_map[device_id]
+            device = hass_data.manager.device_map[device_id]
             if descriptions := SENSORS.get(device.category):
-                for description in descriptions:
-                    if description.key in device.status:
-                        entities.append(
-                            TuyaSensorEntity(
-                                device, hass_data.device_manager, description
-                            )
-                        )
+                entities.extend(
+                    TuyaSensorEntity(device, hass_data.manager, description)
+                    for description in descriptions
+                    if description.key in device.status
+                )
 
         async_add_entities(entities)
 
-    async_discover_device([*hass_data.device_manager.device_map])
+    async_discover_device([*hass_data.manager.device_map])
 
     entry.async_on_unload(
         async_dispatcher_connect(hass, TUYA_DISCOVERY_NEW, async_discover_device)
     )
 
 
-class TuyaSensorEntity(TuyaEntity, SensorEntity):
+class TuyaSensorEntity(TuyaEntity, RestoreSensor):
     """Tuya Sensor Entity."""
 
     entity_description: TuyaSensorEntityDescription
 
-    _status_range: TuyaDeviceStatusRange | None = None
+    _status_range: DeviceStatusRange | None = None
     _type: DPType | None = None
     _type_data: IntegerTypeData | EnumTypeData | None = None
     _uom: UnitOfMeasurement | None = None
 
     def __init__(
         self,
-        device: TuyaDevice,
-        device_manager: TuyaDeviceManager,
+        device: CustomerDevice,
+        device_manager: Manager,
         description: TuyaSensorEntityDescription,
     ) -> None:
         """Init Tuya sensor."""
@@ -375,7 +383,7 @@ class TuyaSensorEntity(TuyaEntity, SensorEntity):
         # match Home Assistants requirements.
         if (
             self.device_class is not None
-            and not self.device_class.startswith(DOMAIN_ORIG)
+            and not self.device_class.startswith(DOMAIN)
             and description.native_unit_of_measurement is None
         ):
             # We cannot have a device class, if the UOM isn't set or the
@@ -396,10 +404,6 @@ class TuyaSensorEntity(TuyaEntity, SensorEntity):
             if self._uom is None:
                 self._attr_device_class = None
                 return
-
-            # If we still have a device class, we should not use an icon
-            if self.device_class:
-                self._attr_icon = None
 
             # Found unit of measurement, use the standardized Unit
             # Use the target conversion unit (if set)
@@ -454,3 +458,17 @@ class TuyaSensorEntity(TuyaEntity, SensorEntity):
 
         # Valid string or enum value
         return value
+    
+    async def async_added_to_hass(self) -> None:
+        """Call when entity about to be added to hass."""
+        await super().async_added_to_hass()
+        if self.entity_description.restoredata == False:
+            return
+        state = await self.async_get_last_sensor_data()
+        LOGGER.debug(f"async_added_to_hass: {state}")
+        # Scale integer/float value
+        if isinstance(self._type_data, IntegerTypeData):
+            scaled_value_back = self._type_data.scale_value_back(state.native_value)
+            state.native_value = scaled_value_back
+        if state:
+            self.device.status[self.entity_description.key] = cast(float, state.native_value)
