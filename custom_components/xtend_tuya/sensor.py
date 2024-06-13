@@ -112,7 +112,7 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
         ),
         TuyaSensorEntityDescription(
             key=DPCode.CLEAN,
-            translation_key="Clean",
+            translation_key="clean",
             state_class=SensorStateClass.MEASUREMENT,
             entity_registry_enabled_default=True,
         ),
@@ -143,7 +143,7 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
         ),
         TuyaSensorEntityDescription(
             key=DPCode.INDUCTION_CLEAN,
-            translation_key="Induction_Clean",
+            translation_key="induction_clean",
             device_class=SensorDeviceClass.DURATION,
             state_class=SensorStateClass.MEASUREMENT,
             entity_registry_enabled_default=True,
@@ -163,13 +163,13 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
         ),
         TuyaSensorEntityDescription(
             key=DPCode.CLEAN_TASTE,
-            translation_key="Clean_taste",
+            translation_key="clean_taste",
             state_class=SensorStateClass.MEASUREMENT,
             entity_registry_enabled_default=True,
         ),
         TuyaSensorEntityDescription(
             key=DPCode.CLEAN_TASTE_SWITCH,
-            translation_key="Clean_tasteSwitch",
+            translation_key="clean_tasteswitch",
             state_class=SensorStateClass.MEASUREMENT,
             entity_registry_enabled_default=True,
         ),
@@ -181,7 +181,7 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
         ),
         TuyaSensorEntityDescription(
             key=DPCode.CLEAN_NOTICE,
-            translation_key="Clean_notice",
+            translation_key="clean_notice",
             state_class=SensorStateClass.MEASUREMENT,
             entity_registry_enabled_default=True,
         ),
@@ -193,7 +193,7 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
         ),
         TuyaSensorEntityDescription(
             key=DPCode.NET_NOTICE,
-            translation_key="Net_notice",
+            translation_key="net_notice",
             state_class=SensorStateClass.MEASUREMENT,
             entity_registry_enabled_default=True,
         ),
@@ -249,7 +249,7 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
         ),
         TuyaSensorEntityDescription(
             key=DPCode.NOT_DISTURB_SWITCH,
-            translation_key="not_disturb_Switch",
+            translation_key="not_disturb_switch",
             state_class=SensorStateClass.MEASUREMENT,
             entity_registry_enabled_default=True,
         ),

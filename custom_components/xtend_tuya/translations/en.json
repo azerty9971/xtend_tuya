@@ -702,13 +702,13 @@
       "deodorization": {
         "name": "Deodorization"
       },
-      "Clean": {
+      "clean": {
         "name": "Clean"
       },
       "empty": {
         "name": "Empty"
       },
-      "Induction_Clean": {
+      "induction_clean": {
         "name": "Induction Clean"
       },
       "clean_time": {
