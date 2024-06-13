@@ -26,6 +26,7 @@ from .const import (
     TUYA_RESPONSE_RESULT,
     TUYA_RESPONSE_SUCCESS,
     TUYA_SCHEMA,
+    LOGGER,
 )
 
 
@@ -44,16 +45,20 @@ class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
         """Step user."""
-        if DOMAIN_ORIG in self.hass.data:
-            tuya_data = self.hass.data[DOMAIN_ORIG]
-            for config in tuya_data:
-                config_entry = self.hass.config_entries.async_get_entry(config)
-                """LOGGER.debug(f"config_entry -> {vars(config_entry)}")"""
+        tuya_data = self.hass.config_entries.async_entries(DOMAIN_ORIG,False,False)
+        xt_tuya_data = self.hass.config_entries.async_entries(DOMAIN,True,True)
+        for config_entry in tuya_data:
+            xt_tuya_config_already_exists = False
+            for xt_tuya_config in xt_tuya_data:
+                if xt_config_tuya_config.title == config_entry.title:
+                    xt_tuya_config_already_exists = True
+                    break;
+            if xt_tuya_config_already_exists == False:
                 return self.async_create_entry(
                     title=config_entry.title,
                     data=config_entry.data,
                 )
-        
+
         return self.async_abort(reason="tuya_not_configured")
 
     async def async_step_scan(
