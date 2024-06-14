@@ -320,7 +320,7 @@ class DPCode(StrEnum):
     SITUATION_SET = "situation_set"
     SLEEP = "sleep"  # Sleep function
     SLEEP_START_TIME = "sleep_start_time"
-    SLEEP_END_TIME = "sleep_start_time"
+    SLEEP_END_TIME = "sleep_end_time"
     SLOW_FEED = "slow_feed"
     SMART_CLEAN = "smart_clean"
     SMOKE_SENSOR_STATE = "smoke_sensor_state"
