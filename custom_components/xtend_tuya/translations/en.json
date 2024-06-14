@@ -182,11 +182,54 @@
       },
       "down_delay": {
         "name": "Down delay"
+      },
+      "delay_clean_time": {
+        "name": "Delay clean time"
+      },
+      "sleep_start_time": {
+        "name": "Sleep start time"
+      },
+      "sleep_end_time": {
+        "name": "Sleep end time"
+      },
+      "uv_start_time": {
+        "name": "UV start time"
+      },
+      "uv_end_time": {
+        "name": "UV end time"
+      },
+      "deo_start_time": {
+        "name": "Deo start time"
+      },
+      "deo_end_time": {
+        "name": "Deo end time"
       }
     },
     "select": {
       "volume": {
         "name": "[%key:component::tuya::entity::number::volume::name%]"
+      },
+      "cat_litter_box_work_mode": {
+        "name": "Cleaning mode",
+        "state": {
+          "auto_clean": "Automatic cleaning",
+          "manual_clean": "Manual cleaning",
+          "sleep": "Sleep",
+          "uv": "UV",
+          "deodorization": "Deodorization"
+        }
+      },
+      "cat_litter_box_status": {
+        "name": "Status",
+        "state": {
+          "standby": "Stand by",
+          "off": "Off",
+          "waiting_cluster": "Waiting cluster",
+          "cleaning": "Cleaning",
+          "uv": "UV",
+          "deodorization": "Deodorization",
+          "sleep": "Sleep"
+        }
       },
       "cups": {
         "name": "Cups"
@@ -698,12 +741,17 @@
       }
     },
     "switch": {
-
+      "auto_clean": {
+        "name": "Auto clean"
+      },
       "deodorization": {
         "name": "Deodorization"
       },
       "clean": {
         "name": "Clean"
+      },
+      "manual_clean": {
+        "name": "Manual clean"
       },
       "empty": {
         "name": "Empty"
@@ -756,8 +804,6 @@
       "auto_deordrizer": {
         "name": "Auto deordrizer"
       },
-
-
       "start": {
         "name": "Start"
       },
@@ -860,6 +906,9 @@
       "usb_6": {
         "name": "USB 6"
       },
+      "uv": {
+        "name": "UV"
+      },
       "socket_1": {
         "name": "Socket 1"
       },
@@ -961,6 +1010,12 @@
       },
       "sterilization": {
         "name": "Sterilization"
+      },
+      "light": {
+        "name": "Light"
+      },
+      "factory_reset": {
+        "name": "Factory reset"
       }
     }
   },

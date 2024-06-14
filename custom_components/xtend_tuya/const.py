@@ -118,6 +118,7 @@ class DPCode(StrEnum):
     ANION = "anion"  # Ionizer unit
     ARM_DOWN_PERCENT = "arm_down_percent"
     ARM_UP_PERCENT = "arm_up_percent"
+    AUTO_CLEAN = "auto_clean"
     AUTO_DEORDRIZER = "auto_deordrizer"
     BASIC_ANTI_FLICKER = "basic_anti_flicker"
     BASIC_DEVICE_VOLUME = "basic_device_volume"
@@ -193,7 +194,10 @@ class DPCode(StrEnum):
     DECIBEL_SWITCH = "decibel_switch"
     DEHUMIDITY_SET_ENUM = "dehumidify_set_enum"
     DEHUMIDITY_SET_VALUE = "dehumidify_set_value"
+    DELAY_CLEAN_TIME = "delay_clean_time"
     DEODORIZATION = "deodorization"
+    DEO_START_TIME = "deo_start_time"
+    DEO_END_TIME = "deo_end_time"
     DETECTION_SENSITIVITY = "detection_sensitivity"
     DISINFECTION = "disinfection"
     DO_NOT_DISTURB = "do_not_disturb"
@@ -207,6 +211,7 @@ class DPCode(StrEnum):
     EMPTY = "empty"
     EXCRETION_TIME_DAY = "excretion_time_day"
     EXCRETION_TIMES_DAY = "excretion_times_day"
+    FACTORY_RESET = "factory_reset"
     FAN_BEEP = "fan_beep"  # Sound
     FAN_COOL = "fan_cool"  # Cool wind
     FAN_DIRECTION = "fan_direction"  # Fan direction
@@ -250,6 +255,7 @@ class DPCode(StrEnum):
     LOCK = "lock"  # Lock / Child lock
     MASTER_MODE = "master_mode"  # alarm mode
     MACH_OPERATE = "mach_operate"
+    MANUAL_CLEAN = "manual_clean"
     MANUAL_FEED = "manual_feed"
     MATERIAL = "material"  # Material
     MONITORING = "monitoring"
@@ -313,6 +319,8 @@ class DPCode(StrEnum):
     SIREN_SWITCH = "siren_switch"
     SITUATION_SET = "situation_set"
     SLEEP = "sleep"  # Sleep function
+    SLEEP_START_TIME = "sleep_start_time"
+    SLEEP_END_TIME = "sleep_end_time"
     SLOW_FEED = "slow_feed"
     SMART_CLEAN = "smart_clean"
     SMOKE_SENSOR_STATE = "smoke_sensor_state"
@@ -388,6 +396,8 @@ class DPCode(StrEnum):
     UPPER_TEMP_F = "upper_temp_f"
     USAGE_TIMES = "usage_times"
     UV = "uv"  # UV sterilization
+    UV_START_TIME = "uv_start_time"
+    UV_END_TIME = "uv_end_time"
     VA_BATTERY = "va_battery"
     VA_HUMIDITY = "va_humidity"
     VA_TEMPERATURE = "va_temperature"

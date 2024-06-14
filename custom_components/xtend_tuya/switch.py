@@ -29,6 +29,18 @@ SWITCHES: dict[str, tuple[SwitchEntityDescription, ...]] = {
     # Note: Undocumented
     "msp": (
         SwitchEntityDescription(
+            key=DPCode.START,
+            translation_key="start",
+            entity_category=EntityCategory.CONFIG,
+            icon="mdi:bacteria",
+        ),
+        SwitchEntityDescription(
+            key=DPCode.AUTO_CLEAN,
+            translation_key="auto_clean",
+            entity_category=EntityCategory.CONFIG,
+            icon="mdi:bacteria",
+        ),
+        SwitchEntityDescription(
             key=DPCode.DEODORIZATION,
             translation_key="deodorization",
             entity_category=EntityCategory.CONFIG,
@@ -37,6 +49,11 @@ SWITCHES: dict[str, tuple[SwitchEntityDescription, ...]] = {
         SwitchEntityDescription(
             key=DPCode.CLEAN,
             translation_key="clean",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        SwitchEntityDescription(
+            key=DPCode.MANUAL_CLEAN,
+            translation_key="manual_clean",
             entity_category=EntityCategory.CONFIG,
         ),
         SwitchEntityDescription(
@@ -133,6 +150,31 @@ SWITCHES: dict[str, tuple[SwitchEntityDescription, ...]] = {
         SwitchEntityDescription(
             key=DPCode.AUTO_DEORDRIZER,
             translation_key="auto_deordrizer",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        SwitchEntityDescription(
+            key=DPCode.SLEEP,
+            translation_key="sleep",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        SwitchEntityDescription(
+            key=DPCode.SWITCH,
+            translation_key="switch",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        SwitchEntityDescription(
+            key=DPCode.UV,
+            translation_key="uv",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        SwitchEntityDescription(
+            key=DPCode.LIGHT,
+            translation_key="light",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        SwitchEntityDescription(
+            key=DPCode.FACTORY_RESET,
+            translation_key="factory_reset",
             entity_category=EntityCategory.CONFIG,
         ),
     ),
