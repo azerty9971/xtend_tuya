@@ -194,7 +194,10 @@ class DPCode(StrEnum):
     DECIBEL_SWITCH = "decibel_switch"
     DEHUMIDITY_SET_ENUM = "dehumidify_set_enum"
     DEHUMIDITY_SET_VALUE = "dehumidify_set_value"
+    DELAY_CLEAN_TIME = "delay_clean_time"
     DEODORIZATION = "deodorization"
+    DEO_START_TIME = "deo_start_time"
+    DEO_END_TIME = "deo_end_time"
     DETECTION_SENSITIVITY = "detection_sensitivity"
     DISINFECTION = "disinfection"
     DO_NOT_DISTURB = "do_not_disturb"
@@ -316,6 +319,8 @@ class DPCode(StrEnum):
     SIREN_SWITCH = "siren_switch"
     SITUATION_SET = "situation_set"
     SLEEP = "sleep"  # Sleep function
+    SLEEP_START_TIME = "sleep_start_time"
+    SLEEP_END_TIME = "sleep_start_time"
     SLOW_FEED = "slow_feed"
     SMART_CLEAN = "smart_clean"
     SMOKE_SENSOR_STATE = "smoke_sensor_state"
@@ -391,6 +396,8 @@ class DPCode(StrEnum):
     UPPER_TEMP_F = "upper_temp_f"
     USAGE_TIMES = "usage_times"
     UV = "uv"  # UV sterilization
+    UV_START_TIME = "uv_start_time"
+    UV_END_TIME = "uv_end_time"
     VA_BATTERY = "va_battery"
     VA_HUMIDITY = "va_humidity"
     VA_TEMPERATURE = "va_temperature"

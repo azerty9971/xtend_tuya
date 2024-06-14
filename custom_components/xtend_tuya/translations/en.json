@@ -182,6 +182,27 @@
       },
       "down_delay": {
         "name": "Down delay"
+      },
+      "delay_clean_time": {
+        "name": "Delay clean time"
+      },
+      "sleep_start_time": {
+        "name": "Sleep start time"
+      },
+      "sleep_end_time": {
+        "name": "Sleep end time"
+      },
+      "uv_start_time": {
+        "name": "UV start time"
+      },
+      "uv_end_time": {
+        "name": "Sleep start time"
+      },
+      "deo_start_time": {
+        "name": "Sleep start time"
+      },
+      "deo_end_time": {
+        "name": "Sleep start time"
       }
     },
     "select": {
@@ -196,6 +217,18 @@
           "sleep": "Sleep",
           "uv": "UV",
           "deodorization": "Deodorization"
+        }
+      },
+      "cat_litter_box_status": {
+        "name": "Status",
+        "state": {
+          "standby": "Stand by",
+          "off": "Off",
+          "waiting_cluster": "Waiting cluster",
+          "cleaning": "Cleaning",
+          "uv": "UV",
+          "deodorization": "Deodorization",
+          "sleep": "Sleep"
         }
       },
       "cups": {

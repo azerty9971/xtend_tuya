@@ -23,6 +23,43 @@ from .const import DEVICE_CLASS_UNITS, DOMAIN, TUYA_DISCOVERY_NEW, DPCode, DPTyp
 # default instructions set of each category end up being a number.
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
 NUMBERS: dict[str, tuple[NumberEntityDescription, ...]] = {
+    "msp": (
+        NumberEntityDescription(
+            key=DPCode.DELAY_CLEAN_TIME,
+            translation_key="delay_clean_time",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        NumberEntityDescription(
+            key=DPCode.SLEEP_START_TIME,
+            translation_key="sleep_start_time",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        NumberEntityDescription(
+            key=DPCode.SLEEP_END_TIME,
+            translation_key="sleep_end_time",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        NumberEntityDescription(
+            key=DPCode.UV_START_TIME,
+            translation_key="uv_start_time",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        NumberEntityDescription(
+            key=DPCode.UV_END_TIME,
+            translation_key="uv_end_time",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        NumberEntityDescription(
+            key=DPCode.DEO_START_TIME,
+            translation_key="deo_start_time",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        NumberEntityDescription(
+            key=DPCode.DEO_END_TIME,
+            translation_key="deo_end_time",
+            entity_category=EntityCategory.CONFIG,
+        ),
+    ),
 }
 
 
