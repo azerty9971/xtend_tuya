@@ -177,6 +177,11 @@ SWITCHES: dict[str, tuple[SwitchEntityDescription, ...]] = {
             translation_key="factory_reset",
             entity_category=EntityCategory.CONFIG,
         ),
+        SwitchEntityDescription(
+            key=DPCode.STATUS,
+            translation_key="cat_litter_box_status",
+            entity_category=EntityCategory.DIAGNOSTIC,
+        ),
     ),
 }
 
