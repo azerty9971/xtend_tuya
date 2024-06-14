@@ -188,6 +188,16 @@
       "volume": {
         "name": "[%key:component::tuya::entity::number::volume::name%]"
       },
+      "cat_litter_box_work_mode": {
+        "name": "Cleaning mode",
+        "state": {
+          "auto_clean": "Automatic cleaning",
+          "manual_clean": "Manual cleaning",
+          "sleep": "Sleep",
+          "uv": "UV",
+          "deodorization": "Deodorization"
+        }
+      },
       "cups": {
         "name": "Cups"
       },
@@ -698,12 +708,17 @@
       }
     },
     "switch": {
-
+      "auto_clean": {
+        "name": "Auto clean"
+      },
       "deodorization": {
         "name": "Deodorization"
       },
       "clean": {
         "name": "Clean"
+      },
+      "manual_clean": {
+        "name": "Manual clean"
       },
       "empty": {
         "name": "Empty"
@@ -756,8 +771,6 @@
       "auto_deordrizer": {
         "name": "Auto deordrizer"
       },
-
-
       "start": {
         "name": "Start"
       },
@@ -860,6 +873,9 @@
       "usb_6": {
         "name": "USB 6"
       },
+      "uv": {
+        "name": "UV"
+      },
       "socket_1": {
         "name": "Socket 1"
       },
@@ -961,6 +977,12 @@
       },
       "sterilization": {
         "name": "Sterilization"
+      },
+      "light": {
+        "name": "Light"
+      },
+      "factory_reset": {
+        "name": "Factory reset"
       }
     }
   },
