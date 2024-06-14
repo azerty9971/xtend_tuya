@@ -196,13 +196,13 @@
         "name": "UV start time"
       },
       "uv_end_time": {
-        "name": "Sleep start time"
+        "name": "UV end time"
       },
       "deo_start_time": {
-        "name": "Sleep start time"
+        "name": "Deo start time"
       },
       "deo_end_time": {
-        "name": "Sleep start time"
+        "name": "Deo end time"
       }
     },
     "select": {
