@@ -310,6 +310,7 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
 SENSORS["cz"] = SENSORS["kg"]
 SENSORS["wkcz"] = SENSORS["kg"]
 SENSORS["tdq"] = SENSORS["kg"]
+SENSORS["dlq"] = SENSORS["kg"]
 
 # Power Socket (duplicate of `kg`)
 # https://developer.tuya.com/en/docs/iot/s?id=K9gf7o5prgf7s
