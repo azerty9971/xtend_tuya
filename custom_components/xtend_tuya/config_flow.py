@@ -17,6 +17,7 @@ from .const import (
     CONF_TOKEN_INFO,
     CONF_USER_CODE,
     DOMAIN,
+    DOMAIN_ORIG,
     TUYA_CLIENT_ID,
     TUYA_RESPONSE_CODE,
     TUYA_RESPONSE_MSG,
@@ -42,36 +43,21 @@ class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
         """Step user."""
-        errors = {}
-        placeholders = {}
+        tuya_data = self.hass.config_entries.async_entries(DOMAIN_ORIG,False,False)
+        xt_tuya_data = self.hass.config_entries.async_entries(DOMAIN,True,True)
+        for config_entry in tuya_data:
+            xt_tuya_config_already_exists = False
+            for xt_tuya_config in xt_tuya_data:
+                if xt_tuya_config.title == config_entry.title:
+                    xt_tuya_config_already_exists = True
+                    break;
+            if not xt_tuya_config_already_exists:
+                return self.async_create_entry(
+                    title=config_entry.title,
+                    data=config_entry.data,
+                )
 
-        if user_input is not None:
-            success, response = await self.__async_get_qr_code(
-                user_input[CONF_USER_CODE]
-            )
-            if success:
-                return await self.async_step_scan()
-
-            errors["base"] = "login_error"
-            placeholders = {
-                TUYA_RESPONSE_MSG: response.get(TUYA_RESPONSE_MSG, "Unknown error"),
-                TUYA_RESPONSE_CODE: response.get(TUYA_RESPONSE_CODE, "0"),
-            }
-        else:
-            user_input = {}
-
-        return self.async_show_form(
-            step_id="user",
-            data_schema=vol.Schema(
-                {
-                    vol.Required(
-                        CONF_USER_CODE, default=user_input.get(CONF_USER_CODE, "")
-                    ): str,
-                }
-            ),
-            errors=errors,
-            description_placeholders=placeholders,
-        )
+        return self.async_abort(reason="tuya_not_configured")
 
     async def async_step_scan(
         self, user_input: dict[str, Any] | None = None

@@ -25,6 +25,7 @@ from .const import (
     CONF_TOKEN_INFO,
     CONF_USER_CODE,
     DOMAIN,
+    DOMAIN_ORIG,
     LOGGER,
     PLATFORMS,
     TUYA_CLIENT_ID,
@@ -68,6 +69,25 @@ async def async_setup_entry(hass: HomeAssistant, entry: TuyaConfigEntry) -> bool
     listener = DeviceListener(hass, manager)
     manager.add_device_listener(listener)
 
+    #reuse_config = False
+    if DOMAIN_ORIG in hass.data:
+        tuya_data = hass.data[DOMAIN_ORIG]
+        for config in tuya_data:
+            config_entry = hass.config_entries.async_get_entry(config)
+            if (
+                    entry.data[CONF_USER_CODE]      == config_entry.data[CONF_USER_CODE]
+                and entry.data[CONF_TERMINAL_ID]    == config_entry.data[CONF_TERMINAL_ID]
+                and entry.data[CONF_ENDPOINT]       == config_entry.data[CONF_ENDPOINT]
+                and entry.data[CONF_TOKEN_INFO]     == config_entry.data[CONF_TOKEN_INFO]
+            ):
+                orig_config = hass.data[DOMAIN_ORIG][config]
+                tuya_device_manager = orig_config.manager
+                tuya_mq = tuya_device_manager.mq
+                manager.set_overriden_device_manager(tuya_device_manager)
+                tuya_device_manager.remove_device_listener(orig_config.listener)
+                tuya_mq.remove_message_listener(tuya_device_manager.on_message)
+                break
+
     # Get all devices from Tuya
     try:
         await hass.async_add_executor_job(manager.update_device_cache)
@@ -90,7 +110,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: TuyaConfigEntry) -> bool
     for device in manager.device_map.values():
         device_registry.async_get_or_create(
             config_entry_id=entry.entry_id,
-            identifiers={(DOMAIN, device.id)},
+            identifiers={(DOMAIN_ORIG, device.id), (DOMAIN, device.id)},
             manufacturer="Tuya",
             name=device.name,
             model=f"{device.product_name} (unsupported)",
