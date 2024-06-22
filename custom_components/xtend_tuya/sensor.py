@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import cast
 
 from tuya_sharing import CustomerDevice, Manager
 from tuya_sharing.device import DeviceStatusRange
@@ -15,7 +14,6 @@ from homeassistant.components.sensor import (
     SensorStateClass,
     RestoreSensor,
 )
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     PERCENTAGE,
     EntityCategory,
@@ -30,24 +28,20 @@ from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import StateType
 
-from . import HomeAssistantTuyaData
+from . import TuyaConfigEntry
 from .base import ElectricityTypeData, EnumTypeData, IntegerTypeData, TuyaEntity
 from .const import (
     DEVICE_CLASS_UNITS,
     DOMAIN,
     TUYA_DISCOVERY_NEW,
-    LOGGER,
     DPCode,
     DPType,
     UnitOfMeasurement,
     VirtualStates,
 )
 
-import copy
 
-UNIT_TIMES = "times"
-
-@dataclass
+@dataclass(frozen=True)
 class TuyaSensorEntityDescription(SensorEntityDescription):
     """Describes Tuya sensor entity."""
 
@@ -93,7 +87,6 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
         TuyaSensorEntityDescription(
             key=DPCode.EXCRETION_TIMES_DAY,
             translation_key="excretion_times_day",
-            native_unit_of_measurement=UNIT_TIMES,
             state_class=SensorStateClass.MEASUREMENT,
             entity_registry_enabled_default=True,
         ),
@@ -303,21 +296,6 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
             entity_registry_enabled_default=True,
         ),
     ),
-    # IR Sensor
-    "wnykq": (
-        TuyaSensorEntityDescription(
-            key=DPCode.VA_TEMPERATURE,
-            translation_key="temperature",
-            device_class=SensorDeviceClass.TEMPERATURE,
-            state_class=SensorStateClass.MEASUREMENT,
-        ),
-        TuyaSensorEntityDescription(
-            key=DPCode.VA_HUMIDITY,
-            translation_key="humidity",
-            device_class=SensorDeviceClass.HUMIDITY,
-            state_class=SensorStateClass.MEASUREMENT,
-        ),
-    ),
 }
 
 # Socket (duplicate of `kg`)
@@ -332,10 +310,10 @@ SENSORS["dlq"] = SENSORS["kg"]
 SENSORS["pc"] = SENSORS["kg"]
 
 async def async_setup_entry(
-    hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
+    hass: HomeAssistant, entry: TuyaConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
     """Set up Tuya sensor dynamically through Tuya discovery."""
-    hass_data: HomeAssistantTuyaData = hass.data[DOMAIN][entry.entry_id]
+    hass_data = entry.runtime_data
 
     @callback
     def async_discover_device(device_ids: list[str]) -> None:
@@ -481,10 +459,9 @@ class TuyaSensorEntity(TuyaEntity, RestoreSensor):
         if self.entity_description.restoredata == False:
             return
         state = await self.async_get_last_sensor_data()
-        LOGGER.debug(f"async_added_to_hass: {state}")
         # Scale integer/float value
         if isinstance(self._type_data, IntegerTypeData):
             scaled_value_back = self._type_data.scale_value_back(state.native_value)
             state.native_value = scaled_value_back
         if state:
-            self.device.status[self.entity_description.key] = cast(float, state.native_value)
+            self.device.status[self.entity_description.key] = float(state.native_value)
