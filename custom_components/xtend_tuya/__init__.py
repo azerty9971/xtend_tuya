@@ -25,7 +25,6 @@ from .const import (
     CONF_TOKEN_INFO,
     CONF_USER_CODE,
     DOMAIN,
-    DOMAIN_ORIG,
     LOGGER,
     PLATFORMS,
     TUYA_CLIENT_ID,
@@ -91,7 +90,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: TuyaConfigEntry) -> bool
     for device in manager.device_map.values():
         device_registry.async_get_or_create(
             config_entry_id=entry.entry_id,
-            identifiers={(DOMAIN_ORIG, device.id), (DOMAIN, device.id)},
+            identifiers={(DOMAIN, device.id)},
             manufacturer="Tuya",
             name=device.name,
             model=f"{device.product_name} (unsupported)",
