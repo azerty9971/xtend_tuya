@@ -11,7 +11,6 @@ from tuya_sharing import (
     SharingDeviceListener,
     SharingTokenListener,
     CustomerApi,
-    CustomerTokenInfo,
     SmartLifeHome,
     HomeRepository,
     DeviceRepository,
@@ -19,6 +18,9 @@ from tuya_sharing import (
     UserRepository,
     DeviceFunction,
     DeviceStatusRange,
+)
+from tuya_sharing.customerapi import (
+    CustomerTokenInfo,
 )
 
 from homeassistant.config_entries import ConfigEntry
