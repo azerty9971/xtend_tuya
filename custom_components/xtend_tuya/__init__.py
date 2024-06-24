@@ -10,6 +10,15 @@ from tuya_sharing import (
     Manager,
     SharingDeviceListener,
     SharingTokenListener,
+    CustomerApi,
+    CustomerTokenInfo,
+    SmartLifeHome,
+    HomeRepository,
+    DeviceRepository,
+    SceneRepository,
+    UserRepository,
+    DeviceFunction,
+    DeviceStatusRange,
 )
 
 from homeassistant.config_entries import ConfigEntry
@@ -234,6 +243,30 @@ class TokenListener(SharingTokenListener):
 
         self.hass.add_job(async_update_entry)
 
+class XTCustomerApi(CustomerApi):
+    def testAPI(self):
+        pass
+
+class XTDeviceRepository(DeviceRepository):
+    def update_device_specification(self, device: CustomerDevice):
+        device_id = device.id
+        response = self.api.get(f"/v1.1/m/life/{device_id}/specifications")
+        LOGGER.debug(f"DEVICE SPEC -> {response}")
+        if response.get("success"):
+            result = response.get("result", {})
+            function_map = {}
+            for function in result["functions"]:
+                code = function["code"]
+                function_map[code] = DeviceFunction(**function)
+
+            status_range = {}
+            for status in result["status"]:
+                code = status["code"]
+                status_range[code] = DeviceStatusRange(**status)
+
+            device.function = function_map
+            device.status_range = status_range
+
 class DeviceManager(Manager):
     def __init__(
         self,
@@ -245,6 +278,23 @@ class DeviceManager(Manager):
         listener: SharingTokenListener = None,
     ) -> None:
         super().__init__(client_id, user_code, terminal_id, end_point, token_response, listener)
+        self.terminal_id = terminal_id
+        self.customer_api = XTCustomerApi(
+            CustomerTokenInfo(token_response),
+            client_id,
+            user_code,
+            end_point,
+            listener,
+        )
+        self.device_map: dict[str, CustomerDevice] = {}
+        self.user_homes: list[SmartLifeHome] = []
+        self.home_repository = HomeRepository(self.customer_api)
+        self.device_repository = XTDeviceRepository(self.customer_api)
+        self.device_listeners = set()
+
+        self.mq = None
+        self.scene_repository = SceneRepository(self.customer_api)
+        self.user_repository = UserRepository(self.customer_api)
         self.other_device_manager = None
     
     @staticmethod
