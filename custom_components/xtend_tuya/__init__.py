@@ -5,22 +5,30 @@ from __future__ import annotations
 import logging
 from typing import Any, NamedTuple
 
-from tuya_sharing import (
-    CustomerDevice,
+from tuya_sharing.manager import (
     Manager,
     SharingDeviceListener,
-    SharingTokenListener,
-    CustomerApi,
-    SmartLifeHome,
-    HomeRepository,
-    DeviceRepository,
-    SceneRepository,
-    UserRepository,
-    DeviceFunction,
-    DeviceStatusRange,
 )
 from tuya_sharing.customerapi import (
     CustomerTokenInfo,
+    CustomerApi,
+    SharingTokenListener,
+)
+from tuya_sharing.home import (
+    SmartLifeHome,
+    HomeRepository,
+)
+from tuya_sharing.device import (
+    CustomerDevice,
+    DeviceRepository,
+    DeviceFunction,
+    DeviceStatusRange,
+)
+from tuya_sharing.scenes import (
+    SceneRepository,
+)
+from tuya_sharing.user import (
+    UserRepository,
 )
 
 from homeassistant.config_entries import ConfigEntry
