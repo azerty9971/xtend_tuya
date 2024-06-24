@@ -261,7 +261,9 @@ class XTDeviceRepository(DeviceRepository):
     def update_device_specification(self, device: CustomerDevice):
         device_id = device.id
         response = self.api.get(f"/v1.1/m/life/{device_id}/specifications")
+        response2 = self.api.get(f"/v2.0/cloud/thing/{device_id}/shadow/properties")
         LOGGER.debug(f"DEVICE SPEC -> {response}")
+        LOGGER.debug(f"DEVICE SPEC2 -> {response2}")
         if response.get("success"):
             result = response.get("result", {})
             function_map = {}
@@ -355,7 +357,7 @@ class DeviceManager(Manager):
                         if "code" in item and "value" in item and item["code"] == virtual_state.key:
                             #LOGGER.debug(f"BEFORE device_id -> {device_id} device_status-> {device.status} status-> {status} VS-> {virtual_states}")
                             item["value"] += device.status[virtual_state.key]
-                            item_val = item["value"]
+                            #item_val = item["value"]
                             #LOGGER.debug(f"Applying virtual state device_id -> {device_id} device_status-> {device.status[virtual_state.key]} status-> {item_val} VS-> {virtual_state}")
                         elif "dpId" in item and "value" in item:
                             dp_id_item = device.local_strategy[item["dpId"]]
