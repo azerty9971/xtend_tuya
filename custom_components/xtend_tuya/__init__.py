@@ -191,11 +191,11 @@ class DeviceListener(SharingDeviceListener):
 
     def update_device(self, device: CustomerDevice) -> None:
         """Update device status."""
-        LOGGER.debug(
-            "Received update for device %s: %s",
-            device.id,
-            self.manager.device_map[device.id].status,
-        )
+        #LOGGER.debug(
+        #    "Received update for device %s: %s",
+        #    device.id,
+        #    self.manager.device_map[device.id].status,
+        #)
         dispatcher_send(self.hass, f"{TUYA_HA_SIGNAL_UPDATE_ENTITY}_{device.id}")
 
     def add_device(self, device: CustomerDevice) -> None:
@@ -212,7 +212,7 @@ class DeviceListener(SharingDeviceListener):
     @callback
     def async_remove_device(self, device_id: str) -> None:
         """Remove device from Home Assistant."""
-        LOGGER.debug("Remove device: %s", device_id)
+        #LOGGER.debug("Remove device: %s", device_id)
         device_registry = dr.async_get(self.hass)
         device_entry = device_registry.async_get_device(
             identifiers={(DOMAIN, device_id)}
@@ -262,7 +262,7 @@ class XTDeviceRepository(DeviceRepository):
         device_id = device.id
         response = self.api.get(f"/v1.1/m/life/{device_id}/specifications")
         #response2 = self.api.get(f"/v2.0/cloud/thing/{device_id}/shadow/properties")
-        LOGGER.debug(f"DEVICE SPEC -> {response}")
+        #LOGGER.debug(f"DEVICE SPEC -> {response}")
         
         #LOGGER.warning(f"DEVICE SPEC2 -> {response2}")
         if response.get("success"):
@@ -339,12 +339,12 @@ class DeviceManager(Manager):
         super().refresh_mq()
 
     def _on_device_other(self, device_id: str, biz_code: str, data: dict[str, Any]):
-        LOGGER.warning(f"mq _on_device_other-> {device_id} -- {biz_code} -- {data}")
+        LOGGER.warning(f"mq _on_device_other-> {device_id} biz_code-> {biz_code} data-> {data}")
         super()._on_device_other(device_id, biz_code, data)
 
     def _on_device_report(self, device_id: str, status: list):
         device = self.device_map.get(device_id, None)
-        #LOGGER.debug(f"Custom device report -> {device_id} status-> {status}")
+        LOGGER.debug(f"mq _on_device_report-> {device_id} status-> {status}")
         if not device:
             return
         #LOGGER.debug(f"Device found!")
