@@ -280,6 +280,37 @@ class XTDeviceRepository(DeviceRepository):
             device.function = function_map
             device.status_range = status_range
 
+    def update_device_strategy_info(self, device: CustomerDevice):
+        device_id = device.id
+        response = self.api.get(f"/v1.0/m/life/devices/{device_id}/status")
+        support_local = True
+        if response.get("success"):
+            result = response.get("result", {})
+            pid = result["productKey"]
+            dp_id_map = {}
+            for dp_status_relation in result["dpStatusRelationDTOS"]:
+                if not dp_status_relation["supportLocal"]:
+                    support_local = False
+                    break
+                # statusFormat valueDesc、valueType,enumMappingMap,pid
+                dp_id_map[dp_status_relation["dpId"]] = {
+                    "value_convert": dp_status_relation["valueConvert"],
+                    "status_code": dp_status_relation["statusCode"],
+                    "config_item": {
+                        "statusFormat": dp_status_relation["statusFormat"],
+                        "valueDesc": dp_status_relation["valueDesc"],
+                        "valueType": dp_status_relation["valueType"],
+                        "enumMappingMap": dp_status_relation["enumMappingMap"],
+                        "pid": pid,
+                    }
+                }
+            device.support_local = support_local
+            if support_local:
+                device.local_strategy = dp_id_map
+
+            LOGGER.warning(
+                f"device status strategy dev_id = {device_id} support_local = {support_local} local_strategy = {dp_id_map}")
+
 class DeviceManager(Manager):
     def __init__(
         self,
