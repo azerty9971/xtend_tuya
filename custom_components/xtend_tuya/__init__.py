@@ -262,7 +262,7 @@ class XTDeviceRepository(DeviceRepository):
         device_id = device.id
         response = self.api.get(f"/v1.1/m/life/{device_id}/specifications")
         #response2 = self.api.get(f"/v2.0/cloud/thing/{device_id}/shadow/properties")
-        LOGGER.debug(f"DEVICE SPEC -> {response}")
+        LOGGER.warning(f"DEVICE SPEC -> {response}")
         
         #LOGGER.debug(f"DEVICE SPEC2 -> {response2}")
         if response.get("success"):
