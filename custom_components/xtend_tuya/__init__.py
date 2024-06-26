@@ -261,10 +261,10 @@ class XTDeviceRepository(DeviceRepository):
     def update_device_specification(self, device: CustomerDevice):
         device_id = device.id
         response = self.api.get(f"/v1.1/m/life/{device_id}/specifications")
-        response2 = self.api.get(f"/v2.0/cloud/thing/{device_id}/shadow/properties")
+        #response2 = self.api.get(f"/v2.0/cloud/thing/{device_id}/shadow/properties")
         LOGGER.debug(f"DEVICE SPEC -> {response}")
         
-        LOGGER.warning(f"DEVICE SPEC2 -> {response2}")
+        #LOGGER.warning(f"DEVICE SPEC2 -> {response2}")
         if response.get("success"):
             result = response.get("result", {})
             function_map = {}
@@ -338,6 +338,9 @@ class DeviceManager(Manager):
             return
         super().refresh_mq()
 
+    def _on_device_other(self, device_id: str, biz_code: str, data: dict[str, Any]):
+        LOGGER.warning(f"mq _on_device_other-> {device_id} -- {biz_code} -- {data}")
+        super()._on_device_other(device_id, biz_code, data)
 
     def _on_device_report(self, device_id: str, status: list):
         device = self.device_map.get(device_id, None)
