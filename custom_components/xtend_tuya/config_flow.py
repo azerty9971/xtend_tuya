@@ -50,7 +50,7 @@ class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
             for xt_tuya_config in xt_tuya_data:
                 if xt_tuya_config.title == config_entry.title:
                     xt_tuya_config_already_exists = True
-                    break;
+                    break
             if not xt_tuya_config_already_exists:
                 return self.async_create_entry(
                     title=config_entry.title,
