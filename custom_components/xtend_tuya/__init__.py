@@ -81,7 +81,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: TuyaConfigEntry) -> bool
         if entry.title == config_entry.title:
             reuse_config = True
             tuya_device_manager = config_entry.runtime_data.manager
-            tuya_mq = tuya_device_manager.mq
             manager = DeviceManager(
                 TUYA_CLIENT_ID,
                 entry.data[CONF_USER_CODE],
@@ -91,8 +90,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: TuyaConfigEntry) -> bool
                 None,
                 tuya_device_manager
             )
-            #tuya_device_manager.remove_device_listener(config_entry.runtime_data.listener)
-            #tuya_mq.remove_message_listener(tuya_device_manager.on_message)
             break
     
     if not reuse_config:
@@ -330,6 +327,7 @@ class DeviceManager(Manager):
             self.terminal_id = other_manager.terminal_id
             self.customer_api = other_manager.customer_api
             self.mq = other_manager.mq
+            self.mq.remove_message_listener(other_manager.on_message)
         self.other_device_manager = other_manager
         self.device_map: dict[str, CustomerDevice] = {}
         self.user_homes: list[SmartLifeHome] = []
