@@ -93,7 +93,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: TuyaConfigEntry) -> bool
     #reuse_config = False
     for config_entry in tuya_data:
         if entry.title == config_entry.title:
-            LOGGER.warning("Config FOUND => {config_entry}")
+            LOGGER.warning(f"Config FOUND => {config_entry}")
             #orig_config = hass.data[DOMAIN_ORIG][config]
             #tuya_device_manager = orig_config.manager
             #tuya_mq = tuya_device_manager.mq
