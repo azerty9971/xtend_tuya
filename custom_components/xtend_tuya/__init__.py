@@ -253,10 +253,6 @@ class TokenListener(SharingTokenListener):
 
         self.hass.add_job(async_update_entry)
 
-class XTCustomerApi(CustomerApi):
-    def testAPI(self):
-        pass
-
 class XTDeviceRepository(DeviceRepository):
     def update_device_specification(self, device: CustomerDevice):
         device_id = device.id
@@ -328,7 +324,7 @@ class DeviceManager(Manager):
     ) -> None:
         super().__init__(client_id, user_code, terminal_id, end_point, token_response, listener)
         self.terminal_id = terminal_id
-        self.customer_api = XTCustomerApi(
+        self.customer_api = CustomerApi(
             CustomerTokenInfo(token_response),
             client_id,
             user_code,
