@@ -83,6 +83,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: TuyaConfigEntry) -> bool
             tuya_config_entry = hass.config_entries.async_get_entry(
                 config_entry.entry_id
             )
+            LOGGER.warning(f"tuya_config_entry : {tuya_config_entry}")
             tuya_device_manager = tuya_config_entry.manager
             tuya_mq = tuya_device_manager.mq
             manager = DeviceManager(
