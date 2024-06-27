@@ -80,7 +80,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: TuyaConfigEntry) -> bool
     for config_entry in tuya_data:
         if entry.title == config_entry.title:
             reuse_config = True
-            tuya_device_manager = config_entry.manager
+            tuya_config_entry = await hass.config_entries.async_get_entry(
+                config_entry.entry_id
+            )
+            tuya_device_manager = tuya_config_entry.manager
             tuya_mq = tuya_device_manager.mq
             manager = DeviceManager(
                 TUYA_CLIENT_ID,
@@ -95,7 +98,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: TuyaConfigEntry) -> bool
             manager.scene_repository  = tuya_device_manager.scene_repository
             manager.user_repository   = tuya_device_manager.user_repository
             manager.set_overriden_device_manager(tuya_device_manager)
-            tuya_device_manager.remove_device_listener(config_entry.listener)
+            tuya_device_manager.remove_device_listener(tuya_config_entry.listener)
             tuya_mq.remove_message_listener(tuya_device_manager.on_message)
             break
     
