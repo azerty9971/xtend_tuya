@@ -89,7 +89,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: TuyaConfigEntry) -> bool
                 entry.data[CONF_ENDPOINT],
                 entry.data[CONF_TOKEN_INFO],
                 None,
-                None,
                 tuya_device_manager
             )
             #tuya_device_manager.remove_device_listener(config_entry.runtime_data.listener)
