@@ -286,19 +286,19 @@ class XTDeviceRepository(DeviceRepository):
             for dp_status_relation in result["dpStatusRelationDTOS"]:
                 if not dp_status_relation["supportLocal"]:
                     support_local = False
-                    break
+                else:
                 # statusFormat valueDesc、valueType,enumMappingMap,pid
-                dp_id_map[dp_status_relation["dpId"]] = {
-                    "value_convert": dp_status_relation["valueConvert"],
-                    "status_code": dp_status_relation["statusCode"],
-                    "config_item": {
-                        "statusFormat": dp_status_relation["statusFormat"],
-                        "valueDesc": dp_status_relation["valueDesc"],
-                        "valueType": dp_status_relation["valueType"],
-                        "enumMappingMap": dp_status_relation["enumMappingMap"],
-                        "pid": pid,
+                    dp_id_map[dp_status_relation["dpId"]] = {
+                        "value_convert": dp_status_relation["valueConvert"],
+                        "status_code": dp_status_relation["statusCode"],
+                        "config_item": {
+                            "statusFormat": dp_status_relation["statusFormat"],
+                            "valueDesc": dp_status_relation["valueDesc"],
+                            "valueType": dp_status_relation["valueType"],
+                            "enumMappingMap": dp_status_relation["enumMappingMap"],
+                            "pid": pid,
+                        }
                     }
-                }
                 if dp_status_relation["statusCode"] not in device.status_range:
                     code = dp_status_relation["statusCode"]
                     device.status_range[code] = DeviceStatusRange()
