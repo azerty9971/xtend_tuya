@@ -88,24 +88,20 @@ async def async_setup_entry(hass: HomeAssistant, entry: TuyaConfigEntry) -> bool
     listener = DeviceListener(hass, manager)
     manager.add_device_listener(listener)
 
+    tuya_data = hass.config_entries.async_entries(DOMAIN_ORIG,False,False)
+
     #reuse_config = False
-    if DOMAIN_ORIG in hass.data:
-        tuya_data = hass.data[DOMAIN_ORIG]
-        for config in tuya_data:
-            config_entry = hass.config_entries.async_get_entry(config)
-            if (
-                    entry.data[CONF_USER_CODE]      == config_entry.data[CONF_USER_CODE]
-                and entry.data[CONF_TERMINAL_ID]    == config_entry.data[CONF_TERMINAL_ID]
-                and entry.data[CONF_ENDPOINT]       == config_entry.data[CONF_ENDPOINT]
-                and entry.data[CONF_TOKEN_INFO]     == config_entry.data[CONF_TOKEN_INFO]
-            ):
-                orig_config = hass.data[DOMAIN_ORIG][config]
-                tuya_device_manager = orig_config.manager
-                tuya_mq = tuya_device_manager.mq
-                manager.set_overriden_device_manager(tuya_device_manager)
-                tuya_device_manager.remove_device_listener(orig_config.listener)
-                tuya_mq.remove_message_listener(tuya_device_manager.on_message)
-                break
+    for config_entry in tuya_data:
+        if entry.title == config_entry.title:
+            LOGGER.warning("Config FOUND => {config_entry}")
+            #orig_config = hass.data[DOMAIN_ORIG][config]
+            #tuya_device_manager = orig_config.manager
+            #tuya_mq = tuya_device_manager.mq
+            #manager.set_overriden_device_manager(tuya_device_manager)
+            #tuya_device_manager.remove_device_listener(orig_config.listener)
+            #tuya_mq.remove_message_listener(tuya_device_manager.on_message)
+            #break
+            pass
 
     # Get all devices from Tuya
     try:
@@ -254,27 +250,9 @@ class TokenListener(SharingTokenListener):
         self.hass.add_job(async_update_entry)
 
 class XTDeviceRepository(DeviceRepository):
-    def update_device_specification(self, device: CustomerDevice):
-        return
-        device_id = device.id
-        response = self.api.get(f"/v1.1/m/life/{device_id}/specifications")
-        #response2 = self.api.get(f"/v2.0/cloud/thing/{device_id}/shadow/properties")
-        LOGGER.debug(f"DEVICE SPEC -> {response}")
-        #LOGGER.warning(f"DEVICE SPEC2 -> {response2}")
-        if response.get("success"):
-            result = response.get("result", {})
-            function_map = {}
-            for function in result["functions"]:
-                code = function["code"]
-                function_map[code] = DeviceFunction(**function)
-
-            status_range = {}
-            for status in result["status"]:
-                code = status["code"]
-                status_range[code] = DeviceStatusRange(**status)
-
-            device.function = function_map
-            device.status_range = status_range
+    def __init__(self, customer_api: CustomerApi, manager: DeviceManager):
+        super().__init__(customer_api)
+        self.manager = manager
 
     def update_device_strategy_info(self, device: CustomerDevice):
         device_id = device.id
@@ -284,6 +262,10 @@ class XTDeviceRepository(DeviceRepository):
             result = response.get("result", {})
             pid = result["productKey"]
             dp_id_map = {}
+            tuya_device = None
+            tuya_manager = self.manager.get_overriden_device_manager()
+            if device.id in tuya_manager.device_map:
+                tuya_device = tuya_manager.device_map[device.id]
             for dp_status_relation in result["dpStatusRelationDTOS"]:
                 if not dp_status_relation["supportLocal"]:
                     support_local = False
@@ -300,18 +282,21 @@ class XTDeviceRepository(DeviceRepository):
                             "pid": pid,
                         }
                     }
-                if dp_status_relation["statusCode"] not in device.status_range:
-                    code = dp_status_relation["statusCode"]
+                code = dp_status_relation["statusCode"]
+                if code not in device.status_range:
                     device.status_range[code] = DeviceStatusRange()
                     device.status_range[code].code   = code
                     device.status_range[code].type   = dp_status_relation["valueType"]
                     device.status_range[code].values = dp_status_relation["valueDesc"]
+                #Also add the status range for Tuya's manager devices
+                if tuya_device is not None and code not in tuya_device.status_range:
+                    tuya_device.status_range[code] = DeviceStatusRange()
+                    tuya_device.status_range[code].code   = code
+                    tuya_device.status_range[code].type   = dp_status_relation["valueType"]
+                    tuya_device.status_range[code].values = dp_status_relation["valueDesc"]
             device.support_local = support_local
             if support_local:
                 device.local_strategy = dp_id_map
-
-            LOGGER.warning(
-                f"device status strategy dev_id = {device_id} support_local = {support_local} local_strategy = {dp_id_map}")
 
 class DeviceManager(Manager):
     def __init__(
@@ -335,7 +320,7 @@ class DeviceManager(Manager):
         self.device_map: dict[str, CustomerDevice] = {}
         self.user_homes: list[SmartLifeHome] = []
         self.home_repository = HomeRepository(self.customer_api)
-        self.device_repository = XTDeviceRepository(self.customer_api)
+        self.device_repository = XTDeviceRepository(self.customer_api, self)
         self.device_listeners = set()
 
         self.mq = None
@@ -357,6 +342,11 @@ class DeviceManager(Manager):
     
     def set_overriden_device_manager(self, other_device_manager: Manager) -> None:
         self.other_device_manager = other_device_manager
+    
+    def get_overriden_device_manager(self) -> Manager:
+        if self.other_device_manager is not None:
+            return self.other_device_manager
+        return self
 
     def on_message(self, msg: str):
         #If we override another device manager, first call its on_message method
