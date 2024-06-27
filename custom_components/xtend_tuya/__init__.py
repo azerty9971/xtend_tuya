@@ -89,7 +89,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: TuyaConfigEntry) -> bool
                 entry.data[CONF_ENDPOINT],
                 entry.data[CONF_TOKEN_INFO],
             )
-            manager.customer_api      = tuya_device_manager.tuya_device_manager
+            manager.customer_api      = tuya_device_manager.customer_api
             manager.home_repository   = tuya_device_manager.home_repository
             manager.device_repository = tuya_device_manager.device_repository
             manager.scene_repository  = tuya_device_manager.scene_repository
