@@ -81,22 +81,15 @@ async def async_setup_entry(hass: HomeAssistant, entry: TuyaConfigEntry) -> bool
         if entry.title == config_entry.title:
             reuse_config = True
             tuya_device_manager = config_entry.runtime_data.manager
-            tuya_mq = tuya_device_manager.mq
             manager = DeviceManager(
                 TUYA_CLIENT_ID,
                 entry.data[CONF_USER_CODE],
                 entry.data[CONF_TERMINAL_ID],
                 entry.data[CONF_ENDPOINT],
                 entry.data[CONF_TOKEN_INFO],
+                None,
+                tuya_device_manager
             )
-            manager.customer_api      = tuya_device_manager.customer_api
-            manager.home_repository   = tuya_device_manager.home_repository
-            manager.device_repository = tuya_device_manager.device_repository
-            manager.scene_repository  = tuya_device_manager.scene_repository
-            manager.user_repository   = tuya_device_manager.user_repository
-            manager.set_overriden_device_manager(tuya_device_manager)
-            #tuya_device_manager.remove_device_listener(config_entry.runtime_data.listener)
-            tuya_mq.remove_message_listener(tuya_device_manager.on_message)
             break
     
     if not reuse_config:
@@ -318,26 +311,31 @@ class DeviceManager(Manager):
         end_point: str,
         token_response: dict[str, Any] = None,
         listener: SharingTokenListener = None,
+        other_manager: Manager = None,
     ) -> None:
-        super().__init__(client_id, user_code, terminal_id, end_point, token_response, listener)
-        self.terminal_id = terminal_id
-        self.customer_api = CustomerApi(
-            CustomerTokenInfo(token_response),
-            client_id,
-            user_code,
-            end_point,
-            listener,
-        )
+        if other_manager is None:
+            self.terminal_id = terminal_id
+            self.customer_api = CustomerApi(
+                CustomerTokenInfo(token_response),
+                client_id,
+                user_code,
+                end_point,
+                listener,
+            )
+            self.mq = None
+        else:
+            self.terminal_id = other_manager.terminal_id
+            self.customer_api = other_manager.customer_api
+            self.mq = other_manager.mq
+            self.mq.remove_message_listener(other_manager.on_message)
+        self.other_device_manager = other_manager
         self.device_map: dict[str, CustomerDevice] = {}
         self.user_homes: list[SmartLifeHome] = []
         self.home_repository = HomeRepository(self.customer_api)
         self.device_repository = XTDeviceRepository(self.customer_api, self)
         self.device_listeners = set()
-
-        self.mq = None
         self.scene_repository = SceneRepository(self.customer_api)
         self.user_repository = UserRepository(self.customer_api)
-        self.other_device_manager = None
     
     @staticmethod
     def get_category_virtual_states(category: str) -> list[DescriptionVirtualState]:
