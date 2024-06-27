@@ -5,11 +5,30 @@ from __future__ import annotations
 import logging
 from typing import Any, NamedTuple
 
-from tuya_sharing import (
-    CustomerDevice,
+from tuya_sharing.manager import (
     Manager,
     SharingDeviceListener,
+)
+from tuya_sharing.customerapi import (
+    CustomerTokenInfo,
+    CustomerApi,
     SharingTokenListener,
+)
+from tuya_sharing.home import (
+    SmartLifeHome,
+    HomeRepository,
+)
+from tuya_sharing.device import (
+    CustomerDevice,
+    DeviceRepository,
+    DeviceFunction,
+    DeviceStatusRange,
+)
+from tuya_sharing.scenes import (
+    SceneRepository,
+)
+from tuya_sharing.user import (
+    UserRepository,
 )
 
 from homeassistant.config_entries import ConfigEntry
@@ -38,6 +57,8 @@ from .const import (
 # Suppress logs from the library, it logs unneeded on error
 logging.getLogger("tuya_sharing").setLevel(logging.CRITICAL)
 
+type TuyaConfigEntry = ConfigEntry[HomeAssistantTuyaData]
+
 
 class HomeAssistantTuyaData(NamedTuple):
     """Tuya data stored in the Home Assistant data object."""
@@ -49,42 +70,49 @@ from .sensor import (
     SENSORS,
 )
 
-async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+async def async_setup_entry(hass: HomeAssistant, entry: TuyaConfigEntry) -> bool:
     """Async setup hass config entry."""
     if CONF_APP_TYPE in entry.data:
         raise ConfigEntryAuthFailed("Authentication failed. Please re-authenticate.")
 
-    token_listener = TokenListener(hass, entry)
-    manager = DeviceManager(
-        TUYA_CLIENT_ID,
-        entry.data[CONF_USER_CODE],
-        entry.data[CONF_TERMINAL_ID],
-        entry.data[CONF_ENDPOINT],
-        entry.data[CONF_TOKEN_INFO],
-        token_listener,
-    )
+    reuse_config = False
+    tuya_data = hass.config_entries.async_entries(DOMAIN_ORIG,False,False)
+    for config_entry in tuya_data:
+        if entry.title == config_entry.title:
+            reuse_config = True
+            tuya_device_manager = config_entry.runtime_data.manager
+            tuya_mq = tuya_device_manager.mq
+            manager = DeviceManager(
+                TUYA_CLIENT_ID,
+                entry.data[CONF_USER_CODE],
+                entry.data[CONF_TERMINAL_ID],
+                entry.data[CONF_ENDPOINT],
+                entry.data[CONF_TOKEN_INFO],
+            )
+            manager.customer_api      = tuya_device_manager.customer_api
+            manager.home_repository   = tuya_device_manager.home_repository
+            manager.device_repository = tuya_device_manager.device_repository
+            manager.scene_repository  = tuya_device_manager.scene_repository
+            manager.user_repository   = tuya_device_manager.user_repository
+            manager.set_overriden_device_manager(tuya_device_manager)
+            tuya_device_manager.remove_device_listener(config_entry.runtime_data.listener)
+            tuya_mq.remove_message_listener(tuya_device_manager.on_message)
+            break
+    
+    if not reuse_config:
+        token_listener = TokenListener(hass, entry)
+        manager = DeviceManager(
+            TUYA_CLIENT_ID,
+            entry.data[CONF_USER_CODE],
+            entry.data[CONF_TERMINAL_ID],
+            entry.data[CONF_ENDPOINT],
+            entry.data[CONF_TOKEN_INFO],
+            token_listener,
+        )
 
     listener = DeviceListener(hass, manager)
     manager.add_device_listener(listener)
-
     #reuse_config = False
-    if DOMAIN_ORIG in hass.data:
-        tuya_data = hass.data[DOMAIN_ORIG]
-        for config in tuya_data:
-            config_entry = hass.config_entries.async_get_entry(config)
-            if (
-                    entry.data[CONF_USER_CODE]      == config_entry.data[CONF_USER_CODE]
-                and entry.data[CONF_TERMINAL_ID]    == config_entry.data[CONF_TERMINAL_ID]
-                and entry.data[CONF_ENDPOINT]       == config_entry.data[CONF_ENDPOINT]
-                and entry.data[CONF_TOKEN_INFO]     == config_entry.data[CONF_TOKEN_INFO]
-            ):
-                orig_config = hass.data[DOMAIN_ORIG][config]
-                tuya_device_manager = orig_config.manager
-                tuya_mq = tuya_device_manager.mq
-                manager.set_overriden_device_manager(tuya_device_manager)
-                tuya_device_manager.remove_device_listener(orig_config.listener)
-                tuya_mq.remove_message_listener(tuya_device_manager.on_message)
-                break
 
     # Get all devices from Tuya
     try:
@@ -98,9 +126,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         raise
 
     # Connection is successful, store the manager & listener
-    hass.data.setdefault(DOMAIN, {})[entry.entry_id] = HomeAssistantTuyaData(
-        manager=manager, listener=listener
-    )
+    entry.runtime_data = HomeAssistantTuyaData(manager=manager, listener=listener)
 
     # Cleanup device registry
     await cleanup_device_registry(hass, manager)
@@ -113,7 +139,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             identifiers={(DOMAIN_ORIG, device.id), (DOMAIN, device.id)},
             manufacturer="Tuya",
             name=device.name,
-            model=f"{device.product_name}",
+            model=f"{device.product_name} (unsupported)",
         )
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
@@ -133,18 +159,17 @@ async def cleanup_device_registry(hass: HomeAssistant, device_manager: Manager) 
                 break
 
 
-async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+async def async_unload_entry(hass: HomeAssistant, entry: TuyaConfigEntry) -> bool:
     """Unloading the Tuya platforms."""
     if unload_ok := await hass.config_entries.async_unload_platforms(entry, PLATFORMS):
-        tuya: HomeAssistantTuyaData = hass.data[DOMAIN][entry.entry_id]
+        tuya = entry.runtime_data
         if tuya.manager.mq is not None:
             tuya.manager.mq.stop()
         tuya.manager.remove_device_listener(tuya.listener)
-        del hass.data[DOMAIN][entry.entry_id]
     return unload_ok
 
 
-async def async_remove_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
+async def async_remove_entry(hass: HomeAssistant, entry: TuyaConfigEntry) -> None:
     """Remove a config entry.
 
     This will revoke the credentials from Tuya.
@@ -173,11 +198,11 @@ class DeviceListener(SharingDeviceListener):
 
     def update_device(self, device: CustomerDevice) -> None:
         """Update device status."""
-        LOGGER.debug(
-            "Received update for device %s: %s",
-            device.id,
-            self.manager.device_map[device.id].status,
-        )
+        #LOGGER.debug(
+        #    "Received update for device %s: %s",
+        #    device.id,
+        #    self.manager.device_map[device.id].status,
+        #)
         dispatcher_send(self.hass, f"{TUYA_HA_SIGNAL_UPDATE_ENTITY}_{device.id}")
 
     def add_device(self, device: CustomerDevice) -> None:
@@ -194,7 +219,7 @@ class DeviceListener(SharingDeviceListener):
     @callback
     def async_remove_device(self, device_id: str) -> None:
         """Remove device from Home Assistant."""
-        LOGGER.debug("Remove device: %s", device_id)
+        #LOGGER.debug("Remove device: %s", device_id)
         device_registry = dr.async_get(self.hass)
         device_entry = device_registry.async_get_device(
             identifiers={(DOMAIN, device_id)}
@@ -209,7 +234,7 @@ class TokenListener(SharingTokenListener):
     def __init__(
         self,
         hass: HomeAssistant,
-        entry: ConfigEntry,
+        entry: TuyaConfigEntry,
     ) -> None:
         """Init TokenListener."""
         self.hass = hass
@@ -235,6 +260,54 @@ class TokenListener(SharingTokenListener):
 
         self.hass.add_job(async_update_entry)
 
+class XTDeviceRepository(DeviceRepository):
+    def __init__(self, customer_api: CustomerApi, manager: DeviceManager):
+        super().__init__(customer_api)
+        self.manager = manager
+
+    def update_device_strategy_info(self, device: CustomerDevice):
+        device_id = device.id
+        response = self.api.get(f"/v1.0/m/life/devices/{device_id}/status")
+        support_local = True
+        if response.get("success"):
+            result = response.get("result", {})
+            pid = result["productKey"]
+            dp_id_map = {}
+            tuya_device = None
+            tuya_manager = self.manager.get_overriden_device_manager()
+            if device.id in tuya_manager.device_map:
+                tuya_device = tuya_manager.device_map[device.id]
+            for dp_status_relation in result["dpStatusRelationDTOS"]:
+                if not dp_status_relation["supportLocal"]:
+                    support_local = False
+                else:
+                # statusFormat valueDesc、valueType,enumMappingMap,pid
+                    dp_id_map[dp_status_relation["dpId"]] = {
+                        "value_convert": dp_status_relation["valueConvert"],
+                        "status_code": dp_status_relation["statusCode"],
+                        "config_item": {
+                            "statusFormat": dp_status_relation["statusFormat"],
+                            "valueDesc": dp_status_relation["valueDesc"],
+                            "valueType": dp_status_relation["valueType"],
+                            "enumMappingMap": dp_status_relation["enumMappingMap"],
+                            "pid": pid,
+                        }
+                    }
+                code = dp_status_relation["statusCode"]
+                if code not in device.status_range:
+                    device.status_range[code] = DeviceStatusRange()
+                    device.status_range[code].code   = code
+                    device.status_range[code].type   = dp_status_relation["valueType"]
+                    device.status_range[code].values = dp_status_relation["valueDesc"]
+                #Also add the status range for Tuya's manager devices
+                if tuya_device is not None and code not in tuya_device.status_range:
+                    tuya_device.status_range[code] = DeviceStatusRange()
+                    tuya_device.status_range[code].code   = code
+                    tuya_device.status_range[code].type   = dp_status_relation["valueType"]
+                    tuya_device.status_range[code].values = dp_status_relation["valueDesc"]
+            device.support_local = support_local
+            if support_local:
+                device.local_strategy = dp_id_map
 
 class DeviceManager(Manager):
     def __init__(
@@ -247,6 +320,23 @@ class DeviceManager(Manager):
         listener: SharingTokenListener = None,
     ) -> None:
         super().__init__(client_id, user_code, terminal_id, end_point, token_response, listener)
+        self.terminal_id = terminal_id
+        self.customer_api = CustomerApi(
+            CustomerTokenInfo(token_response),
+            client_id,
+            user_code,
+            end_point,
+            listener,
+        )
+        self.device_map: dict[str, CustomerDevice] = {}
+        self.user_homes: list[SmartLifeHome] = []
+        self.home_repository = HomeRepository(self.customer_api)
+        self.device_repository = XTDeviceRepository(self.customer_api, self)
+        self.device_listeners = set()
+
+        self.mq = None
+        self.scene_repository = SceneRepository(self.customer_api)
+        self.user_repository = UserRepository(self.customer_api)
         self.other_device_manager = None
     
     @staticmethod
@@ -263,6 +353,11 @@ class DeviceManager(Manager):
     
     def set_overriden_device_manager(self, other_device_manager: Manager) -> None:
         self.other_device_manager = other_device_manager
+    
+    def get_overriden_device_manager(self) -> Manager:
+        if self.other_device_manager is not None:
+            return self.other_device_manager
+        return self
 
     def on_message(self, msg: str):
         #If we override another device manager, first call its on_message method
@@ -277,10 +372,13 @@ class DeviceManager(Manager):
             return
         super().refresh_mq()
 
+    def _on_device_other(self, device_id: str, biz_code: str, data: dict[str, Any]):
+        LOGGER.warning(f"mq _on_device_other-> {device_id} biz_code-> {biz_code} data-> {data}")
+        super()._on_device_other(device_id, biz_code, data)
 
     def _on_device_report(self, device_id: str, status: list):
         device = self.device_map.get(device_id, None)
-        #LOGGER.debug(f"Custom device report -> {device_id} status-> {status}")
+        LOGGER.debug(f"mq _on_device_report-> {device_id} status-> {status}")
         if not device:
             return
         #LOGGER.debug(f"Device found!")
@@ -297,7 +395,7 @@ class DeviceManager(Manager):
                         if "code" in item and "value" in item and item["code"] == virtual_state.key:
                             #LOGGER.debug(f"BEFORE device_id -> {device_id} device_status-> {device.status} status-> {status} VS-> {virtual_states}")
                             item["value"] += device.status[virtual_state.key]
-                            item_val = item["value"]
+                            #item_val = item["value"]
                             #LOGGER.debug(f"Applying virtual state device_id -> {device_id} device_status-> {device.status[virtual_state.key]} status-> {item_val} VS-> {virtual_state}")
                         elif "dpId" in item and "value" in item:
                             dp_id_item = device.local_strategy[item["dpId"]]

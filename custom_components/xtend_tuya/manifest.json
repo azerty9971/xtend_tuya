@@ -44,6 +44,6 @@
   "iot_class": "cloud_push",
   "issue_tracker": "https://github.com/azerty9971/xtend_tuya/issues",
   "loggers": ["tuya_iot"],
-  "requirements": ["tuya-iot-py-sdk==0.6.6"],
+  "requirements": ["tuya-device-sharing-sdk==0.1.9"],
   "version": "1.2.4"
 }
