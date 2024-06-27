@@ -255,6 +255,7 @@ class TokenListener(SharingTokenListener):
 
 class XTDeviceRepository(DeviceRepository):
     def update_device_specification(self, device: CustomerDevice):
+        return
         device_id = device.id
         response = self.api.get(f"/v1.1/m/life/{device_id}/specifications")
         #response2 = self.api.get(f"/v2.0/cloud/thing/{device_id}/shadow/properties")
