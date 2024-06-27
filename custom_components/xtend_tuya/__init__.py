@@ -263,7 +263,6 @@ class XTDeviceRepository(DeviceRepository):
         response = self.api.get(f"/v1.1/m/life/{device_id}/specifications")
         #response2 = self.api.get(f"/v2.0/cloud/thing/{device_id}/shadow/properties")
         LOGGER.debug(f"DEVICE SPEC -> {response}")
-        
         #LOGGER.warning(f"DEVICE SPEC2 -> {response2}")
         if response.get("success"):
             result = response.get("result", {})
@@ -304,6 +303,12 @@ class XTDeviceRepository(DeviceRepository):
                         "pid": pid,
                     }
                 }
+                if dp_status_relation["statusCode"] not in device.status_range:
+                    code = dp_status_relation["statusCode"]
+                    device.status_range[code] = DeviceStatusRange()
+                    device.status_range[code].code   = code
+                    device.status_range[code].type   = dp_status_relation["valueType"]
+                    device.status_range[code].values = dp_status_relation["valueDesc"]
             device.support_local = support_local
             if support_local:
                 device.local_strategy = dp_id_map
