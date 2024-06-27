@@ -75,33 +75,44 @@ async def async_setup_entry(hass: HomeAssistant, entry: TuyaConfigEntry) -> bool
     if CONF_APP_TYPE in entry.data:
         raise ConfigEntryAuthFailed("Authentication failed. Please re-authenticate.")
 
-    token_listener = TokenListener(hass, entry)
-    manager = DeviceManager(
-        TUYA_CLIENT_ID,
-        entry.data[CONF_USER_CODE],
-        entry.data[CONF_TERMINAL_ID],
-        entry.data[CONF_ENDPOINT],
-        entry.data[CONF_TOKEN_INFO],
-        token_listener,
-    )
+    reuse_config = False
+    tuya_data = hass.config_entries.async_entries(DOMAIN_ORIG,False,False)
+    for config_entry in tuya_data:
+        if entry.title == config_entry.title:
+            reuse_config = True
+            tuya_device_manager = config_entry.manager
+            tuya_mq = tuya_device_manager.mq
+            manager = DeviceManager(
+                TUYA_CLIENT_ID,
+                entry.data[CONF_USER_CODE],
+                entry.data[CONF_TERMINAL_ID],
+                entry.data[CONF_ENDPOINT],
+                entry.data[CONF_TOKEN_INFO],
+            )
+            manager.customer_api      = tuya_device_manager.tuya_device_manager
+            manager.home_repository   = tuya_device_manager.home_repository
+            manager.device_repository = tuya_device_manager.device_repository
+            manager.scene_repository  = tuya_device_manager.scene_repository
+            manager.user_repository   = tuya_device_manager.user_repository
+            manager.set_overriden_device_manager(tuya_device_manager)
+            tuya_device_manager.remove_device_listener(config_entry.listener)
+            tuya_mq.remove_message_listener(tuya_device_manager.on_message)
+            break
+    
+    if not reuse_config:
+        token_listener = TokenListener(hass, entry)
+        manager = DeviceManager(
+            TUYA_CLIENT_ID,
+            entry.data[CONF_USER_CODE],
+            entry.data[CONF_TERMINAL_ID],
+            entry.data[CONF_ENDPOINT],
+            entry.data[CONF_TOKEN_INFO],
+            token_listener,
+        )
 
     listener = DeviceListener(hass, manager)
     manager.add_device_listener(listener)
-
-    tuya_data = hass.config_entries.async_entries(DOMAIN_ORIG,False,False)
-
     #reuse_config = False
-    for config_entry in tuya_data:
-        if entry.title == config_entry.title:
-            LOGGER.warning(f"Config FOUND => {config_entry}")
-            #orig_config = hass.data[DOMAIN_ORIG][config]
-            #tuya_device_manager = orig_config.manager
-            #tuya_mq = tuya_device_manager.mq
-            #manager.set_overriden_device_manager(tuya_device_manager)
-            #tuya_device_manager.remove_device_listener(orig_config.listener)
-            #tuya_mq.remove_message_listener(tuya_device_manager.on_message)
-            #break
-            pass
 
     # Get all devices from Tuya
     try:
