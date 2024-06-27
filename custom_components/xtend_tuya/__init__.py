@@ -80,7 +80,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: TuyaConfigEntry) -> bool
     for config_entry in tuya_data:
         if entry.title == config_entry.title:
             reuse_config = True
-            tuya_config_entry = await hass.config_entries.async_get_entry(
+            tuya_config_entry = hass.config_entries.async_get_entry(
                 config_entry.entry_id
             )
             tuya_device_manager = tuya_config_entry.manager
