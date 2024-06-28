@@ -231,6 +231,104 @@
           "sleep": "Sleep"
         }
       },
+      "beep_volume": {
+        "name": "Beep volume",
+        "state": {
+          "0": "High",
+          "1": "Low",
+          "2": "Mute",
+          "high": "High",
+          "low": "Low",
+          "mute": "Mute"
+        }
+      },
+      "special_function": {
+        "name": "Special function",
+        "state": {
+          "0": "Function 1",
+          "1": "Function 2",
+          "2": "Function 3",
+          "3": "Function 4",
+          "4": "Function 5",
+          "function1": "Function 1",
+          "function2": "Function 2",
+          "function3": "Function 3",
+          "function4": "Function 4",
+          "function5": "Function 5"
+        }
+      },
+      "alarm_volume": {
+        "name": "Alarm volume",
+        "state": {
+          "0": "Mute",
+          "1": "Normal",
+          "2": "Loud",
+          "mute": "Mute",
+          "normal": "Normal",
+          "loud": "Loud"
+        }
+      },
+      "sound_mode": {
+        "name": "Sound mode",
+        "state": {
+          "0": "Ringtone 0",
+          "1": "Ringtone 1",
+          "2": "Ringtone 2",
+          "3": "Ringtone 3",
+          "4": "Ringtone 4",
+          "5": "Ringtone 5",
+          "ringtone_0": "Ringtone 0",
+          "ringtone_1": "Ringtone 1",
+          "ringtone_2": "Ringtone 2",
+          "ringtone_3": "Ringtone 3",
+          "ringtone_4": "Ringtone 4",
+          "ringtone_5": "Ringtone 5"
+        }
+      },
+      "alarm_lock": {
+        "name": "Alarm lock",
+        "state": {
+          "0": "Wrong fingerprint",
+          "1": "Wrong password",
+          "2": "Wrong card",
+          "3": "Wrong face",
+          "4": "Bad tongue",
+          "5": "Too hot",
+          "6": "Unclosed time",
+          "7": "Tongue not out",
+          "8": "Pry",
+          "9": "Key in",
+          "10": "Low battery",
+          "11": "Power off",
+          "12": "Shock",
+          "13": "Defense",
+          "wrong_finger": "Wrong fingerprint",
+          "wrong_password": "Wrong password",
+          "wrong_card": "Wrong card",
+          "wrong_face": "Wrong face",
+          "tongue_bad": "Bad tongue",
+          "too_hot": "Too hot",
+          "unclosed_time": "Unclosed time",
+          "tongue_not_out": "Tongue not out",
+          "pry": "Pry",
+          "key_in": "Key in",
+          "low_battery": "Low battery",
+          "power_off": "Power off",
+          "shock": "Shock",
+          "defense": "Defense"
+        }
+      },
+      "closed_opened": {
+        "name": "Open/Closed",
+        "state": {
+          "0": "Unknown",
+          "1": "Open",
+          "2": "Closed",
+          "unknown": "Unknown",
+          "open": "Open",
+          "closed": "Closed"
+        }
+      },
       "cups": {
         "name": "Cups"
       },
