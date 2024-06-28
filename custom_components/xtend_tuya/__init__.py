@@ -105,7 +105,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: TuyaConfigEntry) -> bool
 
     listener = DeviceListener(hass, manager)
     manager.add_device_listener(listener)
-    #reuse_config = False
 
     # Get all devices from Tuya
     try:

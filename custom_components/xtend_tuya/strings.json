@@ -119,6 +119,9 @@
       }
     },
     "number": {
+      "auto_lock_time": {
+        "name": "Auto lock time"
+      },
       "temperature": {
         "name": "[%key:component::sensor::entity_component::temperature::name%]"
       },
@@ -193,6 +196,70 @@
       }
     },
     "select": {
+      "beep_volume": {
+        "name": "Beep volume",
+        "state": {
+          "0": "High",
+          "1": "Low",
+          "2": "Mute"
+        }
+      },
+      "special_function": {
+        "name": "Special function",
+        "state": {
+          "0": "Function 1",
+          "1": "Function 2",
+          "2": "Function 3",
+          "3": "Function 4",
+          "4": "Function 5"
+        }
+      },
+      "alarm_volume": {
+        "name": "Alarm volume",
+        "state": {
+          "0": "Mute",
+          "1": "Normal",
+          "2": "Loud"
+        }
+      },
+      "sound_mode": {
+        "name": "Sound mode",
+        "state": {
+          "0": "Ringtone 0",
+          "1": "Ringtone 1",
+          "2": "Ringtone 2",
+          "3": "Ringtone 3",
+          "4": "Ringtone 4",
+          "5": "Ringtone 5"
+        }
+      },
+      "alarm_lock": {
+        "name": "Alarm lock",
+        "state": {
+          "0": "Wrong fingerprint",
+          "1": "Wrong password",
+          "2": "Wrong card",
+          "3": "Wrong face",
+          "4": "Bad tongue",
+          "5": "Too hot",
+          "6": "Unclosed time",
+          "7": "Tongue not out",
+          "8": "Pry",
+          "9": "Key in",
+          "10": "Low battery",
+          "11": "Power off",
+          "12": "Shock",
+          "13": "Defense"
+        }
+      },
+      "closed_opened": {
+        "name": "Open/Closed",
+        "state": {
+          "0": "Unknown",
+          "1": "Open",
+          "2": "Closed"
+        }
+      },
       "volume": {
         "name": "[%key:component::tuya::entity::number::volume::name%]"
       },
@@ -623,6 +690,18 @@
       }
     },
     "switch": {
+      "automatic_lock": {
+        "name": "Automatic lock"
+      },
+      "rtc_lock": {
+        "name": "RTC lock"
+      },
+      "manual_lock": {
+        "name": "Manual lock"
+      },
+      "alarm_switch": {
+        "name": "Alarm switch"
+      },
       "start": {
         "name": "Start"
       },
