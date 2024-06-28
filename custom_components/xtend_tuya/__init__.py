@@ -325,7 +325,7 @@ class DeviceManager(Manager):
         else:
             self.terminal_id = other_manager.terminal_id
             self.customer_api = other_manager.customer_api
-            LOGGER.warning(f"self.customer_api => {self.customer_api}")
+            #LOGGER.warning(f"self.customer_api => {self.customer_api}")
             self.mq = other_manager.mq
             self.mq.remove_message_listener(other_manager.on_message)
         self.other_device_manager = other_manager
@@ -371,12 +371,12 @@ class DeviceManager(Manager):
         super().refresh_mq()
 
     def _on_device_other(self, device_id: str, biz_code: str, data: dict[str, Any]):
-        LOGGER.warning(f"mq _on_device_other-> {device_id} biz_code-> {biz_code} data-> {data}")
+        #LOGGER.warning(f"mq _on_device_other-> {device_id} biz_code-> {biz_code} data-> {data}")
         super()._on_device_other(device_id, biz_code, data)
 
     def _on_device_report(self, device_id: str, status: list):
         device = self.device_map.get(device_id, None)
-        LOGGER.debug(f"mq _on_device_report-> {device_id} status-> {status}")
+        #LOGGER.debug(f"mq _on_device_report-> {device_id} status-> {status}")
         if not device:
             return
         #LOGGER.debug(f"Device found!")
