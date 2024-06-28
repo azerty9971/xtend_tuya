@@ -33,7 +33,7 @@ from tuya_sharing.user import (
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
-from homeassistant.exceptions import ConfigEntryAuthFailed
+from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryError
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.dispatcher import dispatcher_send
 
@@ -72,9 +72,6 @@ from .sensor import (
 
 async def async_setup_entry(hass: HomeAssistant, entry: TuyaConfigEntry) -> bool:
     """Async setup hass config entry."""
-    if CONF_APP_TYPE in entry.data:
-        raise ConfigEntryAuthFailed("Authentication failed. Please re-authenticate.")
-
     reuse_config = False
     tuya_data = hass.config_entries.async_entries(DOMAIN_ORIG,False,False)
     for config_entry in tuya_data:
@@ -113,8 +110,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: TuyaConfigEntry) -> bool
         # While in general, we should avoid catching broad exceptions,
         # we have no other way of detecting this case.
         if "sign invalid" in str(exc):
-            msg = "Authentication failed. Please re-authenticate"
-            raise ConfigEntryAuthFailed(msg) from exc
+            msg = "Authentication failed. Please re-authenticate the Tuya integration"
+            raise ConfigEntryError(msg) from exc
         raise
 
     # Connection is successful, store the manager & listener
