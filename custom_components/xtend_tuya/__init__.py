@@ -325,6 +325,7 @@ class DeviceManager(Manager):
         else:
             self.terminal_id = other_manager.terminal_id
             self.customer_api = other_manager.customer_api
+            LOGGER.warning(f"self.customer_api => {self.customer_api}")
             self.mq = other_manager.mq
             self.mq.remove_message_listener(other_manager.on_message)
         self.other_device_manager = other_manager
