@@ -123,7 +123,7 @@
         "name": "Auto lock time"
       },
       "temperature": {
-        "name": "[%key:component::sensor::entity_component::temperature::name%]"
+        "name": "[%key:component::number::entity_component::temperature::name%]"
       },
       "time": {
         "name": "Time"
@@ -193,9 +193,55 @@
       },
       "down_delay": {
         "name": "Down delay"
+      },
+      "delay_clean_time": {
+        "name": "Delay clean time"
+      },
+      "sleep_start_time": {
+        "name": "Sleep start time"
+      },
+      "sleep_end_time": {
+        "name": "Sleep end time"
+      },
+      "uv_start_time": {
+        "name": "UV start time"
+      },
+      "uv_end_time": {
+        "name": "UV end time"
+      },
+      "deo_start_time": {
+        "name": "Deo start time"
+      },
+      "deo_end_time": {
+        "name": "Deo end time"
       }
     },
     "select": {
+      "volume": {
+        "name": "[%key:component::tuya::entity::number::volume::name%]"
+      },
+      "cat_litter_box_work_mode": {
+        "name": "Cleaning mode",
+        "state": {
+          "auto_clean": "Automatic cleaning",
+          "manual_clean": "Manual cleaning",
+          "sleep": "Sleep",
+          "uv": "UV",
+          "deodorization": "Deodorization"
+        }
+      },
+      "cat_litter_box_status": {
+        "name": "Status",
+        "state": {
+          "standby": "Stand by",
+          "off": "Off",
+          "waiting_cluster": "Waiting cluster",
+          "cleaning": "Cleaning",
+          "uv": "UV",
+          "deodorization": "Deodorization",
+          "sleep": "Sleep"
+        }
+      },
       "beep_volume": {
         "name": "Beep volume",
         "state": {
@@ -259,9 +305,6 @@
           "1": "Open",
           "2": "Closed"
         }
-      },
-      "volume": {
-        "name": "[%key:component::tuya::entity::number::volume::name%]"
       },
       "cups": {
         "name": "Cups"
@@ -512,6 +555,108 @@
       }
     },
     "sensor": {
+      
+      "cat_weight": {
+        "name": "Cat weight"
+      },
+      "add_ele": {
+        "name": "Consumption"
+      },
+      "excretion_times_day": {
+        "name": "Number of excretion"
+      },
+      "excretion_time_day": {
+        "name": "Duration of excretion"
+      },
+      "deodorization": {
+        "name": "Deodorization"
+      },
+      "clean": {
+        "name": "Clean"
+      },
+      "empty": {
+        "name": "Empty"
+      },
+      "trash_status": {
+        "name": "Trash status"
+      },
+      "monitoring": {
+        "name": "Monitoring"
+      },
+      "induction_clean": {
+        "name": "Induction clean"
+      },
+      "clean_time": {
+        "name": "Clean time"
+      },
+      "clean_time_switch": {
+        "name": "Clean time switch"
+      },
+      "clean_taste": {
+        "name": "Clean taste"
+      },
+      "clean_tasteswitch": {
+        "name": "Clean taste switch"
+      },
+      "not_disturb": {
+        "name": "Not disturb"
+      },
+      "clean_notice": {
+        "name": "Clean notice"
+      },
+      "toilet_notice": {
+        "name": "Toilet notice"
+      },
+      "net_notice": {
+        "name": "Net notice"
+      },
+      "child_lock": {
+        "name": "Child lock"
+      },
+      "calibration": {
+        "name": "Calibration"
+      },
+      "unit": {
+        "name": "Unit"
+      },
+      "induction_delay": {
+        "name": "Induction delay"
+      },
+      "induction_interval": {
+        "name": "Induction interval"
+      },
+      "store_full_notify": {
+        "name": "Store full notify"
+      },
+      "odourless": {
+        "name": "Odourless"
+      },
+      "smart_clean": {
+        "name": "Smart clean"
+      },
+      "not_disturb_switch": {
+        "name": "Not disturb switch"
+      },
+      "usage_times": {
+        "name": "Usage times"
+      },
+      "capacity_calibration": {
+        "name": "Capacity calibration"
+      },
+      "sand_surface_calibration": {
+        "name": "Sand surface calibration"
+      },
+      "auto_deordrizer": {
+        "name": "Auto deordrizer"
+      },
+      "detection_sensitivity": {
+        "name": "Detection sensitivity"
+      },
+      "number": {
+        "name": "Number"
+      },
+
+      
       "battery": {
         "name": "[%key:component::sensor::entity_component::battery::name%]"
       },
@@ -550,9 +695,6 @@
       },
       "voltage": {
         "name": "[%key:component::sensor::entity_component::voltage::name%]"
-      },
-      "add_ele": {
-        "name": "[%key:component::sensor::entity_component::add_ele::name%]"
       },
       "battery_state": {
         "name": "Battery state"
@@ -702,6 +844,69 @@
       "alarm_switch": {
         "name": "Alarm switch"
       },
+      "auto_clean": {
+        "name": "Auto clean"
+      },
+      "deodorization": {
+        "name": "Deodorization"
+      },
+      "clean": {
+        "name": "Clean"
+      },
+      "manual_clean": {
+        "name": "Manual clean"
+      },
+      "empty": {
+        "name": "Empty"
+      },
+      "induction_clean": {
+        "name": "Induction Clean"
+      },
+      "clean_time": {
+        "name": "Clean time"
+      },
+      "clean_time_switch": {
+        "name": "Clean time switch"
+      },
+      "clean_taste": {
+        "name": "Clean taste"
+      },
+      "clean_tasteswitch": {
+        "name": "Clean taste Switch"
+      },
+      "not_disturb": {
+        "name": "Not disturb"
+      },
+      "clean_notice": {
+        "name": "Clean notice"
+      },
+      "toilet_notice": {
+        "name": "Toilet notice"
+      },
+      "net_notice": {
+        "name": "Net notice"
+      },
+      "calibration": {
+        "name": "Calibration"
+      },
+      "unit": {
+        "name": "Unit"
+      },
+      "store_full_notify": {
+        "name": "Store full notify"
+      },
+      "odourless": {
+        "name": "Odourless"
+      },
+      "smart_clean": {
+        "name": "Smart clean"
+      },
+      "not_disturb_switch": {
+        "name": "Not disturb Switch"
+      },
+      "auto_deordrizer": {
+        "name": "Auto deordrizer"
+      },
       "start": {
         "name": "Start"
       },
@@ -804,6 +1009,9 @@
       "usb_6": {
         "name": "USB 6"
       },
+      "uv": {
+        "name": "UV"
+      },
       "socket_1": {
         "name": "Socket 1"
       },
@@ -905,6 +1113,36 @@
       },
       "sterilization": {
         "name": "Sterilization"
+      },
+      "light": {
+        "name": "Light"
+      },
+      "factory_reset": {
+        "name": "Factory reset"
+      }
+    }
+  },
+  "issues": {
+    "service_deprecation_turn_off": {
+      "title": "Tuya vacuum support for vacuum.turn_off is being removed",
+      "fix_flow": {
+        "step": {
+          "confirm": {
+            "title": "[%key:component::tuya::issues::service_deprecation_turn_off::title%]",
+            "description": "Tuya vacuum support for the vacuum.turn_off service is deprecated and will be removed in Home Assistant 2024.2; Please adjust any automation or script that uses the service to instead call vacuum.stop and select submit below to mark this issue as resolved."
+          }
+        }
+      }
+    },
+    "service_deprecation_turn_on": {
+      "title": "Tuya vacuum support for vacuum.turn_on is being removed",
+      "fix_flow": {
+        "step": {
+          "confirm": {
+            "title": "[%key:component::tuya::issues::service_deprecation_turn_on::title%]",
+            "description": "Tuya vacuum support for the vacuum.turn_on service is deprecated and will be removed in Home Assistant 2024.2; Please adjust any automation or script that uses the service to instead call vacuum.start and select submit below to mark this issue as resolved."
+          }
+        }
       }
     }
   }
