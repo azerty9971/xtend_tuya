@@ -57,7 +57,7 @@ class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
                     data=config_entry.data,
                 )
 
-        return self.async_abort(reason="tuya_not_configured")
+        return self.async_abort(reason="No unimported Tuya configuration")
 
     async def async_step_scan(
         self, user_input: dict[str, Any] | None = None
