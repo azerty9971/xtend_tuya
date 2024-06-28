@@ -109,6 +109,7 @@ class DPCode(StrEnum):
 
     ADD_ELE = "add_ele" #Added watt since last heartbeat
     AIR_QUALITY = "air_quality"
+    ALARM_LOCK = "alarm_lock"
     ALARM_SWITCH = "alarm_switch"  # Alarm switch
     ALARM_TIME = "alarm_time"  # Alarm time
     ALARM_VOLUME = "alarm_volume"  # Alarm volume
@@ -120,6 +121,8 @@ class DPCode(StrEnum):
     ARM_UP_PERCENT = "arm_up_percent"
     AUTO_CLEAN = "auto_clean"
     AUTO_DEORDRIZER = "auto_deordrizer"
+    AUTO_LOCK_TIME = "auto_lock_time"
+    AUTOMATIC_LOCK = "automatic_lock"
     BASIC_ANTI_FLICKER = "basic_anti_flicker"
     BASIC_DEVICE_VOLUME = "basic_device_volume"
     BASIC_FLIP = "basic_flip"
@@ -132,6 +135,7 @@ class DPCode(StrEnum):
     BATTERY_PERCENTAGE = "battery_percentage"  # Battery percentage
     BATTERY_STATE = "battery_state"  # Battery state
     BATTERY_VALUE = "battery_value"  # Battery value
+    BEEP_VOLUME = "beep_volume"
     BRIGHT_CONTROLLER = "bright_controller"
     BRIGHT_STATE = "bright_state"  # Brightness status
     BRIGHT_VALUE = "bright_value"  # Brightness
@@ -164,6 +168,7 @@ class DPCode(StrEnum):
     CLEAN_TIME_SWITCH = "clean_time_switch"
     CLICK_SUSTAIN_TIME = "click_sustain_time"
     CLOUD_RECIPE_NUMBER = "cloud_recipe_number"
+    CLOSED_OPENED = "closed_opened"
     CLOSED_OPENED_KIT = "closed_opened_kit"
     CO_STATE = "co_state"
     CO_STATUS = "co_status"
@@ -258,6 +263,7 @@ class DPCode(StrEnum):
     MACH_OPERATE = "mach_operate"
     MANUAL_CLEAN = "manual_clean"
     MANUAL_FEED = "manual_feed"
+    MANUAL_LOCK = "manual_lock"
     MATERIAL = "material"  # Material
     MONITORING = "monitoring"
     MODE = "mode"  # Working mode / Mode
@@ -310,6 +316,7 @@ class DPCode(StrEnum):
     RESET_MAP = "reset_map"
     RESET_ROLL_BRUSH = "reset_roll_brush"
     ROLL_BRUSH = "roll_brush"
+    RTC_TIME = "rtc_time"
     SAND_SURFACE_CALIBRATION = "sand_surface_calibration"
     SEEK = "seek"
     SENSITIVITY = "sensitivity"  # Sensitivity
@@ -329,6 +336,8 @@ class DPCode(StrEnum):
     SMOKE_SENSOR_VALUE = "smoke_sensor_value"
     SOS = "sos"  # Emergency State
     SOS_STATE = "sos_state"  # Emergency mode
+    SOUND_MODE = "sound_mode"
+    SPECIAL_FUNCTION = "special_function"
     SPEED = "speed"  # Speed level
     SPRAY_MODE = "spray_mode"  # Spraying mode
     START = "start"  # Start
