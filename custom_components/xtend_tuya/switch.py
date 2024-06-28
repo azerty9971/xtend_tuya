@@ -24,6 +24,28 @@ from .const import TUYA_DISCOVERY_NEW, DPCode
 # default instruction set of each category end up being a Switch.
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
 SWITCHES: dict[str, tuple[SwitchEntityDescription, ...]] = {
+    "jtmspro": (
+        SwitchEntityDescription(
+            key=DPCode.AUTOMATIC_LOCK,
+            translation_key="automatic_lock",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        SwitchEntityDescription(
+            key=DPCode.RTC_TIME,
+            translation_key="rtc_time",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        SwitchEntityDescription(
+            key=DPCode.MANUAL_LOCK,
+            translation_key="manual_lock",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        SwitchEntityDescription(
+            key=DPCode.ALARM_SWITCH,
+            translation_key="alarm_switch",
+            entity_category=EntityCategory.CONFIG,
+        ),
+    ),
     # Automatic cat litter box
     # Note: Undocumented
     "msp": (
