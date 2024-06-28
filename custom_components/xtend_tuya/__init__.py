@@ -33,7 +33,7 @@ from tuya_sharing.user import (
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
-from homeassistant.exceptions import ConfigEntryAuthFailed
+from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryError
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.dispatcher import dispatcher_send
 
@@ -72,9 +72,6 @@ from .sensor import (
 
 async def async_setup_entry(hass: HomeAssistant, entry: TuyaConfigEntry) -> bool:
     """Async setup hass config entry."""
-    if CONF_APP_TYPE in entry.data:
-        raise ConfigEntryAuthFailed("Authentication failed. Please re-authenticate.")
-
     reuse_config = False
     tuya_data = hass.config_entries.async_entries(DOMAIN_ORIG,False,False)
     for config_entry in tuya_data:
@@ -113,8 +110,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: TuyaConfigEntry) -> bool
         # While in general, we should avoid catching broad exceptions,
         # we have no other way of detecting this case.
         if "sign invalid" in str(exc):
-            msg = "Authentication failed. Please re-authenticate"
-            raise ConfigEntryAuthFailed(msg) from exc
+            msg = "Authentication failed. Please re-authenticate the Tuya integration"
+            if reuse_config:
+                raise ConfigEntryError(msg) from exc
+            else:
+                raise ConfigEntryAuthFailed("Authentication failed. Please re-authenticate.")
         raise
 
     # Connection is successful, store the manager & listener
@@ -155,8 +155,8 @@ async def async_unload_entry(hass: HomeAssistant, entry: TuyaConfigEntry) -> boo
     """Unloading the Tuya platforms."""
     if unload_ok := await hass.config_entries.async_unload_platforms(entry, PLATFORMS):
         tuya = entry.runtime_data
-        if tuya.manager.mq is not None:
-            tuya.manager.mq.stop()
+        """if tuya.manager.mq is not None:
+            tuya.manager.mq.stop()"""
         tuya.manager.remove_device_listener(tuya.listener)
     return unload_ok
 
@@ -166,14 +166,14 @@ async def async_remove_entry(hass: HomeAssistant, entry: TuyaConfigEntry) -> Non
 
     This will revoke the credentials from Tuya.
     """
-    manager = Manager(
+    """manager = Manager(
         TUYA_CLIENT_ID,
         entry.data[CONF_USER_CODE],
         entry.data[CONF_TERMINAL_ID],
         entry.data[CONF_ENDPOINT],
         entry.data[CONF_TOKEN_INFO],
     )
-    await hass.async_add_executor_job(manager.unload)
+    await hass.async_add_executor_job(manager.unload)"""
 
 
 class DeviceListener(SharingDeviceListener):
@@ -325,6 +325,7 @@ class DeviceManager(Manager):
         else:
             self.terminal_id = other_manager.terminal_id
             self.customer_api = other_manager.customer_api
+            #LOGGER.warning(f"self.customer_api => {self.customer_api}")
             self.mq = other_manager.mq
             self.mq.remove_message_listener(other_manager.on_message)
         self.other_device_manager = other_manager
@@ -370,12 +371,12 @@ class DeviceManager(Manager):
         super().refresh_mq()
 
     def _on_device_other(self, device_id: str, biz_code: str, data: dict[str, Any]):
-        LOGGER.warning(f"mq _on_device_other-> {device_id} biz_code-> {biz_code} data-> {data}")
+        #LOGGER.warning(f"mq _on_device_other-> {device_id} biz_code-> {biz_code} data-> {data}")
         super()._on_device_other(device_id, biz_code, data)
 
     def _on_device_report(self, device_id: str, status: list):
         device = self.device_map.get(device_id, None)
-        LOGGER.debug(f"mq _on_device_report-> {device_id} status-> {status}")
+        #LOGGER.debug(f"mq _on_device_report-> {device_id} status-> {status}")
         if not device:
             return
         #LOGGER.debug(f"Device found!")
