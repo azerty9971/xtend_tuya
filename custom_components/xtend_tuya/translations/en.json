@@ -1,20 +1,28 @@
 {
   "config": {
     "step": {
-      "user": {
-        "description": "Enter your Tuya credentials",
+      "reauth_user_code": {
+        "description": "The Tuya integration now uses an improved login method. To reauthenticate with your Smart Life or Tuya Smart account, you need to enter your user code.\n\nYou can find this code in the Smart Life app or Tuya Smart app in **Settings** > **Account and Security** screen, and enter the code shown on the **User Code** field. The user code is case sensitive, please be sure to enter it exactly as shown in the app.",
         "data": {
-          "country_code": "Country",
-          "access_id": "Tuya IoT Access ID",
-          "access_secret": "Tuya IoT Access Secret",
-          "username": "Account",
-          "password": "[%key:common::config_flow::data::password%]"
+          "user_code": "User code"
         }
+      },
+      "user": {
+        "description": "Enter your Smart Life or Tuya Smart user code.\n\nYou can find this code in the Smart Life app or Tuya Smart app in **Settings** > **Account and Security** screen, and enter the code shown on the **User Code** field. The user code is case sensitive, please be sure to enter it exactly as shown in the app.",
+        "data": {
+          "user_code": "User code"
+        }
+      },
+      "scan": {
+        "description": "Use Smart Life app or Tuya Smart app to scan the following QR-code to complete the login.\n\nContinue to the next step once you have completed this step in the app."
       }
     },
     "error": {
       "invalid_auth": "[%key:common::config_flow::error::invalid_auth%]",
       "login_error": "Login error ({code}): {msg}"
+    },
+    "abort": {
+      "reauth_successful": "[%key:common::config_flow::abort::reauth_successful%]"
     }
   },
   "entity": {
@@ -111,6 +119,9 @@
       }
     },
     "number": {
+      "auto_lock_time": {
+        "name": "Auto lock time"
+      },
       "temperature": {
         "name": "[%key:component::number::entity_component::temperature::name%]"
       },
@@ -229,6 +240,70 @@
           "uv": "UV",
           "deodorization": "Deodorization",
           "sleep": "Sleep"
+        }
+      },
+      "beep_volume": {
+        "name": "Beep volume",
+        "state": {
+          "0": "High",
+          "1": "Low",
+          "2": "Mute"
+        }
+      },
+      "special_function": {
+        "name": "Special function",
+        "state": {
+          "0": "Function 1",
+          "1": "Function 2",
+          "2": "Function 3",
+          "3": "Function 4",
+          "4": "Function 5"
+        }
+      },
+      "alarm_volume": {
+        "name": "Alarm volume",
+        "state": {
+          "0": "Mute",
+          "1": "Normal",
+          "2": "Loud"
+        }
+      },
+      "sound_mode": {
+        "name": "Sound mode",
+        "state": {
+          "0": "Ringtone 0",
+          "1": "Ringtone 1",
+          "2": "Ringtone 2",
+          "3": "Ringtone 3",
+          "4": "Ringtone 4",
+          "5": "Ringtone 5"
+        }
+      },
+      "alarm_lock": {
+        "name": "Alarm lock",
+        "state": {
+          "0": "Wrong fingerprint",
+          "1": "Wrong password",
+          "2": "Wrong card",
+          "3": "Wrong face",
+          "4": "Bad tongue",
+          "5": "Too hot",
+          "6": "Unclosed time",
+          "7": "Tongue not out",
+          "8": "Pry",
+          "9": "Key in",
+          "10": "Low battery",
+          "11": "Power off",
+          "12": "Shock",
+          "13": "Defense"
+        }
+      },
+      "closed_opened": {
+        "name": "Open/Closed",
+        "state": {
+          "0": "Unknown",
+          "1": "Open",
+          "2": "Closed"
         }
       },
       "cups": {
@@ -463,6 +538,19 @@
           "3": "Mood 3",
           "4": "Mood 4",
           "5": "Mood 5"
+        }
+      },
+      "weather_delay": {
+        "name": "Weather delay",
+        "state": {
+          "cancel": "Cancel",
+          "24h": "24h",
+          "48h": "48h",
+          "72h": "72h",
+          "96h": "96h",
+          "120h": "120h",
+          "144h": "144h",
+          "168h": "168h"
         }
       }
     },
@@ -701,6 +789,9 @@
       "water_level": {
         "name": "Water level"
       },
+      "total_watering_time": {
+        "name": "Total watering time"
+      },
       "filter_utilization": {
         "name": "Filter utilization"
       },
@@ -741,6 +832,18 @@
       }
     },
     "switch": {
+      "automatic_lock": {
+        "name": "Automatic lock"
+      },
+      "rtc_lock": {
+        "name": "RTC lock"
+      },
+      "manual_lock": {
+        "name": "Manual lock"
+      },
+      "alarm_switch": {
+        "name": "Alarm switch"
+      },
       "auto_clean": {
         "name": "Auto clean"
       },
