@@ -115,7 +115,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: TuyaConfigEntry) -> bool
         if "sign invalid" in str(exc):
             msg = "Authentication failed. Please re-authenticate the Tuya integration"
             if reuse_config:
-                config_entry.runtime_data.tainted = True
+                setattr(config_entry.runtime_data, 'tainted', True)
                 raise ConfigEntryError(msg) from exc
             else:
                 raise ConfigEntryAuthFailed("Authentication failed. Please re-authenticate.")
