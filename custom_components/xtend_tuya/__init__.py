@@ -267,9 +267,29 @@ class XTDeviceRepository(DeviceRepository):
         super().__init__(customer_api)
         self.manager = manager
 
+    def update_device_specification(self, device: CustomerDevice):
+        device_id = device.id
+        response = self.api.get(f"/v1.1/m/life/{device_id}/specifications")
+        LOGGER.warning(f"update_device_specification => {response}")
+        if response.get("success"):
+            result = response.get("result", {})
+            function_map = {}
+            for function in result["functions"]:
+                code = function["code"]
+                function_map[code] = DeviceFunction(**function)
+
+            status_range = {}
+            for status in result["status"]:
+                code = status["code"]
+                status_range[code] = DeviceStatusRange(**status)
+
+            device.function = function_map
+            device.status_range = status_range
+
     def update_device_strategy_info(self, device: CustomerDevice):
         device_id = device.id
         response = self.api.get(f"/v1.0/m/life/devices/{device_id}/status")
+        LOGGER.warning(f"update_device_strategy_info => {response}")
         support_local = True
         if response.get("success"):
             result = response.get("result", {})
