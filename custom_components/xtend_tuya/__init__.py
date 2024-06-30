@@ -77,7 +77,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: TuyaConfigEntry) -> bool
     for config_entry in tuya_data:
         if entry.title == config_entry.title:
             reuse_config = True
-            if config_entry.runtime_data is None or hasattr(config_entry.runtime_data, 'tainted'):
+            if (
+                not hasattr(config_entry, 'runtime_data') 
+                or config_entry.runtime_data is None 
+                or hasattr(config_entry.runtime_data, 'tainted')
+            ):
                 msg = "Authentication failed. Please re-authenticate the Tuya integration"
                 raise ConfigEntryError(msg)
             tuya_device_manager = config_entry.runtime_data.manager
@@ -271,6 +275,8 @@ class XTDeviceRepository(DeviceRepository):
             dp_id_map = {}
             tuya_device = None
             tuya_manager = self.manager.get_overriden_device_manager()
+            if tuya_manager is None:
+                tuya_manager = self.manager
             if device.id in tuya_manager.device_map:
                 tuya_device = tuya_manager.device_map[device.id]
             for dp_status_relation in result["dpStatusRelationDTOS"]:
@@ -289,18 +295,19 @@ class XTDeviceRepository(DeviceRepository):
                             "pid": pid,
                         }
                     }
-                code = dp_status_relation["statusCode"]
-                if code not in device.status_range:
-                    device.status_range[code] = DeviceStatusRange()
-                    device.status_range[code].code   = code
-                    device.status_range[code].type   = dp_status_relation["valueType"]
-                    device.status_range[code].values = dp_status_relation["valueDesc"]
-                #Also add the status range for Tuya's manager devices
-                if tuya_device is not None and code not in tuya_device.status_range:
-                    tuya_device.status_range[code] = DeviceStatusRange()
-                    tuya_device.status_range[code].code   = code
-                    tuya_device.status_range[code].type   = dp_status_relation["valueType"]
-                    tuya_device.status_range[code].values = dp_status_relation["valueDesc"]
+                if "statusCode" in dp_status_relation:
+                    code = dp_status_relation["statusCode"]
+                    if code not in device.status_range:
+                        device.status_range[code] = DeviceStatusRange()
+                        device.status_range[code].code   = code
+                        device.status_range[code].type   = dp_status_relation["valueType"]
+                        device.status_range[code].values = dp_status_relation["valueDesc"]
+                    #Also add the status range for Tuya's manager devices
+                    if tuya_device is not None and code not in tuya_device.status_range:
+                        tuya_device.status_range[code] = DeviceStatusRange()
+                        tuya_device.status_range[code].code   = code
+                        tuya_device.status_range[code].type   = dp_status_relation["valueType"]
+                        tuya_device.status_range[code].values = dp_status_relation["valueDesc"]
             device.support_local = support_local
             if support_local:
                 device.local_strategy = dp_id_map
@@ -356,10 +363,10 @@ class DeviceManager(Manager):
     def set_overriden_device_manager(self, other_device_manager: Manager) -> None:
         self.other_device_manager = other_device_manager
     
-    def get_overriden_device_manager(self) -> Manager:
+    def get_overriden_device_manager(self) -> Manager | None:
         if self.other_device_manager is not None:
             return self.other_device_manager
-        return self
+        return None
 
     def on_message(self, msg: str):
         #If we override another device manager, first call its on_message method
