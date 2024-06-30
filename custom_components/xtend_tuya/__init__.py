@@ -291,18 +291,19 @@ class XTDeviceRepository(DeviceRepository):
                             "pid": pid,
                         }
                     }
-                code = dp_status_relation["statusCode"]
-                if code not in device.status_range:
-                    device.status_range[code] = DeviceStatusRange()
-                    device.status_range[code].code   = code
-                    device.status_range[code].type   = dp_status_relation["valueType"]
-                    device.status_range[code].values = dp_status_relation["valueDesc"]
-                #Also add the status range for Tuya's manager devices
-                if tuya_device is not None and code not in tuya_device.status_range:
-                    tuya_device.status_range[code] = DeviceStatusRange()
-                    tuya_device.status_range[code].code   = code
-                    tuya_device.status_range[code].type   = dp_status_relation["valueType"]
-                    tuya_device.status_range[code].values = dp_status_relation["valueDesc"]
+                if "statusCode" in dp_status_relation:
+                    code = dp_status_relation["statusCode"]
+                    if code not in device.status_range:
+                        device.status_range[code] = DeviceStatusRange()
+                        device.status_range[code].code   = code
+                        device.status_range[code].type   = dp_status_relation["valueType"]
+                        device.status_range[code].values = dp_status_relation["valueDesc"]
+                    #Also add the status range for Tuya's manager devices
+                    if tuya_device is not None and code not in tuya_device.status_range:
+                        tuya_device.status_range[code] = DeviceStatusRange()
+                        tuya_device.status_range[code].code   = code
+                        tuya_device.status_range[code].type   = dp_status_relation["valueType"]
+                        tuya_device.status_range[code].values = dp_status_relation["valueDesc"]
             device.support_local = support_local
             if support_local:
                 device.local_strategy = dp_id_map
