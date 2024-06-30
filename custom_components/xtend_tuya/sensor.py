@@ -74,6 +74,20 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
             restoredata=True,
         ),
     ),
+    # IoT Switch
+    # Note: Undocumented
+    "tdq": (
+        TuyaSensorEntityDescription(
+            key=DPCode.ADD_ELE,
+            #virtualstate=VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD,
+            translation_key="add_ele",
+            device_class=SensorDeviceClass.ENERGY,
+            state_class=SensorStateClass.TOTAL_INCREASING,
+            native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+            entity_registry_enabled_default=True,
+            restoredata=True,
+        ),
+    ),
     # Automatic cat litter box
     # Note: Undocumented
     "msp": (
@@ -283,26 +297,12 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
             entity_registry_enabled_default=False,
         ),
     ),
-    # IoT Switch
-    # Note: Undocumented
-    "tdq": (
-        TuyaSensorEntityDescription(
-            key=DPCode.ADD_ELE,
-            virtualstate=VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD,
-            translation_key="add_ele",
-            device_class=SensorDeviceClass.ENERGY,
-            state_class=SensorStateClass.TOTAL_INCREASING,
-            native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
-            entity_registry_enabled_default=True,
-        ),
-    ),
 }
 
 # Socket (duplicate of `kg`)
 # https://developer.tuya.com/en/docs/iot/s?id=K9gf7o5prgf7s
 SENSORS["cz"] = SENSORS["kg"]
 SENSORS["wkcz"] = SENSORS["kg"]
-SENSORS["tdq"] = SENSORS["kg"]
 SENSORS["dlq"] = SENSORS["kg"]
 
 # Power Socket (duplicate of `kg`)
