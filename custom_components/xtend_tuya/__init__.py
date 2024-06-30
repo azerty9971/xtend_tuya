@@ -271,6 +271,8 @@ class XTDeviceRepository(DeviceRepository):
             dp_id_map = {}
             tuya_device = None
             tuya_manager = self.manager.get_overriden_device_manager()
+            if tuya_manager is None:
+                tuya_manager = self.manager
             if device.id in tuya_manager.device_map:
                 tuya_device = tuya_manager.device_map[device.id]
             for dp_status_relation in result["dpStatusRelationDTOS"]:
@@ -356,10 +358,10 @@ class DeviceManager(Manager):
     def set_overriden_device_manager(self, other_device_manager: Manager) -> None:
         self.other_device_manager = other_device_manager
     
-    def get_overriden_device_manager(self) -> Manager:
+    def get_overriden_device_manager(self) -> Manager | None:
         if self.other_device_manager is not None:
             return self.other_device_manager
-        return self
+        return None
 
     def on_message(self, msg: str):
         #If we override another device manager, first call its on_message method
