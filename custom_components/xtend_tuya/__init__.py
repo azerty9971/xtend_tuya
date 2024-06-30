@@ -77,7 +77,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: TuyaConfigEntry) -> bool
     for config_entry in tuya_data:
         if entry.title == config_entry.title:
             reuse_config = True
-            if not hasattr(config_entry, 'runtime_data') or not hasattr(config_entry.runtime_data, 'tainted'):
+            if config_entry.runtime_data is not None or not config_entry.runtime_data.tainted is not None:
                 msg = "Authentication failed. Please re-authenticate the Tuya integration"
                 raise ConfigEntryError(msg)
             tuya_device_manager = config_entry.runtime_data.manager
