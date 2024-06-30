@@ -65,6 +65,7 @@ class HomeAssistantTuyaData(NamedTuple):
 
     manager: Manager
     listener: SharingDeviceListener
+    reuse_config: bool = False
 
 from .sensor import (
     SENSORS,
@@ -126,7 +127,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: TuyaConfigEntry) -> bool
         raise
 
     # Connection is successful, store the manager & listener
-    entry.runtime_data = HomeAssistantTuyaData(manager=manager, listener=listener)
+    entry.runtime_data = HomeAssistantTuyaData(manager=manager, listener=listener, reuse_config=reuse_config)
 
     # Cleanup device registry
     await cleanup_device_registry(hass, manager)
@@ -163,8 +164,8 @@ async def async_unload_entry(hass: HomeAssistant, entry: TuyaConfigEntry) -> boo
     """Unloading the Tuya platforms."""
     if unload_ok := await hass.config_entries.async_unload_platforms(entry, PLATFORMS):
         tuya = entry.runtime_data
-        """if tuya.manager.mq is not None:
-            tuya.manager.mq.stop()"""
+        if tuya.manager.mq is not None and tuya.manager.get_overriden_device_manager() is not None:
+            tuya.manager.mq.stop()
         tuya.manager.remove_device_listener(tuya.listener)
     return unload_ok
 
@@ -174,14 +175,15 @@ async def async_remove_entry(hass: HomeAssistant, entry: TuyaConfigEntry) -> Non
 
     This will revoke the credentials from Tuya.
     """
-    """manager = Manager(
-        TUYA_CLIENT_ID,
-        entry.data[CONF_USER_CODE],
-        entry.data[CONF_TERMINAL_ID],
-        entry.data[CONF_ENDPOINT],
-        entry.data[CONF_TOKEN_INFO],
-    )
-    await hass.async_add_executor_job(manager.unload)"""
+    if not entry.reuse_config:
+        manager = Manager(
+            TUYA_CLIENT_ID,
+            entry.data[CONF_USER_CODE],
+            entry.data[CONF_TERMINAL_ID],
+            entry.data[CONF_ENDPOINT],
+            entry.data[CONF_TOKEN_INFO],
+        )
+        await hass.async_add_executor_job(manager.unload)
 
 
 class DeviceListener(SharingDeviceListener):
@@ -265,9 +267,29 @@ class XTDeviceRepository(DeviceRepository):
         super().__init__(customer_api)
         self.manager = manager
 
+    """def update_device_specification(self, device: CustomerDevice):
+        device_id = device.id
+        response = self.api.get(f"/v1.1/m/life/{device_id}/specifications")
+        LOGGER.warning(f"update_device_specification => {response}")
+        if response.get("success"):
+            result = response.get("result", {})
+            function_map = {}
+            for function in result["functions"]:
+                code = function["code"]
+                function_map[code] = DeviceFunction(**function)
+
+            status_range = {}
+            for status in result["status"]:
+                code = status["code"]
+                status_range[code] = DeviceStatusRange(**status)
+
+            device.function = function_map
+            device.status_range = status_range"""
+
     def update_device_strategy_info(self, device: CustomerDevice):
         device_id = device.id
         response = self.api.get(f"/v1.0/m/life/devices/{device_id}/status")
+        #LOGGER.warning(f"update_device_strategy_info => {response}")
         support_local = True
         if response.get("success"):
             result = response.get("result", {})

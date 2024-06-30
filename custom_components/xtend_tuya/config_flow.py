@@ -8,7 +8,12 @@ from typing import Any
 from tuya_sharing import LoginControl
 import voluptuous as vol
 
-from homeassistant.config_entries import ConfigEntry, ConfigFlow, ConfigFlowResult
+from homeassistant.config_entries import ConfigEntry, ConfigFlow
+try:
+    from homeassistant.config_entries import ConfigFlowResult
+except ImportError:
+    from homeassistant.data_entry_flow import FlowResult
+    type ConfigFlowResult = FlowResult
 from homeassistant.helpers import selector
 
 from .const import (
