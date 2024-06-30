@@ -41,8 +41,8 @@ CONF_USERNAME = "username"
 TUYA_CLIENT_ID = "HA_3y9q4ak7g4ephrvke"
 TUYA_SCHEMA = "haauthorize"
 
-TUYA_DISCOVERY_NEW = "tuya_discovery_new"
-TUYA_HA_SIGNAL_UPDATE_ENTITY = "tuya_entry_update"
+TUYA_DISCOVERY_NEW = "xtend_tuya_discovery_new"
+TUYA_HA_SIGNAL_UPDATE_ENTITY = "xtend_tuya_entry_update"
 
 TUYA_RESPONSE_CODE = "code"
 TUYA_RESPONSE_MSG = "msg"
