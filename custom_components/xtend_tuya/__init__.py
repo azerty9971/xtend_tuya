@@ -83,15 +83,24 @@ async def async_setup_entry(hass: HomeAssistant, entry: TuyaConfigEntry) -> bool
                 or config_entry.runtime_data is None 
                 or hasattr(config_entry.runtime_data, 'tainted')
             ):
-                msg = "Authentication failed. Please re-authenticate the Tuya integration"
-                raise ConfigEntryError(msg)
-            tuya_device_manager = config_entry.runtime_data.manager
+                #Try to fetch the manager using the old way
+                tuya_device_manager = None
+                if ( DOMAIN_ORIG in hass.data and
+                    config_entry.entry_id in hass.data[DOMAIN_ORIG]
+                ):
+                    orig_config = hass.data[DOMAIN_ORIG][config_entry.entry_id]
+                    tuya_device_manager = orig_config.manager
+                if tuya_device_manager is None:
+                    msg = "Authentication failed. Please re-authenticate the Tuya integration"
+                    raise ConfigEntryError(msg)
+            else:
+                tuya_device_manager = config_entry.runtime_data.manager
             manager = DeviceManager(
                 TUYA_CLIENT_ID,
-                entry.data[CONF_USER_CODE],
-                entry.data[CONF_TERMINAL_ID],
-                entry.data[CONF_ENDPOINT],
-                entry.data[CONF_TOKEN_INFO],
+                config_entry.data[CONF_USER_CODE],
+                config_entry.data[CONF_TERMINAL_ID],
+                config_entry.data[CONF_ENDPOINT],
+                config_entry.data[CONF_TOKEN_INFO],
                 None,
                 tuya_device_manager
             )
