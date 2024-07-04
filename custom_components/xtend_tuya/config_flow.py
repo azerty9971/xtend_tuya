@@ -6,9 +6,11 @@ from collections.abc import Mapping
 from typing import Any
 
 from tuya_sharing import LoginControl
+from tuya_iot import AuthType, TuyaOpenAPI
 import voluptuous as vol
 
-from homeassistant.config_entries import ConfigEntry, ConfigFlow
+from homeassistant.core import callback
+from homeassistant.config_entries import ConfigEntry, ConfigFlow, OptionsFlow
 try:
     from homeassistant.config_entries import ConfigFlowResult
 except ImportError:
@@ -23,6 +25,7 @@ from .const import (
     CONF_USER_CODE,
     DOMAIN,
     DOMAIN_ORIG,
+    LOGGER,
     TUYA_CLIENT_ID,
     TUYA_RESPONSE_CODE,
     TUYA_RESPONSE_MSG,
@@ -30,8 +33,59 @@ from .const import (
     TUYA_RESPONSE_RESULT,
     TUYA_RESPONSE_SUCCESS,
     TUYA_SCHEMA,
+    CONF_ACCESS_ID,
+    CONF_ACCESS_SECRET,
+    CONF_APP_TYPE,
+    CONF_ENDPOINT_OT,
+    CONF_AUTH_TYPE,
+    CONF_COUNTRY_CODE,
+    CONF_PASSWORD,
+    CONF_USERNAME,
+    SMARTLIFE_APP,
+    TUYA_COUNTRIES,
+    TUYA_SMART_APP,
+    TUYA_RESPONSE_PLATFORM_URL,
 )
 
+
+class TuyaOptionFlow(OptionsFlow):
+    def __init__(self, config_entry: ConfigEntry) -> None:
+        """Initialize options flow."""
+        self.config_entry = config_entry
+
+    async def async_step_init(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
+        """Manage the options."""
+        if user_input is not None:
+            return self.async_create_entry(data=user_input)
+
+        return self.async_show_form(
+            step_id="init",
+            data_schema=vol.Schema(
+                {
+                    vol.Optional(
+                        CONF_COUNTRY_CODE,
+                    ): vol.In(
+                        # We don't pass a dict {code:name} because country codes can be duplicate.
+                        [country.name for country in TUYA_COUNTRIES]
+                    ),
+                    vol.Optional(
+                        CONF_ACCESS_ID, default=user_input.get(CONF_ACCESS_ID, "")
+                    ): str,
+                    vol.Optional(
+                        CONF_ACCESS_SECRET,
+                        default=user_input.get(CONF_ACCESS_SECRET, ""),
+                    ): str,
+                    vol.Optional(
+                        CONF_USERNAME, default=user_input.get(CONF_USERNAME, "")
+                    ): str,
+                    vol.Optional(
+                        CONF_PASSWORD, default=user_input.get(CONF_PASSWORD, "")
+                    ): str,
+                }
+            ),
+        )
 
 class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
     """Tuya config flow."""
@@ -43,7 +97,13 @@ class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
     def __init__(self) -> None:
         """Initialize the config flow."""
         self.__login_control = LoginControl()
-
+    
+    @staticmethod
+    @callback
+    def async_get_options_flow(config_entry):
+        """Get the options flow for this handler."""
+        return TuyaOptionFlow(config_entry)
+    
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
