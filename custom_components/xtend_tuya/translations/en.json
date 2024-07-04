@@ -34,7 +34,7 @@
           "access_id": "Tuya IoT Access ID",
           "access_secret": "Tuya IoT Access Secret",
           "username": "Account",
-          "password": "[%key:common::config_flow::data::password%]"
+          "password": "Password"
         },
         "title": "Add Tuya OpenAPI credentials"
       }

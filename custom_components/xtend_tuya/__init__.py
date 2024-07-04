@@ -71,8 +71,13 @@ from .sensor import (
     SENSORS,
 )
 
+async def update_listener(hass, entry):
+    """Handle options update."""
+    pass
+
 async def async_setup_entry(hass: HomeAssistant, entry: TuyaConfigEntry) -> bool:
     """Async setup hass config entry."""
+    entry.async_on_unload(entry.add_update_listener(update_listener))
     reuse_config = False
     tuya_data = hass.config_entries.async_entries(DOMAIN_ORIG,False,False)
     for config_entry in tuya_data:
@@ -95,6 +100,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: TuyaConfigEntry) -> bool
                     raise ConfigEntryError(msg)
             else:
                 tuya_device_manager = config_entry.runtime_data.manager
+            
             manager = DeviceManager(
                 TUYA_CLIENT_ID,
                 config_entry.data[CONF_USER_CODE],
@@ -144,9 +150,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: TuyaConfigEntry) -> bool
     # Register known device IDs
     device_registry = dr.async_get(hass)
     for device in manager.device_map.values():
+        if reuse_config:
+            identifiers = {(DOMAIN_ORIG, device.id), (DOMAIN, device.id)}
+        else:
+            identifiers = {(DOMAIN, device.id)}
         device_registry.async_get_or_create(
             config_entry_id=entry.entry_id,
-            identifiers={(DOMAIN_ORIG, device.id), (DOMAIN, device.id)},
+            identifiers=identifiers,
             manufacturer="Tuya",
             name=device.name,
             model=f"{device.product_name} (unsupported)",
@@ -369,6 +379,7 @@ class DeviceManager(Manager):
             self.customer_api = other_manager.customer_api
             #LOGGER.warning(f"self.customer_api => {self.customer_api}")
             self.mq = other_manager.mq
+            LOGGER.warning(f"MQTT config: URL => {self.mq.mq_config.url} ClientID => {self.mq.mq_config.client_id} Username => {self.mq.mq_config.username} Password => {self.mq.mq_config.password}")
             self.mq.remove_message_listener(other_manager.on_message)
         self.other_device_manager = other_manager
         self.device_map: dict[str, CustomerDevice] = {}
