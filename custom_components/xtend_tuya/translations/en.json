@@ -15,6 +15,13 @@
       },
       "scan": {
         "description": "Use Smart Life app or Tuya Smart app to scan the following QR-code to complete the login.\n\nContinue to the next step once you have completed this step in the app."
+      },
+      "init": {
+        "country_code": "Country",
+        "access_id": "Tuya IoT Access ID",
+        "access_secret": "Tuya IoT Access Secret",
+        "username": "Account",
+        "password": "[%key:common::config_flow::data::password%]"
       }
     },
     "error": {
