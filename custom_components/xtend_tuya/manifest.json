@@ -3,7 +3,8 @@
   "name": "Xtended Tuya",
   "codeowners": ["@azerty9971"],
   "config_flow": true,
-  "dependencies": ["ffmpeg", "tuya"],
+  "dependencies": ["ffmpeg"],
+  "after_dependencies": ["tuya"],
   "dhcp": [
     {
       "macaddress": "105A17*"
