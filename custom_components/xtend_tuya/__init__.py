@@ -358,7 +358,7 @@ class XTDeviceRepository(DeviceRepository):
 
             device.function = function_map
             device.status_range = status_range
-        self.update_device_specification_open_api(device)
+        self.update_device_properties_open_api(device)
     
     def update_device_properties_open_api(self, device: CustomerDevice):
         device_id = device.id
