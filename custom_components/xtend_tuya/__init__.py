@@ -80,6 +80,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: TuyaConfigEntry) -> bool
     """Async setup hass config entry."""
     LOGGER.warning(f"async_setup_entry => {entry}")
     LOGGER.warning(f"{entry.data}")
+    LOGGER.warning(f"{entry.options}")
     entry.async_on_unload(entry.add_update_listener(update_listener))
     reuse_config = False
     tuya_data = hass.config_entries.async_entries(DOMAIN_ORIG,False,False)
