@@ -343,7 +343,7 @@ class XTDeviceRepository(DeviceRepository):
     def update_device_specification(self, device: CustomerDevice):
         device_id = device.id
         response = self.api.get(f"/v1.1/m/life/{device_id}/specifications")
-        #LOGGER.warning(f"update_device_specification => {response}")
+        LOGGER.warning(f"update_device_specification => {response}")
         if response.get("success"):
             result = response.get("result", {})
             function_map = {}
@@ -358,12 +358,42 @@ class XTDeviceRepository(DeviceRepository):
 
             device.function = function_map
             device.status_range = status_range
-        self.update_device_properties_open_api(device)
     
-    def update_device_properties_open_api(self, device: CustomerDevice):
+    def update_device_properties_open_api(self, device: CustomerDevice, dp_id_map, pid):
         device_id = device.id
         response = self.open_api.get(f"/v2.0/cloud/thing/{device_id}/shadow/properties")
         LOGGER.warning(f"update_device_properties_open_api => {response}")
+        if response.get("success"):
+            result = response.get("result", {})
+            tuya_device = None
+            tuya_manager = self.manager.get_overriden_device_manager()
+            if tuya_manager is None:
+                tuya_manager = self.manager
+            if device.id in tuya_manager.device_map:
+                tuya_device = tuya_manager.device_map[device.id]
+            for dp_property in result["properties"]:
+                if dp_property["dp_id"] not in dp_id_map:
+                    dp_id_map[dp_property["dp_id"]] = {
+                        "status_code": dp_property["code"],
+                        "config_item": {
+                            "valueDesc": dp_property["value"],
+                            "valueType": dp_property["type"],
+                            "pid": pid,
+                        }
+                    }
+                if "code" in dp_property:
+                    code = dp_property["code"]
+                    if code not in device.status_range:
+                        device.status_range[code] = DeviceStatusRange()
+                        device.status_range[code].code   = code
+                        device.status_range[code].type   = dp_property["valueType"]
+                        device.status_range[code].values = dp_property["valueDesc"]
+                    #Also add the status range for Tuya's manager devices
+                    if tuya_device is not None and code not in tuya_device.status_range:
+                        tuya_device.status_range[code] = DeviceStatusRange()
+                        tuya_device.status_range[code].code   = code
+                        tuya_device.status_range[code].type   = dp_property["valueType"]
+                        tuya_device.status_range[code].values = dp_property["valueDesc"]
 
     def update_device_strategy_info(self, device: CustomerDevice):
         device_id = device.id
@@ -410,8 +440,9 @@ class XTDeviceRepository(DeviceRepository):
                         tuya_device.status_range[code].type   = dp_status_relation["valueType"]
                         tuya_device.status_range[code].values = dp_status_relation["valueDesc"]
             device.support_local = support_local
-            if support_local:
-                device.local_strategy = dp_id_map
+            #if support_local:
+            self.update_device_properties_open_api(device, dp_id_map, pid)
+            device.local_strategy = dp_id_map
 
 class DeviceManager(Manager):
     def __init__(
