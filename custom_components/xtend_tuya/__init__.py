@@ -71,6 +71,7 @@ from .const import (
     CONF_ENDPOINT_OT,
     CONF_PASSWORD,
     CONF_USERNAME,
+    DPType,
 )
 
 # Suppress logs from the library, it logs unneeded on error
@@ -359,6 +360,20 @@ class XTDeviceRepository(DeviceRepository):
             device.function = function_map
             device.status_range = status_range
     
+    def determine_property_type(self, type, value) -> DPType:
+        if type == "value":
+            return DPType(DPType.INTEGER)
+        if type == "bitmap":
+            return DPType(DPType.RAW)
+        if type == "enum":
+            return DPType(DPType.ENUM)
+        if type == "bool":
+            return DPType(DPType.BOOLEAN)
+        if type == "json":
+            return DPType(DPType.JSON)
+        if type == "string":
+            return DPType(DPType.STRING)
+
     def update_device_properties_open_api(self, device: CustomerDevice, dp_id_map, pid):
         device_id = device.id
         response = self.open_api.get(f"/v2.0/cloud/thing/{device_id}/shadow/properties")
@@ -372,7 +387,8 @@ class XTDeviceRepository(DeviceRepository):
             if device.id in tuya_manager.device_map:
                 tuya_device = tuya_manager.device_map[device.id]
             for dp_property in result["properties"]:
-                if "dp_id" in dp_property and dp_property["dp_id"] not in dp_id_map:
+                if "dp_id" in dp_property and dp_property["dp_id"] not in dp_id_map and "type" in dp_property:
+                    dp_property["type"] = self.determine_property_type(dp_property.get("type",None), dp_property.get("value",None))
                     dp_id_map[dp_property["dp_id"]] = {
                         "status_code": dp_property["code"],
                         "config_item": {
@@ -381,19 +397,23 @@ class XTDeviceRepository(DeviceRepository):
                             "pid": pid,
                         }
                     }
-                if "code" in dp_property and "value" in dp_property and "type" in dp_property:
+                if "code" in dp_property and "type" in dp_property:
                     code = dp_property["code"]
                     if code not in device.status_range:
                         device.status_range[code] = DeviceStatusRange()
                         device.status_range[code].code   = code
                         device.status_range[code].type   = dp_property.get("type",None)
-                        device.status_range[code].values = dp_property.get("value",None),
+                        device.status_range[code].values = {} #dp_property.get("value",None)
+                    if code not in device.status:
+                        device.status[code] = dp_property.get("value",None)
                     #Also add the status range for Tuya's manager devices
                     if tuya_device is not None and code not in tuya_device.status_range:
                         tuya_device.status_range[code] = DeviceStatusRange()
                         tuya_device.status_range[code].code   = code
                         tuya_device.status_range[code].type   = dp_property.get("type",None)
-                        tuya_device.status_range[code].values = dp_property.get("value",None),
+                        tuya_device.status_range[code].values = {} #dp_property.get("value",None)
+                    if code not in tuya_device.status:
+                        tuya_device.status[code] = dp_property.get("value",None)
 
     def update_device_strategy_info(self, device: CustomerDevice):
         device_id = device.id
