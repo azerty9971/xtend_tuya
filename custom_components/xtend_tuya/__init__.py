@@ -372,28 +372,28 @@ class XTDeviceRepository(DeviceRepository):
             if device.id in tuya_manager.device_map:
                 tuya_device = tuya_manager.device_map[device.id]
             for dp_property in result["properties"]:
-                if dp_property["dp_id"] not in dp_id_map:
+                if "dp_id" in dp_property and dp_property["dp_id"] not in dp_id_map:
                     dp_id_map[dp_property["dp_id"]] = {
                         "status_code": dp_property["code"],
                         "config_item": {
-                            "valueDesc": dp_property["value"],
-                            "valueType": dp_property["type"],
+                            "valueDesc": dp_property.get("value",None),
+                            "valueType": dp_property.get("type",None),
                             "pid": pid,
                         }
                     }
-                if "code" in dp_property:
+                if "code" in dp_property and "value" in dp_property and "type" in dp_property:
                     code = dp_property["code"]
                     if code not in device.status_range:
                         device.status_range[code] = DeviceStatusRange()
                         device.status_range[code].code   = code
-                        device.status_range[code].type   = dp_property["type"]
-                        device.status_range[code].values = dp_property["value"]
+                        device.status_range[code].type   = dp_property.get("type",None)
+                        device.status_range[code].values = dp_property("value",None),
                     #Also add the status range for Tuya's manager devices
                     if tuya_device is not None and code not in tuya_device.status_range:
                         tuya_device.status_range[code] = DeviceStatusRange()
                         tuya_device.status_range[code].code   = code
-                        tuya_device.status_range[code].type   = dp_property["type"]
-                        tuya_device.status_range[code].values = dp_property["value"]
+                        tuya_device.status_range[code].type   = dp_property.get("type",None)
+                        tuya_device.status_range[code].values = dp_property("value",None),
 
     def update_device_strategy_info(self, device: CustomerDevice):
         device_id = device.id
