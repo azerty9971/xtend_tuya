@@ -124,6 +124,7 @@ class TuyaOptionFlow(OptionsFlow):
                 data[CONF_AUTH_TYPE] = data[CONF_AUTH_TYPE].value
 
                 return self.async_create_entry(
+                    title="",
                     data=data,
                 )
             errors["base"] = "login_error"
@@ -140,23 +141,27 @@ class TuyaOptionFlow(OptionsFlow):
             data_schema=vol.Schema(
                 {
                     vol.Optional(
-                        CONF_COUNTRY_CODE,
+                        CONF_COUNTRY_CODE, 
+                        default=user_input.get(CONF_COUNTRY_CODE, "")
                     ): vol.In(
                         # We don't pass a dict {code:name} because country codes can be duplicate.
                         [country.name for country in TUYA_COUNTRIES]
                     ),
                     vol.Optional(
-                        CONF_ACCESS_ID, default=user_input.get(CONF_ACCESS_ID, "")
+                        CONF_ACCESS_ID, 
+                        default=user_input.get(CONF_ACCESS_ID, "")
                     ): str,
                     vol.Optional(
                         CONF_ACCESS_SECRET,
                         default=user_input.get(CONF_ACCESS_SECRET, ""),
                     ): str,
                     vol.Optional(
-                        CONF_USERNAME, default=user_input.get(CONF_USERNAME, "")
+                        CONF_USERNAME, 
+                        default=user_input.get(CONF_USERNAME, "")
                     ): str,
                     vol.Optional(
-                        CONF_PASSWORD, default=user_input.get(CONF_PASSWORD, "")
+                        CONF_PASSWORD, 
+                        default=user_input.get(CONF_PASSWORD, "")
                     ): str,
                 }
             ),
