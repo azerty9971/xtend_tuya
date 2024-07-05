@@ -140,13 +140,22 @@ class TuyaOptionFlow(OptionsFlow):
         if user_input is None:
             user_input = {}
 
+        default_country = "United States"
+        if self.options is not None:
+            country_code = self.options.get(CONF_COUNTRY_CODE, "")
+            if country_code != "":
+                for country in TUYA_COUNTRIES:
+                    if country.country_code == country_code:
+                        default_country = country.name
+                        break
+
         return self.async_show_form(
             step_id="init",
             data_schema=vol.Schema(
                 {
                     vol.Optional(
                         CONF_COUNTRY_CODE, 
-                        default=user_input.get(CONF_COUNTRY_CODE, self.options.get(CONF_COUNTRY_CODE, ""))
+                        default=user_input.get(CONF_COUNTRY_CODE, default_country)
                     ): vol.In(
                         # We don't pass a dict {code:name} because country codes can be duplicate.
                         [country.name for country in TUYA_COUNTRIES]
