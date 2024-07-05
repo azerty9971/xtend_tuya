@@ -386,14 +386,14 @@ class XTDeviceRepository(DeviceRepository):
                     if code not in device.status_range:
                         device.status_range[code] = DeviceStatusRange()
                         device.status_range[code].code   = code
-                        device.status_range[code].type   = dp_property["valueType"]
-                        device.status_range[code].values = dp_property["valueDesc"]
+                        device.status_range[code].type   = dp_property["type"]
+                        device.status_range[code].values = dp_property["value"]
                     #Also add the status range for Tuya's manager devices
                     if tuya_device is not None and code not in tuya_device.status_range:
                         tuya_device.status_range[code] = DeviceStatusRange()
                         tuya_device.status_range[code].code   = code
-                        tuya_device.status_range[code].type   = dp_property["valueType"]
-                        tuya_device.status_range[code].values = dp_property["valueDesc"]
+                        tuya_device.status_range[code].type   = dp_property["type"]
+                        tuya_device.status_range[code].values = dp_property["value"]
 
     def update_device_strategy_info(self, device: CustomerDevice):
         device_id = device.id
