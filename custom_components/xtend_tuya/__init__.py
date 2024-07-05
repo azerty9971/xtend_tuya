@@ -291,7 +291,7 @@ class XTDeviceRepository(DeviceRepository):
     def update_device_specification(self, device: CustomerDevice):
         device_id = device.id
         response = self.api.get(f"/v1.1/m/life/{device_id}/specifications")
-        LOGGER.warning(f"update_device_specification => {response}")
+        #LOGGER.warning(f"update_device_specification => {response}")
         if response.get("success"):
             result = response.get("result", {})
             function_map = {}
@@ -310,7 +310,7 @@ class XTDeviceRepository(DeviceRepository):
     def update_device_strategy_info(self, device: CustomerDevice):
         device_id = device.id
         response = self.api.get(f"/v1.0/m/life/devices/{device_id}/status")
-        LOGGER.warning(f"update_device_strategy_info => {response}")
+        #LOGGER.warning(f"update_device_strategy_info => {response}")
         support_local = True
         if response.get("success"):
             result = response.get("result", {})
