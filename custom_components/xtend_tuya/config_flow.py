@@ -52,6 +52,10 @@ class TuyaOptionFlow(OptionsFlow):
     def __init__(self, config_entry: ConfigEntry) -> None:
         """Initialize options flow."""
         self.config_entry = config_entry
+        if config_entry.options is not None:
+            self.options = config_entry.options
+        else:
+            self.options = {}
 
     @staticmethod
     def _try_login(user_input: dict[str, Any]) -> tuple[dict[Any, Any], dict[str, Any]]:
@@ -142,26 +146,26 @@ class TuyaOptionFlow(OptionsFlow):
                 {
                     vol.Optional(
                         CONF_COUNTRY_CODE, 
-                        default=user_input.get(CONF_COUNTRY_CODE, "")
+                        default=user_input.get(CONF_COUNTRY_CODE, self.options.get(CONF_COUNTRY_CODE, ""))
                     ): vol.In(
                         # We don't pass a dict {code:name} because country codes can be duplicate.
                         [country.name for country in TUYA_COUNTRIES]
                     ),
                     vol.Optional(
                         CONF_ACCESS_ID, 
-                        default=user_input.get(CONF_ACCESS_ID, "")
+                        default=user_input.get(CONF_ACCESS_ID, self.options.get(CONF_ACCESS_ID, ""))
                     ): str,
                     vol.Optional(
                         CONF_ACCESS_SECRET,
-                        default=user_input.get(CONF_ACCESS_SECRET, ""),
+                        default=user_input.get(CONF_ACCESS_SECRET, self.options.get(CONF_ACCESS_SECRET, "")),
                     ): str,
                     vol.Optional(
                         CONF_USERNAME, 
-                        default=user_input.get(CONF_USERNAME, "")
+                        default=user_input.get(CONF_USERNAME, self.options.get(CONF_USERNAME, ""))
                     ): str,
                     vol.Optional(
                         CONF_PASSWORD, 
-                        default=user_input.get(CONF_PASSWORD, "")
+                        default=user_input.get(CONF_PASSWORD, self.options.get(CONF_PASSWORD, ""))
                     ): str,
                 }
             ),
