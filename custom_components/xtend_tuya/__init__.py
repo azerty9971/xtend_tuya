@@ -5,6 +5,8 @@ from __future__ import annotations
 import logging
 from typing import Any, NamedTuple
 
+import requests
+
 from tuya_sharing.manager import (
     Manager,
     SharingDeviceListener,
@@ -31,14 +33,23 @@ from tuya_sharing.user import (
     UserRepository,
 )
 
+from tuya_iot import (
+    AuthType,
+    #TuyaDevice,
+    TuyaDeviceListener,
+    TuyaDeviceManager,
+    TuyaHomeManager,
+    TuyaOpenAPI,
+    TuyaOpenMQ,
+)
+
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
-from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryError
+from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryError, ConfigEntryNotReady
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.dispatcher import dispatcher_send
 
 from .const import (
-    CONF_APP_TYPE,
     CONF_ENDPOINT,
     CONF_TERMINAL_ID,
     CONF_TOKEN_INFO,
@@ -52,6 +63,14 @@ from .const import (
     TUYA_HA_SIGNAL_UPDATE_ENTITY,
     VirtualStates,
     DescriptionVirtualState,
+    CONF_ACCESS_ID,
+    CONF_ACCESS_SECRET,
+    CONF_APP_TYPE,
+    CONF_AUTH_TYPE,
+    CONF_COUNTRY_CODE,
+    CONF_ENDPOINT_OT,
+    CONF_PASSWORD,
+    CONF_USERNAME,
 )
 
 # Suppress logs from the library, it logs unneeded on error
@@ -78,10 +97,39 @@ async def update_listener(hass, entry):
 
 async def async_setup_entry(hass: HomeAssistant, entry: TuyaConfigEntry) -> bool:
     """Async setup hass config entry."""
-    LOGGER.warning(f"async_setup_entry => {entry}")
-    LOGGER.warning(f"{entry.data}")
-    LOGGER.warning(f"{entry.options}")
-    entry.async_on_unload(entry.add_update_listener(update_listener))
+    open_api = None
+    open_api_home_manager= None
+    open_api_device_manager = None
+    open_api_tuya_mq = None
+    if entry.options is not None:
+        entry.async_on_unload(entry.add_update_listener(update_listener))
+        auth_type = AuthType(entry.options[CONF_AUTH_TYPE])
+        open_api = TuyaOpenAPI(
+            endpoint=entry.options[CONF_ENDPOINT_OT],
+            access_id=entry.options[CONF_ACCESS_ID],
+            access_secret=entry.options[CONF_ACCESS_SECRET],
+            auth_type=auth_type,
+        )
+        open_api.set_dev_channel("hass")
+        try:
+            if auth_type == AuthType.CUSTOM:
+                response = await hass.async_add_executor_job(
+                    open_api.connect, entry.options[CONF_USERNAME], entry.options[CONF_PASSWORD]
+                )
+            else:
+                response = await hass.async_add_executor_job(
+                    open_api.connect,
+                    entry.options[CONF_USERNAME],
+                    entry.options[CONF_PASSWORD],
+                    entry.options[CONF_COUNTRY_CODE],
+                    entry.options[CONF_APP_TYPE],
+                )
+        except requests.exceptions.RequestException as err:
+            raise ConfigEntryNotReady(err) from err
+
+        if response.get("success", False) is False:
+            raise ConfigEntryNotReady(response)
+        
     reuse_config = False
     tuya_data = hass.config_entries.async_entries(DOMAIN_ORIG,False,False)
     for config_entry in tuya_data:
@@ -89,8 +137,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: TuyaConfigEntry) -> bool
             reuse_config = True
             if (
                 not hasattr(config_entry, 'runtime_data') 
-                or config_entry.runtime_data is None 
-                or hasattr(config_entry.runtime_data, 'tainted')
+                or config_entry.runtime_data is None
             ):
                 #Try to fetch the manager using the old way
                 tuya_device_manager = None
@@ -112,7 +159,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: TuyaConfigEntry) -> bool
                 config_entry.data[CONF_ENDPOINT],
                 config_entry.data[CONF_TOKEN_INFO],
                 None,
-                tuya_device_manager
+                tuya_device_manager,
+                open_api
             )
             break
     
@@ -125,6 +173,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: TuyaConfigEntry) -> bool
             entry.data[CONF_ENDPOINT],
             entry.data[CONF_TOKEN_INFO],
             token_listener,
+            None,
+            open_api
         )
 
     listener = DeviceListener(hass, manager)
@@ -139,8 +189,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: TuyaConfigEntry) -> bool
         if "sign invalid" in str(exc):
             msg = "Authentication failed. Please re-authenticate the Tuya integration"
             if reuse_config:
-                setattr(config_entry.runtime_data, 'tainted', True)
-                raise ConfigEntryError(msg) from exc
+                raise ConfigEntryNotReady(msg) from exc
             else:
                 raise ConfigEntryAuthFailed("Authentication failed. Please re-authenticate.")
         raise
@@ -286,9 +335,10 @@ class TokenListener(SharingTokenListener):
         self.hass.add_job(async_update_entry)
 
 class XTDeviceRepository(DeviceRepository):
-    def __init__(self, customer_api: CustomerApi, manager: DeviceManager):
+    def __init__(self, customer_api: CustomerApi, manager: DeviceManager, open_api: TuyaOpenAPI):
         super().__init__(customer_api)
         self.manager = manager
+        self.open_api= open_api
 
     def update_device_specification(self, device: CustomerDevice):
         device_id = device.id
@@ -308,6 +358,12 @@ class XTDeviceRepository(DeviceRepository):
 
             device.function = function_map
             device.status_range = status_range
+        self.update_device_specification_open_api(device)
+    
+    def update_device_properties_open_api(self, device: CustomerDevice):
+        device_id = device.id
+        response = self.open_api.get(f"/v2.0/cloud/thing/{device_id}/shadow/properties")
+        LOGGER.warning(f"update_device_properties_open_api => {response}")
 
     def update_device_strategy_info(self, device: CustomerDevice):
         device_id = device.id
@@ -367,6 +423,7 @@ class DeviceManager(Manager):
         token_response: dict[str, Any] = None,
         listener: SharingTokenListener = None,
         other_manager: Manager = None,
+        open_api: TuyaOpenAPI = None,
     ) -> None:
         if other_manager is None:
             self.terminal_id = terminal_id
@@ -386,11 +443,20 @@ class DeviceManager(Manager):
             if self.mq is not None and self.mq.mq_config is not None:
                 LOGGER.warning(f"MQTT config: URL => {self.mq.mq_config.url} ClientID => {self.mq.mq_config.client_id} Username => {self.mq.mq_config.username} Password => {self.mq.mq_config.password} Dev Topic => {self.mq.mq_config.dev_topic}")
             self.mq.remove_message_listener(other_manager.on_message)
+        self.open_api = open_api
+        self.open_api_tuya_mq = None
+        self.open_api_device_manager = None
+        self.open_api_home_manager = None
+        if self.open_api is not None:
+            self.open_api_tuya_mq = TuyaOpenMQ(open_api)
+            #tuya_mq.start() #No need to start an MQTT listener
+            self.open_api_device_manager = TuyaDeviceManager(open_api, self.open_api_tuya_mq)
+            self.open_api_home_manager = TuyaHomeManager(open_api, self.open_api_tuya_mq, self.open_api_device_manager)
         self.other_device_manager = other_manager
         self.device_map: dict[str, CustomerDevice] = {}
         self.user_homes: list[SmartLifeHome] = []
         self.home_repository = HomeRepository(self.customer_api)
-        self.device_repository = XTDeviceRepository(self.customer_api, self)
+        self.device_repository = XTDeviceRepository(self.customer_api, self.open_api, self)
         self.device_listeners = set()
         self.scene_repository = SceneRepository(self.customer_api)
         self.user_repository = UserRepository(self.customer_api)
