@@ -73,10 +73,11 @@ from .sensor import (
 
 async def update_listener(hass, entry):
     """Handle options update."""
-    pass
+    LOGGER.warning(f"update_listener => {entry}")
 
 async def async_setup_entry(hass: HomeAssistant, entry: TuyaConfigEntry) -> bool:
     """Async setup hass config entry."""
+    LOGGER.warning(f"async_setup_entry => {entry}")
     entry.async_on_unload(entry.add_update_listener(update_listener))
     reuse_config = False
     tuya_data = hass.config_entries.async_entries(DOMAIN_ORIG,False,False)
