@@ -456,7 +456,7 @@ class DeviceManager(Manager):
         self.device_map: dict[str, CustomerDevice] = {}
         self.user_homes: list[SmartLifeHome] = []
         self.home_repository = HomeRepository(self.customer_api)
-        self.device_repository = XTDeviceRepository(self.customer_api, self.open_api, self)
+        self.device_repository = XTDeviceRepository(self.customer_api, self, self.open_api)
         self.device_listeners = set()
         self.scene_repository = SceneRepository(self.customer_api)
         self.user_repository = UserRepository(self.customer_api)
