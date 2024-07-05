@@ -74,6 +74,7 @@ from .sensor import (
 async def update_listener(hass, entry):
     """Handle options update."""
     LOGGER.warning(f"update_listener => {entry}")
+    LOGGER.warning(f"update_listener => {entry.data}")
 
 async def async_setup_entry(hass: HomeAssistant, entry: TuyaConfigEntry) -> bool:
     """Async setup hass config entry."""
@@ -184,7 +185,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: TuyaConfigEntry) -> boo
     """Unloading the Tuya platforms."""
     if unload_ok := await hass.config_entries.async_unload_platforms(entry, PLATFORMS):
         tuya = entry.runtime_data
-        if tuya.manager.mq is not None and tuya.manager.get_overriden_device_manager() is not None:
+        if tuya.manager.mq is not None and tuya.manager.get_overriden_device_manager() is None:
             tuya.manager.mq.stop()
         tuya.manager.remove_device_listener(tuya.listener)
     return unload_ok
@@ -488,3 +489,4 @@ class DeviceManager(Manager):
         #if show_debug == True:
         #LOGGER.debug(f"AFTER device_id -> {device_id} device_status-> {device.status} status-> {status}")
         super()._on_device_report(device_id, [])
+    
