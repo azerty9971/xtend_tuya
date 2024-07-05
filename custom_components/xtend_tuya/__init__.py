@@ -379,7 +379,7 @@ class DeviceManager(Manager):
             self.customer_api = other_manager.customer_api
             #LOGGER.warning(f"self.customer_api => {self.customer_api}")
             self.mq = other_manager.mq
-            LOGGER.warning(f"MQTT config: URL => {self.mq.mq_config.url} ClientID => {self.mq.mq_config.client_id} Username => {self.mq.mq_config.username} Password => {self.mq.mq_config.password}")
+            LOGGER.warning(f"MQTT config: URL => {self.mq.mq_config.url} ClientID => {self.mq.mq_config.client_id} Username => {self.mq.mq_config.username} Password => {self.mq.mq_config.password} Dev Topic => {self.mq.mq_config.dev_topic}")
             self.mq.remove_message_listener(other_manager.on_message)
         self.other_device_manager = other_manager
         self.device_map: dict[str, CustomerDevice] = {}
