@@ -199,7 +199,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: TuyaConfigEntry) -> bool
     entry.runtime_data = HomeAssistantTuyaData(manager=manager, listener=listener, reuse_config=reuse_config)
 
     # Cleanup device registry
-    await cleanup_device_registry(hass, manager)
+    await cleanup_device_registry(hass, manager, manager.open_api_device_manager)
 
     # Register known device IDs
     device_registry = dr.async_get(hass)
@@ -215,6 +215,19 @@ async def async_setup_entry(hass: HomeAssistant, entry: TuyaConfigEntry) -> bool
             name=device.name,
             model=f"{device.product_name} (unsupported)",
         )
+    if manager.open_api_device_manager is not None:
+        for device in manager.open_api_device_manager.device_map.values():
+            if reuse_config:
+                identifiers = {(DOMAIN_ORIG, device.id), (DOMAIN, device.id)}
+            else:
+                identifiers = {(DOMAIN, device.id)}
+            device_registry.async_get_or_create(
+                config_entry_id=entry.entry_id,
+                identifiers=identifiers,
+                manufacturer="Tuya",
+                name=device.name,
+                model=f"{device.product_name} (unsupported)",
+            )
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     # If the device does not register any entities, the device does not need to subscribe
@@ -223,14 +236,16 @@ async def async_setup_entry(hass: HomeAssistant, entry: TuyaConfigEntry) -> bool
     return True
 
 
-async def cleanup_device_registry(hass: HomeAssistant, device_manager: Manager) -> None:
+async def cleanup_device_registry(hass: HomeAssistant, device_manager: Manager, open_api_device_manager: TuyaDeviceManager) -> None:
     """Remove deleted device registry entry if there are no remaining entities."""
     device_registry = dr.async_get(hass)
     for dev_id, device_entry in list(device_registry.devices.items()):
         for item in device_entry.identifiers:
-            if item[0] == DOMAIN and item[1] not in device_manager.device_map:
-                device_registry.async_remove_device(dev_id)
-                break
+            if item[0] == DOMAIN:
+                if item[1] not in device_manager.device_map:
+                    if open_api_device_manager is None or item[1] not in open_api_device_manager.device_map:
+                        device_registry.async_remove_device(dev_id)
+                        break
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: TuyaConfigEntry) -> bool:
@@ -341,19 +356,13 @@ class XTDeviceRepository(DeviceRepository):
         self.manager = manager
         self.open_api= open_api
 
-    def query_devices_by_home(self, home_id: str) -> list[CustomerDevice]:
+    """def query_devices_by_home(self, home_id: str) -> list[CustomerDevice]:
         LOGGER.warning(f"query_devices_by_home => {home_id}")
-        home_dev = super().query_devices_by_home(home_id)
-        #DEBUG
-        shared_dev = self.query_devices_by_ids({"bf80ca98b2da422bf4na8b"})
-        for device in shared_dev:
-            home_dev.append(device)
-        #ENDDEBUG
-        return home_dev
+        return super().query_devices_by_home(home_id)
 
     def query_devices_by_ids(self, ids: list) -> list[CustomerDevice]:
         LOGGER.warning(f"query_devices_by_home => {ids}")
-        return super().query_devices_by_ids(ids)
+        return super().query_devices_by_ids(ids)"""
 
     def update_device_specification(self, device: CustomerDevice):
         device_id = device.id
@@ -513,10 +522,10 @@ class DeviceManager(Manager):
         self.open_api_device_manager = None
         self.open_api_home_manager = None
         if self.open_api is not None:
-            self.open_api_tuya_mq = TuyaOpenMQ(open_api)
+            self.open_api_tuya_mq = TuyaOpenMQ(self.open_api)
             #tuya_mq.start() #No need to start an MQTT listener
-            self.open_api_device_manager = TuyaDeviceManager(open_api, self.open_api_tuya_mq)
-            self.open_api_home_manager = TuyaHomeManager(open_api, self.open_api_tuya_mq, self.open_api_device_manager)
+            self.open_api_device_manager = TuyaDeviceManager(self.open_api, self.open_api_tuya_mq)
+            self.open_api_home_manager = TuyaHomeManager(self.open_api, self.open_api_tuya_mq, self.open_api_device_manager)
         self.other_device_manager = other_manager
         self.device_map: dict[str, CustomerDevice] = {}
         self.user_homes: list[SmartLifeHome] = []
@@ -526,6 +535,13 @@ class DeviceManager(Manager):
         self.scene_repository = SceneRepository(self.customer_api)
         self.user_repository = UserRepository(self.customer_api)
     
+    def update_device_cache(self):
+        super().update_device_cache()
+
+        #Add Tuya OpenAPI devices to the cache
+        if self.open_api_home_manager is not None:
+            self.open_api_home_manager.update_device_cache()
+
     @staticmethod
     def get_category_virtual_states(category: str) -> list[DescriptionVirtualState]:
         to_return = []
