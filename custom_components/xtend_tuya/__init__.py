@@ -458,7 +458,6 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
             api_status = self.get_device_status("bf80ca98b2da422bf4na8b")
             if api_status["success"]:
                 api_status_result = api_status["result"]
-                LOGGER.warning(f"api_status => {api_status_result}")
                 for item_status in api_status_result:
                     if "code" in item_status and "value" in item_status:
                         code = item_status["code"]
@@ -546,6 +545,8 @@ class DeviceManager(Manager):
                   hasattr(device, "id") and getattr(device, "set_up", False)]
         device.extend([device for device in self.open_api_device_map.values() if
                   hasattr(device, "id") and getattr(device, "set_up", False)])
+
+        LOGGER.warning(f"MQTT device => {device}")
 
         sharing_mq = SharingMQ(self.customer_api, home_ids, device)
         sharing_mq.start()
