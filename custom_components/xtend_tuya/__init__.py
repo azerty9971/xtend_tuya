@@ -106,9 +106,6 @@ async def update_listener(hass, entry):
 async def async_setup_entry(hass: HomeAssistant, entry: TuyaConfigEntry) -> bool:
     """Async setup hass config entry."""
     open_api = None
-    open_api_home_manager= None
-    open_api_device_manager = None
-    open_api_tuya_mq = None
     if entry.options is not None:
         entry.async_on_unload(entry.add_update_listener(update_listener))
         auth_type = AuthType(entry.options[CONF_AUTH_TYPE])

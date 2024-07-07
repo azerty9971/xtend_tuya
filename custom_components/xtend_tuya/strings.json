@@ -42,6 +42,18 @@
   },
   "entity": {
     "binary_sensor": {
+      "cleaning": {
+        "name": "Cleaning"
+      },
+      "cleaning_num": {
+        "name": "Number of cleaning"
+      },
+      "sleeping": {
+        "name": "Sleeping"
+      },
+      "trash_status": {
+        "name": "Trash status"
+      },
       "methane": {
         "name": "Methane"
       },
@@ -134,11 +146,14 @@
       }
     },
     "number": {
+      "quiet_time_end": {
+        "name": "Quiet (end)"
+      },
+      "quiet_time_start": {
+        "name": "Quiet (start)"
+      },
       "auto_lock_time": {
         "name": "Auto lock time"
-      },
-      "temperature": {
-        "name": "[%key:component::number::entity_component::temperature::name%]"
       },
       "time": {
         "name": "Time"
@@ -604,7 +619,24 @@
       }
     },
     "sensor": {
-      
+      "deodorization_num": {
+        "name": "Deodorization number"
+      },
+      "magnetnum": {
+        "name": "Magnet number"
+      },
+      "notification_status": {
+        "name": "Notification status"
+      },
+      "pedal_angle": {
+        "name": "Pedal angle"
+      },
+      "pir_radar": {
+        "name": "PIR Radar"
+      },
+      "work_stat": {
+        "name": "Work stat"
+      },
       "cat_weight": {
         "name": "Cat weight"
       },
@@ -881,6 +913,18 @@
       }
     },
     "switch": {
+      "beep": {
+        "name": "Beep"
+      },
+      "indicator_light": {
+        "name": "Indicator light"
+      },
+      "quiet_timing_on": {
+        "name": "Quiet timing"
+      },
+      "reboot": {
+        "name": "Reboot"
+      },
       "automatic_lock": {
         "name": "Automatic lock"
       },
