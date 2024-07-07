@@ -538,6 +538,14 @@ class DeviceManager(Manager):
         device_id = device.id
         if self.open_api is None:
             return
+        
+        tuya_device = None
+        tuya_manager = self.get_overriden_device_manager()
+        if tuya_manager is None:
+            tuya_manager = self
+        if device.id in tuya_manager.device_map:
+            tuya_device = tuya_manager.device_map[device.id]
+
         response = self.open_api.get(f"/v2.0/cloud/thing/{device_id}/shadow/properties")
         response2 = self.open_api.get(f"/v2.0/cloud/thing/{device_id}/model")
         if response.get("success") and response2.get("success"):
@@ -565,15 +573,17 @@ class DeviceManager(Manager):
                                         "pid": device.product_id,
                                     }
                                 }
+                                if tuya_device is not None:
+                                    device.local_strategy[property["abilityId"]] = {
+                                        "status_code": property["code"],
+                                        "config_item": {
+                                            "valueDesc": typeSpec,
+                                            "valueType": real_type,
+                                            "pid": device.product_id,
+                                        }
+                                    }
 
         result = response.get("result", {})
-        tuya_device = None
-        tuya_manager = self.get_overriden_device_manager()
-        if tuya_manager is None:
-            tuya_manager = self
-        if device.id in tuya_manager.device_map:
-            tuya_device = tuya_manager.device_map[device.id]
-        
         for dp_property in result["properties"]:
             if "dp_id" in dp_property and "type" in dp_property:
                 if dp_property["dp_id"] not in device.local_strategy:
