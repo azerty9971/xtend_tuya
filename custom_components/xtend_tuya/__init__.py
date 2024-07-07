@@ -540,7 +540,7 @@ class DeviceManager(Manager):
             self.mq = self.other_device_manager.mq
             self.mq.add_message_listener(self.on_message)
             for device in self.open_api_device_map:
-                self.mq.subscribe_device(device.id, device)
+                self.mq.subscribe_device(device, self.open_api_device_map[device])
             return
         super().refresh_mq()
 
