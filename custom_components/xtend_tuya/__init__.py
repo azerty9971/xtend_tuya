@@ -582,7 +582,7 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
                 for status in self.device_map[device_id].status_range:
                     status_found = False
                     for spec_status in specs["result"]["status"]:
-                        if spec_status.code == status.code:
+                        if spec_status["code"] == status.code:
                             status_found = True
                             break
                     if not status_found:
