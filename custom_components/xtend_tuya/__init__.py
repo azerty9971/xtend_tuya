@@ -575,9 +575,10 @@ class DeviceManager(Manager):
         if self.open_api_home_manager is not None:
             self.open_api_home_manager.update_device_cache()
             self.open_api_device_map = {}
-            for device in self.open_api_home_manager.device_map:
-                if device.id not in self.device_map:
-                    self.open_api_device_map.append(device)
+            if self.open_api_device_manager is not None:
+                for device in self.open_api_device_manager.device_map:
+                    if device.id not in self.device_map:
+                        self.open_api_device_map.append(device)
 
     @staticmethod
     def get_category_virtual_states(category: str) -> list[DescriptionVirtualState]:
