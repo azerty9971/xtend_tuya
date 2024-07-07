@@ -50,51 +50,35 @@ SWITCHES: dict[str, tuple[SwitchEntityDescription, ...]] = {
     # Note: Undocumented
     "msp": (
         SwitchEntityDescription(
-            key=DPCode.START,
-            translation_key="start",
-            entity_category=EntityCategory.CONFIG,
-            icon="mdi:bacteria",
-        ),
-        SwitchEntityDescription(
             key=DPCode.AUTO_CLEAN,
             translation_key="auto_clean",
             entity_category=EntityCategory.CONFIG,
             icon="mdi:bacteria",
         ),
         SwitchEntityDescription(
-            key=DPCode.DEODORIZATION,
-            translation_key="deodorization",
-            entity_category=EntityCategory.CONFIG,
-            icon="mdi:bacteria",
-        ),
-        SwitchEntityDescription(
-            key=DPCode.CLEAN,
-            translation_key="clean",
+            key=DPCode.AUTO_DEORDRIZER,
+            translation_key="auto_deordrizer",
             entity_category=EntityCategory.CONFIG,
         ),
         SwitchEntityDescription(
-            key=DPCode.MANUAL_CLEAN,
-            translation_key="manual_clean",
+            key=DPCode.BEEP,
+            translation_key="beep",
             entity_category=EntityCategory.CONFIG,
         ),
         SwitchEntityDescription(
-            key=DPCode.EMPTY,
-            translation_key="empty",
+            key=DPCode.CALIBRATION,
+            translation_key="calibration",
             entity_category=EntityCategory.CONFIG,
         ),
         SwitchEntityDescription(
-            key=DPCode.INDUCTION_CLEAN,
-            translation_key="induction_clean",
+            key=DPCode.CHILD_LOCK,
+            translation_key="child_lock",
             entity_category=EntityCategory.CONFIG,
+            icon="mdi:human-child"
         ),
         SwitchEntityDescription(
-            key=DPCode.CLEAN_TIME,
-            translation_key="clean_time",
-            entity_category=EntityCategory.CONFIG,
-        ),
-        SwitchEntityDescription(
-            key=DPCode.CLEAN_TIME_SWITCH,
-            translation_key="clean_time_switch",
+            key=DPCode.CLEAN_NOTICE,
+            translation_key="clean_notice",
             entity_category=EntityCategory.CONFIG,
         ),
         SwitchEntityDescription(
@@ -109,13 +93,103 @@ SWITCHES: dict[str, tuple[SwitchEntityDescription, ...]] = {
             entity_category=EntityCategory.CONFIG,
         ),
         SwitchEntityDescription(
-            key=DPCode.NOT_DISTURB,
-            translation_key="not_disturb",
+            key=DPCode.CLEAN_TIME,
+            translation_key="clean_time",
             entity_category=EntityCategory.CONFIG,
         ),
         SwitchEntityDescription(
-            key=DPCode.CLEAN_NOTICE,
-            translation_key="clean_notice",
+            key=DPCode.CLEAN_TIME_SWITCH,
+            translation_key="clean_time_switch",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        SwitchEntityDescription(
+            key=DPCode.DEODORIZATION,
+            translation_key="deodorization",
+            entity_category=EntityCategory.CONFIG,
+            icon="mdi:bacteria",
+        ),
+        SwitchEntityDescription(
+            key=DPCode.FACTORY_RESET,
+            translation_key="factory_reset",
+            entity_category=EntityCategory.CONFIG,
+            entity_registry_enabled_default=False,
+        ),
+        SwitchEntityDescription(
+            key=DPCode.INDICATOR_LIGHT,
+            translation_key="indicator_light",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        SwitchEntityDescription(
+            key=DPCode.INDUCTION_CLEAN,
+            translation_key="induction_clean",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        SwitchEntityDescription(
+            key=DPCode.LIGHT,
+            translation_key="light",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        SwitchEntityDescription(
+            key=DPCode.MANUAL_CLEAN,
+            translation_key="manual_clean",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        SwitchEntityDescription(
+            key=DPCode.NET_NOTICE,
+            translation_key="net_notice",
+            entity_category=EntityCategory.CONFIG,
+            entity_registry_enabled_default=False,
+        ),
+        SwitchEntityDescription(
+            key=DPCode.NOT_DISTURB_SWITCH,
+            translation_key="not_disturb_switch",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        SwitchEntityDescription(
+            key=DPCode.ODOURLESS,
+            translation_key="odourless",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        SwitchEntityDescription(
+            key=DPCode.POWER,
+            translation_key="power",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        SwitchEntityDescription(
+            key=DPCode.QUIET_TIMING_ON,
+            translation_key="quiet_timing_on",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        SwitchEntityDescription(
+            key=DPCode.REBOOT,
+            translation_key="reboot",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        SwitchEntityDescription(
+            key=DPCode.SLEEP,
+            translation_key="sleep",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        SwitchEntityDescription(
+            key=DPCode.SMART_CLEAN,
+            translation_key="smart_clean",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        SwitchEntityDescription(
+            key=DPCode.START,
+            translation_key="start",
+            entity_category=EntityCategory.CONFIG,
+            icon="mdi:bacteria",
+        ),
+        SwitchEntityDescription(
+            key=DPCode.STORE_FULL_NOTIFY,
+            translation_key="store_full_notify",
+            entity_category=EntityCategory.CONFIG,
+            entity_registry_enabled_default=False,
+        ),
+        SwitchEntityDescription(
+            key=DPCode.SWITCH,
+            translation_key="switch",
             entity_category=EntityCategory.CONFIG,
         ),
         SwitchEntityDescription(
@@ -125,77 +199,14 @@ SWITCHES: dict[str, tuple[SwitchEntityDescription, ...]] = {
             icon="mdi:toilet"
         ),
         SwitchEntityDescription(
-            key=DPCode.NET_NOTICE,
-            translation_key="net_notice",
-            entity_category=EntityCategory.CONFIG,
-            entity_registry_enabled_default=False,
-        ),
-        SwitchEntityDescription(
-            key=DPCode.CHILD_LOCK,
-            translation_key="child_lock",
-            entity_category=EntityCategory.CONFIG,
-            icon="mdi:human-child"
-        ),
-        SwitchEntityDescription(
-            key=DPCode.CALIBRATION,
-            translation_key="calibration",
-            entity_category=EntityCategory.CONFIG,
-        ),
-        SwitchEntityDescription(
             key=DPCode.UNIT,
             translation_key="unit",
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False,
         ),
         SwitchEntityDescription(
-            key=DPCode.STORE_FULL_NOTIFY,
-            translation_key="store_full_notify",
-            entity_category=EntityCategory.CONFIG,
-            entity_registry_enabled_default=False,
-        ),
-        SwitchEntityDescription(
-            key=DPCode.ODOURLESS,
-            translation_key="odourless",
-            entity_category=EntityCategory.CONFIG,
-        ),
-        SwitchEntityDescription(
-            key=DPCode.SMART_CLEAN,
-            translation_key="smart_clean",
-            entity_category=EntityCategory.CONFIG,
-        ),
-        SwitchEntityDescription(
-            key=DPCode.NOT_DISTURB_SWITCH,
-            translation_key="not_disturb_switch",
-            entity_category=EntityCategory.CONFIG,
-        ),
-        SwitchEntityDescription(
-            key=DPCode.AUTO_DEORDRIZER,
-            translation_key="auto_deordrizer",
-            entity_category=EntityCategory.CONFIG,
-        ),
-        SwitchEntityDescription(
-            key=DPCode.SLEEP,
-            translation_key="sleep",
-            entity_category=EntityCategory.CONFIG,
-        ),
-        SwitchEntityDescription(
-            key=DPCode.SWITCH,
-            translation_key="switch",
-            entity_category=EntityCategory.CONFIG,
-        ),
-        SwitchEntityDescription(
             key=DPCode.UV,
             translation_key="uv",
-            entity_category=EntityCategory.CONFIG,
-        ),
-        SwitchEntityDescription(
-            key=DPCode.LIGHT,
-            translation_key="light",
-            entity_category=EntityCategory.CONFIG,
-        ),
-        SwitchEntityDescription(
-            key=DPCode.FACTORY_RESET,
-            translation_key="factory_reset",
             entity_category=EntityCategory.CONFIG,
         ),
     ),

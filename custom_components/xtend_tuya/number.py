@@ -36,6 +36,16 @@ NUMBERS: dict[str, tuple[NumberEntityDescription, ...]] = {
             entity_category=EntityCategory.CONFIG,
         ),
         NumberEntityDescription(
+            key=DPCode.QUIET_TIME_END,
+            translation_key="quiet_time_end",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        NumberEntityDescription(
+            key=DPCode.QUIET_TIME_START,
+            translation_key="quiet_time_start",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        NumberEntityDescription(
             key=DPCode.SLEEP_START_TIME,
             translation_key="sleep_start_time",
             entity_category=EntityCategory.CONFIG,
