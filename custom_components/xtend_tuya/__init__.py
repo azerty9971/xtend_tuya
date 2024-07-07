@@ -642,8 +642,7 @@ class DeviceManager(Manager):
                                 typeSpec = property["typeSpec"]
                                 real_type = determine_property_type(property["typeSpec"]["type"])
                                 typeSpec.pop("type")
-                                if real_type == DPType.ENUM:
-                                    typeSpec = json.dumps(typeSpec)
+                                typeSpec = json.dumps(typeSpec)
                                 device.local_strategy[property["abilityId"]] = {
                                     "status_code": property["code"],
                                     "config_item": {
