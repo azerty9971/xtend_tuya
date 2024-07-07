@@ -504,6 +504,7 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
                 self.device_map[item["id"]] = device
         #DEBUG
         shared_dev = self.get_device_info("bf80ca98b2da422bf4na8b")
+        LOGGER.warning(f"shared_dev => {shared_dev}")
         if shared_dev["success"]:
             for item in shared_dev["result"]:
                 device = TuyaDevice(**item)
@@ -545,8 +546,8 @@ class DeviceManager(Manager):
             self.customer_api = other_manager.customer_api
             #LOGGER.warning(f"self.customer_api => {self.customer_api}")
             self.mq = other_manager.mq
-            if self.mq is not None and self.mq.mq_config is not None:
-                LOGGER.warning(f"MQTT config: URL => {self.mq.mq_config.url} ClientID => {self.mq.mq_config.client_id} Username => {self.mq.mq_config.username} Password => {self.mq.mq_config.password} Dev Topic => {self.mq.mq_config.dev_topic}")
+            #if self.mq is not None and self.mq.mq_config is not None:
+            #    LOGGER.warning(f"MQTT config: URL => {self.mq.mq_config.url} ClientID => {self.mq.mq_config.client_id} Username => {self.mq.mq_config.username} Password => {self.mq.mq_config.password} Dev Topic => {self.mq.mq_config.dev_topic}")
             self.mq.remove_message_listener(other_manager.on_message)
         self.open_api = open_api
         self.open_api_tuya_mq = None
