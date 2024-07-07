@@ -506,7 +506,8 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
         shared_dev = self.get_device_info("bf80ca98b2da422bf4na8b")
         LOGGER.warning(f"shared_dev => {shared_dev}")
         if shared_dev["success"]:
-            device = TuyaDevice(**shared_dev["result"])
+            item = shared_dev["result"]
+            device = TuyaDevice(**item)
             status = {}
             for item_status in device.status:
                 if "code" in item_status and "value" in item_status:
