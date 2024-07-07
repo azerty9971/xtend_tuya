@@ -519,6 +519,20 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
         #ENDDEBUG
         super().update_device_list_in_smart_home()
     
+    def determine_property_type(self, type, value) -> DPType:
+        if type == "value":
+            return DPType(DPType.INTEGER)
+        if type == "bitmap":
+            return DPType(DPType.RAW)
+        if type == "enum":
+            return DPType(DPType.ENUM)
+        if type == "bool":
+            return DPType(DPType.BOOLEAN)
+        if type == "json":
+            return DPType(DPType.JSON)
+        if type == "string":
+            return DPType(DPType.STRING)
+
     def update_device_properties_open_api(self, device, dp_id_map = {}, pid = ""):
         device_id = device.id
         response = self.api.get(f"/v2.0/cloud/thing/{device_id}/shadow/properties")
