@@ -1,7 +1,9 @@
 """Utility methods for the Tuya integration."""
 
 from __future__ import annotations
-
+from .const import (
+    DPType,
+)
 
 def remap_value(
     value: float,
@@ -15,3 +17,17 @@ def remap_value(
     if reverse:
         value = from_max - value + from_min
     return ((value - from_min) / (from_max - from_min)) * (to_max - to_min) + to_min
+
+def determine_property_type(self, type, value = None) -> DPType:
+        if type == "value":
+            return DPType(DPType.INTEGER)
+        if type == "bitmap":
+            return DPType(DPType.RAW)
+        if type == "enum":
+            return DPType(DPType.ENUM)
+        if type == "bool":
+            return DPType(DPType.BOOLEAN)
+        if type == "json":
+            return DPType(DPType.JSON)
+        if type == "string":
+            return DPType(DPType.STRING)
