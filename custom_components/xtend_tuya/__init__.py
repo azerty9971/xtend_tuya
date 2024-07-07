@@ -506,16 +506,15 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
         shared_dev = self.get_device_info("bf80ca98b2da422bf4na8b")
         LOGGER.warning(f"shared_dev => {shared_dev}")
         if shared_dev["success"]:
-            for item in shared_dev["result"]:
-                device = TuyaDevice(**item)
-                status = {}
-                for item_status in device.status:
-                    if "code" in item_status and "value" in item_status:
-                        code = item_status["code"]
-                        value = item_status["value"]
-                        status[code] = value
-                device.status = status
-                self.device_map[item["id"]] = device
+            device = TuyaDevice(**shared_dev["result"])
+            status = {}
+            for item_status in device.status:
+                if "code" in item_status and "value" in item_status:
+                    code = item_status["code"]
+                    value = item_status["value"]
+                    status[code] = value
+            device.status = status
+            self.device_map[item["id"]] = device
         #ENDDEBUG
         self.update_device_function_cache()
 
