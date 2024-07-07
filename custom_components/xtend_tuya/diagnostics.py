@@ -55,9 +55,14 @@ def _async_get_diagnostics(
 
     if device:
         tuya_device_id = next(iter(device.identifiers))[1]
-        data |= _async_device_as_dict(
-            hass, hass_data.manager.device_map[tuya_device_id]
-        )
+        if tuya_device_id in hass_data.manager.device_map:
+            data |= _async_device_as_dict(
+                hass, hass_data.manager.device_map[tuya_device_id]
+            )
+        if hass_data.manager.open_api_device_manager is not None and tuya_device_id in hass_data.manager.open_api_device_manager.device_map:
+            data |= _async_device_as_dict(
+                hass, hass_data.manager.open_api_device_manager.device_map[tuya_device_id]
+            )
     else:
         data.update(
             devices=[
