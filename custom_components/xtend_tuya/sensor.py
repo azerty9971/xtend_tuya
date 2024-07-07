@@ -135,21 +135,9 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
             entity_registry_enabled_default=False,
         ),
         TuyaSensorEntityDescription(
-            key=DPCode.CLEAN_TASTE_SWITCH,
-            translation_key="clean_tasteswitch",
-            state_class=SensorStateClass.MEASUREMENT,
-            entity_registry_enabled_default=False,
-        ),
-        TuyaSensorEntityDescription(
             key=DPCode.CLEAN_TIME,
             translation_key="clean_time",
             device_class=SensorDeviceClass.DURATION,
-            state_class=SensorStateClass.MEASUREMENT,
-            entity_registry_enabled_default=True,
-        ),
-        TuyaSensorEntityDescription(
-            key=DPCode.CLEAN_TIME_SWITCH,
-            translation_key="clean_time_switch",
             state_class=SensorStateClass.MEASUREMENT,
             entity_registry_enabled_default=True,
         ),

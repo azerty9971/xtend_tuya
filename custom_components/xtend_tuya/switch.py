@@ -82,19 +82,8 @@ SWITCHES: dict[str, tuple[SwitchEntityDescription, ...]] = {
             entity_category=EntityCategory.CONFIG,
         ),
         SwitchEntityDescription(
-            key=DPCode.CLEAN_TASTE,
-            translation_key="clean_taste",
-            entity_category=EntityCategory.CONFIG,
-            entity_registry_enabled_default=False,
-        ),
-        SwitchEntityDescription(
             key=DPCode.CLEAN_TASTE_SWITCH,
             translation_key="clean_tasteswitch",
-            entity_category=EntityCategory.CONFIG,
-        ),
-        SwitchEntityDescription(
-            key=DPCode.CLEAN_TIME,
-            translation_key="clean_time",
             entity_category=EntityCategory.CONFIG,
         ),
         SwitchEntityDescription(
