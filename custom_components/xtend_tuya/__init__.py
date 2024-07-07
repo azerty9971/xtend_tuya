@@ -545,8 +545,8 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
                 tuya_manager = self.manager
             if device.id in tuya_manager.device_map:
                 tuya_device = tuya_manager.device_map[device.id]
-            if tuya_device is None and tuya_manager.open_api_device_manager is not None and device.id in tuya_manager.open_api_device_manager.device_map:
-                tuya_device = tuya_manager.open_api_device_manager.device_map[device.id]
+            if tuya_device is None and self.manager.open_api_device_manager is not None and device.id in self.manager.open_api_device_manager.device_map:
+                tuya_device = self.manager.open_api_device_manager.device_map[device.id]
             for dp_property in result["properties"]:
                 if "dp_id" in dp_property and dp_property["dp_id"] not in dp_id_map and "type" in dp_property:
                     dp_property["type"] = self.determine_property_type(dp_property.get("type",None), dp_property.get("value",None))
