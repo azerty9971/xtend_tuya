@@ -582,11 +582,10 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
         #LOGGER.warning(f"update_device_properties_open_api => {response}")
         if response2.get("success"):
             result = response2.get("result", {})
-            model = json.loads(result.get("model", ""))
+            model = json.loads(result.get("model", "{}"))
+            LOGGER.warning(f"MODEL => {model}")
         if response.get("success"):
             result = response.get("result", {})
-            model = json.loads(result.get("model", ""))
-            LOGGER.warning(f"MODEL => {model}")
             tuya_device = None
             tuya_manager = self.manager.get_overriden_device_manager()
             if tuya_manager is None:
