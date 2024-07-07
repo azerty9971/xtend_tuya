@@ -579,6 +579,7 @@ class DeviceManager(Manager):
                 for device in self.open_api_device_manager.device_map:
                     if device not in self.device_map:
                         self.open_api_device_map[device] = self.open_api_device_manager.device_map[device]
+            LOGGER.warning(f"self.open_api_device_map => {self.open_api_device_map}")
 
     @staticmethod
     def get_category_virtual_states(category: str) -> list[DescriptionVirtualState]:
