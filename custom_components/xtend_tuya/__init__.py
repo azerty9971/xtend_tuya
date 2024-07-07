@@ -584,6 +584,27 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
             result = response2.get("result", {})
             model = json.loads(result.get("model", "{}"))
             LOGGER.warning(f"MODEL => {model}")
+            for service in model["services"]:
+                for property in service["properties"]:
+                    if (    "abilityId" in property
+                        and "code" in property
+                        and "accessMode" in property
+                        and "typeSpec" in property
+                        ):
+                        if property["abilityId"] not in device.local_strategy:
+                            if "type" in property["typeSpec"]:
+                                typeSpec = property["typeSpec"]
+                                real_type = self.determine_property_type(property["typeSpec"]["type"])
+                                typeSpec.pop("type")
+                                device.local_strategy[property["abilityId"]] = {
+                                    "status_code": property["code"],
+                                    "config_item": {
+                                        "valueDesc": typeSpec,
+                                        "valueType": real_type,
+                                        "pid": device.product_id,
+                                    }
+                                }
+
         if response.get("success"):
             result = response.get("result", {})
             tuya_device = None
@@ -592,32 +613,37 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
                 tuya_manager = self.manager
             if device.id in tuya_manager.device_map:
                 tuya_device = tuya_manager.device_map[device.id]
+            
             for dp_property in result["properties"]:
-                if "dp_id" in dp_property and dp_property["dp_id"] not in device.local_strategy and "type" in dp_property:
-                    dp_property["type"] = self.determine_property_type(dp_property.get("type",None), dp_property.get("value",None))
-                    device.local_strategy[dp_property["dp_id"]] = {
-                        "status_code": dp_property["code"],
-                        "config_item": {
-                            "valueDesc": dp_property.get("value",None),
-                            "valueType": dp_property.get("type",None),
-                            "pid": device.product_id,
+                if "dp_id" in dp_property and "type" in dp_property:
+                    if dp_property["dp_id"] not in device.local_strategy:
+                        dp_property["type"] = self.determine_property_type(dp_property.get("type",None), dp_property.get("value",None))
+                        device.local_strategy[dp_property["dp_id"]] = {
+                            "status_code": dp_property["code"],
+                            "config_item": {
+                                "valueDesc": dp_property.get("value",None),
+                                "valueType": dp_property.get("type",None),
+                                "pid": device.product_id,
+                            }
                         }
-                    }
-                if "code" in dp_property and "type" in dp_property:
+                if (    "code"  in dp_property 
+                    and "dp_id" in dp_property 
+                    and dp_property["dp_id"]  in device.local_strategy
+                    ):
                     code = dp_property["code"]
                     if code not in device.status_range:
                         device.status_range[code] = DeviceStatusRange()
                         device.status_range[code].code   = code
-                        device.status_range[code].type   = dp_property.get("type",None)
-                        device.status_range[code].values = {} #dp_property.get("value",None)
+                        device.status_range[code].type   = device.local_strategy[dp_property["dp_id"]].config_item.valueType
+                        device.status_range[code].values = device.local_strategy[dp_property["dp_id"]].config_item.valueDesc
                     if code not in device.status:
                         device.status[code] = dp_property.get("value",None)
                     #Also add the status range for Tuya's manager devices
                     if tuya_device is not None and code not in tuya_device.status_range:
                         tuya_device.status_range[code] = DeviceStatusRange()
                         tuya_device.status_range[code].code   = code
-                        tuya_device.status_range[code].type   = dp_property.get("type",None)
-                        tuya_device.status_range[code].values = {} #dp_property.get("value",None)
+                        tuya_device.status_range[code].type   = device.local_strategy[dp_property["dp_id"]].config_item.valueType
+                        tuya_device.status_range[code].values = device.local_strategy[dp_property["dp_id"]].config_item.valueDesc
                     if tuya_device is not None and code not in tuya_device.status:
                         tuya_device.status[code] = dp_property.get("value",None)
 
