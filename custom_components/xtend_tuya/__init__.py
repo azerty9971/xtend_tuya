@@ -508,7 +508,7 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
                 device.status = status
                 self.device_map[item["id"]] = device
         #ENDDEBUG
-        super.update_device_list_in_smart_home()
+        super().update_device_list_in_smart_home()
     
     def get_device_specification(self, device_id: str) -> dict[str, str]:
         specs = super().get_device_specification(device_id)
