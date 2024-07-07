@@ -509,7 +509,8 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
             item = shared_dev["result"]
             device = TuyaDevice(**item)
             status = {}
-            for item_status in device.status:
+            api_status = self.get_device_status("bf80ca98b2da422bf4na8b")
+            for item_status in api_status:
                 if "code" in item_status and "value" in item_status:
                     code = item_status["code"]
                     value = item_status["value"]
