@@ -496,7 +496,7 @@ class XTDeviceRepository(DeviceRepository):
 
 class XTTuyaDevice(TuyaDevice):
     set_up: Optional[bool] = True
-    support_local: Optional[bool] = False
+    support_local: Optional[bool] = True
     local_strategy: dict[int, dict[str, Any]] = {}
 
 class XTTuyaDeviceManager(TuyaDeviceManager):
