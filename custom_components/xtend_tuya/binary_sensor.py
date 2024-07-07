@@ -46,6 +46,25 @@ TAMPER_BINARY_SENSOR = TuyaBinarySensorEntityDescription(
 # end up being a binary sensor.
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
 BINARY_SENSORS: dict[str, tuple[TuyaBinarySensorEntityDescription, ...]] = {
+    "msp": (
+        TuyaBinarySensorEntityDescription(
+            key=DPCode.CLEANING,
+            translation_key="cleaning",
+        ),
+        TuyaBinarySensorEntityDescription(
+            key=DPCode.CLEANING_NUM,
+            translation_key="cleaning_num",
+        ),
+        TuyaBinarySensorEntityDescription(
+            key=DPCode.SLEEPING,
+            translation_key="sleeping",
+        ),
+        TuyaBinarySensorEntityDescription(
+            key=DPCode.TRASH_STATUS,
+            translation_key="trash_status",
+            entity_registry_enabled_default=True,
+        ),
+    ),
 }
 
 

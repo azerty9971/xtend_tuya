@@ -150,6 +150,7 @@ class DPCode(StrEnum):
     BATTERY_PERCENTAGE = "battery_percentage"  # Battery percentage
     BATTERY_STATE = "battery_state"  # Battery state
     BATTERY_VALUE = "battery_value"  # Battery value
+    BEEP = "beep"
     BEEP_VOLUME = "beep_volume"
     BRIGHT_CONTROLLER = "bright_controller"
     BRIGHT_STATE = "bright_state"  # Brightness status
@@ -181,6 +182,8 @@ class DPCode(StrEnum):
     CLEAN_TASTE_SWITCH = "Clean_tasteSwitch"
     CLEAN_TIME = "clean_time"
     CLEAN_TIME_SWITCH = "clean_time_switch"
+    CLEANING = "cleaning"
+    CLEANING_NUM = "cleaning_num"
     CLICK_SUSTAIN_TIME = "click_sustain_time"
     CLOUD_RECIPE_NUMBER = "cloud_recipe_number"
     CLOSED_OPENED = "closed_opened"
@@ -217,6 +220,7 @@ class DPCode(StrEnum):
     DEHUMIDITY_SET_VALUE = "dehumidify_set_value"
     DELAY_CLEAN_TIME = "delay_clean_time"
     DEODORIZATION = "deodorization"
+    DEODORIZATION_NUM = "deodorization_num"
     DEO_START_TIME = "deo_start_time"
     DEO_END_TIME = "deo_end_time"
     DETECTION_SENSITIVITY = "detection_sensitivity"
@@ -256,16 +260,19 @@ class DPCode(StrEnum):
     GAS_SENSOR_STATE = "gas_sensor_state"
     GAS_SENSOR_STATUS = "gas_sensor_status"
     GAS_SENSOR_VALUE = "gas_sensor_value"
+    HISTORY = "History"
     HUMIDIFIER = "humidifier"  # Humidification
     HUMIDITY = "humidity"  # Humidity
     HUMIDITY_CURRENT = "humidity_current"  # Current humidity
     HUMIDITY_INDOOR = "humidity_indoor"  # Indoor humidity
     HUMIDITY_SET = "humidity_set"  # Humidity setting
     HUMIDITY_VALUE = "humidity_value"  # Humidity
+    INDICATOR_LIGHT = "indicator_light"
     INDUCTION_CLEAN = "Induction_Clean"
     INDUCTION_DELAY = "induction_delay"
     INDUCTION_INTERVAL = "induction_interval"
     IPC_WORK_MODE = "ipc_work_mode"
+    KILL = "kill"
     LED_TYPE_1 = "led_type_1"
     LED_TYPE_2 = "led_type_2"
     LED_TYPE_3 = "led_type_3"
@@ -276,6 +283,7 @@ class DPCode(StrEnum):
     LOCK = "lock"  # Lock / Child lock
     MASTER_MODE = "master_mode"  # alarm mode
     MACH_OPERATE = "mach_operate"
+    MAGNETNUM = "magnetNum"
     MANUAL_CLEAN = "manual_clean"
     MANUAL_FEED = "manual_feed"
     MANUAL_LOCK = "manual_lock"
@@ -289,20 +297,27 @@ class DPCode(StrEnum):
     MOTION_TRACKING = "motion_tracking"
     MOVEMENT_DETECT_PIC = "movement_detect_pic"
     MUFFLING = "muffling"  # Muffling
+    M_ADC_NUM = "M_ADC_NUM"
     NEAR_DETECTION = "near_detection"
     NET_NOTICE = "Net_notice"
+    NOTIFICATION_STATUS = "notification_status"
     NOT_DISTURB = "not_disturb"
     NOT_DISTURB_SWITCH = "not_disturb_Switch"
     NUMBER = "number"
+    ODOURLESS = "odourless"
     OPPOSITE = "opposite"
+    OXYGEN = "oxygen"  # Oxygen bar
     PAUSE = "pause"
+    PEDAL_ANGLE = "pedal_angle"
     PERCENT_CONTROL = "percent_control"
     PERCENT_CONTROL_2 = "percent_control_2"
     PERCENT_CONTROL_3 = "percent_control_3"
     PERCENT_STATE = "percent_state"
     PERCENT_STATE_2 = "percent_state_2"
     PERCENT_STATE_3 = "percent_state_3"
+    PIR_RADAR = "PIR_RADAR"
     POSITION = "position"
+    POWER = "power"
     PHASE_A = "phase_a"
     PHASE_B = "phase_b"
     PHASE_C = "phase_c"
@@ -319,8 +334,10 @@ class DPCode(StrEnum):
     PRESSURE_STATE = "pressure_state"
     PRESSURE_VALUE = "pressure_value"
     PUMP_RESET = "pump_reset"  # Water pump reset
-    ODOURLESS = "odourless"
-    OXYGEN = "oxygen"  # Oxygen bar
+    QUIET_TIMING_ON = "quiet_timing_on"
+    QUIET_TIME_END = "quiet_time_end"
+    QUIET_TIME_START = "quiet_time_start"
+    REBOOT = "reboot"
     RECORD_MODE = "record_mode"
     RECORD_SWITCH = "record_switch"  # Recording switch
     RELAY_STATUS = "relay_status"
@@ -342,6 +359,7 @@ class DPCode(StrEnum):
     SIREN_SWITCH = "siren_switch"
     SITUATION_SET = "situation_set"
     SLEEP = "sleep"  # Sleep function
+    SLEEPING = "sleeping"
     SLEEP_START_TIME = "sleep_start_time"
     SLEEP_END_TIME = "sleep_end_time"
     SLOW_FEED = "slow_feed"
@@ -393,6 +411,9 @@ class DPCode(StrEnum):
     SWITCH_VERTICAL = "switch_vertical"  # Vertical swing flap switch
     SWITCH_VOICE = "switch_voice"  # Voice switch
     TEMP = "temp"  # Temperature setting
+    TEMPERATURE = "temperature"
+    TEMPER_ALARM = "temper_alarm"  # Tamper alarm
+    TEMP_ADC = "temp_adc"
     TEMP_BOILING_C = "temp_boiling_c"
     TEMP_BOILING_F = "temp_boiling_f"
     TEMP_CONTROLLER = "temp_controller"
@@ -404,7 +425,6 @@ class DPCode(StrEnum):
     TEMP_UNIT_CONVERT = "temp_unit_convert"  # Temperature unit switching
     TEMP_VALUE = "temp_value"  # Color temperature
     TEMP_VALUE_V2 = "temp_value_v2"
-    TEMPER_ALARM = "temper_alarm"  # Tamper alarm
     TIME_TOTAL = "time_total"
     TOILET_NOTICE = "toilet_notice"
     TIME_USE = "time_use"  # Total seconds of irrigation
@@ -446,6 +466,7 @@ class DPCode(StrEnum):
     WIRELESS_ELECTRICITY = "wireless_electricity"
     WORK_MODE = "work_mode"  # Working mode
     WORK_POWER = "work_power"
+    WORK_STAT = "work_stat"
 
 
 @dataclass
