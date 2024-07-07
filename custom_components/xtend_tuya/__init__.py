@@ -41,7 +41,7 @@ from tuya_sharing.strategy import strategy
 from tuya_iot import (
     AuthType,
     TuyaDevice,
-    #TuyaDeviceListener,
+    TuyaDeviceListener,
     TuyaDeviceManager,
     TuyaHomeManager,
     TuyaOpenAPI,
@@ -168,7 +168,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: TuyaConfigEntry) -> bool
                 config_entry.data[CONF_TOKEN_INFO],
                 None,
                 tuya_device_manager,
-                open_api
+                open_api,
+                hass
             )
             break
     
@@ -281,6 +282,62 @@ async def async_remove_entry(hass: HomeAssistant, entry: TuyaConfigEntry) -> Non
         await hass.async_add_executor_job(manager.unload)
 
 
+class XTDeviceListener(TuyaDeviceListener):
+    """Device Update Listener."""
+
+    def __init__(
+        self,
+        hass: HomeAssistant,
+        device_manager: TuyaDeviceManager,
+        device_ids: set[str],
+    ) -> None:
+        """Init DeviceListener."""
+        self.hass = hass
+        self.device_manager = device_manager
+        self.device_ids = device_ids
+
+    def update_device(self, device: TuyaDevice) -> None:
+        """Update device status."""
+        if device.id in self.device_ids:
+            LOGGER.debug(
+                "Received update for device %s: %s",
+                device.id,
+                self.device_manager.device_map[device.id].status,
+            )
+            dispatcher_send(self.hass, f"{TUYA_HA_SIGNAL_UPDATE_ENTITY}_{device.id}")
+
+    def add_device(self, device: TuyaDevice) -> None:
+        """Add device added listener."""
+        # Ensure the device isn't present stale
+        self.hass.add_job(self.async_remove_device, device.id)
+
+        self.device_ids.add(device.id)
+        dispatcher_send(self.hass, TUYA_DISCOVERY_NEW, [device.id])
+
+        device_manager = self.device_manager
+        device_manager.mq.stop()
+        tuya_mq = TuyaOpenMQ(device_manager.api)
+        tuya_mq.start()
+
+        device_manager.mq = tuya_mq
+        tuya_mq.add_message_listener(device_manager.on_message)
+
+    def remove_device(self, device_id: str) -> None:
+        """Add device removed listener."""
+        self.hass.add_job(self.async_remove_device, device_id)
+
+    @callback
+    def async_remove_device(self, device_id: str) -> None:
+        """Remove device from Home Assistant."""
+        LOGGER.debug("Remove device: %s", device_id)
+        device_registry = dr.async_get(self.hass)
+        device_entry = device_registry.async_get_device(
+            identifiers={(DOMAIN, device_id)}
+        )
+        if device_entry is not None:
+            device_registry.async_remove_device(device_entry.id)
+            self.device_ids.discard(device_id)
+    
 class DeviceListener(SharingDeviceListener):
     """Device Update Listener."""
 
@@ -499,6 +556,7 @@ class DeviceManager(Manager):
         listener: SharingTokenListener = None,
         other_manager: Manager = None,
         open_api: TuyaOpenAPI = None,
+        hass: HomeAssistant = None,
     ) -> None:
         if other_manager is None:
             self.terminal_id = terminal_id
@@ -524,9 +582,12 @@ class DeviceManager(Manager):
         self.open_api_home_manager = None
         if self.open_api is not None:
             self.open_api_tuya_mq = TuyaOpenMQ(self.open_api)
-            #tuya_mq.start() #No need to start an MQTT listener
+            self.open_api_tuya_mq.start()
             self.open_api_device_manager = XTTuyaDeviceManager(self, self.open_api, self.open_api_tuya_mq)
             self.open_api_home_manager = TuyaHomeManager(self.open_api, self.open_api_tuya_mq, self.open_api_device_manager)
+            device_ids: set[str] = set()
+            listener = XTDeviceListener(hass, self.open_api_device_manager, device_ids)
+            self.open_api_device_manager.add_device_listener(listener)
         self.other_device_manager = other_manager
         self.device_map: dict[str, CustomerDevice] = {}
         self.open_api_device_map: dict[str, TuyaDevice] = {}
@@ -541,9 +602,6 @@ class DeviceManager(Manager):
         if self.other_device_manager is not None:
             self.mq = self.other_device_manager.mq
             self.mq.add_message_listener(self.on_message)
-            for device in self.open_api_device_map:
-                self.mq.subscribe_device(device, self.open_api_device_map[device])
-                LOGGER.warning(f"Registering device {device} => {self.open_api_device_map[device]}")
             return
         super().refresh_mq()
 
