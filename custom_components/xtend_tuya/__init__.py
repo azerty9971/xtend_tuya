@@ -536,22 +536,13 @@ class DeviceManager(Manager):
         self.user_repository = UserRepository(self.customer_api)
     
     def refresh_mq(self):
-        if self.mq is not None:
-            self.mq.stop()
-            self.mq = None
-
-        home_ids = [home.id for home in self.user_homes]
-        device = [device for device in self.device_map.values() if
-                  hasattr(device, "id") and getattr(device, "set_up", False)]
-        device.extend([device for device in self.open_api_device_map.values() if
-                  hasattr(device, "id") and getattr(device, "set_up", False)])
-
-        LOGGER.warning(f"MQTT device => {device}")
-
-        sharing_mq = SharingMQ(self.customer_api, home_ids, device)
-        sharing_mq.start()
-        sharing_mq.add_message_listener(self.on_message)
-        self.mq = sharing_mq
+        if self.other_device_manager is not None:
+            self.mq = self.other_device_manager.mq
+            self.mq.add_message_listener(self.on_message)
+            for device in self.open_api_device_map:
+                self.mq.subscribe_device(device.id, device)
+            return
+        super().refresh_mq()
 
     def update_device_properties_open_api(self, device):
         device_id = device.id
@@ -675,13 +666,6 @@ class DeviceManager(Manager):
         if self.other_device_manager is not None:
             self.other_device_manager.on_message(msg)
         super().on_message(msg)
-
-    def refresh_mq(self):
-        if self.other_device_manager is not None:
-            self.mq = self.other_device_manager.mq
-            self.mq.add_message_listener(self.on_message)
-            return
-        super().refresh_mq()
 
     def _on_device_other(self, device_id: str, biz_code: str, data: dict[str, Any]):
         #LOGGER.warning(f"mq _on_device_other-> {device_id} biz_code-> {biz_code} data-> {data}")
