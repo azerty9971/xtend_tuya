@@ -225,6 +225,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: TuyaConfigEntry) -> bool
         )
     if manager.open_api_device_manager is not None:
         for device in manager.open_api_device_manager.device_map.values():
+            manager.device_ids.add(device.id)
             if reuse_config:
                 identifiers = {(DOMAIN_ORIG, device.id), (DOMAIN, device.id)}
             else:
@@ -576,6 +577,7 @@ class DeviceManager(Manager):
             #if self.mq is not None and self.mq.mq_config is not None:
             #    LOGGER.warning(f"MQTT config: URL => {self.mq.mq_config.url} ClientID => {self.mq.mq_config.client_id} Username => {self.mq.mq_config.username} Password => {self.mq.mq_config.password} Dev Topic => {self.mq.mq_config.dev_topic}")
             self.mq.remove_message_listener(other_manager.on_message)
+        self.device_ids: set[str] = set()
         self.open_api = open_api
         self.open_api_tuya_mq = None
         self.open_api_device_manager = None
@@ -585,8 +587,7 @@ class DeviceManager(Manager):
             self.open_api_tuya_mq.start()
             self.open_api_device_manager = XTTuyaDeviceManager(self, self.open_api, self.open_api_tuya_mq)
             self.open_api_home_manager = TuyaHomeManager(self.open_api, self.open_api_tuya_mq, self.open_api_device_manager)
-            device_ids: set[str] = set()
-            listener = XTDeviceListener(hass, self.open_api_device_manager, device_ids)
+            listener = XTDeviceListener(hass, self.open_api_device_manager, self.device_ids)
             self.open_api_device_manager.add_device_listener(listener)
         self.other_device_manager = other_manager
         self.device_map: dict[str, CustomerDevice] = {}
