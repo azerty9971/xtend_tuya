@@ -341,6 +341,14 @@ class XTDeviceRepository(DeviceRepository):
         self.manager = manager
         self.open_api= open_api
 
+    def query_devices_by_home(self, home_id: str) -> list[CustomerDevice]:
+        LOGGER.warning(f"query_devices_by_home => {home_id}")
+        super().query_devices_by_home(home_id)
+
+    def query_devices_by_ids(self, ids: list) -> list[CustomerDevice]:
+        LOGGER.warning(f"query_devices_by_home => {ids}")
+        super().query_devices_by_ids(ids)
+
     def update_device_specification(self, device: CustomerDevice):
         device_id = device.id
         response = self.api.get(f"/v1.1/m/life/{device_id}/specifications")
