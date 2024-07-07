@@ -510,14 +510,16 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
             device = TuyaDevice(**item)
             status = {}
             api_status = self.get_device_status("bf80ca98b2da422bf4na8b")
-            LOGGER.warning(f"api_status => {api_status}")
-            for item_status in api_status:
-                if "code" in item_status and "value" in item_status:
-                    code = item_status["code"]
-                    value = item_status["value"]
-                    status[code] = value
-            device.status = status
-            self.device_map[item["id"]] = device
+            if api_status["success"]:
+                api_status_result = api_status["result"]
+                LOGGER.warning(f"api_status => {api_status_result}")
+                for item_status in api_status_result:
+                    if "code" in item_status and "value" in item_status:
+                        code = item_status["code"]
+                        value = item_status["value"]
+                        status[code] = value
+                device.status = status
+                self.device_map[item["id"]] = device
         #ENDDEBUG
         self.update_device_function_cache()
 
