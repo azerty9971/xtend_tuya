@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import json
 from typing import Any, Optional, NamedTuple
 
 import requests
@@ -367,7 +368,7 @@ class XTDeviceRepository(DeviceRepository):
     def update_device_specification(self, device: CustomerDevice):
         device_id = device.id
         response = self.api.get(f"/v1.1/m/life/{device_id}/specifications")
-        LOGGER.warning(f"update_device_specification => {response}")
+        #LOGGER.warning(f"update_device_specification => {response}")
         if response.get("success"):
             result = response.get("result", {})
             function_map = {}
@@ -400,7 +401,7 @@ class XTDeviceRepository(DeviceRepository):
     def update_device_properties_open_api(self, device, dp_id_map = {}, pid = ""):
         device_id = device.id
         response = self.open_api.get(f"/v2.0/cloud/thing/{device_id}/shadow/properties")
-        LOGGER.warning(f"update_device_properties_open_api => {response}")
+        #LOGGER.warning(f"update_device_properties_open_api => {response}")
         if response.get("success"):
             result = response.get("result", {})
             tuya_device = None
@@ -533,12 +534,55 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
         if type == "string":
             return DPType(DPType.STRING)
 
-    def update_device_properties_open_api(self, device):
+    def update_device_properties_open_api_OLD(self, device):
         device_id = device.id
         response = self.api.get(f"/v2.0/cloud/thing/{device_id}/shadow/properties")
         LOGGER.warning(f"update_device_properties_open_api => {response}")
         if response.get("success"):
             result = response.get("result", {})
+            tuya_device = None
+            tuya_manager = self.manager.get_overriden_device_manager()
+            if tuya_manager is None:
+                tuya_manager = self.manager
+            if device.id in tuya_manager.device_map:
+                tuya_device = tuya_manager.device_map[device.id]
+            for dp_property in result["properties"]:
+                if "dp_id" in dp_property and dp_property["dp_id"] not in device.local_strategy and "type" in dp_property:
+                    dp_property["type"] = self.determine_property_type(dp_property.get("type",None), dp_property.get("value",None))
+                    device.local_strategy[dp_property["dp_id"]] = {
+                        "status_code": dp_property["code"],
+                        "config_item": {
+                            "valueDesc": dp_property.get("value",None),
+                            "valueType": dp_property.get("type",None),
+                            "pid": device.product_id,
+                        }
+                    }
+                if "code" in dp_property and "type" in dp_property:
+                    code = dp_property["code"]
+                    if code not in device.status_range:
+                        device.status_range[code] = DeviceStatusRange()
+                        device.status_range[code].code   = code
+                        device.status_range[code].type   = dp_property.get("type",None)
+                        device.status_range[code].values = {} #dp_property.get("value",None)
+                    if code not in device.status:
+                        device.status[code] = dp_property.get("value",None)
+                    #Also add the status range for Tuya's manager devices
+                    if tuya_device is not None and code not in tuya_device.status_range:
+                        tuya_device.status_range[code] = DeviceStatusRange()
+                        tuya_device.status_range[code].code   = code
+                        tuya_device.status_range[code].type   = dp_property.get("type",None)
+                        tuya_device.status_range[code].values = {} #dp_property.get("value",None)
+                    if tuya_device is not None and code not in tuya_device.status:
+                        tuya_device.status[code] = dp_property.get("value",None)
+
+    def update_device_properties_open_api(self, device):
+        device_id = device.id
+        response = self.api.get(f"/v2.0/cloud/thing/{device_id}/model")
+        #LOGGER.warning(f"update_device_properties_open_api => {response}")
+        if response.get("success"):
+            result = response.get("result", {})
+            model = json.loads(result.get("model", ""))
+            LOGGER.warning(f"MODEL => {model}")
             tuya_device = None
             tuya_manager = self.manager.get_overriden_device_manager()
             if tuya_manager is None:
@@ -588,7 +632,7 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
                             break
                     if not status_found:
                         specs["result"]["status"].append({"code": status.code, "type": status.type, "values": status.values})
-        LOGGER.warning(f"get_device_specification => {specs} status_range => {self.device_map[device_id].status_range}")
+        #LOGGER.warning(f"get_device_specification => {specs} status_range => {self.device_map[device_id].status_range}")
         return specs
 
 class DeviceManager(Manager):
@@ -651,7 +695,7 @@ class DeviceManager(Manager):
                 for device in self.open_api_device_manager.device_map:
                     if device not in self.device_map:
                         self.open_api_device_map[device] = self.open_api_device_manager.device_map[device]
-            LOGGER.warning(f"self.open_api_device_map => {self.open_api_device_map}")
+            #LOGGER.warning(f"self.open_api_device_map => {self.open_api_device_map}")
 
     @staticmethod
     def get_category_virtual_states(category: str) -> list[DescriptionVirtualState]:
