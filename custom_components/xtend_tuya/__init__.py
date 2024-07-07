@@ -41,6 +41,9 @@ from tuya_iot import (
     TuyaHomeManager,
     TuyaOpenAPI,
     TuyaOpenMQ,
+)
+
+from tuya_iot.device import (
     TuyaDeviceStatusRange,
 )
 
