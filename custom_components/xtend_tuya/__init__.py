@@ -577,8 +577,12 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
 
     def update_device_properties_open_api(self, device):
         device_id = device.id
-        response = self.api.get(f"/v2.0/cloud/thing/{device_id}/model")
+        response = self.api.get(f"/v2.0/cloud/thing/{device_id}/shadow/properties")
+        response2 = self.api.get(f"/v2.0/cloud/thing/{device_id}/model")
         #LOGGER.warning(f"update_device_properties_open_api => {response}")
+        if response2.get("success"):
+            result = response2.get("result", {})
+            model = json.loads(result.get("model", ""))
         if response.get("success"):
             result = response.get("result", {})
             model = json.loads(result.get("model", ""))
