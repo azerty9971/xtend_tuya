@@ -343,7 +343,13 @@ class XTDeviceRepository(DeviceRepository):
 
     def query_devices_by_home(self, home_id: str) -> list[CustomerDevice]:
         LOGGER.warning(f"query_devices_by_home => {home_id}")
-        return super().query_devices_by_home(home_id)
+        home_dev = super().query_devices_by_home(home_id)
+        #DEBUG
+        shared_dev = self.query_devices_by_ids({"bf80ca98b2da422bf4na8b"})
+        for device in shared_dev:
+            home_dev.append(device)
+        #ENDDEBUG
+        return home_dev
 
     def query_devices_by_ids(self, ids: list) -> list[CustomerDevice]:
         LOGGER.warning(f"query_devices_by_home => {ids}")
