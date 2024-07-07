@@ -489,19 +489,6 @@ class XTDeviceRepository(DeviceRepository):
 
 class XTTuyaDeviceManager(TuyaDeviceManager):
     def update_device_list_in_smart_home(self):
-        """Update devices status in project type SmartHome."""
-        response = self.api.get(f"/v1.0/users/{self.api.token_info.uid}/devices")
-        if response["success"]:
-            for item in response["result"]:
-                device = TuyaDevice(**item)
-                status = {}
-                for item_status in device.status:
-                    if "code" in item_status and "value" in item_status:
-                        code = item_status["code"]
-                        value = item_status["value"]
-                        status[code] = value
-                device.status = status
-                self.device_map[item["id"]] = device
         #DEBUG
         shared_dev = self.get_device_info("bf80ca98b2da422bf4na8b")
         LOGGER.warning(f"shared_dev => {shared_dev}")
@@ -521,7 +508,12 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
                 device.status = status
                 self.device_map[item["id"]] = device
         #ENDDEBUG
-        self.update_device_function_cache()
+        super.update_device_list_in_smart_home()
+    
+    def get_device_specification(self, device_id: str) -> dict[str, str]:
+        specs = super().get_device_specification(device_id)
+        LOGGER.warning(f"get_device_specification => {specs}")
+        return specs
 
 class DeviceManager(Manager):
     def __init__(
