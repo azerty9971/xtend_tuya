@@ -81,6 +81,12 @@ def _async_device_as_dict(
     """Represent a Tuya device as a dictionary."""
 
     # Base device information, without sensitive information.
+    set_up = {}
+    if hasattr(device, "set_up"):
+        set_up = device.set_up
+    support_local = {}
+    if hasattr(device, "support_local"):
+        support_local = device.support_local
     data = {
         "id": device.id,
         "name": device.name,
@@ -97,8 +103,8 @@ def _async_device_as_dict(
         "status_range": {},
         "status": {},
         "home_assistant": {},
-        "set_up": device.set_up,
-        "support_local": device.support_local,
+        "set_up": set_up,
+        "support_local": support_local,
     }
 
     # Gather Tuya states
