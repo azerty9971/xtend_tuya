@@ -560,6 +560,7 @@ class DeviceManager(Manager):
             self.open_api_home_manager = TuyaHomeManager(self.open_api, self.open_api_tuya_mq, self.open_api_device_manager)
         self.other_device_manager = other_manager
         self.device_map: dict[str, CustomerDevice] = {}
+        self.open_api_device_map: dict[str, TuyaDevice] = {}
         self.user_homes: list[SmartLifeHome] = []
         self.home_repository = HomeRepository(self.customer_api)
         self.device_repository = XTDeviceRepository(self.customer_api, self, self.open_api)
@@ -573,6 +574,10 @@ class DeviceManager(Manager):
         #Add Tuya OpenAPI devices to the cache
         if self.open_api_home_manager is not None:
             self.open_api_home_manager.update_device_cache()
+            self.open_api_device_map = {}
+            for device in self.open_api_home_manager.device_map:
+                if device.id not in self.device_map:
+                    self.open_api_device_map.append(device)
 
     @staticmethod
     def get_category_virtual_states(category: str) -> list[DescriptionVirtualState]:
