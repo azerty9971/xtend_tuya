@@ -579,7 +579,8 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
         self.update_device_properties_open_api(self.device_map[device_id])
         if specs["success"]:
             if "result" in specs and "status" in specs["result"]:
-                for status in self.device_map[device_id].status_range:
+                for status_code in self.device_map[device_id].status_range:
+                    status = self.device_map[device_id].status_range[status_code]
                     status_found = False
                     for spec_status in specs["result"]["status"]:
                         if spec_status["code"] == status.code:
