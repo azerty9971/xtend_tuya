@@ -99,21 +99,23 @@ async def async_setup_entry(
     hass_data = entry.runtime_data
 
     @callback
-    def async_discover_device(device_ids: list[str]):
+    def async_discover_device(manager, device_map):
         """Discover and add a discovered tuya light."""
         entities: list[TuyaLightEntity] = []
+        device_ids = [*device_map]
         for device_id in device_ids:
-            device = hass_data.manager.device_map[device_id]
+            device = device_map[device_id]
             if descriptions := LIGHTS.get(device.category):
                 entities.extend(
-                    TuyaLightEntity(device, hass_data.manager, description)
+                    TuyaLightEntity(device, manager, description)
                     for description in descriptions
                     if description.key in device.status
                 )
 
         async_add_entities(entities)
 
-    async_discover_device([*hass_data.manager.device_map])
+    async_discover_device(hass_data.manager, hass_data.manager.device_map)
+    async_discover_device(hass_data.manager, hass_data.manager.open_api_device_map)
 
     entry.async_on_unload(
         async_dispatcher_connect(hass, TUYA_DISCOVERY_NEW, async_discover_device)
