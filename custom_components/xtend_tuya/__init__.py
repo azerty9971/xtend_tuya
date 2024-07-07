@@ -34,6 +34,8 @@ from tuya_sharing.user import (
     UserRepository,
 )
 
+from tuya_sharing.mq import SharingMQ
+
 from tuya_iot import (
     AuthType,
     TuyaDevice,
@@ -367,7 +369,7 @@ class XTDeviceRepository(DeviceRepository):
         LOGGER.warning(f"query_devices_by_home => {ids}")
         return super().query_devices_by_ids(ids)"""
 
-    def update_device_specification(self, device: CustomerDevice):
+    """def update_device_specification(self, device: CustomerDevice):
         device_id = device.id
         response = self.api.get(f"/v1.1/m/life/{device_id}/specifications")
         #LOGGER.warning(f"update_device_specification => {response}")
@@ -384,7 +386,7 @@ class XTDeviceRepository(DeviceRepository):
                 status_range[code] = DeviceStatusRange(**status)
 
             device.function = function_map
-            device.status_range = status_range
+            device.status_range = status_range"""
 
     def update_device_strategy_info(self, device: CustomerDevice):
         device_id = device.id
@@ -436,7 +438,7 @@ class XTDeviceRepository(DeviceRepository):
             self.manager.update_device_properties_open_api(device)
 
 class XTTuyaDevice(TuyaDevice):
-    set_up: Optional[bool] = False
+    set_up: Optional[bool] = True
     support_local: Optional[bool] = False
     local_strategy: dict[int, dict[str, Any]] = {}
 
@@ -534,6 +536,22 @@ class DeviceManager(Manager):
         self.scene_repository = SceneRepository(self.customer_api)
         self.user_repository = UserRepository(self.customer_api)
     
+    def refresh_mq(self):
+        if self.mq is not None:
+            self.mq.stop()
+            self.mq = None
+
+        home_ids = [home.id for home in self.user_homes]
+        device = [device for device in self.device_map.values() if
+                  hasattr(device, "id") and getattr(device, "set_up", False)]
+        device.extend([device for device in self.open_api_device_map.values() if
+                  hasattr(device, "id") and getattr(device, "set_up", False)])
+
+        sharing_mq = SharingMQ(self.customer_api, home_ids, device)
+        sharing_mq.start()
+        sharing_mq.add_message_listener(self.on_message)
+        self.mq = sharing_mq
+
     def update_device_properties_open_api(self, device):
         device_id = device.id
         if self.open_api is None:
