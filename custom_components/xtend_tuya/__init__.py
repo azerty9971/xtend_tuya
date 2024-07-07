@@ -634,16 +634,16 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
                     if code not in device.status_range:
                         device.status_range[code] = DeviceStatusRange()
                         device.status_range[code].code   = code
-                        device.status_range[code].type   = device.local_strategy[dp_property["dp_id"]].config_item.valueType
-                        device.status_range[code].values = device.local_strategy[dp_property["dp_id"]].config_item.valueDesc
+                        device.status_range[code].type   = device.local_strategy[dp_property["dp_id"]]["config_item"]["valueType"]
+                        device.status_range[code].values = device.local_strategy[dp_property["dp_id"]]["config_item"]["valueDesc"]
                     if code not in device.status:
                         device.status[code] = dp_property.get("value",None)
                     #Also add the status range for Tuya's manager devices
                     if tuya_device is not None and code not in tuya_device.status_range:
                         tuya_device.status_range[code] = DeviceStatusRange()
                         tuya_device.status_range[code].code   = code
-                        tuya_device.status_range[code].type   = device.local_strategy[dp_property["dp_id"]].config_item.valueType
-                        tuya_device.status_range[code].values = device.local_strategy[dp_property["dp_id"]].config_item.valueDesc
+                        tuya_device.status_range[code].type   = device.local_strategy[dp_property["dp_id"]]["config_item"]["valueType"]
+                        tuya_device.status_range[code].values = device.local_strategy[dp_property["dp_id"]]["config_item"]["valueDesc"]
                     if tuya_device is not None and code not in tuya_device.status:
                         tuya_device.status[code] = dp_property.get("value",None)
 
