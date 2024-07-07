@@ -520,7 +520,7 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
         #ENDDEBUG
         super().update_device_list_in_smart_home()
     
-    def determine_property_type(self, type, value) -> DPType:
+    def determine_property_type(self, type, value = None) -> DPType:
         if type == "value":
             return DPType(DPType.INTEGER)
         if type == "bitmap":
