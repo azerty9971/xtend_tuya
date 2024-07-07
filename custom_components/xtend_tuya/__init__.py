@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Any, NamedTuple
+from typing import Any, Optional, NamedTuple
 
 import requests
 
@@ -397,7 +397,7 @@ class XTDeviceRepository(DeviceRepository):
         if type == "string":
             return DPType(DPType.STRING)
 
-    def update_device_properties_open_api(self, device: CustomerDevice, dp_id_map, pid):
+    def update_device_properties_open_api(self, device, dp_id_map = {}, pid = ""):
         device_id = device.id
         response = self.open_api.get(f"/v2.0/cloud/thing/{device_id}/shadow/properties")
         LOGGER.warning(f"update_device_properties_open_api => {response}")
@@ -487,14 +487,23 @@ class XTDeviceRepository(DeviceRepository):
             self.update_device_properties_open_api(device, dp_id_map, pid)
             device.local_strategy = dp_id_map
 
+class XTTuyaDevice(TuyaDevice):
+    set_up: Optional[bool] = False
+    support_local: Optional[bool] = False
+    local_strategy: dict[int, dict[str, Any]] = {}
+
 class XTTuyaDeviceManager(TuyaDeviceManager):
+    def __init__(self, manager, api: TuyaOpenAPI, mq: TuyaOpenMQ) -> None:
+        super().__init__(api, mq)
+        self.manager = manager
+
     def update_device_list_in_smart_home(self):
         #DEBUG
         shared_dev = self.get_device_info("bf80ca98b2da422bf4na8b")
         LOGGER.warning(f"shared_dev => {shared_dev}")
         if shared_dev["success"]:
             item = shared_dev["result"]
-            device = TuyaDevice(**item)
+            device = XTTuyaDevice(**item)
             status = {}
             api_status = self.get_device_status("bf80ca98b2da422bf4na8b")
             if api_status["success"]:
@@ -510,8 +519,50 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
         #ENDDEBUG
         super().update_device_list_in_smart_home()
     
+    def update_device_properties_open_api(self, device, dp_id_map = {}, pid = ""):
+        device_id = device.id
+        response = self.api.get(f"/v2.0/cloud/thing/{device_id}/shadow/properties")
+        LOGGER.warning(f"update_device_properties_open_api => {response}")
+        if response.get("success"):
+            result = response.get("result", {})
+            tuya_device = None
+            tuya_manager = self.manager.get_overriden_device_manager()
+            if tuya_manager is None:
+                tuya_manager = self.manager
+            if device.id in tuya_manager.device_map:
+                tuya_device = tuya_manager.device_map[device.id]
+            for dp_property in result["properties"]:
+                if "dp_id" in dp_property and dp_property["dp_id"] not in dp_id_map and "type" in dp_property:
+                    dp_property["type"] = self.determine_property_type(dp_property.get("type",None), dp_property.get("value",None))
+                    dp_id_map[dp_property["dp_id"]] = {
+                        "status_code": dp_property["code"],
+                        "config_item": {
+                            "valueDesc": dp_property.get("value",None),
+                            "valueType": dp_property.get("type",None),
+                            "pid": device.product_id,
+                        }
+                    }
+                if "code" in dp_property and "type" in dp_property:
+                    code = dp_property["code"]
+                    if code not in device.status_range:
+                        device.status_range[code] = DeviceStatusRange()
+                        device.status_range[code].code   = code
+                        device.status_range[code].type   = dp_property.get("type",None)
+                        device.status_range[code].values = {} #dp_property.get("value",None)
+                    if code not in device.status:
+                        device.status[code] = dp_property.get("value",None)
+                    #Also add the status range for Tuya's manager devices
+                    if tuya_device is not None and code not in tuya_device.status_range:
+                        tuya_device.status_range[code] = DeviceStatusRange()
+                        tuya_device.status_range[code].code   = code
+                        tuya_device.status_range[code].type   = dp_property.get("type",None)
+                        tuya_device.status_range[code].values = {} #dp_property.get("value",None)
+                    if code not in tuya_device.status:
+                        tuya_device.status[code] = dp_property.get("value",None)
+
     def get_device_specification(self, device_id: str) -> dict[str, str]:
         specs = super().get_device_specification(device_id)
+        self.update_device_properties_open_api(self.device_map[device_id], self.device_map[device_id].local_strategy)
         LOGGER.warning(f"get_device_specification => {specs}")
         return specs
 
@@ -552,7 +603,7 @@ class DeviceManager(Manager):
         if self.open_api is not None:
             self.open_api_tuya_mq = TuyaOpenMQ(self.open_api)
             #tuya_mq.start() #No need to start an MQTT listener
-            self.open_api_device_manager = XTTuyaDeviceManager(self.open_api, self.open_api_tuya_mq)
+            self.open_api_device_manager = XTTuyaDeviceManager(self, self.open_api, self.open_api_tuya_mq)
             self.open_api_home_manager = TuyaHomeManager(self.open_api, self.open_api_tuya_mq, self.open_api_device_manager)
         self.other_device_manager = other_manager
         self.device_map: dict[str, CustomerDevice] = {}
