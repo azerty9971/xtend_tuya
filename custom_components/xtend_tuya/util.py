@@ -18,7 +18,7 @@ def remap_value(
         value = from_max - value + from_min
     return ((value - from_min) / (from_max - from_min)) * (to_max - to_min) + to_min
 
-def determine_property_type(self, type, value = None) -> DPType:
+def determine_property_type(type, value = None) -> DPType:
         if type == "value":
             return DPType(DPType.INTEGER)
         if type == "bitmap":
