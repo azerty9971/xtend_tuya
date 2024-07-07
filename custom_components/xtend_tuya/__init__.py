@@ -36,6 +36,8 @@ from tuya_sharing.user import (
 
 from tuya_sharing.mq import SharingMQ
 
+from tuya_sharing.strategy import strategy
+
 from tuya_iot import (
     AuthType,
     TuyaDevice,
@@ -666,6 +668,34 @@ class DeviceManager(Manager):
         if self.other_device_manager is not None:
             self.other_device_manager.on_message(msg)
         super().on_message(msg)
+
+    def _on_device_report(self, device_id: str, status: list):
+        device = self.device_map.get(device_id, None)
+        if not device:
+            device = self.open_api_device_map.get(device_id, None)
+        if not device:
+            return
+        LOGGER.debug(f"mq _on_device_report-> {status}")
+        if device.support_local:
+            for item in status:
+                if "dpId" in item and "value" in item:
+                    dp_id_item = device.local_strategy[item["dpId"]]
+                    strategy_name = dp_id_item["value_convert"]
+                    config_item = dp_id_item["config_item"]
+                    dp_item = (dp_id_item["status_code"], item["value"])
+                    LOGGER.debug(
+                        f"mq _on_device_report before strategy convert strategy_name={strategy_name},dp_item={dp_item},config_item={config_item}")
+                    code, value = strategy.convert(strategy_name, dp_item, config_item)
+                    LOGGER.debug(f"mq _on_device_report after strategy convert code={code},value={value}")
+                    device.status[code] = value
+        else:
+            for item in status:
+                if "code" in item and "value" in item:
+                    code = item["code"]
+                    value = item["value"]
+                    device.status[code] = value
+
+        self.__update_device(device)
 
     def _on_device_other(self, device_id: str, biz_code: str, data: dict[str, Any]):
         #LOGGER.warning(f"mq _on_device_other-> {device_id} biz_code-> {biz_code} data-> {data}")
