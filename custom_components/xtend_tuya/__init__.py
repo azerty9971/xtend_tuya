@@ -595,6 +595,8 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
                             if "type" in property["typeSpec"]:
                                 typeSpec = property["typeSpec"]
                                 real_type = self.determine_property_type(property["typeSpec"]["type"])
+                                if real_type == DPType.ENUM:
+                                    typeSpec = json.dumps(typeSpec)
                                 typeSpec.pop("type")
                                 device.local_strategy[property["abilityId"]] = {
                                     "status_code": property["code"],
