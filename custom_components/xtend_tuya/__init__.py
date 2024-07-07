@@ -605,6 +605,13 @@ class DeviceManager(Manager):
             self.mq.add_message_listener(self.on_message)
             return
         super().refresh_mq()
+    
+    def send_commands(
+            self, device_id: str, commands: list[dict[str, Any]]
+    ):
+        if device_id in self.open_api_device_map:
+            return self.open_api_device_manager.send_commands(device_id, commands)
+        return self.device_repository.send_commands(device_id, commands)
 
     def update_device_properties_open_api(self, device):
         device_id = device.id
