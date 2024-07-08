@@ -84,7 +84,7 @@ from .const import (
     DPType,
 )
 
-from .util import determine_property_type
+from .util import determine_property_type, prepare_value_for_property_update
 
 # Suppress logs from the library, it logs unneeded on error
 logging.getLogger("tuya_sharing").setLevel(logging.CRITICAL)
@@ -658,7 +658,7 @@ class DeviceManager(Manager):
                         code = dp_item.get("status_code", None)
                         #LOGGER.warning(f"command => {command}")
                         if command["code"] == code:
-                            value = str(command["value"])
+                            value = prepare_value_for_property_update(dp_item, command["value"])
                             LOGGER.warning(f"dp_item => {dp_item}")
                             if dp_item.get("property_update", False):
                                 property_dict = {code: value}
