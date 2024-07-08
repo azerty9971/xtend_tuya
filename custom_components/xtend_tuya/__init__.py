@@ -794,8 +794,14 @@ class DeviceManager(Manager):
         for virtual_state in virtual_states:
             if virtual_state.virtual_state_value == VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME:
                 if virtual_state.key in device.status:
-                    for new_code in virtual_state.vs_copy_to_state:
-                        device.status[new_code] = device.status[virtual_state.key]
+                    if virtual_state.key in device.status_range:
+                        for new_code in virtual_state.vs_copy_to_state:
+                            device.status[new_code] = device.status[virtual_state.key]
+                            device.status_range[new_code] = device.status_range[virtual_state.key]
+                    if virtual_state.key in device.function:
+                        for new_code in virtual_state.vs_copy_to_state:
+                            device.status[new_code] = device.status[virtual_state.key]
+                            device.function[new_code] = device.function[virtual_state.key]
 
     def set_overriden_device_manager(self, other_device_manager: Manager) -> None:
         self.other_device_manager = other_device_manager
