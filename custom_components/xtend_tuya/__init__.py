@@ -646,8 +646,8 @@ class DeviceManager(Manager):
     def send_commands(
             self, device_id: str, commands: list[dict[str, Any]]
     ):
-        regular_commands = list[dict[str, Any]]
-        property_commands = list[dict[str, Any]]
+        regular_commands = []
+        property_commands = []
         if device_id in self.device_map:
             LOGGER.warning(f"send_commands => {device_id} ==> {commands}")
             device = self.device_map.get(device_id, None)
@@ -656,13 +656,14 @@ class DeviceManager(Manager):
                     for dp_id in device.local_strategy:
                         dp_item = device.local_strategy[dp_id]
                         code = dp_item.get("status_code", None)
+                        LOGGER.warning(f"command => {command}")
                         if command["code"] == code:
                             if dp_item.get("property_update", False):
-                                property_dict = {str(command["code"]): str(command["value"])}
+                                property_dict = {str(command["code"]): command["value"]}
                                 LOGGER.warning(f"property_dict => {property_dict}")
                                 property_commands.append(property_dict)
                             else:
-                                command_dict = {"code": str(command["code"]), "value": str(command["value"])}
+                                command_dict = {"code": str(command["code"]), "value": command["value"]}
                                 LOGGER.warning(f"command_dict => {command_dict}")
                                 regular_commands.append(command_dict)
                             break
