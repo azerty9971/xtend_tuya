@@ -32,7 +32,7 @@ def determine_property_type(type, value = None) -> DPType:
         if type == "string":
             return DPType(DPType.STRING)
 
-def prepare_value_for_property_update(dp_item, value):
+def prepare_value_for_property_update(dp_item, value) -> str:
     value_type = dp_item.get("valueType", None)
     if value_type is not None:
         if value_type == DPType.BOOLEAN:
@@ -40,4 +40,4 @@ def prepare_value_for_property_update(dp_item, value):
                 return "true"
             else:
                 return "false"
-    return value
+    return str(value)
