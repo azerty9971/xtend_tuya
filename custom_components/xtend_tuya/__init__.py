@@ -844,11 +844,11 @@ class DeviceManager(Manager):
                         value = item["value"]
                         device_other.status[code] = value
                     for dict_key in item:
-                        if dict_key in device.local_strategy:
-                            dp_id_item = device.local_strategy[dict_key]
+                        if dict_key in device_other.local_strategy:
+                            dp_id_item = device_other.local_strategy[dict_key]
                             code = dp_id_item["status_code"]
                             value = item[dict_key]
-                            device.status[code] = value
+                            device_other.status[code] = value
         #if show_debug == True:
         LOGGER.debug(f"AFTER device_id -> {device_id} device_status-> {device.status} status-> {status}")
         super()._on_device_report(device_id, [])
