@@ -48,6 +48,11 @@ from tuya_iot import (
     TuyaOpenMQ,
 )
 
+"""from tuya_iot.device import (
+    PROTOCOL_DEVICE_REPORT,
+    PROTOCOL_OTHER,
+)"""
+
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryError, ConfigEntryNotReady
@@ -506,7 +511,7 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
 
     def update_device_list_in_smart_home(self):
         #DEBUG
-        """shared_dev_id = "SHARED_DEV_ID"
+        shared_dev_id = "SHARED_DEV_ID"
         shared_dev = self.get_device_info(shared_dev_id)
         LOGGER.warning(f"shared_dev => {shared_dev}")
         if shared_dev["success"]:
@@ -522,7 +527,7 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
                         value = item_status["value"]
                         status[code] = value
                 device.status = status
-                self.device_map[item["id"]] = device"""
+                self.device_map[item["id"]] = device
         #ENDDEBUG
         """Update devices status in project type SmartHome."""
         response = self.api.get(f"/v1.0/users/{self.api.token_info.uid}/devices")
@@ -540,6 +545,16 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
 
         self.update_device_function_cache()
     
+    def on_message(self, msg: str):
+        LOGGER.debug(f"mq receive-> {msg}")
+        self.manager.on_message(msg)
+        """protocol = msg.get("protocol", 0)
+        data = msg.get("data", {})
+        if protocol == PROTOCOL_DEVICE_REPORT:
+            self._on_device_report(data["devId"], data["status"])
+        elif protocol == PROTOCOL_OTHER:
+            self._on_device_other(data["devId"], data["bizCode"], data)"""
+
     def _update_device_list_info_cache(self, devIds: list[str]):
 
         response = self.get_device_list_info(devIds)
