@@ -651,7 +651,8 @@ class DeviceManager(Manager):
             LOGGER.warning(f"send_commands => {device_id} ==> {commands}")
             device = self.open_api_device_map.get(device_id, None)
             if device is not None:
-                for dp_item in device.local_strategy:
+                for dp_id in device.local_strategy:
+                    dp_item = device.local_strategy[dp_id]
                     code = dp_item.get("status_code", None)
                     if code in commands:
                         is_prop = dp_item.get("property_update", False)
