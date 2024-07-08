@@ -251,6 +251,7 @@
           "0": "Not shoveling",
           "1": "Start manual shoveling",
           "2": "Pause manual shoveling"
+        }
       },
       "volume": {
         "name": "[%key:component::tuya::entity::number::volume::name%]"
