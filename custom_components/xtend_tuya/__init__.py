@@ -766,13 +766,13 @@ class DeviceManager(Manager):
         super().on_message(msg)
 
     def _on_device_report(self, device_id: str, status: list):
-        LOGGER.debug(f"mq1 _on_device_report-> {status}")
+        LOGGER.warning(f"mq1 _on_device_report-> {status}")
         device = self.device_map.get(device_id, None)
         if device is None:
             device = self.open_api_device_map.get(device_id, None)
         if device is None:
             return
-        LOGGER.debug(f"mq2 _on_device_report-> {status}")
+        LOGGER.warning(f"mq2 _on_device_report-> {status}")
         if device.support_local:
             for item in status:
                 if "dpId" in item and "value" in item:
