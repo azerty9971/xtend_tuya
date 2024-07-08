@@ -47,22 +47,23 @@ TAMPER_BINARY_SENSOR = TuyaBinarySensorEntityDescription(
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
 BINARY_SENSORS: dict[str, tuple[TuyaBinarySensorEntityDescription, ...]] = {
     "msp": (
-        TuyaBinarySensorEntityDescription(
-            key=DPCode.CLEANING,
-            translation_key="cleaning",
-        ),
+        #If 1 is reported, it will be counted once. 
+        #If 0 is reported, it will not be counted
+        #(today and the average number of toilet visits will be counted on the APP)
         TuyaBinarySensorEntityDescription(
             key=DPCode.CLEANING_NUM,
             translation_key="cleaning_num",
         ),
         TuyaBinarySensorEntityDescription(
-            key=DPCode.SLEEPING,
-            translation_key="sleeping",
-        ),
-        TuyaBinarySensorEntityDescription(
             key=DPCode.TRASH_STATUS,
             translation_key="trash_status",
             entity_registry_enabled_default=True,
+            on_value="1"
+        ),
+        TuyaBinarySensorEntityDescription(
+            key=DPCode.POWER,
+            translation_key="power",
+            entity_registry_enabled_default=False,
         ),
     ),
 }

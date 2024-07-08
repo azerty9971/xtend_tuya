@@ -77,6 +77,11 @@ SWITCHES: dict[str, tuple[SwitchEntityDescription, ...]] = {
             icon="mdi:human-child"
         ),
         SwitchEntityDescription(
+            key=DPCode.CLEANING,
+            translation_key="one_click_cleanup",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        SwitchEntityDescription(
             key=DPCode.CLEAN_NOTICE,
             translation_key="clean_notice",
             entity_category=EntityCategory.CONFIG,
@@ -140,23 +145,24 @@ SWITCHES: dict[str, tuple[SwitchEntityDescription, ...]] = {
             entity_category=EntityCategory.CONFIG,
         ),
         SwitchEntityDescription(
-            key=DPCode.POWER,
-            translation_key="power",
-            entity_category=EntityCategory.CONFIG,
-        ),
-        SwitchEntityDescription(
             key=DPCode.QUIET_TIMING_ON,
             translation_key="quiet_timing_on",
             entity_category=EntityCategory.CONFIG,
         ),
         SwitchEntityDescription(
             key=DPCode.REBOOT,
-            translation_key="reboot",
+            translation_key="child_lock",
             entity_category=EntityCategory.CONFIG,
+            entity_registry_enabled_default=False,
         ),
         SwitchEntityDescription(
             key=DPCode.SLEEP,
             translation_key="sleep",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        SwitchEntityDescription(
+            key=DPCode.SLEEPING,
+            translation_key="sleeping",
             entity_category=EntityCategory.CONFIG,
         ),
         SwitchEntityDescription(
