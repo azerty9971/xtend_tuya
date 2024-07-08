@@ -763,7 +763,17 @@ class DeviceManager(Manager):
         #If we override another device manager, first call its on_message method
         if self.other_device_manager is not None:
             self.other_device_manager.on_message(msg)
-        super().on_message(msg)
+        #super().on_message(msg)
+        try:
+            protocol = msg.get("protocol", 0)
+            data = msg.get("data", {})
+
+            if protocol == PROTOCOL_DEVICE_REPORT:
+                self._on_device_report(data["devId"], data["status"])
+            if protocol == PROTOCOL_OTHER:
+                self._on_device_other(data["bizData"]["devId"], data["bizCode"], data)
+        except Exception as e:
+            LOGGER.error("on message error = %s", e)
 
     def _on_device_report(self, device_id: str, status: list):
         LOGGER.warning(f"mq1 _on_device_report-> {status}")
