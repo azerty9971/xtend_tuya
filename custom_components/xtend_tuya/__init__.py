@@ -561,7 +561,7 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
 
     def get_device_specification(self, device_id: str) -> dict[str, str]:
         specs = super().get_device_specification(device_id)
-        self.manager.update_device_properties_open_api(self.device_map[device_id])
+        self.manager.get_device_properties_open_api(self.device_map[device_id])
         if specs["success"]:
             if "result" in specs and "status" in specs["result"]:
                 for status_code in self.device_map[device_id].status_range:
