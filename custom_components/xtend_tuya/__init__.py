@@ -824,8 +824,8 @@ class DeviceManager(Manager):
             
             for dict_key in item:
                 LOGGER.warning(f"dict_key => {dict_key}")
-                if dict_key in device.local_strategy:
-                    dp_id_item = device.local_strategy[dict_key]
+                dp_id_item = device.local_strategy.get(dict_key, None)
+                if dp_id_item is not None:
                     LOGGER.warning(f"dp_id_item => {dp_id_item}")
                     code = dp_id_item["status_code"]
                     value = item[dict_key]
@@ -844,8 +844,8 @@ class DeviceManager(Manager):
                         value = item["value"]
                         device_other.status[code] = value
                     for dict_key in item:
-                        if dict_key in device_other.local_strategy:
-                            dp_id_item = device_other.local_strategy[dict_key]
+                        dp_id_item = device_other.local_strategy.get(dict_key, None)
+                        if dp_id_item is not None:
                             code = dp_id_item["status_code"]
                             value = item[dict_key]
                             device_other.status[code] = value
