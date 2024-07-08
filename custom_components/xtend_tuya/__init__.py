@@ -543,8 +543,13 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
                         status[code] = value
                 device.status = status
                 self.device_map[item["id"]] = device
-                self.manager.apply_init_virtual_states(device)
         self.update_device_function_cache()
+    
+    def update_device_function_cache(self, devIds: list = []):
+        super().update_device_function_cache(devIds)
+        for device_id in self.device_map:
+            self.manager.apply_init_virtual_states(self.device_map[device_id])
+
     
     def on_message(self, msg: str):
         #LOGGER.warning(f"XTTuyaDeviceManager: mq receive-> {msg}")
