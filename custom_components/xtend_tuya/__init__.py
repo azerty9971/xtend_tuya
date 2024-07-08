@@ -658,9 +658,13 @@ class DeviceManager(Manager):
                         code = dp_item.get("status_code", None)
                         if command["code"] == code:
                             if dp_item.get("property_update", False):
-                                property_commands.append({str(command["code"]): str(command["value"])})
+                                property_dict = {str(command["code"]): str(command["value"])}
+                                property_commands.append(property_dict)
+                                LOGGER.warning(f"property_dict => {property_dict}")
                             else:
-                                regular_commands.append({"code": str(command["code"]), "value": str(command["value"])})
+                                command_dict = {"code": str(command["code"]), "value": str(command["value"])}
+                                regular_commands.append(command_dict)
+                                LOGGER.warning(f"command_dict => {command_dict}")
                             break
                 LOGGER.warning(f"split commands => {property_commands} ==> {regular_commands}")
                 if regular_commands:
