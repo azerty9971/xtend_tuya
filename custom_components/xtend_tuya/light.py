@@ -115,7 +115,7 @@ async def async_setup_entry(
         async_add_entities(entities)
 
     async_discover_device(hass_data.manager, hass_data.manager.device_map)
-    async_discover_device(hass_data.manager, hass_data.manager.open_api_device_map)
+    #async_discover_device(hass_data.manager, hass_data.manager.open_api_device_map)
 
     entry.async_on_unload(
         async_dispatcher_connect(hass, TUYA_DISCOVERY_NEW, async_discover_device)
