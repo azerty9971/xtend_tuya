@@ -823,8 +823,10 @@ class DeviceManager(Manager):
                 device.status[code] = value
             
             for dict_key in item:
+                LOGGER.warning(f"dict_key => {dict_key}")
                 if dict_key in device.local_strategy:
                     dp_id_item = device.local_strategy[dict_key]
+                    LOGGER.warning(f"dp_id_item => {dp_id_item}")
                     code = dp_id_item["status_code"]
                     value = item[dict_key]
                     device.status[code] = value
