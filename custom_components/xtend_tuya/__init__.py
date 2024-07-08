@@ -497,7 +497,7 @@ class XTDeviceRepository(DeviceRepository):
             device.support_local = support_local
             #if support_local:
             device.local_strategy = dp_id_map
-            self.manager.update_device_properties_open_api(device)
+            self.manager.get_device_properties_open_api(device)
 
 class XTTuyaDevice(TuyaDevice):
     set_up: Optional[bool] = True
@@ -575,6 +575,13 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
                         specs["result"]["status"].append({"code": status.code, "type": status.type, "values": status.values})
         return specs
 
+    def send_property_update(
+            self, device_id: str, properties: list[dict[str, Any]]
+    ):
+        return self.api.post(
+            f"/v2.0/cloud/thing/{device_id}/shadow/properties/issue", {"properties": properties}
+        )
+
 class DeviceManager(Manager):
     def __init__(
         self,
@@ -638,13 +645,27 @@ class DeviceManager(Manager):
     def send_commands(
             self, device_id: str, commands: list[dict[str, Any]]
     ):
+        regular_commands = commands
+        property_commandes = []
         if device_id in self.open_api_device_map:
             LOGGER.warning(f"send_commands => {device_id} ==> {commands}")
-            self.open_api_device_manager.send_commands(device_id, commands)
+            device = self.open_api_device_map.get(device_id, None)
+            if device is not None:
+                for dp_item in device.local_strategy:
+                    code = dp_item.get("status_code", None)
+                    if code in commands:
+                        is_prop = dp_item.get("property_update", False)
+                        if is_prop:
+                            property_commandes.extend(regular_commands[code])
+                            regular_commands.pop(code)
+            if regular_commands:
+                self.open_api_device_manager.send_commands(device_id, regular_commands)
+            if property_commandes:
+                self.open_api_device_manager.send_property_update(device_id, regular_commands)
             return
         self.device_repository.send_commands(device_id, commands)
 
-    def update_device_properties_open_api(self, device):
+    def get_device_properties_open_api(self, device):
         device_id = device.id
         if self.open_api is None:
             return
