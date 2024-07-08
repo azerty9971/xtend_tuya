@@ -31,3 +31,13 @@ def determine_property_type(type, value = None) -> DPType:
             return DPType(DPType.JSON)
         if type == "string":
             return DPType(DPType.STRING)
+
+def prepare_value_for_property_update(dp_item, value):
+    value_type = dp_item.get("valueType", None)
+    if value_type is not None:
+        if value_type == DPType.BOOLEAN:
+            if bool(value):
+                return "true"
+            else:
+                return "false"
+    return value
