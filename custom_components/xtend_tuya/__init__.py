@@ -105,8 +105,8 @@ from .sensor import (
 
 async def update_listener(hass, entry):
     """Handle options update."""
-    LOGGER.warning(f"update_listener => {entry}")
-    LOGGER.warning(f"update_listener => {entry.data}")
+    LOGGER.debug(f"update_listener => {entry}")
+    LOGGER.debug(f"update_listener => {entry.data}")
 
 async def async_setup_entry(hass: HomeAssistant, entry: TuyaConfigEntry) -> bool:
     """Async setup hass config entry."""
@@ -511,7 +511,7 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
 
     def update_device_list_in_smart_home(self):
         #DEBUG
-        shared_dev_id = "bf80ca98b2da422bf4na8b"
+        """ shared_dev_id = "bf80ca98b2da422bf4na8b"
         shared_dev = self.get_device_info(shared_dev_id)
         LOGGER.warning(f"shared_dev => {shared_dev}")
         if shared_dev["success"]:
@@ -527,7 +527,7 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
                         value = item_status["value"]
                         status[code] = value
                 device.status = status
-                self.device_map[item["id"]] = device
+                self.device_map[item["id"]] = device """
         #ENDDEBUG
         """Update devices status in project type SmartHome."""
         response = self.api.get(f"/v1.0/users/{self.api.token_info.uid}/devices")
@@ -546,7 +546,7 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
         self.update_device_function_cache()
     
     def on_message(self, msg: str):
-        LOGGER.warning(f"XTTuyaDeviceManager: mq receive-> {msg}")
+        #LOGGER.warning(f"XTTuyaDeviceManager: mq receive-> {msg}")
         self.manager.on_message(msg)
         super().on_message(msg)
 
@@ -648,7 +648,7 @@ class DeviceManager(Manager):
         regular_commands = []
         property_commands = []
         if device_id in self.device_map:
-            LOGGER.warning(f"send_commands => {device_id} ==> {commands}")
+            #LOGGER.warning(f"send_commands => {device_id} ==> {commands}")
             device = self.device_map.get(device_id, None)
             if device is not None:
                 for command in commands:
@@ -658,7 +658,7 @@ class DeviceManager(Manager):
                         #LOGGER.warning(f"command => {command}")
                         if command["code"] == code:
                             value = prepare_value_for_property_update(dp_item, command["value"])
-                            LOGGER.warning(f"dp_item => {dp_item}")
+                            #LOGGER.warning(f"dp_item => {dp_item}")
                             if dp_item.get("property_update", False):
                                 property_dict = {code: value}
                                 #LOGGER.warning(f"property_dict => {property_dict}")
@@ -668,7 +668,7 @@ class DeviceManager(Manager):
                                 #LOGGER.warning(f"command_dict => {command_dict}")
                                 regular_commands.append(command_dict)
                             break
-                LOGGER.warning(f"split commands => {property_commands} ==> {regular_commands}")
+                #LOGGER.warning(f"split commands => {property_commands} ==> {regular_commands}")
                 if regular_commands:
                     self.open_api_device_manager.send_commands(device_id, regular_commands)
                 if property_commands:
