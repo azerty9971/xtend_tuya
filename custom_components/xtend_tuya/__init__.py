@@ -828,7 +828,7 @@ class DeviceManager(Manager):
                 if dp_id_item is not None:
                     LOGGER.warning(f"dp_id_item => {dp_id_item}")
                     code = dp_id_item["status_code"]
-                    value = item[dp_id]
+                    value = item[dict_key]
                     device.status[code] = value
         if self.other_device_manager is not None:
             device_other = self.other_device_manager.device_map.get(device_id, None)
@@ -848,7 +848,7 @@ class DeviceManager(Manager):
                         dp_id_item = device_other.local_strategy.get(dp_id, None)
                         if dp_id_item is not None:
                             code = dp_id_item["status_code"]
-                            value = item[dp_id]
+                            value = item[dict_key]
                             device_other.status[code] = value
         #if show_debug == True:
         LOGGER.debug(f"AFTER device_id -> {device_id} device_status-> {device.status} status-> {status}")
