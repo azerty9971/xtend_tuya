@@ -42,6 +42,9 @@
   },
   "entity": {
     "binary_sensor": {
+      "power": {
+        "name": "Powered on and restarted successfully"
+      },
       "cleaning": {
         "name": "Cleaning"
       },
