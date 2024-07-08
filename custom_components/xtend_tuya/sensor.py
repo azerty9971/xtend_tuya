@@ -117,12 +117,6 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
             entity_registry_enabled_default=True,
         ),
         TuyaSensorEntityDescription(
-            key=DPCode.CLEAN,
-            translation_key="clean",
-            state_class=SensorStateClass.MEASUREMENT,
-            entity_registry_enabled_default=True,
-        ),
-        TuyaSensorEntityDescription(
             key=DPCode.CLEAN_NOTICE,
             translation_key="clean_notice",
             state_class=SensorStateClass.MEASUREMENT,
@@ -149,19 +143,13 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
         ),
         TuyaSensorEntityDescription(
             key=DPCode.DEODORIZATION_NUM,
-            translation_key="deodorization_num",
+            translation_key="ozone_concentration",
             state_class=SensorStateClass.MEASUREMENT,
             entity_registry_enabled_default=True,
         ),
         TuyaSensorEntityDescription(
             key=DPCode.DETECTION_SENSITIVITY,
             translation_key="detection_sensitivity",
-            state_class=SensorStateClass.MEASUREMENT,
-            entity_registry_enabled_default=True,
-        ),
-        TuyaSensorEntityDescription(
-            key=DPCode.EMPTY,
-            translation_key="empty",
             state_class=SensorStateClass.MEASUREMENT,
             entity_registry_enabled_default=True,
         ),
@@ -205,12 +193,6 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
             entity_registry_enabled_default=True,
         ),
         TuyaSensorEntityDescription(
-            key=DPCode.MAGNETNUM,
-            translation_key="magnetnum",
-            state_class=SensorStateClass.MEASUREMENT,
-            entity_registry_enabled_default=True,
-        ),
-        TuyaSensorEntityDescription(
             key=DPCode.MONITORING,
             translation_key="monitoring",
             state_class=SensorStateClass.MEASUREMENT,
@@ -232,7 +214,7 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
             key=DPCode.NOTIFICATION_STATUS,
             translation_key="notification_status",
             state_class=SensorStateClass.MEASUREMENT,
-            entity_registry_enabled_default=True,
+            entity_registry_enabled_default=False,
         ),
         TuyaSensorEntityDescription(
             key=DPCode.NUMBER,

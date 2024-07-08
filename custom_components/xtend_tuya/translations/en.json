@@ -48,11 +48,8 @@
       "cleaning_num": {
         "name": "Number of cleaning"
       },
-      "sleeping": {
-        "name": "Sleeping"
-      },
       "trash_status": {
-        "name": "Trash status"
+        "name": "Garbage is full"
       },
       "methane": {
         "name": "Methane"
@@ -147,10 +144,10 @@
     },
     "number": {
       "quiet_time_end": {
-        "name": "Quiet (end)"
+        "name": "Do not disturb (end)"
       },
       "quiet_time_start": {
-        "name": "Quiet (start)"
+        "name": "Do not disturb (start)"
       },
       "auto_lock_time": {
         "name": "Auto lock time"
@@ -247,6 +244,14 @@
       }
     },
     "select": {
+      "cat_litter_box_clean":
+      {
+        "name": "Manual shoveling",
+        "state": {
+          "0": "Not shoveling",
+          "1": "Start manual shoveling",
+          "2": "Pause manual shoveling"
+      },
       "volume": {
         "name": "[%key:component::tuya::entity::number::volume::name%]"
       },
@@ -647,6 +652,9 @@
           "22": "Cat enters"
         }
       },
+      "ozone_concentration": {
+        "name": "Ozone concentration"
+      },
       "deodorization_num": {
         "name": "Deodorization number"
       },
@@ -941,6 +949,13 @@
       }
     },
     "switch": {
+      "sleeping": {
+        "name": "Sleep"
+      },
+      "one_click_cleanup":
+      {
+        "name": "One click cleanup"
+      },
       "beep": {
         "name": "Beep"
       },
@@ -948,7 +963,7 @@
         "name": "Indicator light"
       },
       "quiet_timing_on": {
-        "name": "Quiet timing"
+        "name": "Do not disturb"
       },
       "reboot": {
         "name": "Reboot"
