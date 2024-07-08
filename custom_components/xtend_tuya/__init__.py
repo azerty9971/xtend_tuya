@@ -824,7 +824,7 @@ class DeviceManager(Manager):
             
             for dict_key in item:
                 LOGGER.warning(f"dict_key => {dict_key}")
-                dp_id_item = device.local_strategy.get(dict_key, None)
+                dp_id_item = device.local_strategy[dict_key]
                 if dp_id_item is not None:
                     LOGGER.warning(f"dp_id_item => {dp_id_item}")
                     code = dp_id_item["status_code"]
