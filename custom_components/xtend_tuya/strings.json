@@ -619,6 +619,34 @@
       }
     },
     "sensor": {
+      "msp_history": {
+        "name": "History",
+        "state": {
+          "0":  "None",
+          "1":  "Automatic shoveling completed",
+          "2":  "Manual shoveling completed",
+          "3":  "Trash bin extraction",
+          "4":  "Trash bin reinstallation",
+          "5":  "Start automatic deodorization",
+          "6":  "Start manual deodorization",
+          "7":  "Temperature in the cabin is too high",
+          "8":  "The temperature inside the cabin is suitable",
+          "9":  "Sand dumping completed",
+          "10": "Sand dumping canceled",
+          "11": "Litter shoveling canceled",
+          "12": "Enter Do Not Disturb mode",
+          "13": "Exit Do Not Disturb mode",
+          "14": "Cat approaches",
+          "15": "Cat leaves",
+          "16": "Starting Self-inspection",
+          "17": "Completed self-inspection",
+          "18": "Cover is not installed",
+          "19": "Cover is installed",
+          "20": "Start shoveling",
+          "21": "Start dumping",
+          "22": "Cat enters"
+        }
+      },
       "deodorization_num": {
         "name": "Deodorization number"
       },
@@ -754,7 +782,7 @@
         "name": "[%key:component::sensor::entity_component::illuminance::name%]"
       },
       "temperature": {
-        "name": "[%key:component::sensor::entity_component::temperature::name%]"
+        "name": "Temperature"
       },
       "humidity": {
         "name": "[%key:component::sensor::entity_component::humidity::name%]"
