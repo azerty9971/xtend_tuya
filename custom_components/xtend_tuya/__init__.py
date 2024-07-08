@@ -812,6 +812,7 @@ class DeviceManager(Manager):
                         
         #LOGGER.debug(f"Next step")
         for item in status:
+            LOGGER.warning(f"item in update loop => {item}")
             if "code" in item and "value" in item and item["value"] is not None:
                 code = item["code"]
                 value = item["value"]
