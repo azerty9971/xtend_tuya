@@ -225,7 +225,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: TuyaConfigEntry) -> bool
             name=device.name,
             model=f"{device.product_name} (unsupported)",
         )
-    if manager.open_api_device_manager is not None:
+    """if manager.open_api_device_manager is not None:
         for device in manager.open_api_device_manager.device_map.values():
             manager.device_ids.add(device.id)
             if reuse_config:
@@ -238,7 +238,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: TuyaConfigEntry) -> bool
                 manufacturer="Tuya",
                 name=device.name,
                 model=f"{device.product_name} (unsupported)",
-            )
+            )"""
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     # If the device does not register any entities, the device does not need to subscribe
