@@ -524,8 +524,29 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
                 device.status = status
                 self.device_map[item["id"]] = device"""
         #ENDDEBUG
-        super().update_device_list_in_smart_home()
+        """Update devices status in project type SmartHome."""
+        response = self.api.get(f"/v1.0/users/{self.api.token_info.uid}/devices")
+        if response["success"]:
+            for item in response["result"]:
+                device = XTTuyaDevice(**item)
+                status = {}
+                for item_status in device.status:
+                    if "code" in item_status and "value" in item_status:
+                        code = item_status["code"]
+                        value = item_status["value"]
+                        status[code] = value
+                device.status = status
+                self.device_map[item["id"]] = device
+
+        self.update_device_function_cache()
     
+    def _update_device_list_info_cache(self, devIds: list[str]):
+
+        response = self.get_device_list_info(devIds)
+        result = response.get("result", {})
+        for item in result.get("list", []):
+            device_id = item["id"]
+            self.device_map[device_id] = XTTuyaDevice(**item)
     
 
     def get_device_specification(self, device_id: str) -> dict[str, str]:
