@@ -41,7 +41,7 @@ from .const import (
 )
 
 
-@dataclass(frozen=True)
+@dataclass
 class TuyaSensorEntityDescription(SensorEntityDescription):
     """Describes Tuya sensor entity."""
 
