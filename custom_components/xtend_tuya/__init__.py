@@ -646,25 +646,27 @@ class DeviceManager(Manager):
     def send_commands(
             self, device_id: str, commands: list[dict[str, Any]]
     ):
-        regular_commands = commands
-        property_commandes = []
-        if device_id in self.open_api_device_map:
+        regular_commands = []
+        property_commands = []
+        if device_id in self.device_map:
             LOGGER.warning(f"send_commands => {device_id} ==> {commands}")
-            device = self.open_api_device_map.get(device_id, None)
+            device = self.device_map.get(device_id, None)
             if device is not None:
-                for dp_id in device.local_strategy:
-                    dp_item = device.local_strategy[dp_id]
-                    code = dp_item.get("status_code", None)
-                    if code in commands:
-                        is_prop = dp_item.get("property_update", False)
-                        if is_prop:
-                            property_commandes.extend(regular_commands[code])
-                            regular_commands.pop(code)
-            if regular_commands:
-                self.open_api_device_manager.send_commands(device_id, regular_commands)
-            if property_commandes:
-                self.open_api_device_manager.send_property_update(device_id, regular_commands)
-            return
+                for command in commands:
+                    for dp_id in device.local_strategy:
+                        dp_item = device.local_strategy[dp_id]
+                        code = dp_item.get("status_code", None)
+                        if command.code == code:
+                            if dp_item.get("property_update", False):
+                                property_commands.extend(commands[command])
+                            else:
+                                regular_commands.extend(commands[command])
+                            break
+                if regular_commands:
+                    self.open_api_device_manager.send_commands(device_id, regular_commands)
+                if property_commands:
+                    self.open_api_device_manager.send_property_update(device_id, property_commands)
+                return
         self.device_repository.send_commands(device_id, commands)
 
     def get_device_properties_open_api(self, device):
