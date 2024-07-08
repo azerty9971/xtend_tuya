@@ -639,8 +639,10 @@ class DeviceManager(Manager):
             self, device_id: str, commands: list[dict[str, Any]]
     ):
         if device_id in self.open_api_device_map:
-            return self.open_api_device_manager.send_commands(device_id, commands)
-        return self.device_repository.send_commands(device_id, commands)
+            LOGGER.warning(f"send_commands => {device_id} ==> {commands}")
+            self.open_api_device_manager.send_commands(device_id, commands)
+            return
+        self.device_repository.send_commands(device_id, commands)
 
     def update_device_properties_open_api(self, device):
         device_id = device.id
@@ -678,7 +680,8 @@ class DeviceManager(Manager):
                                         "valueDesc": typeSpec,
                                         "valueType": real_type,
                                         "pid": device.product_id,
-                                    }
+                                    },
+                                    "property_update": True
                                 }
                                 if tuya_device is not None:
                                     device.local_strategy[property["abilityId"]] = {
@@ -687,7 +690,8 @@ class DeviceManager(Manager):
                                             "valueDesc": typeSpec,
                                             "valueType": real_type,
                                             "pid": device.product_id,
-                                        }
+                                        },
+                                        "property_update": True
                                     }
 
         result = response.get("result", {})
@@ -702,7 +706,8 @@ class DeviceManager(Manager):
                             "valueDesc": dp_property.get("value",{}),
                             "valueType": real_type,
                             "pid": device.product_id,
-                        }
+                        },
+                        "property_update": True
                     }
             if (    "code"  in dp_property 
                 and "dp_id" in dp_property 
@@ -781,7 +786,7 @@ class DeviceManager(Manager):
 
     def _on_device_report(self, device_id: str, status: list):
         device = self.device_map.get(device_id, None)
-        LOGGER.debug(f"mq _on_device_report-> {device_id} status-> {status}")
+        #LOGGER.debug(f"mq _on_device_report-> {device_id} status-> {status}")
         if not device:
             return
         #LOGGER.debug(f"Device found!")
@@ -796,37 +801,37 @@ class DeviceManager(Manager):
                 if virtual_state.key in device.status:
                     for item in status:
                         if "code" in item and "value" in item and item["code"] == virtual_state.key:
-                            #LOGGER.debug(f"BEFORE device_id -> {device_id} device_status-> {device.status} status-> {status} VS-> {virtual_states}")
                             item["value"] += device.status[virtual_state.key]
-                            #item_val = item["value"]
-                            #LOGGER.debug(f"Applying virtual state device_id -> {device_id} device_status-> {device.status[virtual_state.key]} status-> {item_val} VS-> {virtual_state}")
+                            continue
                         elif "dpId" in item and "value" in item:
                             dp_id_item = device.local_strategy[item["dpId"]]
-                            #LOGGER.debug(f"device local strategy -> {device.local_strategy}, dp_id_item -> {dp_id_item} device_status-> {device.status}")
                             code = dp_id_item["status_code"]
                             value = item["value"]
                             if code == virtual_state.key:
-                                #LOGGER.debug(f"dpId logic before -> {device_id} device_status-> {device.status} status-> {status}")
                                 item["value"] += device.status[virtual_state.key]
-                                #LOGGER.debug(f"dpId logic after -> {device_id} device_status-> {device.status} status-> {status}")
+                            continue
+                        for dict_key in item:
+                            dp_id = int(dict_key)
+                            dp_id_item = device.local_strategy.get(dp_id, None)
+                            if dp_id_item is not None and dp_id_item["status_code"] == virtual_state.key:
+                                item[dict_key] += device.status[virtual_state.key]
                         
-        LOGGER.debug(f"device.local_strategy => {device.local_strategy}")
         for item in status:
             if "code" in item and "value" in item and item["value"] is not None:
                 code = item["code"]
                 value = item["value"]
                 device.status[code] = value
+                continue
             elif "dpId" in item and "value" in item:
                 dp_id_item = device.local_strategy[item["dpId"]]
                 code = dp_id_item["status_code"]
                 value = item["value"]
                 device.status[code] = value
-            
+                continue
             for dict_key in item:
                 dp_id = int(dict_key)
                 dp_id_item = device.local_strategy.get(dp_id, None)
                 if dp_id_item is not None:
-                    LOGGER.warning(f"dp_id_item => {dp_id_item}")
                     code = dp_id_item["status_code"]
                     value = item[dict_key]
                     device.status[code] = value
@@ -838,11 +843,13 @@ class DeviceManager(Manager):
                         code = item["code"]
                         value = item["value"]
                         device_other.status[code] = value
+                        continue
                     elif "dpId" in item and "value" in item:
                         dp_id_item = device.local_strategy[item["dpId"]]
                         code = dp_id_item["status_code"]
                         value = item["value"]
                         device_other.status[code] = value
+                        continue
                     for dict_key in item:
                         dp_id = int(dict_key)
                         dp_id_item = device_other.local_strategy.get(dp_id, None)
