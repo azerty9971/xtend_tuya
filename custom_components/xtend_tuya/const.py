@@ -175,7 +175,7 @@ class DPCode(StrEnum):
     CH4_SENSOR_VALUE = "ch4_sensor_value"
     CHILD_LOCK = "child_lock"  # Child lock
     CISTERN = "cistern"
-    CLEAN = "Clean"
+    CLEAN = "clean"
     CLEAN_AREA = "clean_area"
     CLEAN_NOTICE = "Clean_notice"
     CLEAN_TASTE = "Clean_taste"
