@@ -511,7 +511,7 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
 
     def update_device_list_in_smart_home(self):
         #DEBUG
-        shared_dev_id = "SHARED_DEV_ID"
+        shared_dev_id = "bf80ca98b2da422bf4na8b"
         shared_dev = self.get_device_info(shared_dev_id)
         LOGGER.warning(f"shared_dev => {shared_dev}")
         if shared_dev["success"]:
