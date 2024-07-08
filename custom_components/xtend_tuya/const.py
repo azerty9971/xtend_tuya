@@ -86,7 +86,8 @@ PLATFORMS = [
 
 class VirtualStates(IntFlag):
     """Virtual states"""
-    STATE_SUMMED_IN_REPORTING_PAYLOAD           = 0X0001,   #Spoof the state value to make it a total instead of an incremental value
+    STATE_COPY_TO_MULTIPLE_STATE_NAME           = 0X0001,   #Copy the state so that it can be used with other virtual states
+    STATE_SUMMED_IN_REPORTING_PAYLOAD           = 0X0002,   #Spoof the state value to make it a total instead of an incremental value
 
 @dataclass
 class DescriptionVirtualState:
@@ -95,6 +96,7 @@ class DescriptionVirtualState:
     key: str
     virtual_state_name: str
     virtual_state_value: str
+    vs_copy_to_state: list[DPCode]
 
 class WorkMode(StrEnum):
     """Work modes."""
@@ -123,6 +125,7 @@ class DPCode(StrEnum):
     """
 
     ADD_ELE = "add_ele" #Added watt since last heartbeat
+    ADD_ELE2 = "add_ele2" #Added watt since last heartbeat
     AIR_QUALITY = "air_quality"
     ALARM_LOCK = "alarm_lock"
     ALARM_SWITCH = "alarm_switch"  # Alarm switch
