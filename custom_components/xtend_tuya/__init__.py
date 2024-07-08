@@ -546,7 +546,7 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
         self.update_device_function_cache()
     
     def on_message(self, msg: str):
-        LOGGER.debug(f"mq receive-> {msg}")
+        LOGGER.warning(f"XTTuyaDeviceManager: mq receive-> {msg}")
         self.manager.on_message(msg)
         super().on_message(msg)
 
