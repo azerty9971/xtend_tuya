@@ -548,7 +548,6 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
     def on_message(self, msg: str):
         LOGGER.debug(f"mq receive-> {msg}")
         self.manager.on_message(msg)
-        msg = self.manager.format_on_message_to_codes(msg)
         super().on_message(msg)
 
     def _update_device_list_info_cache(self, devIds: list[str]):
@@ -642,16 +641,6 @@ class DeviceManager(Manager):
         if device_id in self.open_api_device_map:
             return self.open_api_device_manager.send_commands(device_id, commands)
         return self.device_repository.send_commands(device_id, commands)
-
-    def format_on_message_to_codes(self, msg: str) -> str:
-        protocol = msg.get("protocol", 0)
-        data = msg.get("data", {})
-        LOGGER.warning(f"message data => {data}")
-        if protocol == PROTOCOL_DEVICE_REPORT:
-            for status in data["status"]:
-                pass
-        elif protocol == PROTOCOL_OTHER:
-            return msg
 
     def update_device_properties_open_api(self, device):
         device_id = device.id
@@ -747,6 +736,7 @@ class DeviceManager(Manager):
                 for device in self.open_api_device_manager.device_map:
                     if device not in self.device_map:
                         self.open_api_device_map[device] = self.open_api_device_manager.device_map[device]
+                        self.device_map[device] = self.open_api_device_manager.device_map[device]
             #LOGGER.warning(f"self.open_api_device_map => {self.open_api_device_map}")
 
     @staticmethod
