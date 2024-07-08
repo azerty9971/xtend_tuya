@@ -754,7 +754,7 @@
         "name": "[%key:component::sensor::entity_component::illuminance::name%]"
       },
       "temperature": {
-        "name": "[%key:component::sensor::entity_component::temperature::name%]"
+        "name": "Temperature"
       },
       "humidity": {
         "name": "[%key:component::sensor::entity_component::humidity::name%]"

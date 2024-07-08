@@ -543,6 +543,10 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
                         specs["result"]["status"].append({"code": status.code, "type": status.type, "values": status.values})
         return specs
 
+    def on_message(self, msg: str):
+        LOGGER.warning(f"mq receive-> {msg}")
+        super().on_message(msg)
+
 class DeviceManager(Manager):
     def __init__(
         self,
