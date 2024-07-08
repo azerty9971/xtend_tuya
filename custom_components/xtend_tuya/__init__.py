@@ -656,7 +656,7 @@ class DeviceManager(Manager):
                     for dp_id in device.local_strategy:
                         dp_item = device.local_strategy[dp_id]
                         code = dp_item.get("status_code", None)
-                        if command.code == code:
+                        if command["code"] == code:
                             if dp_item.get("property_update", False):
                                 property_commands.extend(commands[command])
                             else:
