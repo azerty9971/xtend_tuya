@@ -498,6 +498,7 @@ class XTDeviceRepository(DeviceRepository):
             #if support_local:
             device.local_strategy = dp_id_map
             self.manager.get_device_properties_open_api(device)
+            self.manager.apply_init_virtual_states(device)
 
 class XTTuyaDevice(TuyaDevice):
     set_up: Optional[bool] = True
@@ -542,7 +543,7 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
                         status[code] = value
                 device.status = status
                 self.device_map[item["id"]] = device
-
+                self.manager.apply_init_virtual_states(device)
         self.update_device_function_cache()
     
     def on_message(self, msg: str):
@@ -788,6 +789,14 @@ class DeviceManager(Manager):
                         to_return.append(found_virtual_state)
         return to_return
     
+    def apply_init_virtual_states(self, device):
+        virtual_states = DeviceManager.get_category_virtual_states(device.category)
+        for virtual_state in virtual_states:
+            if virtual_state.virtual_state_value == VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME:
+                if virtual_state.key in device.status:
+                    for new_code in virtual_state.vs_copy_to_state:
+                        device.status[new_code] = device.status[virtual_state.key]
+
     def set_overriden_device_manager(self, other_device_manager: Manager) -> None:
         self.other_device_manager = other_device_manager
     
@@ -883,15 +892,8 @@ class DeviceManager(Manager):
             device_other = self.other_device_manager.device_map.get(device_id, None)
             if device_other is not None:
                 for item in status:
-                    if "code" in item and "value" in item and item["value"] is not None:
-                        code = item["code"]
-                        value = item["value"]
-                        device_other.status[code] = value
-                        continue
-                    elif "dpId" in item and "value" in item:
-                        dp_id_item = device.local_strategy[item["dpId"]]
-                        code = dp_id_item["status_code"]
-                        value = item["value"]
+                    code, value = self._read_code_value_from_state(device, item)
+                    if code is not None:
                         device_other.status[code] = value
                         continue
                     for dict_key in item:

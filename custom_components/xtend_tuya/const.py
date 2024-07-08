@@ -95,7 +95,7 @@ class DescriptionVirtualState:
     
     key: str
     virtual_state_name: str
-    virtual_state_value: str
+    virtual_state_value: VirtualStates
     vs_copy_to_state: list[DPCode]
 
 class WorkMode(StrEnum):
