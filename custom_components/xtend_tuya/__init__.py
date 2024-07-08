@@ -784,7 +784,7 @@ class DeviceManager(Manager):
                 for description in descriptions:
                     if description.virtualstate is not None and description.virtualstate & virtual_state.value:
                         # This VirtualState is applied to this key, let's return it
-                        found_virtual_state = DescriptionVirtualState(description.key, virtual_state.name, virtual_state.value)
+                        found_virtual_state = DescriptionVirtualState(description.key, virtual_state.name, virtual_state.value, description.vs_copy_to_state)
                         to_return.append(found_virtual_state)
         return to_return
     
@@ -816,6 +816,16 @@ class DeviceManager(Manager):
         #LOGGER.warning(f"mq _on_device_other-> {device_id} biz_code-> {biz_code} data-> {data}")
         super()._on_device_other(device_id, biz_code, data)
 
+    def _read_code_value_from_state(self, device, state):
+        if "code" in state and "value" in state:
+            return state["code"], state["value"]
+        elif "dpId" in state and "value" in state:
+            dp_id_item = device.local_strategy[state["dpId"]]
+            code = dp_id_item["status_code"]
+            value = state["value"]
+            return code, value
+        return None, None
+
     def _on_device_report(self, device_id: str, status: list):
         device = self.device_map.get(device_id, None)
         #LOGGER.debug(f"mq _on_device_report-> {device_id} status-> {status}")
@@ -827,37 +837,39 @@ class DeviceManager(Manager):
         
         #LOGGER.debug(f"Found virtualstates -> {virtual_states}")
         for virtual_state in virtual_states:
+            if virtual_state.virtual_state_value == VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME:
+                for item in status:
+                    code, value = self._read_code_value_from_state(device, item)
+                    if code == virtual_state.key:
+                        for state_name in virtual_state.vs_copy_to_state:
+                            status[state_name] = value
+                    for dict_key in item:
+                        dp_id = int(dict_key)
+                        dp_id_item = device.local_strategy.get(dp_id, None)
+                        if dp_id_item is not None and dp_id_item["status_code"] == virtual_state.key:
+                            for state_name in virtual_state.vs_copy_to_state:
+                                status[state_name] = item[dict_key]
+                        break
+            
             if virtual_state.virtual_state_value == VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD:
                 if virtual_state.key not in device.status or device.status[virtual_state.key] is None:
                     device.status[virtual_state.key] = 0
                 if virtual_state.key in device.status:
                     for item in status:
-                        if "code" in item and "value" in item and item["code"] == virtual_state.key:
+                        code, value = self._read_code_value_from_state(device, item)
+                        if code == virtual_state.key:
                             item["value"] += device.status[virtual_state.key]
-                            continue
-                        elif "dpId" in item and "value" in item:
-                            dp_id_item = device.local_strategy[item["dpId"]]
-                            code = dp_id_item["status_code"]
-                            value = item["value"]
-                            if code == virtual_state.key:
-                                item["value"] += device.status[virtual_state.key]
                             continue
                         for dict_key in item:
                             dp_id = int(dict_key)
                             dp_id_item = device.local_strategy.get(dp_id, None)
                             if dp_id_item is not None and dp_id_item["status_code"] == virtual_state.key:
                                 item[dict_key] += device.status[virtual_state.key]
+                                break
                         
         for item in status:
-            if "code" in item and "value" in item and item["value"] is not None:
-                code = item["code"]
-                value = item["value"]
-                device.status[code] = value
-                continue
-            elif "dpId" in item and "value" in item:
-                dp_id_item = device.local_strategy[item["dpId"]]
-                code = dp_id_item["status_code"]
-                value = item["value"]
+            code, value = self._read_code_value_from_state(device, item)
+            if code is not None:
                 device.status[code] = value
                 continue
             for dict_key in item:

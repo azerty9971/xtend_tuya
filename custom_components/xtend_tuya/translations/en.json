@@ -681,7 +681,10 @@
         "name": "Cat weight"
       },
       "add_ele": {
-        "name": "Consumption"
+        "name": "Consumption (method A)"
+      },
+      "add_ele2": {
+        "name": "Consumption (method B)"
       },
       "excretion_times_day": {
         "name": "Number of excretion"
