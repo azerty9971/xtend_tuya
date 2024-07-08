@@ -578,7 +578,7 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
     def send_property_update(
             self, device_id: str, properties: list[dict[str, Any]]
     ):
-        LOGGER.warning(f"/v2.0/cloud/thing/{device_id}/shadow/properties/issue => {"properties": properties}")
+        LOGGER.warning(f"/v2.0/cloud/thing/{device_id}/shadow/properties/issue => {properties}")
         return self.api.post(
             f"/v2.0/cloud/thing/{device_id}/shadow/properties/issue", {"properties": properties}
         )
