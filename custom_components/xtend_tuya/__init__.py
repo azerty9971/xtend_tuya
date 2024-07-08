@@ -579,8 +579,8 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
             self, device_id: str, properties: list[dict[str, Any]]
     ):
         LOGGER.warning(f"/v2.0/cloud/thing/{device_id}/shadow/properties/issue => {properties}")
-        return self.api.post(
-            f"/v2.0/cloud/thing/{device_id}/shadow/properties/issue", {"properties": properties}
+        for property in properties:
+            self.api.post(f"/v2.0/cloud/thing/{device_id}/shadow/properties/issue", {"properties": property}
         )
 
 class DeviceManager(Manager):
@@ -656,15 +656,17 @@ class DeviceManager(Manager):
                     for dp_id in device.local_strategy:
                         dp_item = device.local_strategy[dp_id]
                         code = dp_item.get("status_code", None)
-                        LOGGER.warning(f"command => {command}")
+                        #LOGGER.warning(f"command => {command}")
                         if command["code"] == code:
+                            value = str(command["value"])
+                            LOGGER.warning(f"dp_item => {dp_item}")
                             if dp_item.get("property_update", False):
-                                property_dict = {str(command["code"]): command["value"]}
-                                LOGGER.warning(f"property_dict => {property_dict}")
+                                property_dict = {code: value}
+                                #LOGGER.warning(f"property_dict => {property_dict}")
                                 property_commands.append(property_dict)
                             else:
-                                command_dict = {"code": str(command["code"]), "value": command["value"]}
-                                LOGGER.warning(f"command_dict => {command_dict}")
+                                command_dict = {"code": code, "value": value}
+                                #LOGGER.warning(f"command_dict => {command_dict}")
                                 regular_commands.append(command_dict)
                             break
                 LOGGER.warning(f"split commands => {property_commands} ==> {regular_commands}")
