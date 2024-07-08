@@ -823,7 +823,9 @@ class DeviceManager(Manager):
                 device.status[code] = value
             
             for dict_key in item:
-                LOGGER.warning(f"dict_key => {dict_key}")
+                LOGGER.warning(f"dict_key => {type(dict_key)} : {dict_key}")
+                for loc in device.local_strategy:
+                    LOGGER.warning(f"loc => {type(loc)} : {loc}")
                 dp_id_item = device.local_strategy[dict_key]
                 if dp_id_item is not None:
                     LOGGER.warning(f"dp_id_item => {dp_id_item}")
