@@ -181,7 +181,6 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
         TuyaSensorEntityDescription(
             key=DPCode.HISTORY,
             translation_key="msp_history",
-            state_class=SensorStateClass.MEASUREMENT,
             entity_registry_enabled_default=True,
         ),
         TuyaSensorEntityDescription(
