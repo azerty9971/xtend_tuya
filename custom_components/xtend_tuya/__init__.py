@@ -775,45 +775,16 @@ class DeviceManager(Manager):
         except Exception as e:
             LOGGER.error("on message error = %s", e)
 
-    def _on_device_report(self, device_id: str, status: list):
-        LOGGER.warning(f"mq1 _on_device_report-> {status}")
-        device = self.device_map.get(device_id, None)
-        if device is None:
-            device = self.open_api_device_map.get(device_id, None)
-        if device is None:
-            return
-        LOGGER.warning(f"mq2 _on_device_report-> {status}")
-        if device.support_local:
-            for item in status:
-                if "dpId" in item and "value" in item:
-                    dp_id_item = device.local_strategy[item["dpId"]]
-                    strategy_name = dp_id_item["value_convert"]
-                    config_item = dp_id_item["config_item"]
-                    dp_item = (dp_id_item["status_code"], item["value"])
-                    LOGGER.debug(
-                        f"mq _on_device_report before strategy convert strategy_name={strategy_name},dp_item={dp_item},config_item={config_item}")
-                    code, value = strategy.convert(strategy_name, dp_item, config_item)
-                    LOGGER.debug(f"mq _on_device_report after strategy convert code={code},value={value}")
-                    device.status[code] = value
-        else:
-            for item in status:
-                if "code" in item and "value" in item:
-                    code = item["code"]
-                    value = item["value"]
-                    device.status[code] = value
-
-        self.__update_device(device)
-
     def _on_device_other(self, device_id: str, biz_code: str, data: dict[str, Any]):
         #LOGGER.warning(f"mq _on_device_other-> {device_id} biz_code-> {biz_code} data-> {data}")
         super()._on_device_other(device_id, biz_code, data)
 
     def _on_device_report(self, device_id: str, status: list):
         device = self.device_map.get(device_id, None)
-        #LOGGER.debug(f"mq _on_device_report-> {device_id} status-> {status}")
+        LOGGER.debug(f"mq _on_device_report-> {device_id} status-> {status}")
         if not device:
             return
-        #LOGGER.debug(f"Device found!")
+        LOGGER.debug(f"Device found!")
         virtual_states = DeviceManager.get_category_virtual_states(device.category)
         #show_debug = False
         
@@ -865,6 +836,6 @@ class DeviceManager(Manager):
                         device_other.status[code] = value
         
         #if show_debug == True:
-        #LOGGER.debug(f"AFTER device_id -> {device_id} device_status-> {device.status} status-> {status}")
+        LOGGER.debug(f"AFTER device_id -> {device_id} device_status-> {device.status} status-> {status}")
         super()._on_device_report(device_id, [])
     
