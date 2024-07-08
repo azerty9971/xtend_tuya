@@ -48,10 +48,10 @@ from tuya_iot import (
     TuyaOpenMQ,
 )
 
-"""from tuya_iot.device import (
+from tuya_iot.device import (
     PROTOCOL_DEVICE_REPORT,
     PROTOCOL_OTHER,
-)"""
+)
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
@@ -548,12 +548,8 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
     def on_message(self, msg: str):
         LOGGER.debug(f"mq receive-> {msg}")
         self.manager.on_message(msg)
-        """protocol = msg.get("protocol", 0)
-        data = msg.get("data", {})
-        if protocol == PROTOCOL_DEVICE_REPORT:
-            self._on_device_report(data["devId"], data["status"])
-        elif protocol == PROTOCOL_OTHER:
-            self._on_device_other(data["devId"], data["bizCode"], data)"""
+        msg = self.manager.format_on_message_to_codes(msg)
+        super().on_message(msg)
 
     def _update_device_list_info_cache(self, devIds: list[str]):
 
@@ -646,6 +642,16 @@ class DeviceManager(Manager):
         if device_id in self.open_api_device_map:
             return self.open_api_device_manager.send_commands(device_id, commands)
         return self.device_repository.send_commands(device_id, commands)
+
+    def format_on_message_to_codes(self, msg: str) -> str:
+        protocol = msg.get("protocol", 0)
+        data = msg.get("data", {})
+        LOGGER.warning(f"message data => {data}")
+        if protocol == PROTOCOL_DEVICE_REPORT:
+            for status in data["status"]:
+                pass
+        elif protocol == PROTOCOL_OTHER:
+            return msg
 
     def update_device_properties_open_api(self, device):
         device_id = device.id
