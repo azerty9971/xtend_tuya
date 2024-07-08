@@ -48,7 +48,7 @@ class TuyaSensorEntityDescription(SensorEntityDescription):
     subkey: str | None = None
 
     virtualstate: VirtualStates | None = None
-    vs_copy_to_state: list[DPCode] = []
+    vs_copy_to_state: list[DPCode]  | None = None
 
     restoredata: bool = False
 
