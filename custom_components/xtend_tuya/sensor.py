@@ -179,6 +179,12 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
             entity_registry_enabled_default=True,
         ),
         TuyaSensorEntityDescription(
+            key=DPCode.HISTORY,
+            translation_key="msp_history",
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_registry_enabled_default=True,
+        ),
+        TuyaSensorEntityDescription(
             key=DPCode.INDUCTION_CLEAN,
             translation_key="induction_clean",
             device_class=SensorDeviceClass.DURATION,
@@ -202,7 +208,6 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
         TuyaSensorEntityDescription(
             key=DPCode.MAGNETNUM,
             translation_key="magnetnum",
-            device_class=SensorDeviceClass.DURATION,
             state_class=SensorStateClass.MEASUREMENT,
             entity_registry_enabled_default=True,
         ),
