@@ -658,10 +658,11 @@ class DeviceManager(Manager):
                         code = dp_item.get("status_code", None)
                         if command["code"] == code:
                             if dp_item.get("property_update", False):
-                                property_commands.extend(command)
+                                property_commands.extend({command["code"]: command["value"]})
                             else:
-                                regular_commands.extend(command)
+                                regular_commands.extend({"code": command["code"], "value": command["value"]})
                             break
+                LOGGER.warning(f"split commands => {property_commands} ==> {regular_commands}")
                 if regular_commands:
                     self.open_api_device_manager.send_commands(device_id, regular_commands)
                 if property_commands:
