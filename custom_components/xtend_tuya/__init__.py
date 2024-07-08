@@ -646,8 +646,8 @@ class DeviceManager(Manager):
     def send_commands(
             self, device_id: str, commands: list[dict[str, Any]]
     ):
-        regular_commands = []
-        property_commands = []
+        regular_commands = list[dict[str, Any]]
+        property_commands = list[dict[str, Any]]
         if device_id in self.device_map:
             LOGGER.warning(f"send_commands => {device_id} ==> {commands}")
             device = self.device_map.get(device_id, None)
