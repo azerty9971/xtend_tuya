@@ -784,7 +784,7 @@ class DeviceManager(Manager):
         LOGGER.debug(f"mq _on_device_report-> {device_id} status-> {status}")
         if not device:
             return
-        LOGGER.debug(f"Device found!")
+        #LOGGER.debug(f"Device found!")
         virtual_states = DeviceManager.get_category_virtual_states(device.category)
         #show_debug = False
         
@@ -810,9 +810,8 @@ class DeviceManager(Manager):
                                 item["value"] += device.status[virtual_state.key]
                                 #LOGGER.debug(f"dpId logic after -> {device_id} device_status-> {device.status} status-> {status}")
                         
-        #LOGGER.debug(f"Next step")
+        LOGGER.debug(f"device.local_strategy => {device.local_strategy}")
         for item in status:
-            LOGGER.warning(f"item in update loop => {item}")
             if "code" in item and "value" in item and item["value"] is not None:
                 code = item["code"]
                 value = item["value"]
