@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 import json
+import copy
 from typing import Any, Optional, NamedTuple
 
 import requests
@@ -804,13 +805,13 @@ class DeviceManager(Manager):
                 if virtual_state.key in device.status:
                     if virtual_state.key in device.status_range:
                         for new_code in virtual_state.vs_copy_to_state:
-                            device.status[str(new_code)] = device.status[virtual_state.key]
-                            device.status_range[str(new_code)] = device.status_range[virtual_state.key]
+                            device.status[str(new_code)] = copy.deepcopy(device.status[virtual_state.key])
+                            device.status_range[str(new_code)] = copy.deepcopy(device.status_range[virtual_state.key])
                             device.status_range[str(new_code)].code = str(new_code)
                     if virtual_state.key in device.function:
                         for new_code in virtual_state.vs_copy_to_state:
-                            device.status[str(new_code)] = device.status[virtual_state.key]
-                            device.function[str(new_code)] = device.function[virtual_state.key]
+                            device.status[str(new_code)] = copy.deepcopy(device.status[virtual_state.key])
+                            device.function[str(new_code)] = copy.deepcopy(device.function[virtual_state.key])
                             device.function[str(new_code)].code = str(new_code)
         LOGGER.warning(f"apply_init_virtual_states AFTER => {device.status} <=> {device.status_range}")
 
