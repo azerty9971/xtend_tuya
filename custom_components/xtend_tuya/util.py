@@ -3,6 +3,7 @@
 from __future__ import annotations
 from .const import (
     DPType,
+    LOGGER,
 )
 
 def remap_value(
@@ -33,6 +34,7 @@ def determine_property_type(type, value = None) -> DPType:
             return DPType(DPType.STRING)
 
 def prepare_value_for_property_update(dp_item, value) -> str:
+    LOGGER.warning(f"prepare_value_for_property_update => {dp_item} <=> {value}")
     value_type = dp_item.get("valueType", None)
     if value_type is not None:
         if value_type == DPType.BOOLEAN:
