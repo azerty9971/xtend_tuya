@@ -864,13 +864,15 @@ class DeviceManager(Manager):
                     code, value = self._read_code_value_from_state(device, item)
                     if code is not None and code == virtual_state.key:
                         for state_name in virtual_state.vs_copy_to_state:
-                            status[str(state_name)] = value
+                            new_status = {"code": str(state_name), "value": value}
+                            status.append(new_status)
                     for dict_key in item:
                         dp_id = int(dict_key)
                         dp_id_item = device.local_strategy.get(dp_id, None)
                         if dp_id_item is not None and dp_id_item["status_code"] == virtual_state.key:
                             for state_name in virtual_state.vs_copy_to_state:
-                                status[str(state_name)] = item[dict_key]
+                                new_status = {"code": str(state_name), "value": item[dict_key]}
+                                status.append(new_status)
                         break
             
             if virtual_state.virtual_state_value == VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD:
