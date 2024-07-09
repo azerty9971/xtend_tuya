@@ -803,12 +803,12 @@ class DeviceManager(Manager):
                 if virtual_state.key in device.status:
                     if virtual_state.key in device.status_range:
                         for new_code in virtual_state.vs_copy_to_state:
-                            device.status[new_code] = device.status[virtual_state.key]
-                            device.status_range[new_code] = device.status_range[virtual_state.key]
+                            device.status[str(new_code)] = device.status[virtual_state.key]
+                            device.status_range[str(new_code)] = device.status_range[virtual_state.key]
                     if virtual_state.key in device.function:
                         for new_code in virtual_state.vs_copy_to_state:
-                            device.status[new_code] = device.status[virtual_state.key]
-                            device.function[new_code] = device.function[virtual_state.key]
+                            device.status[str(new_code)] = device.status[virtual_state.key]
+                            device.function[str(new_code)] = device.function[virtual_state.key]
 
     def set_overriden_device_manager(self, other_device_manager: Manager) -> None:
         self.other_device_manager = other_device_manager
@@ -864,13 +864,13 @@ class DeviceManager(Manager):
                     code, value = self._read_code_value_from_state(device, item)
                     if code is not None and code == virtual_state.key:
                         for state_name in virtual_state.vs_copy_to_state:
-                            status[state_name] = value
+                            status[str(state_name)] = value
                     for dict_key in item:
                         dp_id = int(dict_key)
                         dp_id_item = device.local_strategy.get(dp_id, None)
                         if dp_id_item is not None and dp_id_item["status_code"] == virtual_state.key:
                             for state_name in virtual_state.vs_copy_to_state:
-                                status[state_name] = item[dict_key]
+                                status[str(state_name)] = item[dict_key]
                         break
             
             if virtual_state.virtual_state_value == VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD:
