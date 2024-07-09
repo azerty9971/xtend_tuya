@@ -51,6 +51,10 @@ BINARY_SENSORS: dict[str, tuple[TuyaBinarySensorEntityDescription, ...]] = {
         #If 0 is reported, it will not be counted
         #(today and the average number of toilet visits will be counted on the APP)
         TuyaBinarySensorEntityDescription(
+            key=DPCode.CLEANING,
+            translation_key="one_click_cleanup",
+        ),
+        TuyaBinarySensorEntityDescription(
             key=DPCode.CLEANING_NUM,
             translation_key="cleaning_num",
         ),
@@ -58,7 +62,7 @@ BINARY_SENSORS: dict[str, tuple[TuyaBinarySensorEntityDescription, ...]] = {
             key=DPCode.TRASH_STATUS,
             translation_key="trash_status",
             entity_registry_enabled_default=True,
-            on_value="1"
+            on_value="1",
         ),
         TuyaBinarySensorEntityDescription(
             key=DPCode.POWER,
