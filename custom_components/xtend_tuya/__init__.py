@@ -589,7 +589,7 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
     ):
         for property in properties:
             for prop_key in property:
-                property_str = f"{{\"{prop_key}\":'{property[prop_key]}'}}"
+                property_str = f"{{\"{prop_key}\":{property[prop_key]}}}"
                 LOGGER.warning(f"send_property_update => {property_str}")
                 self.api.post(f"/v2.0/cloud/thing/{device_id}/shadow/properties/issue", {"properties": property_str}
         )
