@@ -806,10 +806,12 @@ class DeviceManager(Manager):
                         for new_code in virtual_state.vs_copy_to_state:
                             device.status[str(new_code)] = device.status[virtual_state.key]
                             device.status_range[str(new_code)] = device.status_range[virtual_state.key]
+                            device.status_range[str(new_code)].code = str(new_code)
                     if virtual_state.key in device.function:
                         for new_code in virtual_state.vs_copy_to_state:
                             device.status[str(new_code)] = device.status[virtual_state.key]
                             device.function[str(new_code)] = device.function[virtual_state.key]
+                            device.function[str(new_code)].code = str(new_code)
         LOGGER.warning(f"apply_init_virtual_states AFTER => {device.status} <=> {device.status_range}")
 
     def set_overriden_device_manager(self, other_device_manager: Manager) -> None:
