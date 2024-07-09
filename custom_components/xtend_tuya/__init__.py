@@ -832,7 +832,7 @@ class DeviceManager(Manager):
             if protocol == PROTOCOL_OTHER:
                 self._on_device_other(data["bizData"]["devId"], data["bizCode"], data)
         except Exception as e:
-            LOGGER.error("on message error = %s", e)
+            LOGGER.error(f"on message error = {e} msg => {msg}")
 
     def _on_device_other(self, device_id: str, biz_code: str, data: dict[str, Any]):
         #LOGGER.warning(f"mq _on_device_other-> {device_id} biz_code-> {biz_code} data-> {data}")
