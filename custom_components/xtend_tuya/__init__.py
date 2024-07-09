@@ -850,7 +850,7 @@ class DeviceManager(Manager):
 
     def _on_device_report(self, device_id: str, status: list):
         device = self.device_map.get(device_id, None)
-        #LOGGER.debug(f"mq _on_device_report-> {device_id} status-> {status}")
+        LOGGER.debug(f"mq _on_device_report-> {device_id} status-> {status}")
         if not device:
             return
         #LOGGER.debug(f"Device found!")
