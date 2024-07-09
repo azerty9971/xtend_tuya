@@ -499,6 +499,8 @@ class XTDeviceRepository(DeviceRepository):
             device.local_strategy = dp_id_map
             self.manager.get_device_properties_open_api(device)
             self.manager.apply_init_virtual_states(device)
+            if tuya_device is not None:
+                self.manager.apply_init_virtual_states(tuya_device)
 
 class XTTuyaDevice(TuyaDevice):
     set_up: Optional[bool] = True
@@ -860,7 +862,7 @@ class DeviceManager(Manager):
             if virtual_state.virtual_state_value == VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME:
                 for item in status:
                     code, value = self._read_code_value_from_state(device, item)
-                    if code == virtual_state.key:
+                    if code is not None and code == virtual_state.key:
                         for state_name in virtual_state.vs_copy_to_state:
                             status[state_name] = value
                     for dict_key in item:
