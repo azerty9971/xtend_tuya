@@ -798,7 +798,7 @@ class DeviceManager(Manager):
         return to_return
     
     def apply_init_virtual_states(self, device):
-        LOGGER.warning(f"apply_init_virtual_states BEFORE => {device.status} <=> {device.status_range}")
+        #LOGGER.warning(f"apply_init_virtual_states BEFORE => {device.status} <=> {device.status_range}")
         virtual_states = DeviceManager.get_category_virtual_states(device.category)
         for virtual_state in virtual_states:
             if virtual_state.virtual_state_value == VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME:
@@ -813,7 +813,7 @@ class DeviceManager(Manager):
                             device.status[str(new_code)] = copy.deepcopy(device.status[virtual_state.key])
                             device.function[str(new_code)] = copy.deepcopy(device.function[virtual_state.key])
                             device.function[str(new_code)].code = str(new_code)
-        LOGGER.warning(f"apply_init_virtual_states AFTER => {device.status} <=> {device.status_range}")
+        #LOGGER.warning(f"apply_init_virtual_states AFTER => {device.status} <=> {device.status_range}")
 
     def set_overriden_device_manager(self, other_device_manager: Manager) -> None:
         self.other_device_manager = other_device_manager
