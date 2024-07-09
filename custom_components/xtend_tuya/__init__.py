@@ -823,7 +823,7 @@ class DeviceManager(Manager):
         if self.other_device_manager is not None:
             self.other_device_manager.on_message(msg)
         #super().on_message(msg)
-        try:
+        #try:
             protocol = msg.get("protocol", 0)
             data = msg.get("data", {})
 
@@ -831,8 +831,8 @@ class DeviceManager(Manager):
                 self._on_device_report(data["devId"], data["status"])
             if protocol == PROTOCOL_OTHER:
                 self._on_device_other(data["bizData"]["devId"], data["bizCode"], data)
-        except Exception as e:
-            LOGGER.error(f"on message error = {e} msg => {msg}")
+        #except Exception as e:
+        #    LOGGER.error(f"on message error = {e} msg => {msg}")
 
     def _on_device_other(self, device_id: str, biz_code: str, data: dict[str, Any]):
         #LOGGER.warning(f"mq _on_device_other-> {device_id} biz_code-> {biz_code} data-> {data}")
