@@ -77,11 +77,6 @@ SWITCHES: dict[str, tuple[SwitchEntityDescription, ...]] = {
             icon="mdi:human-child"
         ),
         SwitchEntityDescription(
-            key=DPCode.CLEANING,
-            translation_key="one_click_cleanup",
-            entity_category=EntityCategory.CONFIG,
-        ),
-        SwitchEntityDescription(
             key=DPCode.CLEAN_NOTICE,
             translation_key="clean_notice",
             entity_category=EntityCategory.CONFIG,
