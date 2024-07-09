@@ -464,7 +464,7 @@ class TuyaSensorEntity(TuyaEntity, RestoreSensor):
         if not self.entity_description.restoredata:
             return
         state = await self.async_get_last_sensor_data()
-        if state is None:
+        if state is None or state.native_value is None:
             return
         # Scale integer/float value
         if isinstance(self._type_data, IntegerTypeData):
