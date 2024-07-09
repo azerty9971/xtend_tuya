@@ -256,6 +256,15 @@
           "2": "Pause manual shoveling"
         }
       },
+      "cat_litter_box_empty":
+      {
+        "name": "Manual dumping",
+        "state": {
+          "0": "Not dumping",
+          "1": "Start manual dumping",
+          "2": "Pause manual dumping"
+        }
+      },
       "volume": {
         "name": "[%key:component::tuya::entity::number::volume::name%]"
       },

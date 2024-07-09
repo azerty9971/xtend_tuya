@@ -66,6 +66,11 @@ SELECTS: dict[str, tuple[SelectEntityDescription, ...]] = {
             translation_key="cat_litter_box_clean",
             entity_category=EntityCategory.CONFIG,
         ),
+        SelectEntityDescription(
+            key=DPCode.EMPTY,
+            translation_key="cat_litter_box_empty",
+            entity_category=EntityCategory.CONFIG,
+        ),
     ),
 }
 
