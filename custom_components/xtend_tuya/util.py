@@ -41,7 +41,7 @@ def prepare_value_for_property_update(dp_item, value) -> str:
         if value_type is not None:
             if value_type == DPType.BOOLEAN:
                 if bool(value):
-                    return "true"
+                    return 'true'
                 else:
-                    return "false"
+                    return 'false'
     return str(value)
