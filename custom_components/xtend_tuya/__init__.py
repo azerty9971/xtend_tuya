@@ -588,8 +588,10 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
             self, device_id: str, properties: list[dict[str, Any]]
     ):
         for property in properties:
-            LOGGER.warning(f"send_property_update => {property}")
-            self.api.post(f"/v2.0/cloud/thing/{device_id}/shadow/properties/issue", {"properties": property}
+            for prop_key in property:
+                property_str = f"{{\"{prop_key}\":'{property[prop_key]}'}}"
+                LOGGER.warning(f"send_property_update => {property_str}")
+                self.api.post(f"/v2.0/cloud/thing/{device_id}/shadow/properties/issue", {"properties": property_str}
         )
 
 class DeviceManager(Manager):
@@ -670,7 +672,7 @@ class DeviceManager(Manager):
                             value = prepare_value_for_property_update(dp_item, command["value"])
                             #LOGGER.warning(f"dp_item => {dp_item}")
                             if dp_item.get("property_update", False):
-                                property_dict = {code: value}
+                                property_dict = {str(code): value}
                                 #LOGGER.warning(f"property_dict => {property_dict}")
                                 property_commands.append(property_dict)
                             else:
