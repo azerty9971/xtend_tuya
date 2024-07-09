@@ -256,6 +256,15 @@
           "2": "Pause manual shoveling"
         }
       },
+      "cat_litter_box_empty":
+      {
+        "name": "Manual dumping",
+        "state": {
+          "0": "Not dumping",
+          "1": "Start manual dumping",
+          "2": "Pause manual dumping"
+        }
+      },
       "volume": {
         "name": "[%key:component::tuya::entity::number::volume::name%]"
       },
@@ -681,7 +690,10 @@
         "name": "Cat weight"
       },
       "add_ele": {
-        "name": "Consumption"
+        "name": "Consumption (method A)"
+      },
+      "add_ele2": {
+        "name": "Consumption (method B)"
       },
       "excretion_times_day": {
         "name": "Number of excretion"
