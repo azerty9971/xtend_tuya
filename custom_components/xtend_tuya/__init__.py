@@ -625,7 +625,6 @@ class DeviceManager(Manager):
             self.mq = other_manager.mq
             #if self.mq is not None and self.mq.mq_config is not None:
             #    LOGGER.warning(f"MQTT config: URL => {self.mq.mq_config.url} ClientID => {self.mq.mq_config.client_id} Username => {self.mq.mq_config.username} Password => {self.mq.mq_config.password} Dev Topic => {self.mq.mq_config.dev_topic}")
-            self.mq.remove_message_listener(other_manager.on_message)
         self.device_ids: set[str] = set()
         self.open_api = open_api
         self.open_api_tuya_mq = None
@@ -650,8 +649,10 @@ class DeviceManager(Manager):
     
     def refresh_mq(self):
         if self.other_device_manager is not None:
+            self.other_device_manager.refresh_mq()
             self.mq = self.other_device_manager.mq
             self.mq.add_message_listener(self.on_message)
+            self.mq.remove_message_listener(self.other_device_manager.on_message)
             return
         super().refresh_mq()
     
@@ -943,6 +944,5 @@ class DeviceManager(Manager):
     def allow_virtual_devices_not_set_up(self, device):
         if not device.id.startswith("vdevo"):
             return
-
         if not getattr(device, "set_up", True):
             setattr(device, "set_up", True)
