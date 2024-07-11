@@ -667,13 +667,14 @@ class DeviceManager(Manager):
                     for dp_id in device.local_strategy:
                         dp_item = device.local_strategy[dp_id]
                         code = dp_item.get("status_code", None)
+                        value = command["value"]
                         if command["code"] == code:
-                            value = prepare_value_for_property_update(dp_item, command["value"])
-                            if dp_item.get("use_open_api", False):
+                            if dp_item.get("use_open_api", True):
                                 command_dict = {"code": code, "value": value}
                                 regular_commands.append(command_dict)
                             else:
                                 if dp_item.get("property_update", False):
+                                    value = prepare_value_for_property_update(dp_item, command["value"])
                                     property_dict = {str(code): value}
                                     property_commands.append(property_dict)
                                 else:
