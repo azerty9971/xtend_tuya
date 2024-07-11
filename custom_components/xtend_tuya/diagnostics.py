@@ -128,9 +128,8 @@ def _async_device_as_dict(
 
         for dp_item in device.local_strategy.values():
             if dp_item["status_code"] == function.code:
-                if hasattr(dp_item, "property_update"):
-                    property_update = dp_item.get("property_update", False)
-                    break
+                property_update = dp_item.get("property_update", False)
+                break
 
         data["function"][function.code] = {
             "type": function.type,
@@ -148,9 +147,8 @@ def _async_device_as_dict(
 
         for dp_item in device.local_strategy.values():
             if dp_item["status_code"] == status_range.code:
-                if hasattr(dp_item, "property_update"):
-                    property_update = dp_item.get("property_update", False)
-                    break
+                property_update = dp_item.get("property_update", False)
+                break
 
         data["status_range"][status_range.code] = {
             "type": status_range.type,
