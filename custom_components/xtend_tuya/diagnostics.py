@@ -124,9 +124,14 @@ def _async_device_as_dict(
         with suppress(ValueError, TypeError, AttributeError):
             value = json.loads(cast(str, function.values))
 
+        property_update = False
+        if hasattr(function, "property_update"):
+            property_update = function.property_update
+
         data["function"][function.code] = {
             "type": function.type,
             "value": value,
+            "property_update": property_update,
         }
 
     # Gather Tuya status ranges
@@ -135,9 +140,14 @@ def _async_device_as_dict(
         with suppress(ValueError, TypeError, AttributeError):
             value = json.loads(status_range.values)
 
+        property_update = False
+        if hasattr(status_range, "property_update"):
+            property_update = status_range.property_update
+
         data["status_range"][status_range.code] = {
             "type": status_range.type,
             "value": value,
+            "property_update": property_update,
         }
 
     # Gather information how this Tuya device is represented in Home Assistant
