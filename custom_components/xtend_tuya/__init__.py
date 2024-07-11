@@ -657,32 +657,33 @@ class DeviceManager(Manager):
     def send_commands(
             self, device_id: str, commands: list[dict[str, Any]]
     ):
+        open_api_regular_commands = []
         regular_commands = []
         property_commands = []
         if device_id in self.device_map:
-            #LOGGER.warning(f"send_commands => {device_id} ==> {commands}")
             device = self.device_map.get(device_id, None)
             if device is not None:
                 for command in commands:
                     for dp_id in device.local_strategy:
                         dp_item = device.local_strategy[dp_id]
                         code = dp_item.get("status_code", None)
-                        #LOGGER.warning(f"command => {command}")
                         if command["code"] == code:
                             value = prepare_value_for_property_update(dp_item, command["value"])
-                            #LOGGER.warning(f"dp_item => {dp_item}")
-                            if dp_item.get("property_update", False):
-                                property_dict = {str(code): value}
-                                #LOGGER.warning(f"property_dict => {property_dict}")
-                                property_commands.append(property_dict)
-                            else:
+                            if dp_item.get("use_open_api", False):
                                 command_dict = {"code": code, "value": value}
-                                #LOGGER.warning(f"command_dict => {command_dict}")
                                 regular_commands.append(command_dict)
-                            break
-                #LOGGER.warning(f"split commands => {property_commands} ==> {regular_commands}")
+                            else:
+                                if dp_item.get("property_update", False):
+                                    property_dict = {str(code): value}
+                                    property_commands.append(property_dict)
+                                else:
+                                    command_dict = {"code": code, "value": value}
+                                    open_api_regular_commands.append(command_dict)
+                                break
                 if regular_commands:
-                    self.open_api_device_manager.send_commands(device_id, regular_commands)
+                    self.device_repository.send_commands(device_id, regular_commands)
+                if open_api_regular_commands:
+                    self.open_api_device_manager.send_commands(device_id, open_api_regular_commands)
                 if property_commands:
                     self.open_api_device_manager.send_property_update(device_id, property_commands)
                 return
@@ -725,7 +726,8 @@ class DeviceManager(Manager):
                                         "valueType": real_type,
                                         "pid": device.product_id,
                                     },
-                                    "property_update": True
+                                    "property_update": True,
+                                    "use_open_api": True
                                 }
                                 if tuya_device is not None:
                                     device.local_strategy[property["abilityId"]] = {
@@ -735,7 +737,9 @@ class DeviceManager(Manager):
                                             "valueType": real_type,
                                             "pid": device.product_id,
                                         },
-                                        "property_update": True
+                                        "property_update": True,
+                                        "use_open_api": True
+                                        
                                     }
 
         result = response.get("result", {})
@@ -751,7 +755,8 @@ class DeviceManager(Manager):
                             "valueType": real_type,
                             "pid": device.product_id,
                         },
-                        "property_update": True
+                        "property_update": True,
+                        "use_open_api": True
                     }
             if (    "code"  in dp_property 
                 and "dp_id" in dp_property 
