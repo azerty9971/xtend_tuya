@@ -500,6 +500,7 @@ class XTDeviceRepository(DeviceRepository):
             device.local_strategy = dp_id_map
             self.manager.get_device_properties_open_api(device)
             self.manager.apply_init_virtual_states(device)
+            self.manager.allow_virtual_devices_not_set_up(device)
             if tuya_device is not None:
                 self.manager.apply_init_virtual_states(tuya_device)
 
@@ -939,3 +940,9 @@ class DeviceManager(Manager):
         LOGGER.debug(f"AFTER device_id -> {device_id} device_status-> {device.status} status-> {status}")
         super()._on_device_report(device_id, [])
     
+    def allow_virtual_devices_not_set_up(self, device):
+        if not device.id.startswith("vdevo"):
+            return
+
+        if not getattr(device, "set_up", True):
+            setattr(device, "set_up", True)
