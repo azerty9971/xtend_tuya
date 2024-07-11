@@ -524,9 +524,9 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
             return self.device_manage.get_device_info(device_id)
         except Exception as e:
             LOGGER.warning(f"get_device_info failed, trying other method {e}")
-            response = self.api.get(f"/v2.0/cloud/thing/batch?device_ids={device_id}")
+            response = self.api.get(f"/v2.0/cloud/thing/{device_id}")
             if response["success"]:
-                result = response["result"][0]
+                result = response["result"]
                 #LOGGER.warning(f"Got response => {response} <=> {result}")
                 result["online"] = result["is_online"]
                 return result
