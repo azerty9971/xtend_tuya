@@ -946,3 +946,7 @@ class DeviceManager(Manager):
             return
         if not getattr(device, "set_up", True):
             setattr(device, "set_up", True)
+        if device.id in self.other_device_manager.device_map:
+            tuya_device = self.other_device_manager.device_map[device.id]
+            if not getattr(tuya_device, "set_up", True):
+                setattr(tuya_device, "set_up", True)
