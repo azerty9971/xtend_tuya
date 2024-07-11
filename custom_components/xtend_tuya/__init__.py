@@ -530,8 +530,26 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
                 #LOGGER.warning(f"Got response => {response} <=> {result}")
                 result["online"] = result["is_online"]
                 return response
+    def get_device_status(self, device_id: str) -> dict[str, Any]:
+        """Get device status.
 
+        Args:
+          device_id(str): device id
 
+        Returns:
+            response: response body
+        """
+        try:
+            return self.device_manage.get_device_status(device_id)
+        except Exception as e:
+            LOGGER.warning(f"get_device_status failed, trying other method {e}")
+            response = self.api.get(f"/v1.0/iot-03/devices/{device_id}/status")
+            if response["success"]:
+                #result = response["result"]
+                #LOGGER.warning(f"Got response => {response} <=> {result}")
+                #result["online"] = result["is_online"]
+                return response
+            
     def update_device_list_in_smart_home(self):
         #DEBUG
         shared_dev_id = "bf85bd241924094329wbx0"
