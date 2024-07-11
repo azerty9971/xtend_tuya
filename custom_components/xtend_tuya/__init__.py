@@ -529,7 +529,7 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
                 result = response["result"]
                 #LOGGER.warning(f"Got response => {response} <=> {result}")
                 result["online"] = result["is_online"]
-                return result
+                return response
 
 
     def update_device_list_in_smart_home(self):
