@@ -514,9 +514,26 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
         super().__init__(api, mq)
         self.manager = manager
 
+    def get_device_info(self, device_id: str) -> dict[str, Any]:
+        """Get device info.
+
+        Args:
+          device_id(str): device id
+        """
+        try:
+            return self.device_manage.get_device_info(device_id)
+        except Exception as e:
+            LOGGER.warning(f"get_device_info failed, trying other method {e}")
+            response = self.api.get(f"/v2.0/cloud/thing/batch?device_ids={device_id}")
+            if response["success"]:
+                result = response["result"]
+                result["online"] = result["is_online"]
+                return result
+
+
     def update_device_list_in_smart_home(self):
         #DEBUG
-        """shared_dev_id = "bf85bd241924094329wbx0"
+        shared_dev_id = "bf85bd241924094329wbx0"
         shared_dev = self.get_device_info(shared_dev_id)
         LOGGER.warning(f"shared_dev => {shared_dev}")
         if shared_dev["success"]:
@@ -532,7 +549,7 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
                         value = item_status["value"]
                         status[code] = value
                 device.status = status
-                self.device_map[item["id"]] = device"""
+                self.device_map[item["id"]] = device
         #ENDDEBUG
         """Update devices status in project type SmartHome."""
         response = self.api.get(f"/v1.0/users/{self.api.token_info.uid}/devices")
