@@ -790,6 +790,7 @@ class DeviceManager(Manager):
             if self.open_api_device_manager is not None:
                 for device in self.open_api_device_manager.device_map:
                     if device not in self.device_map:
+                        LOGGER.warning(f"Adding device {device.id} to device map")
                         self.open_api_device_map[device] = self.open_api_device_manager.device_map[device]
                         self.device_map[device] = self.open_api_device_manager.device_map[device]
             #LOGGER.warning(f"self.open_api_device_map => {self.open_api_device_map}")
