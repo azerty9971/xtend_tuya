@@ -329,7 +329,7 @@ class XTDeviceListener(TuyaDeviceListener):
             device_manager.mq = tuya_mq
             tuya_mq.add_message_listener(device_manager.on_message)
         else:
-            other_device_manager.add_device(device)
+            device_manager.add_device(device)
             device_manager.mq = other_device_manager.mq
             other_device_manager.mq.add_message_listener(device_manager.on_message)
             other_device_manager.mq.remove_message_listener(other_device_manager.on_message)
