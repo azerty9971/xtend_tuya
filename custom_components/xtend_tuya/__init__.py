@@ -303,10 +303,6 @@ class XTDeviceListener(TuyaDeviceListener):
 
     def update_device(self, device: TuyaDevice) -> None:
         """Update device status."""
-        LOGGER.warning(
-            "Received update for device %s",
-            device.id,
-        )
         if device.id in self.device_ids:
             LOGGER.debug(
                 "Received update for device %s: %s",
@@ -323,16 +319,25 @@ class XTDeviceListener(TuyaDeviceListener):
         self.device_ids.add(device.id)
         dispatcher_send(self.hass, TUYA_DISCOVERY_NEW, [device.id])
 
+        other_device_manager = self.device_manager.get_overriden_device_manager()
         device_manager = self.device_manager
-        device_manager.mq.stop()
-        tuya_mq = TuyaOpenMQ(device_manager.api)
-        tuya_mq.start()
+        if other_device_manager is None:
+            device_manager.mq.stop()
+            tuya_mq = TuyaOpenMQ(device_manager.api)
+            tuya_mq.start()
 
-        device_manager.mq = tuya_mq
-        tuya_mq.add_message_listener(device_manager.on_message)
+            device_manager.mq = tuya_mq
+            tuya_mq.add_message_listener(device_manager.on_message)
+        else:
+            other_device_manager.add_device(device)
+            device_manager.mq = other_device_manager.mq
+            other_device_manager.mq.add_message_listener(device_manager.on_message)
+            other_device_manager.mq.remove_message_listener(other_device_manager.on_message)
 
     def remove_device(self, device_id: str) -> None:
         """Add device removed listener."""
+        if device_manager := self.device_manager.get_overriden_device_manager():
+            device_manager.remove_device(device_id)
         self.hass.add_job(self.async_remove_device, device_id)
 
     @callback
