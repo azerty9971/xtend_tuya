@@ -508,6 +508,7 @@ class XTTuyaDevice(TuyaDevice):
     set_up: Optional[bool] = True
     support_local: Optional[bool] = True
     local_strategy: dict[int, dict[str, Any]] = {}
+    force_open_api: Optional[bool] = False
 
 class XTTuyaDeviceManager(TuyaDeviceManager):
     def __init__(self, manager, api: TuyaOpenAPI, mq: TuyaOpenMQ) -> None:
@@ -553,11 +554,13 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
     def update_device_list_in_smart_home(self):
         #DEBUG
         shared_dev_id = "bf85bd241924094329wbx0"
+        force_open_api = True
         shared_dev = self.get_device_info(shared_dev_id)
         LOGGER.warning(f"shared_dev => {shared_dev}")
         if shared_dev["success"]:
             item = shared_dev["result"]
             device = XTTuyaDevice(**item)
+            device.force_open_api = force_open_api
             status = {}
             api_status = self.get_device_status(shared_dev_id)
             if api_status["success"]:
@@ -569,6 +572,8 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
                         status[code] = value
                 device.status = status
                 self.device_map[item["id"]] = device
+                if self.manager is not None and force_open_api:
+                    self.manager.open_api_device_listener.add_device(device)
         #ENDDEBUG
         """Update devices status in project type SmartHome."""
         response = self.api.get(f"/v1.0/users/{self.api.token_info.uid}/devices")
@@ -666,13 +671,14 @@ class DeviceManager(Manager):
         self.open_api_tuya_mq = None
         self.open_api_device_manager = None
         self.open_api_home_manager = None
+        self.open_api_device_listener = None
         if self.open_api is not None:
             self.open_api_tuya_mq = TuyaOpenMQ(self.open_api)
             self.open_api_tuya_mq.start()
             self.open_api_device_manager = XTTuyaDeviceManager(self, self.open_api, self.open_api_tuya_mq)
             self.open_api_home_manager = TuyaHomeManager(self.open_api, self.open_api_tuya_mq, self.open_api_device_manager)
-            listener = XTDeviceListener(hass, self.open_api_device_manager, self.device_ids)
-            self.open_api_device_manager.add_device_listener(listener)
+            self.open_api_device_listener = XTDeviceListener(hass, self.open_api_device_manager, self.device_ids)
+            self.open_api_device_manager.add_device_listener(self.open_api_device_listener)
         self.other_device_manager = other_manager
         self.device_map: dict[str, CustomerDevice] = {}
         self.open_api_device_map: dict[str, TuyaDevice] = {}
