@@ -302,6 +302,10 @@ class XTDeviceListener(TuyaDeviceListener):
 
     def update_device(self, device: TuyaDevice) -> None:
         """Update device status."""
+        LOGGER.warning(
+            "Received update for device %s",
+            device.id,
+        )
         if device.id in self.device_ids:
             LOGGER.debug(
                 "Received update for device %s: %s",
