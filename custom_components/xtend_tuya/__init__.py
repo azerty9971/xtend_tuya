@@ -577,8 +577,11 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
                         status[code] = value
                 device.status = status
                 self.device_map[item["id"]] = device
-                if self.manager is not None and force_open_api:
-                    self.manager.open_api_device_listener.add_device(device)
+                if self.manager is not None:
+                    if other_device_manager := self.manager.get_overriden_device_manager():
+                        other_device_manager.device_map[item["id"]] = device
+                    if force_open_api:
+                        self.manager.open_api_device_listener.add_device(device)
         #ENDDEBUG
         """Update devices status in project type SmartHome."""
         response = self.api.get(f"/v1.0/users/{self.api.token_info.uid}/devices")
