@@ -299,6 +299,7 @@ class XTDeviceListener(TuyaDeviceListener):
         self.hass = hass
         self.device_manager = device_manager
         self.device_ids = device_ids
+        LOGGER.warning(f"Init XTDeviceListener: mq_config => {self.device_manager.mq.mq_config}")
 
     def update_device(self, device: TuyaDevice) -> None:
         """Update device status."""
