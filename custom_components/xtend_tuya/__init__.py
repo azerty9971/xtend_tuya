@@ -648,6 +648,11 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
                 #LOGGER.warning(f"send_property_update => {property_str}")
                 self.api.post(f"/v2.0/cloud/thing/{device_id}/shadow/properties/issue", {"properties": property_str}
         )
+    
+    def get_overriden_device_manager(self) -> Manager | None:
+        if self.manager is not None:
+            return self.manager.other_device_manager
+        return None
 
 class DeviceManager(Manager):
     def __init__(
