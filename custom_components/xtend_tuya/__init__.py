@@ -653,6 +653,13 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
         if self.manager is not None:
             return self.manager.other_device_manager
         return None
+    
+    def add_device(self, device):
+        if other_device_manager := self.get_overriden_device_manager():
+            for listener in other_device_manager.device_listeners:
+                listener.add_device(device)
+        for listener in self.device_listeners:
+            listener.add_device(device)
 
 class DeviceManager(Manager):
     def __init__(
