@@ -5,6 +5,7 @@ from __future__ import annotations
 import logging
 import json
 import copy
+import uuid
 from typing import Any, Optional, NamedTuple
 
 import requests
