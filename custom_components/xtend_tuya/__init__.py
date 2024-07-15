@@ -611,9 +611,9 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
         super().on_message(msg)
 
     def _update_device_list_info_cache(self, devIds: list[str]):
-
         response = self.get_device_list_info(devIds)
         result = response.get("result", {})
+        LOGGER.warning(f"_update_device_list_info_cache => {devIds} <=> {response}")
         for item in result.get("list", []):
             device_id = item["id"]
             self.device_map[device_id] = XTTuyaDevice(**item)
