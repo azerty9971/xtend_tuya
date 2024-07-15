@@ -668,7 +668,18 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
 class XTTuyaOpenMQ(TuyaOpenMQ):
     def _get_mqtt_config(self) -> Optional[TuyaMQConfig]:
         ret = super()._get_mqtt_config()
-        LOGGER.warning(f"_get_mqtt_config : {json.dumps(ret)}")
+        response = self.api.post(
+            "/v1.0/open-hub/access/config",
+            {
+                "uid": self.api.token_info.uid,
+                "link_id": f"tuya-iot-app-sdk-python.{uuid.uuid1()}",
+                "link_type": "mqtt",
+                "topics": "device",
+                "msg_encrypted_version": "2.0"
+                "1.0",
+            },
+        )
+        LOGGER.warning(f"_get_mqtt_config : {response}")
         return ret
 
 class DeviceManager(Manager):
