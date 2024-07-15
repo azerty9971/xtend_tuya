@@ -329,10 +329,7 @@ class XTDeviceListener(TuyaDeviceListener):
             device_manager.mq = tuya_mq
             tuya_mq.add_message_listener(device_manager.on_message)
         else:
-            device_manager.add_device(device)
             device_manager.mq = other_device_manager.mq
-            other_device_manager.mq.add_message_listener(device_manager.on_message)
-            other_device_manager.mq.remove_message_listener(other_device_manager.on_message)
 
     def remove_device(self, device_id: str) -> None:
         """Add device removed listener."""
@@ -583,10 +580,7 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
                 device.status = status
                 self.device_map[item["id"]] = device
                 if self.manager is not None:
-                    if other_device_manager := self.manager.get_overriden_device_manager():
-                        other_device_manager.device_map[item["id"]] = device
-                    if force_open_api:
-                        self.manager.open_api_device_listener.add_device(device)
+                    self.manager.add_device(device)
         #ENDDEBUG
         """Update devices status in project type SmartHome."""
         response = self.api.get(f"/v1.0/users/{self.api.token_info.uid}/devices")
@@ -655,9 +649,15 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
         return None
     
     def add_device(self, device):
+        #Tuya
         if other_device_manager := self.get_overriden_device_manager():
             for listener in other_device_manager.device_listeners:
                 listener.add_device(device)
+        #XT Tuya
+        if self.manager is not None:
+            for listener in self.manager.device_listeners:
+                listener.add_device(device)
+        #OpenAPI
         for listener in self.device_listeners:
             listener.add_device(device)
 
