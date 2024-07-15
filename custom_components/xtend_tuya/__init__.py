@@ -584,6 +584,7 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
                         other_device_manager.device_map[item["id"]] = device
                     self.manager.device_map[item["id"]] = device
                 self.add_device(device)
+            LOGGER.warning(f"User ID: {self.api.token_info.uid}")
         #ENDDEBUG
         """Update devices status in project type SmartHome."""
         response = self.api.get(f"/v1.0/users/{self.api.token_info.uid}/devices")
