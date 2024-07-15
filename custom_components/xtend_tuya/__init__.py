@@ -717,6 +717,7 @@ class DeviceManager(Manager):
         self.device_listeners = set()
         self.scene_repository = SceneRepository(self.customer_api)
         self.user_repository = UserRepository(self.customer_api)
+        self.hass = hass
     
     def refresh_mq(self):
         if self.other_device_manager is not None:
@@ -868,6 +869,8 @@ class DeviceManager(Manager):
                         self.device_map[device] = self.open_api_device_manager.device_map[device]
                         if other_manager := self.get_overriden_device_manager():
                             other_manager.device_map[device] = self.open_api_device_manager.device_map[device]
+                    if self.hass:
+                        dispatcher_send(self.hass, TUYA_DISCOVERY_NEW, [device])
             #LOGGER.warning(f"self.open_api_device_map => {self.open_api_device_map}")
 
     @staticmethod
