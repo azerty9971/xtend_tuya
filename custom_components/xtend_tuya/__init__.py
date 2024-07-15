@@ -665,6 +665,12 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
         for listener in self.device_listeners:
             listener.add_device(device)
 
+class XTTuyaOpenMQ(TuyaOpenMQ):
+    def _get_mqtt_config(self) -> Optional[TuyaMQConfig]:
+        ret = super()._get_mqtt_config()
+        LOGGER.warning(f"_get_mqtt_config : {ret}")
+        return ret
+
 class DeviceManager(Manager):
     def __init__(
         self,
@@ -702,7 +708,7 @@ class DeviceManager(Manager):
         self.open_api_home_manager = None
         self.open_api_device_listener = None
         if self.open_api is not None:
-            self.open_api_tuya_mq = TuyaOpenMQ(self.open_api)
+            self.open_api_tuya_mq = XTTuyaOpenMQ(self.open_api)
             self.open_api_tuya_mq.start()
             self.open_api_device_manager = XTTuyaDeviceManager(self, self.open_api, self.open_api_tuya_mq)
             self.open_api_home_manager = TuyaHomeManager(self.open_api, self.open_api_tuya_mq, self.open_api_device_manager)
