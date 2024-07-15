@@ -668,7 +668,7 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
 class XTTuyaOpenMQ(TuyaOpenMQ):
     def _get_mqtt_config(self) -> Optional[TuyaMQConfig]:
         ret = super()._get_mqtt_config()
-        LOGGER.warning(f"_get_mqtt_config : {ret}")
+        LOGGER.warning(f"_get_mqtt_config : {json.dumps(ret)}")
         return ret
 
 class DeviceManager(Manager):
