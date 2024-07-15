@@ -866,6 +866,8 @@ class DeviceManager(Manager):
                         LOGGER.warning(f"Adding device {device} to device map")
                         self.open_api_device_map[device] = self.open_api_device_manager.device_map[device]
                         self.device_map[device] = self.open_api_device_manager.device_map[device]
+                        if other_manager := self.get_overriden_device_manager():
+                            other_manager.device_map[device] = self.open_api_device_manager.device_map[device]
             #LOGGER.warning(f"self.open_api_device_map => {self.open_api_device_map}")
 
     @staticmethod
