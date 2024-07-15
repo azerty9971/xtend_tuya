@@ -580,6 +580,8 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
                 device.status = status
                 self.device_map[item["id"]] = device
                 if self.manager is not None:
+                    if other_device_manager := self.manager.get_overriden_device_manager():
+                        other_device_manager.device_map[item["id"]] = device
                     self.add_device(device)
         #ENDDEBUG
         """Update devices status in project type SmartHome."""
