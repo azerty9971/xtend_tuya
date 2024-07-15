@@ -580,7 +580,7 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
                 device.status = status
                 self.device_map[item["id"]] = device
                 if self.manager is not None:
-                    self.manager.add_device(device)
+                    self.add_device(device)
         #ENDDEBUG
         """Update devices status in project type SmartHome."""
         response = self.api.get(f"/v1.0/users/{self.api.token_info.uid}/devices")
