@@ -300,7 +300,6 @@ class XTDeviceListener(TuyaDeviceListener):
         self.hass = hass
         self.device_manager = device_manager
         self.device_ids = device_ids
-        LOGGER.warning(f"Init XTDeviceListener: mq_config => {self.device_manager.mq.mq_config}")
 
     def update_device(self, device: TuyaDevice) -> None:
         """Update device status."""
@@ -580,12 +579,12 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
                         status[code] = value
                 device.status = status
                 self.device_map[item["id"]] = device
-                if self.manager is not None:
+                """if self.manager is not None:
                     if other_device_manager := self.manager.get_overriden_device_manager():
                         other_device_manager.device_map[item["id"]] = device
                     self.manager.device_map[item["id"]] = device
-                self.add_device(device)
-            LOGGER.warning(f"User ID: {self.api.token_info.uid}")
+                self.add_device(device)"""
+            #LOGGER.warning(f"User ID: {self.api.token_info.uid}")
         #ENDDEBUG
         """Update devices status in project type SmartHome."""
         response = self.api.get(f"/v1.0/users/{self.api.token_info.uid}/devices")
@@ -616,7 +615,7 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
     def _update_device_list_info_cache(self, devIds: list[str]):
         response = self.get_device_list_info(devIds)
         result = response.get("result", {})
-        LOGGER.warning(f"_update_device_list_info_cache => {devIds} <=> {response}")
+        #LOGGER.warning(f"_update_device_list_info_cache => {devIds} <=> {response}")
         for item in result.get("list", []):
             device_id = item["id"]
             self.device_map[device_id] = XTTuyaDevice(**item)
@@ -648,7 +647,7 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
                 self.api.post(f"/v2.0/cloud/thing/{device_id}/shadow/properties/issue", {"properties": property_str}
         )
     
-    def get_overriden_device_manager(self) -> Manager | None:
+    """def get_overriden_device_manager(self) -> Manager | None:
         if self.manager is not None:
             return self.manager.other_device_manager
         return None
@@ -664,24 +663,7 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
                 listener.add_device(device)
         #OpenAPI
         for listener in self.device_listeners:
-            listener.add_device(device)
-
-class XTTuyaOpenMQ(TuyaOpenMQ):
-    def _get_mqtt_config(self) -> Optional[TuyaMQConfig]:
-        ret = super()._get_mqtt_config()
-        response = self.api.post(
-            "/v1.0/open-hub/access/config",
-            {
-                "uid": self.api.token_info.uid,
-                "link_id": f"tuya-iot-app-sdk-python.{uuid.uuid1()}",
-                "link_type": "mqtt",
-                "topics": "device",
-                "msg_encrypted_version": "2.0"
-                "1.0",
-            },
-        )
-        LOGGER.warning(f"_get_mqtt_config : {response}")
-        return ret
+            listener.add_device(device)"""
 
 class DeviceManager(Manager):
     def __init__(
@@ -720,7 +702,7 @@ class DeviceManager(Manager):
         self.open_api_home_manager = None
         self.open_api_device_listener = None
         if self.open_api is not None:
-            self.open_api_tuya_mq = XTTuyaOpenMQ(self.open_api)
+            self.open_api_tuya_mq = TuyaOpenMQ(self.open_api)
             self.open_api_tuya_mq.start()
             self.open_api_device_manager = XTTuyaDeviceManager(self, self.open_api, self.open_api_tuya_mq)
             self.open_api_home_manager = TuyaHomeManager(self.open_api, self.open_api_tuya_mq, self.open_api_device_manager)
