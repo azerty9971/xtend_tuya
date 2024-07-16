@@ -11,8 +11,8 @@ class LogStackException(Exception):
     pass
 
 def log_stack(message: str):
-    LOGGER.warning(traceback.format_stack())
-    
+    LOGGER.warning(f"{traceback.format_stack()}")
+
 def remap_value(
     value: float,
     from_min: float = 0,
