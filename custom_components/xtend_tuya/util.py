@@ -13,8 +13,8 @@ class LogStackException(Exception):
 def log_stack(message: str):
     stack = traceback.format_stack()
     for stack_line in stack:
-        stack[stack_line] = stack[stack_line].replace("\\n", "<br/>")
-        stack[stack_line] = stack[stack_line] + "<br/>"
+        stack_line = stack_line.replace("\\n", "<br/>")
+        stack_line = stack_line + "<br/>"
     LOGGER.warning(stack)
 
 def remap_value(
