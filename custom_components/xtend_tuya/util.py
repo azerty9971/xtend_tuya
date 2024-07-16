@@ -1,11 +1,20 @@
 """Utility methods for the Tuya integration."""
 
 from __future__ import annotations
+import traceback 
 from .const import (
     DPType,
     LOGGER,
 )
 
+class LogStackException(Exception):
+    pass
+
+def log_stack(message: str):
+    try:
+        raise LogStackException(message)
+    except LogStackException:
+        LOGGER.warning(traceback.format_exc())
 def remap_value(
     value: float,
     from_min: float = 0,

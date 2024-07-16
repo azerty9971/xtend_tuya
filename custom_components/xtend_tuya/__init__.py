@@ -5,7 +5,6 @@ from __future__ import annotations
 import logging
 import json
 import copy
-import uuid
 from typing import Any, Optional, NamedTuple
 
 import requests
@@ -86,7 +85,11 @@ from .const import (
     DPType,
 )
 
-from .util import determine_property_type, prepare_value_for_property_update
+from .util import (
+    determine_property_type, 
+    prepare_value_for_property_update,
+    log_stack
+)
 
 # Suppress logs from the library, it logs unneeded on error
 logging.getLogger("tuya_sharing").setLevel(logging.CRITICAL)
@@ -229,7 +232,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: TuyaConfigEntry) -> bool
         )
     """if manager.open_api_device_manager is not None:
         for device in manager.open_api_device_manager.device_map.values():
-            manager.device_ids.add(device.id)
+            manager.open_api_device_ids.add(device.id)
             if reuse_config:
                 identifiers = {(DOMAIN_ORIG, device.id), (DOMAIN, device.id)}
             else:
@@ -339,6 +342,7 @@ class XTDeviceListener(TuyaDeviceListener):
 
     @callback
     def async_remove_device(self, device_id: str) -> None:
+        log_stack("XTDeviceListener => async_remove_device")
         """Remove device from Home Assistant."""
         LOGGER.debug("Remove device: %s", device_id)
         device_registry = dr.async_get(self.hass)
@@ -384,6 +388,7 @@ class DeviceListener(SharingDeviceListener):
     @callback
     def async_remove_device(self, device_id: str) -> None:
         """Remove device from Home Assistant."""
+        log_stack("DeviceListener => async_remove_device")
         #LOGGER.debug("Remove device: %s", device_id)
         device_registry = dr.async_get(self.hass)
         device_entry = device_registry.async_get_device(
@@ -695,7 +700,7 @@ class DeviceManager(Manager):
             self.mq = other_manager.mq
             #if self.mq is not None and self.mq.mq_config is not None:
             #    LOGGER.warning(f"MQTT config: URL => {self.mq.mq_config.url} ClientID => {self.mq.mq_config.client_id} Username => {self.mq.mq_config.username} Password => {self.mq.mq_config.password} Dev Topic => {self.mq.mq_config.dev_topic}")
-        self.device_ids: set[str] = set()
+        self.open_api_device_ids: set[str] = set()
         self.open_api = open_api
         self.open_api_tuya_mq = None
         self.open_api_device_manager = None
@@ -706,7 +711,7 @@ class DeviceManager(Manager):
             self.open_api_tuya_mq.start()
             self.open_api_device_manager = XTTuyaDeviceManager(self, self.open_api, self.open_api_tuya_mq)
             self.open_api_home_manager = TuyaHomeManager(self.open_api, self.open_api_tuya_mq, self.open_api_device_manager)
-            self.open_api_device_listener = XTDeviceListener(hass, self.open_api_device_manager, self.device_ids)
+            self.open_api_device_listener = XTDeviceListener(hass, self.open_api_device_manager, self.open_api_device_ids)
             self.open_api_device_manager.add_device_listener(self.open_api_device_listener)
         self.other_device_manager = other_manager
         self.device_map: dict[str, CustomerDevice] = {}
@@ -720,6 +725,7 @@ class DeviceManager(Manager):
         self.hass = hass
     
     def refresh_mq(self):
+        log_stack("refresh_mq")
         if self.other_device_manager is not None:
             self.other_device_manager.refresh_mq()
             self.mq = self.other_device_manager.mq
@@ -862,15 +868,16 @@ class DeviceManager(Manager):
             self.open_api_home_manager.update_device_cache()
             self.open_api_device_map = {}
             if self.open_api_device_manager is not None:
-                for device in self.open_api_device_manager.device_map:
-                    if device not in self.device_map:
-                        LOGGER.warning(f"Adding device {device} to device map")
-                        self.open_api_device_map[device] = self.open_api_device_manager.device_map[device]
-                        self.device_map[device] = self.open_api_device_manager.device_map[device]
+                for device_id in self.open_api_device_manager.device_map:
+                    if device_id not in self.device_map:
+                        LOGGER.warning(f"Adding device {device_id} to device map")
+                        self.open_api_device_ids.add(device_id)
+                        self.open_api_device_map[device_id] = self.open_api_device_manager.device_map[device_id]
+                        self.device_map[device_id] = self.open_api_device_manager.device_map[device_id]
                         if other_manager := self.get_overriden_device_manager():
-                            other_manager.device_map[device] = self.open_api_device_manager.device_map[device]
-                    #if self.hass:
-                    #    dispatcher_send(self.hass, TUYA_DISCOVERY_NEW, [device])
+                            other_manager.device_map[device_id] = self.open_api_device_manager.device_map[device_id]
+                    if self.hass:
+                        dispatcher_send(self.hass, TUYA_DISCOVERY_NEW, [device_id])
             #LOGGER.warning(f"self.open_api_device_map => {self.open_api_device_map}")
 
     @staticmethod
