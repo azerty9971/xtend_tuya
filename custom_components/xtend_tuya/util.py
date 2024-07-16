@@ -11,7 +11,11 @@ class LogStackException(Exception):
     pass
 
 def log_stack(message: str):
-    LOGGER.warning(f"{traceback.format_stack()}")
+    stack = traceback.format_stack()
+    for stack_line in stack:
+        stack[stack_line] = stack[stack_line].replace("\\n", "<br/>")
+        stack[stack_line] = stack[stack_line] + "<br/>"
+    LOGGER.warning(stack)
 
 def remap_value(
     value: float,
