@@ -55,9 +55,14 @@ def _async_get_diagnostics(
 
     if device:
         tuya_device_id = next(iter(device.identifiers))[1]
-        data |= _async_device_as_dict(
-            hass, hass_data.manager.device_map[tuya_device_id]
-        )
+        if tuya_device_id in hass_data.manager.device_map:
+            data |= _async_device_as_dict(
+                hass, hass_data.manager.device_map[tuya_device_id]
+            )
+        if hass_data.manager.open_api_device_manager is not None and tuya_device_id in hass_data.manager.open_api_device_manager.device_map:
+            data |= _async_device_as_dict(
+                hass, hass_data.manager.open_api_device_manager.device_map[tuya_device_id]
+            )
     else:
         data.update(
             devices=[
@@ -76,6 +81,12 @@ def _async_device_as_dict(
     """Represent a Tuya device as a dictionary."""
 
     # Base device information, without sensitive information.
+    set_up = {}
+    if hasattr(device, "set_up"):
+        set_up = device.set_up
+    support_local = {}
+    if hasattr(device, "support_local"):
+        support_local = device.support_local
     data = {
         "id": device.id,
         "name": device.name,
@@ -92,8 +103,8 @@ def _async_device_as_dict(
         "status_range": {},
         "status": {},
         "home_assistant": {},
-        "set_up": device.set_up,
-        "support_local": device.support_local,
+        "set_up": set_up,
+        "support_local": support_local,
     }
 
     # Gather Tuya states
@@ -113,9 +124,17 @@ def _async_device_as_dict(
         with suppress(ValueError, TypeError, AttributeError):
             value = json.loads(cast(str, function.values))
 
+        property_update = False
+
+        for dp_item in device.local_strategy.values():
+            if dp_item["status_code"] == function.code:
+                property_update = dp_item.get("property_update", False)
+                break
+
         data["function"][function.code] = {
             "type": function.type,
             "value": value,
+            "property_update": property_update,
         }
 
     # Gather Tuya status ranges
@@ -124,9 +143,17 @@ def _async_device_as_dict(
         with suppress(ValueError, TypeError, AttributeError):
             value = json.loads(status_range.values)
 
+        property_update = False
+
+        for dp_item in device.local_strategy.values():
+            if dp_item["status_code"] == status_range.code:
+                property_update = dp_item.get("property_update", False)
+                break
+
         data["status_range"][status_range.code] = {
             "type": status_range.type,
             "value": value,
+            "property_update": property_update,
         }
 
     # Gather information how this Tuya device is represented in Home Assistant

@@ -25,8 +25,39 @@
       "reauth_successful": "[%key:common::config_flow::abort::reauth_successful%]"
     }
   },
+  "options": {
+    "step": {
+      "init": {
+        "description": "Add a Tuya OpenAPI credential to improve the compatibility with some Tuya devices",
+        "data": {
+          "country_code": "Country",
+          "access_id": "Tuya IoT Access ID",
+          "access_secret": "Tuya IoT Access Secret",
+          "username": "Account",
+          "password": "Password"
+        },
+        "title": "Add Tuya OpenAPI credentials"
+      }
+    }
+  },
   "entity": {
     "binary_sensor": {
+      "one_click_cleanup":
+      {
+        "name": "One click cleanup"
+      },
+      "power": {
+        "name": "Powered on and restarted successfully"
+      },
+      "cleaning": {
+        "name": "Cleaning"
+      },
+      "cleaning_num": {
+        "name": "Number of cleaning"
+      },
+      "trash_status": {
+        "name": "Garbage is full"
+      },
       "methane": {
         "name": "Methane"
       },
@@ -119,11 +150,14 @@
       }
     },
     "number": {
+      "quiet_time_end": {
+        "name": "Do not disturb (end)"
+      },
+      "quiet_time_start": {
+        "name": "Do not disturb (start)"
+      },
       "auto_lock_time": {
         "name": "Auto lock time"
-      },
-      "temperature": {
-        "name": "[%key:component::number::entity_component::temperature::name%]"
       },
       "time": {
         "name": "Time"
@@ -217,6 +251,24 @@
       }
     },
     "select": {
+      "cat_litter_box_clean":
+      {
+        "name": "Manual shoveling",
+        "state": {
+          "0": "Not shoveling",
+          "1": "Start manual shoveling",
+          "2": "Pause manual shoveling"
+        }
+      },
+      "cat_litter_box_empty":
+      {
+        "name": "Manual dumping",
+        "state": {
+          "0": "Not dumping",
+          "1": "Start manual dumping",
+          "2": "Pause manual dumping"
+        }
+      },
       "volume": {
         "name": "[%key:component::tuya::entity::number::volume::name%]"
       },
@@ -589,12 +641,63 @@
       }
     },
     "sensor": {
-      
+      "msp_history": {
+        "name": "History",
+        "state": {
+          "0":  "None",
+          "1":  "Automatic shoveling completed",
+          "2":  "Manual shoveling completed",
+          "3":  "Trash bin extraction",
+          "4":  "Trash bin reinstallation",
+          "5":  "Start automatic deodorization",
+          "6":  "Start manual deodorization",
+          "7":  "Temperature in the cabin is too high",
+          "8":  "The temperature inside the cabin is suitable",
+          "9":  "Sand dumping completed",
+          "10": "Sand dumping canceled",
+          "11": "Litter shoveling canceled",
+          "12": "Enter Do Not Disturb mode",
+          "13": "Exit Do Not Disturb mode",
+          "14": "Cat approaches",
+          "15": "Cat leaves",
+          "16": "Starting Self-inspection",
+          "17": "Completed self-inspection",
+          "18": "Cover is not installed",
+          "19": "Cover is installed",
+          "20": "Start shoveling",
+          "21": "Start dumping",
+          "22": "Cat enters"
+        }
+      },
+      "ozone_concentration": {
+        "name": "Ozone concentration"
+      },
+      "deodorization_num": {
+        "name": "Deodorization number"
+      },
+      "magnetnum": {
+        "name": "Magnet number"
+      },
+      "notification_status": {
+        "name": "Notification status"
+      },
+      "pedal_angle": {
+        "name": "Pedal angle"
+      },
+      "pir_radar": {
+        "name": "PIR Radar"
+      },
+      "work_stat": {
+        "name": "Work stat"
+      },
       "cat_weight": {
         "name": "Cat weight"
       },
       "add_ele": {
-        "name": "Consumption"
+        "name": "Consumption (method A)"
+      },
+      "add_ele2": {
+        "name": "Consumption (method B)"
       },
       "excretion_times_day": {
         "name": "Number of excretion"
@@ -707,7 +810,7 @@
         "name": "[%key:component::sensor::entity_component::illuminance::name%]"
       },
       "temperature": {
-        "name": "[%key:component::sensor::entity_component::temperature::name%]"
+        "name": "Temperature"
       },
       "humidity": {
         "name": "[%key:component::sensor::entity_component::humidity::name%]"
@@ -866,6 +969,21 @@
       }
     },
     "switch": {
+      "sleeping": {
+        "name": "Sleep"
+      },
+      "beep": {
+        "name": "Beep"
+      },
+      "indicator_light": {
+        "name": "Indicator light"
+      },
+      "quiet_timing_on": {
+        "name": "Do not disturb"
+      },
+      "reboot": {
+        "name": "Reboot"
+      },
       "automatic_lock": {
         "name": "Automatic lock"
       },

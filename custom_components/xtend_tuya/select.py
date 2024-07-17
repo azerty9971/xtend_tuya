@@ -61,6 +61,16 @@ SELECTS: dict[str, tuple[SelectEntityDescription, ...]] = {
             translation_key="cat_litter_box_status",
             entity_category=EntityCategory.DIAGNOSTIC,
         ),
+        SelectEntityDescription(
+            key=DPCode.CLEAN,
+            translation_key="cat_litter_box_clean",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        SelectEntityDescription(
+            key=DPCode.EMPTY,
+            translation_key="cat_litter_box_empty",
+            entity_category=EntityCategory.CONFIG,
+        ),
     ),
 }
 
@@ -72,21 +82,23 @@ async def async_setup_entry(
     hass_data = entry.runtime_data
 
     @callback
-    def async_discover_device(device_ids: list[str]) -> None:
+    def async_discover_device(manager, device_map) -> None:
         """Discover and add a discovered Tuya select."""
         entities: list[TuyaSelectEntity] = []
+        device_ids = [*device_map]
         for device_id in device_ids:
-            device = hass_data.manager.device_map[device_id]
+            device = device_map[device_id]
             if descriptions := SELECTS.get(device.category):
                 entities.extend(
-                    TuyaSelectEntity(device, hass_data.manager, description)
+                    TuyaSelectEntity(device, manager, description)
                     for description in descriptions
                     if description.key in device.status
                 )
 
         async_add_entities(entities)
 
-    async_discover_device([*hass_data.manager.device_map])
+    async_discover_device(hass_data.manager, hass_data.manager.device_map)
+    #async_discover_device(hass_data.manager, hass_data.manager.open_api_device_map)
 
     entry.async_on_unload(
         async_dispatcher_connect(hass, TUYA_DISCOVERY_NEW, async_discover_device)

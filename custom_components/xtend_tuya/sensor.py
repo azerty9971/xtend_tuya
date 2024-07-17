@@ -41,13 +41,14 @@ from .const import (
 )
 
 
-@dataclass(frozen=True)
+@dataclass
 class TuyaSensorEntityDescription(SensorEntityDescription):
     """Describes Tuya sensor entity."""
 
     subkey: str | None = None
 
     virtualstate: VirtualStates | None = None
+    vs_copy_to_state: list[DPCode]  | None = None
 
     restoredata: bool = False
 
@@ -65,7 +66,8 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
     "kg": (
         TuyaSensorEntityDescription(
             key=DPCode.ADD_ELE,
-            virtualstate=VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD,
+            virtualstate=VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME | VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD,
+            vs_copy_to_state=[DPCode.ADD_ELE2],
             translation_key="add_ele",
             device_class=SensorDeviceClass.ENERGY,
             state_class=SensorStateClass.TOTAL_INCREASING,
@@ -73,16 +75,11 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
             entity_registry_enabled_default=True,
             restoredata=True,
         ),
-    ),
-    # IoT Switch
-    # Note: Undocumented
-    "tdq": (
         TuyaSensorEntityDescription(
-            key=DPCode.ADD_ELE,
-            #virtualstate=VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD,
-            translation_key="add_ele",
+            key=DPCode.ADD_ELE2,
+            translation_key="add_ele2",
             device_class=SensorDeviceClass.ENERGY,
-            state_class=SensorStateClass.TOTAL_INCREASING,
+            state_class=SensorStateClass.TOTAL,
             native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
             entity_registry_enabled_default=True,
             restoredata=True,
@@ -92,9 +89,64 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
     # Note: Undocumented
     "msp": (
         TuyaSensorEntityDescription(
+            key=DPCode.AUTO_DEORDRIZER,
+            translation_key="auto_deordrizer",
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_registry_enabled_default=True,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.CALIBRATION,
+            translation_key="calibration",
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_registry_enabled_default=True,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.CAPACITY_CALIBRATION,
+            translation_key="capacity_calibration",
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_registry_enabled_default=True,
+        ),
+        TuyaSensorEntityDescription(
             key=DPCode.CAT_WEIGHT,
             translation_key="cat_weight",
             device_class=SensorDeviceClass.WEIGHT,
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_registry_enabled_default=True,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.CLEAN_NOTICE,
+            translation_key="clean_notice",
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_registry_enabled_default=True,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.CLEAN_TASTE,
+            translation_key="clean_taste",
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_registry_enabled_default=False,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.CLEAN_TIME,
+            translation_key="clean_time",
+            device_class=SensorDeviceClass.DURATION,
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_registry_enabled_default=True,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.DEODORIZATION,
+            translation_key="deodorization",
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_registry_enabled_default=True,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.DEODORIZATION_NUM,
+            translation_key="ozone_concentration",
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_registry_enabled_default=True,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.DETECTION_SENSITIVITY,
+            translation_key="detection_sensitivity",
             state_class=SensorStateClass.MEASUREMENT,
             entity_registry_enabled_default=True,
         ),
@@ -112,113 +164,14 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
             entity_registry_enabled_default=True,
         ),
         TuyaSensorEntityDescription(
-            key=DPCode.DEODORIZATION,
-            translation_key="deodorization",
-            state_class=SensorStateClass.MEASUREMENT,
+            key=DPCode.HISTORY,
+            translation_key="msp_history",
             entity_registry_enabled_default=True,
-        ),
-        TuyaSensorEntityDescription(
-            key=DPCode.CLEAN,
-            translation_key="clean",
-            state_class=SensorStateClass.MEASUREMENT,
-            entity_registry_enabled_default=True,
-        ),
-        TuyaSensorEntityDescription(
-            key=DPCode.EMPTY,
-            translation_key="empty",
-            state_class=SensorStateClass.MEASUREMENT,
-            entity_registry_enabled_default=True,
-        ),
-        TuyaSensorEntityDescription(
-            key=DPCode.EXCRETION_TIME_DAY,
-            translation_key="excretion_time_day",
-            device_class=SensorDeviceClass.DURATION,
-            state_class=SensorStateClass.MEASUREMENT,
-            entity_registry_enabled_default=True,
-        ),
-        TuyaSensorEntityDescription(
-            key=DPCode.TRASH_STATUS,
-            translation_key="trash_status",
-            state_class=SensorStateClass.MEASUREMENT,
-            entity_registry_enabled_default=True,
-        ),
-        TuyaSensorEntityDescription(
-            key=DPCode.MONITORING,
-            translation_key="monitoring",
-            state_class=SensorStateClass.MEASUREMENT,
-            entity_registry_enabled_default=False,
         ),
         TuyaSensorEntityDescription(
             key=DPCode.INDUCTION_CLEAN,
             translation_key="induction_clean",
             device_class=SensorDeviceClass.DURATION,
-            state_class=SensorStateClass.MEASUREMENT,
-            entity_registry_enabled_default=True,
-        ),
-        TuyaSensorEntityDescription(
-            key=DPCode.CLEAN_TIME,
-            translation_key="clean_time",
-            device_class=SensorDeviceClass.DURATION,
-            state_class=SensorStateClass.MEASUREMENT,
-            entity_registry_enabled_default=True,
-        ),
-        TuyaSensorEntityDescription(
-            key=DPCode.CLEAN_TIME_SWITCH,
-            translation_key="clean_time_switch",
-            state_class=SensorStateClass.MEASUREMENT,
-            entity_registry_enabled_default=True,
-        ),
-        TuyaSensorEntityDescription(
-            key=DPCode.CLEAN_TASTE,
-            translation_key="clean_taste",
-            state_class=SensorStateClass.MEASUREMENT,
-            entity_registry_enabled_default=False,
-        ),
-        TuyaSensorEntityDescription(
-            key=DPCode.CLEAN_TASTE_SWITCH,
-            translation_key="clean_tasteswitch",
-            state_class=SensorStateClass.MEASUREMENT,
-            entity_registry_enabled_default=False,
-        ),
-        TuyaSensorEntityDescription(
-            key=DPCode.NOT_DISTURB,
-            translation_key="not_disturb",
-            state_class=SensorStateClass.MEASUREMENT,
-            entity_registry_enabled_default=True,
-        ),
-        TuyaSensorEntityDescription(
-            key=DPCode.CLEAN_NOTICE,
-            translation_key="clean_notice",
-            state_class=SensorStateClass.MEASUREMENT,
-            entity_registry_enabled_default=True,
-        ),
-        TuyaSensorEntityDescription(
-            key=DPCode.TOILET_NOTICE,
-            translation_key="toilet_notice",
-            state_class=SensorStateClass.MEASUREMENT,
-            entity_registry_enabled_default=True,
-        ),
-        TuyaSensorEntityDescription(
-            key=DPCode.NET_NOTICE,
-            translation_key="net_notice",
-            state_class=SensorStateClass.MEASUREMENT,
-            entity_registry_enabled_default=False,
-        ),
-        TuyaSensorEntityDescription(
-            key=DPCode.CHILD_LOCK,
-            translation_key="child_lock",
-            state_class=SensorStateClass.MEASUREMENT,
-            entity_registry_enabled_default=True,
-        ),
-        TuyaSensorEntityDescription(
-            key=DPCode.CALIBRATION,
-            translation_key="calibration",
-            state_class=SensorStateClass.MEASUREMENT,
-            entity_registry_enabled_default=True,
-        ),
-        TuyaSensorEntityDescription(
-            key=DPCode.UNIT,
-            translation_key="unit",
             state_class=SensorStateClass.MEASUREMENT,
             entity_registry_enabled_default=True,
         ),
@@ -237,10 +190,34 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
             entity_registry_enabled_default=True,
         ),
         TuyaSensorEntityDescription(
-            key=DPCode.STORE_FULL_NOTIFY,
-            translation_key="store_full_notify",
+            key=DPCode.MONITORING,
+            translation_key="monitoring",
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_registry_enabled_default=False,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.NET_NOTICE,
+            translation_key="net_notice",
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_registry_enabled_default=False,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.NOT_DISTURB,
+            translation_key="not_disturb",
             state_class=SensorStateClass.MEASUREMENT,
             entity_registry_enabled_default=True,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.NOTIFICATION_STATUS,
+            translation_key="notification_status",
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_registry_enabled_default=False,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.NUMBER,
+            translation_key="number",
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_registry_enabled_default=False,
         ),
         TuyaSensorEntityDescription(
             key=DPCode.ODOURLESS,
@@ -249,14 +226,50 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
             entity_registry_enabled_default=False,
         ),
         TuyaSensorEntityDescription(
+            key=DPCode.PEDAL_ANGLE,
+            translation_key="pedal_angle",
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_registry_enabled_default=False,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.PIR_RADAR,
+            translation_key="pir_radar",
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_registry_enabled_default=False,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.SAND_SURFACE_CALIBRATION,
+            translation_key="sand_surface_calibration",
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_registry_enabled_default=True,
+        ),
+        TuyaSensorEntityDescription(
             key=DPCode.SMART_CLEAN,
             translation_key="smart_clean",
             state_class=SensorStateClass.MEASUREMENT,
             entity_registry_enabled_default=True,
         ),
         TuyaSensorEntityDescription(
-            key=DPCode.NOT_DISTURB_SWITCH,
-            translation_key="not_disturb_switch",
+            key=DPCode.STORE_FULL_NOTIFY,
+            translation_key="store_full_notify",
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_registry_enabled_default=True,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.TEMPERATURE,
+            translation_key="temperature",
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_registry_enabled_default=True,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.TOILET_NOTICE,
+            translation_key="toilet_notice",
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_registry_enabled_default=True,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.UNIT,
+            translation_key="unit",
             state_class=SensorStateClass.MEASUREMENT,
             entity_registry_enabled_default=True,
         ),
@@ -267,32 +280,8 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
             entity_registry_enabled_default=True,
         ),
         TuyaSensorEntityDescription(
-            key=DPCode.CAPACITY_CALIBRATION,
-            translation_key="capacity_calibration",
-            state_class=SensorStateClass.MEASUREMENT,
-            entity_registry_enabled_default=True,
-        ),
-        TuyaSensorEntityDescription(
-            key=DPCode.SAND_SURFACE_CALIBRATION,
-            translation_key="sand_surface_calibration",
-            state_class=SensorStateClass.MEASUREMENT,
-            entity_registry_enabled_default=True,
-        ),
-        TuyaSensorEntityDescription(
-            key=DPCode.AUTO_DEORDRIZER,
-            translation_key="auto_deordrizer",
-            state_class=SensorStateClass.MEASUREMENT,
-            entity_registry_enabled_default=True,
-        ),
-        TuyaSensorEntityDescription(
-            key=DPCode.DETECTION_SENSITIVITY,
-            translation_key="detection_sensitivity",
-            state_class=SensorStateClass.MEASUREMENT,
-            entity_registry_enabled_default=True,
-        ),
-        TuyaSensorEntityDescription(
-            key=DPCode.NUMBER,
-            translation_key="number",
+            key=DPCode.WORK_STAT,
+            translation_key="work_stat",
             state_class=SensorStateClass.MEASUREMENT,
             entity_registry_enabled_default=False,
         ),
@@ -304,9 +293,7 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
 SENSORS["cz"] = SENSORS["kg"]
 SENSORS["wkcz"] = SENSORS["kg"]
 SENSORS["dlq"] = SENSORS["kg"]
-
-# Power Socket (duplicate of `kg`)
-# https://developer.tuya.com/en/docs/iot/s?id=K9gf7o5prgf7s
+SENSORS["tdq"] = SENSORS["kg"]
 SENSORS["pc"] = SENSORS["kg"]
 
 async def async_setup_entry(
@@ -316,21 +303,23 @@ async def async_setup_entry(
     hass_data = entry.runtime_data
 
     @callback
-    def async_discover_device(device_ids: list[str]) -> None:
+    def async_discover_device(manager, device_map) -> None:
         """Discover and add a discovered Tuya sensor."""
         entities: list[TuyaSensorEntity] = []
+        device_ids = [*device_map]
         for device_id in device_ids:
-            device = hass_data.manager.device_map[device_id]
+            device = device_map[device_id]
             if descriptions := SENSORS.get(device.category):
                 entities.extend(
-                    TuyaSensorEntity(device, hass_data.manager, description)
+                    TuyaSensorEntity(device, manager, description)
                     for description in descriptions
                     if description.key in device.status
                 )
 
         async_add_entities(entities)
 
-    async_discover_device([*hass_data.manager.device_map])
+    async_discover_device(hass_data.manager, hass_data.manager.device_map)
+    #async_discover_device(hass_data.manager, hass_data.manager.open_api_device_map)
 
     entry.async_on_unload(
         async_dispatcher_connect(hass, TUYA_DISCOVERY_NEW, async_discover_device)
@@ -459,7 +448,7 @@ class TuyaSensorEntity(TuyaEntity, RestoreSensor):
         if not self.entity_description.restoredata:
             return
         state = await self.async_get_last_sensor_data()
-        if state is None:
+        if state is None or state.native_value is None:
             return
         # Scale integer/float value
         if isinstance(self._type_data, IntegerTypeData):

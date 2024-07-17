@@ -57,16 +57,18 @@ async def async_setup_entry(
     hass_data = entry.runtime_data
 
     @callback
-    def async_discover_device(device_ids: list[str]) -> None:
+    def async_discover_device(manager, device_map) -> None:
         """Discover and add a discovered Tuya vacuum."""
         entities: list[TuyaVacuumEntity] = []
+        device_ids = [*device_map]
         for device_id in device_ids:
-            device = hass_data.manager.device_map[device_id]
+            device = device_map[device_id]
             if device.category == "sd":
-                entities.append(TuyaVacuumEntity(device, hass_data.manager))
+                entities.append(TuyaVacuumEntity(device, manager))
         async_add_entities(entities)
 
-    async_discover_device([*hass_data.manager.device_map])
+    async_discover_device(hass_data.manager, hass_data.manager.device_map)
+    #async_discover_device(hass_data.manager, hass_data.manager.open_api_device_map)
 
     entry.async_on_unload(
         async_dispatcher_connect(hass, TUYA_DISCOVERY_NEW, async_discover_device)
