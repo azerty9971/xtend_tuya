@@ -389,7 +389,6 @@ class DeviceListener(SharingDeviceListener):
     def async_remove_device(self, device_id: str) -> None:
         """Remove device from Home Assistant."""
         log_stack("DeviceListener => async_remove_device")
-        #LOGGER.debug("Remove device: %s", device_id)
         device_registry = dr.async_get(self.hass)
         device_entry = device_registry.async_get_device(
             identifiers={(DOMAIN, device_id)}
@@ -437,11 +436,11 @@ class XTDeviceRepository(DeviceRepository):
         self.open_api= open_api
 
     """def query_devices_by_home(self, home_id: str) -> list[CustomerDevice]:
-        LOGGER.warning(f"query_devices_by_home => {home_id}")
+        #LOGGER.warning(f"query_devices_by_home => {home_id}")
         return super().query_devices_by_home(home_id)
 
     def query_devices_by_ids(self, ids: list) -> list[CustomerDevice]:
-        LOGGER.warning(f"query_devices_by_home => {ids}")
+        #LOGGER.warning(f"query_devices_by_home => {ids}")
         return super().query_devices_by_ids(ids)"""
 
     """def update_device_specification(self, device: CustomerDevice):
@@ -565,7 +564,7 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
             
     def update_device_list_in_smart_home(self):
         #DEBUG
-        shared_dev_id = "bf85bd241924094329wbx0"
+        """shared_dev_id = "bf85bd241924094329wbx0"
         force_open_api = True
         shared_dev = self.get_device_info(shared_dev_id)
         LOGGER.warning(f"shared_dev => {shared_dev}")
@@ -583,12 +582,7 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
                         value = item_status["value"]
                         status[code] = value
                 device.status = status
-                self.device_map[item["id"]] = device
-                """if self.manager is not None:
-                    if other_device_manager := self.manager.get_overriden_device_manager():
-                        other_device_manager.device_map[item["id"]] = device
-                    self.manager.device_map[item["id"]] = device
-                self.add_device(device)"""
+                self.device_map[item["id"]] = device"""
             #LOGGER.warning(f"User ID: {self.api.token_info.uid}")
         #ENDDEBUG
         """Update devices status in project type SmartHome."""
