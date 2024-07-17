@@ -81,7 +81,7 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
             device_class=SensorDeviceClass.ENERGY,
             state_class=SensorStateClass.TOTAL,
             native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
-            entity_registry_enabled_default=True,
+            entity_registry_enabled_default=False,
             restoredata=True,
         ),
     ),
