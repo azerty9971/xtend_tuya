@@ -36,6 +36,16 @@ NUMBERS: dict[str, tuple[NumberEntityDescription, ...]] = {
             entity_category=EntityCategory.CONFIG,
         ),
         NumberEntityDescription(
+            key=DPCode.QUIET_TIME_END,
+            translation_key="quiet_time_end",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        NumberEntityDescription(
+            key=DPCode.QUIET_TIME_START,
+            translation_key="quiet_time_start",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        NumberEntityDescription(
             key=DPCode.SLEEP_START_TIME,
             translation_key="sleep_start_time",
             entity_category=EntityCategory.CONFIG,
@@ -76,21 +86,23 @@ async def async_setup_entry(
     hass_data = entry.runtime_data
 
     @callback
-    def async_discover_device(device_ids: list[str]) -> None:
+    def async_discover_device(manager, device_map) -> None:
         """Discover and add a discovered Tuya number."""
         entities: list[TuyaNumberEntity] = []
+        device_ids = [*device_map]
         for device_id in device_ids:
-            device = hass_data.manager.device_map[device_id]
+            device = device_map[device_id]
             if descriptions := NUMBERS.get(device.category):
                 entities.extend(
-                    TuyaNumberEntity(device, hass_data.manager, description)
+                    TuyaNumberEntity(device, manager, description)
                     for description in descriptions
                     if description.key in device.status
                 )
 
         async_add_entities(entities)
 
-    async_discover_device([*hass_data.manager.device_map])
+    async_discover_device(hass_data.manager, hass_data.manager.device_map)
+    #async_discover_device(hass_data.manager, hass_data.manager.open_api_device_map)
 
     entry.async_on_unload(
         async_dispatcher_connect(hass, TUYA_DISCOVERY_NEW, async_discover_device)
