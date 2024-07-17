@@ -126,7 +126,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: TuyaConfigEntry) -> bool
         and CONF_PASSWORD      in entry.options
         and CONF_COUNTRY_CODE  in entry.options
         and CONF_APP_TYPE      in entry.options
-        and 1 == 2
         ):
         entry.async_on_unload(entry.add_update_listener(update_listener))
         auth_type = AuthType(entry.options[CONF_AUTH_TYPE])
