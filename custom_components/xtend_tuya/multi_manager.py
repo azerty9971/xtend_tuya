@@ -1,3 +1,4 @@
+from __future__ import annotations
 import requests
 from typing import NamedTuple
 
@@ -34,7 +35,6 @@ from tuya_sharing.user import (
     UserRepository,
 )
 
-from . import XTConfigEntry
 from .const import (
     CONF_ENDPOINT,
     CONF_TERMINAL_ID,
@@ -70,6 +70,14 @@ from .tuya_iot import (
     XTDeviceListener,
     tuya_iot_update_listener,
 )
+
+type XTConfigEntry = ConfigEntry[HomeAssistantXTData]
+
+class HomeAssistantXTData(NamedTuple):
+    """Tuya data stored in the Home Assistant data object."""
+
+    multi_manager: MultiManager
+    reuse_config: bool = False
 
 class XTDevice(CustomerDevice):
     def from_customer_device(device: CustomerDevice):

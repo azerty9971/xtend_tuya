@@ -2,6 +2,7 @@
 This file contains all the code that inherit from Tuya integration
 """
 
+from __future__ import annotations
 from typing import Any
 import json
 import copy

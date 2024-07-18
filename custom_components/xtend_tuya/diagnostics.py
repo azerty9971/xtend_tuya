@@ -14,19 +14,19 @@ from homeassistant.helpers import device_registry as dr, entity_registry as er
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.util import dt as dt_util
 
-from . import TuyaConfigEntry
+from .multi_manager import XTConfigEntry
 from .const import DOMAIN, DPCode
 
 
 async def async_get_config_entry_diagnostics(
-    hass: HomeAssistant, entry: TuyaConfigEntry
+    hass: HomeAssistant, entry: XTConfigEntry
 ) -> dict[str, Any]:
     """Return diagnostics for a config entry."""
     return _async_get_diagnostics(hass, entry)
 
 
 async def async_get_device_diagnostics(
-    hass: HomeAssistant, entry: TuyaConfigEntry, device: DeviceEntry
+    hass: HomeAssistant, entry: XTConfigEntry, device: DeviceEntry
 ) -> dict[str, Any]:
     """Return diagnostics for a device entry."""
     return _async_get_diagnostics(hass, entry, device)
@@ -35,7 +35,7 @@ async def async_get_device_diagnostics(
 @callback
 def _async_get_diagnostics(
     hass: HomeAssistant,
-    entry: TuyaConfigEntry,
+    entry: XTConfigEntry,
     device: DeviceEntry | None = None,
 ) -> dict[str, Any]:
     """Return diagnostics for a config entry."""
