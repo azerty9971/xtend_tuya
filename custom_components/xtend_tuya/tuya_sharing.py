@@ -68,7 +68,7 @@ from .const import (
     CONF_USERNAME,
     DPType,
 )
-from .multi_manager import XTConfigEntry
+
 from .util import (
     determine_property_type, 
     prepare_value_for_property_update,
@@ -78,6 +78,7 @@ from .sensor import (
     SENSORS,
 )
 
+#from .multi_manager import XTConfigEntry
 class DeviceListener(SharingDeviceListener):
     """Device Update Listener."""
 
@@ -128,7 +129,7 @@ class TokenListener(SharingTokenListener):
     def __init__(
         self,
         hass: HomeAssistant,
-        entry: XTConfigEntry,
+        entry, #: XTConfigEntry,
     ) -> None:
         """Init TokenListener."""
         self.hass = hass
