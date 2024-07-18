@@ -55,15 +55,8 @@ from .util import (
 
 from .multi_manager import (
     MultiManager,
+    XTConfigEntry,
 )
-
-type XTConfigEntry = ConfigEntry[HomeAssistantXTData]
-
-class HomeAssistantXTData(NamedTuple):
-    """Tuya data stored in the Home Assistant data object."""
-
-    multi_manager: MultiManager
-    reuse_config: bool = False
 
 # Suppress logs from the library, it logs unneeded on error
 logging.getLogger("tuya_sharing").setLevel(logging.CRITICAL)
