@@ -68,7 +68,7 @@ from .const import (
     CONF_USERNAME,
     DPType,
 )
-from .. import XTConfigEntry
+from .multi_manager import XTConfigEntry
 from .util import (
     determine_property_type, 
     prepare_value_for_property_update,
