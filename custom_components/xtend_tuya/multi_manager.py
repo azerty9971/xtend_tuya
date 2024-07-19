@@ -102,6 +102,7 @@ class MultiManager:
         self.sharing_account: TuyaSharingData = None
         self.iot_account: TuyaIOTData = None
         self.reuse_config = False
+        self.descriptors = {}
         if (account := self.get_iot_account(hass, entry)):
             self.iot_account = account
         if (account := self.get_sharing_account(hass,entry)):
@@ -152,14 +153,14 @@ class MultiManager:
         tuya_integration_runtime_data = MultiManager._get_overriden_tuya_integration_runtime_data(hass, entry)
         if tuya_integration_runtime_data:
             #We are using an override of the Tuya integration
-            sharing_device_manager = DeviceManager(other_device_manager=tuya_integration_runtime_data.device_manager)
+            sharing_device_manager = DeviceManager(multi_manager=self, other_device_manager=tuya_integration_runtime_data.device_manager)
             sharing_device_manager.terminal_id  = tuya_integration_runtime_data.device_manager.terminal_id
             sharing_device_manager.mq           = tuya_integration_runtime_data.device_manager.mq
             sharing_device_manager.customer_api = tuya_integration_runtime_data.device_manager.customer_api
             self.reuse_config = True
         else:
             #We are using XT as a standalone integration
-            sharing_device_manager = DeviceManager(other_device_manager=None)
+            sharing_device_manager = DeviceManager(multi_manager=self, other_device_manager=None)
             token_listener = TokenListener(hass, entry)
             sharing_device_manager.terminal_id = entry.data[CONF_TERMINAL_ID]
             sharing_device_manager.customer_api = CustomerApi(
@@ -257,3 +258,18 @@ class MultiManager:
     def refresh_mq(self):
         if self.sharing_account:
             self.sharing_account.device_manager.refresh_mq()
+    
+    def register_device_descriptors(self, name: str, descriptors):
+        self.descriptors[name] = descriptors
+
+    def get_category_virtual_states(self,category: str) -> list[DescriptionVirtualState]:
+        to_return = []
+        for virtual_state in VirtualStates:
+            for descriptor in self.descriptors.values():
+                if (descriptions := descriptor.get(category)):
+                    for description in descriptions:
+                        if description.virtualstate is not None and description.virtualstate & virtual_state.value:
+                            # This VirtualState is applied to this key, let's return it
+                            found_virtual_state = DescriptionVirtualState(description.key, virtual_state.name, virtual_state.value, description.vs_copy_to_state)
+                            to_return.append(found_virtual_state)
+        return to_return

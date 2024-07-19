@@ -74,9 +74,6 @@ from .util import (
     prepare_value_for_property_update,
     log_stack
 )
-from .sensor import (
-    SENSORS,
-)
 
 #from .multi_manager import XTConfigEntry
 class DeviceListener(SharingDeviceListener):
@@ -158,8 +155,10 @@ class TokenListener(SharingTokenListener):
 class DeviceManager(Manager):
     def __init__(
         self,
+        multi_manager,
         other_device_manager: Manager = None
     ) -> None:
+        self.multi_manager = multi_manager
         self.terminal_id = None
         self.mq = None
         self.customer_api = None
@@ -325,22 +324,10 @@ class DeviceManager(Manager):
                         if other_manager := self.get_overriden_device_manager():
                             other_manager.device_map[device_id] = self.open_api_device_manager.device_map[device_id]
             #LOGGER.warning(f"self.open_api_device_map => {self.open_api_device_map}")
-
-    @staticmethod
-    def get_category_virtual_states(category: str) -> list[DescriptionVirtualState]:
-        to_return = []
-        for virtual_state in VirtualStates:
-            if (descriptions := SENSORS.get(category)):
-                for description in descriptions:
-                    if description.virtualstate is not None and description.virtualstate & virtual_state.value:
-                        # This VirtualState is applied to this key, let's return it
-                        found_virtual_state = DescriptionVirtualState(description.key, virtual_state.name, virtual_state.value, description.vs_copy_to_state)
-                        to_return.append(found_virtual_state)
-        return to_return
     
     def apply_init_virtual_states(self, device):
         #LOGGER.warning(f"apply_init_virtual_states BEFORE => {device.status} <=> {device.status_range}")
-        virtual_states = DeviceManager.get_category_virtual_states(device.category)
+        virtual_states = self.multi_manager.get_category_virtual_states(device.category)
         for virtual_state in virtual_states:
             if virtual_state.virtual_state_value == VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME:
                 if virtual_state.key in device.status:
