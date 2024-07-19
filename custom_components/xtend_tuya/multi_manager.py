@@ -233,9 +233,9 @@ class MultiManager:  # noqa: F811
         device_manager.add_device_listener(device_listener)
         return TuyaIOTData(device_manager=device_manager,mq=mq,device_ids=device_ids,device_listener=device_listener)
     
-    async def update_device_cache(self):
+    def update_device_cache(self):
         if self.sharing_account:
-            await self.sharing_account.device_manager.update_device_cache()
+            self.sharing_account.device_manager.update_device_cache()
     
     def is_device_in_domain_device_maps(self, domains: list[str], device_entry_identifiers: list[str]):
         if device_entry_identifiers[0] in domains:
