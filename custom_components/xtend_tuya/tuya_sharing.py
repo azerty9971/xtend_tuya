@@ -75,6 +75,10 @@ from .util import (
     log_stack
 )
 
+from .multi_manager import (
+    MultiManager,
+)
+
 #from .multi_manager import XTConfigEntry
 class DeviceListener(SharingDeviceListener):
     """Device Update Listener."""
@@ -155,7 +159,7 @@ class TokenListener(SharingTokenListener):
 class DeviceManager(Manager):
     def __init__(
         self,
-        multi_manager,
+        multi_manager: MultiManager,
         other_device_manager: Manager = None
     ) -> None:
         self.multi_manager = multi_manager

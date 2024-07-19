@@ -59,6 +59,11 @@ from .const import (
     CONF_USERNAME,
     DPType,
 )
+
+from .import_stub import (
+    MultiManager,
+)
+
 from .tuya_sharing import (
     DeviceManager,
     TokenListener,

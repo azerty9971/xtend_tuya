@@ -1,0 +1,2 @@
+class MultiManager:
+    pass
