@@ -58,10 +58,6 @@ from .multi_manager import (
     XTConfigEntry,
 )
 
-from .sensor import (
-    SENSORS,
-)
-
 # Suppress logs from the library, it logs unneeded on error
 logging.getLogger("tuya_sharing").setLevel(logging.CRITICAL)
 
