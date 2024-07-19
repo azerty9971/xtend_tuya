@@ -119,7 +119,7 @@ class MultiManager:  # noqa: F811
         return hass.config_entries.async_entries(domain,False,False)
     
     def _get_overriden_config_entry(hass: HomeAssistant, entry: XTConfigEntry, other_domain: str) -> ConfigEntry:
-        other_domain_config_entries = MultiManager._get_domain_config_entries(other_domain)
+        other_domain_config_entries = MultiManager._get_domain_config_entries(hass, other_domain)
         for od_config_entry in other_domain_config_entries:
             if entry.title == od_config_entry.title:
                 return od_config_entry
