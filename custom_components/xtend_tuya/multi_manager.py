@@ -108,9 +108,9 @@ class MultiManager:  # noqa: F811
         self.iot_account: TuyaIOTData = None
         self.reuse_config = False
         self.descriptors = {}
-        if (account := self.get_iot_account(hass, entry)):
+        if (account := self.get_iot_account(hass, entry).__await__()):
             self.iot_account = account
-        if (account := self.get_sharing_account(hass,entry)):
+        if (account := self.get_sharing_account(hass,entry).__await__()):
             self.sharing_account = account
 
     def _get_domain_config_entries(hass: HomeAssistant, domain: str) -> list[ConfigEntry]:
