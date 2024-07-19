@@ -110,9 +110,9 @@ class MultiManager:  # noqa: F811
         self.descriptors = {}
 
     async def setup_entry(self, hass: HomeAssistant, entry: XTConfigEntry) -> None:
-        if (account := self.get_iot_account(hass, entry)):
+        if (account := await self.get_iot_account(hass, entry)):
             self.iot_account = account
-        if (account := self.get_sharing_account(hass,entry)):
+        if (account := await self.get_sharing_account(hass,entry)):
             self.sharing_account = account
 
     def _get_domain_config_entries(hass: HomeAssistant, domain: str) -> list[ConfigEntry]:
