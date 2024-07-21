@@ -2,7 +2,6 @@ from __future__ import annotations
 import requests
 import copy
 from typing import NamedTuple, Optional, Any
-from types import SimpleNamespace
 
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryError, ConfigEntryNotReady
@@ -68,9 +67,8 @@ from .const import (
 )
 
 from .shared_classes import (
-    XTDeviceFunction,
     XTDeviceProperties,
-    XTDeviceStatusRange,
+    XTDevice,
 )
 
 from .import_stub import (
@@ -106,42 +104,6 @@ class HomeAssistantXTData(NamedTuple):
     @property
     def manager(self) -> MultiManager:
         return self.multi_manager
-
-
-
-class XTDevice(SimpleNamespace):
-    id: str
-    name: str
-    local_key: str
-    category: str
-    product_id: str
-    product_name: str
-    sub: bool
-    uuid: str
-    asset_id: str
-    online: bool
-    icon: str
-    ip: str
-    time_zone: str
-    active_time: int
-    create_time: int
-    update_time: int
-    set_up: Optional[bool] = False
-    support_local: Optional[bool] = False
-    local_strategy: dict[int, dict[str, Any]] = {}
-
-    status: dict[str, Any] = {}
-    function: dict[str, XTDeviceFunction] = {}
-    status_range: dict[str, XTDeviceStatusRange] = {}
-
-    force_open_api: Optional[bool] = False
-
-    def __eq__(self, other):
-        """If devices are the same one."""
-        return self.id == other.id
-
-    def from_customer_device(device: CustomerDevice):
-        return XTDevice(**(device.__dict__))
 
 class TuyaIOTData(NamedTuple):
     device_manager: XTTuyaDeviceManager

@@ -47,11 +47,11 @@ from .const import (
 from .shared_classes import (
     XTDeviceStatusRange,
     XTDeviceProperties,
+    XTDevice,
 )
 
 from .multi_manager import (
     MultiManager,  # noqa: F811
-    XTDevice,
 )
 from .util import (
     determine_property_type, 
