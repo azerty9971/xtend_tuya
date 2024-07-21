@@ -45,7 +45,6 @@ async def async_setup_entry(
                 entities.append(TuyaFanEntity(device, manager))
         async_add_entities(entities)
 
-    hass_data.manager.register_device_descriptors("fan", TUYA_SUPPORT_TYPE)
     async_discover_device(hass_data.manager, hass_data.manager.device_map)
 
     entry.async_on_unload(
