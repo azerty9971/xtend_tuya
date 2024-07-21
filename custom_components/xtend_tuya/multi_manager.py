@@ -68,6 +68,14 @@ from .import_stub import (
     XTDeviceProperties,
 )
 
+from .util import (
+    get_domain_config_entries,
+    get_overriden_config_entry,
+    get_tuya_integration_runtime_data,
+    get_overriden_tuya_integration_runtime_data,
+    prepare_value_for_property_update,
+)
+
 from .xt_tuya_sharing import (
     DeviceManager,
     TokenListener,
@@ -78,13 +86,6 @@ from .xt_tuya_iot import (
     XTTuyaDeviceManager,
     XTDeviceListener,
     tuya_iot_update_listener,
-)
-from .util import (
-    get_domain_config_entries,
-    get_overriden_config_entry,
-    get_tuya_integration_runtime_data,
-    get_overriden_tuya_integration_runtime_data,
-    prepare_value_for_property_update,
 )
 
 type XTConfigEntry = ConfigEntry[HomeAssistantXTData]
