@@ -42,8 +42,8 @@ def _async_get_diagnostics(
     hass_data = entry.runtime_data
 
     mqtt_connected = None
-    if hass_data.manager.mq.client:
-        mqtt_connected = hass_data.manager.mq.client.is_connected()
+    """if hass_data.manager.mq.client:
+        mqtt_connected = hass_data.manager.mq.client.is_connected()"""
 
     data = {
         "endpoint": hass_data.manager.customer_api.endpoint,
@@ -58,10 +58,6 @@ def _async_get_diagnostics(
         if tuya_device_id in hass_data.manager.device_map:
             data |= _async_device_as_dict(
                 hass, hass_data.manager.device_map[tuya_device_id]
-            )
-        if hass_data.manager.open_api_device_manager is not None and tuya_device_id in hass_data.manager.open_api_device_manager.device_map:
-            data |= _async_device_as_dict(
-                hass, hass_data.manager.open_api_device_manager.device_map[tuya_device_id]
             )
     else:
         data.update(
