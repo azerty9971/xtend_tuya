@@ -69,11 +69,13 @@ class XTDeviceListener(TuyaDeviceListener):
         hass: HomeAssistant,
         device_manager: TuyaDeviceManager,
         device_ids: set[str],
+        multi_manager: MultiManager,
     ) -> None:
         """Init DeviceListener."""
         self.hass = hass
         self.device_manager = device_manager
         self.device_ids = device_ids
+        self.multi_manager = multi_manager
 
     def update_device(self, device: TuyaDevice) -> None:
         """Update device status."""
@@ -101,7 +103,7 @@ class XTDeviceListener(TuyaDeviceListener):
             tuya_mq.start()
 
             device_manager.mq = tuya_mq
-            tuya_mq.add_message_listener(device_manager.on_message)
+            tuya_mq.add_message_listener(self.multi_manager.on_message)
         else:
             device_manager.mq = other_device_manager.mq
 
@@ -210,8 +212,6 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
 
     
     def on_message(self, msg: str):
-        #LOGGER.warning(f"XTTuyaDeviceManager: mq receive-> {msg}")
-        self.multi_manager.on_message(msg)
         super().on_message(msg)
 
     def _update_device_list_info_cache(self, devIds: list[str]):
