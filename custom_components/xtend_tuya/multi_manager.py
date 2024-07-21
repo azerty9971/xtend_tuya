@@ -104,7 +104,7 @@ class HomeAssistantXTData(NamedTuple):
     def manager(self) -> MultiManager:
         return self.multi_manager
 
-class XTDeviceProperties(SimpleNamespace):  # noqa: F811
+class XTDeviceProperties:  # noqa: F811
     local_strategy: dict[int, dict[str, Any]] = {}
     status: dict[str, Any] = {}
     function: dict[str, XTDeviceFunction] = {}
