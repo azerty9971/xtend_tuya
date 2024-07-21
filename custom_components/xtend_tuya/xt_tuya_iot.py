@@ -220,7 +220,8 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
 
     def get_device_specification(self, device_id: str) -> dict[str, str]:
         specs = super().get_device_specification(device_id)
-        self.multi_manager.get_device_properties_open_api(self.device_map[device_id])
+        device_properties = self.get_device_properties(self.device_map[device_id])
+        LOGGER.warning(f"get_device_specification => {specs} <=> {device_properties}")
         if specs["success"]:
             if "result" in specs and "status" in specs["result"]:
                 for status_code in self.device_map[device_id].status_range:
@@ -236,8 +237,8 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
     
     def get_device_properties(self, device) -> XTDeviceProperties | None:
         device_properties = XTDeviceProperties()
-        response = self.open_api.get(f"/v2.0/cloud/thing/{device.id}/shadow/properties")
-        response2 = self.open_api.get(f"/v2.0/cloud/thing/{device.id}/model")
+        response = self.api.get(f"/v2.0/cloud/thing/{device.id}/shadow/properties")
+        response2 = self.api.get(f"/v2.0/cloud/thing/{device.id}/model")
         if response2.get("success"):
             result = response2.get("result", {})
             model = json.loads(result.get("model", "{}"))
