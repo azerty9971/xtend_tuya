@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 import traceback 
+from typing import NamedTuple
 from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
 from .const import (
@@ -10,11 +11,19 @@ from .const import (
     DOMAIN,
     DOMAIN_ORIG,
 )
+
+from tuya_sharing import (
+    Manager as TuyaSharingManager,
+)
+
 from .multi_manager import (
     MultiManager,
     XTConfigEntry,
-    TuyaIntegrationRuntimeData,
 )
+
+class TuyaIntegrationRuntimeData(NamedTuple):
+    device_manager: TuyaSharingManager
+    generic_runtime_data: any
 
 class LogStackException(Exception):
     pass
