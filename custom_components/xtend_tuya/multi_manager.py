@@ -143,7 +143,7 @@ class XTDevice(SimpleNamespace):
         return self.id == other.id
 
     def from_customer_device(device: CustomerDevice):
-        return XTDevice(**device)
+        return XTDevice(**(device.__dict__))
 
 class TuyaIOTData(NamedTuple):
     device_manager: XTTuyaDeviceManager
