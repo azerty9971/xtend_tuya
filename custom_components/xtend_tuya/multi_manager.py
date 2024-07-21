@@ -95,6 +95,10 @@ class HomeAssistantXTData(NamedTuple):
     multi_manager: MultiManager
     reuse_config: bool = False
 
+    @property
+    def manager(self):
+        return self.multi_manager
+
 class XTDeviceProperties(SimpleNamespace):  # noqa: F811
     local_strategy: dict[int, dict[str, Any]] = {}
     status: dict[str, Any] = {}
@@ -162,6 +166,10 @@ class MultiManager:  # noqa: F811
         self.iot_account: TuyaIOTData = None
         self.reuse_config: bool = False
         self.descriptors = {}
+
+    @property
+    def device_map(self):
+        return self.get_aggregated_device_map()
 
     async def setup_entry(self, hass: HomeAssistant, entry: XTConfigEntry) -> None:
         if (account := await self.get_iot_account(hass, entry)):
