@@ -4,6 +4,7 @@ https://github.com/tuya/tuya-iot-python-sdk
 """
 
 from __future__ import annotations
+import json
 from tuya_iot import (
     AuthType,
     TuyaDevice,
@@ -44,6 +45,9 @@ from .const import (
 )
 from .multi_manager import (
     MultiManager,
+    XTDeviceFunction,
+    XTDeviceStatusRange,
+    XTDeviceProperties,
 )
 from .util import (
     determine_property_type, 
@@ -234,6 +238,67 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
                     if not status_found:
                         specs["result"]["status"].append({"code": status.code, "type": status.type, "values": status.values})
         return specs
+    
+    def get_device_properties(self, device) -> XTDeviceProperties | None:
+        device_properties = XTDeviceProperties()
+        response = self.open_api.get(f"/v2.0/cloud/thing/{device.id}/shadow/properties")
+        response2 = self.open_api.get(f"/v2.0/cloud/thing/{device.id}/model")
+        if response2.get("success"):
+            result = response2.get("result", {})
+            model = json.loads(result.get("model", "{}"))
+            for service in model["services"]:
+                for property in service["properties"]:
+                    if (    "abilityId" in property
+                        and "code" in property
+                        and "accessMode" in property
+                        and "typeSpec" in property
+                        ):
+                        if property["abilityId"] not in device_properties.local_strategy:
+                            if "type" in property["typeSpec"]:
+                                typeSpec = property["typeSpec"]
+                                real_type = determine_property_type(property["typeSpec"]["type"])
+                                typeSpec.pop("type")
+                                typeSpec = json.dumps(typeSpec)
+                                device_properties.local_strategy[int(property["abilityId"])] = {
+                                    "status_code": property["code"],
+                                    "config_item": {
+                                        "valueDesc": typeSpec,
+                                        "valueType": real_type,
+                                        "pid": device.product_id,
+                                    },
+                                    "property_update": True,
+                                    "use_open_api": True
+                                }
+        if response.get("success"):
+            result = response.get("result", {})
+            for dp_property in result["properties"]:
+                if "dp_id" in dp_property and "type" in dp_property:
+                    if dp_property["dp_id"] not in device_properties.local_strategy:
+                        dp_id = int(dp_property["dp_id"])
+                        real_type = determine_property_type(dp_property.get("type",None), dp_property.get("value",None))
+                        device_properties.local_strategy[dp_id] = {
+                            "status_code": dp_property["code"],
+                            "config_item": {
+                                "valueDesc": dp_property.get("value",{}),
+                                "valueType": real_type,
+                                "pid": device.product_id,
+                            },
+                            "property_update": True,
+                            "use_open_api": True
+                        }
+                if (    "code"  in dp_property 
+                    and "dp_id" in dp_property 
+                    and dp_property["dp_id"]  in device_properties.local_strategy
+                    ):
+                    code = dp_property["code"]
+                    if code not in device_properties.status_range:
+                        device_properties.status_range[code] = XTDeviceStatusRange()
+                        device_properties.status_range[code].code   = code
+                        device_properties.status_range[code].type   = device_properties.local_strategy[dp_property["dp_id"]]["config_item"]["valueType"]
+                        device_properties.status_range[code].values = device_properties.local_strategy[dp_property["dp_id"]]["config_item"]["valueDesc"]
+                    if code not in device_properties.status:
+                        device_properties.status[code] = dp_property.get("value",None)
+        return device_properties
 
     def send_property_update(
             self, device_id: str, properties: list[dict[str, Any]]
