@@ -47,12 +47,6 @@ from .const import (
     DPType,
 )
 
-from .util import (
-    determine_property_type, 
-    prepare_value_for_property_update,
-    log_stack
-)
-
 from .multi_manager import (
     MultiManager,
     XTConfigEntry,
