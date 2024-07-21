@@ -67,7 +67,6 @@ from .import_stub import (
     XTDeviceFunction,
     XTDeviceProperties,
     XTConfigEntry,
-    TuyaIntegrationRuntimeData,
 )
 
 from .util import (
@@ -154,10 +153,6 @@ class TuyaIOTData(NamedTuple):
 
 class TuyaSharingData(NamedTuple):
     device_manager: DeviceManager
-
-class TuyaIntegrationRuntimeData(NamedTuple):  # noqa: F811
-    device_manager: TuyaSharingManager
-    generic_runtime_data: any
 
 
 class MultiManager:  # noqa: F811
