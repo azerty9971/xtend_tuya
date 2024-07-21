@@ -67,11 +67,14 @@ from .const import (
     DPType,
 )
 
-from .import_stub import (
-    MultiManager,
-    XTDeviceStatusRange,
+from .shared_classes import (
     XTDeviceFunction,
     XTDeviceProperties,
+    XTDeviceStatusRange,
+)
+
+from .import_stub import (
+    MultiManager,
     XTConfigEntry,
 )
 
@@ -104,23 +107,7 @@ class HomeAssistantXTData(NamedTuple):
     def manager(self) -> MultiManager:
         return self.multi_manager
 
-class XTDeviceProperties:  # noqa: F811
-    local_strategy: dict[int, dict[str, Any]] = {}
-    status: dict[str, Any] = {}
-    function: dict[str, XTDeviceFunction] = {}
-    status_range: dict[str, XTDeviceStatusRange] = {}
 
-class XTDeviceStatusRange:  # noqa: F811
-    code: str
-    type: str
-    values: str
-
-class XTDeviceFunction:  # noqa: F811
-    code: str
-    desc: str
-    name: str
-    type: str
-    values: dict[str, Any]
 
 class XTDevice(SimpleNamespace):
     id: str
