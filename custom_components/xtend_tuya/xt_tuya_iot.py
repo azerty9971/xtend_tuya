@@ -206,7 +206,11 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
     def update_device_function_cache(self, devIds: list = []):
         super().update_device_function_cache(devIds)
         for device_id in self.device_map:
-            self.multi_manager.apply_init_virtual_states(self.device_map[device_id])
+            device = self.device_map[device_id]
+            self.multi_manager.apply_init_virtual_states(device)
+            device_properties = self.get_device_properties(device)
+            device_properties.merge_in_device(device)
+
 
     
     def on_message(self, msg: str):
@@ -219,24 +223,6 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
         for item in result.get("list", []):
             device_id = item["id"]
             self.device_map[device_id] = XTTuyaDevice(**item)
-    
-
-    def get_device_specification(self, device_id: str) -> dict[str, str]:
-        specs = super().get_device_specification(device_id)
-        device_properties = self.get_device_properties(self.device_map[device_id])
-        LOGGER.warning(f"get_device_specification => {specs} <=> {device_properties}")
-        if specs["success"]:
-            if "result" in specs and "status" in specs["result"]:
-                for status_code in self.device_map[device_id].status_range:
-                    status = self.device_map[device_id].status_range[status_code]
-                    status_found = False
-                    for spec_status in specs["result"]["status"]:
-                        if spec_status["code"] == status.code:
-                            status_found = True
-                            break
-                    if not status_found:
-                        specs["result"]["status"].append({"code": status.code, "type": status.type, "values": status.values})
-        return specs
     
     def get_device_properties(self, device) -> XTDeviceProperties | None:
         device_properties = XTDeviceProperties()
