@@ -96,7 +96,7 @@ class HomeAssistantXTData(NamedTuple):
     reuse_config: bool = False
 
     @property
-    def manager(self):
+    def manager(self) -> MultiManager:
         return self.multi_manager
 
 class XTDeviceProperties(SimpleNamespace):  # noqa: F811
@@ -159,6 +159,23 @@ class TuyaIOTData(NamedTuple):
 class TuyaSharingData(NamedTuple):
     device_manager: DeviceManager
 
+class MultiMQTTQueue:
+    def __init__(self, multi_manager: MultiManager) -> None:
+        self.multi_manager = multi_manager
+        self.sharing_account_mq = None
+        self.iot_account_mq = None
+
+    def stop(self) -> None:
+        if self.sharing_account_mq and not self.multi_manager.reuse_config:
+            self.sharing_account_mq.stop()
+        if self.iot_account_mq:
+            self.iot_account_mq.stop()
+
+class MultiDeviceListener:
+     def __init__(self, multi_manager: MultiManager) -> None:
+        self.multi_manager = multi_manager
+        self.sharing_account_device_listener = None
+        self.iot_account_device_listener = None
 
 class MultiManager:  # noqa: F811
     def __init__(self, hass: HomeAssistant, entry: XTConfigEntry) -> None:
@@ -166,10 +183,16 @@ class MultiManager:  # noqa: F811
         self.iot_account: TuyaIOTData = None
         self.reuse_config: bool = False
         self.descriptors = {}
+        self.multi_mqtt_queue: MultiMQTTQueue = MultiMQTTQueue(self)
+        self.multi_device_listener: MultiDeviceListener = MultiDeviceListener(self)
 
     @property
     def device_map(self):
         return self.get_aggregated_device_map()
+    
+    @property
+    def mq(self):
+        return self.multi_mqtt_queue
 
     async def setup_entry(self, hass: HomeAssistant, entry: XTConfigEntry) -> None:
         if (account := await self.get_iot_account(hass, entry)):
@@ -201,13 +224,14 @@ class MultiManager:  # noqa: F811
                 token_listener,
             )
             sharing_device_manager.mq = None
+        self.multi_mqtt_queue.sharing_account_mq = sharing_device_manager.mq
         sharing_device_manager.home_repository = HomeRepository(sharing_device_manager.customer_api)
         sharing_device_manager.device_repository = XTDeviceRepository(sharing_device_manager.customer_api, sharing_device_manager, self)
         sharing_device_manager.device_listeners = set()
         sharing_device_manager.scene_repository = SceneRepository(sharing_device_manager.customer_api)
         sharing_device_manager.user_repository = UserRepository(sharing_device_manager.customer_api)
-        listener = DeviceListener(hass, sharing_device_manager)
-        sharing_device_manager.add_device_listener(listener)
+        self.multi_device_listener.sharing_account_device_listener = DeviceListener(hass, sharing_device_manager)
+        sharing_device_manager.add_device_listener(self.multi_device_listener.sharing_account_device_listener)
         return TuyaSharingData(device_manager=sharing_device_manager)
 
     async def get_iot_account(self, hass: HomeAssistant, entry: XTConfigEntry) -> TuyaIOTData | None:
@@ -251,13 +275,18 @@ class MultiManager:  # noqa: F811
             raise ConfigEntryNotReady(response)
         entry.async_on_unload(entry.add_update_listener(tuya_iot_update_listener))
         mq = TuyaOpenMQ(api)
+        self.multi_mqtt_queue.iot_account_mq = mq
         mq.start()
         device_manager = XTTuyaDeviceManager(self, api, mq)
         device_ids: set[str] = set()
-        device_listener = XTDeviceListener(hass, device_manager, device_ids, self)
+        self.multi_device_listener.iot_account_device_listener = XTDeviceListener(hass, device_manager, device_ids, self)
         home_manager = TuyaHomeManager(api, mq, device_manager)
-        device_manager.add_device_listener(device_listener)
-        return TuyaIOTData(device_manager=device_manager,mq=mq,device_ids=device_ids,device_listener=device_listener, home_manager=home_manager)
+        device_manager.add_device_listener(self.multi_device_listener.iot_account_device_listener)
+        return TuyaIOTData(
+            device_manager=device_manager,
+            mq=mq,device_ids=device_ids,
+            device_listener=self.multi_device_listener.iot_account_device_listener, 
+            home_manager=home_manager)
     
     def update_device_cache(self):
         if self.sharing_account:
@@ -331,6 +360,12 @@ class MultiManager:  # noqa: F811
                             to_return.append(found_virtual_state)
         return to_return
     
+    def remove_device_listeners(self) -> None:
+        if self.multi_device_listener.iot_account_device_listener:
+            self.iot_account.device_manager.remove_device_listener(self.multi_device_listener.iot_account_device_listener)
+        if self.multi_device_listener.sharing_account_device_listener:
+            self.sharing_account.device_manager.remove_device_listener(self.multi_device_listener.sharing_account_device_listener)
+
     def get_device_properties(self, device: XTDevice) -> XTDeviceProperties:
         dev_props = XTDeviceProperties()
         if self.iot_account:

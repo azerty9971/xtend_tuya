@@ -122,9 +122,9 @@ async def async_unload_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
     """Unloading the Tuya platforms."""
     if unload_ok := await hass.config_entries.async_unload_platforms(entry, PLATFORMS):
         tuya = entry.runtime_data
-        if tuya.manager.mq is not None and tuya.manager.get_overriden_device_manager() is None:
+        if tuya.manager.mq is not None:
             tuya.manager.mq.stop()
-        tuya.manager.remove_device_listener(tuya.listener)
+        tuya.manager.remove_device_listeners()
     return unload_ok
 
 
