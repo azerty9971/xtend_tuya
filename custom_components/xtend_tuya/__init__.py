@@ -56,6 +56,7 @@ from .util import (
 from .multi_manager import (
     MultiManager,
     XTConfigEntry,
+    HomeAssistantXTData,
 )
 
 # Suppress logs from the library, it logs unneeded on error
@@ -105,20 +106,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
             name=device.name,
             model=f"{device.product_name} (unsupported)",
         )
-    """if manager.open_api_device_manager is not None:
-        for device in manager.open_api_device_manager.device_map.values():
-            manager.open_api_device_ids.add(device.id)
-            if reuse_config:
-                identifiers = {(DOMAIN_ORIG, device.id), (DOMAIN, device.id)}
-            else:
-                identifiers = {(DOMAIN, device.id)}
-            device_registry.async_get_or_create(
-                config_entry_id=entry.entry_id,
-                identifiers=identifiers,
-                manufacturer="Tuya",
-                name=device.name,
-                model=f"{device.product_name} (unsupported)",
-            )"""
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     # If the device does not register any entities, the device does not need to subscribe
