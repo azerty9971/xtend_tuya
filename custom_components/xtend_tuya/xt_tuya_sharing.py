@@ -185,24 +185,6 @@ class DeviceManager(Manager):
             return
         super().refresh_mq()
 
-    def update_device_cache(self):
-        super().update_device_cache()
-
-        #Add Tuya OpenAPI devices to the cache
-        if self.open_api_home_manager is not None:
-            self.open_api_home_manager.update_device_cache()
-            self.open_api_device_map = {}
-            if self.open_api_device_manager is not None:
-                for device_id in self.open_api_device_manager.device_map:
-                    if device_id not in self.device_map:
-                        LOGGER.warning(f"Adding device {device_id} to device map")
-                        self.open_api_device_ids.add(device_id)
-                        self.open_api_device_map[device_id] = self.open_api_device_manager.device_map[device_id]
-                        self.device_map[device_id] = self.open_api_device_manager.device_map[device_id]
-                        if other_manager := self.get_overriden_device_manager():
-                            other_manager.device_map[device_id] = self.open_api_device_manager.device_map[device_id]
-            #LOGGER.warning(f"self.open_api_device_map => {self.open_api_device_map}")
-
     def set_overriden_device_manager(self, other_device_manager: Manager) -> None:
         self.other_device_manager = other_device_manager
     

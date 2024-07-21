@@ -256,7 +256,30 @@ class MultiManager:  # noqa: F811
             self.sharing_account.device_manager.update_device_cache()
         if self.iot_account:
             self.iot_account.home_manager.update_device_cache()
+        self._merge_devices_from_multiple_sources()
     
+    def _merge_devices_from_multiple_sources(self):
+        if not ( self.sharing_account and self.iot_account ):
+            return
+        
+        #Merge the device function, status_range and status between managers
+        device_maps = [self.sharing_account.device_manager.device_map, self.iot_account.device_manager.device_map]
+        aggregated_device_list = self.get_aggregated_device_map()
+        for device in aggregated_device_list.values():
+            to_be_merged = []
+            for device_map in device_maps:
+                if device.id in device_map:
+                    for prev_device in to_be_merged:
+                        self._merge_devices(device, prev_device)
+                    to_be_merged.append(device)
+        for device_map in device_maps:
+            device_map.update(aggregated_device_list)
+            
+    def _merge_devices(self, device1: XTDevice, device2: XTDevice):
+        device1.status_range.update(device2.status_range)
+        device1.function.update(device2.function)
+        device1.status.update(device2.status)
+
     def is_device_in_domain_device_maps(self, domains: list[str], device_entry_identifiers: list[str]):
         if device_entry_identifiers[0] in domains:
             if self.sharing_account and device_entry_identifiers[1] in self.sharing_account.device_manager.device_map:
