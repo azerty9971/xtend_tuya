@@ -346,7 +346,16 @@ class MultiManager:  # noqa: F811
             self.sharing_account.device_manager.refresh_mq()
     
     def register_device_descriptors(self, name: str, descriptors):
-        self.descriptors[name] = descriptors
+        descriptors_with_vs = {}
+        for category in descriptors:
+            decription_tuple: tuple = ()
+            for description in descriptors[category]:
+                if hasattr(description, "virtual_state") and description.virtual_state is not None:
+                    decription_tuple += (description)
+            if decription_tuple.count() > 0:
+                descriptors_with_vs[category] = decription_tuple
+        if len(descriptors_with_vs) > 0:
+            self.descriptors[name] = descriptors_with_vs
 
     def get_category_virtual_states(self,category: str) -> list[DescriptionVirtualState]:
         to_return = []
@@ -354,8 +363,8 @@ class MultiManager:  # noqa: F811
             for descriptor in self.descriptors.values():
                 if (descriptions := descriptor.get(category)):
                     for description in descriptions:
-                        if description.virtualstate is not None and description.virtualstate & virtual_state.value:
-                            # This VirtualState is applied to this key, let's return it
+                        if description.virtual_state is not None and description.virtual_state & virtual_state.value:
+                            # This virtual_state is applied to this key, let's return it
                             found_virtual_state = DescriptionVirtualState(description.key, virtual_state.name, virtual_state.value, description.vs_copy_to_state)
                             to_return.append(found_virtual_state)
         return to_return

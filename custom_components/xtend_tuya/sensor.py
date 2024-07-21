@@ -47,7 +47,7 @@ class TuyaSensorEntityDescription(SensorEntityDescription):
 
     subkey: str | None = None
 
-    virtualstate: VirtualStates | None = None
+    virtual_state: VirtualStates | None = None
     vs_copy_to_state: list[DPCode]  | None = None
 
     restoredata: bool = False
@@ -66,7 +66,7 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
     "kg": (
         TuyaSensorEntityDescription(
             key=DPCode.ADD_ELE,
-            virtualstate=VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME | VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD,
+            virtual_state=VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME | VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD,
             vs_copy_to_state=[DPCode.ADD_ELE2],
             translation_key="add_ele",
             device_class=SensorDeviceClass.ENERGY,
