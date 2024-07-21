@@ -202,24 +202,6 @@ class DeviceManager(Manager):
                         if other_manager := self.get_overriden_device_manager():
                             other_manager.device_map[device_id] = self.open_api_device_manager.device_map[device_id]
             #LOGGER.warning(f"self.open_api_device_map => {self.open_api_device_map}")
-    
-    def apply_init_virtual_states(self, device):
-        #LOGGER.warning(f"apply_init_virtual_states BEFORE => {device.status} <=> {device.status_range}")
-        virtual_states = self.multi_manager.get_category_virtual_states(device.category)
-        for virtual_state in virtual_states:
-            if virtual_state.virtual_state_value == VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME:
-                if virtual_state.key in device.status:
-                    if virtual_state.key in device.status_range:
-                        for new_code in virtual_state.vs_copy_to_state:
-                            device.status[str(new_code)] = copy.deepcopy(device.status[virtual_state.key])
-                            device.status_range[str(new_code)] = copy.deepcopy(device.status_range[virtual_state.key])
-                            device.status_range[str(new_code)].code = str(new_code)
-                    if virtual_state.key in device.function:
-                        for new_code in virtual_state.vs_copy_to_state:
-                            device.status[str(new_code)] = copy.deepcopy(device.status[virtual_state.key])
-                            device.function[str(new_code)] = copy.deepcopy(device.function[virtual_state.key])
-                            device.function[str(new_code)].code = str(new_code)
-        #LOGGER.warning(f"apply_init_virtual_states AFTER => {device.status} <=> {device.status_range}")
 
     def set_overriden_device_manager(self, other_device_manager: Manager) -> None:
         self.other_device_manager = other_device_manager
@@ -334,21 +316,12 @@ class DeviceManager(Manager):
         #if show_debug == True:
         LOGGER.debug(f"AFTER device_id -> {device_id} device_status-> {device.status} status-> {status}")
         super()._on_device_report(device_id, [])
-    
-    def allow_virtual_devices_not_set_up(self, device):
-        if not device.id.startswith("vdevo"):
-            return
-        if not getattr(device, "set_up", True):
-            setattr(device, "set_up", True)
-        if device.id in self.other_device_manager.device_map:
-            tuya_device = self.other_device_manager.device_map[device.id]
-            if not getattr(tuya_device, "set_up", True):
-                setattr(tuya_device, "set_up", True)
 
 class XTDeviceRepository(DeviceRepository):
-    def __init__(self, customer_api: CustomerApi, manager: DeviceManager):
+    def __init__(self, customer_api: CustomerApi, manager: DeviceManager, multi_manager: MultiManager):
         super().__init__(customer_api)
         self.manager = manager
+        self.multi_manager = multi_manager
 
     """def query_devices_by_home(self, home_id: str) -> list[CustomerDevice]:
         #LOGGER.warning(f"query_devices_by_home => {home_id}")
@@ -424,8 +397,7 @@ class XTDeviceRepository(DeviceRepository):
             device.support_local = support_local
             #if support_local:
             device.local_strategy = dp_id_map
-            self.manager.get_device_properties_open_api(device)
-            self.manager.apply_init_virtual_states(device)
-            self.manager.allow_virtual_devices_not_set_up(device)
+            self.multi_manager.apply_init_virtual_states(device)
+            self.multi_manager.allow_virtual_devices_not_set_up(device)
             if tuya_device is not None:
-                self.manager.apply_init_virtual_states(tuya_device)
+                self.multi_manager.apply_init_virtual_states(tuya_device)

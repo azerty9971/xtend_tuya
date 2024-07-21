@@ -1,5 +1,6 @@
 from __future__ import annotations
 import requests
+import copy
 from typing import NamedTuple, Optional, Any
 from types import SimpleNamespace
 
@@ -193,7 +194,7 @@ class MultiManager:  # noqa: F811
             )
             sharing_device_manager.mq = None
         sharing_device_manager.home_repository = HomeRepository(sharing_device_manager.customer_api)
-        sharing_device_manager.device_repository = XTDeviceRepository(sharing_device_manager.customer_api, sharing_device_manager)
+        sharing_device_manager.device_repository = XTDeviceRepository(sharing_device_manager.customer_api, sharing_device_manager, self)
         sharing_device_manager.device_listeners = set()
         sharing_device_manager.scene_repository = SceneRepository(sharing_device_manager.customer_api)
         sharing_device_manager.user_repository = UserRepository(sharing_device_manager.customer_api)
@@ -305,6 +306,30 @@ class MultiManager:  # noqa: F811
         
         return dev_props
     
+    def apply_init_virtual_states(self, device: XTDevice):
+        #LOGGER.warning(f"apply_init_virtual_states BEFORE => {device.status} <=> {device.status_range}")
+        virtual_states = self.multi_manager.get_category_virtual_states(device.category)
+        for virtual_state in virtual_states:
+            if virtual_state.virtual_state_value == VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME:
+                if virtual_state.key in device.status:
+                    if virtual_state.key in device.status_range:
+                        for new_code in virtual_state.vs_copy_to_state:
+                            device.status[str(new_code)] = copy.deepcopy(device.status[virtual_state.key])
+                            device.status_range[str(new_code)] = copy.deepcopy(device.status_range[virtual_state.key])
+                            device.status_range[str(new_code)].code = str(new_code)
+                    if virtual_state.key in device.function:
+                        for new_code in virtual_state.vs_copy_to_state:
+                            device.status[str(new_code)] = copy.deepcopy(device.status[virtual_state.key])
+                            device.function[str(new_code)] = copy.deepcopy(device.function[virtual_state.key])
+                            device.function[str(new_code)].code = str(new_code)
+        #LOGGER.warning(f"apply_init_virtual_states AFTER => {device.status} <=> {device.status_range}")
+
+    def allow_virtual_devices_not_set_up(self, device: XTDevice):
+        if not device.id.startswith("vdevo"):
+            return
+        if not getattr(device, "set_up", True):
+            setattr(device, "set_up", True)
+
     def send_commands(
             self, device_id: str, commands: list[dict[str, Any]]
     ):
