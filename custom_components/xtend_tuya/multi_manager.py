@@ -66,12 +66,12 @@ from .import_stub import (
     XTDeviceStatusRange,
     XTDeviceFunction,
     XTDeviceProperties,
+    XTConfigEntry,
 )
 
 from .util import (
     get_overriden_tuya_integration_runtime_data,
-    prepare_value_for_property_update,
-    XTConfigEntry
+    prepare_value_for_property_update
 )
 
 from .xt_tuya_sharing import (
