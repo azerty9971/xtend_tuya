@@ -294,9 +294,11 @@ class MultiManager:  # noqa: F811
         aggregated_list = dict[str, XTDevice]
         if self.sharing_account:
             for device_id in self.sharing_account.device_manager.device_map:
+                device_id = str(device_id)
                 aggregated_list[device_id] = XTDevice.from_customer_device(self.sharing_account.device_manager.device_map[device_id])
         if self.iot_account:
             for device_id in self.iot_account.device_manager.device_map:
+                device_id = str(device_id)
                 aggregated_list[device_id] = XTDevice.from_customer_device(self.iot_account.device_manager.device_map[device_id])
     
     def unload(self):
