@@ -300,6 +300,7 @@ class MultiManager:  # noqa: F811
                 if device.id in device_map:
                     for prev_device in to_be_merged:
                         self._merge_devices(device, prev_device)
+                        self._merge_devices(prev_device, device)
                     to_be_merged.append(device)
         for device_map in device_maps:
             device_map.update(aggregated_device_list)
@@ -308,6 +309,8 @@ class MultiManager:  # noqa: F811
         device1.status_range.update(device2.status_range)
         device1.function.update(device2.function)
         device1.status.update(device2.status)
+        if hasattr(device1, "local_strategy") and hasattr(device2, "local_strategy"):
+            device1.local_strategy.update(device2.local_strategy)
 
     def is_device_in_domain_device_maps(self, domains: list[str], device_entry_identifiers: list[str]):
         if device_entry_identifiers[0] in domains:
