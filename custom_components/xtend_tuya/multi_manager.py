@@ -348,12 +348,12 @@ class MultiManager:  # noqa: F811
     def register_device_descriptors(self, name: str, descriptors):
         descriptors_with_vs = {}
         for category in descriptors:
-            decription_tuple: tuple = ()
+            decription_list: list = []
             for description in descriptors[category]:
                 if hasattr(description, "virtual_state") and description.virtual_state is not None:
-                    decription_tuple += tuple((description))
-            if len(decription_tuple) > 0:
-                descriptors_with_vs[category] = decription_tuple
+                    decription_list.append(description)
+            if len(decription_list) > 0:
+                descriptors_with_vs[category] = tuple(decription_list)
         if len(descriptors_with_vs) > 0:
             self.descriptors[name] = descriptors_with_vs
 
