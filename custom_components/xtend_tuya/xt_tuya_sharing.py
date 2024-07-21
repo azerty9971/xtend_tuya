@@ -214,7 +214,6 @@ class DeviceManager(Manager):
         super()._on_device_other(device_id, biz_code, data)
 
     def _read_code_value_from_state(self, device, state):
-        LOGGER.warning(f"_read_code_value_from_state => {device.local_strategy}")
         if "code" in state and "value" in state:
             return state["code"], state["value"]
         elif "dpId" in state and "value" in state:
