@@ -51,18 +51,13 @@ from .shared_classes import (
 
 from .multi_manager import (
     MultiManager,  # noqa: F811
+    XTDevice,
 )
 from .util import (
     determine_property_type, 
     prepare_value_for_property_update,
     log_stack
 )
-
-class XTTuyaDevice(TuyaDevice):
-    set_up: Optional[bool] = True
-    support_local: Optional[bool] = True
-    local_strategy: dict[int, dict[str, Any]] = {}
-    force_open_api: Optional[bool] = False
 
 class XTDeviceListener(TuyaDeviceListener):
     """Device Update Listener."""
@@ -192,7 +187,7 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
         response = self.api.get(f"/v1.0/users/{self.api.token_info.uid}/devices")
         if response["success"]:
             for item in response["result"]:
-                device = XTTuyaDevice(**item)
+                device = XTDevice(**item)
                 status = {}
                 for item_status in device.status:
                     if "code" in item_status and "value" in item_status:
@@ -207,9 +202,9 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
         super().update_device_function_cache(devIds)
         for device_id in self.device_map:
             device = self.device_map[device_id]
-            self.multi_manager.apply_init_virtual_states(device)
             device_properties = self.get_device_properties(device)
             device_properties.merge_in_device(device)
+            self.multi_manager.apply_init_virtual_states(device)
 
 
     
@@ -222,7 +217,7 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
         #LOGGER.warning(f"_update_device_list_info_cache => {devIds} <=> {response}")
         for item in result.get("list", []):
             device_id = item["id"]
-            self.device_map[device_id] = XTTuyaDevice(**item)
+            self.device_map[device_id] = XTDevice(**item)
     
     def get_device_properties(self, device) -> XTDeviceProperties | None:
         device_properties = XTDeviceProperties()
