@@ -80,11 +80,6 @@ class XTDeviceListener(TuyaDeviceListener):
     def update_device(self, device: TuyaDevice) -> None:
         """Update device status."""
         if device.id in self.device_ids:
-            LOGGER.debug(
-                "Received update for device %s: %s",
-                device.id,
-                self.device_manager.device_map[device.id].status,
-            )
             dispatcher_send(self.hass, f"{TUYA_HA_SIGNAL_UPDATE_ENTITY}_{device.id}")
 
     def add_device(self, device: TuyaDevice) -> None:
