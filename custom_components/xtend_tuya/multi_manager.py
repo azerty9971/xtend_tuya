@@ -17,6 +17,11 @@ from tuya_iot import (
     TuyaOpenAPI,
     TuyaOpenMQ,
 )
+from xt_tuya_iot.device import (
+    PROTOCOL_DEVICE_REPORT,
+    PROTOCOL_OTHER,
+)
+
 from tuya_sharing import (
     Manager as TuyaSharingManager,
     CustomerDevice
@@ -411,7 +416,23 @@ class MultiManager:  # noqa: F811
         if self.sharing_account:
             self.sharing_account.device_manager.on_message(msg)
         if self.iot_account:
-            self.iot_account.device_manager.on_message(msg)
+            new_message = self._convert_message_for_iot_account(msg)
+            LOGGER.warning(f"new_message => {new_message}")
+            self.iot_account.device_manager.on_message(new_message)
+
+    def _convert_message_for_iot_account(self, msg: str) -> str:
+        protocol = msg.get("protocol", 0)
+        data = msg.get("data", {})
+        if protocol == PROTOCOL_DEVICE_REPORT:
+            return msg
+        elif protocol == PROTOCOL_OTHER:
+            if hasattr(data, "devId"):
+                return msg
+            else:
+                if bizData := data.get("bizData", None):
+                    if dev_id := bizData.get("devId", None):
+                        data["devId"] = dev_id
+        return msg
 
     def send_commands(
             self, device_id: str, commands: list[dict[str, Any]]
