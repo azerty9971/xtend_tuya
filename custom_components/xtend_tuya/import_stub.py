@@ -1,4 +1,5 @@
 from homeassistant.config_entries import ConfigEntry
+from typing import NamedTuple
 
 class MultiManager:
     pass
@@ -15,7 +16,7 @@ class XTDeviceProperties:
 class HomeAssistantXTData:
     pass
 
-class TuyaIntegrationRuntimeData:
+class TuyaIntegrationRuntimeData(NamedTuple):
     pass
 
 type XTConfigEntry = ConfigEntry[HomeAssistantXTData]
