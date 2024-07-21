@@ -352,7 +352,7 @@ class MultiManager:  # noqa: F811
             for description in descriptors[category]:
                 if hasattr(description, "virtual_state") and description.virtual_state is not None:
                     decription_tuple += (description)
-            if decription_tuple.count() > 0:
+            if len(decription_tuple) > 0:
                 descriptors_with_vs[category] = decription_tuple
         if len(descriptors_with_vs) > 0:
             self.descriptors[name] = descriptors_with_vs
