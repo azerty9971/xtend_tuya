@@ -71,6 +71,7 @@ from .import_stub import (
 from .util import (
     get_overriden_tuya_integration_runtime_data,
     prepare_value_for_property_update,
+    XTConfigEntry
 )
 
 from .xt_tuya_sharing import (
@@ -85,7 +86,7 @@ from .xt_tuya_iot import (
     tuya_iot_update_listener,
 )
 
-type XTConfigEntry = ConfigEntry[HomeAssistantXTData]
+type XTConfigEntry = ConfigEntry[HomeAssistantXTData]  # noqa: F811
 
 class HomeAssistantXTData(NamedTuple):
     """Tuya data stored in the Home Assistant data object."""
