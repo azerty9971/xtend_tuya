@@ -134,6 +134,8 @@ class XTDevice(SimpleNamespace):
     function: dict[str, XTDeviceFunction] = {}
     status_range: dict[str, XTDeviceStatusRange] = {}
 
+    force_open_api: Optional[bool] = False
+
     def __eq__(self, other):
         """If devices are the same one."""
         return self.id == other.id
