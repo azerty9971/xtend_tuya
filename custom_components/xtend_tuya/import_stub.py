@@ -1,4 +1,3 @@
-from types import SimpleNamespace
 from homeassistant.config_entries import ConfigEntry
 
 class MultiManager:
@@ -10,7 +9,7 @@ class XTDeviceStatusRange:
 class XTDeviceFunction:
     pass
 
-class XTDeviceProperties(SimpleNamespace):
+class XTDeviceProperties:
     pass
 
 class HomeAssistantXTData:
