@@ -67,13 +67,7 @@ from .const import (
     DPType,
 )
 
-from .import_stub import (
-    MultiManager,
-    XTDeviceStatusRange,
-    XTDeviceFunction,
-    XTDeviceProperties,
-    XTConfigEntry,
-)
+import import_stub
 
 from .util import (
     get_overriden_tuya_integration_runtime_data,
