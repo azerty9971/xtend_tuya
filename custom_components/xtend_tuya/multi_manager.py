@@ -254,7 +254,7 @@ class MultiManager:  # noqa: F811
         mq.start()
         device_manager = XTTuyaDeviceManager(self, api, mq)
         device_ids: set[str] = set()
-        device_listener = XTDeviceListener(hass, device_manager, device_ids)
+        device_listener = XTDeviceListener(hass, device_manager, device_ids, self)
         home_manager = TuyaHomeManager(api, mq, device_manager)
         device_manager.add_device_listener(device_listener)
         return TuyaIOTData(device_manager=device_manager,mq=mq,device_ids=device_ids,device_listener=device_listener, home_manager=home_manager)
@@ -361,6 +361,12 @@ class MultiManager:  # noqa: F811
             return
         if not getattr(device, "set_up", True):
             setattr(device, "set_up", True)
+
+    def on_message(self, msg: str):
+        if self.sharing_account:
+            self.sharing_account.device_manager.on_message(msg)
+        if self.iot_account:
+            self.iot_account.device_manager.on_message(msg)
 
     def send_commands(
             self, device_id: str, commands: list[dict[str, Any]]

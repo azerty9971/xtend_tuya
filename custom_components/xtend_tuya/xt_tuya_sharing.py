@@ -180,7 +180,7 @@ class DeviceManager(Manager):
         if self.other_device_manager is not None:
             self.other_device_manager.refresh_mq()
             self.mq = self.other_device_manager.mq
-            self.mq.add_message_listener(self.on_message)
+            self.mq.add_message_listener(self.multi_manager.on_message)
             self.mq.remove_message_listener(self.other_device_manager.on_message)
             return
         super().refresh_mq()
@@ -229,7 +229,7 @@ class DeviceManager(Manager):
         if not device:
             return
         #LOGGER.debug(f"Device found!")
-        virtual_states = DeviceManager.get_category_virtual_states(device.category)
+        virtual_states = self.multi_manager.get_category_virtual_states(device.category)
         #show_debug = False
         
         #LOGGER.debug(f"Found virtualstates -> {virtual_states}")
