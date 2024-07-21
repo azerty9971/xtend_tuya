@@ -308,7 +308,7 @@ class MultiManager:  # noqa: F811
     
     def apply_init_virtual_states(self, device: XTDevice):
         #LOGGER.warning(f"apply_init_virtual_states BEFORE => {device.status} <=> {device.status_range}")
-        virtual_states = self.multi_manager.get_category_virtual_states(device.category)
+        virtual_states = self.get_category_virtual_states(device.category)
         for virtual_state in virtual_states:
             if virtual_state.virtual_state_value == VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME:
                 if virtual_state.key in device.status:
