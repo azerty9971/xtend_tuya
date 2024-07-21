@@ -69,9 +69,6 @@ from .import_stub import (
 )
 
 from .util import (
-    get_domain_config_entries,
-    get_overriden_config_entry,
-    get_tuya_integration_runtime_data,
     get_overriden_tuya_integration_runtime_data,
     prepare_value_for_property_update,
 )
