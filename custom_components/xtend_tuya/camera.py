@@ -38,7 +38,6 @@ async def async_setup_entry(
 
         async_add_entities(entities)
 
-    hass_data.manager.register_device_descriptors("carmeras", CAMERAS)
     async_discover_device(hass_data.manager, hass_data.manager.device_map)
 
     entry.async_on_unload(
