@@ -43,6 +43,7 @@ from .const import (
     CONF_USERNAME,
     DPType,
 )
+import import_stub
 from .multi_manager import (
     MultiManager,
     XTDeviceFunction,
