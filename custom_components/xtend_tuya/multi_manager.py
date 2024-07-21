@@ -17,7 +17,7 @@ from tuya_iot import (
     TuyaOpenAPI,
     TuyaOpenMQ,
 )
-from xt_tuya_iot.device import (
+from tuya_iot.device import (
     PROTOCOL_DEVICE_REPORT,
     PROTOCOL_OTHER,
 )
