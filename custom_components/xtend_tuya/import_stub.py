@@ -15,4 +15,7 @@ class XTDeviceProperties:
 class HomeAssistantXTData:
     pass
 
+class TuyaIntegrationRuntimeData:
+    pass
+
 type XTConfigEntry = ConfigEntry[HomeAssistantXTData]
