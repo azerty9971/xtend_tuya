@@ -398,6 +398,7 @@ class MultiManager:  # noqa: F811
             setattr(device, "set_up", True)
 
     def on_message(self, msg: str):
+        LOGGER.warning(f"on_message => {msg}")
         if self.sharing_account:
             self.sharing_account.device_manager.on_message(msg)
         if self.iot_account:
