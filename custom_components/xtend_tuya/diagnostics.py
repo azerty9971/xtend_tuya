@@ -46,8 +46,8 @@ def _async_get_diagnostics(
         mqtt_connected = hass_data.manager.mq.client.is_connected()"""
 
     data = {
-        "endpoint": hass_data.manager.customer_api.endpoint,
-        "terminal_id": hass_data.manager.terminal_id,
+        #"endpoint": hass_data.manager.customer_api.endpoint,
+        #"terminal_id": hass_data.manager.terminal_id,
         "mqtt_connected": mqtt_connected,
         "disabled_by": entry.disabled_by,
         "disabled_polling": entry.pref_disable_polling,
