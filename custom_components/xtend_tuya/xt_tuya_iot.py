@@ -43,12 +43,15 @@ from .const import (
     CONF_USERNAME,
     DPType,
 )
-import import_stub
-from .multi_manager import (
+from .import_stub import (
     MultiManager,
-    XTDeviceFunction,
     XTDeviceStatusRange,
     XTDeviceProperties,
+)
+from .multi_manager import (
+    MultiManager,  # noqa: F811
+    XTDeviceStatusRange,  # noqa: F811
+    XTDeviceProperties,  # noqa: F811
 )
 from .util import (
     determine_property_type, 
