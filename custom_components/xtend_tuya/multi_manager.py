@@ -294,6 +294,10 @@ class MultiManager:  # noqa: F811
         if self.iot_account:
             self.iot_account.home_manager.update_device_cache()
         self._merge_devices_from_multiple_sources()
+        aggregated_device_map = self.get_aggregated_device_map()
+        for device in aggregated_device_map.values():
+            self.apply_init_virtual_states(device)
+            self.allow_virtual_devices_not_set_up(device)
     
     def _merge_devices_from_multiple_sources(self):
         if not ( self.sharing_account and self.iot_account ):
