@@ -180,7 +180,7 @@ class DeviceManager(Manager):
         if self.other_device_manager is not None:
             self.other_device_manager.refresh_mq()
             self.mq = self.other_device_manager.mq
-            self.mq.add_message_listener(self.multi_manager.on_message)
+            self.mq.add_message_listener(self.multi_manager.on_message_from_tuya_sharing)
             self.mq.remove_message_listener(self.other_device_manager.on_message)
             return
         super().refresh_mq()

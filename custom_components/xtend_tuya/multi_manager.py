@@ -64,6 +64,8 @@ from .const import (
     CONF_PASSWORD,
     CONF_USERNAME,
     DPType,
+    MESSAGE_SOURCE_TUYA_IOT,
+    MESSAGE_SOURCE_TUYA_SHARING,
 )
 
 from .shared_classes import (
@@ -133,6 +135,27 @@ class MultiDeviceListener:
         self.sharing_account_device_listener = None
         self.iot_account_device_listener = None
 
+class MultiManagerSourceCounter:
+    source_counter: dict[str, int] = {}
+
+    def __init__(self) -> None:
+        self.source_counter = {}
+    
+    def add_counter(self, source: str):
+        if source not in self.source_counter:
+            self.source_counter[source] = 1
+        else:
+            self.source_counter[source] += 1
+    
+    def get_highest_source(self) -> str | None:
+        highest_source = None
+        highest_counter = None
+        for source in self.source_counter:
+            if not highest_counter or highest_counter < self.source_counter[source]:
+                highest_source = source
+                highest_counter = self.source_counter[source]
+        return highest_source
+    
 class MultiManager:  # noqa: F811
     def __init__(self, hass: HomeAssistant, entry: XTConfigEntry) -> None:
         self.sharing_account: TuyaSharingData = None
@@ -141,6 +164,7 @@ class MultiManager:  # noqa: F811
         self.descriptors = {}
         self.multi_mqtt_queue: MultiMQTTQueue = MultiMQTTQueue(self)
         self.multi_device_listener: MultiDeviceListener = MultiDeviceListener(self)
+        self.device_message_source_counter: dict[str, MultiManagerSourceCounter] = {}
 
     @property
     def device_map(self):
@@ -447,13 +471,49 @@ class MultiManager:  # noqa: F811
                                     break
         return status
 
-    def on_message(self, msg: str):
-        LOGGER.warning(f"on_message => {msg}")
-        if self.sharing_account:
+    def on_message_from_tuya_iot(self, msg:str):
+        self.on_message(MESSAGE_SOURCE_TUYA_IOT, msg)
+    
+    def on_message_from_tuya_sharing(self, msg:str):
+        self.on_message(MESSAGE_SOURCE_TUYA_SHARING, msg)
+
+    def on_message(self, source: str, msg: str):
+        LOGGER.warning(f"on_message ({source})=> {msg}")
+        dev_id = self._get_device_id_from_message(msg)
+        if not dev_id:
+            return
+        
+        #DEBUG
+        protocol = msg.get("protocol", 0)
+        if protocol == PROTOCOL_DEVICE_REPORT:
+            data = msg.get("data", {})
+            statuses = self.convert_device_report_status_list(dev_id,data["status"])
+            for status in statuses:
+                code, value = self._read_code_value_from_state(status)
+                if code == "add_ele":
+                    LOGGER.warning(f"ADD_ELE ({source})=> {status}")
+        #END DEBUG
+
+        if dev_id not in self.device_message_source_counter:
+            self.device_message_source_counter[dev_id] = MultiManagerSourceCounter()
+        self.device_message_source_counter[dev_id].add_counter(source)
+        allowed_source = self.device_message_source_counter[dev_id].get_highest_source()
+        if self.sharing_account and allowed_source == MESSAGE_SOURCE_TUYA_SHARING:
             self.sharing_account.device_manager.on_message(msg)
-        if self.iot_account:
+        if self.iot_account and allowed_source == MESSAGE_SOURCE_TUYA_IOT:
             new_message = self._convert_message_for_iot_account(msg)
             self.iot_account.device_manager.on_message(new_message)
+
+    def _get_device_id_from_message(self, msg: str) -> str | None:
+        protocol = msg.get("protocol", 0)
+        data = msg.get("data", {})
+        if (dev_id := data.get("devId", None)):
+            return dev_id
+        if protocol == PROTOCOL_OTHER:
+            if bizData := data.get("bizData", None):
+                if dev_id := bizData.get("devId", None):
+                    return dev_id
+        return None
 
     def _convert_message_for_iot_account(self, msg: str) -> str:
         protocol = msg.get("protocol", 0)

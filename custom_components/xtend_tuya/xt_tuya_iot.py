@@ -82,23 +82,9 @@ class XTDeviceListener(TuyaDeviceListener):
 
     def add_device(self, device: TuyaDevice) -> None:
         """Add device added listener."""
-        # Ensure the device isn't present stale
-        self.hass.add_job(self.async_remove_device, device.id)
-
-        self.device_ids.add(device.id)
-        dispatcher_send(self.hass, TUYA_DISCOVERY_NEW, [device.id])
-
-        other_device_manager = self.device_manager.get_overriden_device_manager()
-        device_manager = self.device_manager
-        if other_device_manager is None:
-            device_manager.mq.stop()
-            tuya_mq = TuyaOpenMQ(device_manager.api)
-            tuya_mq.start()
-
-            device_manager.mq = tuya_mq
-            tuya_mq.add_message_listener(self.multi_manager.on_message)
-        else:
-            device_manager.mq = other_device_manager.mq
+        super().add_device(device)
+        self.device_manager.mq.remove_message_listener(self.device_manager.on_message)
+        self.device_manager.mq.add_message_listener(self.multi_manager.on_message_from_tuya_iot)
 
     def remove_device(self, device_id: str) -> None:
         """Add device removed listener."""
