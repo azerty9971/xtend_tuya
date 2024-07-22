@@ -339,6 +339,8 @@ class MultiManager:  # noqa: F811
                 descriptors_with_vs[category] = tuple(decription_list)
         if len(descriptors_with_vs) > 0:
             self.descriptors[name] = descriptors_with_vs
+            for device in self.get_aggregated_device_map().values()
+                self.apply_init_virtual_states(device)
 
     def get_category_virtual_states(self,category: str) -> list[DescriptionVirtualState]:
         to_return = []
@@ -366,7 +368,8 @@ class MultiManager:  # noqa: F811
         return dev_props
     
     def apply_init_virtual_states(self, device: XTDevice):
-        #LOGGER.warning(f"apply_init_virtual_states BEFORE => {device.status} <=> {device.status_range}")
+        #WARNING, this method might be called multiple times for the same device, make sure it doesn't
+        #fail upon multiple successive calls
         virtual_states = self.get_category_virtual_states(device.category)
         for virtual_state in virtual_states:
             if virtual_state.virtual_state_value == VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME:
@@ -381,7 +384,6 @@ class MultiManager:  # noqa: F811
                             device.status[str(new_code)] = copy.deepcopy(device.status[virtual_state.key])
                             device.function[str(new_code)] = copy.deepcopy(device.function[virtual_state.key])
                             device.function[str(new_code)].code = str(new_code)
-        #LOGGER.warning(f"apply_init_virtual_states AFTER => {device.status} <=> {device.status_range}")
 
     def allow_virtual_devices_not_set_up(self, device: XTDevice):
         if not device.id.startswith("vdevo"):
