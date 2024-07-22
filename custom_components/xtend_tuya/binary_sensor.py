@@ -80,7 +80,7 @@ async def async_setup_entry(
     hass_data = entry.runtime_data
 
     @callback
-    def async_discover_device(manager, device_map) -> None:
+    def async_discover_device(device_map) -> None:
         """Discover and add a discovered Tuya binary sensor."""
         entities: list[TuyaBinarySensorEntity] = []
         device_ids = [*device_map]
@@ -92,14 +92,14 @@ async def async_setup_entry(
                     if dpcode in device.status:
                         entities.append(
                             TuyaBinarySensorEntity(
-                                device, manager, description
+                                device, hass_data.manager, description
                             )
                         )
 
         async_add_entities(entities)
 
     hass_data.manager.register_device_descriptors("binary_sensors", BINARY_SENSORS)
-    async_discover_device(hass_data.manager, hass_data.manager.device_map)
+    async_discover_device(hass_data.manager.device_map)
     #async_discover_device(hass_data.manager, hass_data.manager.open_api_device_map)
 
     entry.async_on_unload(

@@ -48,7 +48,7 @@ async def async_setup_entry(
     hass_data = entry.runtime_data
 
     @callback
-    def async_discover_device(manager, device_map) -> None:
+    def async_discover_device(device_map) -> None:
         """Discover and add a discovered tuya cover."""
         entities: list[TuyaCoverEntity] = []
         device_ids = [*device_map]
@@ -56,7 +56,7 @@ async def async_setup_entry(
             device = device_map[device_id]
             if descriptions := COVERS.get(device.category):
                 entities.extend(
-                    TuyaCoverEntity(device, manager, description)
+                    TuyaCoverEntity(device, hass_data.manager, description)
                     for description in descriptions
                     if (
                         description.key in device.function
@@ -67,7 +67,7 @@ async def async_setup_entry(
         async_add_entities(entities)
 
     hass_data.manager.register_device_descriptors("covers", COVERS)
-    async_discover_device(hass_data.manager, hass_data.manager.device_map)
+    async_discover_device(hass_data.manager.device_map)
 
     entry.async_on_unload(
         async_dispatcher_connect(hass, TUYA_DISCOVERY_NEW, async_discover_device)
