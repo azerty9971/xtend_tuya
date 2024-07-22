@@ -65,6 +65,9 @@ TUYA_RESPONSE_PLATFORM_URL = "platform_url"
 TUYA_SMART_APP = "tuyaSmart"
 SMARTLIFE_APP = "smartlife"
 
+MESSAGE_SOURCE_TUYA_IOT = "tuya_iot"
+MESSAGE_SOURCE_TUYA_SHARING = "tuya_sharing"
+
 PLATFORMS = [
     Platform.ALARM_CONTROL_PANEL,
     Platform.BINARY_SENSOR,
