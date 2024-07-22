@@ -176,7 +176,6 @@ class DeviceManager(Manager):
         self.other_device_manager = other_device_manager
     
     def refresh_mq(self):
-        log_stack("refresh_mq")
         if self.other_device_manager is not None:
             self.other_device_manager.refresh_mq()
             self.mq = self.other_device_manager.mq
