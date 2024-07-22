@@ -494,6 +494,7 @@ class MultiManager:  # noqa: F811
                 devices = self._get_devices_from_device_id(dev_id)
                 for device in devices:
                     code, value = self._read_code_value_from_state(device, status)
+                    LOGGER.debug(f"status => {status}")
                     LOGGER.debug(f"on_message ({source}) => code: {code}, value: {value}")
                     if code == "add_ele":
                         LOGGER.warning(f"ADD_ELE ({source})=> {statuses}")
