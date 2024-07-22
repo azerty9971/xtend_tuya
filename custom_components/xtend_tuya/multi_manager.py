@@ -411,9 +411,8 @@ class MultiManager:  # noqa: F811
             return state["code"], state["value"]
         elif "dpId" in state and "value" in state:
             dp_id_item = device.local_strategy[state["dpId"]]
-            code = dp_id_item["status_code"]
-            value = state["value"]
-            return code, value
+            return dp_id_item["status_code"], state["value"]
+
         return None, None
 
     def convert_device_report_status_list(self, device_id: str, status_in: list) -> list:
@@ -480,7 +479,7 @@ class MultiManager:  # noqa: F811
         self.on_message(MESSAGE_SOURCE_TUYA_SHARING, msg)
 
     def on_message(self, source: str, msg: str):
-        LOGGER.debug(f"on_message ({source})=> {msg}")
+        #LOGGER.debug(f"on_message ({source})=> {msg}")
         dev_id = self._get_device_id_from_message(msg)
         if not dev_id:
             LOGGER.warning(f"dev_id {dev_id} not found!")
@@ -495,6 +494,7 @@ class MultiManager:  # noqa: F811
                 devices = self._get_devices_from_device_id(dev_id)
                 for device in devices:
                     code, value = self._read_code_value_from_state(device, status)
+                    LOGGER.debug(f"on_message ({source}) => code: {code}, value: {value}")
                     if code == "add_ele":
                         LOGGER.warning(f"ADD_ELE ({source})=> {statuses}")
                         break
