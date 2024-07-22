@@ -478,7 +478,7 @@ class MultiManager:  # noqa: F811
         self.on_message(MESSAGE_SOURCE_TUYA_SHARING, msg)
 
     def on_message(self, source: str, msg: str):
-        LOGGER.warning(f"on_message ({source})=> {msg}")
+        LOGGER.debug(f"on_message ({source})=> {msg}")
         dev_id = self._get_device_id_from_message(msg)
         if not dev_id:
             LOGGER.warning(f"dev_id {dev_id} not found!")
@@ -492,7 +492,7 @@ class MultiManager:  # noqa: F811
             for status in statuses:
                 code, value = self._read_code_value_from_state(status)
                 if code == "add_ele":
-                    LOGGER.warning(f"ADD_ELE ({source})=> {status}")
+                    LOGGER.warning(f"ADD_ELE ({source})=> {statuses}")
         #END DEBUG
 
         if dev_id not in self.device_message_source_counter:
