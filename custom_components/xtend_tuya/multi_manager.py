@@ -490,9 +490,12 @@ class MultiManager:  # noqa: F811
             data = msg.get("data", {})
             statuses = self.convert_device_report_status_list(dev_id,data["status"])
             for status in statuses:
-                code, value = self._read_code_value_from_state(status)
-                if code == "add_ele":
-                    LOGGER.warning(f"ADD_ELE ({source})=> {statuses}")
+                devices = self._get_devices_from_device_id(dev_id)
+                for device in devices:
+                    code, value = self._read_code_value_from_state(device, status)
+                    if code == "add_ele":
+                        LOGGER.warning(f"ADD_ELE ({source})=> {statuses}")
+                        break
         #END DEBUG
 
         if dev_id not in self.device_message_source_counter:
