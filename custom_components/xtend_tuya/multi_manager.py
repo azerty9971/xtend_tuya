@@ -364,6 +364,88 @@ class MultiManager:  # noqa: F811
             return
         if not getattr(device, "set_up", True):
             setattr(device, "set_up", True)
+    
+    def _get_devices_from_device_id(self, device_id: str) -> list[XTDevice] | None:
+        return_list = []
+        if (
+                self.sharing_account 
+            and self.sharing_account.device_manager
+            and device_id in self.sharing_account.device_manager.device_map):
+            return_list.append(self.sharing_account.device_manager.device_map[device_id])
+        
+        if (
+                self.iot_account 
+            and self.iot_account.device_manager
+            and device_id in self.iot_account.device_manager.device_map):
+            return_list.append(self.iot_account.device_manager.device_map[device_id])
+        return return_list
+
+    def _read_code_value_from_state(self, device, state):
+        if "code" in state and "value" in state:
+            return state["code"], state["value"]
+        elif "dpId" in state and "value" in state:
+            dp_id_item = device.local_strategy[state["dpId"]]
+            code = dp_id_item["status_code"]
+            value = state["value"]
+            return code, value
+        return None, None
+
+    def convert_device_report_status_list(self, device_id: str, status_in: list) -> list:
+        status = status_in.copy()
+        devices = self._get_devices_from_device_id(device_id)
+        if len(devices) == 0:
+            return []
+        for item in status:
+            if "code" in item:
+                continue
+            for device in devices:
+                code, value = self._read_code_value_from_state(device, item)
+                if code and value:
+                    item["code"] = code
+                    item["value"] = value
+                    break
+                else:
+                    LOGGER.warning(f"convert_device_report_status_list code retrieval failed => {item}")
+        return status
+    
+    def apply_virtual_states_to_status_list(self, device: XTDevice, status_in: list) -> list:
+        status = status_in.copy()
+        virtual_states = self.multi_manager.get_category_virtual_states(device.category)
+        for virtual_state in virtual_states:
+            if virtual_state.virtual_state_value == VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME:
+                for item in status:
+                    code, value = self._read_code_value_from_state(device, item)
+                    if code is not None and code == virtual_state.key:
+                        for state_name in virtual_state.vs_copy_to_state:
+                            new_status = {"code": str(state_name), "value": value}
+                            status.append(new_status)
+                    if code is None and "dpId" in item:
+                        for dict_key in item:
+                            dp_id = int(item["dpId"])
+                            dp_id_item = device.local_strategy.get(dp_id, None)
+                            if dp_id_item is not None and dp_id_item["status_code"] == virtual_state.key:
+                                for state_name in virtual_state.vs_copy_to_state:
+                                    new_status = {"code": str(state_name), "value": item[dict_key]}
+                                    status.append(new_status)
+                            break
+            
+            if virtual_state.virtual_state_value == VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD:
+                if virtual_state.key not in device.status or device.status[virtual_state.key] is None:
+                    device.status[virtual_state.key] = 0
+                if virtual_state.key in device.status:
+                    for item in status:
+                        code, value = self._read_code_value_from_state(device, item)
+                        if code == virtual_state.key:
+                            item["value"] += device.status[virtual_state.key]
+                            continue
+                        if code is None:
+                            for dict_key in item:
+                                dp_id = int(dict_key)
+                                dp_id_item = device.local_strategy.get(dp_id, None)
+                                if dp_id_item is not None and dp_id_item["status_code"] == virtual_state.key:
+                                    item[dict_key] += device.status[virtual_state.key]
+                                    break
+        return status
 
     def on_message(self, msg: str):
         LOGGER.warning(f"on_message => {msg}")
@@ -371,7 +453,6 @@ class MultiManager:  # noqa: F811
             self.sharing_account.device_manager.on_message(msg)
         if self.iot_account:
             new_message = self._convert_message_for_iot_account(msg)
-            LOGGER.warning(f"new_message => {new_message}")
             self.iot_account.device_manager.on_message(new_message)
 
     def _convert_message_for_iot_account(self, msg: str) -> str:
@@ -395,32 +476,29 @@ class MultiManager:  # noqa: F811
         regular_commands = []
         property_commands = []
         device_map = self.get_aggregated_device_map()
-        if device_id in device_map:
-            device = device_map.get(device_id, None)
-            if device is not None:
-                for command in commands:
-                    for dp_id in device.local_strategy:
-                        dp_item = device.local_strategy[dp_id]
-                        code = dp_item.get("status_code", None)
-                        value = command["value"]
-                        if command["code"] == code:
-                            if dp_item.get("use_open_api", True):
-                                command_dict = {"code": code, "value": value}
-                                regular_commands.append(command_dict)
+        if device := device_map.get(device_id, None):
+            for command in commands:
+                for dp_item in device.local_strategy.values():
+                    code = dp_item.get("status_code", None)
+                    value = command["value"]
+                    if command["code"] == code:
+                        if dp_item.get("use_open_api", True):
+                            command_dict = {"code": code, "value": value}
+                            regular_commands.append(command_dict)
+                        else:
+                            if dp_item.get("property_update", False):
+                                value = prepare_value_for_property_update(dp_item, command["value"])
+                                property_dict = {str(code): value}
+                                property_commands.append(property_dict)
                             else:
-                                if dp_item.get("property_update", False):
-                                    value = prepare_value_for_property_update(dp_item, command["value"])
-                                    property_dict = {str(code): value}
-                                    property_commands.append(property_dict)
-                                else:
-                                    command_dict = {"code": code, "value": value}
-                                    open_api_regular_commands.append(command_dict)
-                                break
-                if regular_commands:
-                    self.sharing_account.device_manager.send_commands(device_id, regular_commands)
-                if open_api_regular_commands:
-                    self.iot_account.device_manager.send_commands(device_id, open_api_regular_commands)
-                if property_commands:
-                    self.iot_account.device_manager.send_property_update(device_id, property_commands)
-                return
+                                command_dict = {"code": code, "value": value}
+                                open_api_regular_commands.append(command_dict)
+                            break
+            if regular_commands:
+                self.sharing_account.device_manager.send_commands(device_id, regular_commands)
+            if open_api_regular_commands:
+                self.iot_account.device_manager.send_commands(device_id, open_api_regular_commands)
+            if property_commands:
+                self.iot_account.device_manager.send_property_update(device_id, property_commands)
+            return
         self.sharing_account.device_manager.send_commands(device_id, commands)

@@ -194,110 +194,22 @@ class DeviceManager(Manager):
         return None
 
     def on_message(self, msg: str):
-        #If we override another device manager, first call its on_message method
-        if self.other_device_manager is not None:
-            self.other_device_manager.on_message(msg)
-        #super().on_message(msg)
-        #try:
-            protocol = msg.get("protocol", 0)
-            data = msg.get("data", {})
-
-            if protocol == PROTOCOL_DEVICE_REPORT:
-                self._on_device_report(data["devId"], data["status"])
-            if protocol == PROTOCOL_OTHER:
-                self._on_device_other(data["bizData"]["devId"], data["bizCode"], data)
-        #except Exception as e:
-        #    LOGGER.error(f"on message error = {e} msg => {msg}")
+        super().on_message(msg)
 
     def _on_device_other(self, device_id: str, biz_code: str, data: dict[str, Any]):
-        #LOGGER.warning(f"mq _on_device_other-> {device_id} biz_code-> {biz_code} data-> {data}")
+        if self.other_device_manager:
+            self.other_device_manager._on_device_other(device_id, biz_code, data)
         super()._on_device_other(device_id, biz_code, data)
-
-    def _read_code_value_from_state(self, device, state):
-        if "code" in state and "value" in state:
-            return state["code"], state["value"]
-        elif "dpId" in state and "value" in state:
-            dp_id_item = device.local_strategy[state["dpId"]]
-            code = dp_id_item["status_code"]
-            value = state["value"]
-            return code, value
-        return None, None
 
     def _on_device_report(self, device_id: str, status: list):
         device = self.device_map.get(device_id, None)
-        LOGGER.debug(f"mq _on_device_report-> {device_id} status-> {status}")
         if not device:
             return
-        #LOGGER.debug(f"Device found!")
-        virtual_states = self.multi_manager.get_category_virtual_states(device.category)
-        #show_debug = False
-        
-        #LOGGER.debug(f"Found virtualstates -> {virtual_states}")
-        for virtual_state in virtual_states:
-            if virtual_state.virtual_state_value == VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME:
-                for item in status:
-                    code, value = self._read_code_value_from_state(device, item)
-                    if code is not None and code == virtual_state.key:
-                        for state_name in virtual_state.vs_copy_to_state:
-                            new_status = {"code": str(state_name), "value": value}
-                            status.append(new_status)
-                    if code is None:
-                        for dict_key in item:
-                            dp_id = int(dict_key)
-                            dp_id_item = device.local_strategy.get(dp_id, None)
-                            if dp_id_item is not None and dp_id_item["status_code"] == virtual_state.key:
-                                for state_name in virtual_state.vs_copy_to_state:
-                                    new_status = {"code": str(state_name), "value": item[dict_key]}
-                                    status.append(new_status)
-                            break
-            
-            if virtual_state.virtual_state_value == VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD:
-                if virtual_state.key not in device.status or device.status[virtual_state.key] is None:
-                    device.status[virtual_state.key] = 0
-                if virtual_state.key in device.status:
-                    for item in status:
-                        code, value = self._read_code_value_from_state(device, item)
-                        if code == virtual_state.key:
-                            item["value"] += device.status[virtual_state.key]
-                            continue
-                        if code is None:
-                            for dict_key in item:
-                                dp_id = int(dict_key)
-                                dp_id_item = device.local_strategy.get(dp_id, None)
-                                if dp_id_item is not None and dp_id_item["status_code"] == virtual_state.key:
-                                    item[dict_key] += device.status[virtual_state.key]
-                                    break
-                        
-        for item in status:
-            code, value = self._read_code_value_from_state(device, item)
-            if code is not None:
-                device.status[code] = value
-                continue
-            for dict_key in item:
-                dp_id = int(dict_key)
-                dp_id_item = device.local_strategy.get(dp_id, None)
-                if dp_id_item is not None:
-                    code = dp_id_item["status_code"]
-                    value = item[dict_key]
-                    device.status[code] = value
-        if self.other_device_manager is not None:
-            device_other = self.other_device_manager.device_map.get(device_id, None)
-            if device_other is not None:
-                for item in status:
-                    code, value = self._read_code_value_from_state(device, item)
-                    if code is not None:
-                        device_other.status[code] = value
-                        continue
-                    for dict_key in item:
-                        dp_id = int(dict_key)
-                        dp_id_item = device_other.local_strategy.get(dp_id, None)
-                        if dp_id_item is not None:
-                            code = dp_id_item["status_code"]
-                            value = item[dict_key]
-                            device_other.status[code] = value
-        #if show_debug == True:
-        LOGGER.debug(f"AFTER device_id -> {device_id} device_status-> {device.status} status-> {status}")
-        super()._on_device_report(device_id, [])
+        status_new = self.multi_manager.convert_device_report_status_list(status)
+        status_new = self.multi_manager.apply_virtual_states_to_status_list(device, status_new)
+        if self.other_device_manager:
+            self.other_device_manager._on_device_report(device_id, status_new)
+        super()._on_device_report(device_id, status_new)
 
 class XTDeviceRepository(DeviceRepository):
     def __init__(self, customer_api: CustomerApi, manager: DeviceManager, multi_manager: MultiManager):

@@ -210,6 +210,14 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
     
     def on_message(self, msg: str):
         super().on_message(msg)
+    
+    def _on_device_report(self, device_id: str, status: list):
+        device = self.device_map.get(device_id, None)
+        if not device:
+            return
+        status_new = self.multi_manager.convert_device_report_status_list(status)
+        status_new = self.multi_manager.apply_virtual_states_to_status_list(device, status_new)
+        super()._on_device_report(device_id, status_new)
 
     def _update_device_list_info_cache(self, devIds: list[str]):
         response = self.get_device_list_info(devIds)
@@ -289,24 +297,6 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
                 #LOGGER.warning(f"send_property_update => {property_str}")
                 self.api.post(f"/v2.0/cloud/thing/{device_id}/shadow/properties/issue", {"properties": property_str}
         )
-    
-    """def get_overriden_device_manager(self) -> Manager | None:
-        if self.manager is not None:
-            return self.manager.other_device_manager
-        return None
-    
-    def add_device(self, device):
-        #Tuya
-        if other_device_manager := self.get_overriden_device_manager():
-            for listener in other_device_manager.device_listeners:
-                listener.add_device(device)
-        #XT Tuya
-        if self.manager is not None:
-            for listener in self.manager.device_listeners:
-                listener.add_device(device)
-        #OpenAPI
-        for listener in self.device_listeners:
-            listener.add_device(device)"""
     
 async def tuya_iot_update_listener(hass, entry):
     """Handle options update."""
