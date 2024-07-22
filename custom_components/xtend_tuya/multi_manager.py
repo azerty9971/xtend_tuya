@@ -380,7 +380,7 @@ class MultiManager:  # noqa: F811
             return_list.append(self.iot_account.device_manager.device_map[device_id])
         return return_list
 
-    def _read_code_value_from_state(self, device, state):
+    def _read_code_value_from_state(self, device: XTDevice, state):
         if "code" in state and "value" in state:
             return state["code"], state["value"]
         elif "dpId" in state and "value" in state:
@@ -410,7 +410,7 @@ class MultiManager:  # noqa: F811
     
     def apply_virtual_states_to_status_list(self, device: XTDevice, status_in: list) -> list:
         status = status_in.copy()
-        virtual_states = self.multi_manager.get_category_virtual_states(device.category)
+        virtual_states = self.get_category_virtual_states(device.category)
         for virtual_state in virtual_states:
             if virtual_state.virtual_state_value == VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME:
                 for item in status:
