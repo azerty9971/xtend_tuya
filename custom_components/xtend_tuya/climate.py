@@ -57,7 +57,7 @@ async def async_setup_entry(
     hass_data = entry.runtime_data
 
     @callback
-    def async_discover_device(manager, device_map) -> None:
+    def async_discover_device(device_map) -> None:
         """Discover and add a discovered Tuya climate."""
         entities: list[TuyaClimateEntity] = []
         device_ids = [*device_map]
@@ -67,7 +67,7 @@ async def async_setup_entry(
                 entities.append(
                     TuyaClimateEntity(
                         device,
-                        manager,
+                        hass_data.manager,
                         CLIMATE_DESCRIPTIONS[device.category],
                         hass.config.units.temperature_unit,
                     )
@@ -75,7 +75,7 @@ async def async_setup_entry(
         async_add_entities(entities)
 
     hass_data.manager.register_device_descriptors("climate_descriptions", CLIMATE_DESCRIPTIONS)
-    async_discover_device(hass_data.manager, hass_data.manager.device_map)
+    async_discover_device(hass_data.manager.device_map)
 
     entry.async_on_unload(
         async_dispatcher_connect(hass, TUYA_DISCOVERY_NEW, async_discover_device)
