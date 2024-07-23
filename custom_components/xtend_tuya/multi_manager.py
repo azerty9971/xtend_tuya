@@ -505,9 +505,9 @@ class MultiManager:  # noqa: F811
             self.device_message_source_counter[dev_id] = MultiManagerSourceCounter()
         self.device_message_source_counter[dev_id].add_counter(source)
         allowed_source = self.device_message_source_counter[dev_id].get_highest_source()
-        if self.sharing_account: # and allowed_source == MESSAGE_SOURCE_TUYA_SHARING:
+        if self.sharing_account and allowed_source == MESSAGE_SOURCE_TUYA_SHARING:
             self.sharing_account.device_manager.on_message(msg)
-        if self.iot_account: # and allowed_source == MESSAGE_SOURCE_TUYA_IOT:
+        if self.iot_account and allowed_source == MESSAGE_SOURCE_TUYA_IOT:
             new_message = self._convert_message_for_iot_account(msg)
             self.iot_account.device_manager.on_message(new_message)
 
