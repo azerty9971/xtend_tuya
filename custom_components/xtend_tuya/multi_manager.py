@@ -99,7 +99,7 @@ from .xt_tuya_iot import (
 type XTConfigEntry = ConfigEntry[HomeAssistantXTData]  # noqa: F811
 
 @dataclass
-class HomeAssistantXTData(NamedTuple):
+class HomeAssistantXTData:
     """Tuya data stored in the Home Assistant data object."""
 
     multi_manager: MultiManager
@@ -110,7 +110,7 @@ class HomeAssistantXTData(NamedTuple):
         return self.multi_manager
 
 @dataclass
-class TuyaIOTData(NamedTuple):
+class TuyaIOTData:
     device_manager: XTTuyaDeviceManager
     mq: TuyaOpenMQ
     device_ids: set[str] = field(default_factory=set)
@@ -118,7 +118,7 @@ class TuyaIOTData(NamedTuple):
     home_manager: TuyaHomeManager
 
 @dataclass
-class TuyaSharingData(NamedTuple):
+class TuyaSharingData:
     device_manager: DeviceManager
 
 class MultiMQTTQueue:
