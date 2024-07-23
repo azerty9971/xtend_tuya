@@ -175,7 +175,6 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
         response = self.api.get(f"/v1.0/users/{self.api.token_info.uid}/devices")
         if response["success"]:
             for item in response["result"]:
-                LOGGER.warning(f"XTDevice => {item}")
                 device = XTDevice(**item)
                 status = {}
                 for item_status in device.status:
