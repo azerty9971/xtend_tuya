@@ -1,14 +1,14 @@
 from __future__ import annotations
 from typing import Any, Optional
 from types import SimpleNamespace
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 @dataclass
 class XTDeviceProperties:
-    local_strategy: dict[int, dict[str, Any]]
-    status: dict[str, Any]
-    function: dict[str, XTDeviceFunction]
-    status_range: dict[str, XTDeviceStatusRange]
+    local_strategy: dict[int, dict[str, Any]] = field(default_factory=dict)
+    status: dict[str, Any] = field(default_factory=dict)
+    function: dict[str, XTDeviceFunction] = field(default_factory=dict)
+    status_range: dict[str, XTDeviceStatusRange] = field(default_factory=dict)
 
     def merge_in_device(self, device):
         if hasattr(device, "local_strategy"):
@@ -32,7 +32,7 @@ class XTDeviceFunction:
     desc: str
     name: str
     type: str
-    values: dict[str, Any]
+    values: dict[str, Any] = field(default_factory=dict)
 
 @dataclass
 class XTDevice(SimpleNamespace):
@@ -54,11 +54,11 @@ class XTDevice(SimpleNamespace):
     update_time: int
     set_up: Optional[bool] = False
     support_local: Optional[bool] = False
-    local_strategy: dict[int, dict[str, Any]] = {}
+    local_strategy: dict[int, dict[str, Any]] = field(default_factory=dict)
 
     status: dict[str, Any] = {}
-    function: dict[str, XTDeviceFunction] = {}
-    status_range: dict[str, XTDeviceStatusRange] = {}
+    function: dict[str, XTDeviceFunction] = field(default_factory=dict)
+    status_range: dict[str, XTDeviceStatusRange] = field(default_factory=dict)
 
     force_open_api: Optional[bool] = False
 
