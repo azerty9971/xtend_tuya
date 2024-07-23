@@ -2,6 +2,7 @@ from __future__ import annotations
 import requests
 import copy
 from typing import NamedTuple, Optional, Any
+from dataclasses import dataclass
 
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryError, ConfigEntryNotReady
@@ -97,6 +98,7 @@ from .xt_tuya_iot import (
 
 type XTConfigEntry = ConfigEntry[HomeAssistantXTData]  # noqa: F811
 
+@dataclass
 class HomeAssistantXTData(NamedTuple):
     """Tuya data stored in the Home Assistant data object."""
 
@@ -107,6 +109,7 @@ class HomeAssistantXTData(NamedTuple):
     def manager(self) -> MultiManager:
         return self.multi_manager
 
+@dataclass
 class TuyaIOTData(NamedTuple):
     device_manager: XTTuyaDeviceManager
     mq: TuyaOpenMQ
@@ -114,6 +117,7 @@ class TuyaIOTData(NamedTuple):
     device_listener: XTDeviceListener
     home_manager: TuyaHomeManager
 
+@dataclass
 class TuyaSharingData(NamedTuple):
     device_manager: DeviceManager
 
