@@ -5,10 +5,10 @@ from dataclasses import dataclass
 
 @dataclass
 class XTDeviceProperties:
-    local_strategy: dict[int, dict[str, Any]] = {}
-    status: dict[str, Any] = {}
-    function: dict[str, XTDeviceFunction] = {}
-    status_range: dict[str, XTDeviceStatusRange] = {}
+    local_strategy: dict[int, dict[str, Any]]
+    status: dict[str, Any]
+    function: dict[str, XTDeviceFunction]
+    status_range: dict[str, XTDeviceStatusRange]
 
     def merge_in_device(self, device):
         if hasattr(device, "local_strategy"):
