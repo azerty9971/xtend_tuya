@@ -269,10 +269,9 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
                     ):
                     code = dp_property["code"]
                     if code not in device_properties.status_range:
-                        device_properties.status_range[code] = XTDeviceStatusRange()
-                        device_properties.status_range[code].code   = code
-                        device_properties.status_range[code].type   = device_properties.local_strategy[dp_property["dp_id"]]["config_item"]["valueType"]
-                        device_properties.status_range[code].values = device_properties.local_strategy[dp_property["dp_id"]]["config_item"]["valueDesc"]
+                        device_properties.status_range[code] = XTDeviceStatusRange(code=code, 
+                                                                                   type=device_properties.local_strategy[dp_property["dp_id"]]["config_item"]["valueType"],
+                                                                                   values=device_properties.local_strategy[dp_property["dp_id"]]["config_item"]["valueDesc"])
                     if code not in device_properties.status:
                         device_properties.status[code] = dp_property.get("value",None)
         return device_properties
