@@ -111,7 +111,7 @@ class HomeAssistantXTData(NamedTuple):
 class TuyaIOTData(NamedTuple):
     device_manager: XTTuyaDeviceManager
     mq: TuyaOpenMQ
-    device_ids: set[str] = field(default_factory=set)
+    device_ids: set[str]
     device_listener: XTDeviceListener
     home_manager: TuyaHomeManager
 
