@@ -56,7 +56,7 @@ class XTDevice(SimpleNamespace):
     support_local: Optional[bool] = False
     local_strategy: dict[int, dict[str, Any]] = field(default_factory=dict)
 
-    status: dict[str, Any] = {}
+    status: dict[str, Any] = field(default_factory=dict)
     function: dict[str, XTDeviceFunction] = field(default_factory=dict)
     status_range: dict[str, XTDeviceStatusRange] = field(default_factory=dict)
 
