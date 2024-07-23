@@ -61,6 +61,7 @@ class XTDevice(SimpleNamespace):
     status_range: dict[str, XTDeviceStatusRange] = field(default_factory=dict)
 
     force_open_api: Optional[bool] = False
+    biz_type: Optional[str] = ""
 
     def __eq__(self, other):
         """If devices are the same one."""
