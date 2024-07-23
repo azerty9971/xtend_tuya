@@ -1,18 +1,14 @@
 from __future__ import annotations
 from typing import Any, Optional
 from types import SimpleNamespace
+from dataclasses import dataclass
 
+@dataclass
 class XTDeviceProperties:
     local_strategy: dict[int, dict[str, Any]] = {}
     status: dict[str, Any] = {}
     function: dict[str, XTDeviceFunction] = {}
     status_range: dict[str, XTDeviceStatusRange] = {}
-
-    def __init__(self) -> None:
-        self.local_strategy = {}
-        self.status = {}
-        self.function = {}
-        self.status_range = {}
 
     def merge_in_device(self, device):
         if hasattr(device, "local_strategy"):
@@ -24,11 +20,13 @@ class XTDeviceProperties:
         if hasattr(device, "status_range"):
             device.status_range.update(self.status_range)
 
+@dataclass
 class XTDeviceStatusRange:
     code: str
     type: str
     values: str
 
+@dataclass
 class XTDeviceFunction:
     code: str
     desc: str
@@ -36,6 +34,7 @@ class XTDeviceFunction:
     type: str
     values: dict[str, Any]
 
+@dataclass
 class XTDevice(SimpleNamespace):
     id: str
     name: str
