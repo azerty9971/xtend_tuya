@@ -2,7 +2,7 @@ from __future__ import annotations
 import requests
 import copy
 from typing import NamedTuple, Optional, Any
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryError, ConfigEntryNotReady
@@ -113,7 +113,7 @@ class HomeAssistantXTData(NamedTuple):
 class TuyaIOTData(NamedTuple):
     device_manager: XTTuyaDeviceManager
     mq: TuyaOpenMQ
-    device_ids: set[str]
+    device_ids: set[str] = field(default_factory=set)
     device_listener: XTDeviceListener
     home_manager: TuyaHomeManager
 
