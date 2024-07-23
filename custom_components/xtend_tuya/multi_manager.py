@@ -480,7 +480,6 @@ class MultiManager:  # noqa: F811
         self.on_message(MESSAGE_SOURCE_TUYA_SHARING, msg)
 
     def on_message(self, source: str, msg: str):
-        #LOGGER.debug(f"on_message ({source})=> {msg}")
         dev_id = self._get_device_id_from_message(msg)
         if not dev_id:
             LOGGER.warning(f"dev_id {dev_id} not found!")
@@ -495,8 +494,8 @@ class MultiManager:  # noqa: F811
                 devices = self._get_devices_from_device_id(dev_id)
                 for device in devices:
                     code, value = self._read_code_value_from_state(device, status)
-                    LOGGER.debug(f"status => {status}")
-                    LOGGER.debug(f"on_message ({source}) => code: {code}, value: {value}")
+                    #LOGGER.debug(f"status => {status}")
+                    #LOGGER.debug(f"on_message ({source}) => code: {code}, value: {value}")
                     if code == "add_ele":
                         LOGGER.warning(f"ADD_ELE ({source})=> {statuses}")
                         break
@@ -506,9 +505,9 @@ class MultiManager:  # noqa: F811
             self.device_message_source_counter[dev_id] = MultiManagerSourceCounter()
         self.device_message_source_counter[dev_id].add_counter(source)
         allowed_source = self.device_message_source_counter[dev_id].get_highest_source()
-        if self.sharing_account and allowed_source == MESSAGE_SOURCE_TUYA_SHARING:
+        if self.sharing_account: # and allowed_source == MESSAGE_SOURCE_TUYA_SHARING:
             self.sharing_account.device_manager.on_message(msg)
-        if self.iot_account and allowed_source == MESSAGE_SOURCE_TUYA_IOT:
+        if self.iot_account: # and allowed_source == MESSAGE_SOURCE_TUYA_IOT:
             new_message = self._convert_message_for_iot_account(msg)
             self.iot_account.device_manager.on_message(new_message)
 
