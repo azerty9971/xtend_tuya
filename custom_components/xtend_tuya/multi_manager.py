@@ -167,9 +167,10 @@ class MultiManager:  # noqa: F811
         if tuya_integration_runtime_data:
             #We are using an override of the Tuya integration
             sharing_device_manager = DeviceManager(multi_manager=self, other_device_manager=tuya_integration_runtime_data.device_manager)
-            sharing_device_manager.terminal_id  = tuya_integration_runtime_data.device_manager.terminal_id
-            sharing_device_manager.mq           = tuya_integration_runtime_data.device_manager.mq
-            sharing_device_manager.customer_api = tuya_integration_runtime_data.device_manager.customer_api
+            sharing_device_manager.terminal_id      = tuya_integration_runtime_data.device_manager.terminal_id
+            sharing_device_manager.mq               = tuya_integration_runtime_data.device_manager.mq
+            sharing_device_manager.customer_api     = tuya_integration_runtime_data.device_manager.customer_api
+            sharing_device_manager.device_listeners = tuya_integration_runtime_data.device_manager.device_listeners
             self.reuse_config = True
         else:
             #We are using XT as a standalone integration
@@ -250,10 +251,12 @@ class MultiManager:  # noqa: F811
     def update_device_cache(self):
         if self.sharing_account:
             self.sharing_account.device_manager.update_device_cache()
-            self.sharing_account.device_ids = {device_id for device_id in self.sharing_account.device_manager.device_map}
+            self.sharing_account.device_ids.clear()
+            self.sharing_account.device_ids.update({device_id for device_id in self.sharing_account.device_manager.device_map})
         if self.iot_account:
             self.iot_account.home_manager.update_device_cache()
-            self.iot_account.device_ids = {device_id for device_id in self.iot_account.device_manager.device_map}
+            self.iot_account.device_ids.clear()
+            self.iot_account.device_ids.update({device_id for device_id in self.iot_account.device_manager.device_map})
         self._merge_devices_from_multiple_sources()
     
     def _merge_devices_from_multiple_sources(self):
