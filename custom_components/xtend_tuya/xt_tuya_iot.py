@@ -5,6 +5,7 @@ https://github.com/tuya/tuya-iot-python-sdk
 
 from __future__ import annotations
 import json
+import copy
 from tuya_iot import (
     AuthType,
     TuyaDevice,
@@ -215,8 +216,13 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
             device_id = item["id"]
             self.device_map[device_id] = XTDevice(**item)
     
-    def get_device_properties(self, device) -> XTDeviceProperties | None:
+    def get_device_properties(self, device: XTDevice) -> XTDeviceProperties | None:
         device_properties = XTDeviceProperties()
+        device_properties.function = copy.deepcopy(device.function)
+        device_properties.status_range = copy.deepcopy(device.status_range)
+        device_properties.status = copy.deepcopy(device.status)
+        if (hasattr(device, "local_strategy")):
+            device_properties.local_strategy = copy.deepcopy(device.local_strategy)
         response = self.api.get(f"/v2.0/cloud/thing/{device.id}/shadow/properties")
         response2 = self.api.get(f"/v2.0/cloud/thing/{device.id}/model")
         if response2.get("success"):
@@ -267,7 +273,7 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
                     and dp_property["dp_id"]  in device_properties.local_strategy
                     ):
                     code = dp_property["code"]
-                    if code not in device_properties.status_range:
+                    if code not in device_properties.status_range and code not in device_properties.function :
                         device_properties.status_range[code] = XTDeviceStatusRange(code=code, 
                                                                                    type=device_properties.local_strategy[dp_property["dp_id"]]["config_item"]["valueType"],
                                                                                    values=device_properties.local_strategy[dp_property["dp_id"]]["config_item"]["valueDesc"])
