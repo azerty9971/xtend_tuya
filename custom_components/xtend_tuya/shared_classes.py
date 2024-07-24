@@ -60,6 +60,7 @@ class XTDevice(SimpleNamespace):
     status_range: dict[str, XTDeviceStatusRange]
 
     force_open_api: Optional[bool] = False
+    model: Optional[dict] = ""
 
     def __init__(self, **kwargs: Any) -> None:
         self.local_strategy = {}

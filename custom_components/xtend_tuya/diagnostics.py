@@ -83,6 +83,9 @@ def _async_device_as_dict(
     support_local = {}
     if hasattr(device, "support_local"):
         support_local = device.support_local
+    model = ""
+    if hasattr(device, "model"):
+        model = device.model
     data = {
         "id": device.id,
         "name": device.name,
@@ -101,6 +104,7 @@ def _async_device_as_dict(
         "home_assistant": {},
         "set_up": set_up,
         "support_local": support_local,
+        "model": model,
     }
 
     # Gather Tuya states

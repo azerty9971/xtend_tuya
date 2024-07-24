@@ -228,6 +228,7 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
         if response2.get("success"):
             result = response2.get("result", {})
             model = json.loads(result.get("model", "{}"))
+            device.model = model
             for service in model["services"]:
                 for property in service["properties"]:
                     if (    "abilityId" in property
