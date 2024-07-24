@@ -187,12 +187,11 @@ class MultiManager:  # noqa: F811
         self.multi_mqtt_queue.sharing_account_mq = sharing_device_manager.mq
         sharing_device_manager.home_repository = HomeRepository(sharing_device_manager.customer_api)
         sharing_device_manager.device_repository = XTDeviceRepository(sharing_device_manager.customer_api, sharing_device_manager, self)
-        sharing_device_manager.device_listeners = set()
         sharing_device_manager.scene_repository = SceneRepository(sharing_device_manager.customer_api)
         sharing_device_manager.user_repository = UserRepository(sharing_device_manager.customer_api)
         self.multi_device_listener.sharing_account_device_listener = DeviceListener(hass, sharing_device_manager)
         sharing_device_manager.add_device_listener(self.multi_device_listener.sharing_account_device_listener)
-        return TuyaSharingData(device_manager=sharing_device_manager)
+        return TuyaSharingData(device_manager=sharing_device_manager, device_ids={})
 
     async def get_iot_account(self, hass: HomeAssistant, entry: XTConfigEntry) -> TuyaIOTData | None:
         if (
