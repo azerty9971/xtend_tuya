@@ -270,6 +270,7 @@ class MultiManager:  # noqa: F811
             return_list.append(self.sharing_account.device_manager.device_map)
         if self.iot_account:
             return_list.append(self.iot_account.device_manager.device_map)
+        return return_list
 
     def _merge_devices_from_multiple_sources(self):
         if not ( self.sharing_account and self.iot_account ):
