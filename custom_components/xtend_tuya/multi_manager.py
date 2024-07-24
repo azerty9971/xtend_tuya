@@ -252,12 +252,12 @@ class MultiManager:  # noqa: F811
         if self.sharing_account:
             self.sharing_account.device_manager.update_device_cache()
             self.sharing_account.device_ids.clear()
-            new_device_ids: list[str] = {device_id for device_id in self.sharing_account.device_manager.device_map}
+            new_device_ids: set[str] = [device_id for device_id in self.sharing_account.device_manager.device_map]
             self.sharing_account.device_ids.update(new_device_ids)
         if self.iot_account:
             self.iot_account.home_manager.update_device_cache()
             self.iot_account.device_ids.clear()
-            new_device_ids: list[str] = {device_id for device_id in self.iot_account.device_manager.device_map}
+            new_device_ids: set[str] = [device_id for device_id in self.iot_account.device_manager.device_map]
             self.iot_account.device_ids.update(new_device_ids)
         self._merge_devices_from_multiple_sources()
     
