@@ -262,8 +262,8 @@ class MultiManager:  # noqa: F811
             self.iot_account.device_ids.extend(new_device_ids)
         self._merge_devices_from_multiple_sources()
     
-    def _get_available_device_maps(self) -> list[str]:
-        return_list: list[str] = list()
+    def _get_available_device_maps(self) -> list[dict[str, XTDevice]]:
+        return_list: list[dict[str, XTDevice]] = list()
         if self.sharing_account:
             if other_manager := self.sharing_account.device_manager.get_overriden_device_manager():
                 return_list.append(other_manager.device_map)
@@ -310,12 +310,11 @@ class MultiManager:  # noqa: F811
     
     def get_aggregated_device_map(self) -> dict[str, XTDevice]:
         aggregated_list: dict[str, XTDevice] = {}
-        if self.sharing_account:
-            for device_id in self.sharing_account.device_manager.device_map:
-                aggregated_list[device_id] = XTDevice.from_customer_device(self.sharing_account.device_manager.device_map[device_id])
-        if self.iot_account:
-            for device_id in self.iot_account.device_manager.device_map:
-                aggregated_list[device_id] = XTDevice.from_customer_device(self.iot_account.device_manager.device_map[device_id])
+        device_maps = self._get_available_device_maps()
+        for device_map in device_maps:
+            for device_id in device_map:
+                if device_id not in aggregated_list:
+                    aggregated_list[device_id] = XTDevice.from_customer_device(device_map[device_id])
         return aggregated_list
     
     def unload(self):
@@ -391,17 +390,10 @@ class MultiManager:  # noqa: F811
     
     def _get_devices_from_device_id(self, device_id: str) -> list[XTDevice] | None:
         return_list = []
-        if (
-                self.sharing_account 
-            and self.sharing_account.device_manager
-            and device_id in self.sharing_account.device_manager.device_map):
-            return_list.append(self.sharing_account.device_manager.device_map[device_id])
-        
-        if (
-                self.iot_account 
-            and self.iot_account.device_manager
-            and device_id in self.iot_account.device_manager.device_map):
-            return_list.append(self.iot_account.device_manager.device_map[device_id])
+        device_maps = self._get_available_device_maps()
+        for device_map in device_maps:
+            if device_id in device_map:
+                return_list.append(device_map[device_id])
         return return_list
 
     def _read_code_value_from_state(self, device: XTDevice, state):
