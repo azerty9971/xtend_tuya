@@ -117,6 +117,7 @@ class TuyaIOTData(NamedTuple):
 
 class TuyaSharingData(NamedTuple):
     device_manager: DeviceManager
+    device_ids: set[str]
 
 class MultiMQTTQueue:
     def __init__(self, multi_manager: MultiManager) -> None:
@@ -135,27 +136,6 @@ class MultiDeviceListener:
         self.multi_manager = multi_manager
         self.sharing_account_device_listener = None
         self.iot_account_device_listener = None
-
-class MultiManagerSourceCounter:
-    source_counter: dict[str, int] = {}
-
-    def __init__(self) -> None:
-        self.source_counter = {}
-    
-    def add_counter(self, source: str):
-        if source not in self.source_counter:
-            self.source_counter[source] = 1
-        else:
-            self.source_counter[source] += 1
-    
-    def get_highest_source(self) -> str | None:
-        highest_source = None
-        highest_counter = None
-        for source in self.source_counter:
-            if not highest_counter or highest_counter < self.source_counter[source]:
-                highest_source = source
-                highest_counter = self.source_counter[source]
-        return highest_source
     
 class MultiManager:  # noqa: F811
     def __init__(self, hass: HomeAssistant, entry: XTConfigEntry) -> None:
@@ -165,7 +145,6 @@ class MultiManager:  # noqa: F811
         self.descriptors = {}
         self.multi_mqtt_queue: MultiMQTTQueue = MultiMQTTQueue(self)
         self.multi_device_listener: MultiDeviceListener = MultiDeviceListener(self)
-        self.device_message_source_counter: dict[str, MultiManagerSourceCounter] = {}
 
     @property
     def device_map(self):
@@ -272,8 +251,10 @@ class MultiManager:  # noqa: F811
     def update_device_cache(self):
         if self.sharing_account:
             self.sharing_account.device_manager.update_device_cache()
+            self.sharing_account.device_ids = {device_id for device_id in self.sharing_account.device_manager.device_map}
         if self.iot_account:
             self.iot_account.home_manager.update_device_cache()
+            self.iot_account.device_ids = {device_id for device_id in self.iot_account.device_manager.device_map}
         self._merge_devices_from_multiple_sources()
     
     def _merge_devices_from_multiple_sources(self):
@@ -293,11 +274,12 @@ class MultiManager:  # noqa: F811
                     to_be_merged.append(device)
         for device_map in device_maps:
             device_map.update(aggregated_device_list)
-            
+        
     def _merge_devices(self, device1: XTDevice, device2: XTDevice):
         device1.status_range.update(device2.status_range)
         device1.function.update(device2.function)
         device1.status.update(device2.status)
+        device2.status = device1.status
         if hasattr(device1, "local_strategy") and hasattr(device2, "local_strategy"):
             device1.local_strategy.update(device2.local_strategy)
 
@@ -501,13 +483,9 @@ class MultiManager:  # noqa: F811
                         break
         #END DEBUG
 
-        if dev_id not in self.device_message_source_counter:
-            self.device_message_source_counter[dev_id] = MultiManagerSourceCounter()
-        self.device_message_source_counter[dev_id].add_counter(source)
-        allowed_source = self.device_message_source_counter[dev_id].get_highest_source()
-        if self.sharing_account and allowed_source == MESSAGE_SOURCE_TUYA_SHARING:
+        if (self.sharing_account and dev_id in self.sharing_account.device_ids):
             self.sharing_account.device_manager.on_message(msg)
-        if self.iot_account and allowed_source == MESSAGE_SOURCE_TUYA_IOT:
+        elif self.iot_account and dev_id in self.iot_account.device_ids:
             new_message = self._convert_message_for_iot_account(msg)
             self.iot_account.device_manager.on_message(new_message)
 
