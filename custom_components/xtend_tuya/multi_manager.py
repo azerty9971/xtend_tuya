@@ -262,12 +262,21 @@ class MultiManager:  # noqa: F811
             self.iot_account.device_ids.extend(new_device_ids)
         self._merge_devices_from_multiple_sources()
     
+    def _get_available_device_maps(self) -> list[str]:
+        return_list: list[str] = list()
+        if self.sharing_account:
+            if other_manager := self.sharing_account.device_manager.get_overriden_device_manager():
+                return_list.append(other_manager.device_map)
+            return_list.append(self.sharing_account.device_manager.device_map)
+        if self.iot_account:
+            return_list.append(self.iot_account.device_manager.device_map)
+
     def _merge_devices_from_multiple_sources(self):
         if not ( self.sharing_account and self.iot_account ):
             return
         
         #Merge the device function, status_range and status between managers
-        device_maps = [self.sharing_account.device_manager.device_map, self.iot_account.device_manager.device_map]
+        device_maps = self._get_available_device_maps()
         aggregated_device_list = self.get_aggregated_device_map()
         for device in aggregated_device_list.values():
             to_be_merged = []
