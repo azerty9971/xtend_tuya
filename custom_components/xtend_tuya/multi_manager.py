@@ -275,13 +275,13 @@ class MultiManager:  # noqa: F811
         for device_map in device_maps:
             device_map.update(aggregated_device_list)
         
-    def _merge_devices(self, device1: XTDevice, device2: XTDevice):
-        device1.status_range.update(device2.status_range)
-        device1.function.update(device2.function)
-        device1.status.update(device2.status)
-        device2.status = device1.status
-        if hasattr(device1, "local_strategy") and hasattr(device2, "local_strategy"):
-            device1.local_strategy.update(device2.local_strategy)
+    def _merge_devices(self, receiving_device: XTDevice, giving_device: XTDevice):
+        receiving_device.status_range.update(giving_device.status_range)
+        receiving_device.function.update(giving_device.function)
+        receiving_device.status.update(giving_device.status)
+        giving_device.status = receiving_device.status
+        if hasattr(receiving_device, "local_strategy") and hasattr(giving_device, "local_strategy"):
+            receiving_device.local_strategy.update(giving_device.local_strategy)
 
     def is_device_in_domain_device_maps(self, domains: list[str], device_entry_identifiers: list[str]):
         if device_entry_identifiers[0] in domains:
@@ -527,7 +527,7 @@ class MultiManager:  # noqa: F811
                     code = dp_item.get("status_code", None)
                     value = command["value"]
                     if command["code"] == code:
-                        if dp_item.get("use_open_api", True):
+                        if not dp_item.get("use_open_api", False):
                             command_dict = {"code": code, "value": value}
                             regular_commands.append(command_dict)
                         else:
