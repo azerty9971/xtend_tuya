@@ -420,7 +420,7 @@ class MultiManager:  # noqa: F811
                     item["value"] = value
                     break
                 else:
-                    LOGGER.warning(f"convert_device_report_status_list code retrieval failed => {item}")
+                    LOGGER.warning(f"convert_device_report_status_list code retrieval failed => {item} <=> {device.name} <=>{device_id}")
         return status
     
     def apply_virtual_states_to_status_list(self, device: XTDevice, status_in: list) -> list:
