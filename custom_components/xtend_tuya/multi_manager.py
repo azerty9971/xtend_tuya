@@ -111,13 +111,13 @@ class HomeAssistantXTData(NamedTuple):
 class TuyaIOTData(NamedTuple):
     device_manager: XTTuyaDeviceManager
     mq: TuyaOpenMQ
-    device_ids: set[str]
+    device_ids: list[str]
     device_listener: XTDeviceListener
     home_manager: TuyaHomeManager
 
 class TuyaSharingData(NamedTuple):
     device_manager: DeviceManager
-    device_ids: set[str]
+    device_ids: list[str]
 
 class MultiMQTTQueue:
     def __init__(self, multi_manager: MultiManager) -> None:
@@ -192,7 +192,7 @@ class MultiManager:  # noqa: F811
         sharing_device_manager.user_repository = UserRepository(sharing_device_manager.customer_api)
         self.multi_device_listener.sharing_account_device_listener = DeviceListener(hass, sharing_device_manager)
         sharing_device_manager.add_device_listener(self.multi_device_listener.sharing_account_device_listener)
-        return TuyaSharingData(device_manager=sharing_device_manager, device_ids={})
+        return TuyaSharingData(device_manager=sharing_device_manager, device_ids=[])
 
     async def get_iot_account(self, hass: HomeAssistant, entry: XTConfigEntry) -> TuyaIOTData | None:
         if (
@@ -238,13 +238,14 @@ class MultiManager:  # noqa: F811
         self.multi_mqtt_queue.iot_account_mq = mq
         mq.start()
         device_manager = XTTuyaDeviceManager(self, api, mq)
-        device_ids: set[str] = set()
+        device_ids: list[str] = list()
         self.multi_device_listener.iot_account_device_listener = XTDeviceListener(hass, device_manager, device_ids, self)
         home_manager = TuyaHomeManager(api, mq, device_manager)
         device_manager.add_device_listener(self.multi_device_listener.iot_account_device_listener)
         return TuyaIOTData(
             device_manager=device_manager,
-            mq=mq,device_ids=device_ids,
+            mq=mq,
+            device_ids=device_ids,
             device_listener=self.multi_device_listener.iot_account_device_listener, 
             home_manager=home_manager)
     
@@ -252,12 +253,12 @@ class MultiManager:  # noqa: F811
         if self.sharing_account:
             self.sharing_account.device_manager.update_device_cache()
             self.sharing_account.device_ids.clear()
-            new_device_ids: set[str] = [device_id for device_id in self.sharing_account.device_manager.device_map]
+            new_device_ids: list[str] = [device_id for device_id in self.sharing_account.device_manager.device_map]
             self.sharing_account.device_ids.update(new_device_ids)
         if self.iot_account:
             self.iot_account.home_manager.update_device_cache()
             self.iot_account.device_ids.clear()
-            new_device_ids: set[str] = [device_id for device_id in self.iot_account.device_manager.device_map]
+            new_device_ids: list[str] = [device_id for device_id in self.iot_account.device_manager.device_map]
             self.iot_account.device_ids.update(new_device_ids)
         self._merge_devices_from_multiple_sources()
     
