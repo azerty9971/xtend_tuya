@@ -414,8 +414,6 @@ class MultiManager:  # noqa: F811
         if len(devices) == 0:
             return []
         for item in status:
-            if "code" in item:
-                continue
             for device in devices:
                 code, dpId, value, result_ok = self._read_code_value_from_state(device, item)
                 if result_ok:
@@ -482,7 +480,7 @@ class MultiManager:  # noqa: F811
         protocol = msg.get("protocol", 0)
         if protocol == PROTOCOL_DEVICE_REPORT:
             data = msg.get("data", {})
-            statuses = self.convert_device_report_status_list(dev_id,data["status"])
+            statuses = self.convert_device_report_status_list(dev_id, data["status"])
             for status in statuses:
                 devices = self._get_devices_from_device_id(dev_id)
                 for device in devices:
