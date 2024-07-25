@@ -493,13 +493,12 @@ class MultiManager:  # noqa: F811
                         LOGGER.warning(f"ADD_ELE ({source})=> {statuses}")
                         break
         #END DEBUG
-
+        new_message = self._convert_message_for_all_accounts(msg)
         if (self.sharing_account and dev_id in self.sharing_account.device_ids):
-            LOGGER.warning(f"on_message sharing_account : {msg}")
-            self.sharing_account.device_manager.on_message(msg)
+            LOGGER.warning(f"on_message sharing_account : {new_message}")
+            self.sharing_account.device_manager.on_message(new_message)
         elif self.iot_account and dev_id in self.iot_account.device_ids:
-            new_message = self._convert_message_for_iot_account(msg)
-            LOGGER.warning(f"on_message iot_account : {msg}")
+            LOGGER.warning(f"on_message iot_account : {new_message}")
             self.iot_account.device_manager.on_message(new_message)
 
     def _get_device_id_from_message(self, msg: str) -> str | None:
@@ -513,7 +512,7 @@ class MultiManager:  # noqa: F811
                     return dev_id
         return None
 
-    def _convert_message_for_iot_account(self, msg: str) -> str:
+    def _convert_message_for_all_accounts(self, msg: str) -> str:
         protocol = msg.get("protocol", 0)
         data = msg.get("data", {})
         if protocol == PROTOCOL_DEVICE_REPORT:
