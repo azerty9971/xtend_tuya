@@ -398,12 +398,15 @@ class MultiManager:  # noqa: F811
 
     def _read_code_value_from_state(self, device: XTDevice, state):
         if "code" in state and "value" in state:
-            return state["code"], state["value"], True
+            for dp_id_item_id in device.local_strategy:
+                dp_id_item = device.local_strategy[dp_id_item_id]
+                if dp_id_item["status_code"] == state["code"]:
+                    return state["code"], dp_id_item_id, state["value"], True
         elif "dpId" in state and "value" in state:
             dp_id_item = device.local_strategy[state["dpId"]]
-            return dp_id_item["status_code"], state["value"], True
-
-        return None, None, False
+            return dp_id_item["status_code"], state["dpId"], state["value"], True
+        LOGGER.warning(f"_read_code_value_from_state FAILED => {device.id} <=> {device.name} => {state}")
+        return None, None, None, False
 
     def convert_device_report_status_list(self, device_id: str, status_in: list) -> list:
         status = status_in.copy()
@@ -414,10 +417,11 @@ class MultiManager:  # noqa: F811
             if "code" in item:
                 continue
             for device in devices:
-                code, value, result_ok = self._read_code_value_from_state(device, item)
+                code, dpId, value, result_ok = self._read_code_value_from_state(device, item)
                 if result_ok:
                     item["code"] = code
                     item["value"] = value
+                    item["dpId"] = dpId
                     break
                 else:
                     LOGGER.warning(f"convert_device_report_status_list code retrieval failed => {item} <=> {device.name} <=>{device_id}")
@@ -429,7 +433,7 @@ class MultiManager:  # noqa: F811
         for virtual_state in virtual_states:
             if virtual_state.virtual_state_value == VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME:
                 for item in status:
-                    code, value, result_ok = self._read_code_value_from_state(device, item)
+                    code, dpId, value, result_ok = self._read_code_value_from_state(device, item)
                     if result_ok and code == virtual_state.key:
                         for state_name in virtual_state.vs_copy_to_state:
                             new_status = {"code": str(state_name), "value": value}
@@ -449,7 +453,7 @@ class MultiManager:  # noqa: F811
                     device.status[virtual_state.key] = 0
                 if virtual_state.key in device.status:
                     for item in status:
-                        code, value, result_ok = self._read_code_value_from_state(device, item)
+                        code, dpId, value, result_ok = self._read_code_value_from_state(device, item)
                         if result_ok and code == virtual_state.key:
                             item["value"] += device.status[virtual_state.key]
                             continue
@@ -482,7 +486,7 @@ class MultiManager:  # noqa: F811
             for status in statuses:
                 devices = self._get_devices_from_device_id(dev_id)
                 for device in devices:
-                    code, value, result_ok = self._read_code_value_from_state(device, status)
+                    code, dpId, value, result_ok = self._read_code_value_from_state(device, status)
                     #LOGGER.debug(f"status => {status}")
                     #LOGGER.debug(f"on_message ({source}) => code: {code}, value: {value}")
                     if code == "add_ele":
