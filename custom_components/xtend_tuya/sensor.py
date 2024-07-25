@@ -133,12 +133,6 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
             entity_registry_enabled_default=True,
         ),
         TuyaSensorEntityDescription(
-            key=DPCode.DEODORIZATION,
-            translation_key="deodorization",
-            state_class=SensorStateClass.MEASUREMENT,
-            entity_registry_enabled_default=True,
-        ),
-        TuyaSensorEntityDescription(
             key=DPCode.DEODORIZATION_NUM,
             translation_key="ozone_concentration",
             state_class=SensorStateClass.MEASUREMENT,
