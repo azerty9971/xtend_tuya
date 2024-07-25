@@ -491,9 +491,11 @@ class MultiManager:  # noqa: F811
         #END DEBUG
 
         if (self.sharing_account and dev_id in self.sharing_account.device_ids):
+            LOGGER.warning(f"on_message sharing_account : {msg}")
             self.sharing_account.device_manager.on_message(msg)
         elif self.iot_account and dev_id in self.iot_account.device_ids:
             new_message = self._convert_message_for_iot_account(msg)
+            LOGGER.warning(f"on_message iot_account : {msg}")
             self.iot_account.device_manager.on_message(new_message)
 
     def _get_device_id_from_message(self, msg: str) -> str | None:
