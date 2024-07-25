@@ -83,6 +83,9 @@ def _async_device_as_dict(
     support_local = {}
     if hasattr(device, "support_local"):
         support_local = device.support_local
+    local_strategy = ""
+    if hasattr(device, "local_strategy"):
+        local_strategy = device.local_strategy
     model = ""
     if hasattr(device, "model"):
         model = device.model
@@ -101,6 +104,7 @@ def _async_device_as_dict(
         "function": {},
         "status_range": {},
         "status": {},
+        "local_strategy": local_strategy,
         "home_assistant": {},
         "set_up": set_up,
         "support_local": support_local,
