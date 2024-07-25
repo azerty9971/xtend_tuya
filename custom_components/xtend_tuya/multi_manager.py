@@ -398,12 +398,12 @@ class MultiManager:  # noqa: F811
 
     def _read_code_value_from_state(self, device: XTDevice, state):
         if "code" in state and "value" in state:
-            return state["code"], state["value"]
+            return state["code"], state["value"], True
         elif "dpId" in state and "value" in state:
             dp_id_item = device.local_strategy[state["dpId"]]
-            return dp_id_item["status_code"], state["value"]
+            return dp_id_item["status_code"], state["value"], True
 
-        return None, None
+        return None, None, False
 
     def convert_device_report_status_list(self, device_id: str, status_in: list) -> list:
         status = status_in.copy()
@@ -414,8 +414,8 @@ class MultiManager:  # noqa: F811
             if "code" in item:
                 continue
             for device in devices:
-                code, value = self._read_code_value_from_state(device, item)
-                if code and value:
+                code, value, result_ok = self._read_code_value_from_state(device, item)
+                if result_ok:
                     item["code"] = code
                     item["value"] = value
                     break
