@@ -196,9 +196,9 @@ class DeviceManager(Manager):
         super().on_message(msg)
 
     def _on_device_other(self, device_id: str, biz_code: str, data: dict[str, Any]):
-        if self.other_device_manager:
+        """if self.other_device_manager:
             self.other_device_manager._on_device_other(device_id, biz_code, data)
-            return
+            return"""
         super()._on_device_other(device_id, biz_code, data)
 
     def _on_device_report(self, device_id: str, status: list):
