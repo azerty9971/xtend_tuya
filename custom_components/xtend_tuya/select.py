@@ -52,8 +52,18 @@ SELECTS: dict[str, tuple[SelectEntityDescription, ...]] = {
     ),
     "msp": (
         SelectEntityDescription(
-            key=DPCode.WORK_MODE,
-            translation_key="cat_litter_box_work_mode",
+            key=DPCode.CLEAN,
+            translation_key="cat_litter_box_clean",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        SelectEntityDescription(
+            key=DPCode.CLEANING,
+            translation_key="one_click_cleanup",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        SelectEntityDescription(
+            key=DPCode.EMPTY,
+            translation_key="cat_litter_box_empty",
             entity_category=EntityCategory.CONFIG,
         ),
         SelectEntityDescription(
@@ -62,13 +72,8 @@ SELECTS: dict[str, tuple[SelectEntityDescription, ...]] = {
             entity_category=EntityCategory.DIAGNOSTIC,
         ),
         SelectEntityDescription(
-            key=DPCode.CLEAN,
-            translation_key="cat_litter_box_clean",
-            entity_category=EntityCategory.CONFIG,
-        ),
-        SelectEntityDescription(
-            key=DPCode.EMPTY,
-            translation_key="cat_litter_box_empty",
+            key=DPCode.WORK_MODE,
+            translation_key="cat_litter_box_work_mode",
             entity_category=EntityCategory.CONFIG,
         ),
     ),
