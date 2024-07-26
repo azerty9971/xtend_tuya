@@ -196,9 +196,8 @@ class DeviceManager(Manager):
         super().on_message(msg)
 
     def _on_device_other(self, device_id: str, biz_code: str, data: dict[str, Any]):
-        """if self.other_device_manager:
+        if self.other_device_manager:
             self.other_device_manager._on_device_other(device_id, biz_code, data)
-            return"""
         super()._on_device_other(device_id, biz_code, data)
 
     def _on_device_report(self, device_id: str, status: list):
@@ -207,9 +206,8 @@ class DeviceManager(Manager):
             return
         status_new = self.multi_manager.convert_device_report_status_list(device_id, status)
         status_new = self.multi_manager.apply_virtual_states_to_status_list(device, status_new)
-        """if self.other_device_manager:
+        if self.other_device_manager:
             self.other_device_manager._on_device_report(device_id, status_new)
-            return"""
         super()._on_device_report(device_id, status_new)
 
 class XTDeviceRepository(DeviceRepository):
