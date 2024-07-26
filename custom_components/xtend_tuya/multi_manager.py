@@ -399,22 +399,24 @@ class MultiManager:  # noqa: F811
                             device.status[new_code] = copy.deepcopy(device.status[virtual_state.key])
                             device.status_range[new_code] = copy.deepcopy(device.status_range[virtual_state.key])
                             device.status_range[new_code].code = new_code
-                            if dp_id := self._read_dpId_from_code(virtual_state.key, device):
-                                if new_dp_id := self._get_empty_local_strategy_dp_id(device):
-                                    new_local_strategy = copy.deepcopy(device.local_strategy[dp_id])
-                                    new_local_strategy["status_code"] = new_code
-                                    device.local_strategy[new_dp_id] = new_local_strategy
+                            if not self._read_dpId_from_code(new_code, device):
+                                if dp_id := self._read_dpId_from_code(virtual_state.key, device):
+                                    if new_dp_id := self._get_empty_local_strategy_dp_id(device):
+                                        new_local_strategy = copy.deepcopy(device.local_strategy[dp_id])
+                                        new_local_strategy["status_code"] = new_code
+                                        device.local_strategy[new_dp_id] = new_local_strategy
                     if virtual_state.key in device.function:
                         for vs_new_code in virtual_state.vs_copy_to_state:
                             new_code = str(vs_new_code)
                             device.status[new_code] = copy.deepcopy(device.status[virtual_state.key])
                             device.function[new_code] = copy.deepcopy(device.function[virtual_state.key])
                             device.function[new_code].code = new_code
-                            if dp_id := self._read_dpId_from_code(virtual_state.key, device):
-                                if new_dp_id := self._get_empty_local_strategy_dp_id(device):
-                                    new_local_strategy = copy.deepcopy(device.local_strategy[dp_id])
-                                    new_local_strategy["status_code"] = new_code
-                                    device.local_strategy[new_dp_id] = new_local_strategy
+                            if not self._read_dpId_from_code(new_code, device):
+                                if dp_id := self._read_dpId_from_code(virtual_state.key, device):
+                                    if new_dp_id := self._get_empty_local_strategy_dp_id(device):
+                                        new_local_strategy = copy.deepcopy(device.local_strategy[dp_id])
+                                        new_local_strategy["status_code"] = new_code
+                                        device.local_strategy[new_dp_id] = new_local_strategy
 
     def allow_virtual_devices_not_set_up(self, device: XTDevice):
         if not device.id.startswith("vdevo"):
