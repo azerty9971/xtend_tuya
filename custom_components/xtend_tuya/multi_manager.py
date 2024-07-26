@@ -468,7 +468,7 @@ class MultiManager:  # noqa: F811
         for virtual_state in virtual_states:
             if virtual_state.virtual_state_value == VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME:
                 for item in status:
-                    code, dpId, value, result_ok = self._read_code_dpid_value_from_state(device, item)
+                    code, dpId, value, result_ok = self._read_code_dpid_value_from_state(device, item, False, True)
                     if result_ok and code == virtual_state.key:
                         for state_name in virtual_state.vs_copy_to_state:
                             new_status = {"code": str(state_name), "value": value}
@@ -488,7 +488,7 @@ class MultiManager:  # noqa: F811
                     device.status[virtual_state.key] = 0
                 if virtual_state.key in device.status:
                     for item in status:
-                        code, dpId, value, result_ok = self._read_code_dpid_value_from_state(device, item)
+                        code, dpId, value, result_ok = self._read_code_dpid_value_from_state(device, item, False, True)
                         if result_ok and code == virtual_state.key:
                             item["value"] += device.status[virtual_state.key]
                             continue
@@ -521,10 +521,10 @@ class MultiManager:  # noqa: F811
             for status in statuses:
                 devices = self._get_devices_from_device_id(dev_id)
                 for device in devices:
-                    code, dpId, value, result_ok = self._read_code_dpid_value_from_state(device, status)
+                    code, dpId, value, result_ok = self._read_code_dpid_value_from_state(device, status, False, True)
                     #LOGGER.debug(f"status => {status}")
                     #LOGGER.debug(f"on_message ({source}) => code: {code}, value: {value}")
-                    if code == "add_ele":
+                    if result_ok and code == "add_ele":
                         LOGGER.warning(f"ADD_ELE ({source})=> {statuses}")
                         break
         #END DEBUG
