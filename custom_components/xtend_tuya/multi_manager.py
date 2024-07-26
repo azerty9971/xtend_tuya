@@ -405,7 +405,7 @@ class MultiManager:  # noqa: F811
         elif "dpId" in state and "value" in state:
             dp_id_item = device.local_strategy[state["dpId"]]
             return dp_id_item["status_code"], state["dpId"], state["value"], True
-        LOGGER.warning(f"_read_code_value_from_state FAILED => {device.id} <=> {device.name} => {state}")
+        LOGGER.warning(f"_read_code_value_from_state FAILED => {device.id} <=> {device.name} <=> {state} <=> {device.local_strategy}")
         return None, None, None, False
 
     def convert_device_report_status_list(self, device_id: str, status_in: list) -> list:
