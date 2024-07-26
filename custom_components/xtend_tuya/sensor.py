@@ -73,7 +73,7 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
             state_class=SensorStateClass.TOTAL,
             native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
             entity_registry_enabled_default=True,
-            restoredata=True,
+            #restoredata=True,
         ),
         TuyaSensorEntityDescription(
             key=DPCode.ADD_ELE2,
@@ -82,7 +82,7 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
             state_class=SensorStateClass.TOTAL,
             native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
             entity_registry_enabled_default=False,
-            restoredata=True,
+            #restoredata=True,
         ),
     ),
     # Automatic cat litter box
