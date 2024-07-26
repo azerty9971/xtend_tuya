@@ -513,21 +513,6 @@ class MultiManager:  # noqa: F811
             LOGGER.warning(f"dev_id {dev_id} not found!")
             return
         
-        #DEBUG
-        protocol = msg.get("protocol", 0)
-        if protocol == PROTOCOL_DEVICE_REPORT:
-            data = msg.get("data", {})
-            statuses = self.convert_device_report_status_list(dev_id, data["status"])
-            for status in statuses:
-                devices = self._get_devices_from_device_id(dev_id)
-                for device in devices:
-                    code, dpId, value, result_ok = self._read_code_dpid_value_from_state(device, status, False, True)
-                    #LOGGER.debug(f"status => {status}")
-                    #LOGGER.debug(f"on_message ({source}) => code: {code}, value: {value}")
-                    if result_ok and code == "add_ele":
-                        LOGGER.warning(f"ADD_ELE ({source})=> {statuses}")
-                        break
-        #END DEBUG
         new_message = self._convert_message_for_all_accounts(msg)
         if self.sharing_account and dev_id in self.sharing_account.device_ids:
             if source == MESSAGE_SOURCE_TUYA_SHARING:
