@@ -111,13 +111,13 @@ class HomeAssistantXTData(NamedTuple):
 class TuyaIOTData(NamedTuple):
     device_manager: XTTuyaDeviceManager
     mq: TuyaOpenMQ
-    device_ids: list[str]
+    device_ids: list[str] #List of device IDs that are managed by the manager before the managers device merging process
     device_listener: XTDeviceListener
     home_manager: TuyaHomeManager
 
 class TuyaSharingData(NamedTuple):
     device_manager: DeviceManager
-    device_ids: list[str]
+    device_ids: list[str] #List of device IDs that are managed by the manager before the managers device merging process
 
 class MultiMQTTQueue:
     def __init__(self, multi_manager: MultiManager) -> None:
@@ -529,12 +529,12 @@ class MultiManager:  # noqa: F811
                         break
         #END DEBUG
         new_message = self._convert_message_for_all_accounts(msg)
-        if (self.sharing_account and dev_id in self.sharing_account.device_ids):
-            LOGGER.warning(f"on_message sharing_account : {new_message}")
-            self.sharing_account.device_manager.on_message(new_message)
+        if self.sharing_account and dev_id in self.sharing_account.device_ids:
+            if source == MESSAGE_SOURCE_TUYA_SHARING:
+                self.sharing_account.device_manager.on_message(new_message)
         elif self.iot_account and dev_id in self.iot_account.device_ids:
-            LOGGER.warning(f"on_message iot_account : {new_message}")
-            self.iot_account.device_manager.on_message(new_message)
+            if source == MESSAGE_SOURCE_TUYA_IOT:
+                self.iot_account.device_manager.on_message(new_message)
 
     def _get_device_id_from_message(self, msg: str) -> str | None:
         protocol = msg.get("protocol", 0)
