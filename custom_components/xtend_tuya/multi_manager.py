@@ -409,7 +409,7 @@ class MultiManager:  # noqa: F811
         return None, None, None, False
 
     def convert_device_report_status_list(self, device_id: str, status_in: list) -> list:
-        status = status_in.copy()
+        status = copy.deepcopy(status_in)
         devices = self._get_devices_from_device_id(device_id)
         if len(devices) == 0:
             return []
