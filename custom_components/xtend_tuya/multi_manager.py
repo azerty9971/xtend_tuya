@@ -159,6 +159,13 @@ class MultiManager:  # noqa: F811
             self.iot_account = account
         if (account := await self.get_sharing_account(hass,entry)):
             self.sharing_account = account
+        iot_found = (self.iot_account is not None)
+        sharing_found = (self.sharing_account is not None)
+        overrides = False
+        if sharing_found:
+            overrides = (self.sharing_account.device_manager.get_overriden_device_manager() is not None)
+        LOGGER.warning(f"setup mode: iot_found: {iot_found}, sharing found: {sharing_found}, overrides: {overrides}")
+
 
 
     async def get_sharing_account(self, hass: HomeAssistant, entry: XTConfigEntry) -> TuyaSharingData | None:
