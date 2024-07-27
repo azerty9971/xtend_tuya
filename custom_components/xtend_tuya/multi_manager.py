@@ -326,7 +326,9 @@ class MultiManager:  # noqa: F811
     
     def unload(self):
         LOGGER.warning("MultiManager unload")
-        if self.sharing_account:
+
+        if self.sharing_account and not self.iot_account:
+            #Only call the unload of the Sharing Manager if there is no IOT account as this will revoke its credentials
             self.sharing_account.device_manager.user_repository.unload(self.sharing_account.device_manager.terminal_id)
     
     def refresh_mq(self):
