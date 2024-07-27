@@ -63,7 +63,7 @@ async def update_listener(hass, entry):
 
 async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
     """Async setup hass config entry.""" 
-    LOGGER.warning("async_setup_entry")
+    LOGGER.warning(f"async_setup_entry {entry.entry_id}")
     multi_manager = MultiManager(hass, entry)
     await multi_manager.setup_entry(hass, entry)
 
@@ -126,7 +126,7 @@ async def cleanup_device_registry(hass: HomeAssistant, multi_manager: MultiManag
 
 async def async_unload_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
     """Unloading the Tuya platforms."""
-    LOGGER.warning("async_unload_entry")
+    LOGGER.warning(f"async_unload_entry {entry.entry_id}")
     if unload_ok := await hass.config_entries.async_unload_platforms(entry, PLATFORMS):
         tuya = entry.runtime_data
         if tuya.manager.mq is not None:
@@ -136,7 +136,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
 
 
 async def async_remove_entry(hass: HomeAssistant, entry: XTConfigEntry) -> None:
-    LOGGER.warning("async_remove_entry")
+    LOGGER.warning(f"async_remove_entry {entry.entry_id}")
     """Remove a config entry.
 
     This will revoke the credentials from Tuya.
