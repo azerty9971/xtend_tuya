@@ -325,10 +325,12 @@ class MultiManager:  # noqa: F811
         return aggregated_list
     
     def unload(self):
+        LOGGER.warning("MultiManager unload")
         if self.sharing_account:
             self.sharing_account.device_manager.user_repository.unload(self.sharing_account.device_manager.terminal_id)
     
     def refresh_mq(self):
+        LOGGER.warning("MultiManager refresh_mq")
         if self.sharing_account:
             self.sharing_account.device_manager.refresh_mq()
     
