@@ -108,7 +108,7 @@ def get_tuya_integration_runtime_data(hass: HomeAssistant, entry: ConfigEntry, d
     else:
         return None
 
-def get_overriden_tuya_integration_runtime_data(hass: HomeAssistant, entry: ConfigEntry) -> TuyaIntegrationRuntimeData | None:
+def get_overriden_tuya_integration_runtime_data(hass: HomeAssistant, entry: ConfigEntry) -> tuple[ConfigEntry, TuyaIntegrationRuntimeData] | None:
     if (overriden_config_entry := get_overriden_config_entry(hass,entry, DOMAIN_ORIG)):
-        return get_tuya_integration_runtime_data(hass, overriden_config_entry, DOMAIN_ORIG)
-    return None
+        return overriden_config_entry, get_tuya_integration_runtime_data(hass, overriden_config_entry, DOMAIN_ORIG)
+    return None, None

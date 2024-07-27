@@ -166,12 +166,16 @@ class MultiManager:  # noqa: F811
             overrides = (self.sharing_account.device_manager.get_overriden_device_manager() is not None)
         LOGGER.warning(f"setup mode: iot_found: {iot_found}, sharing found: {sharing_found}, overrides: {overrides}")
 
-
+    async def overriden_tuya_entry_updated(
+        hass: HomeAssistant, config_entry: ConfigEntry
+    ) -> None:
+        LOGGER.warning("overriden_tuya_entry_updated")
 
     async def get_sharing_account(self, hass: HomeAssistant, entry: XTConfigEntry) -> TuyaSharingData | None:
         #See if our current entry is an override of a Tuya integration entry
-        tuya_integration_runtime_data = get_overriden_tuya_integration_runtime_data(hass, entry)
+        tuya_config_entry, tuya_integration_runtime_data = get_overriden_tuya_integration_runtime_data(hass, entry)
         if tuya_integration_runtime_data:
+            tuya_config_entry.add_update_listener(self.overriden_tuya_entry_updated)
             #We are using an override of the Tuya integration
             sharing_device_manager = DeviceManager(multi_manager=self, other_device_manager=tuya_integration_runtime_data.device_manager)
             sharing_device_manager.terminal_id      = tuya_integration_runtime_data.device_manager.terminal_id
