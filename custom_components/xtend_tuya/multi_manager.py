@@ -296,8 +296,8 @@ class MultiManager:  # noqa: F811
             for device_map in device_maps:
                 if device.id in device_map:
                     for prev_device in to_be_merged:
-                        self._merge_devices(device, prev_device)
                         self._merge_devices(prev_device, device)
+                        self._merge_devices(device, prev_device)
                     to_be_merged.append(device)
         for device_map in device_maps:
             device_map.update(aggregated_device_list)
