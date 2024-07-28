@@ -307,7 +307,7 @@ class MultiManager:  # noqa: F811
         receiving_device.status_range.update(giving_device.status_range)
         receiving_device.function.update(giving_device.function)
         receiving_device.status.update(giving_device.status)
-        #giving_device.status = receiving_device.status
+        giving_device.status = receiving_device.status
         if hasattr(receiving_device, "local_strategy") and hasattr(giving_device, "local_strategy"):
             receiving_device.local_strategy.update(giving_device.local_strategy)
 
@@ -474,8 +474,8 @@ class MultiManager:  # noqa: F811
                 return_list.append(device_map[device_id])
         return return_list
 
-    def _read_code_dpid_value_from_state(self, device_id: str, state, fail_if_dpid_not_found = True, fail_if_code_not_found = True):
-        devices = self._get_devices_from_device_id(device_id)
+    def _read_code_dpid_value_from_state(self, device_in: XTDevice, state, fail_if_dpid_not_found = True, fail_if_code_not_found = True):
+        devices = self._get_devices_from_device_id(device_in.id)
         code = None
         dpId = None
         value = None
@@ -505,7 +505,7 @@ class MultiManager:  # noqa: F811
             return []
         for item in status:
             for device in devices:
-                code, dpId, value, result_ok = self._read_code_dpid_value_from_state(device.id, item)
+                code, dpId, value, result_ok = self._read_code_dpid_value_from_state(device, item)
                 if result_ok:
                     item["code"] = code
                     item["dpId"] = dpId
@@ -519,7 +519,7 @@ class MultiManager:  # noqa: F811
         for virtual_state in virtual_states:
             if virtual_state.virtual_state_value == VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME:
                 for item in status:
-                    code, dpId, value, result_ok = self._read_code_dpid_value_from_state(device.id, item)
+                    code, dpId, value, result_ok = self._read_code_dpid_value_from_state(device, item)
                     if result_ok and code == virtual_state.key:
                         for state_name in virtual_state.vs_copy_to_state:
                             new_status = {"code": str(state_name), "value": copy.deepcopy(value), "dpId": dpId}
@@ -530,7 +530,7 @@ class MultiManager:  # noqa: F811
                     device.status[virtual_state.key] = 0
                 if virtual_state.key in device.status:
                     for item in status:
-                        code, dpId, value, result_ok = self._read_code_dpid_value_from_state(device.id, item, False, True)
+                        code, dpId, value, result_ok = self._read_code_dpid_value_from_state(device, item, False, True)
                         if result_ok and code == virtual_state.key:
                             item["value"] += device.status[virtual_state.key]
                             continue
