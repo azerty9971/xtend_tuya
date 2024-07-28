@@ -338,7 +338,7 @@ class MultiManager:  # noqa: F811
         if not before_call and self.sharing_account:
             self.sharing_account.device_manager.on_external_refresh_mq()
     
-    def on_tuya_setup_entry(self, before_call: bool, hass: HomeAssistant, entry: tuya_integration.TuyaConfigEntry):
+    async def on_tuya_setup_entry(self, before_call: bool, hass: HomeAssistant, entry: tuya_integration.TuyaConfigEntry):
         #LOGGER.warning(f"on_tuya_setup_entry {before_call} : {entry.__dict__}")
         if not before_call and self.sharing_account and self.config_entry.title == entry.title:
             self.reuse_config = True
@@ -349,7 +349,7 @@ class MultiManager:  # noqa: F811
             self.update_device_cache()
 
 
-    def on_tuya_unload_entry(self, before_call: bool, hass: HomeAssistant, entry: tuya_integration.TuyaConfigEntry):
+    async def on_tuya_unload_entry(self, before_call: bool, hass: HomeAssistant, entry: tuya_integration.TuyaConfigEntry):
         #LOGGER.warning(f"on_tuya_unload_entry {before_call} : {entry.__dict__}")
         if not before_call and self.sharing_account and self.config_entry.title == entry.title:
             self.reuse_config = False
@@ -357,7 +357,7 @@ class MultiManager:  # noqa: F811
             self.sharing_account.device_manager.mq = None
             self.multi_mqtt_queue.sharing_account_mq = None
 
-    def on_tuya_remove_entry(self, before_call: bool, hass: HomeAssistant, entry: tuya_integration.TuyaConfigEntry):
+    async def on_tuya_remove_entry(self, before_call: bool, hass: HomeAssistant, entry: tuya_integration.TuyaConfigEntry):
         #LOGGER.warning(f"on_tuya_remove_entry {before_call} : {entry.__dict__}")
         if not before_call and self.sharing_account and self.config_entry.title == entry.title:
             self.reuse_config = False
