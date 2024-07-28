@@ -14,6 +14,8 @@ from .const import (
 
 from tuya_sharing import (
     Manager as TuyaSharingManager,
+    SharingDeviceListener,
+
 )
 
 from .multi_manager import (
@@ -23,6 +25,7 @@ from .multi_manager import (
 
 class TuyaIntegrationRuntimeData(NamedTuple):
     device_manager: TuyaSharingManager
+    listener: SharingDeviceListener
     generic_runtime_data: any
 
 class LogStackException(Exception):
@@ -99,12 +102,17 @@ def get_tuya_integration_runtime_data(hass: HomeAssistant, entry: ConfigEntry, d
             entry.entry_id in hass.data[domain]
         ):
             runtime_data = hass.data[domain][entry.entry_id]
-            device_manager = runtime_data.manager
+            if hasattr(runtime_data, "device_manager"):
+                device_manager = runtime_data.device_manager
+            if hasattr(runtime_data, "manager"):
+                device_manager = runtime_data.manager
+            listener = runtime_data.listener
     else:
         runtime_data = entry.runtime_data
         device_manager = entry.runtime_data.manager
+        listener = entry.runtime_data.listener
     if device_manager:
-        return TuyaIntegrationRuntimeData(device_manager=device_manager, generic_runtime_data=runtime_data)
+        return TuyaIntegrationRuntimeData(device_manager=device_manager, generic_runtime_data=runtime_data, listener=listener)
     else:
         return None
 

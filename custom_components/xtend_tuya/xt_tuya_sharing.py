@@ -172,7 +172,7 @@ class DeviceManager(Manager):
         self.user_repository = None
         self.device_map: dict[str, CustomerDevice] = {}
         self.user_homes: list[SmartLifeHome] = []
-        self.device_listeners = set()
+        #self.device_listeners = set()
         self.other_device_manager = other_device_manager
     
     def on_external_refresh_mq(self):
