@@ -553,14 +553,18 @@ class MultiManager:  # noqa: F811
         if self.sharing_account and dev_id in self.sharing_account.device_ids:
             if source == MESSAGE_SOURCE_TUYA_SHARING:
                 self.sharing_account.device_manager.on_message(new_message)
+            else:
+                return
         elif self.iot_account and dev_id in self.iot_account.device_ids:
             if source == MESSAGE_SOURCE_TUYA_IOT:
                 self.iot_account.device_manager.on_message(new_message)
+            else:
+                return
         
         #DEBUG
-        device = self.get_aggregated_device_map()[dev_id]
+        """device = self.get_aggregated_device_map()[dev_id]
         LOGGER.warning(f"on_message : {new_message}")
-        LOGGER.warning(f"Device status after : {device.status}")
+        LOGGER.warning(f"Device status after : {device.status}")"""
         #END DEBUG
 
     def _get_device_id_from_message(self, msg: str) -> str | None:
