@@ -481,6 +481,8 @@ class MultiManager:  # noqa: F811
         code = None
         dpId = None
         value = None
+        if "value" in state:
+            value = state["value"]
         for device in devices:
             if code is None and "code" in state:
                 code = state["code"]
@@ -488,9 +490,7 @@ class MultiManager:  # noqa: F811
             if dpId is None and "dpId" in state:
                 dpId = state["dpId"]
                 code = self._read_code_from_dpId(state["dpId"], device)
-            if value is None and "value" in state:
-                value = state["value"]
-            if code is not None and dpId is not None and value is not None:
+            if code is not None and dpId is not None:
                 return code, dpId, value, True
         if code is None and fail_if_code_not_found:
             LOGGER.warning(f"_read_code_value_from_state FAILED => {device.id} <=> {device.name} <=> {state} <=> {device.local_strategy}")
