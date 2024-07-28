@@ -346,7 +346,18 @@ class MultiManager:  # noqa: F811
             decorate_tuya_manager(tuya_integration_runtime_data.device_manager, self)
             self.sharing_account.device_manager.set_overriden_device_manager(tuya_integration_runtime_data.device_manager)
             self.sharing_account.device_manager.on_external_refresh_mq()
-            self.update_device_cache()
+            try:
+                await hass.async_add_executor_job(self.update_device_cache)
+            except Exception as exc:
+                # While in general, we should avoid catching broad exceptions,
+                # we have no other way of detecting this case.
+                if "sign invalid" in str(exc):
+                    msg = "Authentication failed. Please re-authenticate the Tuya integration"
+                    if self.reuse_config:
+                        raise ConfigEntryNotReady(msg) from exc
+                    else:
+                        raise ConfigEntryAuthFailed("Authentication failed. Please re-authenticate.")
+                raise
 
 
     async def on_tuya_unload_entry(self, before_call: bool, hass: HomeAssistant, entry: tuya_integration.TuyaConfigEntry):
