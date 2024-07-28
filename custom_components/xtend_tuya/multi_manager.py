@@ -163,12 +163,6 @@ class MultiManager:  # noqa: F811
             self.iot_account = account
         if (account := await self.get_sharing_account(hass,entry)):
             self.sharing_account = account
-        iot_found = (self.iot_account is not None)
-        sharing_found = (self.sharing_account is not None)
-        overrides = False
-        if sharing_found:
-            overrides = (self.sharing_account.device_manager.get_overriden_device_manager() is not None)
-        LOGGER.warning(f"setup mode: iot_found: {iot_found}, sharing found: {sharing_found}, overrides: {overrides}")
 
     async def overriden_tuya_entry_updated(self, hass: HomeAssistant, config_entry: ConfigEntry) -> None:
         LOGGER.warning("overriden_tuya_entry_updated")
@@ -331,17 +325,15 @@ class MultiManager:  # noqa: F811
         return aggregated_list
     
     def unload(self):
-        LOGGER.warning("MultiManager unload")
-
         if self.sharing_account and not self.iot_account:
             #Only call the unload of the Sharing Manager if there is no IOT account as this will revoke its credentials
             self.sharing_account.device_manager.user_repository.unload(self.sharing_account.device_manager.terminal_id)
     
     def on_tuya_refresh_mq(self, before_call: bool):
-        LOGGER.warning(f"on_tuya_refresh_mq {before_call}")
-
+        if not before_call and self.sharing_account:
+            self.sharing_account.device_manager.on_external_refresh_mq()
+    
     def refresh_mq(self):
-        LOGGER.warning("MultiManager refresh_mq")
         if self.sharing_account:
             self.sharing_account.device_manager.refresh_mq()
     

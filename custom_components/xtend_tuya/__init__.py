@@ -63,7 +63,6 @@ async def update_listener(hass, entry):
 
 async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
     """Async setup hass config entry.""" 
-    LOGGER.warning(f"async_setup_entry {entry.entry_id}")
     multi_manager = MultiManager(hass, entry)
     await multi_manager.setup_entry(hass, entry)
 
@@ -115,7 +114,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
 
 async def cleanup_device_registry(hass: HomeAssistant, multi_manager: MultiManager) -> None:
     """Remove deleted device registry entry if there are no remaining entities."""
-    LOGGER.warning("cleanup_device_registry")
     device_registry = dr.async_get(hass)
     for dev_id, device_entry in list(device_registry.devices.items()):
         for item in device_entry.identifiers:
@@ -136,7 +134,6 @@ async def async_unload_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
 
 
 async def async_remove_entry(hass: HomeAssistant, entry: XTConfigEntry) -> None:
-    LOGGER.warning(f"async_remove_entry {entry.entry_id}")
     """Remove a config entry.
 
     This will revoke the credentials from Tuya.
