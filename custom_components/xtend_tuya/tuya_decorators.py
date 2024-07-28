@@ -2,6 +2,9 @@ import functools
 from .const import (
     LOGGER
 )
+from .multi_manager import (
+    MultiManager
+)
 from tuya_sharing import (
     CustomerDevice,
     Manager,
@@ -9,17 +12,14 @@ from tuya_sharing import (
     SharingTokenListener,
 )
 
-def report_called(func, after: bool):
-    LOGGER.warning(f"{func.__name__} called (after = {after})")
-
-def wrapper(func):
+def wrapper(func, callback):
     @functools.wraps(func)
     def wrapped(*args, **kwargs):
-        report_called(func, False)
+        callback(False)
         return_val = func(*args, **kwargs)
-        report_called(func, True)
+        callback(True)
         return return_val
     return wrapped
     
-def decorate_tuya_manager(tuya_manager: Manager):
-    tuya_manager.refresh_mq = wrapper(tuya_manager.refresh_mq)
+def decorate_tuya_manager(tuya_manager: Manager, multi_manager: MultiManager):
+    tuya_manager.refresh_mq = wrapper(tuya_manager.refresh_mq, multi_manager.on_tuya_refresh_mq)

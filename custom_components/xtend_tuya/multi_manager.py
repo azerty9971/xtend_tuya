@@ -179,9 +179,6 @@ class MultiManager:  # noqa: F811
         if tuya_integration_runtime_data:
             #We are using an override of the Tuya integration
             decorate_tuya_manager(tuya_integration_runtime_data.device_manager)
-            #DEBUG
-            decorate_tuya_manager(self)
-            #ENDDEBIG
             sharing_device_manager = DeviceManager(multi_manager=self, other_device_manager=tuya_integration_runtime_data.device_manager)
             sharing_device_manager.terminal_id      = tuya_integration_runtime_data.device_manager.terminal_id
             sharing_device_manager.mq               = tuya_integration_runtime_data.device_manager.mq
@@ -340,6 +337,9 @@ class MultiManager:  # noqa: F811
             #Only call the unload of the Sharing Manager if there is no IOT account as this will revoke its credentials
             self.sharing_account.device_manager.user_repository.unload(self.sharing_account.device_manager.terminal_id)
     
+    def on_tuya_refresh_mq(self, before_call: bool):
+        LOGGER.warning(f"on_tuya_refresh_mq {before_call}")
+
     def refresh_mq(self):
         LOGGER.warning("MultiManager refresh_mq")
         if self.sharing_account:
