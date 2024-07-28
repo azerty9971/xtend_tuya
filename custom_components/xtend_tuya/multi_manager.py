@@ -342,7 +342,7 @@ class MultiManager:  # noqa: F811
         LOGGER.warning(f"on_tuya_unload_entry {before_call}")
     
     def on_tuya_remove_entry(self, before_call: bool):
-        LOGGER.warning(f"remove_entry {before_call}")
+        LOGGER.warning(f"on_tuya_remove_entry {before_call}")
     
     def refresh_mq(self):
         if self.sharing_account:
