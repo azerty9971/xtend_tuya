@@ -81,7 +81,7 @@ async def async_setup_entry(
         entities: list[TuyaBinarySensorEntity] = []
         device_ids = [*device_map]
         for device_id in device_ids:
-            device = device_map[device_id]
+            device = hass_data.manager.device_map[device_id]
             if descriptions := BINARY_SENSORS.get(device.category):
                 for description in descriptions:
                     dpcode = description.dpcode or description.key
@@ -95,7 +95,7 @@ async def async_setup_entry(
         async_add_entities(entities)
 
     hass_data.manager.register_device_descriptors("binary_sensors", BINARY_SENSORS)
-    async_discover_device(hass_data.manager.device_map)
+    async_discover_device([*hass_data.manager.device_map])
     #async_discover_device(hass_data.manager, hass_data.manager.open_api_device_map)
 
     entry.async_on_unload(

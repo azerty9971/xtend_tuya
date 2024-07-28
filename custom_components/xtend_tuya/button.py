@@ -32,7 +32,7 @@ async def async_setup_entry(
         entities: list[TuyaButtonEntity] = []
         device_ids = [*device_map]
         for device_id in device_ids:
-            device = device_map[device_id]
+            device = hass_data.manager.device_map[device_id]
             if descriptions := BUTTONS.get(device.category):
                 entities.extend(
                     TuyaButtonEntity(device, hass_data.manager, description)
@@ -43,7 +43,7 @@ async def async_setup_entry(
         async_add_entities(entities)
 
     hass_data.manager.register_device_descriptors("buttons", BUTTONS)
-    async_discover_device(hass_data.manager.device_map)
+    async_discover_device([*hass_data.manager.device_map])
     #async_discover_device(hass_data.manager, hass_data.manager.open_api_device_map)
 
     entry.async_on_unload(

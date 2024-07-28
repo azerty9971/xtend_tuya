@@ -40,12 +40,12 @@ async def async_setup_entry(
         entities: list[TuyaFanEntity] = []
         device_ids = [*device_map]
         for device_id in device_ids:
-            device = device_map[device_id]
+            device = hass_data.manager.device_map[device_id]
             if device and device.category in TUYA_SUPPORT_TYPE:
                 entities.append(TuyaFanEntity(device, hass_data.manager))
         async_add_entities(entities)
 
-    async_discover_device(hass_data.manager.device_map)
+    async_discover_device([*hass_data.manager.device_map])
 
     entry.async_on_unload(
         async_dispatcher_connect(hass, TUYA_DISCOVERY_NEW, async_discover_device)
