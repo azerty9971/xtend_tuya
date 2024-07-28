@@ -332,7 +332,7 @@ class MultiManager:  # noqa: F811
             #Only call the unload of the Sharing Manager if there is no IOT account as this will revoke its credentials
             self.sharing_account.device_manager.user_repository.unload(self.sharing_account.device_manager.terminal_id)
     
-    def on_tuya_refresh_mq(self, before_call: bool, parameters):
+    def on_tuya_refresh_mq(self, before_call: bool):
         if not before_call and self.sharing_account:
             self.sharing_account.device_manager.on_external_refresh_mq()
     
