@@ -293,23 +293,24 @@ class MultiManager:  # noqa: F811
         aggregated_device_list = self.get_aggregated_device_map()
         for device in aggregated_device_list.values():
             to_be_merged = []
-            for device_map in device_maps:
-                if device.id in device_map:
-                    current_device = device_map[device.id]
-                    for prev_device in to_be_merged:
-                        self._merge_devices(current_device, prev_device)
-                        self._merge_devices(prev_device, current_device)
-                    to_be_merged.append(current_device)
+            devices = self._get_devices_from_device_id(device.id)
+            for current_device in devices:
+                for prev_device in to_be_merged:
+                    self._merge_devices(current_device, prev_device)
+                to_be_merged.append(current_device)
         for device_map in device_maps:
             device_map.update(aggregated_device_list)
         
     def _merge_devices(self, receiving_device: XTDevice, giving_device: XTDevice):
         receiving_device.status_range.update(giving_device.status_range)
+        giving_device.status_range = receiving_device.status_range
         receiving_device.function.update(giving_device.function)
+        giving_device.function = receiving_device.function
         receiving_device.status.update(giving_device.status)
         giving_device.status = receiving_device.status
         if hasattr(receiving_device, "local_strategy") and hasattr(giving_device, "local_strategy"):
             receiving_device.local_strategy.update(giving_device.local_strategy)
+            giving_device.local_strategy = receiving_device.local_strategy
 
     def is_device_in_domain_device_maps(self, domains: list[str], device_entry_identifiers: list[str]):
         if device_entry_identifiers[0] in domains:
