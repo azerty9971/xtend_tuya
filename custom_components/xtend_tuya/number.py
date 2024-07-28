@@ -91,7 +91,7 @@ async def async_setup_entry(
         entities: list[TuyaNumberEntity] = []
         device_ids = [*device_map]
         for device_id in device_ids:
-            device = device_map[device_id]
+            device = hass_data.manager.device_map[device_id]
             if descriptions := NUMBERS.get(device.category):
                 entities.extend(
                     TuyaNumberEntity(device, hass_data.manager, description)
@@ -102,7 +102,7 @@ async def async_setup_entry(
         async_add_entities(entities)
 
     hass_data.manager.register_device_descriptors("numbers", NUMBERS)
-    async_discover_device(hass_data.manager.device_map)
+    async_discover_device([*hass_data.manager.device_map])
 
     entry.async_on_unload(
         async_dispatcher_connect(hass, TUYA_DISCOVERY_NEW, async_discover_device)
