@@ -183,7 +183,6 @@ class MultiManager:  # noqa: F811
             sharing_device_manager.mq               = tuya_integration_runtime_data.device_manager.mq
             sharing_device_manager.customer_api     = tuya_integration_runtime_data.device_manager.customer_api
             sharing_device_manager.device_listeners = tuya_integration_runtime_data.device_manager.device_listeners
-            sharing_device_manager.remove_device_listener(tuya_integration_runtime_data.listener)
             self.reuse_config = True
         else:
             #We are using XT as a standalone integration
