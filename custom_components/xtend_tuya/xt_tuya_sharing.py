@@ -180,6 +180,7 @@ class DeviceManager(Manager):
             self.mq = self.other_device_manager.mq
             self.mq.add_message_listener(self.multi_manager.on_message_from_tuya_sharing)
             self.mq.remove_message_listener(self.other_device_manager.on_message)
+            LOGGER.warning("Applied external refresh MQ")
 
     def refresh_mq(self):
         if self.other_device_manager is not None:
