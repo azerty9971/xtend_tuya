@@ -521,7 +521,7 @@ class MultiManager:  # noqa: F811
                     if result_ok and code == virtual_state.key:
                         for state_name in virtual_state.vs_copy_to_state:
                             code, dpId, value, result_ok = self._read_code_dpid_value_from_state(device.id, {"code": str(state_name), "value": value})
-                            new_status = {"code": code, "value": value, "dpId": dpId}
+                            new_status = {"code": code, "value": copy.copy(value), "dpId": dpId}
                             status.append(new_status)
             
             if virtual_state.virtual_state_value == VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD:
