@@ -293,7 +293,7 @@ class MultiManager:  # noqa: F811
         aggregated_device_list = self.get_aggregated_device_map()
         for device in aggregated_device_list.values():
             to_be_merged = []
-            devices = self._get_devices_from_device_id(device.id)
+            devices = self.get_devices_from_device_id(device.id)
             for current_device in devices:
                 for prev_device in to_be_merged:
                     self._merge_devices(current_device, prev_device)
@@ -468,7 +468,7 @@ class MultiManager:  # noqa: F811
         if not getattr(device, "set_up", True):
             setattr(device, "set_up", True)
     
-    def _get_devices_from_device_id(self, device_id: str) -> list[XTDevice] | None:
+    def get_devices_from_device_id(self, device_id: str) -> list[XTDevice] | None:
         return_list = []
         device_maps = self._get_available_device_maps()
         for device_map in device_maps:
@@ -477,7 +477,7 @@ class MultiManager:  # noqa: F811
         return return_list
 
     def _read_code_dpid_value_from_state(self, device_id: str, state, fail_if_dpid_not_found = True, fail_if_code_not_found = True):
-        devices = self._get_devices_from_device_id(device_id)
+        devices = self.get_devices_from_device_id(device_id)
         code = None
         dpId = None
         value = None
