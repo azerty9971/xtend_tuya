@@ -322,6 +322,7 @@ class MultiManager:  # noqa: F811
         return False
     
     def get_aggregated_device_map(self) -> dict[str, XTDevice]:
+        LOGGER.warning("Called get_aggregated_device_map")
         aggregated_list: dict[str, XTDevice] = {}
         device_maps = self._get_available_device_maps()
         for device_map in device_maps:
@@ -342,7 +343,8 @@ class MultiManager:  # noqa: F811
     async def on_tuya_setup_entry(self, before_call: bool, hass: HomeAssistant, entry: tuya_integration.TuyaConfigEntry):
         #LOGGER.warning(f"on_tuya_setup_entry {before_call} : {entry.__dict__}")
         if not before_call and self.sharing_account and self.config_entry.title == entry.title:
-            self.reuse_config = True
+            hass.config_entries.async_schedule_reload(self.config_entry.entry_id)
+            """self.reuse_config = True
             tuya_integration_runtime_data = get_tuya_integration_runtime_data(hass, entry, DOMAIN_ORIG)
             decorate_tuya_manager(tuya_integration_runtime_data.device_manager, self)
             self.sharing_account.device_manager.set_overriden_device_manager(tuya_integration_runtime_data.device_manager)
@@ -362,7 +364,7 @@ class MultiManager:  # noqa: F811
                         raise ConfigEntryNotReady(msg) from exc
                     else:
                         raise ConfigEntryAuthFailed("Authentication failed. Please re-authenticate.")
-                raise
+                raise"""
 
 
     async def on_tuya_unload_entry(self, before_call: bool, hass: HomeAssistant, entry: tuya_integration.TuyaConfigEntry):
