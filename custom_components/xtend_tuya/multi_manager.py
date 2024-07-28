@@ -306,7 +306,7 @@ class MultiManager:  # noqa: F811
         receiving_device.status_range.update(giving_device.status_range)
         receiving_device.function.update(giving_device.function)
         receiving_device.status.update(giving_device.status)
-        giving_device.status = receiving_device.status
+        #giving_device.status = receiving_device.status
         if hasattr(receiving_device, "local_strategy") and hasattr(giving_device, "local_strategy"):
             receiving_device.local_strategy.update(giving_device.local_strategy)
 
@@ -346,6 +346,10 @@ class MultiManager:  # noqa: F811
             decorate_tuya_manager(tuya_integration_runtime_data.device_manager, self)
             self.sharing_account.device_manager.set_overriden_device_manager(tuya_integration_runtime_data.device_manager)
             self.sharing_account.device_manager.on_external_refresh_mq()
+            self.multi_mqtt_queue.sharing_account_mq             = self.sharing_account.device_manager.mq
+            self.sharing_account.device_manager.terminal_id      = tuya_integration_runtime_data.device_manager.terminal_id
+            self.sharing_account.device_manager.customer_api     = tuya_integration_runtime_data.device_manager.customer_api
+            self.sharing_account.device_manager.device_listeners = tuya_integration_runtime_data.device_manager.device_listeners
             try:
                 await hass.async_add_executor_job(self.update_device_cache)
             except Exception as exc:
