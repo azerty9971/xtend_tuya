@@ -216,8 +216,6 @@ class DeviceManager(Manager):
         for current_device in devices:
             for status in status_new:
                 current_device.status[status["code"]] = status["value"]
-        if other_manager := self.get_overriden_device_manager():
-            other_manager._on_device_report(device_id, [])
         super()._on_device_report(device_id, [])
 
 class XTDeviceRepository(DeviceRepository):
