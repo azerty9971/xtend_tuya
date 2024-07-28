@@ -474,17 +474,27 @@ class MultiManager:  # noqa: F811
                 return_list.append(device_map[device_id])
         return return_list
 
-    def _read_code_dpid_value_from_state(self, device: XTDevice, state, fail_if_dpid_not_found = True, fail_if_code_not_found = True):
-        if "code" in state and "value" in state:
-            dpId = self._read_dpId_from_code(state["code"], device)
-            if dpId or not fail_if_dpid_not_found:
-                return state["code"], dpId, state["value"], True
-        elif "dpId" in state and "value" in state:
-            code = self._read_code_from_dpId(state["dpId"], device)
-            if code or not fail_if_code_not_found:
-                return code, state["dpId"], state["value"], True
-        LOGGER.warning(f"_read_code_value_from_state FAILED => {device.id} <=> {device.name} <=> {state} <=> {device.local_strategy}")
-        return None, None, None, False
+    def _read_code_dpid_value_from_state(self, device_id: str, state, fail_if_dpid_not_found = True, fail_if_code_not_found = True):
+        devices = self._get_devices_from_device_id(device_id)
+        code = None
+        dpId = None
+        value = None
+        for device in devices:
+            if not code and "code" in state:
+                dpId = self._read_dpId_from_code(state["code"], device)
+            if not dpId and "dpId" in state:
+                code = self._read_code_from_dpId(state["dpId"], device)
+            if not value and "value" in state:
+                value = state["value"]
+            if code is not None and dpId is not None and value is not None:
+                return code, dpId, value, True
+        if code is None and fail_if_code_not_found:
+            LOGGER.warning(f"_read_code_value_from_state FAILED => {device.id} <=> {device.name} <=> {state} <=> {device.local_strategy}")
+            return None, None, None, False
+        if dpId is None and fail_if_dpid_not_found:
+            LOGGER.warning(f"_read_code_value_from_state FAILED => {device.id} <=> {device.name} <=> {state} <=> {device.local_strategy}")
+            return None, None, None, False
+        return code, dpId, value, True
 
     def convert_device_report_status_list(self, device_id: str, status_in: list) -> list:
         status = copy.deepcopy(status_in)
@@ -493,7 +503,7 @@ class MultiManager:  # noqa: F811
             return []
         for item in status:
             for device in devices:
-                code, dpId, value, result_ok = self._read_code_dpid_value_from_state(device, item)
+                code, dpId, value, result_ok = self._read_code_dpid_value_from_state(device.id, item)
                 if result_ok:
                     item["code"] = code
                     item["value"] = value
@@ -510,37 +520,21 @@ class MultiManager:  # noqa: F811
         for virtual_state in virtual_states:
             if virtual_state.virtual_state_value == VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME:
                 for item in status:
-                    code, dpId, value, result_ok = self._read_code_dpid_value_from_state(device, item, False, True)
+                    code, dpId, value, result_ok = self._read_code_dpid_value_from_state(device.id, item)
                     if result_ok and code == virtual_state.key:
                         for state_name in virtual_state.vs_copy_to_state:
-                            new_status = {"code": str(state_name), "value": copy.deepcopy(value)}
+                            new_status = {"code": str(state_name), "value": copy.deepcopy(value), "dpId": dpId}
                             status.append(new_status)
-                    if code is None and "dpId" in item:
-                        for dict_key in item:
-                            dp_id = int(item["dpId"])
-                            dp_id_item = device.local_strategy.get(dp_id, None)
-                            if dp_id_item is not None and dp_id_item["status_code"] == virtual_state.key:
-                                for state_name in virtual_state.vs_copy_to_state:
-                                    new_status = {"code": str(state_name), "value": copy.deepcopy(item[dict_key])}
-                                    status.append(new_status)
-                            break
             
             if virtual_state.virtual_state_value == VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD:
                 if virtual_state.key not in device.status or device.status[virtual_state.key] is None:
                     device.status[virtual_state.key] = 0
                 if virtual_state.key in device.status:
                     for item in status:
-                        code, dpId, value, result_ok = self._read_code_dpid_value_from_state(device, item, False, True)
+                        code, dpId, value, result_ok = self._read_code_dpid_value_from_state(device.id, item, False, True)
                         if result_ok and code == virtual_state.key:
                             item["value"] += device.status[virtual_state.key]
                             continue
-                        if not result_ok:
-                            for dict_key in item:
-                                dp_id = int(dict_key)
-                                dp_id_item = device.local_strategy.get(dp_id, None)
-                                if dp_id_item is not None and dp_id_item["status_code"] == virtual_state.key:
-                                    item[dict_key] += device.status[virtual_state.key]
-                                    break
         return status
 
     def on_message_from_tuya_iot(self, msg:str):
