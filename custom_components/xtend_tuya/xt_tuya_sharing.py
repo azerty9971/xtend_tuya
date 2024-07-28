@@ -110,7 +110,9 @@ class DeviceListener(SharingDeviceListener):
 
     def remove_device(self, device_id: str) -> None:
         """Add device removed listener."""
-        self.hass.add_job(self.async_remove_device, device_id)
+        if not self.manager.get_overriden_device_manager():
+            #This will already have been done by the Tuya Manager
+            self.hass.add_job(self.async_remove_device, device_id)
 
     @callback
     def async_remove_device(self, device_id: str) -> None:
