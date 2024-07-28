@@ -179,6 +179,9 @@ class MultiManager:  # noqa: F811
         if tuya_integration_runtime_data:
             #We are using an override of the Tuya integration
             decorate_tuya_manager(tuya_integration_runtime_data.device_manager)
+            #DEBUG
+            decorate_tuya_manager(self)
+            #ENDDEBIG
             sharing_device_manager = DeviceManager(multi_manager=self, other_device_manager=tuya_integration_runtime_data.device_manager)
             sharing_device_manager.terminal_id      = tuya_integration_runtime_data.device_manager.terminal_id
             sharing_device_manager.mq               = tuya_integration_runtime_data.device_manager.mq
