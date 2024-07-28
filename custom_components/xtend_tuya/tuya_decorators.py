@@ -27,9 +27,9 @@ def async_wrapper(func, callback):
 def wrapper(func, callback):
     @functools.wraps(func)
     def wrapped(*args, **kwargs):
-        callback(False)
+        callback(False, *args, **kwargs)
         return_val = func(*args, **kwargs)
-        callback(True)
+        callback(True, *args, **kwargs)
         return return_val
     return wrapped
     

@@ -7,6 +7,7 @@ from dataclasses import dataclass, field
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryError, ConfigEntryNotReady
 from homeassistant.config_entries import ConfigEntry
+import homeassistant.components.tuya as tuya_integration
 
 from tuya_iot import (
     AuthType,
@@ -331,18 +332,18 @@ class MultiManager:  # noqa: F811
             #Only call the unload of the Sharing Manager if there is no IOT account as this will revoke its credentials
             self.sharing_account.device_manager.user_repository.unload(self.sharing_account.device_manager.terminal_id)
     
-    def on_tuya_refresh_mq(self, before_call: bool):
+    def on_tuya_refresh_mq(self, before_call: bool, parameters):
         if not before_call and self.sharing_account:
             self.sharing_account.device_manager.on_external_refresh_mq()
     
-    def on_tuya_setup_entry(self, before_call: bool):
-        LOGGER.warning(f"on_tuya_setup_entry {before_call}")
+    def on_tuya_setup_entry(self, before_call: bool, hass: HomeAssistant, entry: tuya_integration.TuyaConfigEntry):
+        LOGGER.warning(f"on_tuya_setup_entry {before_call} : {entry.__dict__}")
 
-    def on_tuya_unload_entry(self, before_call: bool):
-        LOGGER.warning(f"on_tuya_unload_entry {before_call}")
+    def on_tuya_unload_entry(self, before_call: bool, hass: HomeAssistant, entry: tuya_integration.TuyaConfigEntry):
+        LOGGER.warning(f"on_tuya_unload_entry {before_call} : {entry.__dict__}")
     
-    def on_tuya_remove_entry(self, before_call: bool):
-        LOGGER.warning(f"on_tuya_remove_entry {before_call}")
+    def on_tuya_remove_entry(self, before_call: bool, hass: HomeAssistant, entry: tuya_integration.TuyaConfigEntry):
+        LOGGER.warning(f"on_tuya_remove_entry {before_call} : {entry.__dict__}")
     
     def refresh_mq(self):
         if self.sharing_account:
