@@ -214,10 +214,12 @@ class DeviceManager(Manager):
         status_new = self.multi_manager.convert_device_report_status_list(device_id, status)
         LOGGER.warning(f"_on_device_report before: {status_new}")
         status_new = self.multi_manager.apply_virtual_states_to_status_list(device, status_new)
-        if self.other_device_manager:
-            self.other_device_manager._on_device_report(device_id, status_new)
-        LOGGER.warning(f"_on_device_report after: {status_new}")
-        super()._on_device_report(device_id, status_new)
+        devices = self.multi_manager.get_devices_from_device_id(device_id)
+        for current_device in devices:
+            for status in status_new:
+                if status["code"] in current_device.status:
+                    current_device.status["code"] = status["value"]
+        super()._on_device_report(device_id, [])
 
 class XTDeviceRepository(DeviceRepository):
     def __init__(self, customer_api: CustomerApi, manager: DeviceManager, multi_manager: MultiManager):
