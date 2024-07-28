@@ -272,7 +272,7 @@ class MultiManager:  # noqa: F811
             self.iot_account.device_ids.clear()
             new_device_ids: list[str] = [device_id for device_id in self.iot_account.device_manager.device_map]
             self.iot_account.device_ids.extend(new_device_ids)
-        self._merge_devices_from_multiple_sources()
+        #self._merge_devices_from_multiple_sources()
     
     def _get_available_device_maps(self) -> list[dict[str, XTDevice]]:
         return_list: list[dict[str, XTDevice]] = list()
