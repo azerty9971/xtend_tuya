@@ -322,7 +322,6 @@ class MultiManager:  # noqa: F811
         return False
     
     def get_aggregated_device_map(self) -> dict[str, XTDevice]:
-        LOGGER.warning("Called get_aggregated_device_map")
         aggregated_list: dict[str, XTDevice] = {}
         device_maps = self._get_available_device_maps()
         for device_map in device_maps:
@@ -506,7 +505,7 @@ class MultiManager:  # noqa: F811
         return status
     
     def apply_virtual_states_to_status_list(self, device: XTDevice, status_in: list) -> list:
-        status = status_in.copy()
+        status = copy.deepcopy(status_in)
         virtual_states = self.get_category_virtual_states(device.category)
         for virtual_state in virtual_states:
             if virtual_state.virtual_state_value == VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME:
@@ -514,7 +513,7 @@ class MultiManager:  # noqa: F811
                     code, dpId, value, result_ok = self._read_code_dpid_value_from_state(device, item, False, True)
                     if result_ok and code == virtual_state.key:
                         for state_name in virtual_state.vs_copy_to_state:
-                            new_status = {"code": str(state_name), "value": value}
+                            new_status = {"code": str(state_name), "value": copy.deepcopy(value)}
                             status.append(new_status)
                     if code is None and "dpId" in item:
                         for dict_key in item:
@@ -522,7 +521,7 @@ class MultiManager:  # noqa: F811
                             dp_id_item = device.local_strategy.get(dp_id, None)
                             if dp_id_item is not None and dp_id_item["status_code"] == virtual_state.key:
                                 for state_name in virtual_state.vs_copy_to_state:
-                                    new_status = {"code": str(state_name), "value": item[dict_key]}
+                                    new_status = {"code": str(state_name), "value": copy.deepcopy(item[dict_key])}
                                     status.append(new_status)
                             break
             
@@ -551,7 +550,6 @@ class MultiManager:  # noqa: F811
         self.on_message(MESSAGE_SOURCE_TUYA_SHARING, msg)
 
     def on_message(self, source: str, msg: str):
-        LOGGER.debug(f"on_message from {source} : {msg}")
         dev_id = self._get_device_id_from_message(msg)
         if not dev_id:
             LOGGER.warning(f"dev_id {dev_id} not found!")
