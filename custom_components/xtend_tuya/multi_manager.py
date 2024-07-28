@@ -86,6 +86,7 @@ from .util import (
 
 from .tuya_decorators import (
     decorate_tuya_manager,
+    decorate_tuya_integration,
 )
 
 from .xt_tuya_sharing import (
@@ -173,6 +174,7 @@ class MultiManager:  # noqa: F811
         if tuya_integration_runtime_data:
             #We are using an override of the Tuya integration
             decorate_tuya_manager(tuya_integration_runtime_data.device_manager, self)
+            decorate_tuya_integration(self)
             sharing_device_manager = DeviceManager(multi_manager=self, other_device_manager=tuya_integration_runtime_data.device_manager)
             sharing_device_manager.terminal_id      = tuya_integration_runtime_data.device_manager.terminal_id
             sharing_device_manager.mq               = tuya_integration_runtime_data.device_manager.mq
@@ -332,6 +334,15 @@ class MultiManager:  # noqa: F811
     def on_tuya_refresh_mq(self, before_call: bool):
         if not before_call and self.sharing_account:
             self.sharing_account.device_manager.on_external_refresh_mq()
+    
+    def on_tuya_setup_entry(self, before_call: bool):
+        LOGGER.warning(f"on_tuya_setup_entry {before_call}")
+
+    def on_tuya_unload_entry(self, before_call: bool):
+        LOGGER.warning(f"on_tuya_unload_entry {before_call}")
+    
+    def on_tuya_remove_entry(self, before_call: bool):
+        LOGGER.warning(f"remove_entry {before_call}")
     
     def refresh_mq(self):
         if self.sharing_account:
