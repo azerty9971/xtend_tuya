@@ -63,8 +63,8 @@ async def update_listener(hass, entry):
 
 async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
     """Async setup hass config entry.""" 
-    multi_manager = MultiManager(hass, entry)
-    await multi_manager.setup_entry(hass, entry)
+    multi_manager = MultiManager(entry)
+    await multi_manager.setup_entry(hass)
 
     # Get all devices from Tuya
     try:

@@ -184,6 +184,8 @@ class DeviceManager(Manager):
 
     def refresh_mq(self):
         if self.other_device_manager is not None:
+            if self.mq != self.other_device_manager.mq:
+                self.mq.stop()
             self.other_device_manager.refresh_mq()
             self.mq = self.other_device_manager.mq
             self.mq.add_message_listener(self.multi_manager.on_message_from_tuya_sharing)
