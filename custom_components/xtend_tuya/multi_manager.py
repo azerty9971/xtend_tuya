@@ -508,7 +508,6 @@ class MultiManager:  # noqa: F811
                 code, dpId, value, result_ok = self._read_code_dpid_value_from_state(device.id, item)
                 if result_ok:
                     item["code"] = code
-                    item["value"] = value
                     item["dpId"] = dpId
                 else:
                     LOGGER.warning(f"convert_device_report_status_list code retrieval failed => {item} <=> {device.name} <=>{device_id}")
