@@ -82,6 +82,7 @@ from .import_stub import (
 
 from .util import (
     get_overriden_tuya_integration_runtime_data,
+    get_tuya_integration_runtime_data,
     prepare_value_for_property_update
 )
 
@@ -341,7 +342,7 @@ class MultiManager:  # noqa: F811
         #LOGGER.warning(f"on_tuya_setup_entry {before_call} : {entry.__dict__}")
         if not before_call and self.sharing_account and self.config_entry.title == entry.title:
             self.reuse_config = True
-            tuya_integration_runtime_data = get_overriden_tuya_integration_runtime_data(hass, self.config_entry)
+            tuya_integration_runtime_data = get_tuya_integration_runtime_data(hass, entry, DOMAIN_ORIG)
             decorate_tuya_manager(tuya_integration_runtime_data.device_manager, self)
             self.sharing_account.device_manager.set_overriden_device_manager(tuya_integration_runtime_data.device_manager)
             self.sharing_account.device_manager.on_external_refresh_mq()
