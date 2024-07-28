@@ -84,6 +84,10 @@ from .util import (
     prepare_value_for_property_update
 )
 
+from .tuya_decorators import (
+    decorate_tuya_manager,
+)
+
 from .xt_tuya_sharing import (
     DeviceManager,
     TokenListener,
@@ -173,8 +177,8 @@ class MultiManager:  # noqa: F811
         #See if our current entry is an override of a Tuya integration entry
         tuya_config_entry, tuya_integration_runtime_data = get_overriden_tuya_integration_runtime_data(hass, entry)
         if tuya_integration_runtime_data:
-            tuya_config_entry.add_update_listener(self.overriden_tuya_entry_updated)
             #We are using an override of the Tuya integration
+            decorate_tuya_manager(tuya_integration_runtime_data.device_manager)
             sharing_device_manager = DeviceManager(multi_manager=self, other_device_manager=tuya_integration_runtime_data.device_manager)
             sharing_device_manager.terminal_id      = tuya_integration_runtime_data.device_manager.terminal_id
             sharing_device_manager.mq               = tuya_integration_runtime_data.device_manager.mq
