@@ -509,9 +509,7 @@ class MultiManager:  # noqa: F811
                 if result_ok:
                     item["code"] = code
                     item["value"] = value
-                    if dpId:
-                        item["dpId"] = dpId
-                    break
+                    item["dpId"] = dpId
                 else:
                     LOGGER.warning(f"convert_device_report_status_list code retrieval failed => {item} <=> {device.name} <=>{device_id}")
         return status
@@ -561,6 +559,7 @@ class MultiManager:  # noqa: F811
         
         #DEBUG
         device = self.get_aggregated_device_map()[dev_id]
+        LOGGER.warning(f"on_message : {new_message}")
         LOGGER.warning(f"Device status after : {device.status}")
         #END DEBUG
 
