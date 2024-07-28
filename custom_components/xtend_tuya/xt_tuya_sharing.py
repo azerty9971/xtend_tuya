@@ -104,7 +104,9 @@ class DeviceListener(SharingDeviceListener):
     def add_device(self, device: CustomerDevice) -> None:
         """Add device added listener."""
         # Ensure the device isn't present stale
-        self.hass.add_job(self.async_remove_device, device.id)
+        if not self.manager.get_overriden_device_manager():
+            #This will already have been done by the Tuya Manager
+            self.hass.add_job(self.async_remove_device, device.id)
 
         dispatcher_send(self.hass, TUYA_DISCOVERY_NEW, [device.id])
 
