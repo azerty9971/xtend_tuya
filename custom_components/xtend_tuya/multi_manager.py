@@ -581,6 +581,11 @@ class MultiManager:  # noqa: F811
         elif self.iot_account and dev_id in self.iot_account.device_ids:
             if source == MESSAGE_SOURCE_TUYA_IOT:
                 self.iot_account.device_manager.on_message(new_message)
+        
+        #DEBUG
+        device = self.get_aggregated_device_map()[dev_id]
+        LOGGER.warning(f"Device status after : {device.status}")
+        #END DEBUG
 
     def _get_device_id_from_message(self, msg: str) -> str | None:
         protocol = msg.get("protocol", 0)
