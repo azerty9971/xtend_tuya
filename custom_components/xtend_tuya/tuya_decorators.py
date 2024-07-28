@@ -18,18 +18,18 @@ from tuya_sharing import (
 def async_wrapper(func, callback):
     @functools.wraps(func)
     async def wrapped(*args, **kwargs):
-        callback(False, *args, **kwargs)
-        return_val = await func(*args, **kwargs)
         callback(True, *args, **kwargs)
+        return_val = await func(*args, **kwargs)
+        callback(False, *args, **kwargs)
         return return_val
     return wrapped
 
 def wrapper(func, callback):
     @functools.wraps(func)
     def wrapped(*args, **kwargs):
-        callback(False, *args, **kwargs)
-        return_val = func(*args, **kwargs)
         callback(True, *args, **kwargs)
+        return_val = func(*args, **kwargs)
+        callback(False, *args, **kwargs)
         return return_val
     return wrapped
     
