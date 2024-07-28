@@ -144,13 +144,14 @@ class MultiDeviceListener:
         self.iot_account_device_listener = None
     
 class MultiManager:  # noqa: F811
-    def __init__(self, hass: HomeAssistant, entry: XTConfigEntry) -> None:
+    def __init__(self, entry: XTConfigEntry) -> None:
         self.sharing_account: TuyaSharingData = None
         self.iot_account: TuyaIOTData = None
         self.reuse_config: bool = False
         self.descriptors = {}
         self.multi_mqtt_queue: MultiMQTTQueue = MultiMQTTQueue(self)
         self.multi_device_listener: MultiDeviceListener = MultiDeviceListener(self)
+        self.config_entry = entry
 
     @property
     def device_map(self):
@@ -160,10 +161,10 @@ class MultiManager:  # noqa: F811
     def mq(self):
         return self.multi_mqtt_queue
 
-    async def setup_entry(self, hass: HomeAssistant, entry: XTConfigEntry) -> None:
-        if (account := await self.get_iot_account(hass, entry)):
+    async def setup_entry(self, hass: HomeAssistant) -> None:
+        if (account := await self.get_iot_account(hass, self.config_entry)):
             self.iot_account = account
-        if (account := await self.get_sharing_account(hass,entry)):
+        if (account := await self.get_sharing_account(hass,self.config_entry)):
             self.sharing_account = account
 
     async def overriden_tuya_entry_updated(self, hass: HomeAssistant, config_entry: ConfigEntry) -> None:
@@ -171,7 +172,7 @@ class MultiManager:  # noqa: F811
 
     async def get_sharing_account(self, hass: HomeAssistant, entry: XTConfigEntry) -> TuyaSharingData | None:
         #See if our current entry is an override of a Tuya integration entry
-        tuya_config_entry, tuya_integration_runtime_data = get_overriden_tuya_integration_runtime_data(hass, entry)
+        tuya_integration_runtime_data = get_overriden_tuya_integration_runtime_data(hass, entry)
         if tuya_integration_runtime_data:
             #We are using an override of the Tuya integration
             decorate_tuya_manager(tuya_integration_runtime_data.device_manager, self)
@@ -337,13 +338,32 @@ class MultiManager:  # noqa: F811
             self.sharing_account.device_manager.on_external_refresh_mq()
     
     def on_tuya_setup_entry(self, before_call: bool, hass: HomeAssistant, entry: tuya_integration.TuyaConfigEntry):
-        LOGGER.warning(f"on_tuya_setup_entry {before_call} : {entry.__dict__}")
+        #LOGGER.warning(f"on_tuya_setup_entry {before_call} : {entry.__dict__}")
+        if not before_call and self.sharing_account and self.config_entry.title == entry.title:
+            self.reuse_config = True
+            tuya_integration_runtime_data = get_overriden_tuya_integration_runtime_data(hass, self.config_entry)
+            decorate_tuya_manager(tuya_integration_runtime_data.device_manager, self)
+            self.sharing_account.device_manager.set_overriden_device_manager(tuya_integration_runtime_data.device_manager)
+            self.sharing_account.device_manager.on_external_refresh_mq()
+            self.update_device_cache()
+
 
     def on_tuya_unload_entry(self, before_call: bool, hass: HomeAssistant, entry: tuya_integration.TuyaConfigEntry):
-        LOGGER.warning(f"on_tuya_unload_entry {before_call} : {entry.__dict__}")
-    
+        #LOGGER.warning(f"on_tuya_unload_entry {before_call} : {entry.__dict__}")
+        if not before_call and self.sharing_account and self.config_entry.title == entry.title:
+            self.reuse_config = False
+            self.sharing_account.device_manager.set_overriden_device_manager(None)
+            self.sharing_account.device_manager.mq = None
+            self.multi_mqtt_queue.sharing_account_mq = None
+
     def on_tuya_remove_entry(self, before_call: bool, hass: HomeAssistant, entry: tuya_integration.TuyaConfigEntry):
-        LOGGER.warning(f"on_tuya_remove_entry {before_call} : {entry.__dict__}")
+        #LOGGER.warning(f"on_tuya_remove_entry {before_call} : {entry.__dict__}")
+        if not before_call and self.sharing_account and self.config_entry.title == entry.title:
+            self.reuse_config = False
+            self.sharing_account.device_manager.set_overriden_device_manager(None)
+            self.sharing_account.device_manager.mq = None
+            self.multi_mqtt_queue.sharing_account_mq = None
+            self.sharing_account.device_manager.refresh_mq()
     
     def refresh_mq(self):
         if self.sharing_account:
