@@ -218,8 +218,7 @@ class DeviceManager(Manager):
         devices = self.multi_manager.get_devices_from_device_id(device_id)
         for current_device in devices:
             for status in status_new:
-                if status["code"] in current_device.status:
-                    current_device.status["code"] = status["value"]
+                current_device.status["code"] = status["value"]
         if other_manager := self.get_overriden_device_manager():
             other_manager._on_device_report(device_id, [])
         super()._on_device_report(device_id, [])
