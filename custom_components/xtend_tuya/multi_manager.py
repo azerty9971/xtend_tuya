@@ -332,6 +332,7 @@ class MultiManager:  # noqa: F811
         return aggregated_list
     
     def unload(self):
+        LOGGER.warning("UNLOAD")
         if self.sharing_account and not self.iot_account:
             #Only call the unload of the Sharing Manager if there is no IOT account as this will revoke its credentials
             self.sharing_account.device_manager.user_repository.unload(self.sharing_account.device_manager.terminal_id)
@@ -344,27 +345,6 @@ class MultiManager:  # noqa: F811
         #LOGGER.warning(f"on_tuya_setup_entry {before_call} : {entry.__dict__}")
         if not before_call and self.sharing_account and self.config_entry.title == entry.title:
             hass.config_entries.async_schedule_reload(self.config_entry.entry_id)
-            """self.reuse_config = True
-            tuya_integration_runtime_data = get_tuya_integration_runtime_data(hass, entry, DOMAIN_ORIG)
-            decorate_tuya_manager(tuya_integration_runtime_data.device_manager, self)
-            self.sharing_account.device_manager.set_overriden_device_manager(tuya_integration_runtime_data.device_manager)
-            self.sharing_account.device_manager.on_external_refresh_mq()
-            self.multi_mqtt_queue.sharing_account_mq             = self.sharing_account.device_manager.mq
-            self.sharing_account.device_manager.terminal_id      = tuya_integration_runtime_data.device_manager.terminal_id
-            self.sharing_account.device_manager.customer_api     = tuya_integration_runtime_data.device_manager.customer_api
-            self.sharing_account.device_manager.device_listeners = tuya_integration_runtime_data.device_manager.device_listeners
-            try:
-                await hass.async_add_executor_job(self.update_device_cache)
-            except Exception as exc:
-                # While in general, we should avoid catching broad exceptions,
-                # we have no other way of detecting this case.
-                if "sign invalid" in str(exc):
-                    msg = "Authentication failed. Please re-authenticate the Tuya integration"
-                    if self.reuse_config:
-                        raise ConfigEntryNotReady(msg) from exc
-                    else:
-                        raise ConfigEntryAuthFailed("Authentication failed. Please re-authenticate.")
-                raise"""
 
 
     async def on_tuya_unload_entry(self, before_call: bool, hass: HomeAssistant, entry: tuya_integration.TuyaConfigEntry):
