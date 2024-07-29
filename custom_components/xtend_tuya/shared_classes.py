@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import Any, Optional
 from types import SimpleNamespace
 from dataclasses import dataclass, field
+from .const import LOGGER
 
 @dataclass
 class XTDeviceProperties:
@@ -12,6 +13,9 @@ class XTDeviceProperties:
 
     def merge_in_device(self, device):
         if hasattr(device, "local_strategy"):
+            for strat in self.local_strategy:
+                if strat not in device.local_strategy:
+                    LOGGER.warning(f"Adding local_strategy : {self.local_strategy[strat]}")
             device.local_strategy.update(self.local_strategy)
         if hasattr(device, "status"):
             device.status.update(self.status)
