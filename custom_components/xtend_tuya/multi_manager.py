@@ -317,9 +317,10 @@ class MultiManager:  # noqa: F811
             """receiving_device.local_strategy.update(giving_device.local_strategy)
             giving_device.local_strategy = receiving_device.local_strategy"""
         if hasattr(receiving_device, "model") and hasattr(giving_device, "model"):
-            if not receiving_device.model:
+            if receiving_device.model == "" and giving_device.model != "":
                 receiving_device.model = copy.deepcopy(giving_device.model)
-            giving_device.model = copy.deepcopy(receiving_device.model)
+            if giving_device.model == "" and receiving_device.model != "":
+                giving_device.model = copy.deepcopy(receiving_device.model)
 
     def is_device_in_domain_device_maps(self, domains: list[str], device_entry_identifiers: list[str]):
         if device_entry_identifiers[0] in domains:
