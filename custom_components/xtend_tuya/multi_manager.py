@@ -551,29 +551,32 @@ class MultiManager:  # noqa: F811
         self.on_message(MESSAGE_SOURCE_TUYA_SHARING, msg)
 
     def on_message(self, source: str, msg: str):
-        LOGGER.debug(f"on_message from {source} : {msg}")
         dev_id = self._get_device_id_from_message(msg)
         if not dev_id:
             LOGGER.warning(f"dev_id {dev_id} not found!")
             return
         
         new_message = self._convert_message_for_all_accounts(msg)
-        if self.sharing_account and dev_id in self.sharing_account.device_ids:
-            if source == MESSAGE_SOURCE_TUYA_SHARING:
-                self.sharing_account.device_manager.on_message(new_message)
-            else:
-                return
-        elif self.iot_account and dev_id in self.iot_account.device_ids:
-            if source == MESSAGE_SOURCE_TUYA_IOT:
-                self.iot_account.device_manager.on_message(new_message)
-            else:
-                return
+        allowed_source = self.get_allowed_source(dev_id)
+        if source == MESSAGE_SOURCE_TUYA_SHARING and source == allowed_source:
+            self.sharing_account.device_manager.on_message(new_message)
+        elif source == MESSAGE_SOURCE_TUYA_IOT and source == allowed_source:
+            self.iot_account.device_manager.on_message(new_message)
         
         #DEBUG
         """device = self.get_aggregated_device_map()[dev_id]
         LOGGER.warning(f"on_message : {new_message}")
         LOGGER.warning(f"Device status after : {device.status}")"""
         #END DEBUG
+
+    def get_allowed_source(self, dev_id: str, original_source: str) -> str | None:
+        if dev_id.startswith("vdevo"):
+            return MESSAGE_SOURCE_TUYA_IOT
+        if self.sharing_account and self.sharing_account and dev_id in self.sharing_account.device_ids:
+            return MESSAGE_SOURCE_TUYA_SHARING
+        if self.iot_account and dev_id in self.iot_account.device_ids:
+            return MESSAGE_SOURCE_TUYA_IOT
+        return None
 
     def _get_device_id_from_message(self, msg: str) -> str | None:
         protocol = msg.get("protocol", 0)
