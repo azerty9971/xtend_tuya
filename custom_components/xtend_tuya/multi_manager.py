@@ -551,6 +551,7 @@ class MultiManager:  # noqa: F811
         self.on_message(MESSAGE_SOURCE_TUYA_SHARING, msg)
 
     def on_message(self, source: str, msg: str):
+        LOGGER.debug(f"on_message from {source} : {msg}")
         dev_id = self._get_device_id_from_message(msg)
         if not dev_id:
             LOGGER.warning(f"dev_id {dev_id} not found!")
@@ -602,9 +603,9 @@ class MultiManager:  # noqa: F811
     def send_commands(
             self, device_id: str, commands: list[dict[str, Any]]
     ):
-        open_api_regular_commands = []
-        regular_commands = []
-        property_commands = []
+        open_api_regular_commands: list[dict[str, Any]] = []
+        regular_commands: list[dict[str, Any]] = []
+        property_commands: list[dict[str, Any]] = []
         device_map = self.get_aggregated_device_map()
         if device := device_map.get(device_id, None):
             for command in commands:
@@ -614,8 +615,8 @@ class MultiManager:  # noqa: F811
                     value = command["value"]
                     if command["code"] == code:
                         if not dp_item.get("use_open_api", False):
-                            command_dict = {"code": code, "value": value}
-                            regular_commands.append(command_dict)
+                            #command_dict = {"code": code, "value": value}
+                            regular_commands.append(command)
                         else:
                             if dp_item.get("property_update", False):
                                 value = prepare_value_for_property_update(dp_item, command["value"])
