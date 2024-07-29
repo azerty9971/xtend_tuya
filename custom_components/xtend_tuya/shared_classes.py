@@ -62,6 +62,7 @@ class XTDevice(SimpleNamespace):
     active_time: int
     create_time: int
     update_time: int
+    model: Optional[str] = ""
     set_up: Optional[bool] = False
     support_local: Optional[bool] = False
     local_strategy: dict[int, dict[str, Any]]
@@ -71,7 +72,6 @@ class XTDevice(SimpleNamespace):
     status_range: dict[str, XTDeviceStatusRange]
 
     force_open_api: Optional[bool] = False
-    model: Optional[str] = ""
 
     def __init__(self, **kwargs: Any) -> None:
         self.local_strategy = {}
