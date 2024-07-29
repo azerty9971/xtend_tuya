@@ -13,6 +13,7 @@ class XTDeviceProperties:
     status: dict[str, Any] = field(default_factory=dict)
     function: dict[str, XTDeviceFunction] = field(default_factory=dict)
     status_range: dict[str, XTDeviceStatusRange] = field(default_factory=dict)
+    model: dict = field(default_factory=dict)
 
     def merge_in_device(self, device):
         if hasattr(device, "local_strategy"):
@@ -27,6 +28,8 @@ class XTDeviceProperties:
         if hasattr(device, "status_range"):
             merge_iterables(device.status_range, self.status_range)
             #device.status_range.update(self.status_range)
+        if hasattr(device, "model"):
+            merge_iterables(device.model, self.model)
 
 @dataclass
 class XTDeviceStatusRange:
