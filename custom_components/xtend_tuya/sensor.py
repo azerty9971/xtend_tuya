@@ -56,15 +56,9 @@ class TuyaSensorEntityDescription(SensorEntityDescription):
 BATTERY_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
 )
 
-# All descriptions can be found here. Mostly the Integer data types in the
-# default status set of each category (that don't have a set instruction)
-# end up being a sensor.
-# https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
-SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
-    # Switch
-    # https://developer.tuya.com/en/docs/iot/s?id=K9gf7o5prgf7s
-    "kg": (
-        TuyaSensorEntityDescription(
+#Commonlu sed energy sensors, that are re-used in the sensors down below.
+CONSUMPTION_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
+    TuyaSensorEntityDescription(
             key=DPCode.ADD_ELE,
             virtual_state=VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME | VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD,
             vs_copy_to_state=[DPCode.ADD_ELE2],
@@ -74,16 +68,54 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
             native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
             entity_registry_enabled_default=True,
             restoredata=True,
-        ),
-        TuyaSensorEntityDescription(
-            key=DPCode.ADD_ELE2,
-            translation_key="add_ele2",
-            device_class=SensorDeviceClass.ENERGY,
-            state_class=SensorStateClass.TOTAL_INCREASING,
-            native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
-            entity_registry_enabled_default=False,
-            restoredata=True,
-        ),
+    ),
+    TuyaSensorEntityDescription(
+        key=DPCode.ADD_ELE2,
+        translation_key="add_ele2",
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        entity_registry_enabled_default=False,
+        restoredata=True,
+    ),
+    TuyaSensorEntityDescription(
+        key=DPCode.BALANCE_ENERGY,
+        translation_key="balance_energy",
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        entity_registry_enabled_default=True,
+        restoredata=False,
+    ),
+    TuyaSensorEntityDescription(
+        key=DPCode.CHARGE_ENERGY,
+        translation_key="charge_energy",
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        entity_registry_enabled_default=True,
+        restoredata=False,
+    ),
+    TuyaSensorEntityDescription(
+        key=DPCode.TOTAL_FORWARD_ENERGY,
+        translation_key="total_forward_energy",
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        entity_registry_enabled_default=True,
+        restoredata=False,
+    ),
+)
+
+# All descriptions can be found here. Mostly the Integer data types in the
+# default status set of each category (that don't have a set instruction)
+# end up being a sensor.
+# https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
+SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
+    # Switch
+    # https://developer.tuya.com/en/docs/iot/s?id=K9gf7o5prgf7s
+    "kg": (
+        CONSUMPTION_SENSORS,
     ),
     # Automatic cat litter box
     # Note: Undocumented
