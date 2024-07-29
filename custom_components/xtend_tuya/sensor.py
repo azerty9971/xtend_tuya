@@ -115,7 +115,7 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
     # Switch
     # https://developer.tuya.com/en/docs/iot/s?id=K9gf7o5prgf7s
     "kg": (
-        CONSUMPTION_SENSORS,
+        *CONSUMPTION_SENSORS,
     ),
     # Automatic cat litter box
     # Note: Undocumented
