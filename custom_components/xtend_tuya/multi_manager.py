@@ -70,14 +70,14 @@ from .const import (
     MESSAGE_SOURCE_TUYA_SHARING,
 )
 
-from .shared_classes import (
-    XTDeviceProperties,
-    XTDevice,
-)
-
 from .import_stub import (
     MultiManager,
     XTConfigEntry,
+)
+
+from .shared_classes import (
+    XTDeviceProperties,
+    XTDevice,
 )
 
 from .util import (
