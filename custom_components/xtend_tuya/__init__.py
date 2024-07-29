@@ -58,8 +58,7 @@ logging.getLogger("tuya_sharing").setLevel(logging.CRITICAL)
 
 async def update_listener(hass, entry):
     """Handle options update."""
-    LOGGER.warning(f"update_listener => {entry}")
-    LOGGER.warning(f"update_listener => {entry.data}")
+    hass.config_entries.async_schedule_reload(entry.entry_id)
 
 async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
     #LOGGER.warning(f"async_setup_entry {entry.title} : {entry.data}")
