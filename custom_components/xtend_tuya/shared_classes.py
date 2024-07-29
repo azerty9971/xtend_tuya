@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import Any, Optional
 from types import SimpleNamespace
+import copy
 from dataclasses import dataclass, field
 from .const import LOGGER
 from .util import (
@@ -29,7 +30,7 @@ class XTDeviceProperties:
             merge_iterables(device.status_range, self.status_range)
             #device.status_range.update(self.status_range)
         if hasattr(device, "model"):
-            device.model = self.model
+            device.model = copy.deepcopy(self.model)
 
 @dataclass
 class XTDeviceStatusRange:
