@@ -221,6 +221,14 @@ class DeviceManager(Manager):
             for status in status_new:
                 current_device.status[status["code"]] = status["value"]
         super()._on_device_report(device_id, [])
+    
+    def send_commands(
+            self, device_id: str, commands: list[dict[str, Any]]
+    ):
+        if other_manager := self.get_overriden_device_manager():
+            other_manager.send_commands(device_id, commands)
+            return
+        super().send_commands(device_id, commands)
 
 class XTDeviceRepository(DeviceRepository):
     def __init__(self, customer_api: CustomerApi, manager: DeviceManager, multi_manager: MultiManager):
