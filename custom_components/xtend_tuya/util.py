@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 import traceback 
+import copy
 from typing import NamedTuple
 from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
@@ -86,6 +87,14 @@ def get_overriden_config_entry(hass: HomeAssistant, entry: XTConfigEntry, other_
         if entry.title == od_config_entry.title:
             return od_config_entry
     return None
+
+def merge_iterables(iter1, iter2):
+    for item1 in iter1:
+        if item1 not in iter2:
+            iter2[item1] = copy.deepcopy(iter1[item1])
+    for item2 in iter2:
+        if item2 not in iter1:
+            iter1[item2] = copy.deepcopy(iter2[item2])
 
 def get_tuya_integration_runtime_data(hass: HomeAssistant, entry: ConfigEntry, domain: str) -> TuyaIntegrationRuntimeData | None:
     if not entry:

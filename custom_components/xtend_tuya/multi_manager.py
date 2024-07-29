@@ -83,7 +83,8 @@ from .import_stub import (
 from .util import (
     get_overriden_tuya_integration_runtime_data,
     get_tuya_integration_runtime_data,
-    prepare_value_for_property_update
+    prepare_value_for_property_update,
+    merge_iterables,
 )
 
 from .tuya_decorators import (
@@ -302,15 +303,19 @@ class MultiManager:  # noqa: F811
             device_map.update(aggregated_device_list)
         
     def _merge_devices(self, receiving_device: XTDevice, giving_device: XTDevice):
-        receiving_device.status_range.update(giving_device.status_range)
+        merge_iterables(receiving_device.status_range, giving_device.status_range)
+        merge_iterables(receiving_device.function, giving_device.function)
+        merge_iterables(receiving_device.status, giving_device.status)
+        """receiving_device.status_range.update(giving_device.status_range)
         giving_device.status_range = receiving_device.status_range
         receiving_device.function.update(giving_device.function)
         giving_device.function = receiving_device.function
         receiving_device.status.update(giving_device.status)
-        giving_device.status = receiving_device.status
+        giving_device.status = receiving_device.status"""
         if hasattr(receiving_device, "local_strategy") and hasattr(giving_device, "local_strategy"):
-            receiving_device.local_strategy.update(giving_device.local_strategy)
-            giving_device.local_strategy = receiving_device.local_strategy
+            merge_iterables(receiving_device.local_strategy, giving_device.local_strategy)
+            """receiving_device.local_strategy.update(giving_device.local_strategy)
+            giving_device.local_strategy = receiving_device.local_strategy"""
 
     def is_device_in_domain_device_maps(self, domains: list[str], device_entry_identifiers: list[str]):
         if device_entry_identifiers[0] in domains:
