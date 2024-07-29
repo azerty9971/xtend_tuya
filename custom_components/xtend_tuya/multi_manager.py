@@ -278,8 +278,8 @@ class MultiManager:  # noqa: F811
     def _get_available_device_maps(self) -> list[dict[str, XTDevice]]:
         return_list: list[dict[str, XTDevice]] = list()
         if self.sharing_account:
-            if other_manager := self.sharing_account.device_manager.get_overriden_device_manager():
-                return_list.append(other_manager.device_map)
+            """if other_manager := self.sharing_account.device_manager.get_overriden_device_manager():
+                return_list.append(other_manager.device_map)"""
             return_list.append(self.sharing_account.device_manager.device_map)
         if self.iot_account:
             return_list.append(self.iot_account.device_manager.device_map)
