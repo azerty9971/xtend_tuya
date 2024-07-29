@@ -621,10 +621,13 @@ class MultiManager:  # noqa: F811
                                 open_api_regular_commands.append(command_dict)
                             break
             if regular_commands:
+                LOGGER.warning(f"Sending regular command : {regular_commands}")
                 self.sharing_account.device_manager.send_commands(device_id, regular_commands)
             if open_api_regular_commands:
+                LOGGER.warning(f"Sending Open API regular command : {open_api_regular_commands}")
                 self.iot_account.device_manager.send_commands(device_id, open_api_regular_commands)
             if property_commands:
+                LOGGER.warning(f"Sending property command : {property_commands}")
                 self.iot_account.device_manager.send_property_update(device_id, property_commands)
             return
         self.sharing_account.device_manager.send_commands(device_id, commands)
