@@ -229,6 +229,8 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
             device_properties.local_strategy = copy.deepcopy(device.local_strategy)
         response = self.api.get(f"/v2.0/cloud/thing/{device.id}/shadow/properties")
         response2 = self.api.get(f"/v2.0/cloud/thing/{device.id}/model")
+        LOGGER.warning(f"get_device_properties1 : {response}")
+        LOGGER.warning(f"get_device_properties2 : {response2}")
         if response2.get("success"):
             result = response2.get("result", {})
             model = json.loads(result.get("model", "{}"))
