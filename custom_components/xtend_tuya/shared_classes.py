@@ -62,7 +62,7 @@ class XTDevice(SimpleNamespace):
     active_time: int
     create_time: int
     update_time: int
-    model: Optional[str] = ""
+    model: str = ""
     set_up: Optional[bool] = False
     support_local: Optional[bool] = False
     local_strategy: dict[int, dict[str, Any]]
