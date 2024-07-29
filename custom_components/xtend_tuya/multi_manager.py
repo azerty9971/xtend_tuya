@@ -608,6 +608,7 @@ class MultiManager:  # noqa: F811
         device_map = self.get_aggregated_device_map()
         if device := device_map.get(device_id, None):
             for command in commands:
+                LOGGER.warning(f"Base command : {command}")
                 for dp_item in device.local_strategy.values():
                     code = dp_item.get("status_code", None)
                     value = command["value"]
