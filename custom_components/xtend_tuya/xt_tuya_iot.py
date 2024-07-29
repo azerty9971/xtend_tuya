@@ -232,6 +232,7 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
         if response2.get("success"):
             result = response2.get("result", {})
             model = json.loads(result.get("model", "{}"))
+            LOGGER.warning(f"{model}")
             device_properties.model = model
             for service in model["services"]:
                 for property in service["properties"]:
