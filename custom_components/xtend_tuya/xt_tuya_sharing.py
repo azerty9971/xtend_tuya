@@ -72,7 +72,7 @@ from .const import (
 from .util import (
     determine_property_type, 
     prepare_value_for_property_update,
-    log_stack
+    log_stack,
 )
 
 from .multi_manager import (

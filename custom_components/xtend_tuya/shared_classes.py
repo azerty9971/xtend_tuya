@@ -3,6 +3,9 @@ from typing import Any, Optional
 from types import SimpleNamespace
 from dataclasses import dataclass, field
 from .const import LOGGER
+from .util import (
+    merge_iterables,
+)
 
 @dataclass
 class XTDeviceProperties:
@@ -13,13 +16,17 @@ class XTDeviceProperties:
 
     def merge_in_device(self, device):
         if hasattr(device, "local_strategy"):
-            device.local_strategy.update(self.local_strategy)
+            merge_iterables(device.local_strategy, self.local_strategy)
+            #device.local_strategy.update(self.local_strategy)
         if hasattr(device, "status"):
-            device.status.update(self.status)
+            merge_iterables(device.status, self.status)
+            #device.status.update(self.status)
         if hasattr(device, "function"):
-            device.function.update(self.function)
+            merge_iterables(device.function, self.function)
+            #device.function.update(self.function)
         if hasattr(device, "status_range"):
-            device.status_range.update(self.status_range)
+            merge_iterables(device.status_range, self.status_range)
+            #device.status_range.update(self.status_range)
 
 @dataclass
 class XTDeviceStatusRange:

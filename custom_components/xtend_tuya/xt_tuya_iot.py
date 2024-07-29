@@ -192,10 +192,8 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
         for device_id in self.device_map:
             device = self.device_map[device_id]
             device_properties = self.get_device_properties(device)
-            devices = self.multi_manager.get_devices_from_device_id(device_id)
-            for current_device in devices:
-                device_properties.merge_in_device(current_device)
-                self.multi_manager.apply_init_virtual_states(current_device)
+            device_properties.merge_in_device(device)
+            self.multi_manager.apply_init_virtual_states(device)
 
 
     
