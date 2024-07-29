@@ -557,7 +557,7 @@ class MultiManager:  # noqa: F811
             return
         
         new_message = self._convert_message_for_all_accounts(msg)
-        allowed_source = self.get_allowed_source(dev_id)
+        allowed_source = self.get_allowed_source(dev_id, source)
         if source == MESSAGE_SOURCE_TUYA_SHARING and source == allowed_source:
             self.sharing_account.device_manager.on_message(new_message)
         elif source == MESSAGE_SOURCE_TUYA_IOT and source == allowed_source:
