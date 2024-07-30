@@ -2,10 +2,32 @@
 
 from __future__ import annotations
 import traceback 
+import copy
+from typing import NamedTuple
+from homeassistant.core import HomeAssistant
+from homeassistant.config_entries import ConfigEntry
 from .const import (
     DPType,
     LOGGER,
+    DOMAIN,
+    DOMAIN_ORIG,
 )
+
+from tuya_sharing import (
+    Manager as TuyaSharingManager,
+    SharingDeviceListener,
+
+)
+
+from .multi_manager import (
+    MultiManager,
+    XTConfigEntry,
+)
+
+class TuyaIntegrationRuntimeData(NamedTuple):
+    device_manager: TuyaSharingManager
+    listener: SharingDeviceListener
+    generic_runtime_data: any
 
 class LogStackException(Exception):
     pass
@@ -55,3 +77,55 @@ def prepare_value_for_property_update(dp_item, value) -> str:
                 else:
                     return 'false'
     return str(value)
+
+def get_domain_config_entries(hass: HomeAssistant, domain: str) -> list[ConfigEntry]:
+    return hass.config_entries.async_entries(domain,False,False)
+
+def get_overriden_config_entry(hass: HomeAssistant, entry: XTConfigEntry, other_domain: str) -> ConfigEntry:
+    other_domain_config_entries = get_domain_config_entries(hass, other_domain)
+    for od_config_entry in other_domain_config_entries:
+        if entry.title == od_config_entry.title:
+            return od_config_entry
+    return None
+
+def merge_iterables(iter1, iter2):
+    for item1 in iter1:
+        if item1 not in iter2:
+            iter2[item1] = copy.deepcopy(iter1[item1])
+    for item2 in iter2:
+        if item2 not in iter1:
+            iter1[item2] = copy.deepcopy(iter2[item2])
+
+def get_tuya_integration_runtime_data(hass: HomeAssistant, entry: ConfigEntry, domain: str) -> TuyaIntegrationRuntimeData | None:
+    if not entry:
+        return None
+    runtime_data = None
+    if (
+        not hasattr(entry, 'runtime_data') 
+        or entry.runtime_data is None
+    ):
+        #Try to fetch the manager using the old way
+        device_manager = None
+        if (
+            domain in hass.data and
+            entry.entry_id in hass.data[domain]
+        ):
+            runtime_data = hass.data[domain][entry.entry_id]
+            if hasattr(runtime_data, "device_manager"):
+                device_manager = runtime_data.device_manager
+            if hasattr(runtime_data, "manager"):
+                device_manager = runtime_data.manager
+            listener = runtime_data.listener
+    else:
+        runtime_data = entry.runtime_data
+        device_manager = entry.runtime_data.manager
+        listener = entry.runtime_data.listener
+    if device_manager:
+        return TuyaIntegrationRuntimeData(device_manager=device_manager, generic_runtime_data=runtime_data, listener=listener)
+    else:
+        return None
+
+def get_overriden_tuya_integration_runtime_data(hass: HomeAssistant, entry: ConfigEntry) -> TuyaIntegrationRuntimeData | None:
+    if (overriden_config_entry := get_overriden_config_entry(hass,entry, DOMAIN_ORIG)):
+        return get_tuya_integration_runtime_data(hass, overriden_config_entry, DOMAIN_ORIG)
+    return None

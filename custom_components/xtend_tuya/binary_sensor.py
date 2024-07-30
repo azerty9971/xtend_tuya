@@ -16,7 +16,7 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from . import TuyaConfigEntry
+from .multi_manager import XTConfigEntry
 from .base import TuyaEntity
 from .const import TUYA_DISCOVERY_NEW, DPCode
 
@@ -51,10 +51,6 @@ BINARY_SENSORS: dict[str, tuple[TuyaBinarySensorEntityDescription, ...]] = {
         #If 0 is reported, it will not be counted
         #(today and the average number of toilet visits will be counted on the APP)
         TuyaBinarySensorEntityDescription(
-            key=DPCode.CLEANING,
-            translation_key="one_click_cleanup",
-        ),
-        TuyaBinarySensorEntityDescription(
             key=DPCode.CLEANING_NUM,
             translation_key="cleaning_num",
         ),
@@ -74,31 +70,32 @@ BINARY_SENSORS: dict[str, tuple[TuyaBinarySensorEntityDescription, ...]] = {
 
 
 async def async_setup_entry(
-    hass: HomeAssistant, entry: TuyaConfigEntry, async_add_entities: AddEntitiesCallback
+    hass: HomeAssistant, entry: XTConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
     """Set up Tuya binary sensor dynamically through Tuya discovery."""
     hass_data = entry.runtime_data
 
     @callback
-    def async_discover_device(manager, device_map) -> None:
+    def async_discover_device(device_map) -> None:
         """Discover and add a discovered Tuya binary sensor."""
         entities: list[TuyaBinarySensorEntity] = []
         device_ids = [*device_map]
         for device_id in device_ids:
-            device = device_map[device_id]
+            device = hass_data.manager.device_map[device_id]
             if descriptions := BINARY_SENSORS.get(device.category):
                 for description in descriptions:
                     dpcode = description.dpcode or description.key
                     if dpcode in device.status:
                         entities.append(
                             TuyaBinarySensorEntity(
-                                device, manager, description
+                                device, hass_data.manager, description
                             )
                         )
 
         async_add_entities(entities)
 
-    async_discover_device(hass_data.manager, hass_data.manager.device_map)
+    hass_data.manager.register_device_descriptors("binary_sensors", BINARY_SENSORS)
+    async_discover_device([*hass_data.manager.device_map])
     #async_discover_device(hass_data.manager, hass_data.manager.open_api_device_map)
 
     entry.async_on_unload(
