@@ -52,8 +52,10 @@ CONF_APP_TYPE = "tuya_app_type"
 TUYA_CLIENT_ID = "HA_3y9q4ak7g4ephrvke"
 TUYA_SCHEMA = "haauthorize"
 
-TUYA_DISCOVERY_NEW = "tuya_discovery_new"
-TUYA_HA_SIGNAL_UPDATE_ENTITY = "tuya_entry_update"
+TUYA_DISCOVERY_NEW_ORIG = "tuya_discovery_new"
+TUYA_HA_SIGNAL_UPDATE_ENTITY_ORIG = "tuya_entry_update"
+TUYA_DISCOVERY_NEW = "xt_tuya_discovery_new"
+TUYA_HA_SIGNAL_UPDATE_ENTITY = "xt_tuya_entry_update"
 
 TUYA_RESPONSE_CODE = "code"
 TUYA_RESPONSE_MSG = "msg"
@@ -64,6 +66,9 @@ TUYA_RESPONSE_SUCCESS = "success"
 TUYA_RESPONSE_PLATFORM_URL = "platform_url"
 TUYA_SMART_APP = "tuyaSmart"
 SMARTLIFE_APP = "smartlife"
+
+MESSAGE_SOURCE_TUYA_IOT = "tuya_iot"
+MESSAGE_SOURCE_TUYA_SHARING = "tuya_sharing"
 
 PLATFORMS = [
     Platform.ALARM_CONTROL_PANEL,
@@ -141,6 +146,7 @@ class DPCode(StrEnum):
     AUTO_DEORDRIZER = "auto_deordrizer"
     AUTO_LOCK_TIME = "auto_lock_time"
     AUTOMATIC_LOCK = "automatic_lock"
+    BALANCE_ENERGY = "balance_energy"
     BASIC_ANTI_FLICKER = "basic_anti_flicker"
     BASIC_DEVICE_VOLUME = "basic_device_volume"
     BASIC_FLIP = "basic_flip"
@@ -176,6 +182,7 @@ class DPCode(StrEnum):
     CH2O_VALUE = "ch2o_value"
     CH4_SENSOR_STATE = "ch4_sensor_state"
     CH4_SENSOR_VALUE = "ch4_sensor_value"
+    CHARGE_ENERGY = "charge_energy"
     CHILD_LOCK = "child_lock"  # Child lock
     CISTERN = "cistern"
     CLEAN = "clean"

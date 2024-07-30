@@ -16,7 +16,7 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from . import TuyaConfigEntry
+from .multi_manager import XTConfigEntry
 from .base import IntegerTypeData, TuyaEntity
 from .const import TUYA_DISCOVERY_NEW, DPCode, DPType
 
@@ -37,26 +37,26 @@ HUMIDIFIERS: dict[str, TuyaHumidifierEntityDescription] = {
 
 
 async def async_setup_entry(
-    hass: HomeAssistant, entry: TuyaConfigEntry, async_add_entities: AddEntitiesCallback
+    hass: HomeAssistant, entry: XTConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
     """Set up Tuya (de)humidifier dynamically through Tuya discovery."""
     hass_data = entry.runtime_data
 
     @callback
-    def async_discover_device(manager, device_map) -> None:
+    def async_discover_device(device_map) -> None:
         """Discover and add a discovered Tuya (de)humidifier."""
         entities: list[TuyaHumidifierEntity] = []
         device_ids = [*device_map]
         for device_id in device_ids:
-            device = device_map[device_id]
+            device = hass_data.manager.device_map[device_id]
             if description := HUMIDIFIERS.get(device.category):
                 entities.append(
-                    TuyaHumidifierEntity(device, manager, description)
+                    TuyaHumidifierEntity(device, hass_data.manager, description)
                 )
         async_add_entities(entities)
 
-    async_discover_device(hass_data.manager, hass_data.manager.device_map)
-    #async_discover_device(hass_data.manager, hass_data.manager.open_api_device_map)
+    hass_data.manager.register_device_descriptors("humidifiers", HUMIDIFIERS)
+    async_discover_device([*hass_data.manager.device_map])
 
     entry.async_on_unload(
         async_dispatcher_connect(hass, TUYA_DISCOVERY_NEW, async_discover_device)
