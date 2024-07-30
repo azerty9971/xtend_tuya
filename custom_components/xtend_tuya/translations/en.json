@@ -641,6 +641,15 @@
       }
     },
     "sensor": {
+      "balance_energy": {
+        "name": "Balance energy"
+      },
+      "charge_energy": {
+        "name": "Charge energy"
+      },
+      "total_forward_energy": {
+        "name": "Total forward energy"
+      },
       "msp_history": {
         "name": "History",
         "state": {
