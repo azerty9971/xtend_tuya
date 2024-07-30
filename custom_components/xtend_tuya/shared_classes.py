@@ -85,5 +85,5 @@ class XTDevice(SimpleNamespace):
         """If devices are the same one."""
         return self.id == other.id
 
-    def from_customer_device(device):
+    def from_compatible_device(device):
         return XTDevice(**(device.__dict__))
