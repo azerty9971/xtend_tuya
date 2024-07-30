@@ -277,12 +277,12 @@ class MultiManager:  # noqa: F811
     
     def _get_available_device_maps(self) -> list[dict[str, XTDevice]]:
         return_list: list[dict[str, XTDevice]] = list()
+        if self.iot_account:
+            return_list.append(self.iot_account.device_manager.device_map)
         if self.sharing_account:
             return_list.append(self.sharing_account.device_manager.device_map)
             if other_manager := self.sharing_account.device_manager.get_overriden_device_manager():
                 return_list.append(other_manager.device_map)
-        if self.iot_account:
-            return_list.append(self.iot_account.device_manager.device_map)
         return return_list
 
     def _merge_devices_from_multiple_sources(self):
@@ -338,7 +338,7 @@ class MultiManager:  # noqa: F811
         for device_map in device_maps:
             for device_id in device_map:
                 if device_id not in aggregated_list:
-                    aggregated_list[device_id] = XTDevice.from_customer_device(device_map[device_id])
+                    aggregated_list[device_id] = XTDevice.from_compatible_device(device_map[device_id])
         return aggregated_list
     
     def unload(self):
