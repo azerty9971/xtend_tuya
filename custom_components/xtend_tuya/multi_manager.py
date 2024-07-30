@@ -268,6 +268,8 @@ class MultiManager:  # noqa: F811
             new_device_ids: list[str] = [device_id for device_id in self.sharing_account.device_manager.device_map]
             self.sharing_account.device_ids.clear()
             self.sharing_account.device_ids.extend(new_device_ids)
+            if other_manager := self.sharing_account.device_manager.get_overriden_device_manager():
+                self._convert_tuya_devices_to_xt(other_manager)
         if self.iot_account:
             self.iot_account.home_manager.update_device_cache()
             new_device_ids: list[str] = [device_id for device_id in self.iot_account.device_manager.device_map]
@@ -275,6 +277,10 @@ class MultiManager:  # noqa: F811
             self.iot_account.device_ids.extend(new_device_ids)
         self._merge_devices_from_multiple_sources()
     
+    def _convert_tuya_devices_to_xt(self, manager):
+        for dev_id in manager.device_map:
+            manager.device_map[dev_id] = XTDevice.from_compatible_device(manager.device_map[dev_id])
+
     def _get_available_device_maps(self) -> list[dict[str, XTDevice]]:
         return_list: list[dict[str, XTDevice]] = list()
         if self.sharing_account:
