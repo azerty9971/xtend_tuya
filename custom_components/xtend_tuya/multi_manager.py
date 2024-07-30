@@ -574,10 +574,10 @@ class MultiManager:  # noqa: F811
     def get_allowed_source(self, dev_id: str, original_source: str) -> str | None:
         if dev_id.startswith("vdevo"):
             return MESSAGE_SOURCE_TUYA_IOT
-        if self.sharing_account and self.sharing_account and dev_id in self.sharing_account.device_ids:
-            return MESSAGE_SOURCE_TUYA_SHARING
         if self.iot_account and dev_id in self.iot_account.device_ids:
             return MESSAGE_SOURCE_TUYA_IOT
+        if self.sharing_account and self.sharing_account and dev_id in self.sharing_account.device_ids:
+            return MESSAGE_SOURCE_TUYA_SHARING
         return None
 
     def _get_device_id_from_message(self, msg: str) -> str | None:
