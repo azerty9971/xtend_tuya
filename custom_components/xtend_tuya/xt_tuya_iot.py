@@ -91,8 +91,6 @@ class XTDeviceListener(TuyaDeviceListener):
 
     def remove_device(self, device_id: str) -> None:
         """Add device removed listener."""
-        if device_manager := self.device_manager.get_overriden_device_manager():
-            device_manager.remove_device(device_id)
         self.hass.add_job(self.async_remove_device, device_id)
 
     @callback
