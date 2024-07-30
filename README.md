@@ -22,3 +22,13 @@ Once this is done, restart your HomeAssistant instance, go to Settings -> Device
 # Usage
 Once installed, the base devices should have the new entities automatically added and they should be supported in the Energy dashboard for instance<br/>
 If you have more than 1 tuya account, click go to the Xtended Tuya configuration page (Settings -> Devices and integrations -> Xtended Tuya) and click "Add a bridge", this will pull the next available Tuya configuration available (repeat for more)
+
+# Adding your Tuya Cloud credentials
+If you have missing entities, you can try inserting your Tuya Cloud API credentials.
+To do that, go to the Xtended Tuya integration page, next to your account, click the "configure" button.
+You'll be prompted for cloud credentials, for an assistance on how to get these, follow the following tutorial:
+https://www.youtube.com/watch?v=y6kNHIYcJ5c
+Please watch out that the username is the same as the username displayed in the regular Tuya integration
+(the gg-106053160716494114782 in the following screenshot)
+![image](https://github.com/user-attachments/assets/8f8ec9d3-1454-4ef5-8871-61ab4c12de90)
+
