@@ -552,6 +552,7 @@ class MultiManager:  # noqa: F811
         self.on_message(MESSAGE_SOURCE_TUYA_SHARING, msg)
 
     def on_message(self, source: str, msg: str):
+        LOGGER.debug(f"on_message from {source} : {msg}")
         dev_id = self._get_device_id_from_message(msg)
         if not dev_id:
             LOGGER.warning(f"dev_id {dev_id} not found!")
@@ -613,7 +614,7 @@ class MultiManager:  # noqa: F811
         device_map = self.get_aggregated_device_map()
         if device := device_map.get(device_id, None):
             for command in commands:
-                #LOGGER.warning(f"Base command : {command}")
+                LOGGER.warning(f"Base command : {command}")
                 for dp_item in device.local_strategy.values():
                     code = dp_item.get("status_code", None)
                     value = command["value"]
@@ -631,13 +632,13 @@ class MultiManager:  # noqa: F811
                                 open_api_regular_commands.append(command_dict)
                             break
             if regular_commands:
-                #LOGGER.warning(f"Sending regular command : {regular_commands}")
+                LOGGER.warning(f"Sending regular command : {regular_commands}")
                 self.sharing_account.device_manager.send_commands(device_id, regular_commands)
             if open_api_regular_commands:
-                #LOGGER.warning(f"Sending Open API regular command : {open_api_regular_commands}")
+                LOGGER.warning(f"Sending Open API regular command : {open_api_regular_commands}")
                 self.iot_account.device_manager.send_commands(device_id, open_api_regular_commands)
             if property_commands:
-                #LOGGER.warning(f"Sending property command : {property_commands}")
+                LOGGER.warning(f"Sending property command : {property_commands}")
                 self.iot_account.device_manager.send_property_update(device_id, property_commands)
             return
         self.sharing_account.device_manager.send_commands(device_id, commands)
