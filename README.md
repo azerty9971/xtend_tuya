@@ -24,11 +24,11 @@ Once installed, the base devices should have the new entities automatically adde
 If you have more than 1 tuya account, click go to the Xtended Tuya configuration page (Settings -> Devices and integrations -> Xtended Tuya) and click "Add a bridge", this will pull the next available Tuya configuration available (repeat for more)
 
 # Adding your Tuya Cloud credentials
-If you have missing entities, you can try inserting your Tuya Cloud API credentials.
-To do that, go to the Xtended Tuya integration page, next to your account, click the "configure" button.
-You'll be prompted for cloud credentials, for an assistance on how to get these, follow the following tutorial:
-https://www.youtube.com/watch?v=y6kNHIYcJ5c
-Please watch out that the username is the same as the username displayed in the regular Tuya integration
-(the gg-106053160716494114782 in the following screenshot)
+If you have missing entities, you can try inserting your Tuya Cloud API credentials.<br/>
+To do that, go to the Xtended Tuya integration page, next to your account, click the "configure" button.<br/>
+You'll be prompted for cloud credentials, for an assistance on how to get these, follow the following tutorial:<br/>
+https://www.youtube.com/watch?v=y6kNHIYcJ5c<br/>
+Please watch out that the username is the same as the username displayed in the regular Tuya integration<br/>
+(the gg-106053160716494114782 in the following screenshot)<br/>
 ![image](https://github.com/user-attachments/assets/8f8ec9d3-1454-4ef5-8871-61ab4c12de90)
 
