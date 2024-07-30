@@ -300,7 +300,7 @@ class MultiManager:  # noqa: F811
                     self._merge_devices(current_device, prev_device)
                 to_be_merged.append(current_device)
         for device_map in device_maps:
-            device_map.update(aggregated_device_list)
+            merge_iterables(device_map, aggregated_device_list)
         
     def _merge_devices(self, receiving_device: XTDevice, giving_device: XTDevice):
         merge_iterables(receiving_device.status_range, giving_device.status_range)
