@@ -19,6 +19,9 @@ from typing import Any, Optional
 from homeassistant.helpers import device_registry as dr
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import dispatcher_send
+from homeassistant.components.tuya.const import (
+    TUYA_HA_SIGNAL_UPDATE_ENTITY as TUYA_HA_SIGNAL_UPDATE_ENTITY_ORIG
+)
 
 from .const import (
     CONF_ENDPOINT,
@@ -79,6 +82,7 @@ class XTDeviceListener(TuyaDeviceListener):
     def update_device(self, device: TuyaDevice) -> None:
         """Update device status."""
         if device.id in self.device_ids:
+            dispatcher_send(self.hass, f"{TUYA_HA_SIGNAL_UPDATE_ENTITY_ORIG}_{device.id}")
             dispatcher_send(self.hass, f"{TUYA_HA_SIGNAL_UPDATE_ENTITY}_{device.id}")
 
     def add_device(self, device: TuyaDevice) -> None:

@@ -12,6 +12,10 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import dispatcher_send
 from homeassistant.config_entries import ConfigEntry
 
+from homeassistant.components.tuya.const import (
+    TUYA_HA_SIGNAL_UPDATE_ENTITY as TUYA_HA_SIGNAL_UPDATE_ENTITY_ORIG
+)
+
 from tuya_sharing.manager import (
     Manager,
     SharingDeviceListener,
@@ -99,6 +103,7 @@ class DeviceListener(SharingDeviceListener):
         #    device.id,
         #    self.manager.device_map[device.id].status,
         #)
+        dispatcher_send(self.hass, f"{TUYA_HA_SIGNAL_UPDATE_ENTITY_ORIG}_{device.id}")
         dispatcher_send(self.hass, f"{TUYA_HA_SIGNAL_UPDATE_ENTITY}_{device.id}")
 
     def add_device(self, device: CustomerDevice) -> None:
