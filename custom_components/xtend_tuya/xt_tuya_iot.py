@@ -19,9 +19,6 @@ from typing import Any, Optional
 from homeassistant.helpers import device_registry as dr
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import dispatcher_send
-from homeassistant.components.tuya.const import (
-    TUYA_HA_SIGNAL_UPDATE_ENTITY as TUYA_HA_SIGNAL_UPDATE_ENTITY_ORIG
-)
 
 from .const import (
     CONF_ENDPOINT,
@@ -34,7 +31,9 @@ from .const import (
     PLATFORMS,
     TUYA_CLIENT_ID,
     TUYA_DISCOVERY_NEW,
+    TUYA_DISCOVERY_NEW_ORIG,
     TUYA_HA_SIGNAL_UPDATE_ENTITY,
+    TUYA_HA_SIGNAL_UPDATE_ENTITY_ORIG,
     VirtualStates,
     DescriptionVirtualState,
     CONF_ACCESS_ID,

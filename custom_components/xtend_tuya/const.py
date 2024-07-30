@@ -52,6 +52,8 @@ CONF_APP_TYPE = "tuya_app_type"
 TUYA_CLIENT_ID = "HA_3y9q4ak7g4ephrvke"
 TUYA_SCHEMA = "haauthorize"
 
+TUYA_DISCOVERY_NEW_ORIG = "tuya_discovery_new"
+TUYA_HA_SIGNAL_UPDATE_ENTITY_ORIG = "tuya_entry_update"
 TUYA_DISCOVERY_NEW = "xt_tuya_discovery_new"
 TUYA_HA_SIGNAL_UPDATE_ENTITY = "xt_tuya_entry_update"
 
