@@ -278,7 +278,7 @@ class MultiManager:  # noqa: F811
     
     def _convert_tuya_devices_to_xt(self, manager):
         for dev_id in manager.device_map:
-            manager.device_map[dev_id] = manager.device_map[dev_id]
+            manager.device_map[dev_id] = XTDevice.from_compatible_device(manager.device_map[dev_id])
 
     def _get_available_device_maps(self) -> list[dict[str, XTDevice]]:
         return_list: list[dict[str, XTDevice]] = list()
