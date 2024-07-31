@@ -454,7 +454,8 @@ class MultiManager:  # noqa: F811
                     if virtual_state.key in device.status_range:
                         for vs_new_code in virtual_state.vs_copy_to_state:
                             new_code = str(vs_new_code)
-                            device.status[new_code] = copy.deepcopy(device.status[virtual_state.key])
+                            if device.status.get(new_code, None) is None:
+                                device.status[new_code] = copy.deepcopy(device.status[virtual_state.key])
                             device.status_range[new_code] = copy.deepcopy(device.status_range[virtual_state.key])
                             device.status_range[new_code].code = new_code
                             if not self._read_dpId_from_code(new_code, device):
