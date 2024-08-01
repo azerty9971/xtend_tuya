@@ -140,6 +140,11 @@ SWITCHES: dict[str, tuple[SwitchEntityDescription, ...]] = {
             entity_category=EntityCategory.CONFIG,
         ),
         SwitchEntityDescription(
+            key=DPCode.CLEANING,
+            translation_key="one_click_cleanup",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        SwitchEntityDescription(
             key=DPCode.QUIET_TIMING_ON,
             translation_key="quiet_timing_on",
             entity_category=EntityCategory.CONFIG,

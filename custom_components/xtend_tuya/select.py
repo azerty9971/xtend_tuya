@@ -57,11 +57,6 @@ SELECTS: dict[str, tuple[SelectEntityDescription, ...]] = {
             entity_category=EntityCategory.CONFIG,
         ),
         SelectEntityDescription(
-            key=DPCode.CLEANING,
-            translation_key="one_click_cleanup",
-            entity_category=EntityCategory.CONFIG,
-        ),
-        SelectEntityDescription(
             key=DPCode.EMPTY,
             translation_key="cat_litter_box_empty",
             entity_category=EntityCategory.CONFIG,

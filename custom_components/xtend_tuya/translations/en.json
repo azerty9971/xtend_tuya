@@ -42,10 +42,6 @@
   },
   "entity": {
     "binary_sensor": {
-      "one_click_cleanup":
-      {
-        "name": "One click cleanup"
-      },
       "power": {
         "name": "Powered on and restarted successfully"
       },
@@ -978,6 +974,10 @@
       }
     },
     "switch": {
+      "one_click_cleanup":
+      {
+        "name": "One click cleanup"
+      },
       "sleeping": {
         "name": "Sleep"
       },
