@@ -53,6 +53,10 @@ from .multi_manager import (
     HomeAssistantXTData,
 )
 
+from .tuya_decorators import (
+    decorate_tuya_integration
+)
+
 # Suppress logs from the library, it logs unneeded on error
 logging.getLogger("tuya_sharing").setLevel(logging.CRITICAL)
 
@@ -63,7 +67,8 @@ async def update_listener(hass, entry):
 async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
     #LOGGER.warning(f"async_setup_entry {entry.title} : {entry.data}")
     """Async setup hass config entry.""" 
-    multi_manager = MultiManager(entry)
+    multi_manager = MultiManager(hass, entry)
+    decorate_tuya_integration(multi_manager)
     await multi_manager.setup_entry(hass)
 
     # Get all devices from Tuya

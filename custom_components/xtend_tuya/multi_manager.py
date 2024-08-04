@@ -4,10 +4,12 @@ import copy
 from typing import NamedTuple, Optional, Any
 from dataclasses import dataclass, field
 
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryError, ConfigEntryNotReady
 from homeassistant.config_entries import ConfigEntry
 import homeassistant.components.tuya as tuya_integration
+from homeassistant.helpers.dispatcher import dispatcher_send
+from homeassistant.helpers import device_registry as dr
 
 from tuya_iot import (
     AuthType,
@@ -54,7 +56,9 @@ from .const import (
     PLATFORMS,
     TUYA_CLIENT_ID,
     TUYA_DISCOVERY_NEW,
+    TUYA_DISCOVERY_NEW_ORIG,
     TUYA_HA_SIGNAL_UPDATE_ENTITY,
+    TUYA_HA_SIGNAL_UPDATE_ENTITY_ORIG,
     VirtualStates,
     DescriptionVirtualState,
     CONF_ACCESS_ID,
@@ -89,7 +93,6 @@ from .util import (
 
 from .tuya_decorators import (
     decorate_tuya_manager,
-    decorate_tuya_integration,
 )
 
 from .xt_tuya_sharing import (
@@ -140,20 +143,53 @@ class MultiMQTTQueue:
             self.iot_account_mq.stop()
 
 class MultiDeviceListener:
-     def __init__(self, multi_manager: MultiManager) -> None:
+    def __init__(self, hass: HomeAssistant, multi_manager: MultiManager) -> None:
         self.multi_manager = multi_manager
-        self.sharing_account_device_listener = None
-        self.iot_account_device_listener = None
+        self.hass = hass
+    
+    def update_device(self, device: XTDevice):
+        devices = self.multi_manager.get_devices_from_device_id(device.id)
+        for cur_device in devices:
+            if cur_device != device:
+                cur_device.copy_data_from_device(device)
+        #dispatcher_send(self.hass, f"{TUYA_HA_SIGNAL_UPDATE_ENTITY_ORIG}_{device.id}")
+        dispatcher_send(self.hass, f"{TUYA_HA_SIGNAL_UPDATE_ENTITY}_{device.id}")
+
+    def add_device(self, device: XTDevice):
+        self.hass.add_job(self.async_remove_device, device.id)
+        dispatcher_send(self.hass, TUYA_DISCOVERY_NEW_ORIG, [device.id])
+        dispatcher_send(self.hass, TUYA_DISCOVERY_NEW, [device.id])
+
+    def remove_device(self, device_id: str):
+        #log_stack("DeviceListener => async_remove_device")
+        device_registry = dr.async_get(self.hass)
+        device_entry = device_registry.async_get_device(
+            identifiers={(DOMAIN_ORIG, device_id), (DOMAIN, device_id)}
+        )
+        if device_entry is not None:
+            device_registry.async_remove_device(device_entry.id)
+    
+    @callback
+    def async_remove_device(self, device_id: str) -> None:
+        """Remove device from Home Assistant."""
+        #log_stack("DeviceListener => async_remove_device")
+        device_registry = dr.async_get(self.hass)
+        device_entry = device_registry.async_get_device(
+            identifiers={(DOMAIN_ORIG, device_id), (DOMAIN, device_id)}
+        )
+        if device_entry is not None:
+            device_registry.async_remove_device(device_entry.id)
     
 class MultiManager:  # noqa: F811
-    def __init__(self, entry: XTConfigEntry) -> None:
+    def __init__(self, hass: HomeAssistant, entry: XTConfigEntry) -> None:
         self.sharing_account: TuyaSharingData = None
         self.iot_account: TuyaIOTData = None
         self.reuse_config: bool = False
         self.descriptors = {}
         self.multi_mqtt_queue: MultiMQTTQueue = MultiMQTTQueue(self)
-        self.multi_device_listener: MultiDeviceListener = MultiDeviceListener(self)
+        self.multi_device_listener: MultiDeviceListener = MultiDeviceListener(hass, self)
         self.config_entry = entry
+        self.hass = hass
 
     @property
     def device_map(self):
@@ -178,12 +214,11 @@ class MultiManager:  # noqa: F811
         if tuya_integration_runtime_data:
             #We are using an override of the Tuya integration
             decorate_tuya_manager(tuya_integration_runtime_data.device_manager, self)
-            decorate_tuya_integration(self)
             sharing_device_manager = DeviceManager(multi_manager=self, other_device_manager=tuya_integration_runtime_data.device_manager)
             sharing_device_manager.terminal_id      = tuya_integration_runtime_data.device_manager.terminal_id
             sharing_device_manager.mq               = tuya_integration_runtime_data.device_manager.mq
             sharing_device_manager.customer_api     = tuya_integration_runtime_data.device_manager.customer_api
-            sharing_device_manager.device_listeners = tuya_integration_runtime_data.device_manager.device_listeners
+            tuya_integration_runtime_data.device_manager.device_listeners.clear()
             self._convert_tuya_devices_to_xt(tuya_integration_runtime_data.device_manager)
             self.reuse_config = True
         else:
@@ -204,8 +239,8 @@ class MultiManager:  # noqa: F811
         sharing_device_manager.device_repository = XTDeviceRepository(sharing_device_manager.customer_api, sharing_device_manager, self)
         sharing_device_manager.scene_repository = SceneRepository(sharing_device_manager.customer_api)
         sharing_device_manager.user_repository = UserRepository(sharing_device_manager.customer_api)
-        self.multi_device_listener.sharing_account_device_listener = DeviceListener(hass, sharing_device_manager)
-        sharing_device_manager.add_device_listener(self.multi_device_listener.sharing_account_device_listener)
+        sharing_device_manager.device_listeners.clear()
+        sharing_device_manager.add_device_listener(self.multi_device_listener)
         return TuyaSharingData(device_manager=sharing_device_manager, device_ids=[])
 
     async def get_iot_account(self, hass: HomeAssistant, entry: XTConfigEntry) -> TuyaIOTData | None:
@@ -253,24 +288,24 @@ class MultiManager:  # noqa: F811
         mq.start()
         device_manager = XTTuyaDeviceManager(self, api, mq)
         device_ids: list[str] = list()
-        self.multi_device_listener.iot_account_device_listener = XTDeviceListener(hass, device_manager, device_ids, self)
         home_manager = TuyaHomeManager(api, mq, device_manager)
-        device_manager.add_device_listener(self.multi_device_listener.iot_account_device_listener)
+        device_manager.add_device_listener(self.multi_device_listener)
         return TuyaIOTData(
             device_manager=device_manager,
             mq=mq,
             device_ids=device_ids,
-            device_listener=self.multi_device_listener.iot_account_device_listener, 
             home_manager=home_manager)
     
-    def update_device_cache(self):
+    def update_device_cache(self, external_update = False):
         if self.sharing_account:
-            self.sharing_account.device_manager.update_device_cache()
+            if not external_update:
+                self.sharing_account.device_manager.update_device_cache()
             new_device_ids: list[str] = [device_id for device_id in self.sharing_account.device_manager.device_map]
             self.sharing_account.device_ids.clear()
             self.sharing_account.device_ids.extend(new_device_ids)
         if self.iot_account:
-            self.iot_account.home_manager.update_device_cache()
+            if not external_update:
+                self.iot_account.home_manager.update_device_cache()
             new_device_ids: list[str] = [device_id for device_id in self.iot_account.device_manager.device_map]
             self.iot_account.device_ids.clear()
             self.iot_account.device_ids.extend(new_device_ids)
