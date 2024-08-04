@@ -474,6 +474,8 @@ class MultiManager:  # noqa: F811
         #WARNING, this method might be called multiple times for the same device, make sure it doesn't
         #fail upon multiple successive calls
         virtual_states = self.get_category_virtual_states(device.category)
+        if device.id == "bf85bd241924094329wbx0":
+            LOGGER.warning(f"apply_init_virtual_states BEFORE: {device.status}")
         for virtual_state in virtual_states:
             if virtual_state.virtual_state_value == VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME:
                 if virtual_state.key in device.status:
@@ -503,6 +505,8 @@ class MultiManager:  # noqa: F811
                                         new_local_strategy = copy.deepcopy(device.local_strategy[dp_id])
                                         new_local_strategy["status_code"] = new_code
                                         device.local_strategy[new_dp_id] = new_local_strategy
+        if device.id == "bf85bd241924094329wbx0":
+            LOGGER.warning(f"apply_init_virtual_states AFTER: {device.status}")
 
     def allow_virtual_devices_not_set_up(self, device: XTDevice):
         if not device.id.startswith("vdevo"):
