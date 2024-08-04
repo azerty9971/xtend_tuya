@@ -531,12 +531,12 @@ class MultiManager:  # noqa: F811
                 dpId = state["dpId"]
                 code = self._read_code_from_dpId(state["dpId"], device)
             if dpId is None and "dpId" not in state and "code" not in state:
-                for temp_dpId, temp_value in state.values():
+                for temp_dpId in state:
                     temp_code = self._read_code_from_dpId(temp_dpId, device)
                     if temp_code is not None:
                         dpId = temp_dpId
                         code = temp_code
-                        value = temp_value
+                        value = state[temp_dpId]
 
             if code is not None and dpId is not None:
                 return code, dpId, value, True
