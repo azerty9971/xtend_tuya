@@ -121,28 +121,6 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
                 return response
             
     def update_device_list_in_smart_home(self):
-        #DEBUG
-        """shared_dev_id = "bf85bd241924094329wbx0"
-        force_open_api = True
-        shared_dev = self.get_device_info(shared_dev_id)
-        LOGGER.warning(f"shared_dev => {shared_dev}")
-        if shared_dev["success"]:
-            item = shared_dev["result"]
-            device = XTTuyaDevice(**item)
-            device.force_open_api = force_open_api
-            status = {}
-            api_status = self.get_device_status(shared_dev_id)
-            if api_status["success"]:
-                api_status_result = api_status["result"]
-                for item_status in api_status_result:
-                    if "code" in item_status and "value" in item_status:
-                        code = item_status["code"]
-                        value = item_status["value"]
-                        status[code] = value
-                device.status = status
-                self.device_map[item["id"]] = device"""
-            #LOGGER.warning(f"User ID: {self.api.token_info.uid}")
-        #ENDDEBUG
         """Update devices status in project type SmartHome."""
         response = self.api.get(f"/v1.0/users/{self.api.token_info.uid}/devices")
         response2 = self.api.get(f"/v1.0/users/{self.api.token_info.uid}/devices?from=sharing")

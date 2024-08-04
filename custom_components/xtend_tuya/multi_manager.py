@@ -323,12 +323,9 @@ class MultiManager:  # noqa: F811
         return return_list
 
     def _merge_devices_from_multiple_sources(self):
-        if not ( self.sharing_account and self.iot_account ):
-            return
-        
         #Merge the device function, status_range and status between managers
         device_maps = self._get_available_device_maps()
-        aggregated_device_list = self.get_aggregated_device_map()
+        aggregated_device_list = self.device_map
         for device in aggregated_device_list.values():
             to_be_merged = []
             devices = self.get_devices_from_device_id(device.id)
@@ -343,16 +340,8 @@ class MultiManager:  # noqa: F811
         merge_iterables(receiving_device.status_range, giving_device.status_range)
         merge_iterables(receiving_device.function, giving_device.function)
         merge_iterables(receiving_device.status, giving_device.status)
-        """receiving_device.status_range.update(giving_device.status_range)
-        giving_device.status_range = receiving_device.status_range
-        receiving_device.function.update(giving_device.function)
-        giving_device.function = receiving_device.function
-        receiving_device.status.update(giving_device.status)
-        giving_device.status = receiving_device.status"""
         if hasattr(receiving_device, "local_strategy") and hasattr(giving_device, "local_strategy"):
             merge_iterables(receiving_device.local_strategy, giving_device.local_strategy)
-            """receiving_device.local_strategy.update(giving_device.local_strategy)
-            giving_device.local_strategy = receiving_device.local_strategy"""
         if hasattr(receiving_device, "model") and hasattr(giving_device, "model"):
             if receiving_device.model == "" and giving_device.model != "":
                 receiving_device.model = copy.deepcopy(giving_device.model)
