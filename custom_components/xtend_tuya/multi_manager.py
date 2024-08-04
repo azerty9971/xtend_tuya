@@ -358,16 +358,6 @@ class MultiManager:  # noqa: F811
                 receiving_device.model = copy.deepcopy(giving_device.model)
             if giving_device.model == "" and receiving_device.model != "":
                 giving_device.model = copy.deepcopy(receiving_device.model)
-
-    def is_device_in_domain_device_maps(self, domains: list[str], device_entry_identifiers: list[str]):
-        if device_entry_identifiers[0] in domains:
-            if self.sharing_account and device_entry_identifiers[1] in self.sharing_account.device_manager.device_map:
-                return True
-            if self.iot_account and device_entry_identifiers[1] in self.iot_account.device_manager.device_map:
-                return True
-        else:
-            return True
-        return False
     
     def get_aggregated_device_map(self) -> dict[str, XTDevice]:
         aggregated_list: dict[str, XTDevice] = {}

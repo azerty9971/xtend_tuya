@@ -80,7 +80,7 @@ def prepare_value_for_property_update(dp_item, value) -> str:
     return str(value)
 
 def get_domain_config_entries(hass: HomeAssistant, domain: str) -> list[ConfigEntry]:
-    return hass.config_entries.async_entries(domain,False,False)
+    return hass.config_entries.async_entries(domain, False, False)
 
 def get_overriden_config_entry(hass: HomeAssistant, entry: XTConfigEntry, other_domain: str) -> ConfigEntry:
     other_domain_config_entries = get_domain_config_entries(hass, other_domain)
