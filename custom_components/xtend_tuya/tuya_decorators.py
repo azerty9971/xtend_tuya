@@ -29,7 +29,7 @@ class XTDecorator:
         @functools.wraps(func)
         async def wrapped(*args, **kwargs):
             await callback(True, *args, **kwargs)
-            return_val = await func(*args, **kwargs)
+            return_val = await self.orig_func(*args, **kwargs)
             await callback(False, *args, **kwargs)
             return return_val
         self.func = wrapped
@@ -41,7 +41,7 @@ class XTDecorator:
         @functools.wraps(func)
         def wrapped(*args, **kwargs):
             self.callback(True, *args, **kwargs)
-            return_val = self.func(*args, **kwargs)
+            return_val = self.orig_func(*args, **kwargs)
             self.callback(False, *args, **kwargs)
             return return_val
         self.func = wrapped
