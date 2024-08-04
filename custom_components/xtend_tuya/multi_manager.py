@@ -530,13 +530,14 @@ class MultiManager:  # noqa: F811
             if dpId is None and "dpId" in state:
                 dpId = state["dpId"]
                 code = self._read_code_from_dpId(state["dpId"], device)
-            if dpId is None and "dpId" not in state and "code" not in state:
+            if dpId is None and code is None and "dpId" not in state and "code" not in state:
                 for temp_dpId in state:
                     temp_code = self._read_code_from_dpId(int(temp_dpId), device)
                     if temp_code is not None:
                         dpId = int(temp_dpId)
                         code = temp_code
                         value = state[temp_dpId]
+                        LOGGER.warning(f"Found values: {dpId} {code} {value}")
 
             if code is not None and dpId is not None:
                 return code, dpId, value, True
@@ -555,6 +556,7 @@ class MultiManager:  # noqa: F811
             if result_ok:
                 item["code"] = code
                 item["dpId"] = dpId
+                item["value"] = value
             else:
                 LOGGER.warning(f"convert_device_report_status_list code retrieval failed => {item} <=>{device_id}")
         return status
