@@ -141,8 +141,12 @@ class TuyaEntity(Entity):
         self._attr_unique_id = f"tuya.{device.id}"
         # TuyaEntity initialize mq can subscribe
         device.set_up = True
-        self.device = device
+        self.device_id = device.id
         self.device_manager = device_manager
+
+    @property
+    def device(self):
+        return self.device_manager.device_map[self.device_id]
 
     @property
     def device_info(self) -> DeviceInfo:
