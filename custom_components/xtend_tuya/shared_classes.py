@@ -91,5 +91,5 @@ class XTDevice(SimpleNamespace):
     def copy_data_from_device(self, device: XTDevice) -> None:
         self.online = device.online
         self.name = device.name
-        for code, value in device.status:
+        for code, value in device.status.items():
             self.status[code] = value
