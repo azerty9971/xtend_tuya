@@ -132,6 +132,8 @@ class DeviceManager(Manager):
         self.device_listeners = set()
         self.other_device_manager = other_device_manager
     
+
+
     def on_external_refresh_mq(self):
         if self.other_device_manager is not None:
             self.mq = self.other_device_manager.mq
@@ -153,6 +155,10 @@ class DeviceManager(Manager):
         if self.other_device_manager is not None:
             return self.other_device_manager
         return None
+
+    def update_device_cache(self):
+        super().update_device_cache()
+        self.multi_manager.convert_tuya_devices_to_xt(self)
 
     def on_message(self, msg: str):
         super().on_message(msg)

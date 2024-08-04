@@ -103,6 +103,7 @@ from .xt_tuya_sharing import (
 from .xt_tuya_iot import (
     XTTuyaDeviceManager,
     tuya_iot_update_listener,
+    XTTuyaHomeManager,
 )
 
 type XTConfigEntry = ConfigEntry[HomeAssistantXTData]  # noqa: F811
@@ -121,7 +122,7 @@ class TuyaIOTData(NamedTuple):
     device_manager: XTTuyaDeviceManager
     mq: TuyaOpenMQ
     device_ids: list[str] #List of device IDs that are managed by the manager before the managers device merging process
-    home_manager: TuyaHomeManager
+    home_manager: XTTuyaHomeManager
 
 class TuyaSharingData(NamedTuple):
     device_manager: DeviceManager
@@ -216,7 +217,7 @@ class MultiManager:  # noqa: F811
             sharing_device_manager.mq               = tuya_integration_runtime_data.device_manager.mq
             sharing_device_manager.customer_api     = tuya_integration_runtime_data.device_manager.customer_api
             tuya_integration_runtime_data.device_manager.device_listeners.clear()
-            self._convert_tuya_devices_to_xt(tuya_integration_runtime_data.device_manager)
+            self.convert_tuya_devices_to_xt(tuya_integration_runtime_data.device_manager)
             self.reuse_config = True
         else:
             #We are using XT as a standalone integration
@@ -285,7 +286,7 @@ class MultiManager:  # noqa: F811
         mq.start()
         device_manager = XTTuyaDeviceManager(self, api, mq)
         device_ids: list[str] = list()
-        home_manager = TuyaHomeManager(api, mq, device_manager)
+        home_manager = XTTuyaHomeManager(api, mq, device_manager, self)
         device_manager.add_device_listener(self.multi_device_listener)
         return TuyaIOTData(
             device_manager=device_manager,
@@ -293,22 +294,20 @@ class MultiManager:  # noqa: F811
             device_ids=device_ids,
             home_manager=home_manager)
     
-    def update_device_cache(self, external_update = False):
+    def update_device_cache(self):
         if self.sharing_account:
-            if not external_update:
-                self.sharing_account.device_manager.update_device_cache()
+            self.sharing_account.device_manager.update_device_cache()
             new_device_ids: list[str] = [device_id for device_id in self.sharing_account.device_manager.device_map]
             self.sharing_account.device_ids.clear()
             self.sharing_account.device_ids.extend(new_device_ids)
         if self.iot_account:
-            if not external_update:
-                self.iot_account.home_manager.update_device_cache()
+            self.iot_account.home_manager.update_device_cache()
             new_device_ids: list[str] = [device_id for device_id in self.iot_account.device_manager.device_map]
             self.iot_account.device_ids.clear()
             self.iot_account.device_ids.extend(new_device_ids)
         self._merge_devices_from_multiple_sources()
     
-    def _convert_tuya_devices_to_xt(self, manager):
+    def convert_tuya_devices_to_xt(self, manager):
         for dev_id in manager.device_map:
             manager.device_map[dev_id] = XTDevice.from_compatible_device(manager.device_map[dev_id])
 
