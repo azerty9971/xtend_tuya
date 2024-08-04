@@ -146,6 +146,7 @@ class MultiDeviceListener:
         self.hass = hass
     
     def update_device(self, device: XTDevice):
+        LOGGER.warning(f"Updating device {device.id}")
         devices = self.multi_manager.get_devices_from_device_id(device.id)
         for cur_device in devices:
             cur_device.copy_data_from_device(device)
