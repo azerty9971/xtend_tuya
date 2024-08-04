@@ -153,9 +153,16 @@ def merge_descriptor_category(category1: tuple[EntityDescription, ...], category
             return_category.append(copy.deepcopy(descriptor))
     return tuple(return_category)
 
-def merge_categories(category_list1, category_list2):
-    return_list = copy.deepcopy(list(category_list1))
-    for category in category_list2:
-        if category not in return_list:
-            return_list[category] = copy.deepcopy(category_list2[category])
+def append_dictionnaries(dict1: dict, dict2: dict) -> dict:
+    return_dict = copy.deepcopy(dict1)
+    for category in dict2:
+        if category not in return_dict:
+            return_dict[category] = copy.deepcopy(dict2[category])
+    return return_dict
+
+def append_lists(list1: list, list2: list) -> list:
+    return_list = copy.deepcopy(list(list1))
+    for item in list2:
+        if item not in return_list:
+            return_list.append(copy.deepcopy(item))
     return return_list

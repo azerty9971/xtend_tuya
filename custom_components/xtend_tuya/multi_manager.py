@@ -90,6 +90,7 @@ from .util import (
     get_tuya_integration_runtime_data,
     prepare_value_for_property_update,
     merge_iterables,
+    append_lists
 )
 
 from .tuya_decorators import (
@@ -653,6 +654,16 @@ class MultiManager:  # noqa: F811
                     if dev_id := bizData.get("devId", None):
                         data["devId"] = dev_id
         return msg
+
+    def query_scenes(self) -> list:
+        return_list = []
+        if self.sharing_account:
+            temp_list = self.sharing_account.device_manager.query_scenes()
+            return_list = append_lists(return_list, temp_list)
+        if self.iot_account:
+            temp_list = self.iot_account.home_manager.query_scenes()
+            return_list = append_lists(return_list, temp_list)
+        return return_list
 
     def send_commands(
             self, device_id: str, commands: list[dict[str, Any]]
