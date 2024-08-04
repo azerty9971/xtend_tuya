@@ -93,7 +93,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
     entry.runtime_data = HomeAssistantXTData(multi_manager=multi_manager, reuse_config=multi_manager.reuse_config)
 
     # Cleanup device registry
-    await cleanup_device_registry(hass, multi_manager)
+    await cleanup_device_registry(hass, multi_manager, entry)
 
     # Register known device IDs
     device_registry = dr.async_get(hass)
@@ -137,12 +137,14 @@ async def cleanup_device_registry(hass: HomeAssistant, multi_manager: MultiManag
                 device_registry.async_remove_device(dev_id)
                 break
 
-def are_all_domain_config_loaded(hass: HomeAssistant, domain: str) -> bool:
+def are_all_domain_config_loaded(hass: HomeAssistant, domain: str, current_entry: ConfigEntry) -> bool:
     config_entries = hass.config_entries.async_entries(domain, False, False)
     for config_entry in config_entries:
+        if config_entry.entry_id == current_entry.entry_id:
+            continue
         if config_entry.state is not ConfigEntryState.LOADED:
-            LOGGER.warning(f"config state: {config_entry.state}")
             return False
+    LOGGER.warning("Executing cleanup")
     return True
 
 def get_domain_device_map(hass: HomeAssistant, domain: str) -> dict[str, any]:
