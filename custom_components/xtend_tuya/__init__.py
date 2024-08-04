@@ -90,7 +90,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
         raise
 
     # Connection is successful, store the manager & listener
-    entry.runtime_data = HomeAssistantXTData(multi_manager=multi_manager, reuse_config=multi_manager.reuse_config)
+    entry.runtime_data = HomeAssistantXTData(multi_manager=multi_manager, reuse_config=multi_manager.reuse_config, listener=multi_manager.multi_device_listener)
 
     # Cleanup device registry
     await cleanup_device_registry(hass, multi_manager, entry)
