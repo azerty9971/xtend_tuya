@@ -393,11 +393,16 @@ class MultiManager:  # noqa: F811
 
     async def on_tuya_unload_entry(self, before_call: bool, hass: HomeAssistant, entry: tuya_integration.TuyaConfigEntry):
         #LOGGER.warning(f"on_tuya_unload_entry {before_call} : {entry.__dict__}")
-        if not before_call and self.sharing_account and self.config_entry.title == entry.title:
-            self.reuse_config = False
-            self.sharing_account.device_manager.set_overriden_device_manager(None)
-            self.sharing_account.device_manager.mq = None
-            self.multi_mqtt_queue.sharing_account_mq = None
+        if before_call:
+            #If before the call, we need to add the regular device listener back
+            runtime_data = get_tuya_integration_runtime_data(hass, entry, DOMAIN_ORIG)
+            runtime_data.device_manager.add_device_listener(runtime_data.device_listener)
+        else:
+            if self.sharing_account and self.config_entry.title == entry.title:
+                self.reuse_config = False
+                self.sharing_account.device_manager.set_overriden_device_manager(None)
+                self.sharing_account.device_manager.mq = None
+                self.multi_mqtt_queue.sharing_account_mq = None
 
     async def on_tuya_remove_entry(self, before_call: bool, hass: HomeAssistant, entry: tuya_integration.TuyaConfigEntry):
         #LOGGER.warning(f"on_tuya_remove_entry {before_call} : {entry.__dict__}")
