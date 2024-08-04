@@ -208,6 +208,10 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
                         ):
                         if int(property["abilityId"]) not in device_properties.local_strategy:
                             if "type" in property["typeSpec"]:
+                                if property["code"] in device_properties.function or property["code"] in device_properties.status_range:
+                                    property_update = False
+                                else:
+                                    property_update = True
                                 typeSpec = property["typeSpec"]
                                 real_type = determine_property_type(property["typeSpec"]["type"])
                                 typeSpec.pop("type")
@@ -219,7 +223,7 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
                                         "valueType": real_type,
                                         "pid": device.product_id,
                                     },
-                                    "property_update": True,
+                                    "property_update": property_update,
                                     "use_open_api": True
                                 }
         if response.get("success"):
@@ -227,6 +231,10 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
             for dp_property in result["properties"]:
                 if "dp_id" in dp_property and "type" in dp_property:
                     if int(dp_property["dp_id"]) not in device_properties.local_strategy:
+                        if dp_property["code"] in device_properties.function or dp_property["code"] in device_properties.status_range:
+                            property_update = False
+                        else:
+                            property_update = True
                         dp_id = int(dp_property["dp_id"])
                         real_type = determine_property_type(dp_property.get("type",None), dp_property.get("value",None))
                         device_properties.local_strategy[dp_id] = {
@@ -236,7 +244,7 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
                                 "valueType": real_type,
                                 "pid": device.product_id,
                             },
-                            "property_update": True,
+                            "property_update": property_update,
                             "use_open_api": True
                         }
                 if (    "code"  in dp_property 
