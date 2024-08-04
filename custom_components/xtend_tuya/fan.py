@@ -24,7 +24,7 @@ from homeassistant.components.tuya.fan import (
     TUYA_SUPPORT_TYPE as TUYA_SUPPORT_TYPE_TUYA
 )
 from .util import (
-    append_lists
+    append_dictionnaries
 )
 
 from .multi_manager import XTConfigEntry
@@ -43,7 +43,7 @@ async def async_setup_entry(
 
     merged_categories = TUYA_SUPPORT_TYPE
     if not entry.runtime_data.multi_manager.reuse_config:
-        merged_categories = dict(append_lists(TUYA_SUPPORT_TYPE, TUYA_SUPPORT_TYPE_TUYA))
+        merged_categories = append_dictionnaries(TUYA_SUPPORT_TYPE, TUYA_SUPPORT_TYPE_TUYA)
 
     @callback
     def async_discover_device(device_map) -> None:
