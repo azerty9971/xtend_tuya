@@ -444,10 +444,10 @@ class MultiManager:  # noqa: F811
         return to_return
     
     def remove_device_listeners(self) -> None:
-        if self.multi_device_listener.iot_account_device_listener:
-            self.iot_account.device_manager.remove_device_listener(self.multi_device_listener.iot_account_device_listener)
-        if self.multi_device_listener.sharing_account_device_listener:
-            self.sharing_account.device_manager.remove_device_listener(self.multi_device_listener.sharing_account_device_listener)
+        if self.iot_account:
+            self.iot_account.device_manager.remove_device_listener(self.multi_device_listener)
+        if self.sharing_account:
+            self.sharing_account.device_manager.remove_device_listener(self.multi_device_listener)
 
     def get_device_properties(self, device: XTDevice) -> XTDeviceProperties:
         dev_props = XTDeviceProperties()
