@@ -10,6 +10,7 @@ from homeassistant.config_entries import ConfigEntry
 import homeassistant.components.tuya as tuya_integration
 from homeassistant.helpers.dispatcher import dispatcher_send
 from homeassistant.helpers import device_registry as dr
+from homeassistant.helpers.entity import EntityDescription
 
 from tuya_iot import (
     AuthType,
@@ -421,11 +422,17 @@ class MultiManager:  # noqa: F811
         descriptors_with_vs = {}
         for category in descriptors:
             decription_list: list = []
-            for description in descriptors[category]:
-                if hasattr(description, "virtual_state") and description.virtual_state is not None:
-                    decription_list.append(description)
+            if isinstance(category, tuple):
+                for description in descriptors[category]:
+                    if hasattr(description, "virtual_state") and description.virtual_state is not None:
+                        decription_list.append(description)
+            elif isinstance(category, EntityDescription):
+                #category is directly a descriptor
+                if hasattr(category, "virtual_state") and category.virtual_state is not None:
+                    decription_list.append(category)
+
             if len(decription_list) > 0:
-                descriptors_with_vs[category] = tuple(decription_list)
+                    descriptors_with_vs[category] = tuple(decription_list)
         if len(descriptors_with_vs) > 0:
             self.descriptors[name] = descriptors_with_vs
             for device in self.get_aggregated_device_map().values():

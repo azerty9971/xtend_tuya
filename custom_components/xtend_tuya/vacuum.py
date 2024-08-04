@@ -55,7 +55,10 @@ async def async_setup_entry(
 ) -> None:
     """Set up Tuya vacuum dynamically through Tuya discovery."""
     hass_data = entry.runtime_data
-
+    
+    if hass_data.multi_manager.reuse_config:
+        return
+    
     @callback
     def async_discover_device(device_map) -> None:
         """Discover and add a discovered Tuya vacuum."""

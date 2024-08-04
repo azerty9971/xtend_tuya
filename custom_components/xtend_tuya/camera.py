@@ -10,6 +10,13 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
+from homeassistant.components.tuya.camera import (
+    CAMERAS as CAMERAS_TUYA
+)
+from .util import (
+    merge_categories
+)
+
 from .multi_manager import XTConfigEntry
 from .base import TuyaEntity
 from .const import TUYA_DISCOVERY_NEW, DPCode
@@ -26,6 +33,10 @@ async def async_setup_entry(
     """Set up Tuya cameras dynamically through Tuya discovery."""
     hass_data = entry.runtime_data
 
+    merged_categories = CAMERAS
+    if not entry.runtime_data.multi_manager.reuse_config:
+        merged_categories = merge_categories(CAMERAS, CAMERAS_TUYA)
+
     @callback
     def async_discover_device(device_map) -> None:
         """Discover and add a discovered Tuya camera."""
@@ -33,7 +44,7 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             device = hass_data.manager.device_map[device_id]
-            if device.category in CAMERAS:
+            if device.category in merged_categories:
                 entities.append(TuyaCameraEntity(device, hass_data.manager))
 
         async_add_entities(entities)

@@ -6,6 +6,7 @@ import copy
 from typing import NamedTuple
 from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.helpers.entity import EntityDescription
 from .const import (
     DPType,
     LOGGER,
@@ -129,3 +130,32 @@ def get_overriden_tuya_integration_runtime_data(hass: HomeAssistant, entry: Conf
     if (overriden_config_entry := get_overriden_config_entry(hass,entry, DOMAIN_ORIG)):
         return get_tuya_integration_runtime_data(hass, overriden_config_entry, DOMAIN_ORIG)
     return None
+
+def merge_device_descriptors(descriptors1, descriptors2):
+    return_descriptors = copy.deepcopy(descriptors1)
+    for category in descriptors2:
+        if category not in descriptors1:
+            #Merge the whole category
+            return_descriptors[category] = copy.deepcopy(descriptors2[category])
+        else:
+            #Merge the content of the descriptor category
+            return_descriptors[category] = merge_descriptor_category(descriptors1[category], descriptors2[category])
+    return return_descriptors
+
+def merge_descriptor_category(category1: tuple[EntityDescription, ...], category2: tuple[EntityDescription, ...]):
+    descriptor1_key_list = []
+    return_category = copy.deepcopy(list(category1))
+    for descriptor in category1:
+        if descriptor.key not in descriptor1_key_list:
+            descriptor1_key_list.append(descriptor.key)
+    for descriptor in category2:
+        if descriptor.key not in descriptor1_key_list:
+            return_category.append(copy.deepcopy(descriptor))
+    return tuple(return_category)
+
+def merge_categories(category_list1, category_list2):
+    return_list = copy.deepcopy(list(category_list1))
+    for category in category_list2:
+        if category not in return_list:
+            return_list[category] = copy.deepcopy(category_list2[category])
+    return return_list

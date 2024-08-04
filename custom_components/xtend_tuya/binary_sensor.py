@@ -16,6 +16,13 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
+from homeassistant.components.tuya.binary_sensor import (
+    BINARY_SENSORS as BINARY_SENSORS_TUYA
+)
+from .util import (
+    merge_device_descriptors
+)
+
 from .multi_manager import XTConfigEntry
 from .base import TuyaEntity
 from .const import TUYA_DISCOVERY_NEW, DPCode
@@ -75,6 +82,10 @@ async def async_setup_entry(
     """Set up Tuya binary sensor dynamically through Tuya discovery."""
     hass_data = entry.runtime_data
 
+    merged_descriptors = BINARY_SENSORS
+    if not entry.runtime_data.multi_manager.reuse_config:
+        merged_descriptors = merge_device_descriptors(BINARY_SENSORS, BINARY_SENSORS_TUYA)
+
     @callback
     def async_discover_device(device_map) -> None:
         """Discover and add a discovered Tuya binary sensor."""
@@ -82,7 +93,7 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             device = hass_data.manager.device_map[device_id]
-            if descriptions := BINARY_SENSORS.get(device.category):
+            if descriptions := merged_descriptors.get(device.category):
                 for description in descriptions:
                     dpcode = description.dpcode or description.key
                     if dpcode in device.status:
@@ -94,7 +105,7 @@ async def async_setup_entry(
 
         async_add_entities(entities)
 
-    hass_data.manager.register_device_descriptors("binary_sensors", BINARY_SENSORS)
+    hass_data.manager.register_device_descriptors("binary_sensors", merged_descriptors)
     async_discover_device([*hass_data.manager.device_map])
     #async_discover_device(hass_data.manager, hass_data.manager.open_api_device_map)
 
