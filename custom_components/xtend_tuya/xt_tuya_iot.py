@@ -145,6 +145,18 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
         #ENDDEBUG
         """Update devices status in project type SmartHome."""
         response = self.api.get(f"/v1.0/users/{self.api.token_info.uid}/devices")
+        response2 = self.api.get(f"/v1.0/users/{self.api.token_info.uid}/devices?from=sharing")
+        if response2["success"]:
+            for item in response2["result"]:
+                device = XTDevice(**item)
+                status = {}
+                for item_status in device.status:
+                    if "code" in item_status and "value" in item_status:
+                        code = item_status["code"]
+                        value = item_status["value"]
+                        status[code] = value
+                device.status = status
+                self.device_map[item["id"]] = device
         if response["success"]:
             for item in response["result"]:
                 device = XTDevice(**item)
