@@ -20,7 +20,7 @@ from homeassistant.components.tuya.humidifier import (
     HUMIDIFIERS as HUMIDIFIERS_TUYA
 )
 from .util import (
-    merge_categories
+    append_dictionnaries
 )
 
 from .multi_manager import XTConfigEntry
@@ -51,7 +51,7 @@ async def async_setup_entry(
 
     merged_categories = HUMIDIFIERS
     if not entry.runtime_data.multi_manager.reuse_config:
-        merged_categories = merge_categories(HUMIDIFIERS, HUMIDIFIERS_TUYA)
+        merged_categories = append_dictionnaries(HUMIDIFIERS, HUMIDIFIERS_TUYA)
 
     @callback
     def async_discover_device(device_map) -> None:

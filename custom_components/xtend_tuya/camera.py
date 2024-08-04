@@ -14,7 +14,7 @@ from homeassistant.components.tuya.camera import (
     CAMERAS as CAMERAS_TUYA
 )
 from .util import (
-    merge_categories
+    append_lists
 )
 
 from .multi_manager import XTConfigEntry
@@ -35,7 +35,7 @@ async def async_setup_entry(
 
     merged_categories = CAMERAS
     if not entry.runtime_data.multi_manager.reuse_config:
-        merged_categories = merge_categories(CAMERAS, CAMERAS_TUYA)
+        merged_categories = tuple(append_lists(CAMERAS, CAMERAS_TUYA))
 
     @callback
     def async_discover_device(device_map) -> None:

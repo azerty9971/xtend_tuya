@@ -27,7 +27,7 @@ from homeassistant.components.tuya.climate import (
     CLIMATE_DESCRIPTIONS as CLIMATE_DESCRIPTIONS_TUYA
 )
 from .util import (
-    merge_categories
+    append_dictionnaries
 )
 
 from .multi_manager import XTConfigEntry
@@ -65,7 +65,7 @@ async def async_setup_entry(
     
     merged_descriptions = CLIMATE_DESCRIPTIONS
     if not entry.runtime_data.multi_manager.reuse_config:
-        merged_descriptions = merge_categories(CLIMATE_DESCRIPTIONS, CLIMATE_DESCRIPTIONS_TUYA)
+        merged_descriptions = append_dictionnaries(CLIMATE_DESCRIPTIONS, CLIMATE_DESCRIPTIONS_TUYA)
 
     @callback
     def async_discover_device(device_map) -> None:
