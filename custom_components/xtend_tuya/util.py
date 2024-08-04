@@ -134,12 +134,12 @@ def get_overriden_tuya_integration_runtime_data(hass: HomeAssistant, entry: Conf
 def merge_device_descriptors(descriptors1, descriptors2):
     return_descriptors = copy.deepcopy(descriptors1)
     for category in descriptors2:
-        if category not in descriptors1:
+        if category not in return_descriptors:
             #Merge the whole category
             return_descriptors[category] = copy.deepcopy(descriptors2[category])
         else:
             #Merge the content of the descriptor category
-            return_descriptors[category] = merge_descriptor_category(descriptors1[category], descriptors2[category])
+            return_descriptors[category] = merge_descriptor_category(return_descriptors[category], descriptors2[category])
     return return_descriptors
 
 def merge_descriptor_category(category1: tuple[EntityDescription, ...], category2: tuple[EntityDescription, ...]):
