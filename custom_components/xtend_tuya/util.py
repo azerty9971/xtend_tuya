@@ -166,3 +166,10 @@ def append_lists(list1: list, list2: list) -> list:
         if item not in return_list:
             return_list.append(copy.deepcopy(item))
     return return_list
+
+def append_sets(set1: set, set2: set) -> set:
+    return_set = copy.deepcopy(set1)
+    for item in set2:
+        if item not in return_set:
+            return_set.add(item)
+    return return_set
