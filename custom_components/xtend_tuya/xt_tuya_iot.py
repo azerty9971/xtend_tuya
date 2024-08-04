@@ -122,7 +122,7 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
             
     def update_device_list_in_smart_home(self):
         """Update devices status in project type SmartHome."""
-        response = self.api.get(f"/v1.0/users/{self.api.token_info.uid}/devices")
+        response  = self.api.get(f"/v1.0/users/{self.api.token_info.uid}/devices")
         response2 = self.api.get(f"/v1.0/users/{self.api.token_info.uid}/devices?from=sharing")
         if response2["success"]:
             for item in response2["result"]:
@@ -191,6 +191,8 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
         device_properties.status = copy.deepcopy(device.status)
         if (hasattr(device, "local_strategy")):
             device_properties.local_strategy = copy.deepcopy(device.local_strategy)
+        if device.id == "bf85bd241924094329wbx0":
+            LOGGER.warning(f"DEBUG BEFORE: {device_properties}")
         response = self.api.get(f"/v2.0/cloud/thing/{device.id}/shadow/properties")
         response2 = self.api.get(f"/v2.0/cloud/thing/{device.id}/model")
         if response2.get("success"):
@@ -204,7 +206,7 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
                         and "accessMode" in property
                         and "typeSpec" in property
                         ):
-                        if property["abilityId"] not in device_properties.local_strategy:
+                        if int(property["abilityId"]) not in device_properties.local_strategy:
                             if "type" in property["typeSpec"]:
                                 typeSpec = property["typeSpec"]
                                 real_type = determine_property_type(property["typeSpec"]["type"])
@@ -224,7 +226,7 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
             result = response.get("result", {})
             for dp_property in result["properties"]:
                 if "dp_id" in dp_property and "type" in dp_property:
-                    if dp_property["dp_id"] not in device_properties.local_strategy:
+                    if int(dp_property["dp_id"]) not in device_properties.local_strategy:
                         dp_id = int(dp_property["dp_id"])
                         real_type = determine_property_type(dp_property.get("type",None), dp_property.get("value",None))
                         device_properties.local_strategy[dp_id] = {
@@ -239,15 +241,17 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
                         }
                 if (    "code"  in dp_property 
                     and "dp_id" in dp_property 
-                    and dp_property["dp_id"]  in device_properties.local_strategy
+                    and int(dp_property["dp_id"])  in device_properties.local_strategy
                     ):
                     code = dp_property["code"]
                     if code not in device_properties.status_range and code not in device_properties.function :
                         device_properties.status_range[code] = XTDeviceStatusRange(code=code, 
-                                                                                   type=device_properties.local_strategy[dp_property["dp_id"]]["config_item"]["valueType"],
-                                                                                   values=device_properties.local_strategy[dp_property["dp_id"]]["config_item"]["valueDesc"])
+                                                                                   type=device_properties.local_strategy[int(dp_property["dp_id"])]["config_item"]["valueType"],
+                                                                                   values=device_properties.local_strategy[int(dp_property["dp_id"])]["config_item"]["valueDesc"])
                     if code not in device_properties.status:
                         device_properties.status[code] = dp_property.get("value",None)
+        if device.id == "bf85bd241924094329wbx0":
+            LOGGER.warning(f"DEBUG AFTER: {device_properties}")
         return device_properties
 
     def send_property_update(
