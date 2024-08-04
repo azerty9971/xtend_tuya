@@ -171,5 +171,5 @@ def append_sets(set1: set, set2: set) -> set:
     return_set = copy.deepcopy(set1)
     for item in set2:
         if item not in return_set:
-            return_set.add(item)
+            return_set.add(copy.deepcopy(item))
     return return_set
