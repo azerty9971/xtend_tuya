@@ -43,9 +43,9 @@ async def async_setup_entry(
         entities: list[TuyaCameraEntity] = []
         device_ids = [*device_map]
         for device_id in device_ids:
-            device = hass_data.manager.device_map[device_id]
-            if device.category in merged_categories:
-                entities.append(TuyaCameraEntity(device, hass_data.manager))
+            if device := hass_data.manager.device_map.get(device_id):
+                if device.category in merged_categories:
+                    entities.append(TuyaCameraEntity(device, hass_data.manager))
 
         async_add_entities(entities)
 

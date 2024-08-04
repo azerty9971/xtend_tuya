@@ -51,9 +51,9 @@ async def async_setup_entry(
         entities: list[TuyaFanEntity] = []
         device_ids = [*device_map]
         for device_id in device_ids:
-            device = hass_data.manager.device_map[device_id]
-            if device and device.category in merged_categories:
-                entities.append(TuyaFanEntity(device, hass_data.manager))
+            if device := hass_data.manager.device_map.get(device_id):
+                if device and device.category in merged_categories:
+                    entities.append(TuyaFanEntity(device, hass_data.manager))
         async_add_entities(entities)
 
     async_discover_device([*hass_data.manager.device_map])

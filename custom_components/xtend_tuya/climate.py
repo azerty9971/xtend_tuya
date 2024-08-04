@@ -73,16 +73,16 @@ async def async_setup_entry(
         entities: list[TuyaClimateEntity] = []
         device_ids = [*device_map]
         for device_id in device_ids:
-            device = hass_data.manager.device_map[device_id]
-            if device and device.category in merged_descriptions:
-                entities.append(
-                    TuyaClimateEntity(
-                        device,
-                        hass_data.manager,
-                        merged_descriptions[device.category],
-                        hass.config.units.temperature_unit,
+            if device := hass_data.manager.device_map.get(device_id):
+                if device and device.category in merged_descriptions:
+                    entities.append(
+                        TuyaClimateEntity(
+                            device,
+                            hass_data.manager,
+                            merged_descriptions[device.category],
+                            hass.config.units.temperature_unit,
+                        )
                     )
-                )
         async_add_entities(entities)
 
     hass_data.manager.register_device_descriptors("climate_descriptions", merged_descriptions)
