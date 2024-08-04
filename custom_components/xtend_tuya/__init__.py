@@ -144,7 +144,6 @@ def are_all_domain_config_loaded(hass: HomeAssistant, domain: str, current_entry
             continue
         if config_entry.state is not ConfigEntryState.LOADED:
             return False
-    LOGGER.warning("Executing cleanup")
     return True
 
 def get_domain_device_map(hass: HomeAssistant, domain: str) -> dict[str, any]:
