@@ -149,7 +149,7 @@ class MultiDeviceListener:
         LOGGER.warning(f"Updating device {device.id}")
         devices = self.multi_manager.get_devices_from_device_id(device.id)
         for cur_device in devices:
-            cur_device.copy_data_from_device(device)
+            XTDevice.copy_data_from_device(device, cur_device)
         #dispatcher_send(self.hass, f"{TUYA_HA_SIGNAL_UPDATE_ENTITY_ORIG}_{device.id}")
         dispatcher_send(self.hass, f"{TUYA_HA_SIGNAL_UPDATE_ENTITY}_{device.id}")
 
