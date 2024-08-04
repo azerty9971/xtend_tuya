@@ -91,7 +91,8 @@ from .util import (
     get_tuya_integration_runtime_data,
     prepare_value_for_property_update,
     merge_iterables,
-    append_lists
+    append_lists,
+    log_stack,
 )
 
 from .tuya_decorators import (
@@ -537,7 +538,7 @@ class MultiManager:  # noqa: F811
                         dpId = int(temp_dpId)
                         code = temp_code
                         value = state[temp_dpId]
-                        LOGGER.warning(f"Found values: {dpId} {code} {value}")
+                        log_stack(f"Found values: {dpId} {code} {value}")
 
             if code is not None and dpId is not None:
                 return code, dpId, value, True
@@ -605,12 +606,6 @@ class MultiManager:  # noqa: F811
             self.sharing_account.device_manager.on_message(new_message)
         elif source == MESSAGE_SOURCE_TUYA_IOT and source == allowed_source:
             self.iot_account.device_manager.on_message(new_message)
-        
-        #DEBUG
-        """device = self.get_aggregated_device_map()[dev_id]
-        LOGGER.warning(f"on_message : {new_message}")
-        LOGGER.warning(f"Device status after : {device.status}")"""
-        #END DEBUG
 
     def get_allowed_source(self, dev_id: str, original_source: str) -> str | None:
         if dev_id.startswith("vdevo"):
