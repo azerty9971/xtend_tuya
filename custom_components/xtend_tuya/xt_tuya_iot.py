@@ -62,50 +62,6 @@ from .util import (
     log_stack
 )
 
-class XTDeviceListener(TuyaDeviceListener):
-    """Device Update Listener."""
-
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        device_manager: TuyaDeviceManager,
-        device_ids: set[str],
-        multi_manager: MultiManager,
-    ) -> None:
-        """Init DeviceListener."""
-        self.hass = hass
-        self.device_manager = device_manager
-        self.device_ids = device_ids
-        self.multi_manager = multi_manager
-
-    def update_device(self, device: TuyaDevice) -> None:
-        """Update device status."""
-        dispatcher_send(self.hass, f"{TUYA_HA_SIGNAL_UPDATE_ENTITY_ORIG}_{device.id}")
-        dispatcher_send(self.hass, f"{TUYA_HA_SIGNAL_UPDATE_ENTITY}_{device.id}")
-
-    def add_device(self, device: TuyaDevice) -> None:
-        """Add device added listener."""
-        super().add_device(device)
-        self.device_manager.mq.remove_message_listener(self.device_manager.on_message)
-        self.device_manager.mq.add_message_listener(self.multi_manager.on_message_from_tuya_iot)
-
-    def remove_device(self, device_id: str) -> None:
-        """Add device removed listener."""
-        self.hass.add_job(self.async_remove_device, device_id)
-
-    @callback
-    def async_remove_device(self, device_id: str) -> None:
-        log_stack("XTDeviceListener => async_remove_device")
-        """Remove device from Home Assistant."""
-        LOGGER.debug("Remove device: %s", device_id)
-        device_registry = dr.async_get(self.hass)
-        device_entry = device_registry.async_get_device(
-            identifiers={(DOMAIN, device_id)}
-        )
-        if device_entry is not None:
-            device_registry.async_remove_device(device_entry.id)
-            self.device_ids.discard(device_id)
-
 class XTTuyaDeviceManager(TuyaDeviceManager):
     def __init__(self, multi_manager: MultiManager, api: TuyaOpenAPI, mq: TuyaOpenMQ) -> None:
         super().__init__(api, mq)
@@ -200,17 +156,20 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
     def on_message(self, msg: str):
         super().on_message(msg)
     
+    def _on_device_other(self, device_id: str, biz_code: str, data: dict[str, Any]):
+        return super()._on_device_other(device_id, biz_code, data)
+
     def _on_device_report(self, device_id: str, status: list):
         device = self.device_map.get(device_id, None)
         if not device:
             return
         status_new = self.multi_manager.convert_device_report_status_list(device_id, status)
         status_new = self.multi_manager.apply_virtual_states_to_status_list(device, status_new)
-        devices = self.multi_manager.get_devices_from_device_id(device_id)
+        """devices = self.multi_manager.get_devices_from_device_id(device_id)
         for current_device in devices:
-            for status in status_new:
-                current_device.status[status["code"]] = status["value"]
-        super()._on_device_report(device_id, [])
+            for cur_status_new in status_new:
+                current_device.status[cur_status_new["code"]] = cur_status_new["value"]"""
+        super()._on_device_report(device_id, status_new)
 
     def _update_device_list_info_cache(self, devIds: list[str]):
         response = self.get_device_list_info(devIds)

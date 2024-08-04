@@ -81,56 +81,6 @@ from .multi_manager import (
     MultiManager,
 )
 
-#from .multi_manager import XTConfigEntry
-class DeviceListener(SharingDeviceListener):
-    """Device Update Listener."""
-
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        manager: Manager,
-    ) -> None:
-        """Init DeviceListener."""
-        self.hass = hass
-        self.manager = manager
-
-    def update_device(self, device: CustomerDevice) -> None:
-        """Update device status."""
-        #LOGGER.debug(
-        #    "Received update for device %s: %s",
-        #    device.id,
-        #    self.manager.device_map[device.id].status,
-        #)
-        dispatcher_send(self.hass, f"{TUYA_HA_SIGNAL_UPDATE_ENTITY_ORIG}_{device.id}")
-        dispatcher_send(self.hass, f"{TUYA_HA_SIGNAL_UPDATE_ENTITY}_{device.id}")
-
-    def add_device(self, device: CustomerDevice) -> None:
-        """Add device added listener."""
-        # Ensure the device isn't present stale
-        if not self.manager.get_overriden_device_manager():
-            #This will already have been done by the Tuya Manager
-            self.hass.add_job(self.async_remove_device, device.id)
-
-        dispatcher_send(self.hass, TUYA_DISCOVERY_NEW, [device.id])
-
-    def remove_device(self, device_id: str) -> None:
-        """Add device removed listener."""
-        if not self.manager.get_overriden_device_manager():
-            #This will already have been done by the Tuya Manager
-            self.hass.add_job(self.async_remove_device, device_id)
-
-    @callback
-    def async_remove_device(self, device_id: str) -> None:
-        """Remove device from Home Assistant."""
-        log_stack("DeviceListener => async_remove_device")
-        device_registry = dr.async_get(self.hass)
-        device_entry = device_registry.async_get_device(
-            identifiers={(DOMAIN, device_id)}
-        )
-        if device_entry is not None:
-            device_registry.async_remove_device(device_entry.id)
-
-
 class TokenListener(SharingTokenListener):
     """Token listener for upstream token updates."""
 
@@ -179,7 +129,7 @@ class DeviceManager(Manager):
         self.user_repository = None
         self.device_map: dict[str, CustomerDevice] = {}
         self.user_homes: list[SmartLifeHome] = []
-        #self.device_listeners = set()
+        self.device_listeners = set()
         self.other_device_manager = other_device_manager
     
     def on_external_refresh_mq(self):
@@ -219,11 +169,11 @@ class DeviceManager(Manager):
             return
         status_new = self.multi_manager.convert_device_report_status_list(device_id, status)
         status_new = self.multi_manager.apply_virtual_states_to_status_list(device, status_new)
-        devices = self.multi_manager.get_devices_from_device_id(device_id)
+        """devices = self.multi_manager.get_devices_from_device_id(device_id)
         for current_device in devices:
             for status in status_new:
-                current_device.status[status["code"]] = status["value"]
-        super()._on_device_report(device_id, [])
+                current_device.status[status["code"]] = status["value"]"""
+        super()._on_device_report(device_id, status_new)
     
     def send_commands(
             self, device_id: str, commands: list[dict[str, Any]]
