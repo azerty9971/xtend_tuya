@@ -98,12 +98,10 @@ from .tuya_decorators import (
 from .xt_tuya_sharing import (
     DeviceManager,
     TokenListener,
-    DeviceListener,
     XTDeviceRepository,
 )
 from .xt_tuya_iot import (
     XTTuyaDeviceManager,
-    XTDeviceListener,
     tuya_iot_update_listener,
 )
 
@@ -123,7 +121,6 @@ class TuyaIOTData(NamedTuple):
     device_manager: XTTuyaDeviceManager
     mq: TuyaOpenMQ
     device_ids: list[str] #List of device IDs that are managed by the manager before the managers device merging process
-    device_listener: XTDeviceListener
     home_manager: TuyaHomeManager
 
 class TuyaSharingData(NamedTuple):
