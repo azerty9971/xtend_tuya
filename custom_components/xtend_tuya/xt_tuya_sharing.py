@@ -158,7 +158,7 @@ class DeviceManager(Manager):
 
     def update_device_cache(self):
         super().update_device_cache()
-        self.multi_manager.convert_tuya_devices_to_xt(self)
+        #self.multi_manager.convert_tuya_devices_to_xt(self)
 
     def on_message(self, msg: str):
         super().on_message(msg)

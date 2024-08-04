@@ -74,7 +74,7 @@ class XTTuyaHomeManager(TuyaHomeManager):
 
     def update_device_cache(self):
         super().update_device_cache()
-        self.multi_manager.convert_tuya_devices_to_xt(self.device_manager)
+        #self.multi_manager.convert_tuya_devices_to_xt(self.device_manager)
 
 
 class XTTuyaDeviceManager(TuyaDeviceManager):
