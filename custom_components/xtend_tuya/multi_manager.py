@@ -374,7 +374,7 @@ class MultiManager:  # noqa: F811
         for device_map in device_maps:
             for device_id in device_map:
                 if device_id not in aggregated_list:
-                    aggregated_list[device_id] = XTDevice.from_compatible_device(device_map[device_id])
+                    aggregated_list[device_id] = device_map[device_id]
         return aggregated_list
     
     def unload(self):
