@@ -141,6 +141,7 @@ def are_all_domain_config_loaded(hass: HomeAssistant, domain: str) -> bool:
     config_entries = hass.config_entries.async_entries(domain, False, False)
     for config_entry in config_entries:
         if config_entry.state is not ConfigEntryState.LOADED:
+            LOGGER.warning(f"config state: {config_entry.state}")
             return False
     return True
 
