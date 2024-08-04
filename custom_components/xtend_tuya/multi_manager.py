@@ -28,7 +28,8 @@ from tuya_iot.device import (
 
 from tuya_sharing import (
     Manager as TuyaSharingManager,
-    CustomerDevice
+    CustomerDevice,
+    SharingDeviceListener,
 )
 from tuya_sharing.customerapi import (
     CustomerTokenInfo,
@@ -115,6 +116,7 @@ class HomeAssistantXTData(NamedTuple):
 
     multi_manager: MultiManager
     reuse_config: bool = False
+    listener: SharingDeviceListener = None
 
     @property
     def manager(self) -> MultiManager:
