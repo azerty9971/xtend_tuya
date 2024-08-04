@@ -124,11 +124,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
     return True
 
 
-async def cleanup_device_registry(hass: HomeAssistant, multi_manager: MultiManager) -> None:
+async def cleanup_device_registry(hass: HomeAssistant, multi_manager: MultiManager, current_entry: ConfigEntry) -> None:
     """Remove deleted device registry entry if there are no remaining entities."""
-    if not are_all_domain_config_loaded(hass, DOMAIN):
+    if not are_all_domain_config_loaded(hass, DOMAIN, current_entry):
         return
-    if not are_all_domain_config_loaded(hass, DOMAIN_ORIG):
+    if not are_all_domain_config_loaded(hass, DOMAIN_ORIG, current_entry):
         return
     device_registry = dr.async_get(hass)
     for dev_id, device_entry in list(device_registry.devices.items()):
