@@ -92,16 +92,16 @@ async def async_setup_entry(
         entities: list[TuyaBinarySensorEntity] = []
         device_ids = [*device_map]
         for device_id in device_ids:
-            device = hass_data.manager.device_map[device_id]
-            if descriptions := merged_descriptors.get(device.category):
-                for description in descriptions:
-                    dpcode = description.dpcode or description.key
-                    if dpcode in device.status:
-                        entities.append(
-                            TuyaBinarySensorEntity(
-                                device, hass_data.manager, description
+            if device := hass_data.manager.device_map.get(device_id, None):
+                if descriptions := merged_descriptors.get(device.category):
+                    for description in descriptions:
+                        dpcode = description.dpcode or description.key
+                        if dpcode in device.status:
+                            entities.append(
+                                TuyaBinarySensorEntity(
+                                    device, hass_data.manager, description
+                                )
                             )
-                        )
 
         async_add_entities(entities)
 

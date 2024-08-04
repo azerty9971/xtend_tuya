@@ -43,13 +43,13 @@ async def async_setup_entry(
         entities: list[TuyaButtonEntity] = []
         device_ids = [*device_map]
         for device_id in device_ids:
-            device = hass_data.manager.device_map[device_id]
-            if descriptions := merged_descriptors.get(device.category):
-                entities.extend(
-                    TuyaButtonEntity(device, hass_data.manager, description)
-                    for description in descriptions
-                    if description.key in device.status
-                )
+            if device := hass_data.manager.device_map.get(device_id):
+                if descriptions := merged_descriptors.get(device.category):
+                    entities.extend(
+                        TuyaButtonEntity(device, hass_data.manager, description)
+                        for description in descriptions
+                        if description.key in device.status
+                    )
 
         async_add_entities(entities)
 

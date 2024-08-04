@@ -155,12 +155,14 @@ class MultiDeviceListener:
         devices = self.multi_manager.get_devices_from_device_id(device.id)
         for cur_device in devices:
             XTDevice.copy_data_from_device(device, cur_device)
-        dispatcher_send(self.hass, f"{TUYA_HA_SIGNAL_UPDATE_ENTITY_ORIG}_{device.id}")
+        if self.multi_manager.reuse_config:
+            dispatcher_send(self.hass, f"{TUYA_HA_SIGNAL_UPDATE_ENTITY_ORIG}_{device.id}")
         dispatcher_send(self.hass, f"{TUYA_HA_SIGNAL_UPDATE_ENTITY}_{device.id}")
 
     def add_device(self, device: XTDevice):
         self.hass.add_job(self.async_remove_device, device.id)
-        dispatcher_send(self.hass, TUYA_DISCOVERY_NEW_ORIG, [device.id])
+        if self.multi_manager.reuse_config:
+            dispatcher_send(self.hass, TUYA_DISCOVERY_NEW_ORIG, [device.id])
         dispatcher_send(self.hass, TUYA_DISCOVERY_NEW, [device.id])
 
     def remove_device(self, device_id: str):

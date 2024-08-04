@@ -59,11 +59,11 @@ async def async_setup_entry(
         entities: list[TuyaHumidifierEntity] = []
         device_ids = [*device_map]
         for device_id in device_ids:
-            device = hass_data.manager.device_map[device_id]
-            if description := merged_categories.get(device.category):
-                entities.append(
-                    TuyaHumidifierEntity(device, hass_data.manager, description)
-                )
+            if device := hass_data.manager.device_map.get(device_id):
+                if description := merged_categories.get(device.category):
+                    entities.append(
+                        TuyaHumidifierEntity(device, hass_data.manager, description)
+                    )
         async_add_entities(entities)
 
     hass_data.manager.register_device_descriptors("humidifiers", merged_categories)
