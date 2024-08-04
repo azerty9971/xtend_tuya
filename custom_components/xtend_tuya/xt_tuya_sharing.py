@@ -147,6 +147,8 @@ class DeviceManager(Manager):
             self.other_device_manager.refresh_mq()
             return
         super().refresh_mq()
+        self.mq.remove_message_listener(self.on_message)
+        self.mq.add_message_listener(self.multi_manager.on_message_from_tuya_sharing)
 
     def set_overriden_device_manager(self, other_device_manager: Manager) -> None:
         self.other_device_manager = other_device_manager
