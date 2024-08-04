@@ -237,7 +237,6 @@ class MultiManager:  # noqa: F811
         sharing_device_manager.device_repository = XTDeviceRepository(sharing_device_manager.customer_api, sharing_device_manager, self)
         sharing_device_manager.scene_repository = SceneRepository(sharing_device_manager.customer_api)
         sharing_device_manager.user_repository = UserRepository(sharing_device_manager.customer_api)
-        sharing_device_manager.device_listeners.clear()
         sharing_device_manager.add_device_listener(self.multi_device_listener)
         return TuyaSharingData(device_manager=sharing_device_manager, device_ids=[])
 
