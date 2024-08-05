@@ -36,6 +36,7 @@ from .util import (
 )
 
 from .multi_manager import XTConfigEntry
+from .shared_classes import XTEntityDescription
 from .base import ElectricityTypeData, EnumTypeData, IntegerTypeData, TuyaEntity
 from .const import (
     DEVICE_CLASS_UNITS,
@@ -48,17 +49,11 @@ from .const import (
     LOGGER,
 )
 
-
-@dataclass
-class TuyaSensorEntityDescription(SensorEntityDescription):
+@dataclass(frozen=True)
+class TuyaSensorEntityDescription(SensorEntityDescription, XTEntityDescription):
     """Describes Tuya sensor entity."""
 
     subkey: str | None = None
-
-    virtual_state: VirtualStates | None = None
-    vs_copy_to_state: list[DPCode]  | None = None
-
-    restoredata: bool = False
 
 # Commonly used battery sensors, that are re-used in the sensors down below.
 BATTERY_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
