@@ -50,8 +50,7 @@ STATE_MAPPING: dict[str, str] = {
     Mode.SOS: STATE_ALARM_TRIGGERED,
 }
 
-@dataclass(frozen=True)
-class TuyaAlarmControlPanelEntityDescription(AlarmControlPanelEntityDescription, XTEntityDescription):
+class TuyaAlarmControlPanelEntityDescription(AlarmControlPanelEntityDescription, frozen_or_thawed=True):
     pass
 
 # All descriptions can be found here:
