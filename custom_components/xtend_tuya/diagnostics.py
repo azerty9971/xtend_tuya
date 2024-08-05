@@ -14,19 +14,19 @@ from homeassistant.helpers import device_registry as dr, entity_registry as er
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.util import dt as dt_util
 
-from . import TuyaConfigEntry
+from .multi_manager import XTConfigEntry
 from .const import DOMAIN, DPCode
 
 
 async def async_get_config_entry_diagnostics(
-    hass: HomeAssistant, entry: TuyaConfigEntry
+    hass: HomeAssistant, entry: XTConfigEntry
 ) -> dict[str, Any]:
     """Return diagnostics for a config entry."""
     return _async_get_diagnostics(hass, entry)
 
 
 async def async_get_device_diagnostics(
-    hass: HomeAssistant, entry: TuyaConfigEntry, device: DeviceEntry
+    hass: HomeAssistant, entry: XTConfigEntry, device: DeviceEntry
 ) -> dict[str, Any]:
     """Return diagnostics for a device entry."""
     return _async_get_diagnostics(hass, entry, device)
@@ -35,19 +35,19 @@ async def async_get_device_diagnostics(
 @callback
 def _async_get_diagnostics(
     hass: HomeAssistant,
-    entry: TuyaConfigEntry,
+    entry: XTConfigEntry,
     device: DeviceEntry | None = None,
 ) -> dict[str, Any]:
     """Return diagnostics for a config entry."""
     hass_data = entry.runtime_data
 
     mqtt_connected = None
-    if hass_data.manager.mq.client:
-        mqtt_connected = hass_data.manager.mq.client.is_connected()
+    """if hass_data.manager.mq.client:
+        mqtt_connected = hass_data.manager.mq.client.is_connected()"""
 
     data = {
-        "endpoint": hass_data.manager.customer_api.endpoint,
-        "terminal_id": hass_data.manager.terminal_id,
+        #"endpoint": hass_data.manager.customer_api.endpoint,
+        #"terminal_id": hass_data.manager.terminal_id,
         "mqtt_connected": mqtt_connected,
         "disabled_by": entry.disabled_by,
         "disabled_polling": entry.pref_disable_polling,
@@ -58,10 +58,6 @@ def _async_get_diagnostics(
         if tuya_device_id in hass_data.manager.device_map:
             data |= _async_device_as_dict(
                 hass, hass_data.manager.device_map[tuya_device_id]
-            )
-        if hass_data.manager.open_api_device_manager is not None and tuya_device_id in hass_data.manager.open_api_device_manager.device_map:
-            data |= _async_device_as_dict(
-                hass, hass_data.manager.open_api_device_manager.device_map[tuya_device_id]
             )
     else:
         data.update(
@@ -87,6 +83,12 @@ def _async_device_as_dict(
     support_local = {}
     if hasattr(device, "support_local"):
         support_local = device.support_local
+    local_strategy = ""
+    if hasattr(device, "local_strategy"):
+        local_strategy = device.local_strategy
+    model = ""
+    if hasattr(device, "model"):
+        model = device.model
     data = {
         "id": device.id,
         "name": device.name,
@@ -102,9 +104,11 @@ def _async_device_as_dict(
         "function": {},
         "status_range": {},
         "status": {},
+        "local_strategy": local_strategy,
         "home_assistant": {},
         "set_up": set_up,
         "support_local": support_local,
+        "model": model,
     }
 
     # Gather Tuya states
