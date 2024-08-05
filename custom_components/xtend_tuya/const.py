@@ -94,6 +94,10 @@ class VirtualStates(IntFlag):
     STATE_COPY_TO_MULTIPLE_STATE_NAME           = 0X0001,   #Copy the state so that it can be used with other virtual states
     STATE_SUMMED_IN_REPORTING_PAYLOAD           = 0X0002,   #Spoof the state value to make it a total instead of an incremental value
 
+class VirtualFunction(IntFlag):
+    """Virtual functions"""
+    FUNCTION_RESET_STATE                        = 0X0001,   #Reset the specified states
+
 @dataclass
 class DescriptionVirtualState:
     """Describes the VirtualStates linked to a specific Description Key."""

@@ -21,11 +21,11 @@ from .util import (
 
 from .multi_manager import XTConfigEntry
 from .base import TuyaEntity
-from .const import TUYA_DISCOVERY_NEW, DPCode
+from .const import TUYA_DISCOVERY_NEW, DPCode, VirtualFunction
 
 @dataclass(frozen=True)
 class TuyaButtonEntityDescription(ButtonEntityDescription):
-    pass
+    virtual_function: VirtualFunction | None = None
 
 # All descriptions can be found here.
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
