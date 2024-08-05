@@ -402,13 +402,16 @@ class MultiManager:  # noqa: F811
         if self.sharing_account:
             self.sharing_account.device_manager.refresh_mq()
     
-    def register_device_descriptors(self, name: str, descriptors):
+    def register_device_descriptors(self, name: str, descriptors, debug = False):
         descriptors_with_vs = {}
         for category in descriptors:
             decription_list: list = []
             if isinstance(category, tuple):
+                if debug:
+                    LOGGER.warning("Adding Tuple")
                 for description in descriptors[category]:
                     if hasattr(description, "virtual_state") and description.virtual_state is not None:
+                        LOGGER.warning(f"Adding VS = {description}")
                         decription_list.append(description)
             elif isinstance(category, EntityDescription):
                 #category is directly a descriptor
