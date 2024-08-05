@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from enum import StrEnum
-from dataclasses import dataclass
+
 from tuya_sharing import CustomerDevice, Manager
 
 from homeassistant.components.alarm_control_panel import (
@@ -31,7 +31,6 @@ from .util import (
 from .multi_manager import XTConfigEntry
 from .base import TuyaEntity
 from .const import TUYA_DISCOVERY_NEW, DPCode, DPType
-from .shared_classes import XTEntityDescription
 
 
 class Mode(StrEnum):
@@ -50,12 +49,10 @@ STATE_MAPPING: dict[str, str] = {
     Mode.SOS: STATE_ALARM_TRIGGERED,
 }
 
-class TuyaAlarmControlPanelEntityDescription(AlarmControlPanelEntityDescription, XTEntityDescription):
-    pass
 
 # All descriptions can be found here:
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
-ALARM: dict[str, tuple[TuyaAlarmControlPanelEntityDescription, ...]] = {
+ALARM: dict[str, tuple[AlarmControlPanelEntityDescription, ...]] = {
 }
 
 
@@ -102,7 +99,7 @@ class TuyaAlarmEntity(TuyaEntity, AlarmControlPanelEntity):
         self,
         device: CustomerDevice,
         device_manager: Manager,
-        description: TuyaAlarmControlPanelEntityDescription,
+        description: AlarmControlPanelEntityDescription,
     ) -> None:
         """Init Tuya Alarm."""
         super().__init__(device, device_manager)

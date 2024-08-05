@@ -33,7 +33,7 @@ from .multi_manager import XTConfigEntry
 from .base import IntegerTypeData, TuyaEntity
 from .const import TUYA_DISCOVERY_NEW, DPCode, DPType, WorkMode
 from .util import remap_value
-from .shared_classes import XTEntityDescription
+
 
 @dataclass
 class ColorTypeData:
@@ -58,7 +58,7 @@ DEFAULT_COLOR_TYPE_DATA_V2 = ColorTypeData(
 
 
 @dataclass(frozen=True)
-class TuyaLightEntityDescription(LightEntityDescription, XTEntityDescription):
+class TuyaLightEntityDescription(LightEntityDescription):
     """Describe an Tuya light entity."""
 
     brightness_max: DPCode | None = None

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
 from typing import Any
 
 from tuya_sharing import CustomerDevice, Manager
@@ -27,32 +26,28 @@ from .util import (
 from .multi_manager import XTConfigEntry
 from .base import TuyaEntity
 from .const import TUYA_DISCOVERY_NEW, DPCode
-from .shared_classes import XTEntityDescription
-
-class TuyaSwitchEntityDescription(SwitchEntityDescription, XTEntityDescription):
-    pass
 
 # All descriptions can be found here. Mostly the Boolean data types in the
 # default instruction set of each category end up being a Switch.
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
-SWITCHES: dict[str, tuple[TuyaSwitchEntityDescription, ...]] = {
+SWITCHES: dict[str, tuple[SwitchEntityDescription, ...]] = {
     "jtmspro": (
-        TuyaSwitchEntityDescription(
+        SwitchEntityDescription(
             key=DPCode.AUTOMATIC_LOCK,
             translation_key="automatic_lock",
             entity_category=EntityCategory.CONFIG,
         ),
-        TuyaSwitchEntityDescription(
+        SwitchEntityDescription(
             key=DPCode.RTC_TIME,
             translation_key="rtc_time",
             entity_category=EntityCategory.CONFIG,
         ),
-        TuyaSwitchEntityDescription(
+        SwitchEntityDescription(
             key=DPCode.MANUAL_LOCK,
             translation_key="manual_lock",
             entity_category=EntityCategory.CONFIG,
         ),
-        TuyaSwitchEntityDescription(
+        SwitchEntityDescription(
             key=DPCode.ALARM_SWITCH,
             translation_key="alarm_switch",
             entity_category=EntityCategory.CONFIG,
@@ -61,157 +56,157 @@ SWITCHES: dict[str, tuple[TuyaSwitchEntityDescription, ...]] = {
     # Automatic cat litter box
     # Note: Undocumented
     "msp": (
-        TuyaSwitchEntityDescription(
+        SwitchEntityDescription(
             key=DPCode.AUTO_CLEAN,
             translation_key="auto_clean",
             entity_category=EntityCategory.CONFIG,
             icon="mdi:bacteria",
         ),
-        TuyaSwitchEntityDescription(
+        SwitchEntityDescription(
             key=DPCode.AUTO_DEORDRIZER,
             translation_key="auto_deordrizer",
             entity_category=EntityCategory.CONFIG,
         ),
-        TuyaSwitchEntityDescription(
+        SwitchEntityDescription(
             key=DPCode.BEEP,
             translation_key="beep",
             entity_category=EntityCategory.CONFIG,
         ),
-        TuyaSwitchEntityDescription(
+        SwitchEntityDescription(
             key=DPCode.CALIBRATION,
             translation_key="calibration",
             entity_category=EntityCategory.CONFIG,
         ),
-        TuyaSwitchEntityDescription(
+        SwitchEntityDescription(
             key=DPCode.CHILD_LOCK,
             translation_key="child_lock",
             entity_category=EntityCategory.CONFIG,
             icon="mdi:human-child"
         ),
-        TuyaSwitchEntityDescription(
+        SwitchEntityDescription(
             key=DPCode.CLEAN_NOTICE,
             translation_key="clean_notice",
             entity_category=EntityCategory.CONFIG,
         ),
-        TuyaSwitchEntityDescription(
+        SwitchEntityDescription(
             key=DPCode.CLEAN_TASTE_SWITCH,
             translation_key="clean_tasteswitch",
             entity_category=EntityCategory.CONFIG,
         ),
-        TuyaSwitchEntityDescription(
+        SwitchEntityDescription(
             key=DPCode.CLEAN_TIME_SWITCH,
             translation_key="clean_time_switch",
             entity_category=EntityCategory.CONFIG,
         ),
-        TuyaSwitchEntityDescription(
+        SwitchEntityDescription(
             key=DPCode.DEODORIZATION,
             translation_key="deodorization",
             entity_category=EntityCategory.CONFIG,
             icon="mdi:bacteria",
         ),
-        TuyaSwitchEntityDescription(
+        SwitchEntityDescription(
             key=DPCode.FACTORY_RESET,
             translation_key="factory_reset",
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False,
         ),
-        TuyaSwitchEntityDescription(
+        SwitchEntityDescription(
             key=DPCode.INDICATOR_LIGHT,
             translation_key="indicator_light",
             entity_category=EntityCategory.CONFIG,
         ),
-        TuyaSwitchEntityDescription(
+        SwitchEntityDescription(
             key=DPCode.INDUCTION_CLEAN,
             translation_key="induction_clean",
             entity_category=EntityCategory.CONFIG,
         ),
-        TuyaSwitchEntityDescription(
+        SwitchEntityDescription(
             key=DPCode.LIGHT,
             translation_key="light",
             entity_category=EntityCategory.CONFIG,
         ),
-        TuyaSwitchEntityDescription(
+        SwitchEntityDescription(
             key=DPCode.MANUAL_CLEAN,
             translation_key="manual_clean",
             entity_category=EntityCategory.CONFIG,
         ),
-        TuyaSwitchEntityDescription(
+        SwitchEntityDescription(
             key=DPCode.NET_NOTICE,
             translation_key="net_notice",
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False,
         ),
-        TuyaSwitchEntityDescription(
+        SwitchEntityDescription(
             key=DPCode.NOT_DISTURB_SWITCH,
             translation_key="not_disturb_switch",
             entity_category=EntityCategory.CONFIG,
         ),
-        TuyaSwitchEntityDescription(
+        SwitchEntityDescription(
             key=DPCode.ODOURLESS,
             translation_key="odourless",
             entity_category=EntityCategory.CONFIG,
         ),
-        TuyaSwitchEntityDescription(
+        SwitchEntityDescription(
             key=DPCode.CLEANING,
             translation_key="one_click_cleanup",
             entity_category=EntityCategory.CONFIG,
         ),
-        TuyaSwitchEntityDescription(
+        SwitchEntityDescription(
             key=DPCode.QUIET_TIMING_ON,
             translation_key="quiet_timing_on",
             entity_category=EntityCategory.CONFIG,
         ),
-        TuyaSwitchEntityDescription(
+        SwitchEntityDescription(
             key=DPCode.REBOOT,
             translation_key="child_lock",
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False,
         ),
-        TuyaSwitchEntityDescription(
+        SwitchEntityDescription(
             key=DPCode.SLEEP,
             translation_key="sleep",
             entity_category=EntityCategory.CONFIG,
         ),
-        TuyaSwitchEntityDescription(
+        SwitchEntityDescription(
             key=DPCode.SLEEPING,
             translation_key="sleeping",
             entity_category=EntityCategory.CONFIG,
         ),
-        TuyaSwitchEntityDescription(
+        SwitchEntityDescription(
             key=DPCode.SMART_CLEAN,
             translation_key="smart_clean",
             entity_category=EntityCategory.CONFIG,
         ),
-        TuyaSwitchEntityDescription(
+        SwitchEntityDescription(
             key=DPCode.START,
             translation_key="start",
             entity_category=EntityCategory.CONFIG,
             icon="mdi:bacteria",
         ),
-        TuyaSwitchEntityDescription(
+        SwitchEntityDescription(
             key=DPCode.STORE_FULL_NOTIFY,
             translation_key="store_full_notify",
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False,
         ),
-        TuyaSwitchEntityDescription(
+        SwitchEntityDescription(
             key=DPCode.SWITCH,
             translation_key="switch",
             entity_category=EntityCategory.CONFIG,
         ),
-        TuyaSwitchEntityDescription(
+        SwitchEntityDescription(
             key=DPCode.TOILET_NOTICE,
             translation_key="toilet_notice",
             entity_category=EntityCategory.CONFIG,
             icon="mdi:toilet"
         ),
-        TuyaSwitchEntityDescription(
+        SwitchEntityDescription(
             key=DPCode.UNIT,
             translation_key="unit",
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False,
         ),
-        TuyaSwitchEntityDescription(
+        SwitchEntityDescription(
             key=DPCode.UV,
             translation_key="uv",
             entity_category=EntityCategory.CONFIG,
@@ -261,7 +256,7 @@ class TuyaSwitchEntity(TuyaEntity, SwitchEntity):
         self,
         device: CustomerDevice,
         device_manager: Manager,
-        description: TuyaSwitchEntityDescription,
+        description: SwitchEntityDescription,
     ) -> None:
         """Init TuyaHaSwitch."""
         super().__init__(device, device_manager)
