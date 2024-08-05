@@ -21,17 +21,17 @@ from .util import (
 
 from .multi_manager import XTConfigEntry
 from .base import TuyaEntity
-from .const import TUYA_DISCOVERY_NEW, DPCode, VirtualFunction
+from .const import TUYA_DISCOVERY_NEW, DPCode, VirtualFunctions
 
 @dataclass(frozen=True)
 class TuyaButtonEntityDescription(ButtonEntityDescription):
-    virtual_function: VirtualFunction | None = None
+    virtual_function: VirtualFunctions | None = None
     vf_reset_state: list[DPCode]  | None = field(default_factory=list)
 
 CONSUMPTION_BUTTONS: tuple[TuyaButtonEntityDescription, ...] = (
     TuyaButtonEntityDescription(
             key=DPCode.RESET_ADD_ELE,
-            virtual_function = VirtualFunction.FUNCTION_RESET_STATE,
+            virtual_function = VirtualFunctions.FUNCTION_RESET_STATE,
             vf_reset_state=[DPCode.ADD_ELE],
             translation_key="reset_add_ele",
             entity_category=EntityCategory.CONFIG,
