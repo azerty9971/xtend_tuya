@@ -28,8 +28,8 @@ from .base import TuyaEntity
 from .const import TUYA_DISCOVERY_NEW, DPCode
 from .shared_classes import XTEntityDescription
 
-@dataclass(frozen=True)
-class InterimBinarySensorEntityDescription(BinarySensorEntityDescription):
+@dataclass(frozen=False)
+class TuyaBinarySensorEntityDescription(BinarySensorEntityDescription, XTEntityDescription):
     """Describes a Tuya binary sensor."""
 
     # DPCode, to use. If None, the key will be used as DPCode
@@ -37,9 +37,6 @@ class InterimBinarySensorEntityDescription(BinarySensorEntityDescription):
 
     # Value or values to consider binary sensor to be "on"
     on_value: bool | float | int | str | set[bool | float | int | str] = True
-
-class TuyaBinarySensorEntityDescription(InterimBinarySensorEntityDescription, XTEntityDescription):
-    pass
 
 # Commonly used sensors
 TAMPER_BINARY_SENSOR = TuyaBinarySensorEntityDescription(

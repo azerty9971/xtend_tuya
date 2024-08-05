@@ -22,6 +22,7 @@ from .base import TuyaEntity
 from .const import TUYA_DISCOVERY_NEW, DPCode, DPType
 from .shared_classes import XTEntityDescription
 
+@dataclass(frozen=True)
 class TuyaSelectEntityDescription(SelectEntityDescription, XTEntityDescription):
     pass
 
