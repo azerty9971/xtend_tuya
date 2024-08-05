@@ -4,10 +4,13 @@ import copy
 from typing import NamedTuple, Optional, Any
 from dataclasses import dataclass, field
 
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryError, ConfigEntryNotReady
 from homeassistant.config_entries import ConfigEntry
 import homeassistant.components.tuya as tuya_integration
+from homeassistant.helpers.dispatcher import dispatcher_send
+from homeassistant.helpers import device_registry as dr
+from homeassistant.helpers.entity import EntityDescription
 
 from tuya_iot import (
     AuthType,
@@ -25,7 +28,8 @@ from tuya_iot.device import (
 
 from tuya_sharing import (
     Manager as TuyaSharingManager,
-    CustomerDevice
+    CustomerDevice,
+    SharingDeviceListener,
 )
 from tuya_sharing.customerapi import (
     CustomerTokenInfo,
@@ -54,9 +58,13 @@ from .const import (
     PLATFORMS,
     TUYA_CLIENT_ID,
     TUYA_DISCOVERY_NEW,
+    TUYA_DISCOVERY_NEW_ORIG,
     TUYA_HA_SIGNAL_UPDATE_ENTITY,
+    TUYA_HA_SIGNAL_UPDATE_ENTITY_ORIG,
     VirtualStates,
+    VirtualFunctions,
     DescriptionVirtualState,
+    DescriptionVirtualFunction,
     CONF_ACCESS_ID,
     CONF_ACCESS_SECRET,
     CONF_APP_TYPE,
@@ -85,23 +93,23 @@ from .util import (
     get_tuya_integration_runtime_data,
     prepare_value_for_property_update,
     merge_iterables,
+    append_lists,
+    log_stack,
 )
 
 from .tuya_decorators import (
     decorate_tuya_manager,
-    decorate_tuya_integration,
 )
 
 from .xt_tuya_sharing import (
     DeviceManager,
     TokenListener,
-    DeviceListener,
     XTDeviceRepository,
 )
 from .xt_tuya_iot import (
     XTTuyaDeviceManager,
-    XTDeviceListener,
     tuya_iot_update_listener,
+    XTTuyaHomeManager,
 )
 
 type XTConfigEntry = ConfigEntry[HomeAssistantXTData]  # noqa: F811
@@ -111,6 +119,7 @@ class HomeAssistantXTData(NamedTuple):
 
     multi_manager: MultiManager
     reuse_config: bool = False
+    listener: SharingDeviceListener = None
 
     @property
     def manager(self) -> MultiManager:
@@ -120,8 +129,7 @@ class TuyaIOTData(NamedTuple):
     device_manager: XTTuyaDeviceManager
     mq: TuyaOpenMQ
     device_ids: list[str] #List of device IDs that are managed by the manager before the managers device merging process
-    device_listener: XTDeviceListener
-    home_manager: TuyaHomeManager
+    home_manager: XTTuyaHomeManager
 
 class TuyaSharingData(NamedTuple):
     device_manager: DeviceManager
@@ -140,20 +148,55 @@ class MultiMQTTQueue:
             self.iot_account_mq.stop()
 
 class MultiDeviceListener:
-     def __init__(self, multi_manager: MultiManager) -> None:
+    def __init__(self, hass: HomeAssistant, multi_manager: MultiManager) -> None:
         self.multi_manager = multi_manager
-        self.sharing_account_device_listener = None
-        self.iot_account_device_listener = None
+        self.hass = hass
+
+    def update_device(self, device: XTDevice):
+        devices = self.multi_manager.get_devices_from_device_id(device.id)
+        for cur_device in devices:
+            XTDevice.copy_data_from_device(device, cur_device)
+        if self.multi_manager.reuse_config:
+            dispatcher_send(self.hass, f"{TUYA_HA_SIGNAL_UPDATE_ENTITY_ORIG}_{device.id}")
+        dispatcher_send(self.hass, f"{TUYA_HA_SIGNAL_UPDATE_ENTITY}_{device.id}")
+
+    def add_device(self, device: XTDevice):
+        self.hass.add_job(self.async_remove_device, device.id)
+        if self.multi_manager.reuse_config:
+            dispatcher_send(self.hass, TUYA_DISCOVERY_NEW_ORIG, [device.id])
+        dispatcher_send(self.hass, TUYA_DISCOVERY_NEW, [device.id])
+
+    def remove_device(self, device_id: str):
+        #log_stack("DeviceListener => async_remove_device")
+        device_registry = dr.async_get(self.hass)
+        device_entry = device_registry.async_get_device(
+            identifiers={(DOMAIN_ORIG, device_id), (DOMAIN, device_id)}
+        )
+        if device_entry is not None:
+            device_registry.async_remove_device(device_entry.id)
+    
+    @callback
+    def async_remove_device(self, device_id: str) -> None:
+        """Remove device from Home Assistant."""
+        #log_stack("DeviceListener => async_remove_device")
+        device_registry = dr.async_get(self.hass)
+        device_entry = device_registry.async_get_device(
+            identifiers={(DOMAIN_ORIG, device_id), (DOMAIN, device_id)}
+        )
+        if device_entry is not None:
+            device_registry.async_remove_device(device_entry.id)
     
 class MultiManager:  # noqa: F811
-    def __init__(self, entry: XTConfigEntry) -> None:
+    def __init__(self, hass: HomeAssistant, entry: XTConfigEntry) -> None:
         self.sharing_account: TuyaSharingData = None
         self.iot_account: TuyaIOTData = None
         self.reuse_config: bool = False
-        self.descriptors = {}
+        self.descriptors_with_virtual_state = {}
+        self.descriptors_with_virtual_function = {}
         self.multi_mqtt_queue: MultiMQTTQueue = MultiMQTTQueue(self)
-        self.multi_device_listener: MultiDeviceListener = MultiDeviceListener(self)
+        self.multi_device_listener: MultiDeviceListener = MultiDeviceListener(hass, self)
         self.config_entry = entry
+        self.hass = hass
 
     @property
     def device_map(self):
@@ -178,13 +221,12 @@ class MultiManager:  # noqa: F811
         if tuya_integration_runtime_data:
             #We are using an override of the Tuya integration
             decorate_tuya_manager(tuya_integration_runtime_data.device_manager, self)
-            decorate_tuya_integration(self)
             sharing_device_manager = DeviceManager(multi_manager=self, other_device_manager=tuya_integration_runtime_data.device_manager)
             sharing_device_manager.terminal_id      = tuya_integration_runtime_data.device_manager.terminal_id
             sharing_device_manager.mq               = tuya_integration_runtime_data.device_manager.mq
             sharing_device_manager.customer_api     = tuya_integration_runtime_data.device_manager.customer_api
-            sharing_device_manager.device_listeners = tuya_integration_runtime_data.device_manager.device_listeners
-            self._convert_tuya_devices_to_xt(tuya_integration_runtime_data.device_manager)
+            tuya_integration_runtime_data.device_manager.device_listeners.clear()
+            #self.convert_tuya_devices_to_xt(tuya_integration_runtime_data.device_manager)
             self.reuse_config = True
         else:
             #We are using XT as a standalone integration
@@ -204,8 +246,7 @@ class MultiManager:  # noqa: F811
         sharing_device_manager.device_repository = XTDeviceRepository(sharing_device_manager.customer_api, sharing_device_manager, self)
         sharing_device_manager.scene_repository = SceneRepository(sharing_device_manager.customer_api)
         sharing_device_manager.user_repository = UserRepository(sharing_device_manager.customer_api)
-        self.multi_device_listener.sharing_account_device_listener = DeviceListener(hass, sharing_device_manager)
-        sharing_device_manager.add_device_listener(self.multi_device_listener.sharing_account_device_listener)
+        sharing_device_manager.add_device_listener(self.multi_device_listener)
         return TuyaSharingData(device_manager=sharing_device_manager, device_ids=[])
 
     async def get_iot_account(self, hass: HomeAssistant, entry: XTConfigEntry) -> TuyaIOTData | None:
@@ -253,14 +294,12 @@ class MultiManager:  # noqa: F811
         mq.start()
         device_manager = XTTuyaDeviceManager(self, api, mq)
         device_ids: list[str] = list()
-        self.multi_device_listener.iot_account_device_listener = XTDeviceListener(hass, device_manager, device_ids, self)
-        home_manager = TuyaHomeManager(api, mq, device_manager)
-        device_manager.add_device_listener(self.multi_device_listener.iot_account_device_listener)
+        home_manager = XTTuyaHomeManager(api, mq, device_manager, self)
+        device_manager.add_device_listener(self.multi_device_listener)
         return TuyaIOTData(
             device_manager=device_manager,
             mq=mq,
             device_ids=device_ids,
-            device_listener=self.multi_device_listener.iot_account_device_listener, 
             home_manager=home_manager)
     
     def update_device_cache(self):
@@ -276,7 +315,7 @@ class MultiManager:  # noqa: F811
             self.iot_account.device_ids.extend(new_device_ids)
         self._merge_devices_from_multiple_sources()
     
-    def _convert_tuya_devices_to_xt(self, manager):
+    def convert_tuya_devices_to_xt(self, manager):
         for dev_id in manager.device_map:
             manager.device_map[dev_id] = XTDevice.from_compatible_device(manager.device_map[dev_id])
 
@@ -291,12 +330,9 @@ class MultiManager:  # noqa: F811
         return return_list
 
     def _merge_devices_from_multiple_sources(self):
-        if not ( self.sharing_account and self.iot_account ):
-            return
-        
         #Merge the device function, status_range and status between managers
         device_maps = self._get_available_device_maps()
-        aggregated_device_list = self.get_aggregated_device_map()
+        aggregated_device_list = self.device_map
         for device in aggregated_device_list.values():
             to_be_merged = []
             devices = self.get_devices_from_device_id(device.id)
@@ -311,31 +347,13 @@ class MultiManager:  # noqa: F811
         merge_iterables(receiving_device.status_range, giving_device.status_range)
         merge_iterables(receiving_device.function, giving_device.function)
         merge_iterables(receiving_device.status, giving_device.status)
-        """receiving_device.status_range.update(giving_device.status_range)
-        giving_device.status_range = receiving_device.status_range
-        receiving_device.function.update(giving_device.function)
-        giving_device.function = receiving_device.function
-        receiving_device.status.update(giving_device.status)
-        giving_device.status = receiving_device.status"""
         if hasattr(receiving_device, "local_strategy") and hasattr(giving_device, "local_strategy"):
             merge_iterables(receiving_device.local_strategy, giving_device.local_strategy)
-            """receiving_device.local_strategy.update(giving_device.local_strategy)
-            giving_device.local_strategy = receiving_device.local_strategy"""
         if hasattr(receiving_device, "model") and hasattr(giving_device, "model"):
             if receiving_device.model == "" and giving_device.model != "":
                 receiving_device.model = copy.deepcopy(giving_device.model)
             if giving_device.model == "" and receiving_device.model != "":
                 giving_device.model = copy.deepcopy(receiving_device.model)
-
-    def is_device_in_domain_device_maps(self, domains: list[str], device_entry_identifiers: list[str]):
-        if device_entry_identifiers[0] in domains:
-            if self.sharing_account and device_entry_identifiers[1] in self.sharing_account.device_manager.device_map:
-                return True
-            if self.iot_account and device_entry_identifiers[1] in self.iot_account.device_manager.device_map:
-                return True
-        else:
-            return True
-        return False
     
     def get_aggregated_device_map(self) -> dict[str, XTDevice]:
         aggregated_list: dict[str, XTDevice] = {}
@@ -343,7 +361,7 @@ class MultiManager:  # noqa: F811
         for device_map in device_maps:
             for device_id in device_map:
                 if device_id not in aggregated_list:
-                    aggregated_list[device_id] = XTDevice.from_compatible_device(device_map[device_id])
+                    aggregated_list[device_id] = device_map[device_id]
         return aggregated_list
     
     def unload(self):
@@ -363,11 +381,16 @@ class MultiManager:  # noqa: F811
 
     async def on_tuya_unload_entry(self, before_call: bool, hass: HomeAssistant, entry: tuya_integration.TuyaConfigEntry):
         #LOGGER.warning(f"on_tuya_unload_entry {before_call} : {entry.__dict__}")
-        if not before_call and self.sharing_account and self.config_entry.title == entry.title:
-            self.reuse_config = False
-            self.sharing_account.device_manager.set_overriden_device_manager(None)
-            self.sharing_account.device_manager.mq = None
-            self.multi_mqtt_queue.sharing_account_mq = None
+        if before_call:
+            #If before the call, we need to add the regular device listener back
+            runtime_data = get_tuya_integration_runtime_data(hass, entry, DOMAIN_ORIG)
+            runtime_data.device_manager.add_device_listener(runtime_data.device_listener)
+        else:
+            if self.sharing_account and self.config_entry.title == entry.title:
+                self.reuse_config = False
+                self.sharing_account.device_manager.set_overriden_device_manager(None)
+                self.sharing_account.device_manager.mq = None
+                self.multi_mqtt_queue.sharing_account_mq = None
 
     async def on_tuya_remove_entry(self, before_call: bool, hass: HomeAssistant, entry: tuya_integration.TuyaConfigEntry):
         #LOGGER.warning(f"on_tuya_remove_entry {before_call} : {entry.__dict__}")
@@ -381,25 +404,46 @@ class MultiManager:  # noqa: F811
     def refresh_mq(self):
         if self.sharing_account:
             self.sharing_account.device_manager.refresh_mq()
-    
+
     def register_device_descriptors(self, name: str, descriptors):
         descriptors_with_vs = {}
+        descriptors_with_vf = {}
         for category in descriptors:
-            decription_list: list = []
-            for description in descriptors[category]:
-                if hasattr(description, "virtual_state") and description.virtual_state is not None:
-                    decription_list.append(description)
-            if len(decription_list) > 0:
-                descriptors_with_vs[category] = tuple(decription_list)
+            description_list_vs: list = []
+            description_list_vf: list = []
+            category_item = descriptors[category]
+            if isinstance(category_item, tuple):
+                for description in category_item:
+                    if hasattr(description, "virtual_state") and description.virtual_state is not None:
+                        description_list_vs.append(description)
+                    if hasattr(description, "virtual_function") and description.virtual_function is not None:
+                        description_list_vf.append(description)
+                    
+            elif isinstance(category_item, EntityDescription):
+                #category is directly a descriptor
+                if hasattr(category_item, "virtual_state") and category_item.virtual_state is not None:
+                    description_list_vs.append(category_item)
+                if hasattr(category_item, "virtual_function") and category_item.virtual_function is not None:
+                    description_list_vf.append(category_item)
+
+            if len(description_list_vs) > 0:
+                    descriptors_with_vs[category] = tuple(description_list_vs)
+            if len(description_list_vf) > 0:
+                    descriptors_with_vf[category] = tuple(description_list_vf)
         if len(descriptors_with_vs) > 0:
-            self.descriptors[name] = descriptors_with_vs
-            for device in self.get_aggregated_device_map().values():
-                self.apply_init_virtual_states(device)
+            self.descriptors_with_virtual_state[name] = descriptors_with_vs
+            for device_id in self.device_map:
+                devices = self.get_devices_from_device_id(device_id)
+                for device in devices:
+                    self.apply_init_virtual_states(device)
+
+        if len(descriptors_with_vf) > 0:
+            self.descriptors_with_virtual_function[name] = descriptors_with_vf
 
     def get_category_virtual_states(self,category: str) -> list[DescriptionVirtualState]:
         to_return = []
         for virtual_state in VirtualStates:
-            for descriptor in self.descriptors.values():
+            for descriptor in self.descriptors_with_virtual_state.values():
                 if (descriptions := descriptor.get(category)):
                     for description in descriptions:
                         if description.virtual_state is not None and description.virtual_state & virtual_state.value:
@@ -408,11 +452,23 @@ class MultiManager:  # noqa: F811
                             to_return.append(found_virtual_state)
         return to_return
     
+    def get_category_virtual_functions(self,category: str) -> list[DescriptionVirtualFunction]:
+        to_return = []
+        for virtual_function in VirtualFunctions:
+            for descriptor in self.descriptors_with_virtual_function.values():
+                if (descriptions := descriptor.get(category)):
+                    for description in descriptions:
+                        if description.virtual_function is not None and description.virtual_function & virtual_function.value:
+                            # This virtual_state is applied to this key, let's return it
+                            found_virtual_function = DescriptionVirtualFunction(description.key, virtual_function.name, virtual_function.value, description.vf_reset_state)
+                            to_return.append(found_virtual_function)
+        return to_return
+    
     def remove_device_listeners(self) -> None:
-        if self.multi_device_listener.iot_account_device_listener:
-            self.iot_account.device_manager.remove_device_listener(self.multi_device_listener.iot_account_device_listener)
-        if self.multi_device_listener.sharing_account_device_listener:
-            self.sharing_account.device_manager.remove_device_listener(self.multi_device_listener.sharing_account_device_listener)
+        if self.iot_account:
+            self.iot_account.device_manager.remove_device_listener(self.multi_device_listener)
+        if self.sharing_account:
+            self.sharing_account.device_manager.remove_device_listener(self.multi_device_listener)
 
     def get_device_properties(self, device: XTDevice) -> XTDeviceProperties:
         dev_props = XTDeviceProperties()
@@ -506,6 +562,14 @@ class MultiManager:  # noqa: F811
             if dpId is None and "dpId" in state:
                 dpId = state["dpId"]
                 code = self._read_code_from_dpId(state["dpId"], device)
+            if dpId is None and code is None and "dpId" not in state and "code" not in state:
+                for temp_dpId in state:
+                    temp_code = self._read_code_from_dpId(int(temp_dpId), device)
+                    if temp_code is not None:
+                        dpId = int(temp_dpId)
+                        code = temp_code
+                        value = state[temp_dpId]
+
             if code is not None and dpId is not None:
                 return code, dpId, value, True
         if code is None and fail_if_code_not_found:
@@ -523,6 +587,7 @@ class MultiManager:  # noqa: F811
             if result_ok:
                 item["code"] = code
                 item["dpId"] = dpId
+                item["value"] = value
             else:
                 LOGGER.warning(f"convert_device_report_status_list code retrieval failed => {item} <=>{device_id}")
         return status
@@ -571,12 +636,6 @@ class MultiManager:  # noqa: F811
             self.sharing_account.device_manager.on_message(new_message)
         elif source == MESSAGE_SOURCE_TUYA_IOT and source == allowed_source:
             self.iot_account.device_manager.on_message(new_message)
-        
-        #DEBUG
-        """device = self.get_aggregated_device_map()[dev_id]
-        LOGGER.warning(f"on_message : {new_message}")
-        LOGGER.warning(f"Device status after : {device.status}")"""
-        #END DEBUG
 
     def get_allowed_source(self, dev_id: str, original_source: str) -> str | None:
         if dev_id.startswith("vdevo"):
@@ -612,32 +671,58 @@ class MultiManager:  # noqa: F811
                         data["devId"] = dev_id
         return msg
 
+    def query_scenes(self) -> list:
+        return_list = []
+        if self.sharing_account:
+            temp_list = self.sharing_account.device_manager.query_scenes()
+            return_list = append_lists(return_list, temp_list)
+        if self.iot_account:
+            temp_list = self.iot_account.home_manager.query_scenes()
+            return_list = append_lists(return_list, temp_list)
+        return return_list
+
     def send_commands(
             self, device_id: str, commands: list[dict[str, Any]]
     ):
         open_api_regular_commands: list[dict[str, Any]] = []
         regular_commands: list[dict[str, Any]] = []
         property_commands: list[dict[str, Any]] = []
+        virtual_function_commands: list[dict[str, Any]] = []
         device_map = self.get_aggregated_device_map()
         if device := device_map.get(device_id, None):
+            virtual_function_list = self.get_category_virtual_functions(device.category)
             for command in commands:
+                command_code  = command["code"]
+                command_value = command["value"]
                 LOGGER.debug(f"Base command : {command}")
+                vf_found = False
+                for virtual_function in virtual_function_list:
+                    if (command_code == virtual_function.key or
+                        command_code in virtual_function.vf_reset_state):
+                        command_dict = {"code": command_code, "value": command_value, "virtual_function": virtual_function}
+                        virtual_function_commands.append(command_dict)
+                        vf_found = True
+                        break
+                if vf_found:
+                    continue
                 for dp_item in device.local_strategy.values():
-                    code = dp_item.get("status_code", None)
-                    value = command["value"]
-                    if command["code"] == code:
+                    dp_item_code = dp_item.get("status_code", None)
+                    if command_code == dp_item_code:
                         if not dp_item.get("use_open_api", False):
                             #command_dict = {"code": code, "value": value}
                             regular_commands.append(command)
                         else:
                             if dp_item.get("property_update", False):
-                                value = prepare_value_for_property_update(dp_item, command["value"])
-                                property_dict = {str(code): value}
+                                command_value = prepare_value_for_property_update(dp_item, command_value)
+                                property_dict = {str(dp_item_code): command_value}
                                 property_commands.append(property_dict)
                             else:
-                                command_dict = {"code": code, "value": value}
+                                command_dict = {"code": dp_item_code, "value": command_value}
                                 open_api_regular_commands.append(command_dict)
                             break
+            if virtual_function_commands:
+                LOGGER.debug(f"Sending virtual function command : {virtual_function_commands}")
+                self._process_virtual_function(device_id, virtual_function_commands)
             if regular_commands:
                 LOGGER.debug(f"Sending regular command : {regular_commands}")
                 self.sharing_account.device_manager.send_commands(device_id, regular_commands)
@@ -649,3 +734,20 @@ class MultiManager:  # noqa: F811
                 self.iot_account.device_manager.send_property_update(device_id, property_commands)
             return
         self.sharing_account.device_manager.send_commands(device_id, commands)
+
+    def _process_virtual_function(self, device_id: str, commands: list[dict[str, Any]]):
+        devices = self.get_devices_from_device_id(device_id)
+        if not devices:
+            return
+        for command in commands:
+            virtual_function: DescriptionVirtualFunction = command["virtual_function"]
+            """command_code: str = command["code"]
+            command_value: Any = command["value"]"""
+            device = None
+            if virtual_function.virtual_function_value == VirtualFunctions.FUNCTION_RESET_STATE:
+                for state_to_reset in virtual_function.vf_reset_state:
+                    for device in devices:
+                        if state_to_reset in device.status:
+                            device.status[state_to_reset] = 0
+                            self.multi_device_listener.update_device(device)
+                            break
