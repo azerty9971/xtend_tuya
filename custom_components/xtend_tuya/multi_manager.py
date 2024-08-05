@@ -748,6 +748,6 @@ class MultiManager:  # noqa: F811
                 for state_to_reset in virtual_function.vf_reset_state:
                     for device in devices:
                         if state_to_reset in device.status:
-                            device.status[state_to_reset] = 0
+                            device.status[state_to_reset] = None
                             self.multi_device_listener.update_device(device)
                             break
