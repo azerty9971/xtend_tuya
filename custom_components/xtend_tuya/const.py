@@ -355,6 +355,7 @@ class DPCode(StrEnum):
     RECORD_SWITCH = "record_switch"  # Recording switch
     RELAY_STATUS = "relay_status"
     REMAIN_TIME = "remain_time"
+    RESET_ADD_ELE = "reset_add_ele"
     RESET_DUSTER_CLOTH = "reset_duster_cloth"
     RESET_EDGE_BRUSH = "reset_edge_brush"
     RESET_FILTER = "reset_filter"
