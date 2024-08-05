@@ -1,7 +1,7 @@
 """Support for Tuya select."""
 
 from __future__ import annotations
-from dataclasses import dataclass
+
 from tuya_sharing import CustomerDevice, Manager
 
 from homeassistant.components.select import SelectEntity, SelectEntityDescription
@@ -20,65 +20,60 @@ from .util import (
 from .multi_manager import XTConfigEntry
 from .base import TuyaEntity
 from .const import TUYA_DISCOVERY_NEW, DPCode, DPType
-from .shared_classes import XTEntityDescription
-
-@dataclass(frozen=True)
-class TuyaSelectEntityDescription(SelectEntityDescription, XTEntityDescription):
-    pass
 
 # All descriptions can be found here. Mostly the Enum data types in the
 # default instructions set of each category end up being a select.
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
-SELECTS: dict[str, tuple[TuyaSelectEntityDescription, ...]] = {
+SELECTS: dict[str, tuple[SelectEntityDescription, ...]] = {
     "jtmspro": (
-        TuyaSelectEntityDescription(
+        SelectEntityDescription(
             key=DPCode.BEEP_VOLUME,
             translation_key="beep_volume",
             entity_category=EntityCategory.CONFIG,
         ),
-        TuyaSelectEntityDescription(
+        SelectEntityDescription(
             key=DPCode.SPECIAL_FUNCTION,
             translation_key="special_function",
             entity_category=EntityCategory.CONFIG,
         ),
-        TuyaSelectEntityDescription(
+        SelectEntityDescription(
             key=DPCode.ALARM_VOLUME,
             translation_key="alarm_volume",
             entity_category=EntityCategory.CONFIG,
         ),
-        TuyaSelectEntityDescription(
+        SelectEntityDescription(
             key=DPCode.SOUND_MODE,
             translation_key="sound_mode",
             entity_category=EntityCategory.CONFIG,
         ),
-        TuyaSelectEntityDescription(
+        SelectEntityDescription(
             key=DPCode.ALARM_LOCK,
             translation_key="alarm_lock",
             entity_category=EntityCategory.CONFIG,
         ),
-        TuyaSelectEntityDescription(
+        SelectEntityDescription(
             key=DPCode.CLOSED_OPENED,
             translation_key="close_opened",
             entity_category=EntityCategory.CONFIG,
         ),
     ),
     "msp": (
-        TuyaSelectEntityDescription(
+        SelectEntityDescription(
             key=DPCode.CLEAN,
             translation_key="cat_litter_box_clean",
             entity_category=EntityCategory.CONFIG,
         ),
-        TuyaSelectEntityDescription(
+        SelectEntityDescription(
             key=DPCode.EMPTY,
             translation_key="cat_litter_box_empty",
             entity_category=EntityCategory.CONFIG,
         ),
-        TuyaSelectEntityDescription(
+        SelectEntityDescription(
             key=DPCode.STATUS,
             translation_key="cat_litter_box_status",
             entity_category=EntityCategory.DIAGNOSTIC,
         ),
-        TuyaSelectEntityDescription(
+        SelectEntityDescription(
             key=DPCode.WORK_MODE,
             translation_key="cat_litter_box_work_mode",
             entity_category=EntityCategory.CONFIG,
@@ -128,7 +123,7 @@ class TuyaSelectEntity(TuyaEntity, SelectEntity):
         self,
         device: CustomerDevice,
         device_manager: Manager,
-        description: TuyaSelectEntityDescription,
+        description: SelectEntityDescription,
     ) -> None:
         """Init Tuya sensor."""
         super().__init__(device, device_manager)

@@ -3,12 +3,7 @@ from typing import Any, Optional
 from types import SimpleNamespace
 import copy
 from dataclasses import dataclass, field
-from homeassistant.util.frozen_dataclass_compat import FrozenOrThawed
-from .const import (
-    LOGGER,
-    VirtualStates,
-    DPCode,
-)
+from .const import LOGGER
 from .util import (
     merge_iterables,
 )
@@ -101,10 +96,3 @@ class XTDevice(SimpleNamespace):
         if hasattr(source_device, "status") and hasattr(dest_device, "status"):
             for code, value in source_device.status.items():
                 dest_device.status[code] = value
-
-@dataclass(frozen=True)
-class XTEntityDescription:
-    virtual_state: VirtualStates | None = field(default_factory=VirtualStates)
-    vs_copy_to_state: list[DPCode]  | None = field(default_factory=list)
-
-    restoredata: bool = False
