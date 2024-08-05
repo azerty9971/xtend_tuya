@@ -419,8 +419,10 @@ class MultiManager:  # noqa: F811
                     descriptors_with_vs[category] = tuple(decription_list)
         if len(descriptors_with_vs) > 0:
             self.descriptors[name] = descriptors_with_vs
-            for device in self.get_aggregated_device_map().values():
-                self.apply_init_virtual_states(device)
+            for device_id in self.device_map:
+                devices = self.get_devices_from_device_id(device_id)
+                for device in devices:
+                    self.apply_init_virtual_states(device)
 
     def get_category_virtual_states(self,category: str) -> list[DescriptionVirtualState]:
         to_return = []
