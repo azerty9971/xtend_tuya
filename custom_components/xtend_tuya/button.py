@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
+
 from tuya_sharing import CustomerDevice, Manager
 
 from homeassistant.components.button import ButtonEntity, ButtonEntityDescription
@@ -21,9 +23,13 @@ from .multi_manager import XTConfigEntry
 from .base import TuyaEntity
 from .const import TUYA_DISCOVERY_NEW, DPCode
 
+@dataclass(frozen=True)
+class TuyaButtonEntityDescription(ButtonEntityDescription):
+    pass
+
 # All descriptions can be found here.
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
-BUTTONS: dict[str, tuple[ButtonEntityDescription, ...]] = {
+BUTTONS: dict[str, tuple[TuyaButtonEntityDescription, ...]] = {
 }
 
 
@@ -69,7 +75,7 @@ class TuyaButtonEntity(TuyaEntity, ButtonEntity):
         self,
         device: CustomerDevice,
         device_manager: Manager,
-        description: ButtonEntityDescription,
+        description: TuyaButtonEntityDescription,
     ) -> None:
         """Init Tuya button."""
         super().__init__(device, device_manager)
