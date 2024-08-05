@@ -1,7 +1,7 @@
 """Support for Tuya number."""
 
 from __future__ import annotations
-
+from dataclasses import dataclass
 from tuya_sharing import CustomerDevice, Manager
 
 from homeassistant.components.number import (
@@ -24,60 +24,65 @@ from .util import (
 from .multi_manager import XTConfigEntry
 from .base import IntegerTypeData, TuyaEntity
 from .const import DEVICE_CLASS_UNITS, DOMAIN, TUYA_DISCOVERY_NEW, DPCode, DPType
+from .shared_classes import XTEntityDescription
+
+@dataclass(frozen=True)
+class TuyaNumberEntityDescription(NumberEntityDescription, XTEntityDescription):
+    pass
 
 # All descriptions can be found here. Mostly the Integer data types in the
 # default instructions set of each category end up being a number.
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
-NUMBERS: dict[str, tuple[NumberEntityDescription, ...]] = {
+NUMBERS: dict[str, tuple[TuyaNumberEntityDescription, ...]] = {
     "jtmspro": (
-        NumberEntityDescription(
+        TuyaNumberEntityDescription(
             key=DPCode.AUTO_LOCK_TIME,
             translation_key="auto_lock_time",
             entity_category=EntityCategory.CONFIG,
         ),
     ),
     "msp": (
-        NumberEntityDescription(
+        TuyaNumberEntityDescription(
             key=DPCode.DELAY_CLEAN_TIME,
             translation_key="delay_clean_time",
             entity_category=EntityCategory.CONFIG,
         ),
-        NumberEntityDescription(
+        TuyaNumberEntityDescription(
             key=DPCode.QUIET_TIME_END,
             translation_key="quiet_time_end",
             entity_category=EntityCategory.CONFIG,
         ),
-        NumberEntityDescription(
+        TuyaNumberEntityDescription(
             key=DPCode.QUIET_TIME_START,
             translation_key="quiet_time_start",
             entity_category=EntityCategory.CONFIG,
         ),
-        NumberEntityDescription(
+        TuyaNumberEntityDescription(
             key=DPCode.SLEEP_START_TIME,
             translation_key="sleep_start_time",
             entity_category=EntityCategory.CONFIG,
         ),
-        NumberEntityDescription(
+        TuyaNumberEntityDescription(
             key=DPCode.SLEEP_END_TIME,
             translation_key="sleep_end_time",
             entity_category=EntityCategory.CONFIG,
         ),
-        NumberEntityDescription(
+        TuyaNumberEntityDescription(
             key=DPCode.UV_START_TIME,
             translation_key="uv_start_time",
             entity_category=EntityCategory.CONFIG,
         ),
-        NumberEntityDescription(
+        TuyaNumberEntityDescription(
             key=DPCode.UV_END_TIME,
             translation_key="uv_end_time",
             entity_category=EntityCategory.CONFIG,
         ),
-        NumberEntityDescription(
+        TuyaNumberEntityDescription(
             key=DPCode.DEO_START_TIME,
             translation_key="deo_start_time",
             entity_category=EntityCategory.CONFIG,
         ),
-        NumberEntityDescription(
+        TuyaNumberEntityDescription(
             key=DPCode.DEO_END_TIME,
             translation_key="deo_end_time",
             entity_category=EntityCategory.CONFIG,
@@ -129,7 +134,7 @@ class TuyaNumberEntity(TuyaEntity, NumberEntity):
         self,
         device: CustomerDevice,
         device_manager: Manager,
-        description: NumberEntityDescription,
+        description: TuyaNumberEntityDescription,
     ) -> None:
         """Init Tuya sensor."""
         super().__init__(device, device_manager)
