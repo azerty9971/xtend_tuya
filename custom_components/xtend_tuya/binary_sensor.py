@@ -28,7 +28,7 @@ from .base import TuyaEntity
 from .const import TUYA_DISCOVERY_NEW, DPCode
 from .shared_classes import XTEntityDescription
 
-@dataclass(frozen=False)
+@dataclass(frozen=True)
 class TuyaBinarySensorEntityDescription(BinarySensorEntityDescription, XTEntityDescription):
     """Describes a Tuya binary sensor."""
 
