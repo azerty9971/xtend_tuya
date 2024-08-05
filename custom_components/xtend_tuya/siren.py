@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import Any
 
 from tuya_sharing import CustomerDevice, Manager
@@ -25,10 +26,15 @@ from .util import (
 from .multi_manager import XTConfigEntry
 from .base import TuyaEntity
 from .const import TUYA_DISCOVERY_NEW, DPCode
+from .shared_classes import XTEntityDescription
+
+@dataclass(frozen=True)
+class TuyaSirenEntityDescription(SirenEntityDescription, XTEntityDescription):
+    pass
 
 # All descriptions can be found here:
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
-SIRENS: dict[str, tuple[SirenEntityDescription, ...]] = {
+SIRENS: dict[str, tuple[TuyaSirenEntityDescription, ...]] = {
 }
 
 
@@ -75,7 +81,7 @@ class TuyaSirenEntity(TuyaEntity, SirenEntity):
         self,
         device: CustomerDevice,
         device_manager: Manager,
-        description: SirenEntityDescription,
+        description: TuyaSirenEntityDescription,
     ) -> None:
         """Init Tuya Siren."""
         super().__init__(device, device_manager)
