@@ -29,10 +29,10 @@ from .util import (
 from .multi_manager import XTConfigEntry
 from .base import IntegerTypeData, TuyaEntity
 from .const import TUYA_DISCOVERY_NEW, DPCode, DPType
-from .shared_classes import XTEntityDescription
+
 
 @dataclass(frozen=True)
-class TuyaCoverEntityDescription(CoverEntityDescription, XTEntityDescription):
+class TuyaCoverEntityDescription(CoverEntityDescription):
     """Describe an Tuya cover entity."""
 
     current_state: DPCode | None = None
