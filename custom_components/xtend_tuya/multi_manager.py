@@ -404,16 +404,17 @@ class MultiManager:  # noqa: F811
     
     def register_device_descriptors(self, name: str, descriptors):
         descriptors_with_vs = {}
-        for category in descriptors.values():
+        for category in descriptors:
             decription_list: list = []
-            if isinstance(category, tuple):
-                for description in category:
+            category_item = descriptors[category]
+            if isinstance(category_item, tuple):
+                for description in category_item:
                     if hasattr(description, "virtual_state") and description.virtual_state is not None:
                         decription_list.append(description)
-            elif isinstance(category, EntityDescription):
+            elif isinstance(category_item, EntityDescription):
                 #category is directly a descriptor
-                if hasattr(category, "virtual_state") and category.virtual_state is not None:
-                    decription_list.append(category)
+                if hasattr(category_item, "virtual_state") and category_item.virtual_state is not None:
+                    decription_list.append(category_item)
 
             if len(decription_list) > 0:
                     descriptors_with_vs[category] = tuple(decription_list)
