@@ -87,7 +87,7 @@
     },
     "button": {
       "reset_add_ele": {
-        "name": "Reset energy consumption"
+        "name": "Reset consumption"
       },
       "reset_duster_cloth": {
         "name": "Reset duster cloth"
