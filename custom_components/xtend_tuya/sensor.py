@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from tuya_sharing import CustomerDevice, Manager
 from tuya_sharing.device import DeviceStatusRange
@@ -56,7 +56,7 @@ class TuyaSensorEntityDescription(SensorEntityDescription):
     subkey: str | None = None
 
     virtual_state: VirtualStates | None = None
-    vs_copy_to_state: list[DPCode]  | None = None
+    vs_copy_to_state: list[DPCode]  | None = field(default_factory=list)
 
     restoredata: bool = False
 
