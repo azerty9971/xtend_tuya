@@ -29,6 +29,7 @@ from homeassistant.components.tuya.climate import (
 from .util import (
     append_dictionnaries
 )
+from .shared_classes import XTEntityDescription
 
 from .multi_manager import XTConfigEntry
 from .base import IntegerTypeData, TuyaEntity
@@ -47,7 +48,7 @@ TUYA_HVAC_TO_HA = {
 
 
 @dataclass(frozen=True, kw_only=True)
-class TuyaClimateEntityDescription(ClimateEntityDescription):
+class TuyaClimateEntityDescription(ClimateEntityDescription, XTEntityDescription):
     """Describe an Tuya climate entity."""
 
     switch_only_hvac_mode: HVACMode
