@@ -339,7 +339,6 @@ async def async_setup_entry(
     merged_descriptors = SENSORS
     if not entry.runtime_data.multi_manager.reuse_config:
         merged_descriptors = merge_device_descriptors(SENSORS, SENSORS_TUYA)
-        LOGGER.warning(f"Descriptors after: {merged_descriptors}")
 
     @callback
     def async_discover_device(device_map) -> None:
