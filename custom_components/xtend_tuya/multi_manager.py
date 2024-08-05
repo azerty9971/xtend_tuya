@@ -402,18 +402,15 @@ class MultiManager:  # noqa: F811
         if self.sharing_account:
             self.sharing_account.device_manager.refresh_mq()
     
-    def register_device_descriptors(self, name: str, descriptors, debug = False):
+    def register_device_descriptors(self, name: str, descriptors):
         descriptors_with_vs = {}
-        for category in descriptors:
+        for category in descriptors.values():
             decription_list: list = []
-            if isinstance(descriptors[category], tuple):
-                if debug:
-                    LOGGER.warning("Adding Tuple")
-                for description in descriptors[category]:
+            if isinstance(category, tuple):
+                for description in category:
                     if hasattr(description, "virtual_state") and description.virtual_state is not None:
-                        LOGGER.warning(f"Adding VS = {description}")
                         decription_list.append(description)
-            elif isinstance(descriptors[category], EntityDescription):
+            elif isinstance(category, EntityDescription):
                 #category is directly a descriptor
                 if hasattr(category, "virtual_state") and category.virtual_state is not None:
                     decription_list.append(category)
@@ -479,8 +476,6 @@ class MultiManager:  # noqa: F811
         #WARNING, this method might be called multiple times for the same device, make sure it doesn't
         #fail upon multiple successive calls
         virtual_states = self.get_category_virtual_states(device.category)
-        if device.id == "bf85bd241924094329wbx0":
-            LOGGER.warning(f"Virtual States : {virtual_states}")
         for virtual_state in virtual_states:
             if virtual_state.virtual_state_value == VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME:
                 if virtual_state.key in device.status:
@@ -510,8 +505,6 @@ class MultiManager:  # noqa: F811
                                         new_local_strategy = copy.deepcopy(device.local_strategy[dp_id])
                                         new_local_strategy["status_code"] = new_code
                                         device.local_strategy[new_dp_id] = new_local_strategy
-        if device.id == "bf85bd241924094329wbx0":
-            LOGGER.warning(f"apply_init_virtual_states AFTER: {device.status}")
 
     def allow_virtual_devices_not_set_up(self, device: XTDevice):
         if not device.id.startswith("vdevo"):
@@ -548,7 +541,6 @@ class MultiManager:  # noqa: F811
                         dpId = int(temp_dpId)
                         code = temp_code
                         value = state[temp_dpId]
-                        log_stack(f"Found values: {dpId} {code} {value}")
 
             if code is not None and dpId is not None:
                 return code, dpId, value, True
