@@ -477,7 +477,6 @@ class MultiManager:  # noqa: F811
         #fail upon multiple successive calls
         virtual_states = self.get_category_virtual_states(device.category)
         if device.id == "bf85bd241924094329wbx0":
-            LOGGER.warning(f"apply_init_virtual_states BEFORE: {device.status}")
             LOGGER.warning(f"Virtual States : {virtual_states}")
         for virtual_state in virtual_states:
             if virtual_state.virtual_state_value == VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME:
