@@ -26,11 +26,10 @@ from .util import (
 from .multi_manager import XTConfigEntry
 from .base import IntegerTypeData, TuyaEntity
 from .const import TUYA_DISCOVERY_NEW, DPCode, DPType
-from .shared_classes import XTEntityDescription
 
 
 @dataclass(frozen=True)
-class TuyaHumidifierEntityDescription(HumidifierEntityDescription, XTEntityDescription):
+class TuyaHumidifierEntityDescription(HumidifierEntityDescription):
     """Describe an Tuya (de)humidifier entity."""
 
     # DPCode, to use. If None, the key will be used as DPCode
