@@ -87,3 +87,12 @@ class XTDevice(SimpleNamespace):
 
     def from_compatible_device(device):
         return XTDevice(**(device.__dict__))
+    
+    def copy_data_from_device(source_device, dest_device) -> None:
+        if hasattr(source_device, "online") and hasattr(dest_device, "online"):
+            dest_device.online = source_device.online
+        if hasattr(source_device, "name") and hasattr(dest_device, "name"):
+            dest_device.name = source_device.name
+        if hasattr(source_device, "status") and hasattr(dest_device, "status"):
+            for code, value in source_device.status.items():
+                dest_device.status[code] = value

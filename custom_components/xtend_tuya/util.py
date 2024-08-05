@@ -6,6 +6,7 @@ import copy
 from typing import NamedTuple
 from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.helpers.entity import EntityDescription
 from .const import (
     DPType,
     LOGGER,
@@ -26,7 +27,7 @@ from .multi_manager import (
 
 class TuyaIntegrationRuntimeData(NamedTuple):
     device_manager: TuyaSharingManager
-    listener: SharingDeviceListener
+    device_listener: SharingDeviceListener
     generic_runtime_data: any
 
 class LogStackException(Exception):
@@ -79,7 +80,7 @@ def prepare_value_for_property_update(dp_item, value) -> str:
     return str(value)
 
 def get_domain_config_entries(hass: HomeAssistant, domain: str) -> list[ConfigEntry]:
-    return hass.config_entries.async_entries(domain,False,False)
+    return hass.config_entries.async_entries(domain, False, False)
 
 def get_overriden_config_entry(hass: HomeAssistant, entry: XTConfigEntry, other_domain: str) -> ConfigEntry:
     other_domain_config_entries = get_domain_config_entries(hass, other_domain)
@@ -115,13 +116,13 @@ def get_tuya_integration_runtime_data(hass: HomeAssistant, entry: ConfigEntry, d
                 device_manager = runtime_data.device_manager
             if hasattr(runtime_data, "manager"):
                 device_manager = runtime_data.manager
-            listener = runtime_data.listener
+            device_listener = runtime_data.device_listener
     else:
         runtime_data = entry.runtime_data
         device_manager = entry.runtime_data.manager
-        listener = entry.runtime_data.listener
+        device_listener = entry.runtime_data.listener
     if device_manager:
-        return TuyaIntegrationRuntimeData(device_manager=device_manager, generic_runtime_data=runtime_data, listener=listener)
+        return TuyaIntegrationRuntimeData(device_manager=device_manager, generic_runtime_data=runtime_data, device_listener=device_listener)
     else:
         return None
 
@@ -129,3 +130,46 @@ def get_overriden_tuya_integration_runtime_data(hass: HomeAssistant, entry: Conf
     if (overriden_config_entry := get_overriden_config_entry(hass,entry, DOMAIN_ORIG)):
         return get_tuya_integration_runtime_data(hass, overriden_config_entry, DOMAIN_ORIG)
     return None
+
+def merge_device_descriptors(descriptors1, descriptors2):
+    return_descriptors = copy.deepcopy(descriptors1)
+    for category in descriptors2:
+        if category not in return_descriptors:
+            #Merge the whole category
+            return_descriptors[category] = copy.deepcopy(descriptors2[category])
+        else:
+            #Merge the content of the descriptor category
+            return_descriptors[category] = merge_descriptor_category(return_descriptors[category], descriptors2[category])
+    return return_descriptors
+
+def merge_descriptor_category(category1: tuple[EntityDescription, ...], category2: tuple[EntityDescription, ...]):
+    descriptor1_key_list = []
+    return_category = copy.deepcopy(list(category1))
+    for descriptor in category1:
+        if descriptor.key not in descriptor1_key_list:
+            descriptor1_key_list.append(descriptor.key)
+    for descriptor in category2:
+        if descriptor.key not in descriptor1_key_list:
+            return_category.append(copy.deepcopy(descriptor))
+    return tuple(return_category)
+
+def append_dictionnaries(dict1: dict, dict2: dict) -> dict:
+    return_dict = copy.deepcopy(dict1)
+    for category in dict2:
+        if category not in return_dict:
+            return_dict[category] = copy.deepcopy(dict2[category])
+    return return_dict
+
+def append_lists(list1: list, list2: list) -> list:
+    return_list = copy.deepcopy(list(list1))
+    for item in list2:
+        if item not in return_list:
+            return_list.append(copy.deepcopy(item))
+    return return_list
+
+def append_sets(set1: set, set2: set) -> set:
+    return_set = set(copy.deepcopy(set1))
+    for item in set2:
+        if item not in return_set:
+            return_set.add(copy.deepcopy(item))
+    return return_set
