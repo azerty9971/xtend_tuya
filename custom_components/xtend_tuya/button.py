@@ -34,6 +34,7 @@ CONSUMPTION_BUTTONS: tuple[TuyaButtonEntityDescription, ...] = (
             virtual_function = VirtualFunction.FUNCTION_RESET_STATE,
             vf_reset_state=[DPCode.ADD_ELE],
             translation_key="reset_add_ele",
+            entity_category=EntityCategory.CONFIG,
     ),
 )
 
