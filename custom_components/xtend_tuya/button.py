@@ -79,7 +79,7 @@ async def async_setup_entry(
                             for reset_state in description.vf_reset_state:
                                 if reset_state in device.status:
                                     entities.extend(
-                                        TuyaButtonEntity(device, hass_data.manager, description)
+                                        [TuyaButtonEntity(device, hass_data.manager, description)]
                                     )
                                 break
 
