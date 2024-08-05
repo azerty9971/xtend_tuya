@@ -10,7 +10,14 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from . import TuyaConfigEntry
+from homeassistant.components.tuya.select import (
+    SELECTS as SELECTS_TUYA
+)
+from .util import (
+    merge_device_descriptors
+)
+
+from .multi_manager import XTConfigEntry
 from .base import TuyaEntity
 from .const import TUYA_DISCOVERY_NEW, DPCode, DPType
 
@@ -52,16 +59,6 @@ SELECTS: dict[str, tuple[SelectEntityDescription, ...]] = {
     ),
     "msp": (
         SelectEntityDescription(
-            key=DPCode.WORK_MODE,
-            translation_key="cat_litter_box_work_mode",
-            entity_category=EntityCategory.CONFIG,
-        ),
-        SelectEntityDescription(
-            key=DPCode.STATUS,
-            translation_key="cat_litter_box_status",
-            entity_category=EntityCategory.DIAGNOSTIC,
-        ),
-        SelectEntityDescription(
             key=DPCode.CLEAN,
             translation_key="cat_litter_box_clean",
             entity_category=EntityCategory.CONFIG,
@@ -71,34 +68,48 @@ SELECTS: dict[str, tuple[SelectEntityDescription, ...]] = {
             translation_key="cat_litter_box_empty",
             entity_category=EntityCategory.CONFIG,
         ),
+        SelectEntityDescription(
+            key=DPCode.STATUS,
+            translation_key="cat_litter_box_status",
+            entity_category=EntityCategory.DIAGNOSTIC,
+        ),
+        SelectEntityDescription(
+            key=DPCode.WORK_MODE,
+            translation_key="cat_litter_box_work_mode",
+            entity_category=EntityCategory.CONFIG,
+        ),
     ),
 }
 
 
 async def async_setup_entry(
-    hass: HomeAssistant, entry: TuyaConfigEntry, async_add_entities: AddEntitiesCallback
+    hass: HomeAssistant, entry: XTConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
     """Set up Tuya select dynamically through Tuya discovery."""
     hass_data = entry.runtime_data
 
+    merged_descriptors = SELECTS
+    if not entry.runtime_data.multi_manager.reuse_config:
+        merged_descriptors = merge_device_descriptors(SELECTS, SELECTS_TUYA)
+
     @callback
-    def async_discover_device(manager, device_map) -> None:
+    def async_discover_device(device_map) -> None:
         """Discover and add a discovered Tuya select."""
         entities: list[TuyaSelectEntity] = []
         device_ids = [*device_map]
         for device_id in device_ids:
-            device = device_map[device_id]
-            if descriptions := SELECTS.get(device.category):
-                entities.extend(
-                    TuyaSelectEntity(device, manager, description)
-                    for description in descriptions
-                    if description.key in device.status
-                )
+            if device := hass_data.manager.device_map.get(device_id):
+                if descriptions := merged_descriptors.get(device.category):
+                    entities.extend(
+                        TuyaSelectEntity(device, hass_data.manager, description)
+                        for description in descriptions
+                        if description.key in device.status
+                    )
 
         async_add_entities(entities)
 
-    async_discover_device(hass_data.manager, hass_data.manager.device_map)
-    #async_discover_device(hass_data.manager, hass_data.manager.open_api_device_map)
+    hass_data.manager.register_device_descriptors("selects", merged_descriptors)
+    async_discover_device([*hass_data.manager.device_map])
 
     entry.async_on_unload(
         async_dispatcher_connect(hass, TUYA_DISCOVERY_NEW, async_discover_device)

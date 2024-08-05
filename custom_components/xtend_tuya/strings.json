@@ -42,10 +42,6 @@
   },
   "entity": {
     "binary_sensor": {
-      "one_click_cleanup":
-      {
-        "name": "One click cleanup"
-      },
       "power": {
         "name": "Powered on and restarted successfully"
       },
@@ -90,6 +86,9 @@
       }
     },
     "button": {
+      "reset_add_ele": {
+        "name": "Reset consumption"
+      },
       "reset_duster_cloth": {
         "name": "Reset duster cloth"
       },
@@ -111,10 +110,10 @@
     },
     "cover": {
       "blind": {
-        "name": "[%key:component::cover::entity_component::blind::name%]"
+        "name": "Blind"
       },
       "curtain": {
-        "name": "[%key:component::cover::entity_component::curtain::name%]"
+        "name": "Curtain"
       },
       "curtain_2": {
         "name": "Curtain 2"
@@ -123,7 +122,7 @@
         "name": "Curtain 3"
       },
       "door": {
-        "name": "[%key:component::cover::entity_component::door::name%]"
+        "name": "Door"
       },
       "door_2": {
         "name": "Door 2"
@@ -137,7 +136,7 @@
         "name": "Backlight"
       },
       "light": {
-        "name": "[%key:component::light::title%]"
+        "name": "Light"
       },
       "light_2": {
         "name": "Light 2"
@@ -270,7 +269,7 @@
         }
       },
       "volume": {
-        "name": "[%key:component::tuya::entity::number::volume::name%]"
+        "name": "Volume"
       },
       "cat_litter_box_work_mode": {
         "name": "Cleaning mode",
@@ -454,23 +453,23 @@
       "led_type_2": {
         "name": "Light 2 source type",
         "state": {
-          "halogen": "[%key:component::tuya::entity::select::led_type::state::halogen%]",
-          "incandescent": "[%key:component::tuya::entity::select::led_type::state::incandescent%]",
-          "led": "[%key:component::tuya::entity::select::led_type::state::led%]"
+          "halogen": "Halogen",
+          "incandescent": "Incandescent",
+          "led": "LED"
         }
       },
       "led_type_3": {
         "name": "Light 3 source type",
         "state": {
-          "halogen": "[%key:component::tuya::entity::select::led_type::state::halogen%]",
-          "incandescent": "[%key:component::tuya::entity::select::led_type::state::incandescent%]",
-          "led": "[%key:component::tuya::entity::select::led_type::state::led%]"
+          "halogen": "Halogen",
+          "incandescent": "Incandescent",
+          "led": "LED"
         }
       },
       "light_mode": {
         "name": "Indicator light mode",
         "state": {
-          "none": "[%key:common::state::off%]",
+          "none": "Off",
           "pos": "Indicate switch location",
           "relay": "Indicate switch on/off state"
         }
@@ -494,11 +493,11 @@
         "name": "Power on behavior",
         "state": {
           "last": "Remember last state",
-          "memory": "[%key:component::tuya::entity::select::relay_status::state::last%]",
-          "off": "[%key:common::state::off%]",
-          "on": "[%key:common::state::on%]",
-          "power_off": "[%key:common::state::off%]",
-          "power_on": "[%key:common::state::on%]"
+          "memory": "Remember last state",
+          "off": "Off",
+          "on": "On",
+          "power_off": "Off",
+          "power_on": "On"
         }
       },
       "fingerbot_mode": {
@@ -641,6 +640,15 @@
       }
     },
     "sensor": {
+      "balance_energy": {
+        "name": "Balance energy"
+      },
+      "charge_energy": {
+        "name": "Charge energy"
+      },
+      "total_forward_energy": {
+        "name": "Total forward energy"
+      },
       "msp_history": {
         "name": "History",
         "state": {
@@ -694,7 +702,7 @@
         "name": "Cat weight"
       },
       "add_ele": {
-        "name": "Consumption (method A)"
+        "name": "Consumption"
       },
       "add_ele2": {
         "name": "Consumption (method B)"
@@ -795,43 +803,43 @@
 
       
       "battery": {
-        "name": "[%key:component::sensor::entity_component::battery::name%]"
+        "name": "Battery"
       },
       "voc": {
-        "name": "[%key:component::sensor::entity_component::volatile_organic_compounds::name%]"
+        "name": "VOCs"
       },
       "carbon_monoxide": {
-        "name": "[%key:component::sensor::entity_component::carbon_monoxide::name%]"
+        "name": "Carbon monoxide"
       },
       "carbon_dioxide": {
-        "name": "[%key:component::sensor::entity_component::carbon_dioxide::name%]"
+        "name": "Carbon dioxide"
       },
       "illuminance": {
-        "name": "[%key:component::sensor::entity_component::illuminance::name%]"
+        "name": "Illuminance"
       },
       "temperature": {
         "name": "Temperature"
       },
       "humidity": {
-        "name": "[%key:component::sensor::entity_component::humidity::name%]"
+        "name": "Humidity"
       },
       "pm25": {
-        "name": "[%key:component::sensor::entity_component::pm25::name%]"
+        "name": "PM2.5"
       },
       "pm1": {
-        "name": "[%key:component::sensor::entity_component::pm1::name%]"
+        "name": "PM1"
       },
       "pm10": {
-        "name": "[%key:component::sensor::entity_component::pm10::name%]"
+        "name": "PM10"
       },
       "current": {
-        "name": "[%key:component::sensor::entity_component::current::name%]"
+        "name": "Current"
       },
       "power": {
-        "name": "[%key:component::sensor::entity_component::power::name%]"
+        "name": "Power"
       },
       "voltage": {
-        "name": "[%key:component::sensor::entity_component::voltage::name%]"
+        "name": "Voltage"
       },
       "battery_state": {
         "name": "Battery state"
@@ -840,7 +848,7 @@
         "name": "Gas"
       },
       "formaldehyde": {
-        "name": "[%key:component::tuya::entity::binary_sensor::formaldehyde::name%]"
+        "name": "Formaldehyde"
       },
       "luminosity": {
         "name": "Luminosity"
@@ -861,7 +869,7 @@
         "name": "Remaining time"
       },
       "methane": {
-        "name": "[%key:component::tuya::entity::binary_sensor::methane::name%]"
+        "name": "Methane"
       },
       "total_energy": {
         "name": "Total energy"
@@ -969,6 +977,10 @@
       }
     },
     "switch": {
+      "one_click_cleanup":
+      {
+        "name": "One click cleanup"
+      },
       "sleeping": {
         "name": "Sleep"
       },
@@ -1280,7 +1292,7 @@
       "fix_flow": {
         "step": {
           "confirm": {
-            "title": "[%key:component::tuya::issues::service_deprecation_turn_off::title%]",
+            "title": "Tuya vacuum support for vacuum.turn_off is being removed",
             "description": "Tuya vacuum support for the vacuum.turn_off service is deprecated and will be removed in Home Assistant 2024.2; Please adjust any automation or script that uses the service to instead call vacuum.stop and select submit below to mark this issue as resolved."
           }
         }
@@ -1291,7 +1303,7 @@
       "fix_flow": {
         "step": {
           "confirm": {
-            "title": "[%key:component::tuya::issues::service_deprecation_turn_on::title%]",
+            "title": "Tuya vacuum support for vacuum.turn_on is being removed",
             "description": "Tuya vacuum support for the vacuum.turn_on service is deprecated and will be removed in Home Assistant 2024.2; Please adjust any automation or script that uses the service to instead call vacuum.start and select submit below to mark this issue as resolved."
           }
         }

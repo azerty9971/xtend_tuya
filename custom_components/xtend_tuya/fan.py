@@ -20,7 +20,14 @@ from homeassistant.util.percentage import (
     percentage_to_ordered_list_item,
 )
 
-from . import TuyaConfigEntry
+from homeassistant.components.tuya.fan import (
+    TUYA_SUPPORT_TYPE as TUYA_SUPPORT_TYPE_TUYA
+)
+from .util import (
+    append_sets
+)
+
+from .multi_manager import XTConfigEntry
 from .base import EnumTypeData, IntegerTypeData, TuyaEntity
 from .const import TUYA_DISCOVERY_NEW, DPCode, DPType
 
@@ -29,24 +36,27 @@ TUYA_SUPPORT_TYPE = {
 
 
 async def async_setup_entry(
-    hass: HomeAssistant, entry: TuyaConfigEntry, async_add_entities: AddEntitiesCallback
+    hass: HomeAssistant, entry: XTConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
     """Set up tuya fan dynamically through tuya discovery."""
     hass_data = entry.runtime_data
 
+    merged_categories = TUYA_SUPPORT_TYPE
+    if not entry.runtime_data.multi_manager.reuse_config:
+        merged_categories = append_sets(TUYA_SUPPORT_TYPE, TUYA_SUPPORT_TYPE_TUYA)
+
     @callback
-    def async_discover_device(manager, device_map) -> None:
+    def async_discover_device(device_map) -> None:
         """Discover and add a discovered tuya fan."""
         entities: list[TuyaFanEntity] = []
         device_ids = [*device_map]
         for device_id in device_ids:
-            device = device_map[device_id]
-            if device and device.category in TUYA_SUPPORT_TYPE:
-                entities.append(TuyaFanEntity(device, manager))
+            if device := hass_data.manager.device_map.get(device_id):
+                if device and device.category in merged_categories:
+                    entities.append(TuyaFanEntity(device, hass_data.manager))
         async_add_entities(entities)
 
-    async_discover_device(hass_data.manager, hass_data.manager.device_map)
-    #async_discover_device(hass_data.manager, hass_data.manager.open_api_device_map)
+    async_discover_device([*hass_data.manager.device_map])
 
     entry.async_on_unload(
         async_dispatcher_connect(hass, TUYA_DISCOVERY_NEW, async_discover_device)

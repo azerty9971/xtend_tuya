@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from tuya_sharing import CustomerDevice, Manager
 from tuya_sharing.device import DeviceStatusRange
@@ -28,7 +28,14 @@ from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import StateType
 
-from . import TuyaConfigEntry
+from homeassistant.components.tuya.sensor import (
+    SENSORS as SENSORS_TUYA
+)
+from .util import (
+    merge_device_descriptors
+)
+
+from .multi_manager import XTConfigEntry
 from .base import ElectricityTypeData, EnumTypeData, IntegerTypeData, TuyaEntity
 from .const import (
     DEVICE_CLASS_UNITS,
@@ -38,6 +45,7 @@ from .const import (
     DPType,
     UnitOfMeasurement,
     VirtualStates,
+    LOGGER,
 )
 
 
@@ -47,13 +55,64 @@ class TuyaSensorEntityDescription(SensorEntityDescription):
 
     subkey: str | None = None
 
-    virtualstate: VirtualStates | None = None
-    vs_copy_to_state: list[DPCode]  | None = None
+    virtual_state: VirtualStates | None = None
+    vs_copy_to_state: list[DPCode]  | None = field(default_factory=list)
 
     restoredata: bool = False
 
 # Commonly used battery sensors, that are re-used in the sensors down below.
 BATTERY_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
+)
+
+#Commonlu sed energy sensors, that are re-used in the sensors down below.
+CONSUMPTION_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
+    TuyaSensorEntityDescription(
+            key=DPCode.ADD_ELE,
+            virtual_state=VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME | VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD,
+            vs_copy_to_state=[DPCode.ADD_ELE2],
+            translation_key="add_ele",
+            device_class=SensorDeviceClass.ENERGY,
+            state_class=SensorStateClass.TOTAL_INCREASING,
+            native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+            entity_registry_enabled_default=True,
+            restoredata=True,
+    ),
+    TuyaSensorEntityDescription(
+        key=DPCode.ADD_ELE2,
+        translation_key="add_ele2",
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        entity_registry_enabled_default=False,
+        restoredata=True,
+    ),
+    TuyaSensorEntityDescription(
+        key=DPCode.BALANCE_ENERGY,
+        translation_key="balance_energy",
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        entity_registry_enabled_default=True,
+        restoredata=False,
+    ),
+    TuyaSensorEntityDescription(
+        key=DPCode.CHARGE_ENERGY,
+        translation_key="charge_energy",
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        entity_registry_enabled_default=True,
+        restoredata=False,
+    ),
+    TuyaSensorEntityDescription(
+        key=DPCode.TOTAL_FORWARD_ENERGY,
+        translation_key="total_forward_energy",
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        entity_registry_enabled_default=True,
+        restoredata=False,
+    ),
 )
 
 # All descriptions can be found here. Mostly the Integer data types in the
@@ -64,26 +123,7 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
     # Switch
     # https://developer.tuya.com/en/docs/iot/s?id=K9gf7o5prgf7s
     "kg": (
-        TuyaSensorEntityDescription(
-            key=DPCode.ADD_ELE,
-            virtualstate=VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME | VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD,
-            vs_copy_to_state=[DPCode.ADD_ELE2],
-            translation_key="add_ele",
-            device_class=SensorDeviceClass.ENERGY,
-            state_class=SensorStateClass.TOTAL_INCREASING,
-            native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
-            entity_registry_enabled_default=True,
-            restoredata=True,
-        ),
-        TuyaSensorEntityDescription(
-            key=DPCode.ADD_ELE2,
-            translation_key="add_ele2",
-            device_class=SensorDeviceClass.ENERGY,
-            state_class=SensorStateClass.TOTAL,
-            native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
-            entity_registry_enabled_default=False,
-            restoredata=True,
-        ),
+        *CONSUMPTION_SENSORS,
     ),
     # Automatic cat litter box
     # Note: Undocumented
@@ -129,12 +169,6 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
             key=DPCode.CLEAN_TIME,
             translation_key="clean_time",
             device_class=SensorDeviceClass.DURATION,
-            state_class=SensorStateClass.MEASUREMENT,
-            entity_registry_enabled_default=True,
-        ),
-        TuyaSensorEntityDescription(
-            key=DPCode.DEODORIZATION,
-            translation_key="deodorization",
             state_class=SensorStateClass.MEASUREMENT,
             entity_registry_enabled_default=True,
         ),
@@ -297,29 +331,33 @@ SENSORS["tdq"] = SENSORS["kg"]
 SENSORS["pc"] = SENSORS["kg"]
 
 async def async_setup_entry(
-    hass: HomeAssistant, entry: TuyaConfigEntry, async_add_entities: AddEntitiesCallback
+    hass: HomeAssistant, entry: XTConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
     """Set up Tuya sensor dynamically through Tuya discovery."""
     hass_data = entry.runtime_data
 
+    merged_descriptors = SENSORS
+    if not entry.runtime_data.multi_manager.reuse_config:
+        merged_descriptors = merge_device_descriptors(SENSORS, SENSORS_TUYA)
+
     @callback
-    def async_discover_device(manager, device_map) -> None:
+    def async_discover_device(device_map) -> None:
         """Discover and add a discovered Tuya sensor."""
         entities: list[TuyaSensorEntity] = []
         device_ids = [*device_map]
         for device_id in device_ids:
-            device = device_map[device_id]
-            if descriptions := SENSORS.get(device.category):
-                entities.extend(
-                    TuyaSensorEntity(device, manager, description)
-                    for description in descriptions
-                    if description.key in device.status
-                )
+            if device := hass_data.manager.device_map.get(device_id):
+                if descriptions := merged_descriptors.get(device.category):
+                    entities.extend(
+                        TuyaSensorEntity(device, hass_data.manager, description)
+                        for description in descriptions
+                        if description.key in device.status
+                    )
 
         async_add_entities(entities)
 
-    async_discover_device(hass_data.manager, hass_data.manager.device_map)
-    #async_discover_device(hass_data.manager, hass_data.manager.open_api_device_map)
+    hass_data.manager.register_device_descriptors("sensors", merged_descriptors)
+    async_discover_device([*hass_data.manager.device_map])
 
     entry.async_on_unload(
         async_dispatcher_connect(hass, TUYA_DISCOVERY_NEW, async_discover_device)
