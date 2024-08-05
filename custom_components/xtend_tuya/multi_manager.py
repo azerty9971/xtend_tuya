@@ -189,7 +189,8 @@ class MultiManager:  # noqa: F811
         self.sharing_account: TuyaSharingData = None
         self.iot_account: TuyaIOTData = None
         self.reuse_config: bool = False
-        self.descriptors = {}
+        self.descriptors_with_vs_state = {}
+        self.descriptors_with_vf_state = {}
         self.multi_mqtt_queue: MultiMQTTQueue = MultiMQTTQueue(self)
         self.multi_device_listener: MultiDeviceListener = MultiDeviceListener(hass, self)
         self.config_entry = entry
@@ -401,34 +402,46 @@ class MultiManager:  # noqa: F811
     def refresh_mq(self):
         if self.sharing_account:
             self.sharing_account.device_manager.refresh_mq()
-    
+
     def register_device_descriptors(self, name: str, descriptors):
         descriptors_with_vs = {}
+        descriptors_with_vf = {}
         for category in descriptors:
-            decription_list: list = []
+            description_list_vs: list = []
+            description_list_vf: list = []
             category_item = descriptors[category]
             if isinstance(category_item, tuple):
                 for description in category_item:
                     if hasattr(description, "virtual_state") and description.virtual_state is not None:
-                        decription_list.append(description)
+                        description_list_vs.append(description)
+                    if hasattr(description, "virtual_function") and description.virtual_function is not None:
+                        description_list_vf.append(description)
+                    
             elif isinstance(category_item, EntityDescription):
                 #category is directly a descriptor
                 if hasattr(category_item, "virtual_state") and category_item.virtual_state is not None:
-                    decription_list.append(category_item)
+                    description_list_vs.append(category_item)
+                if hasattr(category_item, "virtual_function") and category_item.virtual_function is not None:
+                    description_list_vf.append(category_item)
 
-            if len(decription_list) > 0:
-                    descriptors_with_vs[category] = tuple(decription_list)
+            if len(description_list_vs) > 0:
+                    descriptors_with_vs[category] = tuple(description_list_vs)
+            if len(description_list_vf) > 0:
+                    descriptors_with_vf[category] = tuple(description_list_vf)
         if len(descriptors_with_vs) > 0:
-            self.descriptors[name] = descriptors_with_vs
+            self.descriptors_with_vs_state[name] = descriptors_with_vs
             for device_id in self.device_map:
                 devices = self.get_devices_from_device_id(device_id)
                 for device in devices:
                     self.apply_init_virtual_states(device)
 
+        if len(descriptors_with_vf) > 0:
+            self.descriptors_with_vf_state[name] = descriptors_with_vf
+
     def get_category_virtual_states(self,category: str) -> list[DescriptionVirtualState]:
         to_return = []
         for virtual_state in VirtualStates:
-            for descriptor in self.descriptors.values():
+            for descriptor in self.descriptors_with_vs_state.values():
                 if (descriptions := descriptor.get(category)):
                     for description in descriptions:
                         if description.virtual_state is not None and description.virtual_state & virtual_state.value:
