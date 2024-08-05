@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from tuya_sharing import CustomerDevice, Manager
 
@@ -26,10 +26,23 @@ from .const import TUYA_DISCOVERY_NEW, DPCode, VirtualFunction
 @dataclass(frozen=True)
 class TuyaButtonEntityDescription(ButtonEntityDescription):
     virtual_function: VirtualFunction | None = None
+    vf_reset_state: list[DPCode]  | None = field(default_factory=list)
+
+CONSUMPTION_BUTTONS: tuple[TuyaButtonEntityDescription, ...] = (
+    TuyaButtonEntityDescription(
+            key=DPCode.RESET_ADD_ELE,
+            virtual_function = VirtualFunction.FUNCTION_RESET_STATE,
+            vf_reset_state=[DPCode.ADD_ELE],
+            translation_key="reset_add_ele",
+    ),
+)
 
 # All descriptions can be found here.
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
 BUTTONS: dict[str, tuple[TuyaButtonEntityDescription, ...]] = {
+    "kg": (
+        *CONSUMPTION_BUTTONS,
+    ),
 }
 
 
@@ -56,6 +69,14 @@ async def async_setup_entry(
                         for description in descriptions
                         if description.key in device.status
                     )
+                    for description in descriptions:
+                        if description.vf_reset_state:
+                            for reset_state in description.vf_reset_state:
+                                if reset_state in device.status:
+                                    entities.extend(
+                                        TuyaButtonEntity(device, hass_data.manager, description)
+                                    )
+                                break
 
         async_add_entities(entities)
 
