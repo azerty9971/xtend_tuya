@@ -94,7 +94,7 @@ class VirtualStates(IntFlag):
     STATE_COPY_TO_MULTIPLE_STATE_NAME           = 0X0001,   #Copy the state so that it can be used with other virtual states
     STATE_SUMMED_IN_REPORTING_PAYLOAD           = 0X0002,   #Spoof the state value to make it a total instead of an incremental value
 
-class VirtualFunction(IntFlag):
+class VirtualFunctions(IntFlag):
     """Virtual functions"""
     FUNCTION_RESET_STATE                        = 0X0001,   #Reset the specified states
 
@@ -104,8 +104,17 @@ class DescriptionVirtualState:
     
     key: str
     virtual_state_name: str
-    virtual_state_value: VirtualStates
-    vs_copy_to_state: list[DPCode]
+    virtual_state_value: VirtualStates = None
+    vs_copy_to_state: list[DPCode] = field(default_factory=list)
+
+@dataclass
+class DescriptionVirtualFunction:
+    """Describes the VirtualFunctions linked to a specific Description Key."""
+    
+    key: str
+    virtual_function_name: str
+    virtual_function_value: VirtualStates = None
+    vf_reset_state: list[DPCode] = field(default_factory=list)
 
 class WorkMode(StrEnum):
     """Work modes."""

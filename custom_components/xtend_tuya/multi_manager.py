@@ -62,7 +62,9 @@ from .const import (
     TUYA_HA_SIGNAL_UPDATE_ENTITY,
     TUYA_HA_SIGNAL_UPDATE_ENTITY_ORIG,
     VirtualStates,
+    VirtualFunctions,
     DescriptionVirtualState,
+    DescriptionVirtualFunction,
     CONF_ACCESS_ID,
     CONF_ACCESS_SECRET,
     CONF_APP_TYPE,
@@ -149,7 +151,7 @@ class MultiDeviceListener:
     def __init__(self, hass: HomeAssistant, multi_manager: MultiManager) -> None:
         self.multi_manager = multi_manager
         self.hass = hass
-    
+
     def update_device(self, device: XTDevice):
         devices = self.multi_manager.get_devices_from_device_id(device.id)
         for cur_device in devices:
@@ -189,8 +191,8 @@ class MultiManager:  # noqa: F811
         self.sharing_account: TuyaSharingData = None
         self.iot_account: TuyaIOTData = None
         self.reuse_config: bool = False
-        self.descriptors_with_vs_state = {}
-        self.descriptors_with_vf_state = {}
+        self.descriptors_with_virtual_state = {}
+        self.descriptors_with_virtual_function = {}
         self.multi_mqtt_queue: MultiMQTTQueue = MultiMQTTQueue(self)
         self.multi_device_listener: MultiDeviceListener = MultiDeviceListener(hass, self)
         self.config_entry = entry
@@ -429,25 +431,37 @@ class MultiManager:  # noqa: F811
             if len(description_list_vf) > 0:
                     descriptors_with_vf[category] = tuple(description_list_vf)
         if len(descriptors_with_vs) > 0:
-            self.descriptors_with_vs_state[name] = descriptors_with_vs
+            self.descriptors_with_virtual_state[name] = descriptors_with_vs
             for device_id in self.device_map:
                 devices = self.get_devices_from_device_id(device_id)
                 for device in devices:
                     self.apply_init_virtual_states(device)
 
         if len(descriptors_with_vf) > 0:
-            self.descriptors_with_vf_state[name] = descriptors_with_vf
+            self.descriptors_with_virtual_function[name] = descriptors_with_vf
 
     def get_category_virtual_states(self,category: str) -> list[DescriptionVirtualState]:
         to_return = []
         for virtual_state in VirtualStates:
-            for descriptor in self.descriptors_with_vs_state.values():
+            for descriptor in self.descriptors_with_virtual_state.values():
                 if (descriptions := descriptor.get(category)):
                     for description in descriptions:
                         if description.virtual_state is not None and description.virtual_state & virtual_state.value:
                             # This virtual_state is applied to this key, let's return it
                             found_virtual_state = DescriptionVirtualState(description.key, virtual_state.name, virtual_state.value, description.vs_copy_to_state)
                             to_return.append(found_virtual_state)
+        return to_return
+    
+    def get_category_virtual_functions(self,category: str) -> list[DescriptionVirtualFunction]:
+        to_return = []
+        for virtual_function in VirtualFunctions:
+            for descriptor in self.descriptors_with_virtual_function.values():
+                if (descriptions := descriptor.get(category)):
+                    for description in descriptions:
+                        if description.virtual_function is not None and description.virtual_function & virtual_function.value:
+                            # This virtual_state is applied to this key, let's return it
+                            found_virtual_function = DescriptionVirtualFunction(description.key, virtual_function.name, virtual_function.value, description.vf_reset_state)
+                            to_return.append(found_virtual_function)
         return to_return
     
     def remove_device_listeners(self) -> None:
@@ -673,26 +687,42 @@ class MultiManager:  # noqa: F811
         open_api_regular_commands: list[dict[str, Any]] = []
         regular_commands: list[dict[str, Any]] = []
         property_commands: list[dict[str, Any]] = []
+        virtual_function_commands: list[dict[str, Any]] = []
         device_map = self.get_aggregated_device_map()
         if device := device_map.get(device_id, None):
+            virtual_function_list = self.get_category_virtual_functions(device.category)
             for command in commands:
+                command_code  = command["code"]
+                command_value = command["value"]
                 LOGGER.debug(f"Base command : {command}")
+                vf_found = False
+                for virtual_function in virtual_function_list:
+                    if (command_code == virtual_function.key or
+                        command_code in virtual_function.vf_reset_state):
+                        command_dict = {"code": command_code, "value": command_value, "virtual_function": virtual_function}
+                        virtual_function_commands.append(command_dict)
+                        vf_found = True
+                        break
+                if vf_found:
+                    continue
                 for dp_item in device.local_strategy.values():
-                    code = dp_item.get("status_code", None)
-                    value = command["value"]
-                    if command["code"] == code:
+                    dp_item_code = dp_item.get("status_code", None)
+                    if command_code == dp_item_code:
                         if not dp_item.get("use_open_api", False):
                             #command_dict = {"code": code, "value": value}
                             regular_commands.append(command)
                         else:
                             if dp_item.get("property_update", False):
-                                value = prepare_value_for_property_update(dp_item, command["value"])
-                                property_dict = {str(code): value}
+                                command_value = prepare_value_for_property_update(dp_item, command_value)
+                                property_dict = {str(dp_item_code): command_value}
                                 property_commands.append(property_dict)
                             else:
-                                command_dict = {"code": code, "value": value}
+                                command_dict = {"code": dp_item_code, "value": command_value}
                                 open_api_regular_commands.append(command_dict)
                             break
+            if virtual_function_commands:
+                LOGGER.debug(f"Sending virtual function command : {virtual_function_commands}")
+                self._process_virtual_function(device_id, virtual_function_commands)
             if regular_commands:
                 LOGGER.debug(f"Sending regular command : {regular_commands}")
                 self.sharing_account.device_manager.send_commands(device_id, regular_commands)
@@ -704,3 +734,20 @@ class MultiManager:  # noqa: F811
                 self.iot_account.device_manager.send_property_update(device_id, property_commands)
             return
         self.sharing_account.device_manager.send_commands(device_id, commands)
+
+    def _process_virtual_function(self, device_id: str, commands: list[dict[str, Any]]):
+        devices = self.get_devices_from_device_id(device_id)
+        if not devices:
+            return
+        for command in commands:
+            virtual_function: DescriptionVirtualFunction = command["virtual_function"]
+            """command_code: str = command["code"]
+            command_value: Any = command["value"]"""
+            device = None
+            if virtual_function.virtual_function_value == VirtualFunctions.FUNCTION_RESET_STATE:
+                for state_to_reset in virtual_function.vf_reset_state:
+                    for device in devices:
+                        if state_to_reset in device.status:
+                            device.status[state_to_reset] = 0
+                            self.multi_device_listener.update_device(device)
+                            break
