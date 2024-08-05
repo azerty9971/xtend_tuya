@@ -49,7 +49,7 @@ from .const import (
     LOGGER,
 )
 
-
+@dataclass(frozen=True)
 class TuyaSensorEntityDescription(SensorEntityDescription, XTEntityDescription):
     """Describes Tuya sensor entity."""
 

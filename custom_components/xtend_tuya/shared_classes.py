@@ -102,8 +102,9 @@ class XTDevice(SimpleNamespace):
             for code, value in source_device.status.items():
                 dest_device.status[code] = value
 
-class XTEntityDescription(metaclass=FrozenOrThawed, frozen_or_thawed=True):
-    virtual_state: VirtualStates | None = None
-    vs_copy_to_state: list[DPCode]  | None = None
+@dataclass(frozen=True)
+class XTEntityDescription:
+    virtual_state: VirtualStates | None = field(default_factory=VirtualStates)
+    vs_copy_to_state: list[DPCode]  | None = field(default_factory=list)
 
     restoredata: bool = False

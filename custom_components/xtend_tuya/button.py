@@ -24,6 +24,7 @@ from .base import TuyaEntity
 from .const import TUYA_DISCOVERY_NEW, DPCode, VirtualStates
 from .shared_classes import XTEntityDescription
 
+@dataclass(frozen=True)
 class TuyaButtonEntityDescription(ButtonEntityDescription, XTEntityDescription):
     pass
 

@@ -26,6 +26,7 @@ from .base import IntegerTypeData, TuyaEntity
 from .const import DEVICE_CLASS_UNITS, DOMAIN, TUYA_DISCOVERY_NEW, DPCode, DPType
 from .shared_classes import XTEntityDescription
 
+@dataclass(frozen=True)
 class TuyaNumberEntityDescription(NumberEntityDescription, XTEntityDescription):
     pass
 
