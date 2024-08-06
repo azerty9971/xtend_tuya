@@ -8,14 +8,13 @@ import json
 import struct
 from typing import Any, Literal, Self, overload
 
-from tuya_sharing import CustomerDevice, Manager
-
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity import Entity
 
-from .const import DOMAIN, LOGGER, TUYA_HA_SIGNAL_UPDATE_ENTITY, DPCode, DPType
+from .const import DOMAIN, TUYA_HA_SIGNAL_UPDATE_ENTITY, DPCode, DPType
 from .util import remap_value
+from .multi_manager import MultiManager, XTDevice
 
 
 @dataclass
@@ -136,7 +135,7 @@ class TuyaEntity(Entity):
     _attr_has_entity_name = True
     _attr_should_poll = False
 
-    def __init__(self, device: CustomerDevice, device_manager: Manager) -> None:
+    def __init__(self, device: XTDevice, device_manager: MultiManager) -> None:
         """Init TuyaHaEntity."""
         self._attr_unique_id = f"tuya.{device.id}"
         # TuyaEntity initialize mq can subscribe
