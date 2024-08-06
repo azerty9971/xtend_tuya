@@ -71,6 +71,7 @@ class XTDevice(SimpleNamespace):
     function: dict[str, XTDeviceFunction] = field(default_factory=dict)
     status_range: dict[str, XTDeviceStatusRange] = field(default_factory=dict)
 
+    biz_type: str = ""
     force_open_api: Optional[bool] = False
     model: Optional[str] = ""
 
