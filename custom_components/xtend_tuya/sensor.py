@@ -9,18 +9,11 @@ from tuya_sharing.device import DeviceStatusRange
 
 from homeassistant.components.sensor import (
     SensorDeviceClass,
-    SensorEntity,
     SensorEntityDescription,
     SensorStateClass,
     RestoreSensor,
 )
 from homeassistant.const import (
-    PERCENTAGE,
-    EntityCategory,
-    UnitOfElectricCurrent,
-    UnitOfElectricPotential,
-    UnitOfPower,
-    UnitOfTime,
     UnitOfEnergy,
 )
 from homeassistant.core import HomeAssistant, callback
@@ -35,7 +28,7 @@ from .util import (
     merge_device_descriptors
 )
 
-from .multi_manager import XTConfigEntry
+from .multi_manager import XTConfigEntry, MultiManager
 from .base import ElectricityTypeData, EnumTypeData, IntegerTypeData, TuyaEntity
 from .const import (
     DEVICE_CLASS_UNITS,
@@ -45,7 +38,6 @@ from .const import (
     DPType,
     UnitOfMeasurement,
     VirtualStates,
-    LOGGER,
 )
 
 
@@ -377,7 +369,7 @@ class TuyaSensorEntity(TuyaEntity, RestoreSensor):
     def __init__(
         self,
         device: CustomerDevice,
-        device_manager: Manager,
+        device_manager: MultiManager,
         description: TuyaSensorEntityDescription,
     ) -> None:
         """Init Tuya sensor."""
@@ -493,4 +485,6 @@ class TuyaSensorEntity(TuyaEntity, RestoreSensor):
             scaled_value_back = self._type_data.scale_value_back(state.native_value)
             state.native_value = scaled_value_back
         if state:
-            self.device.status[self.entity_description.key] = float(state.native_value)
+            devices = self.device_manager.get_devices_from_device_id(self.device.id)
+            for device in devices:
+                device.status[self.entity_description.key] = float(state.native_value)
