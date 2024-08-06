@@ -17,7 +17,6 @@ from homeassistant.components.light import (
     LightEntityDescription,
     filter_supported_color_modes,
 )
-from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback

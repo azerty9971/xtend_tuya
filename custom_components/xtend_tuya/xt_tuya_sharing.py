@@ -32,7 +32,7 @@ from .multi_manager import (
     MultiManager,
 )
 
-class TokenListener(SharingTokenListener):
+class XTSharingTokenListener(SharingTokenListener):
     """Token listener for upstream token updates."""
 
     def __init__(
@@ -64,7 +64,7 @@ class TokenListener(SharingTokenListener):
 
         self.hass.add_job(async_update_entry)
 
-class DeviceManager(Manager):
+class XTSharingDeviceManager(Manager):
     def __init__(
         self,
         multi_manager: MultiManager,
@@ -124,8 +124,8 @@ class DeviceManager(Manager):
             return
         super().send_commands(device_id, commands)
 
-class XTDeviceRepository(DeviceRepository):
-    def __init__(self, customer_api: CustomerApi, manager: DeviceManager, multi_manager: MultiManager):
+class XTSharingDeviceRepository(DeviceRepository):
+    def __init__(self, customer_api: CustomerApi, manager: XTSharingDeviceManager, multi_manager: MultiManager):
         super().__init__(customer_api)
         self.manager = manager
         self.multi_manager = multi_manager

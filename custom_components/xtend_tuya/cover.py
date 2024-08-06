@@ -10,7 +10,6 @@ from tuya_sharing import CustomerDevice, Manager
 from homeassistant.components.cover import (
     ATTR_POSITION,
     ATTR_TILT_POSITION,
-    CoverDeviceClass,
     CoverEntity,
     CoverEntityDescription,
     CoverEntityFeature,

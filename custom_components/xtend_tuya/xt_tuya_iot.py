@@ -31,7 +31,7 @@ from .util import (
     determine_property_type,
 )
 
-class XTTuyaHomeManager(TuyaHomeManager):
+class XTIOTHomeManager(TuyaHomeManager):
     def __init__(
         self, api: TuyaOpenAPI, 
         mq: TuyaOpenMQ, 
@@ -46,7 +46,7 @@ class XTTuyaHomeManager(TuyaHomeManager):
         #self.multi_manager.convert_tuya_devices_to_xt(self.device_manager)
 
 
-class XTTuyaDeviceManager(TuyaDeviceManager):
+class XTIOTDeviceManager(TuyaDeviceManager):
     def __init__(self, multi_manager: MultiManager, api: TuyaOpenAPI, mq: TuyaOpenMQ) -> None:
         super().__init__(api, mq)
         mq.remove_message_listener(self.on_message)
@@ -236,8 +236,3 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
                 #LOGGER.warning(f"send_property_update => {property_str}")
                 self.api.post(f"/v2.0/cloud/thing/{device_id}/shadow/properties/issue", {"properties": property_str}
         )
-    
-async def tuya_iot_update_listener(hass, entry):
-    """Handle options update."""
-    LOGGER.debug(f"update_listener => {entry}")
-    LOGGER.debug(f"update_listener => {entry.data}")
