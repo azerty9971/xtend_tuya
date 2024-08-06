@@ -8,6 +8,22 @@ The custom component is working as expected
 This Custom Integration is there to add the missing entities in Tuya's integration.<br/>
 The reason why this is not merged in the main Tuya integration is that the way this is done is not officially supported by HomeAssistant (AKA this integration is using hacks to do its job)
 
+# Supported operation modes
+This integration supports different operating modes:<br/>
+- Standalone without cloud credentials (ST) (use XT instead of the regular Tuya integration)<br/>
+- Standalone with cloud credentials (ST+Cloud)<br/>
+- Alongside Tuya without cloud credentials(TU) (use XT alongside the regular Tuya integration)<br/>
+- Alongside Tuya with cloud credentials(TU+Cloud)<br/>
+<br/>
+The table below shows the different functionnalities of each operating mode<br/>
+
+| Functionnality          | ST  | ST+Cloud | TU  | TU+Cloud | Remarks                                                            |
+| :---------------------- | :-: | :------: | :-: | :------: | :----------------------------------------------------------------- |
+| All supported entities  |     | X        |     |          | TU+Cloud is close but in some rare cases entitites will be missing |
+| Multiple account support| X   | X        | X   | X        | Only for multiple accounts in XT, not the regular Tuya integration |
+| Shared device support   |     | X        |     | X        |                                                                    |
+
+
 # Installation
 You have 2 choices to install, either via Home Assistant Community Store (HACS) or using manual install:<br/>
 1- HACS (recommended)<br/>
