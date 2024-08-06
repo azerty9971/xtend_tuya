@@ -7,7 +7,6 @@ from dataclasses import dataclass
 from tuya_sharing import CustomerDevice, Manager
 
 from homeassistant.components.humidifier import (
-    HumidifierDeviceClass,
     HumidifierEntity,
     HumidifierEntityDescription,
     HumidifierEntityFeature,

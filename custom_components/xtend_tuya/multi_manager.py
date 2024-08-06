@@ -1,11 +1,10 @@
 from __future__ import annotations
 import requests
 import copy
-from typing import NamedTuple, Optional, Any
-from dataclasses import dataclass, field
+from typing import NamedTuple, Any
 
 from homeassistant.core import HomeAssistant, callback
-from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryError, ConfigEntryNotReady
+from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.config_entries import ConfigEntry
 import homeassistant.components.tuya as tuya_integration
 from homeassistant.helpers.dispatcher import dispatcher_send
@@ -14,10 +13,6 @@ from homeassistant.helpers.entity import EntityDescription
 
 from tuya_iot import (
     AuthType,
-    TuyaDevice,
-    TuyaDeviceListener,
-    TuyaDeviceManager,
-    TuyaHomeManager,
     TuyaOpenAPI,
     TuyaOpenMQ,
 )
@@ -27,17 +22,13 @@ from tuya_iot.device import (
 )
 
 from tuya_sharing import (
-    Manager as TuyaSharingManager,
-    CustomerDevice,
     SharingDeviceListener,
 )
 from tuya_sharing.customerapi import (
     CustomerTokenInfo,
     CustomerApi,
-    SharingTokenListener,
 )
 from tuya_sharing.home import (
-    SmartLifeHome,
     HomeRepository,
 )
 from tuya_sharing.scenes import (
@@ -55,7 +46,6 @@ from .const import (
     DOMAIN,
     DOMAIN_ORIG,
     LOGGER,
-    PLATFORMS,
     TUYA_CLIENT_ID,
     TUYA_DISCOVERY_NEW,
     TUYA_DISCOVERY_NEW_ORIG,
@@ -73,7 +63,6 @@ from .const import (
     CONF_ENDPOINT_OT,
     CONF_PASSWORD,
     CONF_USERNAME,
-    DPType,
     MESSAGE_SOURCE_TUYA_IOT,
     MESSAGE_SOURCE_TUYA_SHARING,
 )
@@ -94,7 +83,6 @@ from .util import (
     prepare_value_for_property_update,
     merge_iterables,
     append_lists,
-    log_stack,
 )
 
 from .tuya_decorators import (
@@ -102,17 +90,14 @@ from .tuya_decorators import (
 )
 
 from .xt_tuya_sharing import (
-    DeviceManager,
-    TokenListener,
-    XTDeviceRepository,
+    XTSharingDeviceManager,
+    XTSharingTokenListener,
+    XTSharingDeviceRepository,
 )
 from .xt_tuya_iot import (
-    XTTuyaDeviceManager,
-    tuya_iot_update_listener,
-    XTTuyaHomeManager,
+    XTIOTDeviceManager,
+    XTIOTHomeManager,
 )
-
-type XTConfigEntry = ConfigEntry[HomeAssistantXTData]  # noqa: F811
 
 class HomeAssistantXTData(NamedTuple):
     """Tuya data stored in the Home Assistant data object."""
@@ -126,13 +111,13 @@ class HomeAssistantXTData(NamedTuple):
         return self.multi_manager
 
 class TuyaIOTData(NamedTuple):
-    device_manager: XTTuyaDeviceManager
+    device_manager: XTIOTDeviceManager
     mq: TuyaOpenMQ
     device_ids: list[str] #List of device IDs that are managed by the manager before the managers device merging process
-    home_manager: XTTuyaHomeManager
+    home_manager: XTIOTHomeManager
 
 class TuyaSharingData(NamedTuple):
-    device_manager: DeviceManager
+    device_manager: XTSharingDeviceManager
     device_ids: list[str] #List of device IDs that are managed by the manager before the managers device merging process
 
 class MultiMQTTQueue:
@@ -221,7 +206,7 @@ class MultiManager:  # noqa: F811
         if tuya_integration_runtime_data:
             #We are using an override of the Tuya integration
             decorate_tuya_manager(tuya_integration_runtime_data.device_manager, self)
-            sharing_device_manager = DeviceManager(multi_manager=self, other_device_manager=tuya_integration_runtime_data.device_manager)
+            sharing_device_manager = XTSharingDeviceManager(multi_manager=self, other_device_manager=tuya_integration_runtime_data.device_manager)
             sharing_device_manager.terminal_id      = tuya_integration_runtime_data.device_manager.terminal_id
             sharing_device_manager.mq               = tuya_integration_runtime_data.device_manager.mq
             sharing_device_manager.customer_api     = tuya_integration_runtime_data.device_manager.customer_api
@@ -230,8 +215,8 @@ class MultiManager:  # noqa: F811
             self.reuse_config = True
         else:
             #We are using XT as a standalone integration
-            sharing_device_manager = DeviceManager(multi_manager=self, other_device_manager=None)
-            token_listener = TokenListener(hass, entry)
+            sharing_device_manager = XTSharingDeviceManager(multi_manager=self, other_device_manager=None)
+            token_listener = XTSharingTokenListener(hass, entry)
             sharing_device_manager.terminal_id = entry.data[CONF_TERMINAL_ID]
             sharing_device_manager.customer_api = CustomerApi(
                 CustomerTokenInfo(entry.data[CONF_TOKEN_INFO]),
@@ -243,7 +228,7 @@ class MultiManager:  # noqa: F811
             sharing_device_manager.mq = None
         self.multi_mqtt_queue.sharing_account_mq = sharing_device_manager.mq
         sharing_device_manager.home_repository = HomeRepository(sharing_device_manager.customer_api)
-        sharing_device_manager.device_repository = XTDeviceRepository(sharing_device_manager.customer_api, sharing_device_manager, self)
+        sharing_device_manager.device_repository = XTSharingDeviceRepository(sharing_device_manager.customer_api, sharing_device_manager, self)
         sharing_device_manager.scene_repository = SceneRepository(sharing_device_manager.customer_api)
         sharing_device_manager.user_repository = UserRepository(sharing_device_manager.customer_api)
         sharing_device_manager.add_device_listener(self.multi_device_listener)
@@ -288,13 +273,12 @@ class MultiManager:  # noqa: F811
 
         if response.get("success", False) is False:
             raise ConfigEntryNotReady(response)
-        entry.async_on_unload(entry.add_update_listener(tuya_iot_update_listener))
         mq = TuyaOpenMQ(api)
         self.multi_mqtt_queue.iot_account_mq = mq
         mq.start()
-        device_manager = XTTuyaDeviceManager(self, api, mq)
+        device_manager = XTIOTDeviceManager(self, api, mq)
         device_ids: list[str] = list()
-        home_manager = XTTuyaHomeManager(api, mq, device_manager, self)
+        home_manager = XTIOTHomeManager(api, mq, device_manager, self)
         device_manager.add_device_listener(self.multi_device_listener)
         return TuyaIOTData(
             device_manager=device_manager,

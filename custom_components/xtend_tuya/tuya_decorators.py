@@ -4,17 +4,11 @@ import functools
 
 import homeassistant.components.tuya as tuya_integration
 
-from .const import (
-    LOGGER
-)
 from .multi_manager import (
     MultiManager
 )
 from tuya_sharing import (
-    CustomerDevice,
     Manager,
-    SharingDeviceListener,
-    SharingTokenListener,
 )
 
 class XTDecorator:
