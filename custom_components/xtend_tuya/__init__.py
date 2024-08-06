@@ -1,50 +1,17 @@
 """Support for Tuya Smart devices."""
 
 from __future__ import annotations
-
 import logging
-import json
-import copy
-from typing import NamedTuple
-
-import requests
-
-
-
-from tuya_iot.device import (
-    PROTOCOL_DEVICE_REPORT,
-    PROTOCOL_OTHER,
-)
 
 from homeassistant.config_entries import ConfigEntry, ConfigEntryState
-from homeassistant.core import HomeAssistant, callback
-from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryError, ConfigEntryNotReady
+from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady
 from homeassistant.helpers import device_registry as dr
-from homeassistant.helpers.dispatcher import dispatcher_send
 
 from .const import (
-    CONF_ENDPOINT,
-    CONF_TERMINAL_ID,
-    CONF_TOKEN_INFO,
-    CONF_USER_CODE,
     DOMAIN,
     DOMAIN_ORIG,
-    LOGGER,
     PLATFORMS,
-    TUYA_CLIENT_ID,
-    TUYA_DISCOVERY_NEW,
-    TUYA_HA_SIGNAL_UPDATE_ENTITY,
-    VirtualStates,
-    DescriptionVirtualState,
-    CONF_ACCESS_ID,
-    CONF_ACCESS_SECRET,
-    CONF_APP_TYPE,
-    CONF_AUTH_TYPE,
-    CONF_COUNTRY_CODE,
-    CONF_ENDPOINT_OT,
-    CONF_PASSWORD,
-    CONF_USERNAME,
-    DPType,
 )
 
 from .multi_manager import (
