@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from tuya_sharing import CustomerDevice, Manager
+from tuya_sharing import CustomerDevice
 from tuya_sharing.device import DeviceStatusRange
 
 from homeassistant.components.sensor import (

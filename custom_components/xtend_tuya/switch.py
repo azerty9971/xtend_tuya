@@ -7,7 +7,6 @@ from typing import Any
 from tuya_sharing import CustomerDevice, Manager
 
 from homeassistant.components.switch import (
-    SwitchDeviceClass,
     SwitchEntity,
     SwitchEntityDescription,
 )
