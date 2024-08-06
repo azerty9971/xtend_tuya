@@ -7,44 +7,15 @@ from __future__ import annotations
 import json
 import copy
 from tuya_iot import (
-    AuthType,
-    TuyaDevice,
-    TuyaDeviceListener,
     TuyaDeviceManager,
     TuyaHomeManager,
     TuyaOpenAPI,
     TuyaOpenMQ,
 )
-from typing import Any, Optional
-from homeassistant.helpers import device_registry as dr
-from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers.dispatcher import dispatcher_send
+from typing import Any
 
 from .const import (
-    CONF_ENDPOINT,
-    CONF_TERMINAL_ID,
-    CONF_TOKEN_INFO,
-    CONF_USER_CODE,
-    DOMAIN,
-    DOMAIN_ORIG,
     LOGGER,
-    PLATFORMS,
-    TUYA_CLIENT_ID,
-    TUYA_DISCOVERY_NEW,
-    TUYA_DISCOVERY_NEW_ORIG,
-    TUYA_HA_SIGNAL_UPDATE_ENTITY,
-    TUYA_HA_SIGNAL_UPDATE_ENTITY_ORIG,
-    VirtualStates,
-    DescriptionVirtualState,
-    CONF_ACCESS_ID,
-    CONF_ACCESS_SECRET,
-    CONF_APP_TYPE,
-    CONF_AUTH_TYPE,
-    CONF_COUNTRY_CODE,
-    CONF_ENDPOINT_OT,
-    CONF_PASSWORD,
-    CONF_USERNAME,
-    DPType,
 )
 
 from .shared_classes import (
@@ -57,9 +28,7 @@ from .multi_manager import (
     MultiManager,  # noqa: F811
 )
 from .util import (
-    determine_property_type, 
-    prepare_value_for_property_update,
-    log_stack
+    determine_property_type,
 )
 
 class XTTuyaHomeManager(TuyaHomeManager):

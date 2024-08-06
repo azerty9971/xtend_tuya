@@ -1,11 +1,10 @@
 from __future__ import annotations
 import requests
 import copy
-from typing import NamedTuple, Optional, Any
-from dataclasses import dataclass, field
+from typing import NamedTuple, Any
 
 from homeassistant.core import HomeAssistant, callback
-from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryError, ConfigEntryNotReady
+from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.config_entries import ConfigEntry
 import homeassistant.components.tuya as tuya_integration
 from homeassistant.helpers.dispatcher import dispatcher_send
@@ -14,10 +13,6 @@ from homeassistant.helpers.entity import EntityDescription
 
 from tuya_iot import (
     AuthType,
-    TuyaDevice,
-    TuyaDeviceListener,
-    TuyaDeviceManager,
-    TuyaHomeManager,
     TuyaOpenAPI,
     TuyaOpenMQ,
 )
@@ -27,17 +22,13 @@ from tuya_iot.device import (
 )
 
 from tuya_sharing import (
-    Manager as TuyaSharingManager,
-    CustomerDevice,
     SharingDeviceListener,
 )
 from tuya_sharing.customerapi import (
     CustomerTokenInfo,
     CustomerApi,
-    SharingTokenListener,
 )
 from tuya_sharing.home import (
-    SmartLifeHome,
     HomeRepository,
 )
 from tuya_sharing.scenes import (
@@ -55,7 +46,6 @@ from .const import (
     DOMAIN,
     DOMAIN_ORIG,
     LOGGER,
-    PLATFORMS,
     TUYA_CLIENT_ID,
     TUYA_DISCOVERY_NEW,
     TUYA_DISCOVERY_NEW_ORIG,
@@ -73,7 +63,6 @@ from .const import (
     CONF_ENDPOINT_OT,
     CONF_PASSWORD,
     CONF_USERNAME,
-    DPType,
     MESSAGE_SOURCE_TUYA_IOT,
     MESSAGE_SOURCE_TUYA_SHARING,
 )
@@ -94,7 +83,6 @@ from .util import (
     prepare_value_for_property_update,
     merge_iterables,
     append_lists,
-    log_stack,
 )
 
 from .tuya_decorators import (
@@ -111,8 +99,6 @@ from .xt_tuya_iot import (
     tuya_iot_update_listener,
     XTTuyaHomeManager,
 )
-
-type XTConfigEntry = ConfigEntry[HomeAssistantXTData]  # noqa: F811
 
 class HomeAssistantXTData(NamedTuple):
     """Tuya data stored in the Home Assistant data object."""

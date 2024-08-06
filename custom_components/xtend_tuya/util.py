@@ -10,7 +10,6 @@ from homeassistant.helpers.entity import EntityDescription
 from .const import (
     DPType,
     LOGGER,
-    DOMAIN,
     DOMAIN_ORIG,
 )
 
@@ -21,7 +20,6 @@ from tuya_sharing import (
 )
 
 from .multi_manager import (
-    MultiManager,
     XTConfigEntry,
 )
 
