@@ -45,6 +45,7 @@ class XTDeviceFunction:
     type: str
     values: dict[str, Any] = field(default_factory=dict)
 
+@dataclass(frozen=False)
 class XTDevice(SimpleNamespace):
     id: str
     name: str
@@ -64,21 +65,14 @@ class XTDevice(SimpleNamespace):
     update_time: int
     set_up: Optional[bool] = False
     support_local: Optional[bool] = False
-    local_strategy: dict[int, dict[str, Any]]
+    local_strategy: dict[int, dict[str, Any]] = field(default_factory=dict)
 
-    status: dict[str, Any]
-    function: dict[str, XTDeviceFunction]
-    status_range: dict[str, XTDeviceStatusRange]
+    status: dict[str, Any] = field(default_factory=dict)
+    function: dict[str, XTDeviceFunction] = field(default_factory=dict)
+    status_range: dict[str, XTDeviceStatusRange] = field(default_factory=dict)
 
     force_open_api: Optional[bool] = False
     model: Optional[str] = ""
-
-    def __init__(self, **kwargs: Any) -> None:
-        self.local_strategy = {}
-        self.status = {}
-        self.function = {}
-        self.status_range = {}
-        super().__init__(**kwargs)
 
     def __eq__(self, other):
         """If devices are the same one."""
