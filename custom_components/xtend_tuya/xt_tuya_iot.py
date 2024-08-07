@@ -233,7 +233,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                         device_properties.local_strategy[dp_id] = {
                             "status_code": code,
                             "config_item": {
-                                "valueDesc": {},
+                                "valueDesc": "{}",
                                 "valueType": real_type,
                                 "pid": device.product_id,
                             },
