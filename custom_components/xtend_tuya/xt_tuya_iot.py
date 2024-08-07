@@ -174,9 +174,10 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                         and "typeSpec" in property
                         ):
                         dp_id = int(property["abilityId"])
+                        code  = property["code"]
                         if dp_id not in device_properties.local_strategy:
                             if "type" in property["typeSpec"]:
-                                if property["code"] in device_properties.function or property["code"] in device_properties.status_range:
+                                if code in device_properties.function or code in device_properties.status_range:
                                     property_update = False
                                 else:
                                     property_update = True
@@ -185,7 +186,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                                 typeSpec.pop("type")
                                 typeSpec = json.dumps(typeSpec)
                                 device_properties.local_strategy[dp_id] = {
-                                    "status_code": property["code"],
+                                    "status_code": code,
                                     "config_item": {
                                         "valueDesc": typeSpec,
                                         "valueType": real_type,
@@ -194,13 +195,20 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                                     "property_update": property_update,
                                     "use_open_api": True
                                 }
-                        else:
-                            #Sometimes the default returned typeSpec from the regular Tuya Properties is wrong
-                            #override it with the QueryThingsDataModel one
-                            typeSpec = property["typeSpec"]
-                            typeSpec.pop("type")
-                            typeSpec = json.dumps(typeSpec)
-                            device.local_strategy[dp_id]["config_item"]["valueDesc"] = typeSpec
+                        
+                        #Sometimes the default returned typeSpec from the regular Tuya Properties is wrong
+                        #override it with the QueryThingsDataModel one
+                        typeSpec = property["typeSpec"]
+                        typeSpec.pop("type")
+                        typeSpec_json = json.dumps(typeSpec)
+                        devices = self.multi_manager.get_devices_from_device_id(device.id)
+                        for cur_device in devices:
+                            if dp_id in cur_device.local_strategy:
+                                cur_device.local_strategy[dp_id]["config_item"]["valueDesc"] = typeSpec_json
+                                if code in cur_device.status_range:
+                                    cur_device.status_range[code].values = typeSpec
+                                if code in cur_device.function:
+                                    cur_device.function[code].values = typeSpec
 
 
         if response.get("success"):
