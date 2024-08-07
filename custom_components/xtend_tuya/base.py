@@ -238,7 +238,7 @@ class TuyaEntity(Entity):
                             continue
                         return integer_type
                     except TypeError:
-                        LOGGER.warning(f"Device : {self.device.id} -> {self.device.name} failed to setup")
+                        LOGGER.warning(f"Device : {self.device.id} -> {self.device.name} -> {dpcode} failed to setup")
 
                 if dptype not in (DPType.ENUM, DPType.INTEGER):
                     return dpcode
