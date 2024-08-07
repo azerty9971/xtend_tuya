@@ -180,7 +180,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                         typeSpec = property["typeSpec"]
                         real_type = determine_property_type(property["typeSpec"]["type"])
                         typeSpec.pop("type")
-                        typeSpec = json.dumps(typeSpec)
+                        typeSpec_json = json.dumps(typeSpec)
                         if dp_id not in device_properties.local_strategy:
                             if "type" in property["typeSpec"]:
                                 if code in device_properties.function or code in device_properties.status_range:
@@ -190,7 +190,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                                 device_properties.local_strategy[dp_id] = {
                                     "status_code": code,
                                     "config_item": {
-                                        "valueDesc": typeSpec,
+                                        "valueDesc": typeSpec_json,
                                         "valueType": real_type,
                                         "pid": device.product_id,
                                     },
@@ -202,11 +202,11 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                         devices = self.multi_manager.get_devices_from_device_id(device.id)
                         for cur_device in devices:
                             if dp_id in cur_device.local_strategy:
-                                cur_device.local_strategy[dp_id]["config_item"]["valueDesc"] = typeSpec
+                                cur_device.local_strategy[dp_id]["config_item"]["valueDesc"] = typeSpec_json
                                 if code in cur_device.status_range:
-                                    cur_device.status_range[code].values = typeSpec
+                                    cur_device.status_range[code].values = typeSpec_json
                                 if code in cur_device.function:
-                                    cur_device.function[code].values = typeSpec
+                                    cur_device.function[code].values = typeSpec_json
 
 
         if response.get("success"):
