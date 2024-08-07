@@ -173,7 +173,8 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                         and "accessMode" in property
                         and "typeSpec" in property
                         ):
-                        if int(property["abilityId"]) not in device_properties.local_strategy:
+                        dp_id = int(property["abilityId"])
+                        if dp_id not in device_properties.local_strategy:
                             if "type" in property["typeSpec"]:
                                 if property["code"] in device_properties.function or property["code"] in device_properties.status_range:
                                     property_update = False
@@ -183,7 +184,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                                 real_type = determine_property_type(property["typeSpec"]["type"])
                                 typeSpec.pop("type")
                                 typeSpec = json.dumps(typeSpec)
-                                device_properties.local_strategy[int(property["abilityId"])] = {
+                                device_properties.local_strategy[dp_id] = {
                                     "status_code": property["code"],
                                     "config_item": {
                                         "valueDesc": typeSpec,
@@ -193,16 +194,25 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                                     "property_update": property_update,
                                     "use_open_api": True
                                 }
+                        else:
+                            #Sometimes the default returned typeSpec from the regular Tuya Properties is wrong
+                            #override it with the QueryThingsDataModel one
+                            typeSpec = property["typeSpec"]
+                            typeSpec.pop("type")
+                            typeSpec = json.dumps(typeSpec)
+                            device_properties.local_strategy[dp_id]["config_item"]["valueDesc"] = typeSpec
+
+
         if response.get("success"):
             result = response.get("result", {})
             for dp_property in result["properties"]:
                 if "dp_id" in dp_property and "type" in dp_property:
-                    if int(dp_property["dp_id"]) not in device_properties.local_strategy:
+                    dp_id = int(dp_property["dp_id"])
+                    if dp_id not in device_properties.local_strategy:
                         if dp_property["code"] in device_properties.function or dp_property["code"] in device_properties.status_range:
                             property_update = False
                         else:
                             property_update = True
-                        dp_id = int(dp_property["dp_id"])
                         real_type = determine_property_type(dp_property.get("type",None), dp_property.get("value",None))
                         device_properties.local_strategy[dp_id] = {
                             "status_code": dp_property["code"],
@@ -216,7 +226,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                         }
                 if (    "code"  in dp_property 
                     and "dp_id" in dp_property 
-                    and int(dp_property["dp_id"])  in device_properties.local_strategy
+                    and int(dp_property["dp_id"]) in device_properties.local_strategy
                     ):
                     code = dp_property["code"]
                     if code not in device_properties.status_range and code not in device_properties.function :
