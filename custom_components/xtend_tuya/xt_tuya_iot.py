@@ -204,9 +204,9 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                             if dp_id in cur_device.local_strategy:
                                 cur_device.local_strategy[dp_id]["config_item"]["valueDesc"] = typeSpec_json
                                 if code in cur_device.status_range:
-                                    cur_device.status_range[code].values = typeSpec_json
+                                    cur_device.status_range[code].values = copy.deepcopy(typeSpec_json)
                                 if code in cur_device.function:
-                                    cur_device.function[code].values = typeSpec_json
+                                    cur_device.function[code].values = copy.deepcopy(typeSpec_json)
 
 
         if response.get("success"):
