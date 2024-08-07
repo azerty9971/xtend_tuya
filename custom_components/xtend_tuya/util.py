@@ -53,7 +53,7 @@ def remap_value(
 def determine_property_type(type, value = None) -> DPType:
         if type == "value":
             return DPType(DPType.INTEGER)
-        if type == "bitmap":
+        if type == "bitmap" or type == "raw":
             return DPType(DPType.RAW)
         if type == "enum":
             return DPType(DPType.ENUM)
