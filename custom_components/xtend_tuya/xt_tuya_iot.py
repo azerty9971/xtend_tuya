@@ -200,7 +200,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                             typeSpec = property["typeSpec"]
                             typeSpec.pop("type")
                             typeSpec = json.dumps(typeSpec)
-                            device_properties.local_strategy[dp_id]["config_item"]["valueDesc"] = typeSpec
+                            device.local_strategy[dp_id]["config_item"]["valueDesc"] = typeSpec
 
 
         if response.get("success"):
@@ -235,6 +235,8 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                                                                                    values=device_properties.local_strategy[int(dp_property["dp_id"])]["config_item"]["valueDesc"])
                     if code not in device_properties.status:
                         device_properties.status[code] = dp_property.get("value",None)
+        if device.id == "1554002648551950e34b":
+            LOGGER.warning(f"get_device_properties : {device_properties.local_strategy}")
         return device_properties
 
     def send_property_update(
