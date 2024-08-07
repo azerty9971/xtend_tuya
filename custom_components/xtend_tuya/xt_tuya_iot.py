@@ -187,21 +187,20 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                         if code == "quiet_time_end":
                             LOGGER.warning(f"quiet_time_end: {typeSpec} <=> {typeSpec_json} <=> {device.id} <=> {device.name} <=> {device_properties.local_strategy}")
                         if dp_id not in device_properties.local_strategy:
-                            if "type" in property["typeSpec"]:
-                                if code in device_properties.function or code in device_properties.status_range:
-                                    property_update = False
-                                else:
-                                    property_update = True
-                                device_properties.local_strategy[dp_id] = {
-                                    "status_code": code,
-                                    "config_item": {
-                                        "valueDesc": typeSpec_json,
-                                        "valueType": real_type,
-                                        "pid": device.product_id,
-                                    },
-                                    "property_update": property_update,
-                                    "use_open_api": True
-                                }
+                            if code in device_properties.function or code in device_properties.status_range:
+                                property_update = False
+                            else:
+                                property_update = True
+                            device_properties.local_strategy[dp_id] = {
+                                "status_code": code,
+                                "config_item": {
+                                    "valueDesc": typeSpec_json,
+                                    "valueType": real_type,
+                                    "pid": device.product_id,
+                                },
+                                "property_update": property_update,
+                                "use_open_api": True
+                            }
                         #Sometimes the default returned typeSpec from the regular Tuya Properties is wrong
                         #override it with the QueryThingsDataModel one
                         devices = self.multi_manager.get_devices_from_device_id(device.id)
