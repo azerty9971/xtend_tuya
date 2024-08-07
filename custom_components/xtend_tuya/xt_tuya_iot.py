@@ -222,6 +222,8 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                 dp_id = int(dp_property["dp_id"])
                 if "dp_id" in dp_property and "type" in dp_property:
                     code = dp_property["code"]
+                    if code == "quiet_time_end":
+                        LOGGER.warning(f"response : {device_properties.local_strategy}")
                     dp_type = dp_property.get("type",None)
                     value = dp_property.get("value",None)
                     if dp_id not in device_properties.local_strategy:
