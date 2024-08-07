@@ -160,7 +160,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         device_properties.status = copy.deepcopy(device.status)
         if (hasattr(device, "local_strategy")):
             device_properties.local_strategy = copy.deepcopy(device.local_strategy)
-        if device.id == "1554002648551950e34b":
+        if device.id == "bf80ca98b2da422bf4na8b":
             LOGGER.warning(f"get_device_properties BEFORE: {device_properties.local_strategy}")
         response = self.api.get(f"/v2.0/cloud/thing/{device.id}/shadow/properties")
         response2 = self.api.get(f"/v2.0/cloud/thing/{device.id}/model")
@@ -241,7 +241,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                                                                                    values=device_properties.local_strategy[int(dp_property["dp_id"])]["config_item"]["valueDesc"])
                     if code not in device_properties.status:
                         device_properties.status[code] = dp_property.get("value",None)
-        if device.id == "1554002648551950e34b":
+        if device.id == "bf80ca98b2da422bf4na8b":
             LOGGER.warning(f"get_device_properties : {device_properties.local_strategy}")
         return device_properties
 
