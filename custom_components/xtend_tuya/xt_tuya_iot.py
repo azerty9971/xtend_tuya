@@ -195,20 +195,20 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                                     "property_update": property_update,
                                     "use_open_api": True
                                 }
-                        
-                        #Sometimes the default returned typeSpec from the regular Tuya Properties is wrong
-                        #override it with the QueryThingsDataModel one
-                        typeSpec = property["typeSpec"]
-                        typeSpec.pop("type")
-                        typeSpec_json = json.dumps(typeSpec)
-                        devices = self.multi_manager.get_devices_from_device_id(device.id)
-                        for cur_device in devices:
-                            if dp_id in cur_device.local_strategy:
-                                cur_device.local_strategy[dp_id]["config_item"]["valueDesc"] = typeSpec_json
-                                if code in cur_device.status_range:
-                                    cur_device.status_range[code].values = typeSpec
-                                if code in cur_device.function:
-                                    cur_device.function[code].values = typeSpec
+                        else:
+                            #Sometimes the default returned typeSpec from the regular Tuya Properties is wrong
+                            #override it with the QueryThingsDataModel one
+                            typeSpec = property["typeSpec"]
+                            typeSpec.pop("type")
+                            typeSpec_json = json.dumps(typeSpec)
+                            devices = self.multi_manager.get_devices_from_device_id(device.id)
+                            for cur_device in devices:
+                                if dp_id in cur_device.local_strategy:
+                                    cur_device.local_strategy[dp_id]["config_item"]["valueDesc"] = typeSpec_json
+                                    if code in cur_device.status_range:
+                                        cur_device.status_range[code].values = typeSpec
+                                    if code in cur_device.function:
+                                        cur_device.function[code].values = typeSpec
 
 
         if response.get("success"):
