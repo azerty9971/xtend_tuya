@@ -51,6 +51,7 @@ BUTTONS["wkcz"] = BUTTONS["kg"]
 BUTTONS["dlq"]  = BUTTONS["kg"]
 BUTTONS["tdq"]  = BUTTONS["kg"]
 BUTTONS["pc"]   = BUTTONS["kg"]
+BUTTONS["aqcz"] = BUTTONS["kg"]
 
 async def async_setup_entry(
     hass: HomeAssistant, entry: XTConfigEntry, async_add_entities: AddEntitiesCallback

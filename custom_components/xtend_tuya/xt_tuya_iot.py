@@ -7,44 +7,15 @@ from __future__ import annotations
 import json
 import copy
 from tuya_iot import (
-    AuthType,
-    TuyaDevice,
-    TuyaDeviceListener,
     TuyaDeviceManager,
     TuyaHomeManager,
     TuyaOpenAPI,
     TuyaOpenMQ,
 )
-from typing import Any, Optional
-from homeassistant.helpers import device_registry as dr
-from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers.dispatcher import dispatcher_send
+from typing import Any
 
 from .const import (
-    CONF_ENDPOINT,
-    CONF_TERMINAL_ID,
-    CONF_TOKEN_INFO,
-    CONF_USER_CODE,
-    DOMAIN,
-    DOMAIN_ORIG,
     LOGGER,
-    PLATFORMS,
-    TUYA_CLIENT_ID,
-    TUYA_DISCOVERY_NEW,
-    TUYA_DISCOVERY_NEW_ORIG,
-    TUYA_HA_SIGNAL_UPDATE_ENTITY,
-    TUYA_HA_SIGNAL_UPDATE_ENTITY_ORIG,
-    VirtualStates,
-    DescriptionVirtualState,
-    CONF_ACCESS_ID,
-    CONF_ACCESS_SECRET,
-    CONF_APP_TYPE,
-    CONF_AUTH_TYPE,
-    CONF_COUNTRY_CODE,
-    CONF_ENDPOINT_OT,
-    CONF_PASSWORD,
-    CONF_USERNAME,
-    DPType,
 )
 
 from .shared_classes import (
@@ -57,12 +28,10 @@ from .multi_manager import (
     MultiManager,  # noqa: F811
 )
 from .util import (
-    determine_property_type, 
-    prepare_value_for_property_update,
-    log_stack
+    determine_property_type,
 )
 
-class XTTuyaHomeManager(TuyaHomeManager):
+class XTIOTHomeManager(TuyaHomeManager):
     def __init__(
         self, api: TuyaOpenAPI, 
         mq: TuyaOpenMQ, 
@@ -77,7 +46,7 @@ class XTTuyaHomeManager(TuyaHomeManager):
         #self.multi_manager.convert_tuya_devices_to_xt(self.device_manager)
 
 
-class XTTuyaDeviceManager(TuyaDeviceManager):
+class XTIOTDeviceManager(TuyaDeviceManager):
     def __init__(self, multi_manager: MultiManager, api: TuyaOpenAPI, mq: TuyaOpenMQ) -> None:
         super().__init__(api, mq)
         mq.remove_message_listener(self.on_message)
@@ -193,6 +162,9 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
             device_properties.local_strategy = copy.deepcopy(device.local_strategy)
         response = self.api.get(f"/v2.0/cloud/thing/{device.id}/shadow/properties")
         response2 = self.api.get(f"/v2.0/cloud/thing/{device.id}/model")
+        if not response.get("success") or not response2.get("success"):
+            return
+        
         if response2.get("success"):
             result = response2.get("result", {})
             model = json.loads(result.get("model", "{}"))
@@ -204,41 +176,59 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
                         and "accessMode" in property
                         and "typeSpec" in property
                         ):
-                        if int(property["abilityId"]) not in device_properties.local_strategy:
-                            if "type" in property["typeSpec"]:
-                                if property["code"] in device_properties.function or property["code"] in device_properties.status_range:
-                                    property_update = False
-                                else:
-                                    property_update = True
-                                typeSpec = property["typeSpec"]
-                                real_type = determine_property_type(property["typeSpec"]["type"])
-                                typeSpec.pop("type")
-                                typeSpec = json.dumps(typeSpec)
-                                device_properties.local_strategy[int(property["abilityId"])] = {
-                                    "status_code": property["code"],
-                                    "config_item": {
-                                        "valueDesc": typeSpec,
-                                        "valueType": real_type,
-                                        "pid": device.product_id,
-                                    },
-                                    "property_update": property_update,
-                                    "use_open_api": True
-                                }
+                        dp_id = int(property["abilityId"])
+                        code  = property["code"]
+                        typeSpec = property["typeSpec"]
+                        real_type = determine_property_type(typeSpec["type"])
+                        typeSpec.pop("type")
+                        typeSpec_json = json.dumps(typeSpec)
+                        if dp_id not in device_properties.local_strategy:
+                            if code in device_properties.function or code in device_properties.status_range:
+                                property_update = False
+                            else:
+                                property_update = True
+                            device_properties.local_strategy[dp_id] = {
+                                "status_code": code,
+                                "config_item": {
+                                    "valueDesc": typeSpec_json,
+                                    "valueType": real_type,
+                                    "pid": device.product_id,
+                                },
+                                "property_update": property_update,
+                                "use_open_api": True
+                            }
+                        #Sometimes the default returned typeSpec from the regular Tuya Properties is wrong
+                        #override it with the QueryThingsDataModel one
+                        devices = self.multi_manager.get_devices_from_device_id(device.id)
+                        for cur_device in devices:
+                            if dp_id in cur_device.local_strategy:
+                                cur_device.local_strategy[dp_id]["config_item"]["valueDesc"] = typeSpec_json
+                                if code in cur_device.status_range:
+                                    cur_device.status_range[code].values = typeSpec_json
+                                if code in cur_device.function:
+                                    cur_device.function[code].values = typeSpec_json
+
+
         if response.get("success"):
             result = response.get("result", {})
             for dp_property in result["properties"]:
+                if "dp_id" not in dp_property:
+                    continue
+                dp_id = int(dp_property["dp_id"])
                 if "dp_id" in dp_property and "type" in dp_property:
-                    if int(dp_property["dp_id"]) not in device_properties.local_strategy:
-                        if dp_property["code"] in device_properties.function or dp_property["code"] in device_properties.status_range:
+                    code = dp_property["code"]
+                    dp_type = dp_property.get("type",None)
+                    value = dp_property.get("value",None)
+                    if dp_id not in device_properties.local_strategy:
+                        if code in device_properties.function or code in device_properties.status_range:
                             property_update = False
                         else:
                             property_update = True
-                        dp_id = int(dp_property["dp_id"])
-                        real_type = determine_property_type(dp_property.get("type",None), dp_property.get("value",None))
+                        real_type = determine_property_type(dp_type, value)
                         device_properties.local_strategy[dp_id] = {
-                            "status_code": dp_property["code"],
+                            "status_code": code,
                             "config_item": {
-                                "valueDesc": dp_property.get("value",{}),
+                                "valueDesc": "{}",
                                 "valueType": real_type,
                                 "pid": device.product_id,
                             },
@@ -247,13 +237,13 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
                         }
                 if (    "code"  in dp_property 
                     and "dp_id" in dp_property 
-                    and int(dp_property["dp_id"])  in device_properties.local_strategy
+                    and dp_id in device_properties.local_strategy
                     ):
                     code = dp_property["code"]
                     if code not in device_properties.status_range and code not in device_properties.function :
                         device_properties.status_range[code] = XTDeviceStatusRange(code=code, 
-                                                                                   type=device_properties.local_strategy[int(dp_property["dp_id"])]["config_item"]["valueType"],
-                                                                                   values=device_properties.local_strategy[int(dp_property["dp_id"])]["config_item"]["valueDesc"])
+                                                                                   type=device_properties.local_strategy[dp_id]["config_item"]["valueType"],
+                                                                                   values=device_properties.local_strategy[dp_id]["config_item"]["valueDesc"])
                     if code not in device_properties.status:
                         device_properties.status[code] = dp_property.get("value",None)
         return device_properties
@@ -267,8 +257,3 @@ class XTTuyaDeviceManager(TuyaDeviceManager):
                 #LOGGER.warning(f"send_property_update => {property_str}")
                 self.api.post(f"/v2.0/cloud/thing/{device_id}/shadow/properties/issue", {"properties": property_str}
         )
-    
-async def tuya_iot_update_listener(hass, entry):
-    """Handle options update."""
-    LOGGER.debug(f"update_listener => {entry}")
-    LOGGER.debug(f"update_listener => {entry.data}")
