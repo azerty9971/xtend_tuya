@@ -10,7 +10,6 @@ from homeassistant.helpers.entity import EntityDescription
 from .const import (
     DPType,
     LOGGER,
-    DOMAIN,
     DOMAIN_ORIG,
 )
 
@@ -21,7 +20,6 @@ from tuya_sharing import (
 )
 
 from .multi_manager import (
-    MultiManager,
     XTConfigEntry,
 )
 
@@ -55,7 +53,7 @@ def remap_value(
 def determine_property_type(type, value = None) -> DPType:
         if type == "value":
             return DPType(DPType.INTEGER)
-        if type == "bitmap":
+        if type == "bitmap" or type == "raw":
             return DPType(DPType.RAW)
         if type == "enum":
             return DPType(DPType.ENUM)

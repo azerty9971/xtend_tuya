@@ -30,7 +30,7 @@ from .util import (
 
 from .multi_manager import XTConfigEntry
 from .base import TuyaEntity
-from .const import TUYA_DISCOVERY_NEW, DPCode, DPType
+from .const import TUYA_DISCOVERY_NEW, DPType
 
 
 class Mode(StrEnum):
