@@ -160,8 +160,6 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         device_properties.status = copy.deepcopy(device.status)
         if (hasattr(device, "local_strategy")):
             device_properties.local_strategy = copy.deepcopy(device.local_strategy)
-        if device.id == "bf80ca98b2da422bf4na8b":
-            LOGGER.warning(f"get_device_properties BEFORE: {device_properties.local_strategy}")
         response = self.api.get(f"/v2.0/cloud/thing/{device.id}/shadow/properties")
         response2 = self.api.get(f"/v2.0/cloud/thing/{device.id}/model")
         if not response.get("success") or not response2.get("success"):
@@ -181,11 +179,9 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                         dp_id = int(property["abilityId"])
                         code  = property["code"]
                         typeSpec = property["typeSpec"]
-                        real_type = determine_property_type(property["typeSpec"]["type"])
+                        real_type = determine_property_type(typeSpec["type"])
                         typeSpec.pop("type")
                         typeSpec_json = json.dumps(typeSpec)
-                        if code == "quiet_time_end":
-                            LOGGER.warning(f"quiet_time_end: {typeSpec} <=> {typeSpec_json} <=> {device.id} <=> {device.name} <=> {device_properties.local_strategy}")
                         if dp_id not in device_properties.local_strategy:
                             if code in device_properties.function or code in device_properties.status_range:
                                 property_update = False
@@ -221,8 +217,6 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                 dp_id = int(dp_property["dp_id"])
                 if "dp_id" in dp_property and "type" in dp_property:
                     code = dp_property["code"]
-                    if code == "quiet_time_end":
-                        LOGGER.warning(f"response : {device_properties.local_strategy}")
                     dp_type = dp_property.get("type",None)
                     value = dp_property.get("value",None)
                     if dp_id not in device_properties.local_strategy:
@@ -252,8 +246,6 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                                                                                    values=device_properties.local_strategy[dp_id]["config_item"]["valueDesc"])
                     if code not in device_properties.status:
                         device_properties.status[code] = dp_property.get("value",None)
-        if device.id == "bf80ca98b2da422bf4na8b":
-            LOGGER.warning(f"get_device_properties : {device_properties.local_strategy}")
         return device_properties
 
     def send_property_update(
