@@ -181,6 +181,8 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                         real_type = determine_property_type(property["typeSpec"]["type"])
                         typeSpec.pop("type")
                         typeSpec_json = json.dumps(typeSpec)
+                        if code == "quiet_time_end":
+                            LOGGER.warning(f"quiet_time_end: {typeSpec} <=> {typeSpec_json}")
                         if dp_id not in device_properties.local_strategy:
                             if "type" in property["typeSpec"]:
                                 if code in device_properties.function or code in device_properties.status_range:
