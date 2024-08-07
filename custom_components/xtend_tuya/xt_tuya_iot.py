@@ -164,6 +164,9 @@ class XTIOTDeviceManager(TuyaDeviceManager):
             LOGGER.warning(f"get_device_properties BEFORE: {device_properties.local_strategy}")
         response = self.api.get(f"/v2.0/cloud/thing/{device.id}/shadow/properties")
         response2 = self.api.get(f"/v2.0/cloud/thing/{device.id}/model")
+        if not response.get("success") or not response2.get("success"):
+            return
+        
         if response2.get("success"):
             result = response2.get("result", {})
             model = json.loads(result.get("model", "{}"))
@@ -214,18 +217,23 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         if response.get("success"):
             result = response.get("result", {})
             for dp_property in result["properties"]:
+                if "dp_id" not in dp_property:
+                    continue
+                dp_id = int(dp_property["dp_id"])
                 if "dp_id" in dp_property and "type" in dp_property:
-                    dp_id = int(dp_property["dp_id"])
+                    code = dp_property["code"]
+                    dp_type = dp_property.get("type",None)
+                    value = dp_property.get("value",None)
                     if dp_id not in device_properties.local_strategy:
-                        if dp_property["code"] in device_properties.function or dp_property["code"] in device_properties.status_range:
+                        if code in device_properties.function or code in device_properties.status_range:
                             property_update = False
                         else:
                             property_update = True
-                        real_type = determine_property_type(dp_property.get("type",None), dp_property.get("value",None))
+                        real_type = determine_property_type(dp_type, value)
                         device_properties.local_strategy[dp_id] = {
-                            "status_code": dp_property["code"],
+                            "status_code": code,
                             "config_item": {
-                                "valueDesc": dp_property.get("value",{}),
+                                "valueDesc": {},
                                 "valueType": real_type,
                                 "pid": device.product_id,
                             },
@@ -234,13 +242,13 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                         }
                 if (    "code"  in dp_property 
                     and "dp_id" in dp_property 
-                    and int(dp_property["dp_id"]) in device_properties.local_strategy
+                    and dp_id in device_properties.local_strategy
                     ):
                     code = dp_property["code"]
                     if code not in device_properties.status_range and code not in device_properties.function :
                         device_properties.status_range[code] = XTDeviceStatusRange(code=code, 
-                                                                                   type=device_properties.local_strategy[int(dp_property["dp_id"])]["config_item"]["valueType"],
-                                                                                   values=device_properties.local_strategy[int(dp_property["dp_id"])]["config_item"]["valueDesc"])
+                                                                                   type=device_properties.local_strategy[dp_id]["config_item"]["valueType"],
+                                                                                   values=device_properties.local_strategy[dp_id]["config_item"]["valueDesc"])
                     if code not in device_properties.status:
                         device_properties.status[code] = dp_property.get("value",None)
         if device.id == "bf80ca98b2da422bf4na8b":
