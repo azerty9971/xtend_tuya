@@ -206,19 +206,19 @@ class XTSharingCustomerApi(CustomerApi):
 
         t = int(time.time() * 1000)
         headers = {
-            "X-appKey": self.client_id,
-            "X-requestId": rid,
-            "X-sid": sid,
-            "X-time": str(t),
+            "client_id": self.client_id,
+            "request_id": rid,
+            "sid": sid,
+            "t": str(t),
         }
         if self.token_info is not None and len(self.token_info.access_token) > 0:
-            headers["X-token"] = self.token_info.access_token
+            headers["access_token"] = self.token_info.access_token
 
         sign = XTSharingCustomerApi._restful_sign(hash_key,
                              query_encdata,
                              body_encdata,
                              headers)
-        headers["X-sign"] = sign
+        headers["sign"] = sign
 
         response = self.session.request(
             method, self.endpoint + path, params=params, json=body, headers=headers
@@ -246,7 +246,7 @@ class XTSharingCustomerApi(CustomerApi):
         return ret
 
     def _restful_sign(hash_key: str, query_encdata: str, body_encdata: str, data: dict[str, Any]) -> str:
-        headers = ["X-appKey", "X-requestId", "X-sid", "X-time", "X-token"]
+        headers = ["client_id", "request_id", "sid", "t", "access_token"]
         header_sign_str = ""
         for item in headers:
             val = data.get(item, "")
