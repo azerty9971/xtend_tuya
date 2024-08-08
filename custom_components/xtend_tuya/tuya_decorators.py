@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import functools
 
+from .const import LOGGER
+
 try:
     from ..tuya import (
         async_setup_entry  as tuya_integration_async_setup_entry,
@@ -9,6 +11,7 @@ try:
         async_remove_entry as tuya_integration_async_remove_entry
     )
 except ImportError:
+    LOGGER.warning("Loading regular Tuya module")
     from homeassistant.components.tuya import (
         async_setup_entry  as tuya_integration_async_setup_entry,
         async_unload_entry as tuya_integration_async_unload_entry,
