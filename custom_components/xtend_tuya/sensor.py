@@ -107,6 +107,30 @@ CONSUMPTION_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
     ),
 )
 
+TEMPERATURE_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
+    TuyaSensorEntityDescription(
+        key=DPCode.TEMPERATURE,
+        translation_key="temperature",
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_registry_enabled_default=True,
+    ),
+    TuyaSensorEntityDescription(
+        key=DPCode.TEMP_VALUE,
+        translation_key="temperature",
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_registry_enabled_default=True,
+    ),
+)
+
+HUMIDITY_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
+    TuyaSensorEntityDescription(
+        key=DPCode.HUMIDITY_VALUE,
+        translation_key="humidity",
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_registry_enabled_default=True,
+    ),
+)
+
 # All descriptions can be found here. Mostly the Integer data types in the
 # default status set of each category (that don't have a set instruction)
 # end up being a sensor.
@@ -282,12 +306,6 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
             entity_registry_enabled_default=True,
         ),
         TuyaSensorEntityDescription(
-            key=DPCode.TEMPERATURE,
-            translation_key="temperature",
-            state_class=SensorStateClass.MEASUREMENT,
-            entity_registry_enabled_default=True,
-        ),
-        TuyaSensorEntityDescription(
             key=DPCode.TOILET_NOTICE,
             translation_key="toilet_notice",
             state_class=SensorStateClass.MEASUREMENT,
@@ -311,6 +329,17 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
             state_class=SensorStateClass.MEASUREMENT,
             entity_registry_enabled_default=False,
         ),
+        *TEMPERATURE_SENSORS,
+    ),
+    "wnykq": (
+        TuyaSensorEntityDescription(
+            key=DPCode.IR_CONTROL,
+            translation_key="wnykq_ir_control",
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_registry_enabled_default=True,
+        ),
+        *TEMPERATURE_SENSORS,
+        *HUMIDITY_SENSORS,
     ),
 }
 
@@ -476,7 +505,7 @@ class TuyaSensorEntity(TuyaEntity, RestoreSensor):
     async def async_added_to_hass(self) -> None:
         """Call when entity about to be added to hass."""
         await super().async_added_to_hass()
-        if not self.entity_description.restoredata:
+        if not hasattr(self.entity_description, "restoredata") or not self.entity_description.restoredata:
             return
         state = await self.async_get_last_sensor_data()
         if state is None or state.native_value is None:

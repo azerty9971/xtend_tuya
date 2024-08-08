@@ -26,10 +26,15 @@ from tuya_sharing.device import (
 from .const import (
     CONF_TOKEN_INFO,
     LOGGER,
+    DPType,
 )
 
 from .multi_manager import (
     MultiManager,
+)
+
+from .util import (
+    determine_property_type,
 )
 
 class XTSharingTokenListener(SharingTokenListener):
@@ -130,19 +135,48 @@ class XTSharingDeviceRepository(DeviceRepository):
         self.manager = manager
         self.multi_manager = multi_manager
 
+    def update_device_specification(self, device: CustomerDevice):
+        super().update_device_specification(device)
+
     def update_device_strategy_info(self, device: CustomerDevice):
         super().update_device_strategy_info(device)
-        for loc_strat in device.local_strategy.values():
-            if (
-                "statusCode" in loc_strat and 
-                "valueType"  in loc_strat and
-                "valueDesc"  in loc_strat and
-                loc_strat["statusCode"] not in device.status_range and
-                loc_strat["statusCode"] not in device.function
-                ):
-                device.status_range[loc_strat["statusCode"]] = DeviceStatusRange()
-                device.status_range[loc_strat["statusCode"]].code   = loc_strat["statusCode"]
-                device.status_range[loc_strat["statusCode"]].type   = loc_strat["valueType"]
-                device.status_range[loc_strat["statusCode"]].values = loc_strat["valueDesc"]
+        
+        if device.support_local:
+            #Sometimes the Type provided by Tuya is ill formed,
+            #replace it with the one from the local strategy
+            for loc_strat in device.local_strategy.values():
+                if "statusCode" not in loc_strat or "valueType" not in loc_strat:
+                    continue
+                code = loc_strat["statusCode"]
+                value_type = loc_strat["valueType"]
+
+                if code in device.status_range:
+                    device.status_range[code].type = value_type
+                if code in device.function:
+                    device.function[code].type     = value_type
+
+                if (
+                    "valueDesc"  in loc_strat and
+                    code not in device.status_range and
+                    code not in device.function
+                    ):
+                    device.status_range[code] = DeviceStatusRange()
+                    device.status_range[code].code   = code
+                    device.status_range[code].type   = value_type
+                    device.status_range[code].values = loc_strat["valueDesc"]
+
+        #Sometimes the Type provided by Tuya is ill formed,
+        #Try to reformat it into the correct one
+        for status in device.status_range.values():
+            try:
+                DPType(status.type)
+            except ValueError:
+                status.type = determine_property_type(status.type)
+        for func in device.function.values():
+            try:
+                DPType(func.type)
+            except ValueError:
+                func.type = determine_property_type(func.type)
+
         self.multi_manager.apply_init_virtual_states(device)
         self.multi_manager.allow_virtual_devices_not_set_up(device)

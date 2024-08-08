@@ -149,6 +149,15 @@
       }
     },
     "number": {
+      "bright_value": {
+        "name": "Brightness"
+      },
+      "humidity_calibration": {
+        "name": "Humidity calibration"
+      },
+      "temp_calibration": {
+        "name": "Temperature calibration"
+      },
       "quiet_time_end": {
         "name": "Do not disturb (end)"
       },
@@ -640,6 +649,20 @@
       }
     },
     "sensor": {
+      "wnykq_ir_control":
+      {
+        "name": "IR control",
+        "state": {
+          "0": "Study",
+          "1": "Stop",
+          "2": "Success",
+          "3": "Fail",
+          "study": "Study",
+          "stop": "Stop",
+          "success": "Success",
+          "fail": "Fail"
+        }
+      },
       "balance_energy": {
         "name": "Balance energy"
       },
