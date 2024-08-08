@@ -184,7 +184,7 @@ class XTSharingCustomerApi(CustomerApi):
         secret = _secret_generating(rid, sid, hash_key)
 
         access_token = self.token_info.access_token if self.token_info else ""
-        sign, t = self._calculate_sign(hash_key, method, path, params, body)
+        sign, t = self._calculate_sign(secret, method, path, params, body)
         headers = {
             "client_id": self.client_id,
             "sign": sign,
