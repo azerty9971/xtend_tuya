@@ -204,10 +204,10 @@ class XTSharingCustomerApi(CustomerApi):
         t = int(time.time() * 1000)
         headers = {
             "client_id": self.client_id,
-            "X-requestId": rid,
-            "X-sid": sid,
             "t": str(t),
-            "sign_method": "HMAC-SHA256"
+            "sign_method": "HMAC-SHA256",
+            "mode": "cors",
+            "Content-Type": "application/json"
         }
         if self.token_info is not None and len(self.token_info.access_token) > 0:
             headers["access_token"] = self.token_info.access_token
