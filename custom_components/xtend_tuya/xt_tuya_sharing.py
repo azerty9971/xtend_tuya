@@ -138,7 +138,8 @@ class XTSharingDeviceRepository(DeviceRepository):
     def update_device_strategy_info(self, device: CustomerDevice):
         super().update_device_strategy_info(device)
         if device.id == "bfd373337fcd1752dbs9b4":
-            LOGGER.warning(f"update_device_strategy_info BEFORE: {device.status_range}")
+            LOGGER.warning(f"update_device_strategy_info1 BEFORE: {device.status_range}")
+            LOGGER.warning(f"update_device_strategy_info2 BEFORE: {device.local_strategy}")
         for loc_strat in device.local_strategy.values():
             if "statusCode" not in loc_strat or "valueType" not in loc_strat:
                 continue
