@@ -148,9 +148,9 @@ class XTSharingCustomerApi(CustomerApi):
             self.token_info = other_api.token_info
             self.client_id = other_api.client_id
             self.user_code = other_api.user_code
-            self.endpoint = other_api.end_point
+            self.endpoint = other_api.endpoint
             self.refresh_token = other_api.refresh_token
-            self.token_listener = other_api.listener
+            self.token_listener = other_api.token_listener
         elif len(args) == 5:
             super().__init__(args[0], args[1], args[2], args[3], args[4])
 
