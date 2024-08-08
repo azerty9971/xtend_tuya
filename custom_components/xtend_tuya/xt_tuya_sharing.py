@@ -9,7 +9,7 @@ import uuid
 import hashlib
 import time
 import json
-import requests
+import hmac
 
 from homeassistant.core import HomeAssistant, callback
 
@@ -23,7 +23,6 @@ from tuya_sharing.customerapi import (
     _secret_generating,
     _form_to_json,
     _aes_gcm_encrypt,
-    _restful_sign,
     _aex_gcm_decrypt
 )
 from tuya_sharing.home import (
@@ -212,10 +211,10 @@ class XTSharingCustomerApi(CustomerApi):
         if self.token_info is not None and len(self.token_info.access_token) > 0:
             headers["access_token"] = self.token_info.access_token
 
-        sign = _restful_sign(hash_key,
-                             query_encdata,
-                             body_encdata,
-                             headers)
+        sign = XTSharingCustomerApi._restful_sign(  hash_key,
+                                                    query_encdata,
+                                                    body_encdata,
+                                                    headers)
         headers["sign"] = sign
 
         LOGGER.warning(f"QUERY : headers: {headers} <=> params: {params}")
@@ -244,6 +243,27 @@ class XTSharingCustomerApi(CustomerApi):
 
         LOGGER.debug("response ret = %s", ret)
         return ret
+    
+    def _restful_sign(hash_key: str, query_encdata: str, body_encdata: str, data: dict[str, Any]) -> str:
+        headers = ["client_id", "t", "access_token"]
+        header_sign_str = ""
+        for item in headers:
+            val = data.get(item, "")
+            if val != "":
+                header_sign_str += item + "=" + val + "||"
+
+        sign_str = header_sign_str[:-2]
+
+        if query_encdata is not None and query_encdata != "":
+            sign_str += query_encdata
+        if body_encdata is not None and body_encdata != "":
+            sign_str += body_encdata
+
+        sign_str = bytes(sign_str, 'utf-8')
+        hash_key = bytes(hash_key, 'utf-8')
+
+        hash_value = hmac.new(hash_key, sign_str, hashlib.sha256)
+        return hash_value.hexdigest()
 
 class XTSharingDeviceRepository(DeviceRepository):
     def __init__(self, customer_api: CustomerApi, manager: XTSharingDeviceManager, multi_manager: MultiManager):
