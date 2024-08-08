@@ -175,14 +175,25 @@ class XTSharingCustomerApi(CustomerApi):
 
         self.refresh_access_token_if_need()
 
+        rid = str(uuid.uuid4())
+        sid = ""
+        md5 = hashlib.md5()
+        rid_refresh_token = rid + self.token_info.refresh_token
+        md5.update(rid_refresh_token.encode('utf-8'))
+        hash_key = md5.hexdigest()
+        secret = _secret_generating(rid, sid, hash_key)
+
         access_token = self.token_info.access_token if self.token_info else ""
-        sign, t = self._calculate_sign(method, path, params, body)
+        sign, t = self._calculate_sign(hash_key, method, path, params, body)
         headers = {
             "client_id": self.client_id,
             "sign": sign,
             "sign_method": "HMAC-SHA256",
             "access_token": access_token,
-            "t": str(t)
+            "t": str(t),
+            "lang": "en",
+            "X-requestId": rid,
+            "X-sid": sid,
         }
 
         LOGGER.debug(
@@ -212,6 +223,7 @@ class XTSharingCustomerApi(CustomerApi):
     
     def _calculate_sign(
         self,
+        hash_key: str,
         method: str,
         path: str,
         params: dict[str, Any] | None = None,
@@ -254,7 +266,7 @@ class XTSharingCustomerApi(CustomerApi):
         message += str(t) + str_to_sign
         sign = (
             hmac.new(
-                self.token_info.refresh_token.encode("utf8"),
+                hash_key.encode("utf8"),
                 msg=message.encode("utf8"),
                 digestmod=hashlib.sha256,
             )
