@@ -476,7 +476,7 @@ class TuyaSensorEntity(TuyaEntity, RestoreSensor):
     async def async_added_to_hass(self) -> None:
         """Call when entity about to be added to hass."""
         await super().async_added_to_hass()
-        if not self.entity_description.restoredata:
+        if not hasattr(self.entity_description, "restoredata") or not self.entity_description.restoredata:
             return
         state = await self.async_get_last_sensor_data()
         if state is None or state.native_value is None:
