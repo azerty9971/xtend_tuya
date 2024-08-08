@@ -42,6 +42,15 @@
   },
   "entity": {
     "binary_sensor": {
+      "off_bed": {
+        "name": "Out of bed"
+      },
+      "wakeup": {
+        "name": "Woken up"
+      },
+      "off": {
+        "name": "Off"
+      },
       "power": {
         "name": "Powered on and restarted successfully"
       },
@@ -649,6 +658,35 @@
       }
     },
     "sensor": {
+      "heart_rate":
+      {
+        "name": "Heart rate"
+      },
+      "respiratory_rate":
+      {
+        "name": "Respiratory rate"
+      },
+      "sleep_stage": {
+        "name": "Sleep stage",
+        "state": {
+          "sleep": "Sleep",
+          "awake": "Awake",
+          "0": "Sleep",
+          "1": "Awake"
+        }
+      },
+      "time_get_in_bed":
+      {
+        "name": "Time get in bed"
+      },
+      "off_bed_time":
+      {
+        "name": "Time get out of bed"
+      },
+      "clct_time":
+      {
+        "name": "CLCT time"
+      },
       "wnykq_ir_control":
       {
         "name": "IR control",
@@ -823,8 +861,6 @@
       "number": {
         "name": "Number"
       },
-
-      
       "battery": {
         "name": "Battery"
       },
