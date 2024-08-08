@@ -178,12 +178,11 @@ class XTSharingCustomerApi(CustomerApi):
         access_token = self.token_info.access_token if self.token_info else ""
         sign, t = self._calculate_sign(method, path, params, body)
         headers = {
-            "client_id": self.clie,
+            "client_id": self.client_id,
             "sign": sign,
             "sign_method": "HMAC-SHA256",
             "access_token": access_token,
-            "t": str(t),
-            "lang": self.lang,
+            "t": str(t)
         }
 
         LOGGER.debug(
