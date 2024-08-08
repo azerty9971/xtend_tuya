@@ -206,7 +206,7 @@ class XTSharingCustomerApi(CustomerApi):
             "client_id": self.client_id,
             "X-requestId": rid,
             "X-sid": sid,
-            "X-time": str(t),
+            "t": str(t),
         }
         if self.token_info is not None and len(self.token_info.access_token) > 0:
             headers["access_token"] = self.token_info.access_token
