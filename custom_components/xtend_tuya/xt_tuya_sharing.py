@@ -137,14 +137,9 @@ class XTSharingDeviceRepository(DeviceRepository):
 
     def update_device_specification(self, device: CustomerDevice):
         super().update_device_specification(device)
-        if device.id == "bfd373337fcd1752dbs9b4":
-            LOGGER.warning(f"update_device_specification: {device.status_range}")
 
     def update_device_strategy_info(self, device: CustomerDevice):
         super().update_device_strategy_info(device)
-        if device.id == "bfd373337fcd1752dbs9b4":
-            LOGGER.warning(f"update_device_strategy_info1 BEFORE: {device.status_range}")
-            LOGGER.warning(f"update_device_strategy_info2 BEFORE: {device.local_strategy}")
         
         if device.support_local:
             #Sometimes the Type provided by Tuya is ill formed,
@@ -183,8 +178,5 @@ class XTSharingDeviceRepository(DeviceRepository):
             except ValueError:
                 func.type = determine_property_type(func.type)
 
-
-        if device.id == "bfd373337fcd1752dbs9b4":
-            LOGGER.warning(f"update_device_strategy_info AFTER: {device.status_range}")
         self.multi_manager.apply_init_virtual_states(device)
         self.multi_manager.allow_virtual_devices_not_set_up(device)
