@@ -130,6 +130,11 @@ class XTSharingDeviceRepository(DeviceRepository):
         self.manager = manager
         self.multi_manager = multi_manager
 
+    def update_device_specification(self, device: CustomerDevice):
+        super().update_device_specification(device)
+        if device.id == "bfd373337fcd1752dbs9b4":
+            LOGGER.warning(f"update_device_specification: {device.status_range}")
+
     def update_device_strategy_info(self, device: CustomerDevice):
         super().update_device_strategy_info(device)
         for loc_strat in device.local_strategy.values():
