@@ -137,18 +137,20 @@ class XTSharingDeviceRepository(DeviceRepository):
 
     def update_device_strategy_info(self, device: CustomerDevice):
         super().update_device_strategy_info(device)
+        if device.id == "bfd373337fcd1752dbs9b4":
+            LOGGER.warning(f"update_device_strategy_info BEFORE: {device.status_range}")
         for loc_strat in device.local_strategy.values():
             if "statusCode" not in loc_strat or "valueType" not in loc_strat:
                 continue
             code = loc_strat["statusCode"]
             value_type = loc_strat["valueType"]
-            
+
             #Sometimes the Type provided by Tuya is ill formed,
             #replace it with the one from the local strategy
             if code in device.status_range:
-                device.status_range[code].type   = value_type
+                device.status_range[code].type = value_type
             if code in device.function:
-                device.function[code].type   = value_type
+                device.function[code].type     = value_type
 
             if (
                 "valueDesc"  in loc_strat and
@@ -159,5 +161,7 @@ class XTSharingDeviceRepository(DeviceRepository):
                 device.status_range[code].code   = code
                 device.status_range[code].type   = value_type
                 device.status_range[code].values = loc_strat["valueDesc"]
+        if device.id == "bfd373337fcd1752dbs9b4":
+            LOGGER.warning(f"update_device_strategy_info AFTER: {device.status_range}")
         self.multi_manager.apply_init_virtual_states(device)
         self.multi_manager.allow_virtual_devices_not_set_up(device)
