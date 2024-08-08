@@ -157,14 +157,114 @@ class XTSharingCustomerApi(CustomerApi):
         try:
             return super().get(path, params)
         except Exception:
-            return None
-            #return self._get2(path, params)
+            #return None
+            return self._get3(path, params)
     
+    def _get3(self, path: str, params: dict[str, Any] | None = None) -> dict[str, Any]:
+        return self.__request2("GET", path, params, None)
+
     def _get2(self, path: str, params: dict[str, Any] | None = None) -> dict[str, Any]:
         #try:
         return self.__request("GET", path, params, None)
         #except Exception:
         #    return None
+
+    def __request2(
+            self,
+            method: str,
+            path: str,
+            params: dict[str, Any] | None = None,
+            body: dict[str, Any] | None = None,
+    ) -> dict[str, Any] | None:
+
+        self.refresh_access_token_if_need()
+
+        rid = str(uuid.uuid4())
+        sid = ""
+        md5 = hashlib.md5()
+        rid_refresh_token = rid + self.token_info.refresh_token
+        md5.update(rid_refresh_token.encode('utf-8'))
+        hash_key = md5.hexdigest()
+        secret = _secret_generating(rid, sid, hash_key)
+
+        query_encdata = ""
+        if params is not None and len(params.keys()) > 0:
+            query_encdata = _form_to_json(params)
+            query_encdata = _aes_gcm_encrypt(query_encdata, secret)
+            params = {
+                "encdata": query_encdata
+            }
+            query_encdata = str(query_encdata, encoding="utf8")
+        body_encdata = ""
+        if body is not None and len(body.keys()) > 0:
+            body_encdata = _form_to_json(body)
+            body_encdata = _aes_gcm_encrypt(body_encdata, secret)
+            body = {
+                "encdata": str(body_encdata, encoding="utf8")
+            }
+            body_encdata = str(body_encdata, encoding="utf8")
+
+        t = int(time.time() * 1000)
+        headers = {
+            "X-appKey": self.client_id,
+            "X-requestId": rid,
+            "X-sid": sid,
+            "X-time": str(t),
+        }
+        if self.token_info is not None and len(self.token_info.access_token) > 0:
+            headers["X-token"] = self.token_info.access_token
+
+        sign = XTSharingCustomerApi._restful_sign(hash_key,
+                             query_encdata,
+                             body_encdata,
+                             headers)
+        headers["X-sign"] = sign
+
+        response = self.session.request(
+            method, self.endpoint + path, params=params, json=body, headers=headers
+        )
+
+        if response.ok is False:
+            LOGGER.error(
+                f"Response error: code={response.status_code}, content={response.content}"
+            )
+            return None
+
+        ret = response.json()
+        LOGGER.debug("response before decrypt ret = %s", ret)
+
+        if not ret.get("success"):
+            raise Exception(f"network error:({ret['code']}) {ret['msg']}")
+
+        result = _aex_gcm_decrypt(ret.get("result"), secret)
+        try:
+            ret["result"] = json.loads(result)
+        except json.decoder.JSONDecodeError:
+            ret["result"] = result
+
+        LOGGER.debug("response ret = %s", ret)
+        return ret
+
+    def _restful_sign(hash_key: str, query_encdata: str, body_encdata: str, data: dict[str, Any]) -> str:
+        headers = ["X-appKey", "X-requestId", "X-sid", "X-time", "X-token"]
+        header_sign_str = ""
+        for item in headers:
+            val = data.get(item, "")
+            if val != "":
+                header_sign_str += item + "=" + val + "||"
+
+        sign_str = header_sign_str[:-2]
+
+        if query_encdata is not None and query_encdata != "":
+            sign_str += query_encdata
+        if body_encdata is not None and body_encdata != "":
+            sign_str += body_encdata
+
+        sign_str = bytes(sign_str, 'utf-8')
+        hash_key = bytes(hash_key, 'utf-8')
+
+        hash_value = hmac.new(hash_key, sign_str, hashlib.sha256)
+        return hash_value.hexdigest()
 
     def __request(
             self,
@@ -288,7 +388,7 @@ class XTSharingDeviceRepository(DeviceRepository):
     def update_device_strategy_info(self, device: CustomerDevice):
         super().update_device_strategy_info(device)
         #response2 = self.api.get(f"/v2.0/cloud/thing/{device.id}/model")
-        response2 = self.api.get(f"/v1.0/m/life/devices/{device.id}/model")
+        response2 = self.api.get(f"/v2.0/cloud/thing/{device.id}/model")
         LOGGER.warning(response2)
         if device.support_local:
             #Sometimes the Type provided by Tuya is ill formed,
