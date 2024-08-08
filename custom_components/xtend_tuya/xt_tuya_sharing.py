@@ -218,10 +218,11 @@ class XTSharingCustomerApi(CustomerApi):
                              headers)
         headers["sign"] = sign
 
+        LOGGER.warning(f"QUERY : headers: {headers} <=> params: {params}")
+
         response = self.session.request(
             method, self.endpoint + path, params=params, json=body, headers=headers
         )
-        LOGGER.warning(f"RESPONSE : {response}")
 
         if response.ok is False:
             LOGGER.error(
@@ -230,7 +231,7 @@ class XTSharingCustomerApi(CustomerApi):
             return None
 
         ret = response.json()
-        LOGGER.debug("response before decrypt ret = %s", ret)
+        LOGGER.warning("response before decrypt ret = %s", ret)
 
         if not ret.get("success"):
             raise Exception(f"network error:({ret['code']}) {ret['msg']}")
