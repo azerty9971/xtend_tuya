@@ -33,9 +33,7 @@ from .multi_manager import (
     MultiManager,
 )
 
-from .util import (
-    determine_property_type,
-)
+from .base import TuyaEntity
 
 class XTSharingTokenListener(SharingTokenListener):
     """Token listener for upstream token updates."""
@@ -171,12 +169,12 @@ class XTSharingDeviceRepository(DeviceRepository):
             try:
                 DPType(status.type)
             except ValueError:
-                status.type = determine_property_type(status.type)
+                status.type = TuyaEntity.determine_dptype(status.type)
         for func in device.function.values():
             try:
                 DPType(func.type)
             except ValueError:
-                func.type = determine_property_type(func.type)
+                func.type = TuyaEntity.determine_dptype(func.type)
 
         self.multi_manager.apply_init_virtual_states(device)
         self.multi_manager.allow_virtual_devices_not_set_up(device)

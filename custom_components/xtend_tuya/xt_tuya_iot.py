@@ -27,9 +27,7 @@ from .shared_classes import (
 from .multi_manager import (
     MultiManager,  # noqa: F811
 )
-from .util import (
-    determine_property_type,
-)
+from .base import TuyaEntity
 
 class XTIOTHomeManager(TuyaHomeManager):
     def __init__(
@@ -179,7 +177,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                         dp_id = int(property["abilityId"])
                         code  = property["code"]
                         typeSpec = property["typeSpec"]
-                        real_type = determine_property_type(typeSpec["type"])
+                        real_type = TuyaEntity.determine_dptype(typeSpec["type"])
                         typeSpec.pop("type")
                         typeSpec_json = json.dumps(typeSpec)
                         if dp_id not in device_properties.local_strategy:
@@ -218,13 +216,12 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                 if "dp_id" in dp_property and "type" in dp_property:
                     code = dp_property["code"]
                     dp_type = dp_property.get("type",None)
-                    value = dp_property.get("value",None)
                     if dp_id not in device_properties.local_strategy:
                         if code in device_properties.function or code in device_properties.status_range:
                             property_update = False
                         else:
                             property_update = True
-                        real_type = determine_property_type(dp_type, value)
+                        real_type = TuyaEntity.determine_dptype(dp_type)
                         device_properties.local_strategy[dp_id] = {
                             "status_code": code,
                             "config_item": {

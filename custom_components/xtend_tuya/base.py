@@ -267,9 +267,23 @@ class TuyaEntity(Entity):
                 try:
                     return DPType(getattr(self.device, key)[dpcode].type)
                 except ValueError:
-                    LOGGER.warning(f"DPType for {self.device.name} FAILED => {dpcode}")
-                    return None
+                    return TuyaEntity.determine_dptype(getattr(self.device, key)[dpcode].type)
 
+        return None
+    
+    def determine_dptype(type) -> DPType | None:
+        if type == "value":
+            return DPType(DPType.INTEGER)
+        if type == "bitmap" or type == "raw":
+            return DPType(DPType.RAW)
+        if type == "enum":
+            return DPType(DPType.ENUM)
+        if type == "bool":
+            return DPType(DPType.BOOLEAN)
+        if type == "json":
+            return DPType(DPType.JSON)
+        if type == "string":
+            return DPType(DPType.STRING)
         return None
 
     async def async_added_to_hass(self) -> None:
