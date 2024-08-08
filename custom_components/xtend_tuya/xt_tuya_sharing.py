@@ -220,6 +220,7 @@ class XTSharingCustomerApi(CustomerApi):
         response = self.session.request(
             method, self.endpoint + path, params=params, json=body, headers=headers
         )
+        LOGGER.warning(f"RESPONSE : {response}")
 
         if response.ok is False:
             LOGGER.error(
