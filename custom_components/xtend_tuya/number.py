@@ -16,6 +16,9 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.components.tuya.number import (
     NUMBERS as NUMBERS_TUYA
 )
+from homeassistant.components.number.const import (
+    NumberMode,
+)
 from .util import (
     merge_device_descriptors
 )
@@ -79,6 +82,25 @@ NUMBERS: dict[str, tuple[NumberEntityDescription, ...]] = {
         NumberEntityDescription(
             key=DPCode.DEO_END_TIME,
             translation_key="deo_end_time",
+            entity_category=EntityCategory.CONFIG,
+        ),
+    ),
+    "wnykq": (
+        NumberEntityDescription(
+            key=DPCode.BRIGHT_VALUE,
+            translation_key="bright_value",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        NumberEntityDescription(
+            key=DPCode.HUMIDITY_CALIBRATION,
+            translation_key="humidity_calibration",
+            mode = NumberMode.SLIDER,
+            entity_category=EntityCategory.CONFIG,
+        ),
+        NumberEntityDescription(
+            key=DPCode.TEMP_CALIBRATION,
+            translation_key="temp_calibration",
+            mode = NumberMode.SLIDER,
             entity_category=EntityCategory.CONFIG,
         ),
     ),

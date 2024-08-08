@@ -12,6 +12,10 @@ from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity import Entity
 
+from homeassistant.components.tuya.const import (
+    DPCode as DPCode_tuya
+)
+
 from .const import DOMAIN, TUYA_HA_SIGNAL_UPDATE_ENTITY, DPCode, DPType, LOGGER
 from .util import remap_value
 from .multi_manager import MultiManager, XTDevice
@@ -196,7 +200,10 @@ class TuyaEntity(Entity):
             return None
 
         if isinstance(dpcodes, str):
-            dpcodes = (DPCode(dpcodes),)
+            try:
+                dpcodes = (DPCode(dpcodes),)
+            except ValueError:
+                dpcodes = (DPCode_tuya(dpcodes),)
         elif not isinstance(dpcodes, tuple):
             dpcodes = (dpcodes,)
 
@@ -257,7 +264,11 @@ class TuyaEntity(Entity):
             order = ["function", "status_range"]
         for key in order:
             if dpcode in getattr(self.device, key):
-                return DPType(getattr(self.device, key)[dpcode].type)
+                try:
+                    return DPType(getattr(self.device, key)[dpcode].type)
+                except ValueError:
+                    LOGGER.warning(f"DPType for {self.device.name} FAILED => {dpcode}")
+                    return None
 
         return None
 
