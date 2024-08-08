@@ -140,6 +140,7 @@ class XTSharingDeviceManager(Manager):
 
 class XTSharingCustomerApi(CustomerApi):
     def __init__(self, *args):
+        self.other_api = None
         if len(args) == 1:
             #From a CustomerAPI
             other_api: CustomerApi = args[0]
@@ -150,6 +151,7 @@ class XTSharingCustomerApi(CustomerApi):
             self.endpoint = other_api.endpoint
             self.refresh_token = other_api.refresh_token
             self.token_listener = other_api.token_listener
+            self.other_api = other_api
         elif len(args) == 5:
             super().__init__(args[0], args[1], args[2], args[3], args[4])
 
@@ -158,6 +160,13 @@ class XTSharingCustomerApi(CustomerApi):
             return super().get(path, params)
         except Exception:
             #return None
+            if self.other_api:
+                self.token_info     = self.other_api.token_info
+                self.client_id      = self.other_api.client_id
+                self.user_code      = self.other_api.user_code
+                self.endpoint       = self.other_api.endpoint
+                self.refresh_token  = self.other_api.refresh_token
+                self.token_listener = self.other_api.token_listener
             return self._get3(path, params)
     
     def _get3(self, path: str, params: dict[str, Any] | None = None) -> dict[str, Any]:
@@ -210,6 +219,7 @@ class XTSharingCustomerApi(CustomerApi):
             "request_id": rid,
             "sid": sid,
             "t": str(t),
+            "sign_method": "HMAC-SHA256"
         }
         if self.token_info is not None and len(self.token_info.access_token) > 0:
             headers["access_token"] = self.token_info.access_token
