@@ -353,7 +353,6 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
         TuyaSensorEntityDescription(
             key=DPCode.SLEEP_STAGE,
             translation_key="sleep_stage",
-            state_class=SensorStateClass.MEASUREMENT,
             entity_registry_enabled_default=True,
         ),
         TuyaSensorEntityDescription(
@@ -379,7 +378,6 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
         TuyaSensorEntityDescription(
             key=DPCode.IR_CONTROL,
             translation_key="wnykq_ir_control",
-            state_class=SensorStateClass.MEASUREMENT,
             entity_registry_enabled_default=True,
         ),
         *TEMPERATURE_SENSORS,
