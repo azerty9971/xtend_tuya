@@ -5,6 +5,11 @@ This file contains all the code that inherit from Tuya integration
 from __future__ import annotations
 from typing import Any
 
+import uuid
+import hashlib
+import time
+import json
+
 from homeassistant.core import HomeAssistant, callback
 
 from tuya_sharing.manager import (
@@ -13,6 +18,11 @@ from tuya_sharing.manager import (
 from tuya_sharing.customerapi import (
     CustomerApi,
     SharingTokenListener,
+    _secret_generating,
+    _form_to_json,
+    _aes_gcm_encrypt,
+    _restful_sign,
+    _aex_gcm_decrypt
 )
 from tuya_sharing.home import (
     SmartLifeHome,
@@ -127,9 +137,98 @@ class XTSharingDeviceManager(Manager):
             return
         super().send_commands(device_id, commands)
 
+class XTCustomerApi(CustomerApi):
+    def get(self, path: str, params: dict[str, Any] | None = None) -> dict[str, Any]:
+        try:
+            return super().get(path, params)
+        except Exception:
+            return self._get2(path, params)
+    
+    def _get2(self, path: str, params: dict[str, Any] | None = None) -> dict[str, Any]:
+        try:
+            return self.__request("GET", path, params, None)
+        except Exception:
+            return None
+
+    def __request(
+            self,
+            method: str,
+            path: str,
+            params: dict[str, Any] | None = None,
+            body: dict[str, Any] | None = None,
+    ) -> dict[str, Any] | None:
+
+        self.refresh_access_token_if_need()
+
+        rid = str(uuid.uuid4())
+        sid = ""
+        md5 = hashlib.md5()
+        rid_refresh_token = rid + self.token_info.refresh_token
+        md5.update(rid_refresh_token.encode('utf-8'))
+        hash_key = md5.hexdigest()
+        secret = _secret_generating(rid, sid, hash_key)
+
+        query_encdata = ""
+        if params is not None and len(params.keys()) > 0:
+            query_encdata = _form_to_json(params)
+            query_encdata = _aes_gcm_encrypt(query_encdata, secret)
+            params = {
+                "encdata": query_encdata
+            }
+            query_encdata = str(query_encdata, encoding="utf8")
+        body_encdata = ""
+        if body is not None and len(body.keys()) > 0:
+            body_encdata = _form_to_json(body)
+            body_encdata = _aes_gcm_encrypt(body_encdata, secret)
+            body = {
+                "encdata": str(body_encdata, encoding="utf8")
+            }
+            body_encdata = str(body_encdata, encoding="utf8")
+
+        t = int(time.time() * 1000)
+        headers = {
+            "client_id": self.client_id,
+            "X-requestId": rid,
+            "X-sid": sid,
+            "X-time": str(t),
+        }
+        if self.token_info is not None and len(self.token_info.access_token) > 0:
+            headers["access_token"] = self.token_info.access_token
+
+        sign = _restful_sign(hash_key,
+                             query_encdata,
+                             body_encdata,
+                             headers)
+        headers["sign"] = sign
+
+        response = self.session.request(
+            method, self.endpoint + path, params=params, json=body, headers=headers
+        )
+
+        if response.ok is False:
+            LOGGER.error(
+                f"Response error: code={response.status_code}, content={response.content}"
+            )
+            return None
+
+        ret = response.json()
+        LOGGER.debug("response before decrypt ret = %s", ret)
+
+        if not ret.get("success"):
+            raise Exception(f"network error:({ret['code']}) {ret['msg']}")
+
+        result = _aex_gcm_decrypt(ret.get("result"), secret)
+        try:
+            ret["result"] = json.loads(result)
+        except json.decoder.JSONDecodeError:
+            ret["result"] = result
+
+        LOGGER.debug("response ret = %s", ret)
+        return ret
+
 class XTSharingDeviceRepository(DeviceRepository):
     def __init__(self, customer_api: CustomerApi, manager: XTSharingDeviceManager, multi_manager: MultiManager):
-        super().__init__(customer_api)
+        super().__init__(XTCustomerApi(customer_api))
         self.manager = manager
         self.multi_manager = multi_manager
 
