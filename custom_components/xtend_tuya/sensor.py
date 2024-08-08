@@ -115,6 +115,12 @@ TEMPERATURE_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
         entity_registry_enabled_default=True,
     ),
     TuyaSensorEntityDescription(
+        key=DPCode.TEMP_CURRENT,
+        translation_key="temperature",
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_registry_enabled_default=True,
+    ),
+    TuyaSensorEntityDescription(
         key=DPCode.TEMP_VALUE,
         translation_key="temperature",
         state_class=SensorStateClass.MEASUREMENT,
