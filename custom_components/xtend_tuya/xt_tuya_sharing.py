@@ -144,7 +144,7 @@ class XTSharingCustomerApi(CustomerApi):
         if len(args) == 1:
             #From a CustomerAPI
             other_api: CustomerApi = args[0]
-            self.session = requests.session()
+            self.session = other_api.session
             self.token_info = other_api.token_info
             self.client_id = other_api.client_id
             self.user_code = other_api.user_code
