@@ -161,10 +161,10 @@ class XTSharingCustomerApi(CustomerApi):
             return self._get2(path, params)
     
     def _get2(self, path: str, params: dict[str, Any] | None = None) -> dict[str, Any]:
-        try:
-            return self.__request("GET", path, params, None)
-        except Exception:
-            return None
+        #try:
+        return self.__request("GET", path, params, None)
+        #except Exception:
+        #    return None
 
     def __request(
             self,
