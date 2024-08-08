@@ -286,6 +286,7 @@ class DPCode(StrEnum):
     HISTORY = "History"
     HUMIDIFIER = "humidifier"  # Humidification
     HUMIDITY = "humidity"  # Humidity
+    HUMIDITY_CALIBRATION = "humidity_calibration"
     HUMIDITY_CURRENT = "humidity_current"  # Current humidity
     HUMIDITY_INDOOR = "humidity_indoor"  # Indoor humidity
     HUMIDITY_SET = "humidity_set"  # Humidity setting
@@ -295,6 +296,7 @@ class DPCode(StrEnum):
     INDUCTION_DELAY = "induction_delay"
     INDUCTION_INTERVAL = "induction_interval"
     IPC_WORK_MODE = "ipc_work_mode"
+    IR_CONTROL = "ir_control"
     KILL = "kill"
     LED_TYPE_1 = "led_type_1"
     LED_TYPE_2 = "led_type_2"
@@ -351,6 +353,7 @@ class DPCode(StrEnum):
     POSITION = "position"
     POWDER_SET = "powder_set"  # Powder
     POWER = "power"
+    POWERON = "poweron"
     POWER_GO = "power_go"
     PRESENCE_STATE = "presence_state"
     PRESSURE_STATE = "pressure_state"
@@ -439,6 +442,7 @@ class DPCode(StrEnum):
     TEMP_ADC = "temp_adc"
     TEMP_BOILING_C = "temp_boiling_c"
     TEMP_BOILING_F = "temp_boiling_f"
+    TEMP_CALIBRATION = "temp_calibration"
     TEMP_CONTROLLER = "temp_controller"
     TEMP_CURRENT = "temp_current"  # Current temperature in °C
     TEMP_CURRENT_F = "temp_current_f"  # Current temperature in °F
