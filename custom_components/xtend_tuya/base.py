@@ -264,7 +264,11 @@ class TuyaEntity(Entity):
             order = ["function", "status_range"]
         for key in order:
             if dpcode in getattr(self.device, key):
-                return DPType(getattr(self.device, key)[dpcode].type)
+                try:
+                    return DPType(getattr(self.device, key)[dpcode].type)
+                except ValueError:
+                    LOGGER.warning(f"DPType for {self.device.name} FAILED => {dpcode}")
+                    return None
 
         return None
 
