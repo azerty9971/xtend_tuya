@@ -93,6 +93,7 @@ from .xt_tuya_sharing import (
     XTSharingDeviceManager,
     XTSharingTokenListener,
     XTSharingDeviceRepository,
+    XTSharingCustomerApi,
 )
 from .xt_tuya_iot import (
     XTIOTDeviceManager,
