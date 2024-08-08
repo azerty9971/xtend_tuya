@@ -211,6 +211,7 @@ class DPCode(StrEnum):
     CLOUD_RECIPE_NUMBER = "cloud_recipe_number"
     CLOSED_OPENED = "closed_opened"
     CLOSED_OPENED_KIT = "closed_opened_kit"
+    CLCT_TIME = "clct_time"
     CO_STATE = "co_state"
     CO_STATUS = "co_status"
     CO_VALUE = "co_value"
@@ -283,6 +284,7 @@ class DPCode(StrEnum):
     GAS_SENSOR_STATE = "gas_sensor_state"
     GAS_SENSOR_STATUS = "gas_sensor_status"
     GAS_SENSOR_VALUE = "gas_sensor_value"
+    HEART_RATE = "heart_rate"
     HISTORY = "History"
     HUMIDIFIER = "humidifier"  # Humidification
     HUMIDITY = "humidity"  # Humidity
@@ -330,6 +332,9 @@ class DPCode(StrEnum):
     NOT_DISTURB_SWITCH = "not_disturb_Switch"
     NUMBER = "number"
     ODOURLESS = "odourless"
+    OFF = "off"
+    OFF_BED = "off_bed"
+    OFF_BED_TIME = "off_bed_time"
     OPPOSITE = "opposite"
     OXYGEN = "oxygen"  # Oxygen bar
     PAUSE = "pause"
@@ -373,6 +378,7 @@ class DPCode(StrEnum):
     RESET_FILTER = "reset_filter"
     RESET_MAP = "reset_map"
     RESET_ROLL_BRUSH = "reset_roll_brush"
+    RESPIRATORY_RATE = "respiratory_rate"
     ROLL_BRUSH = "roll_brush"
     RTC_TIME = "rtc_time"
     SAND_SURFACE_CALIBRATION = "sand_surface_calibration"
@@ -386,8 +392,9 @@ class DPCode(StrEnum):
     SITUATION_SET = "situation_set"
     SLEEP = "sleep"  # Sleep function
     SLEEPING = "sleeping"
-    SLEEP_START_TIME = "sleep_start_time"
     SLEEP_END_TIME = "sleep_end_time"
+    SLEEP_STAGE = "sleep_stage"
+    SLEEP_START_TIME = "sleep_start_time"
     SLOW_FEED = "slow_feed"
     SMART_CLEAN = "smart_clean"
     SMOKE_SENSOR_STATE = "smoke_sensor_state"
@@ -454,6 +461,7 @@ class DPCode(StrEnum):
     TEMP_VALUE_V2 = "temp_value_v2"
     TIME_TOTAL = "time_total"
     TOILET_NOTICE = "toilet_notice"
+    TIME_GET_IN_BED = "time_get_in_bed"
     TIME_USE = "time_use"  # Total seconds of irrigation
     TOTAL_CLEAN_AREA = "total_clean_area"
     TOTAL_CLEAN_COUNT = "total_clean_count"
@@ -478,6 +486,7 @@ class DPCode(StrEnum):
     VOICE_SWITCH = "voice_switch"
     VOICE_TIMES = "voice_times"
     VOLUME_SET = "volume_set"
+    WAKEUP = "wakeup"
     WARM = "warm"  # Heat preservation
     WARM_TIME = "warm_time"  # Heat preservation time
     WATER = "water"

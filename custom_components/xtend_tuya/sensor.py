@@ -115,6 +115,12 @@ TEMPERATURE_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
         entity_registry_enabled_default=True,
     ),
     TuyaSensorEntityDescription(
+        key=DPCode.TEMP_CURRENT,
+        translation_key="temperature",
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_registry_enabled_default=True,
+    ),
+    TuyaSensorEntityDescription(
         key=DPCode.TEMP_VALUE,
         translation_key="temperature",
         state_class=SensorStateClass.MEASUREMENT,
@@ -330,6 +336,44 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
             entity_registry_enabled_default=False,
         ),
         *TEMPERATURE_SENSORS,
+    ),
+    "smd": (
+        TuyaSensorEntityDescription(
+            key=DPCode.HEART_RATE,
+            translation_key="heart_rate",
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_registry_enabled_default=True,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.RESPIRATORY_RATE,
+            translation_key="respiratory_rate",
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_registry_enabled_default=True,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.SLEEP_STAGE,
+            translation_key="sleep_stage",
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_registry_enabled_default=True,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.TIME_GET_IN_BED,
+            translation_key="time_get_in_bed",
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_registry_enabled_default=True,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.OFF_BED_TIME,
+            translation_key="off_bed_time",
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_registry_enabled_default=True,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.CLCT_TIME,
+            translation_key="clct_time",
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_registry_enabled_default=False,
+        ),
     ),
     "wnykq": (
         TuyaSensorEntityDescription(

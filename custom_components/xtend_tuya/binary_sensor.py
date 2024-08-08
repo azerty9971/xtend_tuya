@@ -73,6 +73,20 @@ BINARY_SENSORS: dict[str, tuple[TuyaBinarySensorEntityDescription, ...]] = {
             entity_registry_enabled_default=False,
         ),
     ),
+    "smd": (
+        TuyaBinarySensorEntityDescription(
+            key=DPCode.OFF_BED,
+            translation_key="off_bed",
+        ),
+        TuyaBinarySensorEntityDescription(
+            key=DPCode.WAKEUP,
+            translation_key="wakeup",
+        ),
+        TuyaBinarySensorEntityDescription(
+            key=DPCode.OFF,
+            translation_key="off",
+        ),
+    ),
 }
 
 
