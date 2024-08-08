@@ -175,49 +175,24 @@ class XTSharingCustomerApi(CustomerApi):
 
         self.refresh_access_token_if_need()
 
-        rid = str(uuid.uuid4())
-        sid = ""
-        md5 = hashlib.md5()
-        rid_refresh_token = rid + self.token_info.refresh_token
-        md5.update(rid_refresh_token.encode('utf-8'))
-        hash_key = md5.hexdigest()
-        secret = _secret_generating(rid, sid, hash_key)
-
-        query_encdata = ""
-        if params is not None and len(params.keys()) > 0:
-            query_encdata = _form_to_json(params)
-            query_encdata = _aes_gcm_encrypt(query_encdata, secret)
-            params = {
-                "encdata": query_encdata
-            }
-            query_encdata = str(query_encdata, encoding="utf8")
-        body_encdata = ""
-        if body is not None and len(body.keys()) > 0:
-            body_encdata = _form_to_json(body)
-            body_encdata = _aes_gcm_encrypt(body_encdata, secret)
-            body = {
-                "encdata": str(body_encdata, encoding="utf8")
-            }
-            body_encdata = str(body_encdata, encoding="utf8")
-
-        t = int(time.time() * 1000)
+        access_token = self.token_info.access_token if self.token_info else ""
+        sign, t = self._calculate_sign(method, path, params, body)
         headers = {
-            "client_id": self.client_id,
-            "t": str(t),
+            "client_id": self.clie,
+            "sign": sign,
             "sign_method": "HMAC-SHA256",
-            "mode": "cors",
-            "Content-Type": "application/json"
+            "access_token": access_token,
+            "t": str(t),
+            "lang": self.lang,
         }
-        if self.token_info is not None and len(self.token_info.access_token) > 0:
-            headers["access_token"] = self.token_info.access_token
 
-        sign = XTSharingCustomerApi._restful_sign(  hash_key,
-                                                    query_encdata,
-                                                    body_encdata,
-                                                    headers)
-        headers["sign"] = sign
-
-        LOGGER.warning(f"QUERY : headers: {headers} <=> params: {params}")
+        LOGGER.debug(
+            f"Request: method = {method}, \
+                url = {self.endpoint + path},\
+                params = {params},\
+                body = {body},\
+                t = {int(time.time()*1000)}"
+        )
 
         response = self.session.request(
             method, self.endpoint + path, params=params, json=body, headers=headers
@@ -225,45 +200,69 @@ class XTSharingCustomerApi(CustomerApi):
 
         if response.ok is False:
             LOGGER.error(
-                f"Response error: code={response.status_code}, content={response.content}"
+                f"Response error: code={response.status_code}, body={response.body}"
             )
             return None
 
-        ret = response.json()
-        LOGGER.warning("response before decrypt ret = %s", ret)
+        result = response.json()
 
-        if not ret.get("success"):
-            raise Exception(f"network error:({ret['code']}) {ret['msg']}")
-
-        result = _aex_gcm_decrypt(ret.get("result"), secret)
-        try:
-            ret["result"] = json.loads(result)
-        except json.decoder.JSONDecodeError:
-            ret["result"] = result
-
-        LOGGER.debug("response ret = %s", ret)
-        return ret
+        LOGGER.warning(
+            f"Response: {json.dumps(result, ensure_ascii=False, indent=2)}"
+        )
+        return result
     
-    def _restful_sign(hash_key: str, query_encdata: str, body_encdata: str, data: dict[str, Any]) -> str:
-        headers = ["client_id", "t", "access_token"]
-        header_sign_str = ""
-        for item in headers:
-            val = data.get(item, "")
-            if val != "":
-                header_sign_str += item + "=" + val + "||"
+    def _calculate_sign(
+        self,
+        method: str,
+        path: str,
+        params: dict[str, Any] | None = None,
+        body: dict[str, Any] | None = None,
+    ) -> tuple[str, int]:
 
-        sign_str = header_sign_str[:-2]
+        # HTTPMethod
+        str_to_sign = method
+        str_to_sign += "\n"
 
-        if query_encdata is not None and query_encdata != "":
-            sign_str += query_encdata
-        if body_encdata is not None and body_encdata != "":
-            sign_str += body_encdata
+        # Content-SHA256
+        content_to_sha256 = (
+            "" if body is None or len(body.keys()) == 0 else json.dumps(body)
+        )
 
-        sign_str = bytes(sign_str, 'utf-8')
-        hash_key = bytes(hash_key, 'utf-8')
+        str_to_sign += (
+            hashlib.sha256(content_to_sha256.encode("utf8")).hexdigest().lower()
+        )
+        str_to_sign += "\n"
 
-        hash_value = hmac.new(hash_key, sign_str, hashlib.sha256)
-        return hash_value.hexdigest()
+        # Header
+        str_to_sign += "\n"
+
+        # URL
+        str_to_sign += path
+
+        if params is not None and len(params.keys()) > 0:
+            str_to_sign += "?"
+
+            params_keys = sorted(params.keys())
+            query_builder = "".join(f"{key}={params[key]}&" for key in params_keys)
+            str_to_sign += query_builder[:-1]
+
+        # Sign
+        t = int(time.time() * 1000)
+
+        message = self.client_id
+        if self.token_info is not None:
+            message += self.token_info.access_token
+        message += str(t) + str_to_sign
+        sign = (
+            hmac.new(
+                self.token_info.refresh_token.encode("utf8"),
+                msg=message.encode("utf8"),
+                digestmod=hashlib.sha256,
+            )
+            .hexdigest()
+            .upper()
+        )
+        return sign, t
 
 class XTSharingDeviceRepository(DeviceRepository):
     def __init__(self, customer_api: CustomerApi, manager: XTSharingDeviceManager, multi_manager: MultiManager):
