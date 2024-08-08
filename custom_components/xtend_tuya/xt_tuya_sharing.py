@@ -167,7 +167,7 @@ class XTSharingCustomerApi(CustomerApi):
                 self.endpoint       = self.other_api.endpoint
                 self.refresh_token  = self.other_api.refresh_token
                 self.token_listener = self.other_api.token_listener
-            return self._get3(path, params)
+            return self._get2(path, params)
     
     def _get3(self, path: str, params: dict[str, Any] | None = None) -> dict[str, Any]:
         return self.__request2("GET", path, params, None)
@@ -388,7 +388,7 @@ class XTSharingCustomerApi(CustomerApi):
 
 class XTSharingDeviceRepository(DeviceRepository):
     def __init__(self, customer_api: CustomerApi, manager: XTSharingDeviceManager, multi_manager: MultiManager):
-        super().__init__(XTSharingCustomerApi(customer_api))
+        super().__init__(customer_api)
         self.manager = manager
         self.multi_manager = multi_manager
 
