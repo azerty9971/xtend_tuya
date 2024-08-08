@@ -207,6 +207,7 @@ class XTSharingCustomerApi(CustomerApi):
             "X-requestId": rid,
             "X-sid": sid,
             "t": str(t),
+            "sign_method": "HMAC-SHA256"
         }
         if self.token_info is not None and len(self.token_info.access_token) > 0:
             headers["access_token"] = self.token_info.access_token
