@@ -9,6 +9,7 @@ import uuid
 import hashlib
 import time
 import json
+import requests
 
 from homeassistant.core import HomeAssistant, callback
 
@@ -17,6 +18,7 @@ from tuya_sharing.manager import (
 )
 from tuya_sharing.customerapi import (
     CustomerApi,
+    CustomerTokenInfo,
     SharingTokenListener,
     _secret_generating,
     _form_to_json,
@@ -137,7 +139,21 @@ class XTSharingDeviceManager(Manager):
             return
         super().send_commands(device_id, commands)
 
-class XTCustomerApi(CustomerApi):
+class XTSharingCustomerApi(CustomerApi):
+    def __init__(self, *args):
+        if len(args) == 1:
+            #From a CustomerAPI
+            other_api: CustomerApi = args[0]
+            self.session = requests.session()
+            self.token_info = other_api.token_info
+            self.client_id = other_api.client_id
+            self.user_code = other_api.user_code
+            self.endpoint = other_api.end_point
+            self.refresh_token = other_api.refresh_token
+            self.token_listener = other_api.listener
+        elif len(args) == 5:
+            super().__init__(args[0], args[1], args[2], args[3], args[4])
+
     def get(self, path: str, params: dict[str, Any] | None = None) -> dict[str, Any]:
         try:
             return super().get(path, params)
@@ -228,7 +244,7 @@ class XTCustomerApi(CustomerApi):
 
 class XTSharingDeviceRepository(DeviceRepository):
     def __init__(self, customer_api: CustomerApi, manager: XTSharingDeviceManager, multi_manager: MultiManager):
-        super().__init__(XTCustomerApi(customer_api))
+        super().__init__(XTSharingCustomerApi(customer_api))
         self.manager = manager
         self.multi_manager = multi_manager
 
