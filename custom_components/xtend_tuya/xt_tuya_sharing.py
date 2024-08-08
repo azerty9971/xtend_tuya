@@ -398,8 +398,8 @@ class XTSharingDeviceRepository(DeviceRepository):
     def update_device_strategy_info(self, device: CustomerDevice):
         super().update_device_strategy_info(device)
         #response2 = self.api.get(f"/v2.0/cloud/thing/{device.id}/model")
-        response2 = self.api.get(f"/v2.0/cloud/thing/{device.id}/model")
-        LOGGER.warning(response2)
+        """response2 = self.api.get(f"/v2.0/cloud/thing/{device.id}/model")
+        LOGGER.warning(response2)"""
         if device.support_local:
             #Sometimes the Type provided by Tuya is ill formed,
             #replace it with the one from the local strategy
