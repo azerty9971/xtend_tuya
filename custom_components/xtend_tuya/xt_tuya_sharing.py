@@ -170,7 +170,7 @@ class XTSharingCustomerApi(CustomerApi):
             return self._get2(path, params)
     
     def get2(self, path: str, params: dict[str, Any] | None = None) -> dict[str, Any]:
-        return self._get2(path, params)
+        return self._get3(path, params)
 
     def _get3(self, path: str, params: dict[str, Any] | None = None) -> dict[str, Any]:
         return self.__request2("GET", path, params, None)
@@ -191,7 +191,7 @@ class XTSharingCustomerApi(CustomerApi):
 
         self.refresh_access_token_if_need()
 
-        rid = str(uuid.uuid4())
+        rid = "" #str(uuid.uuid4())
         sid = ""
         md5 = hashlib.md5()
         rid_refresh_token = rid + self.token_info.refresh_token
