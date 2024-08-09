@@ -10,6 +10,7 @@ The reason why this is not merged in the main Tuya integration is that the way t
 
 # Supported operation modes
 This integration supports different operating modes:<br/>
+- Regular Tuya integration (RT) (without XT or the cloud)<br/>
 - Standalone without cloud credentials (ST) (use XT instead of the regular Tuya integration)<br/>
 - Standalone with cloud credentials (ST+Cloud)<br/>
 - Alongside Tuya without cloud credentials(TU) (use XT alongside the regular Tuya integration)<br/>
@@ -17,11 +18,15 @@ This integration supports different operating modes:<br/>
 <br/>
 The table below shows the different functionnalities of each operating mode<br/>
 
-| Functionnality          | ST  | ST+Cloud | TU  | TU+Cloud | Remarks                                                            |
-| :---------------------- | :-: | :------: | :-: | :------: | :----------------------------------------------------------------- |
-| All supported entities  |     | X        |     |          | TU+Cloud is close but in some rare cases entitites will be missing |
-| Multiple account support| X   | X        | X   | X        | Only for multiple accounts in XT, not the regular Tuya integration |
-| Shared device support   |     | X        |     | X        |                                                                    |
+| Functionnality                  | RT  | ST  | ST+Cloud | TU  | TU+Cloud | Remarks                                                            |
+| :------------------------------ | :-: | :-: | :------: | :-: | :------: | :----------------------------------------------------------------- |
+| Regular Tuya entities           | X   | X   | X        | X   | X        |                                                                    |
+| Additional supported entities   |     | X   | X        | X   | X        |                                                                    |
+| All possible supported entities |     |     | X        |     |          | TU+Cloud is close but in some rare cases entitites will be missing |
+| Autocorrection of some entities |     |     | X        |     |          | ST + Cloud uses multiple source to determine the entity props      |
+| Multiple account support        |     | X   | X        | X   | X        | Only for multiple accounts in XT, not the regular Tuya integration |
+| Shared device support           |     |     | X        |     | X        |                                                                    |
+| Shared home support             | X   | X   | X        | X   | X        |                                                                    |
 
 
 # Installation
