@@ -169,6 +169,9 @@ class XTSharingCustomerApi(CustomerApi):
                 self.token_listener = self.other_api.token_listener
             return self._get2(path, params)
     
+    def get2(self, path: str, params: dict[str, Any] | None = None) -> dict[str, Any]:
+        return self._get2(path, params)
+
     def _get3(self, path: str, params: dict[str, Any] | None = None) -> dict[str, Any]:
         return self.__request2("GET", path, params, None)
 
@@ -398,8 +401,8 @@ class XTSharingDeviceRepository(DeviceRepository):
     def update_device_strategy_info(self, device: CustomerDevice):
         super().update_device_strategy_info(device)
         #response2 = self.api.get(f"/v2.0/cloud/thing/{device.id}/model")
-        """response2 = self.api.get(f"/v2.0/cloud/thing/{device.id}/model")
-        LOGGER.warning(response2)"""
+        response2 = self.api.get2(f"/v2.0/cloud/thing/{device.id}/model")
+        LOGGER.warning(response2)
         if device.support_local:
             #Sometimes the Type provided by Tuya is ill formed,
             #replace it with the one from the local strategy
