@@ -59,15 +59,15 @@ BATTERY_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
 #Commonlu sed energy sensors, that are re-used in the sensors down below.
 CONSUMPTION_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
     TuyaSensorEntityDescription(
-            key=DPCode.ADD_ELE,
-            virtual_state=VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME | VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD,
-            vs_copy_to_state=[DPCode.ADD_ELE2],
-            translation_key="add_ele",
-            device_class=SensorDeviceClass.ENERGY,
-            state_class=SensorStateClass.TOTAL_INCREASING,
-            native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
-            entity_registry_enabled_default=True,
-            restoredata=True,
+        key=DPCode.ADD_ELE,
+        virtual_state=VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME | VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD,
+        vs_copy_to_state=[DPCode.ADD_ELE2],
+        translation_key="add_ele",
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        entity_registry_enabled_default=True,
+        restoredata=True,
     ),
     TuyaSensorEntityDescription(
         key=DPCode.ADD_ELE2,
@@ -104,6 +104,13 @@ CONSUMPTION_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         entity_registry_enabled_default=True,
         restoredata=False,
+    ),
+    TuyaSensorEntityDescription(
+        key=DPCode.CUR_POWER,
+        translation_key="power",
+        device_class=SensorDeviceClass.POWER,
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_registry_enabled_default=True,
     ),
 )
 
