@@ -286,7 +286,7 @@ class XTSharingCustomerApi(CustomerApi):
 
         self.refresh_access_token_if_need()
 
-        rid = str(uuid.uuid4())
+        rid = "" #str(uuid.uuid4())
         sid = ""
         md5 = hashlib.md5()
         rid_refresh_token = rid + self.token_info.refresh_token
@@ -388,7 +388,7 @@ class XTSharingCustomerApi(CustomerApi):
 
 class XTSharingDeviceRepository(DeviceRepository):
     def __init__(self, customer_api: CustomerApi, manager: XTSharingDeviceManager, multi_manager: MultiManager):
-        super().__init__(customer_api)
+        super().__init__(XTSharingCustomerApi(customer_api))
         self.manager = manager
         self.multi_manager = multi_manager
 
