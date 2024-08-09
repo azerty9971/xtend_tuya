@@ -624,9 +624,18 @@ class MultiManager:  # noqa: F811
     def get_allowed_source(self, dev_id: str, original_source: str) -> str | None:
         if dev_id.startswith("vdevo"):
             return MESSAGE_SOURCE_TUYA_IOT
+        in_iot = False
         if self.iot_account and dev_id in self.iot_account.device_ids:
+            in_iot = True
+        in_sharing = False
+        if self.sharing_account and dev_id in self.sharing_account.device_ids:
+            in_sharing = True
+
+        if in_iot and in_sharing:
+            return MESSAGE_SOURCE_TUYA_SHARING
+        elif in_iot:
             return MESSAGE_SOURCE_TUYA_IOT
-        if self.sharing_account and self.sharing_account and dev_id in self.sharing_account.device_ids:
+        elif in_sharing:
             return MESSAGE_SOURCE_TUYA_SHARING
         return None
 

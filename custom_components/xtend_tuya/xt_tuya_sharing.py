@@ -5,6 +5,12 @@ This file contains all the code that inherit from Tuya integration
 from __future__ import annotations
 from typing import Any
 
+import uuid
+import hashlib
+import time
+import json
+import hmac
+
 from homeassistant.core import HomeAssistant, callback
 
 from tuya_sharing.manager import (
@@ -12,7 +18,12 @@ from tuya_sharing.manager import (
 )
 from tuya_sharing.customerapi import (
     CustomerApi,
+    CustomerTokenInfo,
     SharingTokenListener,
+    _secret_generating,
+    _form_to_json,
+    _aes_gcm_encrypt,
+    _aex_gcm_decrypt
 )
 from tuya_sharing.home import (
     SmartLifeHome,
@@ -136,9 +147,40 @@ class XTSharingDeviceRepository(DeviceRepository):
     def update_device_specification(self, device: CustomerDevice):
         super().update_device_specification(device)
 
+    def _update_device_strategy_info_mod(self, device: CustomerDevice):
+        device_id = device.id
+        response = self.api.get(f"/v1.0/m/life/devices/{device_id}/status")
+        support_local = True
+        if response.get("success"):
+            result = response.get("result", {})
+            pid = result["productKey"]
+            dp_id_map = {}
+            for dp_status_relation in result["dpStatusRelationDTOS"]:
+                if not dp_status_relation["supportLocal"]:
+                    support_local = False
+                    break
+                # statusFormat valueDesc、valueType,enumMappingMap,pid
+                dp_id_map[dp_status_relation["dpId"]] = {
+                    "value_convert": dp_status_relation["valueConvert"],
+                    "status_code": dp_status_relation["statusCode"],
+                    "config_item": {
+                        "statusFormat": dp_status_relation["statusFormat"],
+                        "valueDesc": dp_status_relation["valueDesc"],
+                        "valueType": dp_status_relation["valueType"],
+                        "enumMappingMap": dp_status_relation["enumMappingMap"],
+                        "pid": pid,
+                    }
+                }
+            device.support_local = support_local
+            #if support_local:                      #CHANGED
+            device.local_strategy = dp_id_map       #CHANGED
+
+            LOGGER.debug(
+                f"device status strategy dev_id = {device_id} support_local = {support_local} local_strategy = {dp_id_map}")
+
     def update_device_strategy_info(self, device: CustomerDevice):
-        super().update_device_strategy_info(device)
-        
+        #super().update_device_strategy_info(device)
+        self._update_device_strategy_info_mod(device=device)
         if device.support_local:
             #Sometimes the Type provided by Tuya is ill formed,
             #replace it with the one from the local strategy
