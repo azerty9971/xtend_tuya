@@ -2,11 +2,17 @@ from __future__ import annotations
 
 import functools
 
-import homeassistant.components.tuya as tuya_integration
-
 from .multi_manager import (
     MultiManager
 )
+from .const import LOGGER
+import sys
+try:
+    import custom_components.tuya as tuya_integration
+except ImportError:
+    LOGGER.warning(f"Importing regular Tuya : {sys.path}")
+    import homeassistant.components.tuya as tuya_integration
+
 from tuya_sharing import (
     Manager,
 )
