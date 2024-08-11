@@ -152,7 +152,7 @@ class XTSharingDeviceManager(Manager):
         if device.support_local:
             if device_id.startswith("vdevo"):
                 LOGGER.warning("Using local strategy")
-            for item in status:
+            for item in status_new:
                 if "dpId" in item and "value" in item:
                     dp_id_item = device.local_strategy[item["dpId"]]
                     strategy_name = dp_id_item["value_convert"]
@@ -166,7 +166,7 @@ class XTSharingDeviceManager(Manager):
                         LOGGER.warning(f"mq _on_device_report after strategy convert code={code},value={value}")
                     device.status[code] = value
         else:
-            for item in status:
+            for item in status_new:
                 if "code" in item and "value" in item:
                     code = item["code"]
                     value = item["value"]
