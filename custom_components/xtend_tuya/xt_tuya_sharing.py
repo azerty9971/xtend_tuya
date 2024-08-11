@@ -130,24 +130,6 @@ class XTSharingDeviceManager(Manager):
             return self.other_device_manager
         return None
     
-    #TOREMOVE
-    def on_message(self, msg: dict):
-        LOGGER.debug(f"mq receive-> {msg}")
-
-        #try:
-        protocol = msg.get("protocol", 0)
-        data = msg.get("data", {})
-
-        if protocol == PROTOCOL_DEVICE_REPORT:
-            self._on_device_report(data["devId"], data["status"])
-        if protocol == PROTOCOL_OTHER and data['bizCode'] in [BIZCODE_DELETE, BIZCODE_BIND_USER,
-                                                                BIZCODE_DPNAME_UPDATE, BIZCODE_NAME_UPDATE,
-                                                                BIZCODE_OFFLINE, BIZCODE_ONLINE]:
-            self._on_device_other(data["bizData"]["devId"], data["bizCode"], data)
-        #except Exception as e:
-            #LOGGER.error("on message error = %s", e)
-    #ENDTOREMOVE
-
     def _on_device_report(self, device_id: str, status: list):
         device = self.device_map.get(device_id, None)
         if not device:
@@ -203,8 +185,8 @@ class XTSharingDeviceRepository(DeviceRepository):
             #if support_local:                      #CHANGED
             device.local_strategy = dp_id_map       #CHANGED
 
-            LOGGER.debug(
-                f"device status strategy dev_id = {device_id} support_local = {support_local} local_strategy = {dp_id_map}")
+            #LOGGER.debug(
+            #    f"device status strategy dev_id = {device_id} support_local = {support_local} local_strategy = {dp_id_map}")
 
     def update_device_strategy_info(self, device: CustomerDevice):
         #super().update_device_strategy_info(device)

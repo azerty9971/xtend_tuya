@@ -100,8 +100,6 @@ class TuyaOptionFlow(OptionsFlow):
                 schema=data[CONF_APP_TYPE],
             )
 
-            LOGGER.debug("Response %s", response)
-
             if response.get(TUYA_RESPONSE_SUCCESS, False):
                 break
 
