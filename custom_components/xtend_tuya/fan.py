@@ -21,7 +21,7 @@ from homeassistant.util.percentage import (
 )
 
 try:
-    from custom_components.tuya.fan import (
+    from custom_components.tuya.fan import ( # type: ignore
         TUYA_SUPPORT_TYPE as TUYA_SUPPORT_TYPE_TUYA
     )
 except ImportError:

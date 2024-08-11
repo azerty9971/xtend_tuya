@@ -5,10 +5,8 @@ import functools
 from .multi_manager import (
     MultiManager
 )
-from .const import LOGGER
-import sys
 try:
-    import custom_components.tuya as tuya_integration
+    import custom_components.tuya as tuya_integration # type: ignore
 except ImportError:
     import homeassistant.components.tuya as tuya_integration
 

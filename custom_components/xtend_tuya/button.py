@@ -13,7 +13,7 @@ from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 try:
-    from custom_components.tuya.button import (
+    from custom_components.tuya.button import ( # type: ignore
         BUTTONS as BUTTONS_TUYA
     )
 except ImportError:

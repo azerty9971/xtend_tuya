@@ -19,7 +19,7 @@ from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 try:
-    from custom_components.tuya.cover import (
+    from custom_components.tuya.cover import ( # type: ignore
         COVERS as COVERS_TUYA
     )
 except ImportError:

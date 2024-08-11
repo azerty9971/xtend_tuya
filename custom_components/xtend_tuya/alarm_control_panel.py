@@ -22,7 +22,7 @@ from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 try:
-    from custom_components.tuya.alarm_control_panel import (
+    from custom_components.tuya.alarm_control_panel import ( # type: ignore
         ALARM as ALARM_TUYA
     )
 except ImportError:

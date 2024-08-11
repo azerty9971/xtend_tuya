@@ -14,7 +14,7 @@ from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 try:
-    from custom_components.tuya.number import (
+    from custom_components.tuya.number import ( # type: ignore
         NUMBERS as NUMBERS_TUYA
     )
 except ImportError:

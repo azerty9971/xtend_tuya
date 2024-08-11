@@ -22,7 +22,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import StateType
 
 try:
-    from custom_components.tuya.sensor import (
+    from custom_components.tuya.sensor import ( # type: ignore
         SENSORS as SENSORS_TUYA
     )
 except ImportError:

@@ -16,7 +16,7 @@ from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 try:
-    from custom_components.tuya.siren import (
+    from custom_components.tuya.siren import ( # type: ignore
         SIRENS as SIRENS_TUYA
     )
 except ImportError:
