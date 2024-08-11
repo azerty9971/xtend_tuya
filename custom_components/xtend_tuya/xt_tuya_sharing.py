@@ -15,7 +15,16 @@ from homeassistant.core import HomeAssistant, callback
 
 from tuya_sharing.manager import (
     Manager,
+    PROTOCOL_DEVICE_REPORT,
+    PROTOCOL_OTHER,
+    BIZCODE_BIND_USER,
+    BIZCODE_DELETE,
+    BIZCODE_DPNAME_UPDATE,
+    BIZCODE_NAME_UPDATE,
+    BIZCODE_OFFLINE,
+    BIZCODE_ONLINE,
 )
+
 from tuya_sharing.customerapi import (
     CustomerApi,
     CustomerTokenInfo,
@@ -120,6 +129,22 @@ class XTSharingDeviceManager(Manager):
         if self.other_device_manager is not None:
             return self.other_device_manager
         return None
+    
+    def on_message(self, msg: dict):
+        LOGGER.debug(f"mq receive-> {msg}")
+
+        #try:
+        protocol = msg.get("protocol", 0)
+        data = msg.get("data", {})
+
+        if protocol == PROTOCOL_DEVICE_REPORT:
+            self._on_device_report(data["devId"], data["status"])
+        if protocol == PROTOCOL_OTHER and data['bizCode'] in [BIZCODE_DELETE, BIZCODE_BIND_USER,
+                                                                BIZCODE_DPNAME_UPDATE, BIZCODE_NAME_UPDATE,
+                                                                BIZCODE_OFFLINE, BIZCODE_ONLINE]:
+            self._on_device_other(data["bizData"]["devId"], data["bizCode"], data)
+        #except Exception as e:
+            #LOGGER.error("on message error = %s", e)
 
     def _on_device_report(self, device_id: str, status: list):
         device = self.device_map.get(device_id, None)
