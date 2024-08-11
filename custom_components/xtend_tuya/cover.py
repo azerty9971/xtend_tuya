@@ -18,9 +18,14 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from homeassistant.components.tuya.cover import (
-    COVERS as COVERS_TUYA
-)
+try:
+    from custom_components.tuya.cover import (
+        COVERS as COVERS_TUYA
+    )
+except ImportError:
+    from homeassistant.components.tuya.cover import (
+        COVERS as COVERS_TUYA
+    )
 from .util import (
     merge_device_descriptors
 )

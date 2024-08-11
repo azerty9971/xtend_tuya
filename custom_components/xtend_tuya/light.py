@@ -21,9 +21,14 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from homeassistant.components.tuya.light import (
-    LIGHTS as LIGHTS_TUYA
-)
+try:
+    from custom_components.tuya.light import (
+        LIGHTS as LIGHTS_TUYA
+    )
+except ImportError:
+    from homeassistant.components.tuya.light import (
+        LIGHTS as LIGHTS_TUYA
+    )
 from .util import (
     merge_device_descriptors
 )
