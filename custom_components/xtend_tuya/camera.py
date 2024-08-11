@@ -11,7 +11,7 @@ from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 try:
-    from custom_components.tuya.camera import (
+    from custom_components.tuya.camera import ( # type: ignore
         CAMERAS as CAMERAS_TUYA
     )
 except ImportError:

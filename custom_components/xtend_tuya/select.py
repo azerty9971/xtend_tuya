@@ -11,7 +11,7 @@ from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 try:
-    from custom_components.tuya.select import (
+    from custom_components.tuya.select import ( # type: ignore
         SELECTS as SELECTS_TUYA
     )
 except ImportError:

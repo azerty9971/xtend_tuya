@@ -16,7 +16,7 @@ from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 try:
-    from custom_components.tuya.switch import (
+    from custom_components.tuya.switch import ( # type: ignore
         SWITCHES as SWITCHES_TUYA
     )
 except ImportError:

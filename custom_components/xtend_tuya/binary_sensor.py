@@ -17,7 +17,7 @@ from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 try:
-    from custom_components.tuya.binary_sensor import (
+    from custom_components.tuya.binary_sensor import ( # type: ignore
         BINARY_SENSORS as BINARY_SENSORS_TUYA
     )
 except ImportError:

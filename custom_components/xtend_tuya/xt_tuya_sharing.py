@@ -5,34 +5,15 @@ This file contains all the code that inherit from Tuya integration
 from __future__ import annotations
 from typing import Any
 
-import uuid
-import hashlib
-import time
-import json
-import hmac
-
 from homeassistant.core import HomeAssistant, callback
 
 from tuya_sharing.manager import (
     Manager,
-    PROTOCOL_DEVICE_REPORT,
-    PROTOCOL_OTHER,
-    BIZCODE_BIND_USER,
-    BIZCODE_DELETE,
-    BIZCODE_DPNAME_UPDATE,
-    BIZCODE_NAME_UPDATE,
-    BIZCODE_OFFLINE,
-    BIZCODE_ONLINE,
 )
 
 from tuya_sharing.customerapi import (
     CustomerApi,
-    CustomerTokenInfo,
     SharingTokenListener,
-    _secret_generating,
-    _form_to_json,
-    _aes_gcm_encrypt,
-    _aex_gcm_decrypt
 )
 from tuya_sharing.home import (
     SmartLifeHome,
@@ -42,8 +23,6 @@ from tuya_sharing.device import (
     DeviceRepository,
     DeviceStatusRange,
 )
-
-from tuya_sharing.strategy import strategy
 
 from .const import (
     CONF_TOKEN_INFO,
