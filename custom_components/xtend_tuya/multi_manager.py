@@ -139,8 +139,6 @@ class MultiDeviceListener:
 
     def update_device(self, device: XTDevice):
         devices = self.multi_manager.get_devices_from_device_id(device.id)
-        if device.id.startswith("vdevo"):
-            LOGGER.warning(f"Updating device {device.name} => {device.status}")
         for cur_device in devices:
             XTDevice.copy_data_from_device(device, cur_device)
         #if self.multi_manager.reuse_config:
@@ -504,12 +502,10 @@ class MultiManager:  # noqa: F811
                                 if dp_id := self._read_dpId_from_code(virtual_state.key, device):
                                     if new_dp_id := self._get_empty_local_strategy_dp_id(device):
                                         new_local_strategy = copy.deepcopy(device.local_strategy[dp_id])
-                                        LOGGER.warning(f"NEW LOC STRAT: {new_local_strategy}")
                                         if "config_item" in new_local_strategy:
                                             new_local_strategy_config_item = new_local_strategy["config_item"]
                                             if "statusFormat" in new_local_strategy_config_item and virtual_state.key in new_local_strategy_config_item["statusFormat"]:
                                                 new_local_strategy_config_item["statusFormat"] = new_local_strategy_config_item["statusFormat"].replace(virtual_state.key, new_code)
-                                                LOGGER.warning(f"Updating statusFormat result: {new_local_strategy_config_item["statusFormat"]}")
                                         new_local_strategy["status_code"] = new_code
                                         device.local_strategy[new_dp_id] = new_local_strategy
                     if virtual_state.key in device.function:
@@ -617,11 +613,11 @@ class MultiManager:  # noqa: F811
 
     def on_message(self, source: str, msg: str):
         dev_id = self._get_device_id_from_message(msg)
-        if dev_id.startswith("vdevo"):
-            LOGGER.debug(f"on_message from {source} : {msg}")
         if not dev_id:
             LOGGER.warning(f"dev_id {dev_id} not found!")
             return
+        
+        LOGGER.debug(f"on_message from {source} : {msg}")
         
         new_message = self._convert_message_for_all_accounts(msg)
         allowed_source = self.get_allowed_source(dev_id, source)

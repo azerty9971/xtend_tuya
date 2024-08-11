@@ -138,40 +138,7 @@ class XTSharingDeviceManager(Manager):
             LOGGER.warning(f"_on_device_report sharing device not found : {device_id}")
             return
         status_new = self.multi_manager.convert_device_report_status_list(device_id, status)
-        if device_id.startswith("vdevo"):
-            LOGGER.warning(f"_on_device_report BEFORE => {status_new}")
         status_new = self.multi_manager.apply_virtual_states_to_status_list(device, status_new)
-        if device_id.startswith("vdevo"):
-            LOGGER.warning(f"_on_device_report AFTER => {status_new}")
-
-
-        """ DEBUG """
-        device = self.device_map.get(device_id, None)
-        if not device:
-            return
-        if device.support_local:
-            if device_id.startswith("vdevo"):
-                LOGGER.warning("Using local strategy")
-            for item in status_new:
-                if "dpId" in item and "value" in item:
-                    dp_id_item = device.local_strategy[item["dpId"]]
-                    strategy_name = dp_id_item["value_convert"]
-                    config_item = dp_id_item["config_item"]
-                    dp_item = (dp_id_item["status_code"], item["value"])
-                    if device_id.startswith("vdevo"):
-                        LOGGER.warning(
-                        f"mq _on_device_report before strategy convert strategy_name={strategy_name},dp_item={dp_item},config_item={config_item}")
-                    code, value = strategy.convert(strategy_name, dp_item, config_item)
-                    if device_id.startswith("vdevo"):
-                        LOGGER.warning(f"mq _on_device_report after strategy convert code={code},value={value}")
-                    device.status[code] = value
-        else:
-            for item in status_new:
-                if "code" in item and "value" in item:
-                    code = item["code"]
-                    value = item["value"]
-                    device.status[code] = value
-        """ END DEBUG"""
         super()._on_device_report(device_id, status_new)
     
     def send_commands(
