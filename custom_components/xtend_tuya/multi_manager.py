@@ -504,6 +504,7 @@ class MultiManager:  # noqa: F811
                                 if dp_id := self._read_dpId_from_code(virtual_state.key, device):
                                     if new_dp_id := self._get_empty_local_strategy_dp_id(device):
                                         new_local_strategy = copy.deepcopy(device.local_strategy[dp_id])
+                                        LOGGER.warning(f"NEW LOC STRAT: {new_local_strategy}")
                                         new_local_strategy["status_code"] = new_code
                                         device.local_strategy[new_dp_id] = new_local_strategy
                     if virtual_state.key in device.function:
