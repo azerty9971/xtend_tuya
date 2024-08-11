@@ -204,7 +204,6 @@ class MultiManager:  # noqa: F811
     async def get_sharing_account(self, hass: HomeAssistant, entry: XTConfigEntry) -> TuyaSharingData | None:
         #See if our current entry is an override of a Tuya integration entry
         tuya_integration_runtime_data = get_overriden_tuya_integration_runtime_data(hass, entry)
-        LOGGER.warning(f"Tuya Override for {entry.title} : {tuya_integration_runtime_data}")
         if tuya_integration_runtime_data:
             #We are using an override of the Tuya integration
             decorate_tuya_manager(tuya_integration_runtime_data.device_manager, self)
