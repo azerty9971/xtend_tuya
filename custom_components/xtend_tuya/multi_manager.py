@@ -505,6 +505,14 @@ class MultiManager:  # noqa: F811
                                     if new_dp_id := self._get_empty_local_strategy_dp_id(device):
                                         new_local_strategy = copy.deepcopy(device.local_strategy[dp_id])
                                         LOGGER.warning(f"NEW LOC STRAT: {new_local_strategy}")
+                                        if "config_item" in new_local_strategy:
+                                            new_local_strategy_config_item = new_local_strategy["config_item"]
+                                            if "statusFormat" in new_local_strategy_config_item:
+                                                new_local_strategy_status_format = new_local_strategy_config_item["statusFormat"]
+                                                if virtual_state.key in new_local_strategy_status_format:
+                                                    LOGGER.warning(f"Updating statusFormat from {virtual_state.key} to {new_code}")
+                                                    new_local_strategy_status_format[new_code] = new_local_strategy_status_format[virtual_state.key]
+                                                    new_local_strategy_status_format.pop(virtual_state.key)
                                         new_local_strategy["status_code"] = new_code
                                         device.local_strategy[new_dp_id] = new_local_strategy
                     if virtual_state.key in device.function:
