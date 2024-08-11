@@ -186,6 +186,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                             else:
                                 property_update = True
                             device_properties.local_strategy[dp_id] = {
+                                "value_convert": "default",
                                 "status_code": code,
                                 "config_item": {
                                     "valueDesc": typeSpec_json,
@@ -223,6 +224,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                             property_update = True
                         real_type = TuyaEntity.determine_dptype(dp_type)
                         device_properties.local_strategy[dp_id] = {
+                            "value_convert": "default",
                             "status_code": code,
                             "config_item": {
                                 "valueDesc": "{}",
