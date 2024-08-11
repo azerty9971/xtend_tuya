@@ -155,6 +155,7 @@ class XTSharingDeviceManager(Manager):
             return
         status_new = self.multi_manager.convert_device_report_status_list(device_id, status)
         status_new = self.multi_manager.apply_virtual_states_to_status_list(device, status_new)
+        LOGGER.warning(f"_on_device_report => {status_new}")
         super()._on_device_report(device_id, status_new)
     
     def send_commands(
