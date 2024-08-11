@@ -8,7 +8,7 @@ from .multi_manager import (
 from .const import LOGGER
 import sys
 try:
-    import custom_components.tuya as tuya_integration
+    import custom_components.tuyas as tuya_integration
 except ImportError:
     LOGGER.warning(f"Importing regular Tuya : {sys.path}")
     import homeassistant.components.tuya as tuya_integration
