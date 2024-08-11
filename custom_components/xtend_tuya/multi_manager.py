@@ -622,8 +622,8 @@ class MultiManager:  # noqa: F811
             self.iot_account.device_manager.on_message(new_message)
 
     def get_allowed_source(self, dev_id: str, original_source: str) -> str | None:
-        if dev_id.startswith("vdevo"):
-            return MESSAGE_SOURCE_TUYA_IOT
+        """if dev_id.startswith("vdevo"):
+            return MESSAGE_SOURCE_TUYA_IOT"""
         in_iot = False
         if self.iot_account and dev_id in self.iot_account.device_ids:
             in_iot = True
