@@ -158,10 +158,12 @@ class XTSharingDeviceManager(Manager):
                     strategy_name = dp_id_item["value_convert"]
                     config_item = dp_id_item["config_item"]
                     dp_item = (dp_id_item["status_code"], item["value"])
-                    LOGGER.warning(
+                    if device_id.startswith("vdevo"):
+                        LOGGER.warning(
                         f"mq _on_device_report before strategy convert strategy_name={strategy_name},dp_item={dp_item},config_item={config_item}")
                     code, value = strategy.convert(strategy_name, dp_item, config_item)
-                    LOGGER.warning(f"mq _on_device_report after strategy convert code={code},value={value}")
+                    if device_id.startswith("vdevo"):
+                        LOGGER.warning(f"mq _on_device_report after strategy convert code={code},value={value}")
                     device.status[code] = value
         else:
             for item in status:
