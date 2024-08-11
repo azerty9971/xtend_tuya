@@ -141,8 +141,8 @@ class MultiDeviceListener:
         devices = self.multi_manager.get_devices_from_device_id(device.id)
         for cur_device in devices:
             XTDevice.copy_data_from_device(device, cur_device)
-        if self.multi_manager.reuse_config:
-            dispatcher_send(self.hass, f"{TUYA_HA_SIGNAL_UPDATE_ENTITY_ORIG}_{device.id}")
+        #if self.multi_manager.reuse_config:
+        dispatcher_send(self.hass, f"{TUYA_HA_SIGNAL_UPDATE_ENTITY_ORIG}_{device.id}")
         dispatcher_send(self.hass, f"{TUYA_HA_SIGNAL_UPDATE_ENTITY}_{device.id}")
 
     def add_device(self, device: XTDevice):
