@@ -141,7 +141,7 @@ class TuyaEntity(Entity):
 
     def __init__(self, device: XTDevice, device_manager: MultiManager) -> None:
         """Init TuyaHaEntity."""
-        self._attr_unique_id = f"xt_tuya.{device.id}"
+        self._attr_unique_id = f"tuya.{device.id}"
         # TuyaEntity initialize mq can subscribe
         device.set_up = True
         self.device = device
