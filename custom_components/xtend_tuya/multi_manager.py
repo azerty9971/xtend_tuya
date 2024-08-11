@@ -507,12 +507,9 @@ class MultiManager:  # noqa: F811
                                         LOGGER.warning(f"NEW LOC STRAT: {new_local_strategy}")
                                         if "config_item" in new_local_strategy:
                                             new_local_strategy_config_item = new_local_strategy["config_item"]
-                                            if "statusFormat" in new_local_strategy_config_item:
-                                                new_local_strategy_status_format = new_local_strategy_config_item["statusFormat"]
-                                                if virtual_state.key in new_local_strategy_status_format:
-                                                    LOGGER.warning(f"Updating statusFormat from {virtual_state.key} to {new_code}")
-                                                    new_local_strategy_status_format.replace(virtual_state.key, new_code)
-                                                    LOGGER.warning(f"Updating statusFormat result: {new_local_strategy_status_format}")
+                                            if "statusFormat" in new_local_strategy_config_item and virtual_state.key in new_local_strategy_config_item["statusFormat"]:
+                                                new_local_strategy_config_item["statusFormat"] = new_local_strategy_config_item["statusFormat"].replace(virtual_state.key, new_code)
+                                                LOGGER.warning(f"Updating statusFormat result: {new_local_strategy_config_item["statusFormat"]}")
                                         new_local_strategy["status_code"] = new_code
                                         device.local_strategy[new_dp_id] = new_local_strategy
                     if virtual_state.key in device.function:
