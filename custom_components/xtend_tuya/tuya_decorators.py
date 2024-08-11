@@ -60,7 +60,7 @@ class XTDecorator:
 def decorate_tuya_manager(tuya_manager: Manager, multi_manager: MultiManager) -> list[XTDecorator]:
     return_list : list[XTDecorator] = []
 
-    decorator, tuya_manager.refresh_mq  = XTDecorator.get_decorator(tuya_manager.refresh_mq, multi_manager.on_tuya_refresh_mq)
+    decorator, tuya_manager.refresh_mq  = XTDecorator.get_decorator(tuya_manager.refresh_mq, None)
     return_list.append(decorator)
 
     decorator, tuya_manager.on_message  = XTDecorator.get_decorator(tuya_manager.on_message, None)
