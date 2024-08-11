@@ -15,9 +15,14 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from homeassistant.components.tuya.humidifier import (
-    HUMIDIFIERS as HUMIDIFIERS_TUYA
-)
+try:
+    from custom_components.tuya.humidifier import ( # type: ignore
+        HUMIDIFIERS as HUMIDIFIERS_TUYA
+    )
+except ImportError:
+    from homeassistant.components.tuya.humidifier import (
+        HUMIDIFIERS as HUMIDIFIERS_TUYA
+    )
 from .util import (
     append_dictionnaries
 )

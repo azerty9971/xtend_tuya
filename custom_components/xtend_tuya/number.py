@@ -13,9 +13,14 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from homeassistant.components.tuya.number import (
-    NUMBERS as NUMBERS_TUYA
-)
+try:
+    from custom_components.tuya.number import ( # type: ignore
+        NUMBERS as NUMBERS_TUYA
+    )
+except ImportError:
+    from homeassistant.components.tuya.number import (
+        NUMBERS as NUMBERS_TUYA
+    )
 from homeassistant.components.number.const import (
     NumberMode,
 )

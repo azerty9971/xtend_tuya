@@ -21,9 +21,14 @@ from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import StateType
 
-from homeassistant.components.tuya.sensor import (
-    SENSORS as SENSORS_TUYA
-)
+try:
+    from custom_components.tuya.sensor import ( # type: ignore
+        SENSORS as SENSORS_TUYA
+    )
+except ImportError:
+    from homeassistant.components.tuya.sensor import (
+        SENSORS as SENSORS_TUYA
+    )
 from .util import (
     merge_device_descriptors
 )
