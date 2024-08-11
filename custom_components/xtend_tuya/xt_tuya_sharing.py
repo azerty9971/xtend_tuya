@@ -136,8 +136,11 @@ class XTSharingDeviceManager(Manager):
             LOGGER.warning(f"_on_device_report sharing device not found : {device_id}")
             return
         status_new = self.multi_manager.convert_device_report_status_list(device_id, status)
+        if device_id.startswith("vdevo"):
+            LOGGER.warning(f"_on_device_report BEFORE => {status_new}")
         status_new = self.multi_manager.apply_virtual_states_to_status_list(device, status_new)
-        LOGGER.warning(f"_on_device_report => {status_new}")
+        if device_id.startswith("vdevo"):
+            LOGGER.warning(f"_on_device_report AFTER => {status_new}")
         super()._on_device_report(device_id, status_new)
     
     def send_commands(

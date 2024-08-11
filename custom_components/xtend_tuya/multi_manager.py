@@ -139,7 +139,8 @@ class MultiDeviceListener:
 
     def update_device(self, device: XTDevice):
         devices = self.multi_manager.get_devices_from_device_id(device.id)
-        LOGGER.warning(f"Updating device {device.name} => {device.status}")
+        if device.id.startswith("vdevo"):
+            LOGGER.warning(f"Updating device {device.name} => {device.status}")
         for cur_device in devices:
             XTDevice.copy_data_from_device(device, cur_device)
         #if self.multi_manager.reuse_config:
@@ -609,8 +610,9 @@ class MultiManager:  # noqa: F811
         self.on_message(MESSAGE_SOURCE_TUYA_SHARING, msg)
 
     def on_message(self, source: str, msg: str):
-        LOGGER.debug(f"on_message from {source} : {msg}")
         dev_id = self._get_device_id_from_message(msg)
+        if dev_id.startswith("vdevo"):
+            LOGGER.debug(f"on_message from {source} : {msg}")
         if not dev_id:
             LOGGER.warning(f"dev_id {dev_id} not found!")
             return
