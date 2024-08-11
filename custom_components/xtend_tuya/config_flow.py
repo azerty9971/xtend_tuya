@@ -25,7 +25,6 @@ from .const import (
     CONF_USER_CODE,
     DOMAIN,
     DOMAIN_ORIG,
-    LOGGER,
     TUYA_CLIENT_ID,
     TUYA_RESPONSE_CODE,
     TUYA_RESPONSE_MSG,
@@ -99,8 +98,6 @@ class TuyaOptionFlow(OptionsFlow):
                 country_code=data[CONF_COUNTRY_CODE],
                 schema=data[CONF_APP_TYPE],
             )
-
-            LOGGER.debug("Response %s", response)
 
             if response.get(TUYA_RESPONSE_SUCCESS, False):
                 break

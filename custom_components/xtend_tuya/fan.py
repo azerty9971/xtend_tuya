@@ -20,9 +20,14 @@ from homeassistant.util.percentage import (
     percentage_to_ordered_list_item,
 )
 
-from homeassistant.components.tuya.fan import (
-    TUYA_SUPPORT_TYPE as TUYA_SUPPORT_TYPE_TUYA
-)
+try:
+    from custom_components.tuya.fan import ( # type: ignore
+        TUYA_SUPPORT_TYPE as TUYA_SUPPORT_TYPE_TUYA
+    )
+except ImportError:
+    from homeassistant.components.tuya.fan import (
+        TUYA_SUPPORT_TYPE as TUYA_SUPPORT_TYPE_TUYA
+    )
 from .util import (
     append_sets
 )

@@ -12,9 +12,14 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from homeassistant.components.tuya.button import (
-    BUTTONS as BUTTONS_TUYA
-)
+try:
+    from custom_components.tuya.button import ( # type: ignore
+        BUTTONS as BUTTONS_TUYA
+    )
+except ImportError:
+    from homeassistant.components.tuya.button import (
+        BUTTONS as BUTTONS_TUYA
+    )
 from .util import (
     merge_device_descriptors
 )

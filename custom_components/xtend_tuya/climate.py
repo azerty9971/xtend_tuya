@@ -23,9 +23,14 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from homeassistant.components.tuya.climate import (
-    CLIMATE_DESCRIPTIONS as CLIMATE_DESCRIPTIONS_TUYA
-)
+try:
+    from custom_components.tuya.climate import ( # type: ignore
+        CLIMATE_DESCRIPTIONS as CLIMATE_DESCRIPTIONS_TUYA
+    )
+except ImportError:
+    from homeassistant.components.tuya.climate import (
+        CLIMATE_DESCRIPTIONS as CLIMATE_DESCRIPTIONS_TUYA
+    )
 from .util import (
     append_dictionnaries
 )
