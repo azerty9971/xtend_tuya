@@ -139,6 +139,7 @@ class MultiDeviceListener:
 
     def update_device(self, device: XTDevice):
         devices = self.multi_manager.get_devices_from_device_id(device.id)
+        LOGGER.warning(f"Updating device {device.name} => {device.status}")
         for cur_device in devices:
             XTDevice.copy_data_from_device(device, cur_device)
         #if self.multi_manager.reuse_config:
