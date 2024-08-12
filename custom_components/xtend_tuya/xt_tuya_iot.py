@@ -189,6 +189,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                                 "value_convert": "default",
                                 "status_code": code,
                                 "config_item": {
+                                    "statusFormat": f'{{"{code}":"$"}}',
                                     "valueDesc": typeSpec_json,
                                     "valueType": real_type,
                                     "pid": device.product_id,
@@ -227,6 +228,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                             "value_convert": "default",
                             "status_code": code,
                             "config_item": {
+                                "statusFormat": f'{{"{code}":"$"}}',
                                 "valueDesc": "{}",
                                 "valueType": real_type,
                                 "pid": device.product_id,
