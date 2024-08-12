@@ -171,29 +171,28 @@ class XTSharingDeviceRepository(DeviceRepository):
     def update_device_strategy_info(self, device: CustomerDevice):
         #super().update_device_strategy_info(device)
         self._update_device_strategy_info_mod(device=device)
-        if device.support_local:
-            #Sometimes the Type provided by Tuya is ill formed,
-            #replace it with the one from the local strategy
-            for loc_strat in device.local_strategy.values():
-                if "statusCode" not in loc_strat or "valueType" not in loc_strat:
-                    continue
-                code = loc_strat["statusCode"]
-                value_type = loc_strat["valueType"]
+        #Sometimes the Type provided by Tuya is ill formed,
+        #replace it with the one from the local strategy
+        for loc_strat in device.local_strategy.values():
+            if "statusCode" not in loc_strat or "valueType" not in loc_strat:
+                continue
+            code = loc_strat["statusCode"]
+            value_type = loc_strat["valueType"]
 
-                if code in device.status_range:
-                    device.status_range[code].type = value_type
-                if code in device.function:
-                    device.function[code].type     = value_type
+            if code in device.status_range:
+                device.status_range[code].type = value_type
+            if code in device.function:
+                device.function[code].type     = value_type
 
-                if (
-                    "valueDesc"  in loc_strat and
-                    code not in device.status_range and
-                    code not in device.function
-                    ):
-                    device.status_range[code] = DeviceStatusRange()
-                    device.status_range[code].code   = code
-                    device.status_range[code].type   = value_type
-                    device.status_range[code].values = loc_strat["valueDesc"]
+            if (
+                "valueDesc"  in loc_strat and
+                code not in device.status_range and
+                code not in device.function
+                ):
+                device.status_range[code] = DeviceStatusRange()
+                device.status_range[code].code   = code
+                device.status_range[code].type   = value_type
+                device.status_range[code].values = loc_strat["valueDesc"]
 
         #Sometimes the Type provided by Tuya is ill formed,
         #Try to reformat it into the correct one
