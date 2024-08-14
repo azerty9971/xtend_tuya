@@ -16,6 +16,7 @@ from typing import Any
 
 from .const import (
     LOGGER,
+    DPType,
 )
 
 from .shared_classes import (
@@ -199,6 +200,8 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                             }
                         #Sometimes the default returned typeSpec from the regular Tuya Properties is wrong
                         #override it with the QueryThingsDataModel one
+                        if real_type == DPType.ENUM: #Enums should not be altered since sometimes the model is wrong about them
+                            continue
                         devices = self.multi_manager.get_devices_from_device_id(device.id)
                         for cur_device in devices:
                             if dp_id in cur_device.local_strategy:
