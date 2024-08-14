@@ -292,17 +292,11 @@ class MultiManager:  # noqa: F811
             new_device_ids: list[str] = [device_id for device_id in self.sharing_account.device_manager.device_map]
             self.sharing_account.device_ids.clear()
             self.sharing_account.device_ids.extend(new_device_ids)
-            if "bfbafccd64f08100eflq1v" in self.sharing_account.device_manager.device_map:
-                device = self.sharing_account.device_manager.device_map["bfbafccd64f08100eflq1v"]
-                LOGGER.warning(f"Device BEFORE {device.id} => {device.function} <=> {device.status_range}")
         if self.iot_account:
             self.iot_account.home_manager.update_device_cache()
             new_device_ids: list[str] = [device_id for device_id in self.iot_account.device_manager.device_map]
             self.iot_account.device_ids.clear()
             self.iot_account.device_ids.extend(new_device_ids)
-            if "bfbafccd64f08100eflq1v" in self.sharing_account.device_manager.device_map:
-                device = self.sharing_account.device_manager.device_map["bfbafccd64f08100eflq1v"]
-                LOGGER.warning(f"Device AFTER {device.id} => {device.function} <=> {device.status_range}")
         self._merge_devices_from_multiple_sources()
     
     def convert_tuya_devices_to_xt(self, manager):
@@ -328,29 +322,17 @@ class MultiManager:  # noqa: F811
             devices = self.get_devices_from_device_id(device.id)
             for current_device in devices:
                 for prev_device in to_be_merged:
-                    if device.id == "bfbafccd64f08100eflq1v":
-                        LOGGER.warning(f"Merging BEFORE {current_device.function} <=> {current_device.status_range} WITH {prev_device.function} <=> {prev_device.status_range}")
                     self._merge_devices(current_device, prev_device)
-                    #if device.id == "bfbafccd64f08100eflq1v":
-                    #    LOGGER.warning(f"Merging AFTER {current_device.function} <=> {current_device.status_range} WITH {prev_device.function} <=> {prev_device.status_range}")
-                to_be_merged.append(current_device)
+                    to_be_merged.append(current_device)
         for device_map in device_maps:
             merge_iterables(device_map, aggregated_device_list)
         
     def _merge_devices(self, receiving_device: XTDevice, giving_device: XTDevice):
-        if receiving_device.id == "bfbafccd64f08100eflq1v":
-            LOGGER.warning(f"Merging BEFORE {giving_device.status_range} WITH {receiving_device.status_range}")
         merge_iterables(receiving_device.status_range, giving_device.status_range)
-        if receiving_device.id == "bfbafccd64f08100eflq1v":
-            LOGGER.warning(f"Merging AFTER {giving_device.status_range} WITH {receiving_device.status_range}")
-        receiving_device.status_range = copy.deepcopy(giving_device.status_range)
         merge_iterables(receiving_device.function, giving_device.function)
-        receiving_device.function = copy.deepcopy(giving_device.function)
         merge_iterables(receiving_device.status, giving_device.status)
-        receiving_device.status = copy.deepcopy(giving_device.status)
         if hasattr(receiving_device, "local_strategy") and hasattr(giving_device, "local_strategy"):
             merge_iterables(receiving_device.local_strategy, giving_device.local_strategy)
-            receiving_device.local_strategy = copy.deepcopy(giving_device.local_strategy)
         if hasattr(receiving_device, "model") and hasattr(giving_device, "model"):
             if receiving_device.model == "" and giving_device.model != "":
                 receiving_device.model = copy.deepcopy(giving_device.model)
