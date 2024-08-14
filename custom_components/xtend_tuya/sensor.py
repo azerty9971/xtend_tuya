@@ -395,6 +395,23 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
         *TEMPERATURE_SENSORS,
         *HUMIDITY_SENSORS,
     ),
+    "ywcgq": (
+        TuyaSensorEntityDescription(
+            key=DPCode.LIQUID_STATE,
+            translation_key="liquid_state",
+            entity_registry_enabled_default=True,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.LIQUID_DEPTH,
+            translation_key="liquid_depth",
+            entity_registry_enabled_default=True,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.LIQUID_LEVEL_PERCENT,
+            translation_key="liquid_level_percent",
+            entity_registry_enabled_default=True,
+        ),
+    ),
 }
 
 # Socket (duplicate of `kg`)
