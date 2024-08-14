@@ -15,9 +15,14 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from homeassistant.components.tuya.switch import (
-    SWITCHES as SWITCHES_TUYA
-)
+try:
+    from custom_components.tuya.switch import ( # type: ignore
+        SWITCHES as SWITCHES_TUYA
+    )
+except ImportError:
+    from homeassistant.components.tuya.switch import (
+        SWITCHES as SWITCHES_TUYA
+    )
 from .util import (
     merge_device_descriptors
 )
@@ -208,6 +213,13 @@ SWITCHES: dict[str, tuple[SwitchEntityDescription, ...]] = {
         SwitchEntityDescription(
             key=DPCode.UV,
             translation_key="uv",
+            entity_category=EntityCategory.CONFIG,
+        ),
+    ),
+    "wnykq": (
+        SwitchEntityDescription(
+            key=DPCode.POWERON,
+            translation_key="power",
             entity_category=EntityCategory.CONFIG,
         ),
     ),

@@ -21,9 +21,14 @@ from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import StateType
 
-from homeassistant.components.tuya.sensor import (
-    SENSORS as SENSORS_TUYA
-)
+try:
+    from custom_components.tuya.sensor import ( # type: ignore
+        SENSORS as SENSORS_TUYA
+    )
+except ImportError:
+    from homeassistant.components.tuya.sensor import (
+        SENSORS as SENSORS_TUYA
+    )
 from .util import (
     merge_device_descriptors
 )
@@ -59,15 +64,15 @@ BATTERY_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
 #Commonlu sed energy sensors, that are re-used in the sensors down below.
 CONSUMPTION_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
     TuyaSensorEntityDescription(
-            key=DPCode.ADD_ELE,
-            virtual_state=VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME | VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD,
-            vs_copy_to_state=[DPCode.ADD_ELE2],
-            translation_key="add_ele",
-            device_class=SensorDeviceClass.ENERGY,
-            state_class=SensorStateClass.TOTAL_INCREASING,
-            native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
-            entity_registry_enabled_default=True,
-            restoredata=True,
+        key=DPCode.ADD_ELE,
+        virtual_state=VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME | VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD,
+        vs_copy_to_state=[DPCode.ADD_ELE2],
+        translation_key="add_ele",
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        entity_registry_enabled_default=True,
+        restoredata=True,
     ),
     TuyaSensorEntityDescription(
         key=DPCode.ADD_ELE2,
@@ -104,6 +109,43 @@ CONSUMPTION_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         entity_registry_enabled_default=True,
         restoredata=False,
+    ),
+    TuyaSensorEntityDescription(
+        key=DPCode.CUR_POWER,
+        translation_key="power",
+        device_class=SensorDeviceClass.POWER,
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_registry_enabled_default=True,
+    ),
+)
+
+TEMPERATURE_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
+    TuyaSensorEntityDescription(
+        key=DPCode.TEMPERATURE,
+        translation_key="temperature",
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_registry_enabled_default=True,
+    ),
+    TuyaSensorEntityDescription(
+        key=DPCode.TEMP_CURRENT,
+        translation_key="temperature",
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_registry_enabled_default=True,
+    ),
+    TuyaSensorEntityDescription(
+        key=DPCode.TEMP_VALUE,
+        translation_key="temperature",
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_registry_enabled_default=True,
+    ),
+)
+
+HUMIDITY_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
+    TuyaSensorEntityDescription(
+        key=DPCode.HUMIDITY_VALUE,
+        translation_key="humidity",
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_registry_enabled_default=True,
     ),
 )
 
@@ -282,12 +324,6 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
             entity_registry_enabled_default=True,
         ),
         TuyaSensorEntityDescription(
-            key=DPCode.TEMPERATURE,
-            translation_key="temperature",
-            state_class=SensorStateClass.MEASUREMENT,
-            entity_registry_enabled_default=True,
-        ),
-        TuyaSensorEntityDescription(
             key=DPCode.TOILET_NOTICE,
             translation_key="toilet_notice",
             state_class=SensorStateClass.MEASUREMENT,
@@ -310,6 +346,70 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
             translation_key="work_stat",
             state_class=SensorStateClass.MEASUREMENT,
             entity_registry_enabled_default=False,
+        ),
+        *TEMPERATURE_SENSORS,
+    ),
+    "smd": (
+        TuyaSensorEntityDescription(
+            key=DPCode.HEART_RATE,
+            translation_key="heart_rate",
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_registry_enabled_default=True,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.RESPIRATORY_RATE,
+            translation_key="respiratory_rate",
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_registry_enabled_default=True,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.SLEEP_STAGE,
+            translation_key="sleep_stage",
+            entity_registry_enabled_default=True,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.TIME_GET_IN_BED,
+            translation_key="time_get_in_bed",
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_registry_enabled_default=True,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.OFF_BED_TIME,
+            translation_key="off_bed_time",
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_registry_enabled_default=True,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.CLCT_TIME,
+            translation_key="clct_time",
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_registry_enabled_default=False,
+        ),
+    ),
+    "wnykq": (
+        TuyaSensorEntityDescription(
+            key=DPCode.IR_CONTROL,
+            translation_key="wnykq_ir_control",
+            entity_registry_enabled_default=True,
+        ),
+        *TEMPERATURE_SENSORS,
+        *HUMIDITY_SENSORS,
+    ),
+    "ywcgq": (
+        TuyaSensorEntityDescription(
+            key=DPCode.LIQUID_STATE,
+            translation_key="liquid_state",
+            entity_registry_enabled_default=True,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.LIQUID_DEPTH,
+            translation_key="liquid_depth",
+            entity_registry_enabled_default=True,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.LIQUID_LEVEL_PERCENT,
+            translation_key="liquid_level_percent",
+            entity_registry_enabled_default=True,
         ),
     ),
 }
@@ -476,7 +576,7 @@ class TuyaSensorEntity(TuyaEntity, RestoreSensor):
     async def async_added_to_hass(self) -> None:
         """Call when entity about to be added to hass."""
         await super().async_added_to_hass()
-        if not self.entity_description.restoredata:
+        if not hasattr(self.entity_description, "restoredata") or not self.entity_description.restoredata:
             return
         state = await self.async_get_last_sensor_data()
         if state is None or state.native_value is None:

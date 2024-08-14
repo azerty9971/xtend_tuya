@@ -10,9 +10,14 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from homeassistant.components.tuya.select import (
-    SELECTS as SELECTS_TUYA
-)
+try:
+    from custom_components.tuya.select import ( # type: ignore
+        SELECTS as SELECTS_TUYA
+    )
+except ImportError:
+    from homeassistant.components.tuya.select import (
+        SELECTS as SELECTS_TUYA
+    )
 from .util import (
     merge_device_descriptors
 )

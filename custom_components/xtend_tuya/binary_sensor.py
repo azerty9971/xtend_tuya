@@ -16,9 +16,14 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from homeassistant.components.tuya.binary_sensor import (
-    BINARY_SENSORS as BINARY_SENSORS_TUYA
-)
+try:
+    from custom_components.tuya.binary_sensor import ( # type: ignore
+        BINARY_SENSORS as BINARY_SENSORS_TUYA
+    )
+except ImportError:
+    from homeassistant.components.tuya.binary_sensor import (
+        BINARY_SENSORS as BINARY_SENSORS_TUYA
+    )
 from .util import (
     merge_device_descriptors
 )
@@ -71,6 +76,20 @@ BINARY_SENSORS: dict[str, tuple[TuyaBinarySensorEntityDescription, ...]] = {
             key=DPCode.POWER,
             translation_key="power",
             entity_registry_enabled_default=False,
+        ),
+    ),
+    "smd": (
+        TuyaBinarySensorEntityDescription(
+            key=DPCode.OFF_BED,
+            translation_key="off_bed",
+        ),
+        TuyaBinarySensorEntityDescription(
+            key=DPCode.WAKEUP,
+            translation_key="wakeup",
+        ),
+        TuyaBinarySensorEntityDescription(
+            key=DPCode.OFF,
+            translation_key="off",
         ),
     ),
 }

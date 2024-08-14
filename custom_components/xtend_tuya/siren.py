@@ -15,9 +15,14 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from homeassistant.components.tuya.siren import (
-    SIRENS as SIRENS_TUYA
-)
+try:
+    from custom_components.tuya.siren import ( # type: ignore
+        SIRENS as SIRENS_TUYA
+    )
+except ImportError:
+    from homeassistant.components.tuya.siren import (
+        SIRENS as SIRENS_TUYA
+    )
 from .util import (
     merge_device_descriptors
 )

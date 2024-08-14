@@ -12,7 +12,11 @@ from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity import Entity
 
-from .const import DOMAIN, TUYA_HA_SIGNAL_UPDATE_ENTITY, DPCode, DPType
+from homeassistant.components.tuya.const import (
+    DPCode as DPCode_tuya
+)
+
+from .const import DOMAIN, TUYA_HA_SIGNAL_UPDATE_ENTITY, DPCode, DPType, LOGGER
 from .util import remap_value
 from .multi_manager import MultiManager, XTDevice
 
@@ -196,7 +200,10 @@ class TuyaEntity(Entity):
             return None
 
         if isinstance(dpcodes, str):
-            dpcodes = (DPCode(dpcodes),)
+            try:
+                dpcodes = (DPCode(dpcodes),)
+            except ValueError:
+                dpcodes = (DPCode_tuya(dpcodes),)
         elif not isinstance(dpcodes, tuple):
             dpcodes = (dpcodes,)
 
@@ -229,13 +236,16 @@ class TuyaEntity(Entity):
                     dptype == DPType.INTEGER
                     and getattr(self.device, key)[dpcode].type == DPType.INTEGER
                 ):
-                    if not (
-                        integer_type := IntegerTypeData.from_json(
-                            dpcode, getattr(self.device, key)[dpcode].values
-                        )
-                    ):
-                        continue
-                    return integer_type
+                    try:
+                        if not (
+                            integer_type := IntegerTypeData.from_json(
+                                dpcode, getattr(self.device, key)[dpcode].values
+                            )
+                        ):
+                            continue
+                        return integer_type
+                    except TypeError:
+                        LOGGER.warning(f"Device : {self.device.id} -> {self.device.name} -> {dpcode} failed to setup")
 
                 if dptype not in (DPType.ENUM, DPType.INTEGER):
                     return dpcode
@@ -254,8 +264,28 @@ class TuyaEntity(Entity):
             order = ["function", "status_range"]
         for key in order:
             if dpcode in getattr(self.device, key):
-                return DPType(getattr(self.device, key)[dpcode].type)
+                try:
+                    return DPType(getattr(self.device, key)[dpcode].type)
+                except ValueError:
+                    fixed_type = TuyaEntity.determine_dptype(getattr(self.device, key)[dpcode].type)
+                    LOGGER.warning(f"Device {self.device.name} (id: {self.device.id}) has returned a bad model dpId type for code {dpcode} : \"{getattr(self.device, key)[dpcode].type}\", it should have been \"{fixed_type}\". Please contact the Tuya Support about this")
+                    return fixed_type
 
+        return None
+    
+    def determine_dptype(type) -> DPType | None:
+        if type == "value":
+            return DPType(DPType.INTEGER)
+        if type == "bitmap" or type == "raw":
+            return DPType(DPType.RAW)
+        if type == "enum":
+            return DPType(DPType.ENUM)
+        if type == "bool":
+            return DPType(DPType.BOOLEAN)
+        if type == "json":
+            return DPType(DPType.JSON)
+        if type == "string":
+            return DPType(DPType.STRING)
         return None
 
     async def async_added_to_hass(self) -> None:
