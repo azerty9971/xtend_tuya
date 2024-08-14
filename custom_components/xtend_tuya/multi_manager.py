@@ -548,10 +548,10 @@ class MultiManager:  # noqa: F811
                 code = state["code"]
                 dpId = self._read_dpId_from_code(state["code"], device)
             if dpId is None and "dpId" in state:
-                if device_id == "bfd96de2b508052bb3dzco":
-                    LOGGER.warning("Found dpId")
                 dpId = int(state["dpId"])
                 code = self._read_code_from_dpId(dpId, device)
+                if device_id == "bfd96de2b508052bb3dzco":
+                    LOGGER.warning(f"Found dpId : {dpId} => {code}")
             if dpId is None and code is None and "dpId" not in state and "code" not in state:
                 for temp_dpId in state:
                     temp_code = self._read_code_from_dpId(int(temp_dpId), device)
