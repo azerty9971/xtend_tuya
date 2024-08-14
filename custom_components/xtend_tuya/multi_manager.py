@@ -321,7 +321,7 @@ class MultiManager:  # noqa: F811
         device_maps = self._get_available_device_maps()
         aggregated_device_list = self.device_map
         for device in aggregated_device_list.values():
-            to_be_merged = []
+            to_be_merged: list[XTDevice] = []
             devices = self.get_devices_from_device_id(device.id)
             for current_device in devices:
                 for prev_device in to_be_merged:
