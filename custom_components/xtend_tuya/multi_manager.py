@@ -292,6 +292,9 @@ class MultiManager:  # noqa: F811
             new_device_ids: list[str] = [device_id for device_id in self.sharing_account.device_manager.device_map]
             self.sharing_account.device_ids.clear()
             self.sharing_account.device_ids.extend(new_device_ids)
+            if "bfbafccd64f08100eflq1v" in self.sharing_account.device_manager.device_map:
+                device = self.sharing_account.device_manager.device_map["bfbafccd64f08100eflq1v"]
+                LOGGER.warning(f"Device {device.id} => {device.function} <=> {device.status_range}")
         if self.iot_account:
             self.iot_account.home_manager.update_device_cache()
             new_device_ids: list[str] = [device_id for device_id in self.iot_account.device_manager.device_map]
