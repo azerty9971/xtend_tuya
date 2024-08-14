@@ -109,6 +109,32 @@ NUMBERS: dict[str, tuple[NumberEntityDescription, ...]] = {
             entity_category=EntityCategory.CONFIG,
         ),
     ),
+    "ywcgq": (
+        NumberEntityDescription(
+            key=DPCode.MAX_SET,
+            translation_key="max_set",
+            mode = NumberMode.SLIDER,
+            entity_category=EntityCategory.CONFIG,
+        ),
+        NumberEntityDescription(
+            key=DPCode.MINI_SET,
+            translation_key="mini_set",
+            mode = NumberMode.SLIDER,
+            entity_category=EntityCategory.CONFIG,
+        ),
+        NumberEntityDescription(
+            key=DPCode.INSTALLATION_HEIGHT,
+            translation_key="installation_height",
+            mode = NumberMode.SLIDER,
+            entity_category=EntityCategory.CONFIG,
+        ),
+        NumberEntityDescription(
+            key=DPCode.LIQUID_DEPTH_MAX,
+            translation_key="liquid_depth_max",
+            mode = NumberMode.SLIDER,
+            entity_category=EntityCategory.CONFIG,
+        ),
+    ),
 }
 
 

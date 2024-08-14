@@ -158,6 +158,18 @@
       }
     },
     "number": {
+      "max_set": {
+        "name": "Maximum"
+      },
+      "mini_set": {
+        "name": "Minimum"
+      },
+      "installation_height": {
+        "name": "Installation height"
+      },
+      "liquid_depth_max": {
+        "name": "Max liquid depth"
+      },
       "bright_value": {
         "name": "Brightness"
       },
@@ -658,6 +670,26 @@
       }
     },
     "sensor": {
+      "liquid_state":
+      {
+        "name": "Liquid state",
+        "state": {
+          "normal": "Normal",
+          "lower_alarm": "Lower alarm",
+          "upper_alarm": "Upper alarm",
+          "0": "Normal",
+          "1": "Lower alarm",
+          "2": "Upper alarm"
+        }
+      },
+      "liquid_depth":
+      {
+        "name": "Liquid depth"
+      },
+      "liquid_level_percent":
+      {
+        "name": "Liquid level"
+      },
       "heart_rate":
       {
         "name": "Heart rate"
