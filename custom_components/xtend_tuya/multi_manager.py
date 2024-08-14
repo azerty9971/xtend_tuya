@@ -334,10 +334,14 @@ class MultiManager:  # noqa: F811
         
     def _merge_devices(self, receiving_device: XTDevice, giving_device: XTDevice):
         merge_iterables(receiving_device.status_range, giving_device.status_range)
+        receiving_device.status_range = copy.deepcopy(giving_device.status_range)
         merge_iterables(receiving_device.function, giving_device.function)
+        receiving_device.function = copy.deepcopy(giving_device.function)
         merge_iterables(receiving_device.status, giving_device.status)
+        receiving_device.status = copy.deepcopy(giving_device.status)
         if hasattr(receiving_device, "local_strategy") and hasattr(giving_device, "local_strategy"):
             merge_iterables(receiving_device.local_strategy, giving_device.local_strategy)
+            receiving_device.local_strategy = copy.deepcopy(giving_device.local_strategy)
         if hasattr(receiving_device, "model") and hasattr(giving_device, "model"):
             if receiving_device.model == "" and giving_device.model != "":
                 receiving_device.model = copy.deepcopy(giving_device.model)
