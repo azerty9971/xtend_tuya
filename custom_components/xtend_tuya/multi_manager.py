@@ -326,6 +326,8 @@ class MultiManager:  # noqa: F811
             for current_device in devices:
                 for prev_device in to_be_merged:
                     self._merge_devices(current_device, prev_device)
+                    if device.id == "bfbafccd64f08100eflq1v":
+                        LOGGER.warning(f"Merging {current_device.function} <=> {current_device.status_range} WITH {prev_device.function} <=> {prev_device.status_range}")
                 to_be_merged.append(current_device)
         for device_map in device_maps:
             merge_iterables(device_map, aggregated_device_list)
