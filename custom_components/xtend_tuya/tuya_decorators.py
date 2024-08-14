@@ -2,11 +2,14 @@ from __future__ import annotations
 
 import functools
 
-import homeassistant.components.tuya as tuya_integration
-
 from .multi_manager import (
     MultiManager
 )
+try:
+    import custom_components.tuya as tuya_integration # type: ignore
+except ImportError:
+    import homeassistant.components.tuya as tuya_integration
+
 from tuya_sharing import (
     Manager,
 )
@@ -55,6 +58,9 @@ def decorate_tuya_manager(tuya_manager: Manager, multi_manager: MultiManager) ->
     return_list : list[XTDecorator] = []
 
     decorator, tuya_manager.refresh_mq  = XTDecorator.get_decorator(tuya_manager.refresh_mq, multi_manager.on_tuya_refresh_mq)
+    return_list.append(decorator)
+
+    decorator, tuya_manager.on_message  = XTDecorator.get_decorator(tuya_manager.on_message, None)
     return_list.append(decorator)
 
     return return_list

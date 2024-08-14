@@ -10,6 +10,7 @@ from homeassistant.core import HomeAssistant, callback
 from tuya_sharing.manager import (
     Manager,
 )
+
 from tuya_sharing.customerapi import (
     CustomerApi,
     SharingTokenListener,
@@ -26,11 +27,14 @@ from tuya_sharing.device import (
 from .const import (
     CONF_TOKEN_INFO,
     LOGGER,
+    DPType,
 )
 
 from .multi_manager import (
     MultiManager,
 )
+
+from .base import TuyaEntity
 
 class XTSharingTokenListener(SharingTokenListener):
     """Token listener for upstream token updates."""
@@ -106,7 +110,7 @@ class XTSharingDeviceManager(Manager):
         if self.other_device_manager is not None:
             return self.other_device_manager
         return None
-
+    
     def _on_device_report(self, device_id: str, status: list):
         device = self.device_map.get(device_id, None)
         if not device:
@@ -130,19 +134,78 @@ class XTSharingDeviceRepository(DeviceRepository):
         self.manager = manager
         self.multi_manager = multi_manager
 
+    def update_device_specification(self, device: CustomerDevice):
+        super().update_device_specification(device)
+
+    def _update_device_strategy_info_mod(self, device: CustomerDevice):
+        device_id = device.id
+        response = self.api.get(f"/v1.0/m/life/devices/{device_id}/status")
+        support_local = True
+        if response.get("success"):
+            result = response.get("result", {})
+            pid = result["productKey"]
+            dp_id_map = {}
+            for dp_status_relation in result["dpStatusRelationDTOS"]:
+                if not dp_status_relation["supportLocal"]:
+                    support_local = False
+                    break
+                # statusFormat valueDesc、valueType,enumMappingMap,pid
+                dp_id_map[dp_status_relation["dpId"]] = {
+                    "value_convert": dp_status_relation["valueConvert"],
+                    "status_code": dp_status_relation["statusCode"],
+                    "config_item": {
+                        "statusFormat": dp_status_relation["statusFormat"],
+                        "valueDesc": dp_status_relation["valueDesc"],
+                        "valueType": dp_status_relation["valueType"],
+                        "enumMappingMap": dp_status_relation["enumMappingMap"],
+                        "pid": pid,
+                    }
+                }
+            device.support_local = support_local
+            #if support_local:                      #CHANGED
+            device.local_strategy = dp_id_map       #CHANGED
+
+            #LOGGER.debug(
+            #    f"device status strategy dev_id = {device_id} support_local = {support_local} local_strategy = {dp_id_map}")
+
     def update_device_strategy_info(self, device: CustomerDevice):
-        super().update_device_strategy_info(device)
+        #super().update_device_strategy_info(device)
+        self._update_device_strategy_info_mod(device=device)
+        #Sometimes the Type provided by Tuya is ill formed,
+        #replace it with the one from the local strategy
         for loc_strat in device.local_strategy.values():
+            if "statusCode" not in loc_strat or "valueType" not in loc_strat:
+                continue
+            code = loc_strat["statusCode"]
+            value_type = loc_strat["valueType"]
+
+            if code in device.status_range:
+                device.status_range[code].type = value_type
+            if code in device.function:
+                device.function[code].type     = value_type
+
             if (
-                "statusCode" in loc_strat and 
-                "valueType"  in loc_strat and
                 "valueDesc"  in loc_strat and
-                loc_strat["statusCode"] not in device.status_range and
-                loc_strat["statusCode"] not in device.function
+                code not in device.status_range and
+                code not in device.function
                 ):
-                device.status_range[loc_strat["statusCode"]] = DeviceStatusRange()
-                device.status_range[loc_strat["statusCode"]].code   = loc_strat["statusCode"]
-                device.status_range[loc_strat["statusCode"]].type   = loc_strat["valueType"]
-                device.status_range[loc_strat["statusCode"]].values = loc_strat["valueDesc"]
+                device.status_range[code] = DeviceStatusRange()
+                device.status_range[code].code   = code
+                device.status_range[code].type   = value_type
+                device.status_range[code].values = loc_strat["valueDesc"]
+
+        #Sometimes the Type provided by Tuya is ill formed,
+        #Try to reformat it into the correct one
+        for status in device.status_range.values():
+            try:
+                DPType(status.type)
+            except ValueError:
+                status.type = TuyaEntity.determine_dptype(status.type)
+        for func in device.function.values():
+            try:
+                DPType(func.type)
+            except ValueError:
+                func.type = TuyaEntity.determine_dptype(func.type)
+
         self.multi_manager.apply_init_virtual_states(device)
         self.multi_manager.allow_virtual_devices_not_set_up(device)

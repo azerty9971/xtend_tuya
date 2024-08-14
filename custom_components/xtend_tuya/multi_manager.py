@@ -141,8 +141,8 @@ class MultiDeviceListener:
         devices = self.multi_manager.get_devices_from_device_id(device.id)
         for cur_device in devices:
             XTDevice.copy_data_from_device(device, cur_device)
-        if self.multi_manager.reuse_config:
-            dispatcher_send(self.hass, f"{TUYA_HA_SIGNAL_UPDATE_ENTITY_ORIG}_{device.id}")
+        #if self.multi_manager.reuse_config:
+        dispatcher_send(self.hass, f"{TUYA_HA_SIGNAL_UPDATE_ENTITY_ORIG}_{device.id}")
         dispatcher_send(self.hass, f"{TUYA_HA_SIGNAL_UPDATE_ENTITY}_{device.id}")
 
     def add_device(self, device: XTDevice):
@@ -318,12 +318,12 @@ class MultiManager:  # noqa: F811
         device_maps = self._get_available_device_maps()
         aggregated_device_list = self.device_map
         for device in aggregated_device_list.values():
-            to_be_merged = []
+            to_be_merged: list[XTDevice] = []
             devices = self.get_devices_from_device_id(device.id)
             for current_device in devices:
                 for prev_device in to_be_merged:
                     self._merge_devices(current_device, prev_device)
-                to_be_merged.append(current_device)
+                    to_be_merged.append(current_device)
         for device_map in device_maps:
             merge_iterables(device_map, aggregated_device_list)
         
@@ -502,6 +502,10 @@ class MultiManager:  # noqa: F811
                                 if dp_id := self._read_dpId_from_code(virtual_state.key, device):
                                     if new_dp_id := self._get_empty_local_strategy_dp_id(device):
                                         new_local_strategy = copy.deepcopy(device.local_strategy[dp_id])
+                                        if "config_item" in new_local_strategy:
+                                            new_local_strategy_config_item = new_local_strategy["config_item"]
+                                            if "statusFormat" in new_local_strategy_config_item and virtual_state.key in new_local_strategy_config_item["statusFormat"]:
+                                                new_local_strategy_config_item["statusFormat"] = new_local_strategy_config_item["statusFormat"].replace(virtual_state.key, new_code)
                                         new_local_strategy["status_code"] = new_code
                                         device.local_strategy[new_dp_id] = new_local_strategy
                     if virtual_state.key in device.function:
@@ -542,11 +546,16 @@ class MultiManager:  # noqa: F811
         for device in devices:
             if code is None and "code" in state:
                 code = state["code"]
-                dpId = self._read_dpId_from_code(state["code"], device)
             if dpId is None and "dpId" in state:
                 dpId = state["dpId"]
-                code = self._read_code_from_dpId(state["dpId"], device)
-            if dpId is None and code is None and "dpId" not in state and "code" not in state:
+
+            if code is None and dpId is not None:
+                code = self._read_code_from_dpId(dpId, device)
+
+            if dpId is None and code is not None:
+                dpId = self._read_dpId_from_code(code, device)
+
+            if dpId is None and code is None:
                 for temp_dpId in state:
                     temp_code = self._read_code_from_dpId(int(temp_dpId), device)
                     if temp_code is not None:
@@ -608,11 +617,12 @@ class MultiManager:  # noqa: F811
         self.on_message(MESSAGE_SOURCE_TUYA_SHARING, msg)
 
     def on_message(self, source: str, msg: str):
-        LOGGER.debug(f"on_message from {source} : {msg}")
         dev_id = self._get_device_id_from_message(msg)
         if not dev_id:
             LOGGER.warning(f"dev_id {dev_id} not found!")
             return
+        
+        LOGGER.debug(f"on_message from {source} : {msg}")
         
         new_message = self._convert_message_for_all_accounts(msg)
         allowed_source = self.get_allowed_source(dev_id, source)
@@ -622,11 +632,20 @@ class MultiManager:  # noqa: F811
             self.iot_account.device_manager.on_message(new_message)
 
     def get_allowed_source(self, dev_id: str, original_source: str) -> str | None:
-        if dev_id.startswith("vdevo"):
-            return MESSAGE_SOURCE_TUYA_IOT
+        """if dev_id.startswith("vdevo"):
+            return MESSAGE_SOURCE_TUYA_IOT"""
+        in_iot = False
         if self.iot_account and dev_id in self.iot_account.device_ids:
+            in_iot = True
+        in_sharing = False
+        if self.sharing_account and dev_id in self.sharing_account.device_ids:
+            in_sharing = True
+
+        if in_iot and in_sharing:
+            return MESSAGE_SOURCE_TUYA_SHARING
+        elif in_iot:
             return MESSAGE_SOURCE_TUYA_IOT
-        if self.sharing_account and self.sharing_account and dev_id in self.sharing_account.device_ids:
+        elif in_sharing:
             return MESSAGE_SOURCE_TUYA_SHARING
         return None
 
