@@ -472,6 +472,8 @@ class MultiManager:  # noqa: F811
     def _read_code_from_dpId(self, dpId: int, device: XTDevice) -> str | None:
         if dp_id_item := device.local_strategy.get(dpId, None):
             return dp_id_item["status_code"]
+        if device.id == "bfd96de2b508052bb3dzco":
+            LOGGER.warning(f"dpId {dpId} NOT found in {device.local_strategy}")
         return None
     
     def _get_empty_local_strategy_dp_id(self, device: XTDevice) -> int | None:
@@ -548,7 +550,7 @@ class MultiManager:  # noqa: F811
                 code = state["code"]
                 dpId = self._read_dpId_from_code(state["code"], device)
             if dpId is None and "dpId" in state:
-                dpId = int(state["dpId"])
+                dpId = state["dpId"]
                 code = self._read_code_from_dpId(dpId, device)
                 if device_id == "bfd96de2b508052bb3dzco":
                     LOGGER.warning(f"Found dpId : {dpId} => {code}")
