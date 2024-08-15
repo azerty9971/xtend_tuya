@@ -640,7 +640,7 @@ class TuyaSensorEntity(TuyaEntity, RestoreSensor):
         ):
             self.async_on_remove(
                 async_track_time_change(
-                    self.hass, reset_status_daily, hour=0, minute=0, second=0
+                    self.hass, reset_status_daily, hour=18, minute=47, second=0
                 )
             )
 
