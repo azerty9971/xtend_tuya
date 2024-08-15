@@ -65,7 +65,7 @@ BATTERY_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
 CONSUMPTION_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
     TuyaSensorEntityDescription(
         key=DPCode.ADD_ELE,
-        virtual_state=VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME | VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD,
+        virtual_state= VirtualStates.STATE_INIT_AT_ZERO | VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME | VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD,
         vs_copy_to_state=[DPCode.ADD_ELE2, DPCode.ADD_ELE_TODAY, DPCode.ADD_ELE_THIS_MONTH],
         translation_key="add_ele",
         device_class=SensorDeviceClass.ENERGY,
