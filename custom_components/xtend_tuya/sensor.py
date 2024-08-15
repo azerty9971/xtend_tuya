@@ -631,6 +631,7 @@ class TuyaSensorEntity(TuyaEntity, RestoreSensor):
                 devices = self.device_manager.get_devices_from_device_id(self.device.id)
                 for device in devices:
                     device.status[self.entity_description.key] = float(0)
+                self.entity_description.last_reset = now
 
         if (
            ( hasattr(self.entity_description, "reset_daily") and self.entity_description.reset_daily )
