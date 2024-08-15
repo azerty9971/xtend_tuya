@@ -798,10 +798,13 @@
         "name": "Consumption"
       },
       "add_ele_this_month": {
-        "name": "This month's consumption"
+        "name": "Monthly consumption"
+      },
+      "add_ele_this_year": {
+        "name": "Yearly consumption"
       },
       "add_ele_today": {
-        "name": "Today's consumption"
+        "name": "Daily consumption"
       },
       "add_ele2": {
         "name": "Consumption (method B)"
