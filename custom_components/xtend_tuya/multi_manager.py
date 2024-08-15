@@ -491,9 +491,6 @@ class MultiManager:  # noqa: F811
         for virtual_state in virtual_states:
             if virtual_state.virtual_state_value == VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME:
                 if virtual_state.key in device.status:
-                    device.status[virtual_state.key] = 0
-            if virtual_state.virtual_state_value == VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME:
-                if virtual_state.key in device.status:
                     if virtual_state.key in device.status_range:
                         for vs_new_code in virtual_state.vs_copy_to_state:
                             new_code = str(vs_new_code)
