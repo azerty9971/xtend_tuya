@@ -18,11 +18,11 @@
       }
     },
     "error": {
-      "invalid_auth": "[%key:common::config_flow::error::invalid_auth%]",
+      "invalid_auth": "Invalid authentication",
       "login_error": "Login error ({code}): {msg}"
     },
     "abort": {
-      "reauth_successful": "[%key:common::config_flow::abort::reauth_successful%]"
+      "reauth_successful": "Reauthentication successful"
     }
   },
   "options": {
@@ -445,7 +445,7 @@
       "basic_anti_flicker": {
         "name": "Anti-flicker",
         "state": {
-          "0": "[%key:common::state::disabled%]",
+          "0": "Disabled",
           "1": "50 Hz",
           "2": "60 Hz"
         }
@@ -454,8 +454,8 @@
         "name": "Night vision",
         "state": {
           "0": "Automatic",
-          "1": "[%key:common::state::off%]",
-          "2": "[%key:common::state::on%]"
+          "1": "Off",
+          "2": "On"
         }
       },
       "decibel_sensitivity": {
@@ -543,7 +543,7 @@
           "low": "Low",
           "middle": "Middle",
           "high": "High",
-          "closed": "[%key:common::state::closed%]"
+          "closed": "Closed"
         }
       },
       "vacuum_collection": {
@@ -557,7 +557,7 @@
       "vacuum_mode": {
         "name": "Mode",
         "state": {
-          "standby": "[%key:common::state::standby%]",
+          "standby": "Stand by",
           "random": "Random",
           "smart": "Smart",
           "wall_follow": "Follow wall",
@@ -796,6 +796,15 @@
       },
       "add_ele": {
         "name": "Consumption"
+      },
+      "add_ele_this_month": {
+        "name": "Monthly consumption"
+      },
+      "add_ele_this_year": {
+        "name": "Yearly consumption"
+      },
+      "add_ele_today": {
+        "name": "Daily consumption"
       },
       "add_ele2": {
         "name": "Consumption (method B)"
@@ -1053,7 +1062,7 @@
           "reserve_1": "Reserve 1",
           "reserve_2": "Reserve 2",
           "reserve_3": "Reserve 3",
-          "standby": "[%key:common::state::standby%]",
+          "standby": "Stand by",
           "warm": "Heat preservation"
         }
       },
