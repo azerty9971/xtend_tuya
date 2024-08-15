@@ -621,7 +621,7 @@ class TuyaSensorEntity(TuyaEntity, RestoreSensor):
             if hasattr(self.entity_description, "reset_daily") and self.entity_description.reset_daily:
                 should_reset = True
 
-            if hasattr(self.entity_description, "reset_monthly") and self.entity_description.reset_monthly and now.day == 1:
+            if hasattr(self.entity_description, "reset_monthly") and self.entity_description.reset_monthly and now.day == 15:
                 should_reset = True
 
             if hasattr(self.entity_description, "reset_yearly") and self.entity_description.reset_yearly and now.day == 1 and now.month == 1:
@@ -632,6 +632,7 @@ class TuyaSensorEntity(TuyaEntity, RestoreSensor):
                 for device in devices:
                     device.status[self.entity_description.key] = float(0)
                 self.entity_description.last_reset = now
+                self.async_write_ha_state()
 
         if (
            ( hasattr(self.entity_description, "reset_daily") and self.entity_description.reset_daily )
@@ -640,7 +641,7 @@ class TuyaSensorEntity(TuyaEntity, RestoreSensor):
         ):
             self.async_on_remove(
                 async_track_time_change(
-                    self.hass, reset_status_daily, hour=18, minute=50, second=0
+                    self.hass, reset_status_daily, hour=18, minute=54, second=0
                 )
             )
 
