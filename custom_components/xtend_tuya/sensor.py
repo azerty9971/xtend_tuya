@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import datetime
+
 from dataclasses import dataclass, field
 
 from tuya_sharing import CustomerDevice
@@ -20,6 +22,7 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import StateType
+from homeassistant.helpers.event import async_track_time_change
 
 try:
     from custom_components.tuya.sensor import ( # type: ignore
@@ -55,6 +58,9 @@ class TuyaSensorEntityDescription(SensorEntityDescription):
     virtual_state: VirtualStates | None = None
     vs_copy_to_state: list[DPCode]  | None = field(default_factory=list)
 
+    reset_daily: bool = False
+    reset_monthly: bool = False
+    reset_yearly: bool = False
     restoredata: bool = False
 
 # Commonly used battery sensors, that are re-used in the sensors down below.
@@ -66,7 +72,7 @@ CONSUMPTION_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
     TuyaSensorEntityDescription(
         key=DPCode.ADD_ELE,
         virtual_state=VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME | VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD,
-        vs_copy_to_state=[DPCode.ADD_ELE2],
+        vs_copy_to_state=[DPCode.ADD_ELE2, DPCode.ADD_ELE_TODAY, DPCode.ADD_ELE_THIS_MONTH, DPCode.ADD_ELE_THIS_YEAR],
         translation_key="add_ele",
         device_class=SensorDeviceClass.ENERGY,
         state_class=SensorStateClass.TOTAL_INCREASING,
@@ -82,6 +88,39 @@ CONSUMPTION_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         entity_registry_enabled_default=False,
         restoredata=True,
+    ),
+    TuyaSensorEntityDescription(
+        key=DPCode.ADD_ELE_TODAY,
+        virtual_state=VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD,
+        translation_key="add_ele_today",
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        entity_registry_enabled_default=True,
+        restoredata=True,
+        reset_daily=True
+    ),
+    TuyaSensorEntityDescription(
+        key=DPCode.ADD_ELE_THIS_MONTH,
+        virtual_state=VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD,
+        translation_key="add_ele_this_month",
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        entity_registry_enabled_default=True,
+        restoredata=True,
+        reset_monthly=True
+    ),
+    TuyaSensorEntityDescription(
+        key=DPCode.ADD_ELE_THIS_YEAR,
+        virtual_state=VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD,
+        translation_key="add_ele_this_year",
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        entity_registry_enabled_default=True,
+        restoredata=True,
+        reset_yearly=True
     ),
     TuyaSensorEntityDescription(
         key=DPCode.BALANCE_ENERGY,
@@ -576,6 +615,36 @@ class TuyaSensorEntity(TuyaEntity, RestoreSensor):
     async def async_added_to_hass(self) -> None:
         """Call when entity about to be added to hass."""
         await super().async_added_to_hass()
+
+        async def reset_status_daily(now: datetime.datetime) -> None:
+            should_reset = False
+            if hasattr(self.entity_description, "reset_daily") and self.entity_description.reset_daily:
+                should_reset = True
+
+            if hasattr(self.entity_description, "reset_monthly") and self.entity_description.reset_monthly and now.day == 1:
+                should_reset = True
+
+            if hasattr(self.entity_description, "reset_yearly") and self.entity_description.reset_yearly and now.day == 1 and now.month == 1:
+                should_reset = True
+            
+            if should_reset:
+                devices = self.device_manager.get_devices_from_device_id(self.device.id)
+                for device in devices:
+                    device.status[self.entity_description.key] = float(0)
+                self.entity_description.last_reset = now
+                self.async_write_ha_state()
+
+        if (
+           ( hasattr(self.entity_description, "reset_daily") and self.entity_description.reset_daily )
+        or ( hasattr(self.entity_description, "reset_monthly") and self.entity_description.reset_monthly )
+        or ( hasattr(self.entity_description, "reset_yearly") and self.entity_description.reset_yearly )
+        ):
+            self.async_on_remove(
+                async_track_time_change(
+                    self.hass, reset_status_daily, hour=0, minute=0, second=0
+                )
+            )
+
         if not hasattr(self.entity_description, "restoredata") or not self.entity_description.restoredata:
             return
         state = await self.async_get_last_sensor_data()
@@ -585,7 +654,7 @@ class TuyaSensorEntity(TuyaEntity, RestoreSensor):
         if isinstance(self._type_data, IntegerTypeData):
             scaled_value_back = self._type_data.scale_value_back(state.native_value)
             state.native_value = scaled_value_back
-        if state:
-            devices = self.device_manager.get_devices_from_device_id(self.device.id)
-            for device in devices:
-                device.status[self.entity_description.key] = float(state.native_value)
+
+        devices = self.device_manager.get_devices_from_device_id(self.device.id)
+        for device in devices:
+            device.status[self.entity_description.key] = float(state.native_value)

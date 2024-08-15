@@ -143,6 +143,9 @@ class DPCode(StrEnum):
     """
 
     ADD_ELE = "add_ele" #Added watt since last heartbeat
+    ADD_ELE_THIS_MONTH = "add_ele_this_month"
+    ADD_ELE_THIS_YEAR = "add_ele_this_year"
+    ADD_ELE_TODAY = "add_ele_today"
     ADD_ELE2 = "add_ele2" #Added watt since last heartbeat
     AIR_QUALITY = "air_quality"
     ALARM_LOCK = "alarm_lock"
