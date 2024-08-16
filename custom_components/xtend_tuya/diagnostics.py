@@ -14,7 +14,7 @@ from homeassistant.helpers import device_registry as dr, entity_registry as er
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.util import dt as dt_util
 
-from .multi_manager import XTConfigEntry
+from ..multi_manager.multi_manager import XTConfigEntry
 from .const import DOMAIN, DPCode
 
 

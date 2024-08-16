@@ -14,21 +14,21 @@ from tuya_iot import (
 )
 from typing import Any
 
-from .const import (
+from ...xtend_tuya.const import (
     LOGGER,
     DPType,
 )
 
-from .shared_classes import (
+from ..shared.shared_classes import (
     XTDeviceStatusRange,
     XTDeviceProperties,
     XTDevice,
 )
 
-from .multi_manager import (
+from ..multi_manager import (
     MultiManager,  # noqa: F811
 )
-from .base import TuyaEntity
+from ...xtend_tuya.base import TuyaEntity
 
 class XTIOTHomeManager(TuyaHomeManager):
     def __init__(
