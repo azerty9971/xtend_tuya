@@ -30,7 +30,7 @@ from ...const import (
     DPType,
 )
 
-from .multi_manager import (
+from ..multi_manager import (
     MultiManager,
 )
 
