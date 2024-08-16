@@ -432,7 +432,7 @@ class MultiManager:  # noqa: F811
                     for description in descriptions:
                         if description.virtual_state is not None and description.virtual_state & virtual_state.value:
                             # This virtual_state is applied to this key, let's return it
-                            found_virtual_state = DescriptionVirtualState(description.key, virtual_state.name, virtual_state.value, description.vs_copy_to_state)
+                            found_virtual_state = DescriptionVirtualState(description.key, virtual_state.name, virtual_state.value, description.vs_copy_to_state, description.vs_copy_delta_to_state)
                             to_return.append(found_virtual_state)
         return to_return
     
@@ -508,6 +508,22 @@ class MultiManager:  # noqa: F811
                                                 new_local_strategy_config_item["statusFormat"] = new_local_strategy_config_item["statusFormat"].replace(virtual_state.key, new_code)
                                         new_local_strategy["status_code"] = new_code
                                         device.local_strategy[new_dp_id] = new_local_strategy
+                        for vs_new_code in virtual_state.vs_copy_delta_to_state:
+                            new_code = str(vs_new_code)
+                            if device.status.get(new_code, None) is None:
+                                device.status[new_code] = 0
+                            device.status_range[new_code] = copy.deepcopy(device.status_range[virtual_state.key])
+                            device.status_range[new_code].code = new_code
+                            if not self._read_dpId_from_code(new_code, device):
+                                if dp_id := self._read_dpId_from_code(virtual_state.key, device):
+                                    if new_dp_id := self._get_empty_local_strategy_dp_id(device):
+                                        new_local_strategy = copy.deepcopy(device.local_strategy[dp_id])
+                                        if "config_item" in new_local_strategy:
+                                            new_local_strategy_config_item = new_local_strategy["config_item"]
+                                            if "statusFormat" in new_local_strategy_config_item and virtual_state.key in new_local_strategy_config_item["statusFormat"]:
+                                                new_local_strategy_config_item["statusFormat"] = new_local_strategy_config_item["statusFormat"].replace(virtual_state.key, new_code)
+                                        new_local_strategy["status_code"] = new_code
+                                        device.local_strategy[new_dp_id] = new_local_strategy
                     if virtual_state.key in device.function:
                         for vs_new_code in virtual_state.vs_copy_to_state:
                             new_code = str(vs_new_code)
@@ -521,6 +537,39 @@ class MultiManager:  # noqa: F811
                                         new_local_strategy = copy.deepcopy(device.local_strategy[dp_id])
                                         new_local_strategy["status_code"] = new_code
                                         device.local_strategy[new_dp_id] = new_local_strategy
+
+    def apply_virtual_states_to_status_list(self, device: XTDevice, status_in: list) -> list:
+        status = copy.deepcopy(status_in)
+        virtual_states = self.get_category_virtual_states(device.category)
+        for virtual_state in virtual_states:
+            if virtual_state.virtual_state_value == VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME:
+                for item in status:
+                    code, dpId, value, result_ok = self._read_code_dpid_value_from_state(device.id, item)
+                    if result_ok and code == virtual_state.key:
+                        for state_name in virtual_state.vs_copy_to_state:
+                            code, dpId, value, result_ok = self._read_code_dpid_value_from_state(device.id, {"code": str(state_name), "value": value})
+                            if result_ok:
+                                new_status = {"code": code, "value": copy.copy(value), "dpId": dpId}
+                                status.append(new_status)
+                        for state_name in virtual_state.vs_copy_delta_to_state:
+                            code, dpId, value, result_ok = self._read_code_dpid_value_from_state(device.id, {"code": str(state_name), "value": value})
+                            current_value = None
+                            if code in device.status:
+                                current_value = device.status[code]
+                            if result_ok and current_value is not None:
+                                new_status = {"code": code, "value": copy.copy(value - current_value), "dpId": dpId}
+                                status.append(new_status)
+            
+            if virtual_state.virtual_state_value == VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD:
+                if virtual_state.key not in device.status or device.status[virtual_state.key] is None:
+                    device.status[virtual_state.key] = 0
+                if virtual_state.key in device.status:
+                    for item in status:
+                        code, dpId, value, result_ok = self._read_code_dpid_value_from_state(device.id, item, False, True)
+                        if result_ok and code == virtual_state.key:
+                            item["value"] += device.status[virtual_state.key]
+                            continue
+        return status
 
     def allow_virtual_devices_not_set_up(self, device: XTDevice):
         if not device.id.startswith("vdevo"):
@@ -583,31 +632,6 @@ class MultiManager:  # noqa: F811
                 item["value"] = value
             else:
                 LOGGER.warning(f"convert_device_report_status_list code retrieval failed => {item} <=>{device_id}")
-        return status
-    
-    def apply_virtual_states_to_status_list(self, device: XTDevice, status_in: list) -> list:
-        status = copy.deepcopy(status_in)
-        virtual_states = self.get_category_virtual_states(device.category)
-        for virtual_state in virtual_states:
-            if virtual_state.virtual_state_value == VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME:
-                for item in status:
-                    code, dpId, value, result_ok = self._read_code_dpid_value_from_state(device.id, item)
-                    if result_ok and code == virtual_state.key:
-                        for state_name in virtual_state.vs_copy_to_state:
-                            code, dpId, value, result_ok = self._read_code_dpid_value_from_state(device.id, {"code": str(state_name), "value": value})
-                            if result_ok:
-                                new_status = {"code": code, "value": copy.copy(value), "dpId": dpId}
-                                status.append(new_status)
-            
-            if virtual_state.virtual_state_value == VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD:
-                if virtual_state.key not in device.status or device.status[virtual_state.key] is None:
-                    device.status[virtual_state.key] = 0
-                if virtual_state.key in device.status:
-                    for item in status:
-                        code, dpId, value, result_ok = self._read_code_dpid_value_from_state(device.id, item, False, True)
-                        if result_ok and code == virtual_state.key:
-                            item["value"] += device.status[virtual_state.key]
-                            continue
         return status
 
     def on_message_from_tuya_iot(self, msg:str):

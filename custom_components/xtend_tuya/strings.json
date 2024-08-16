@@ -809,6 +809,15 @@
       "add_ele2": {
         "name": "Consumption (method B)"
       },
+      "add_ele2_this_month": {
+        "name": "Monthly consumption (method B)"
+      },
+      "add_ele2_this_year": {
+        "name": "Yearly consumption (method B)"
+      },
+      "add_ele2_today": {
+        "name": "Daily consumption (method B)"
+      },
       "excretion_times_day": {
         "name": "Number of excretion"
       },
