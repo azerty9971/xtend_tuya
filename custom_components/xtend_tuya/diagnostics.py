@@ -89,10 +89,14 @@ def _async_device_as_dict(
     data_model = ""
     if hasattr(device, "data_model"):
         data_model = device.data_model
+    local_key = ""
+    if hasattr(device, "local_key"):
+        local_key = device.local_key
     data = {
         "id": device.id,
         "name": device.name,
         "category": device.category,
+        "local_key": local_key,
         "product_id": device.product_id,
         "product_name": device.product_name,
         "online": device.online,
