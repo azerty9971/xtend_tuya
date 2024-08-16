@@ -3,7 +3,7 @@ from typing import Any, Optional
 from types import SimpleNamespace
 import copy
 from dataclasses import dataclass, field
-from ...xtend_tuya.util import (
+from ...util import (
     merge_iterables,
 )
 

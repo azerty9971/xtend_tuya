@@ -28,7 +28,7 @@ from .util import (
     merge_device_descriptors
 )
 
-from ..multi_manager.multi_manager import XTConfigEntry
+from .multi_manager.multi_manager import XTConfigEntry
 from .base import IntegerTypeData, TuyaEntity
 from .const import DEVICE_CLASS_UNITS, DOMAIN, TUYA_DISCOVERY_NEW, DPCode, DPType
 

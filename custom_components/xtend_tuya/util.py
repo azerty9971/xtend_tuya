@@ -19,7 +19,7 @@ from tuya_sharing import (
 
 )
 
-from ..multi_manager.multi_manager import (
+from .multi_manager.multi_manager import (
     XTConfigEntry,
 )
 

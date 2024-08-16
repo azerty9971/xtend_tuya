@@ -33,7 +33,7 @@ from .util import (
     merge_device_descriptors
 )
 
-from ..multi_manager.multi_manager import XTConfigEntry
+from .multi_manager.multi_manager import XTConfigEntry
 from .base import IntegerTypeData, TuyaEntity
 from .const import TUYA_DISCOVERY_NEW, DPCode, DPType, WorkMode
 from .util import remap_value
