@@ -20,7 +20,7 @@ from .multi_manager.multi_manager import (
     HomeAssistantXTData,
 )
 
-from .tuya_decorators import (
+from .multi_manager.tuya_sharing.tuya_decorators import (
     decorate_tuya_integration
 )
 

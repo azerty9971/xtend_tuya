@@ -85,7 +85,7 @@ from ..util import (
     append_lists,
 )
 
-from ..tuya_decorators import (
+from .tuya_sharing.tuya_decorators import (
     decorate_tuya_manager,
 )
 
