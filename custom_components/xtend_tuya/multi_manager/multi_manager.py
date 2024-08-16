@@ -38,7 +38,7 @@ from tuya_sharing.user import (
     UserRepository,
 )
 
-from ..xtend_tuya.const import (
+from .const import (
     CONF_ENDPOINT,
     CONF_TERMINAL_ID,
     CONF_TOKEN_INFO,
@@ -77,7 +77,7 @@ from .shared.shared_classes import (
     XTDevice,
 )
 
-from ..xtend_tuya.util import (
+from ..util import (
     get_overriden_tuya_integration_runtime_data,
     get_tuya_integration_runtime_data,
     prepare_value_for_property_update,
@@ -85,7 +85,7 @@ from ..xtend_tuya.util import (
     append_lists,
 )
 
-from ..xtend_tuya.tuya_decorators import (
+from ..tuya_decorators import (
     decorate_tuya_manager,
 )
 

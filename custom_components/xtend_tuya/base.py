@@ -18,7 +18,7 @@ from homeassistant.components.tuya.const import (
 
 from .const import DOMAIN, TUYA_HA_SIGNAL_UPDATE_ENTITY, DPCode, DPType, LOGGER
 from .util import remap_value
-from ..multi_manager.multi_manager import MultiManager, XTDevice
+from .multi_manager.multi_manager import MultiManager, XTDevice
 
 
 @dataclass
