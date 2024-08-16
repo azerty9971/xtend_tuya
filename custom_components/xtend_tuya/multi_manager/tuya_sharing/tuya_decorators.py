@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import functools
 
-from .multi_manager.multi_manager import (
+from ..multi_manager import (
     MultiManager
 )
 try:
