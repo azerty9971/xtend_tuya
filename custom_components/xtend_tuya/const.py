@@ -393,6 +393,7 @@ class DPCode(StrEnum):
     RESET_MAP = "reset_map"
     RESET_ROLL_BRUSH = "reset_roll_brush"
     RESPIRATORY_RATE = "respiratory_rate"
+    REVERSE_ENERGY_TOTAL = "reverse_energy_total"
     ROLL_BRUSH = "roll_brush"
     RTC_TIME = "rtc_time"
     SAND_SURFACE_CALIBRATION = "sand_surface_calibration"
