@@ -333,11 +333,11 @@ class MultiManager:  # noqa: F811
         merge_iterables(receiving_device.status, giving_device.status)
         if hasattr(receiving_device, "local_strategy") and hasattr(giving_device, "local_strategy"):
             merge_iterables(receiving_device.local_strategy, giving_device.local_strategy)
-        if hasattr(receiving_device, "model") and hasattr(giving_device, "model"):
-            if receiving_device.model == "" and giving_device.model != "":
-                receiving_device.model = copy.deepcopy(giving_device.model)
-            if giving_device.model == "" and receiving_device.model != "":
-                giving_device.model = copy.deepcopy(receiving_device.model)
+        if hasattr(receiving_device, "data_model") and hasattr(giving_device, "data_model"):
+            if receiving_device.data_model == "" and giving_device.data_model != "":
+                receiving_device.data_model = copy.deepcopy(giving_device.data_model)
+            if giving_device.data_model == "" and receiving_device.data_model != "":
+                giving_device.data_model = copy.deepcopy(receiving_device.data_model)
     
     def get_aggregated_device_map(self) -> dict[str, XTDevice]:
         aggregated_list: dict[str, XTDevice] = {}
