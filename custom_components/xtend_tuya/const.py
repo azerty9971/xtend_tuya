@@ -106,6 +106,7 @@ class DescriptionVirtualState:
     virtual_state_name: str
     virtual_state_value: VirtualStates = None
     vs_copy_to_state: list[DPCode] = field(default_factory=list)
+    vs_copy_delta_to_state: list[DPCode] = field(default_factory=list)
 
 @dataclass
 class DescriptionVirtualFunction:
@@ -147,6 +148,9 @@ class DPCode(StrEnum):
     ADD_ELE_THIS_YEAR = "add_ele_this_year"
     ADD_ELE_TODAY = "add_ele_today"
     ADD_ELE2 = "add_ele2" #Added watt since last heartbeat
+    ADD_ELE2_THIS_MONTH = "add_ele2_this_month"
+    ADD_ELE2_THIS_YEAR = "add_ele2_this_year"
+    ADD_ELE2_TODAY = "add_ele2_today"
     AIR_QUALITY = "air_quality"
     ALARM_LOCK = "alarm_lock"
     ALARM_SWITCH = "alarm_switch"  # Alarm switch
