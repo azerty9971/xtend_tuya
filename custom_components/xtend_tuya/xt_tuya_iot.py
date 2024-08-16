@@ -123,6 +123,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
             device_properties = self.get_device_properties(device)
             device_properties.merge_in_device(device)
             self.multi_manager.apply_init_virtual_states(device)
+            self.multi_manager.allow_virtual_devices_not_set_up(device)
 
 
     
