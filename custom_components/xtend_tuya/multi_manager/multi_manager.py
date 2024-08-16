@@ -38,7 +38,7 @@ from tuya_sharing.user import (
     UserRepository,
 )
 
-from .const import (
+from ..const import (
     CONF_ENDPOINT,
     CONF_TERMINAL_ID,
     CONF_TOKEN_INFO,

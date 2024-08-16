@@ -25,7 +25,7 @@ from ..shared.shared_classes import (
     XTDevice,
 )
 
-from .multi_manager import (
+from ..multi_manager import (
     MultiManager,  # noqa: F811
 )
 from ...base import TuyaEntity
