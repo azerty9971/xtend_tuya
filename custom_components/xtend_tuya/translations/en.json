@@ -670,6 +670,10 @@
       }
     },
     "sensor": {
+      "gross_generation":
+      {
+        "name": "Gross generation"
+      },
       "liquid_state":
       {
         "name": "Liquid state",
