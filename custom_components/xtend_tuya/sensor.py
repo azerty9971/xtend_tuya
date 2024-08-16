@@ -36,7 +36,7 @@ from .util import (
     merge_device_descriptors
 )
 
-from .multi_manager import XTConfigEntry, MultiManager
+from ..multi_manager.multi_manager import XTConfigEntry, MultiManager
 from .base import ElectricityTypeData, EnumTypeData, IntegerTypeData, TuyaEntity
 from .const import (
     DEVICE_CLASS_UNITS,

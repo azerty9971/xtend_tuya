@@ -27,7 +27,7 @@ from .util import (
     append_dictionnaries
 )
 
-from .multi_manager import XTConfigEntry
+from ..multi_manager.multi_manager import XTConfigEntry
 from .base import IntegerTypeData, TuyaEntity
 from .const import TUYA_DISCOVERY_NEW, DPCode, DPType
 

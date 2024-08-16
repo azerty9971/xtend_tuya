@@ -38,7 +38,7 @@ from tuya_sharing.user import (
     UserRepository,
 )
 
-from .const import (
+from ..xtend_tuya.const import (
     CONF_ENDPOINT,
     CONF_TERMINAL_ID,
     CONF_TOKEN_INFO,
@@ -67,17 +67,17 @@ from .const import (
     MESSAGE_SOURCE_TUYA_SHARING,
 )
 
-from .import_stub import (
+from .shared.import_stub import (
     MultiManager,
     XTConfigEntry,
 )
 
-from .shared_classes import (
+from .shared.shared_classes import (
     XTDeviceProperties,
     XTDevice,
 )
 
-from .util import (
+from ..xtend_tuya.util import (
     get_overriden_tuya_integration_runtime_data,
     get_tuya_integration_runtime_data,
     prepare_value_for_property_update,
@@ -85,16 +85,16 @@ from .util import (
     append_lists,
 )
 
-from .tuya_decorators import (
+from ..xtend_tuya.tuya_decorators import (
     decorate_tuya_manager,
 )
 
-from .xt_tuya_sharing import (
+from .tuya_sharing.xt_tuya_sharing import (
     XTSharingDeviceManager,
     XTSharingTokenListener,
     XTSharingDeviceRepository,
 )
-from .xt_tuya_iot import (
+from .tuya_iot.xt_tuya_iot import (
     XTIOTDeviceManager,
     XTIOTHomeManager,
 )
