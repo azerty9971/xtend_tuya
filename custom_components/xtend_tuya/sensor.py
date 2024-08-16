@@ -512,6 +512,7 @@ SENSORS["dlq"]  = SENSORS["kg"]
 SENSORS["tdq"]  = SENSORS["kg"]
 SENSORS["pc"]   = SENSORS["kg"]
 SENSORS["aqcz"] = SENSORS["kg"]
+SENSORS["zndb"] = SENSORS["kg"]
 
 async def async_setup_entry(
     hass: HomeAssistant, entry: XTConfigEntry, async_add_entities: AddEntitiesCallback
