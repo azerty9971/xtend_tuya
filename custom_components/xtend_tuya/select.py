@@ -84,6 +84,13 @@ SELECTS: dict[str, tuple[SelectEntityDescription, ...]] = {
             entity_category=EntityCategory.CONFIG,
         ),
     ),
+    "mzj": (
+        SelectEntityDescription(
+            key=DPCode.TEMPCHANGER,
+            translation_key="change_temp_unit",
+            entity_category=EntityCategory.CONFIG,
+        ),
+    ),
 }
 
 

@@ -440,6 +440,23 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
         ),
         *TEMPERATURE_SENSORS,
     ),
+    "mzj": (
+        TuyaSensorEntityDescription(
+            key=DPCode.WORK_STATUS,
+            translation_key="mzj_work_status",
+            entity_registry_enabled_default=True,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.TEMPSHOW,
+            translation_key="temp_show",
+            entity_registry_enabled_default=True,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.REMAININGTIME,
+            translation_key="remaining_time",
+            entity_registry_enabled_default=True,
+        ),
+    ),
     "smd": (
         TuyaSensorEntityDescription(
             key=DPCode.HEART_RATE,

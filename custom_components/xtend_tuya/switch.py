@@ -216,6 +216,13 @@ SWITCHES: dict[str, tuple[SwitchEntityDescription, ...]] = {
             entity_category=EntityCategory.CONFIG,
         ),
     ),
+    "mzj": (
+        SwitchEntityDescription(
+            key=DPCode.POWERONOFF,
+            translation_key="power",
+            entity_category=EntityCategory.CONFIG,
+        ),
+    ),
     "wnykq": (
         SwitchEntityDescription(
             key=DPCode.POWERON,
