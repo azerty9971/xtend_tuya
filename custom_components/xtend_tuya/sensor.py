@@ -133,7 +133,7 @@ CONSUMPTION_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
         state_class=SensorStateClass.TOTAL_INCREASING,
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         entity_registry_enabled_default=False,
-        restoredata=True,
+        restoredata=False,
         reset_daily=True
     ),
     TuyaSensorEntityDescription(
@@ -144,7 +144,7 @@ CONSUMPTION_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
         state_class=SensorStateClass.TOTAL_INCREASING,
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         entity_registry_enabled_default=False,
-        restoredata=True,
+        restoredata=False,
         reset_monthly=True
     ),
     TuyaSensorEntityDescription(
@@ -155,7 +155,7 @@ CONSUMPTION_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
         state_class=SensorStateClass.TOTAL_INCREASING,
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         entity_registry_enabled_default=False,
-        restoredata=True,
+        restoredata=False,
         reset_yearly=True
     ),
     TuyaSensorEntityDescription(
