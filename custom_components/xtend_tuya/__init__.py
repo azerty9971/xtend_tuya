@@ -14,13 +14,13 @@ from .const import (
     PLATFORMS,
 )
 
-from .multi_manager import (
+from .multi_manager.multi_manager import (
     MultiManager,
     XTConfigEntry,
     HomeAssistantXTData,
 )
 
-from .tuya_decorators import (
+from .multi_manager.tuya_sharing.tuya_decorators import (
     decorate_tuya_integration
 )
 

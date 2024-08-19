@@ -14,21 +14,21 @@ from tuya_iot import (
 )
 from typing import Any
 
-from .const import (
+from ...const import (
     LOGGER,
     DPType,
 )
 
-from .shared_classes import (
+from ..shared.shared_classes import (
     XTDeviceStatusRange,
     XTDeviceProperties,
     XTDevice,
 )
 
-from .multi_manager import (
+from ..multi_manager import (
     MultiManager,  # noqa: F811
 )
-from .base import TuyaEntity
+from ...base import TuyaEntity
 
 class XTIOTHomeManager(TuyaHomeManager):
     def __init__(
@@ -167,9 +167,9 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         
         if response2.get("success"):
             result = response2.get("result", {})
-            model = json.loads(result.get("model", "{}"))
-            device_properties.model = model
-            for service in model["services"]:
+            data_model = json.loads(result.get("model", "{}"))
+            device_properties.data_model = data_model
+            for service in data_model["services"]:
                 for property in service["properties"]:
                     if (    "abilityId" in property
                         and "code" in property

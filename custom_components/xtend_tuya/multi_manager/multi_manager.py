@@ -38,7 +38,7 @@ from tuya_sharing.user import (
     UserRepository,
 )
 
-from .const import (
+from ..const import (
     CONF_ENDPOINT,
     CONF_TERMINAL_ID,
     CONF_TOKEN_INFO,
@@ -67,17 +67,17 @@ from .const import (
     MESSAGE_SOURCE_TUYA_SHARING,
 )
 
-from .import_stub import (
+from .shared.import_stub import (
     MultiManager,
     XTConfigEntry,
 )
 
-from .shared_classes import (
+from .shared.shared_classes import (
     XTDeviceProperties,
     XTDevice,
 )
 
-from .util import (
+from ..util import (
     get_overriden_tuya_integration_runtime_data,
     get_tuya_integration_runtime_data,
     prepare_value_for_property_update,
@@ -85,16 +85,16 @@ from .util import (
     append_lists,
 )
 
-from .tuya_decorators import (
+from .tuya_sharing.tuya_decorators import (
     decorate_tuya_manager,
 )
 
-from .xt_tuya_sharing import (
+from .tuya_sharing.xt_tuya_sharing import (
     XTSharingDeviceManager,
     XTSharingTokenListener,
     XTSharingDeviceRepository,
 )
-from .xt_tuya_iot import (
+from .tuya_iot.xt_tuya_iot import (
     XTIOTDeviceManager,
     XTIOTHomeManager,
 )
@@ -333,11 +333,11 @@ class MultiManager:  # noqa: F811
         merge_iterables(receiving_device.status, giving_device.status)
         if hasattr(receiving_device, "local_strategy") and hasattr(giving_device, "local_strategy"):
             merge_iterables(receiving_device.local_strategy, giving_device.local_strategy)
-        if hasattr(receiving_device, "model") and hasattr(giving_device, "model"):
-            if receiving_device.model == "" and giving_device.model != "":
-                receiving_device.model = copy.deepcopy(giving_device.model)
-            if giving_device.model == "" and receiving_device.model != "":
-                giving_device.model = copy.deepcopy(receiving_device.model)
+        if hasattr(receiving_device, "data_model") and hasattr(giving_device, "data_model"):
+            if receiving_device.data_model == "" and giving_device.data_model != "":
+                receiving_device.data_model = copy.deepcopy(giving_device.data_model)
+            if giving_device.data_model == "" and receiving_device.data_model != "":
+                giving_device.data_model = copy.deepcopy(receiving_device.data_model)
     
     def get_aggregated_device_map(self) -> dict[str, XTDevice]:
         aggregated_list: dict[str, XTDevice] = {}
@@ -544,20 +544,23 @@ class MultiManager:  # noqa: F811
         for virtual_state in virtual_states:
             if virtual_state.virtual_state_value == VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME:
                 for item in status:
-                    code, dpId, value, result_ok = self._read_code_dpid_value_from_state(device.id, item)
+                    code, dpId, new_key_value, result_ok = self._read_code_dpid_value_from_state(device.id, item)
                     if result_ok and code == virtual_state.key:
+                        cur_key_value = 0
+                        if code in device.status:
+                            cur_key_value = device.status[code]
                         for state_name in virtual_state.vs_copy_to_state:
-                            code, dpId, value, result_ok = self._read_code_dpid_value_from_state(device.id, {"code": str(state_name), "value": value})
+                            code, dpId, new_key_value, result_ok = self._read_code_dpid_value_from_state(device.id, {"code": str(state_name), "value": new_key_value})
                             if result_ok:
-                                new_status = {"code": code, "value": copy.copy(value), "dpId": dpId}
+                                new_status = {"code": code, "value": copy.copy(new_key_value), "dpId": dpId}
                                 status.append(new_status)
                         for state_name in virtual_state.vs_copy_delta_to_state:
-                            code, dpId, value, result_ok = self._read_code_dpid_value_from_state(device.id, {"code": str(state_name), "value": value})
+                            code, dpId, new_key_value, result_ok = self._read_code_dpid_value_from_state(device.id, {"code": str(state_name), "value": new_key_value})
                             current_value = None
                             if code in device.status:
                                 current_value = device.status[code]
                             if result_ok and current_value is not None:
-                                new_status = {"code": code, "value": copy.copy(value - current_value), "dpId": dpId}
+                                new_status = {"code": code, "value": copy.copy(new_key_value - cur_key_value), "dpId": dpId}
                                 status.append(new_status)
             
             if virtual_state.virtual_state_value == VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD:
@@ -565,7 +568,7 @@ class MultiManager:  # noqa: F811
                     device.status[virtual_state.key] = 0
                 if virtual_state.key in device.status:
                     for item in status:
-                        code, dpId, value, result_ok = self._read_code_dpid_value_from_state(device.id, item, False, True)
+                        code, dpId, new_key_value, result_ok = self._read_code_dpid_value_from_state(device.id, item, False, True)
                         if result_ok and code == virtual_state.key:
                             item["value"] += device.status[virtual_state.key]
                             continue

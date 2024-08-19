@@ -14,7 +14,7 @@ from homeassistant.helpers import device_registry as dr, entity_registry as er
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.util import dt as dt_util
 
-from .multi_manager import XTConfigEntry
+from .multi_manager.multi_manager import XTConfigEntry
 from .const import DOMAIN, DPCode
 
 
@@ -86,13 +86,17 @@ def _async_device_as_dict(
     local_strategy = ""
     if hasattr(device, "local_strategy"):
         local_strategy = device.local_strategy
-    model = ""
-    if hasattr(device, "model"):
-        model = device.model
+    data_model = ""
+    if hasattr(device, "data_model"):
+        data_model = device.data_model
+    local_key = ""
+    if hasattr(device, "local_key"):
+        local_key = device.local_key
     data = {
         "id": device.id,
         "name": device.name,
         "category": device.category,
+        "local_key": local_key,
         "product_id": device.product_id,
         "product_name": device.product_name,
         "online": device.online,
@@ -108,7 +112,7 @@ def _async_device_as_dict(
         "home_assistant": {},
         "set_up": set_up,
         "support_local": support_local,
-        "model": model,
+        "data_model": data_model,
     }
 
     # Gather Tuya states
