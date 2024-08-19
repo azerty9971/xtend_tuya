@@ -90,6 +90,30 @@ NUMBERS: dict[str, tuple[NumberEntityDescription, ...]] = {
             entity_category=EntityCategory.CONFIG,
         ),
     ),
+    "mzj": (
+        NumberEntityDescription(
+            key=DPCode.TEMPSET,
+            translation_key="temp_set",
+            mode = NumberMode.SLIDER,
+            entity_category=EntityCategory.CONFIG,
+        ),
+        NumberEntityDescription(
+            key=DPCode.RECIPE,
+            translation_key="recipe",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        NumberEntityDescription(
+            key=DPCode.SETTIME,
+            translation_key="set_time",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        NumberEntityDescription(
+            key=DPCode.TEMPSC,
+            translation_key="tempsc",
+            mode = NumberMode.SLIDER,
+            entity_category=EntityCategory.CONFIG,
+        ),
+    ),
     "wnykq": (
         NumberEntityDescription(
             key=DPCode.BRIGHT_VALUE,
