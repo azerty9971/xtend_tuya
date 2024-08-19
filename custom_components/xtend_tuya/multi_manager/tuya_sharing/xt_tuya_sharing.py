@@ -24,17 +24,17 @@ from tuya_sharing.device import (
     DeviceStatusRange,
 )
 
-from .const import (
+from ...const import (
     CONF_TOKEN_INFO,
     LOGGER,
     DPType,
 )
 
-from .multi_manager import (
+from ..multi_manager import (
     MultiManager,
 )
 
-from .base import TuyaEntity
+from ...base import TuyaEntity
 
 class XTSharingTokenListener(SharingTokenListener):
     """Token listener for upstream token updates."""
