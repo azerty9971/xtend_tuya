@@ -158,6 +158,18 @@
       }
     },
     "number": {
+      "temp_set": {
+        "name": "Temperature"
+      },
+      "set_time": {
+        "name": "Set time"
+      },
+      "recipe": {
+        "name": "Recipe #"
+      },
+      "tempsc": {
+        "name": "Temperature correction"
+      },
       "max_set": {
         "name": "Maximum"
       },
@@ -280,6 +292,16 @@
       }
     },
     "select": {
+      "change_temp_unit":
+      {
+        "name": "Temperature unit",
+        "state": {
+          "0": "C°",
+          "1": "F",
+          "false": "C°",
+          "true": "F"
+        }
+      },
       "cat_litter_box_clean":
       {
         "name": "Manual shoveling",
@@ -670,6 +692,26 @@
       }
     },
     "sensor": {
+      "temp_show":
+      {
+        "name": "Current temperature"
+      },
+      "mzj_work_status":
+      {
+        "name": "Work status",
+        "state": {
+          "stop": "Stopped",
+          "working": "Working",
+          "complete": "Complete",
+          "0": "Stopped",
+          "1": "Working",
+          "2": "Complete"
+        }
+      },
+      "gross_generation":
+      {
+        "name": "Gross generation"
+      },
       "liquid_state":
       {
         "name": "Liquid state",
@@ -808,6 +850,15 @@
       },
       "add_ele2": {
         "name": "Consumption (method B)"
+      },
+      "add_ele2_this_month": {
+        "name": "Monthly consumption (method B)"
+      },
+      "add_ele2_this_year": {
+        "name": "Yearly consumption (method B)"
+      },
+      "add_ele2_today": {
+        "name": "Daily consumption (method B)"
       },
       "excretion_times_day": {
         "name": "Number of excretion"

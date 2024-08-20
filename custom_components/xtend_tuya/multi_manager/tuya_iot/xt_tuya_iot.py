@@ -14,21 +14,22 @@ from tuya_iot import (
 )
 from typing import Any
 
-from .const import (
+from ...const import (
     LOGGER,
     DPType,
+    MESSAGE_SOURCE_TUYA_IOT,
 )
 
-from .shared_classes import (
+from ..shared.shared_classes import (
     XTDeviceStatusRange,
     XTDeviceProperties,
     XTDevice,
 )
 
-from .multi_manager import (
+from ..multi_manager import (
     MultiManager,  # noqa: F811
 )
-from .base import TuyaEntity
+from ...base import TuyaEntity
 
 class XTIOTHomeManager(TuyaHomeManager):
     def __init__(
@@ -123,6 +124,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
             device_properties = self.get_device_properties(device)
             device_properties.merge_in_device(device)
             self.multi_manager.apply_init_virtual_states(device)
+            self.multi_manager.allow_virtual_devices_not_set_up(device)
 
 
     
@@ -137,11 +139,8 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         if not device:
             return
         status_new = self.multi_manager.convert_device_report_status_list(device_id, status)
+        status_new = self.multi_manager.multi_source_handler.filter_status_list(device_id, MESSAGE_SOURCE_TUYA_IOT, status_new)
         status_new = self.multi_manager.apply_virtual_states_to_status_list(device, status_new)
-        """devices = self.multi_manager.get_devices_from_device_id(device_id)
-        for current_device in devices:
-            for cur_status_new in status_new:
-                current_device.status[cur_status_new["code"]] = cur_status_new["value"]"""
         super()._on_device_report(device_id, status_new)
 
     def _update_device_list_info_cache(self, devIds: list[str]):
@@ -166,9 +165,9 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         
         if response2.get("success"):
             result = response2.get("result", {})
-            model = json.loads(result.get("model", "{}"))
-            device_properties.model = model
-            for service in model["services"]:
+            data_model = json.loads(result.get("model", "{}"))
+            device_properties.data_model = data_model
+            for service in data_model["services"]:
                 for property in service["properties"]:
                     if (    "abilityId" in property
                         and "code" in property
