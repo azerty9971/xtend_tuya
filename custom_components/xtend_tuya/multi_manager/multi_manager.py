@@ -77,6 +77,10 @@ from .shared.shared_classes import (
     XTDevice,
 )
 
+from .shared.multi_source_handler import (
+    MultiSourceHandler,
+)
+
 from ..util import (
     get_overriden_tuya_integration_runtime_data,
     get_tuya_integration_runtime_data,
@@ -182,6 +186,7 @@ class MultiManager:  # noqa: F811
         self.multi_device_listener: MultiDeviceListener = MultiDeviceListener(hass, self)
         self.config_entry = entry
         self.hass = hass
+        self.multi_source_handler = MultiSourceHandler(self)
 
     @property
     def device_map(self):
@@ -192,10 +197,8 @@ class MultiManager:  # noqa: F811
         return self.multi_mqtt_queue
 
     async def setup_entry(self, hass: HomeAssistant) -> None:
-        if (account := await self.get_iot_account(hass, self.config_entry)):
-            self.iot_account = account
-        if (account := await self.get_sharing_account(hass,self.config_entry)):
-            self.sharing_account = account
+        self.sharing_account = await self.get_sharing_account(hass,self.config_entry)
+        self.iot_account     = await self.get_iot_account(hass, self.config_entry)
 
     async def overriden_tuya_entry_updated(self, hass: HomeAssistant, config_entry: ConfigEntry) -> None:
         LOGGER.warning("overriden_tuya_entry_updated")
@@ -649,32 +652,14 @@ class MultiManager:  # noqa: F811
             LOGGER.warning(f"dev_id {dev_id} not found!")
             return
         
-        LOGGER.debug(f"on_message from {source} : {msg}")
-        
         new_message = self._convert_message_for_all_accounts(msg)
-        allowed_source = self.get_allowed_source(dev_id, source)
-        if source == MESSAGE_SOURCE_TUYA_SHARING and source == allowed_source:
+        if status_list := self._get_status_list_from_message(msg):
+            self.multi_source_handler.register_status_list_from_source(dev_id, source, status_list)
+        
+        if self.sharing_account and source == MESSAGE_SOURCE_TUYA_SHARING:
             self.sharing_account.device_manager.on_message(new_message)
-        elif source == MESSAGE_SOURCE_TUYA_IOT and source == allowed_source:
+        if self.iot_account and source == MESSAGE_SOURCE_TUYA_IOT:
             self.iot_account.device_manager.on_message(new_message)
-
-    def get_allowed_source(self, dev_id: str, original_source: str) -> str | None:
-        """if dev_id.startswith("vdevo"):
-            return MESSAGE_SOURCE_TUYA_IOT"""
-        in_iot = False
-        if self.iot_account and dev_id in self.iot_account.device_ids:
-            in_iot = True
-        in_sharing = False
-        if self.sharing_account and dev_id in self.sharing_account.device_ids:
-            in_sharing = True
-
-        if in_iot and in_sharing:
-            return MESSAGE_SOURCE_TUYA_SHARING
-        elif in_iot:
-            return MESSAGE_SOURCE_TUYA_IOT
-        elif in_sharing:
-            return MESSAGE_SOURCE_TUYA_SHARING
-        return None
 
     def _get_device_id_from_message(self, msg: str) -> str | None:
         protocol = msg.get("protocol", 0)
@@ -685,6 +670,13 @@ class MultiManager:  # noqa: F811
             if bizData := data.get("bizData", None):
                 if dev_id := bizData.get("devId", None):
                     return dev_id
+        return None
+    
+    def _get_status_list_from_message(self, msg: str) -> str | None:
+        protocol = msg.get("protocol", 0)
+        data = msg.get("data", {})
+        if protocol == PROTOCOL_DEVICE_REPORT and "status" in data:
+            return data["status"]
         return None
 
     def _convert_message_for_all_accounts(self, msg: str) -> str:
