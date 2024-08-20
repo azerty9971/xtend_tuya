@@ -197,10 +197,8 @@ class MultiManager:  # noqa: F811
         return self.multi_mqtt_queue
 
     async def setup_entry(self, hass: HomeAssistant) -> None:
-        if (account := await self.get_iot_account(hass, self.config_entry)):
-            self.iot_account = account
-        if (account := await self.get_sharing_account(hass,self.config_entry)):
-            self.sharing_account = account
+        self.sharing_account = await self.get_sharing_account(hass,self.config_entry)
+        self.iot_account     = await self.get_iot_account(hass, self.config_entry)
 
     async def overriden_tuya_entry_updated(self, hass: HomeAssistant, config_entry: ConfigEntry) -> None:
         LOGGER.warning("overriden_tuya_entry_updated")
