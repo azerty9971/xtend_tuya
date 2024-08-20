@@ -656,9 +656,9 @@ class MultiManager:  # noqa: F811
         if status_list := self._get_status_list_from_message(msg):
             self.multi_source_handler.register_status_list_from_source(dev_id, source, status_list)
         
-        if self.sharing_account:
+        if self.sharing_account and source == MESSAGE_SOURCE_TUYA_SHARING:
             self.sharing_account.device_manager.on_message(new_message)
-        if self.iot_account:
+        if self.iot_account and source == MESSAGE_SOURCE_TUYA_IOT:
             self.iot_account.device_manager.on_message(new_message)
 
     def _get_device_id_from_message(self, msg: str) -> str | None:
