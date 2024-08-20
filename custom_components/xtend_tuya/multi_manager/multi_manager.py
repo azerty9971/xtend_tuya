@@ -186,6 +186,7 @@ class MultiManager:  # noqa: F811
         self.multi_device_listener: MultiDeviceListener = MultiDeviceListener(hass, self)
         self.config_entry = entry
         self.hass = hass
+        self.multi_source_handler = MultiSourceHandler(self)
 
     @property
     def device_map(self):
@@ -655,30 +656,12 @@ class MultiManager:  # noqa: F811
         
         new_message = self._convert_message_for_all_accounts(msg)
         if status_list := self._get_status_list_from_message(msg):
-            pass
-        allowed_source = self.get_allowed_source(dev_id, source)
-        if source == MESSAGE_SOURCE_TUYA_SHARING and source == allowed_source:
+            self.multi_source_handler.register_status_list_from_source(dev_id, source, status_list)
+        
+        if self.sharing_account:
             self.sharing_account.device_manager.on_message(new_message)
-        elif source == MESSAGE_SOURCE_TUYA_IOT and source == allowed_source:
+        if self.iot_account:
             self.iot_account.device_manager.on_message(new_message)
-
-    def get_allowed_source(self, dev_id: str, original_source: str) -> str | None:
-        """if dev_id.startswith("vdevo"):
-            return MESSAGE_SOURCE_TUYA_IOT"""
-        in_iot = False
-        if self.iot_account and dev_id in self.iot_account.device_ids:
-            in_iot = True
-        in_sharing = False
-        if self.sharing_account and dev_id in self.sharing_account.device_ids:
-            in_sharing = True
-
-        if in_iot and in_sharing:
-            return MESSAGE_SOURCE_TUYA_SHARING
-        elif in_iot:
-            return MESSAGE_SOURCE_TUYA_IOT
-        elif in_sharing:
-            return MESSAGE_SOURCE_TUYA_SHARING
-        return None
 
     def _get_device_id_from_message(self, msg: str) -> str | None:
         protocol = msg.get("protocol", 0)

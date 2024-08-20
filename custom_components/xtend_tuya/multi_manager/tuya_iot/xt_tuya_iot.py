@@ -17,6 +17,7 @@ from typing import Any
 from ...const import (
     LOGGER,
     DPType,
+    MESSAGE_SOURCE_TUYA_IOT,
 )
 
 from ..shared.shared_classes import (
@@ -138,11 +139,8 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         if not device:
             return
         status_new = self.multi_manager.convert_device_report_status_list(device_id, status)
+        status_new = self.multi_manager.multi_source_handler.filter_status_list(device_id, MESSAGE_SOURCE_TUYA_IOT, status_new)
         status_new = self.multi_manager.apply_virtual_states_to_status_list(device, status_new)
-        """devices = self.multi_manager.get_devices_from_device_id(device_id)
-        for current_device in devices:
-            for cur_status_new in status_new:
-                current_device.status[cur_status_new["code"]] = cur_status_new["value"]"""
         super()._on_device_report(device_id, status_new)
 
     def _update_device_list_info_cache(self, devIds: list[str]):
