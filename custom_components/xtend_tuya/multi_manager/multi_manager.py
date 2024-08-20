@@ -77,6 +77,10 @@ from .shared.shared_classes import (
     XTDevice,
 )
 
+from .shared.multi_source_handler import (
+    MultiSourceHandler,
+)
+
 from ..util import (
     get_overriden_tuya_integration_runtime_data,
     get_tuya_integration_runtime_data,
@@ -649,9 +653,9 @@ class MultiManager:  # noqa: F811
             LOGGER.warning(f"dev_id {dev_id} not found!")
             return
         
-        LOGGER.debug(f"on_message from {source} : {msg}")
-        
         new_message = self._convert_message_for_all_accounts(msg)
+        if status_list := self._get_status_list_from_message(msg):
+            pass
         allowed_source = self.get_allowed_source(dev_id, source)
         if source == MESSAGE_SOURCE_TUYA_SHARING and source == allowed_source:
             self.sharing_account.device_manager.on_message(new_message)
@@ -685,6 +689,13 @@ class MultiManager:  # noqa: F811
             if bizData := data.get("bizData", None):
                 if dev_id := bizData.get("devId", None):
                     return dev_id
+        return None
+    
+    def _get_status_list_from_message(self, msg: str) -> str | None:
+        protocol = msg.get("protocol", 0)
+        data = msg.get("data", {})
+        if protocol == PROTOCOL_DEVICE_REPORT and "status" in data:
+            return data["status"]
         return None
 
     def _convert_message_for_all_accounts(self, msg: str) -> str:
