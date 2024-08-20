@@ -92,7 +92,6 @@ class MultiSourceHandler:
                 if code == virtual_state.key:
                     self._prepare_structure_for_code(dev_id, code)
                     if not self._is_allowed_source_for_code(dev_id, code, original_source):
-                        LOGGER.warning(f"Discarding status {item} from source {original_source}")
                         status_list.pop(i)
                         i -= 1
                         break
