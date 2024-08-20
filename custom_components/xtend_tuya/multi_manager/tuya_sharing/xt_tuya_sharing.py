@@ -115,7 +115,6 @@ class XTSharingDeviceManager(Manager):
     def _on_device_report(self, device_id: str, status: list):
         device = self.device_map.get(device_id, None)
         if not device:
-            LOGGER.warning(f"_on_device_report sharing device not found : {device_id}")
             return
         status_new = self.multi_manager.convert_device_report_status_list(device_id, status)
         status_new = self.multi_manager.multi_source_handler.filter_status_list(device_id, MESSAGE_SOURCE_TUYA_SHARING, status_new)
