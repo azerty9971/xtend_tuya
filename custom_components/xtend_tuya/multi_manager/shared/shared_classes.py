@@ -3,7 +3,7 @@ from typing import Any, Optional
 from types import SimpleNamespace
 import copy
 from dataclasses import dataclass, field
-from .util import (
+from ...util import (
     merge_iterables,
 )
 
@@ -13,7 +13,7 @@ class XTDeviceProperties:
     status: dict[str, Any] = field(default_factory=dict)
     function: dict[str, XTDeviceFunction] = field(default_factory=dict)
     status_range: dict[str, XTDeviceStatusRange] = field(default_factory=dict)
-    model: str = field(default_factory=str)
+    data_model: str = field(default_factory=str)
 
     def merge_in_device(self, device):
         if hasattr(device, "local_strategy"):
@@ -28,8 +28,8 @@ class XTDeviceProperties:
         if hasattr(device, "status_range"):
             merge_iterables(device.status_range, self.status_range)
             #device.status_range.update(self.status_range)
-        if hasattr(device, "model"):
-            device.model = copy.deepcopy(self.model)
+        if hasattr(device, "data_model"):
+            device.data_model = copy.deepcopy(self.data_model)
 
 @dataclass
 class XTDeviceStatusRange:
@@ -62,6 +62,7 @@ class XTDevice(SimpleNamespace):
     active_time: int
     create_time: int
     update_time: int
+    local_key: str
     set_up: Optional[bool] = False
     support_local: Optional[bool] = False
     local_strategy: dict[int, dict[str, Any]]
@@ -71,7 +72,7 @@ class XTDevice(SimpleNamespace):
     status_range: dict[str, XTDeviceStatusRange]
 
     force_open_api: Optional[bool] = False
-    model: Optional[str] = ""
+    data_model: Optional[str] = ""
 
     def __init__(self, **kwargs: Any) -> None:
         self.local_strategy = {}

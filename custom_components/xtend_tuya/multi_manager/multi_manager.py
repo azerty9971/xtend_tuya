@@ -38,7 +38,7 @@ from tuya_sharing.user import (
     UserRepository,
 )
 
-from .const import (
+from ..const import (
     CONF_ENDPOINT,
     CONF_TERMINAL_ID,
     CONF_TOKEN_INFO,
@@ -67,17 +67,21 @@ from .const import (
     MESSAGE_SOURCE_TUYA_SHARING,
 )
 
-from .import_stub import (
+from .shared.import_stub import (
     MultiManager,
     XTConfigEntry,
 )
 
-from .shared_classes import (
+from .shared.shared_classes import (
     XTDeviceProperties,
     XTDevice,
 )
 
-from .util import (
+from .shared.multi_source_handler import (
+    MultiSourceHandler,
+)
+
+from ..util import (
     get_overriden_tuya_integration_runtime_data,
     get_tuya_integration_runtime_data,
     prepare_value_for_property_update,
@@ -85,16 +89,16 @@ from .util import (
     append_lists,
 )
 
-from .tuya_decorators import (
+from .tuya_sharing.tuya_decorators import (
     decorate_tuya_manager,
 )
 
-from .xt_tuya_sharing import (
+from .tuya_sharing.xt_tuya_sharing import (
     XTSharingDeviceManager,
     XTSharingTokenListener,
     XTSharingDeviceRepository,
 )
-from .xt_tuya_iot import (
+from .tuya_iot.xt_tuya_iot import (
     XTIOTDeviceManager,
     XTIOTHomeManager,
 )
@@ -182,6 +186,7 @@ class MultiManager:  # noqa: F811
         self.multi_device_listener: MultiDeviceListener = MultiDeviceListener(hass, self)
         self.config_entry = entry
         self.hass = hass
+        self.multi_source_handler = MultiSourceHandler(self)
 
     @property
     def device_map(self):
@@ -192,10 +197,8 @@ class MultiManager:  # noqa: F811
         return self.multi_mqtt_queue
 
     async def setup_entry(self, hass: HomeAssistant) -> None:
-        if (account := await self.get_iot_account(hass, self.config_entry)):
-            self.iot_account = account
-        if (account := await self.get_sharing_account(hass,self.config_entry)):
-            self.sharing_account = account
+        self.sharing_account = await self.get_sharing_account(hass,self.config_entry)
+        self.iot_account     = await self.get_iot_account(hass, self.config_entry)
 
     async def overriden_tuya_entry_updated(self, hass: HomeAssistant, config_entry: ConfigEntry) -> None:
         LOGGER.warning("overriden_tuya_entry_updated")
@@ -333,11 +336,11 @@ class MultiManager:  # noqa: F811
         merge_iterables(receiving_device.status, giving_device.status)
         if hasattr(receiving_device, "local_strategy") and hasattr(giving_device, "local_strategy"):
             merge_iterables(receiving_device.local_strategy, giving_device.local_strategy)
-        if hasattr(receiving_device, "model") and hasattr(giving_device, "model"):
-            if receiving_device.model == "" and giving_device.model != "":
-                receiving_device.model = copy.deepcopy(giving_device.model)
-            if giving_device.model == "" and receiving_device.model != "":
-                giving_device.model = copy.deepcopy(receiving_device.model)
+        if hasattr(receiving_device, "data_model") and hasattr(giving_device, "data_model"):
+            if receiving_device.data_model == "" and giving_device.data_model != "":
+                receiving_device.data_model = copy.deepcopy(giving_device.data_model)
+            if giving_device.data_model == "" and receiving_device.data_model != "":
+                giving_device.data_model = copy.deepcopy(receiving_device.data_model)
     
     def get_aggregated_device_map(self) -> dict[str, XTDevice]:
         aggregated_list: dict[str, XTDevice] = {}
@@ -432,7 +435,7 @@ class MultiManager:  # noqa: F811
                     for description in descriptions:
                         if description.virtual_state is not None and description.virtual_state & virtual_state.value:
                             # This virtual_state is applied to this key, let's return it
-                            found_virtual_state = DescriptionVirtualState(description.key, virtual_state.name, virtual_state.value, description.vs_copy_to_state)
+                            found_virtual_state = DescriptionVirtualState(description.key, virtual_state.name, virtual_state.value, description.vs_copy_to_state, description.vs_copy_delta_to_state)
                             to_return.append(found_virtual_state)
         return to_return
     
@@ -508,6 +511,22 @@ class MultiManager:  # noqa: F811
                                                 new_local_strategy_config_item["statusFormat"] = new_local_strategy_config_item["statusFormat"].replace(virtual_state.key, new_code)
                                         new_local_strategy["status_code"] = new_code
                                         device.local_strategy[new_dp_id] = new_local_strategy
+                        for vs_new_code in virtual_state.vs_copy_delta_to_state:
+                            new_code = str(vs_new_code)
+                            if device.status.get(new_code, None) is None:
+                                device.status[new_code] = 0
+                            device.status_range[new_code] = copy.deepcopy(device.status_range[virtual_state.key])
+                            device.status_range[new_code].code = new_code
+                            if not self._read_dpId_from_code(new_code, device):
+                                if dp_id := self._read_dpId_from_code(virtual_state.key, device):
+                                    if new_dp_id := self._get_empty_local_strategy_dp_id(device):
+                                        new_local_strategy = copy.deepcopy(device.local_strategy[dp_id])
+                                        if "config_item" in new_local_strategy:
+                                            new_local_strategy_config_item = new_local_strategy["config_item"]
+                                            if "statusFormat" in new_local_strategy_config_item and virtual_state.key in new_local_strategy_config_item["statusFormat"]:
+                                                new_local_strategy_config_item["statusFormat"] = new_local_strategy_config_item["statusFormat"].replace(virtual_state.key, new_code)
+                                        new_local_strategy["status_code"] = new_code
+                                        device.local_strategy[new_dp_id] = new_local_strategy
                     if virtual_state.key in device.function:
                         for vs_new_code in virtual_state.vs_copy_to_state:
                             new_code = str(vs_new_code)
@@ -521,6 +540,42 @@ class MultiManager:  # noqa: F811
                                         new_local_strategy = copy.deepcopy(device.local_strategy[dp_id])
                                         new_local_strategy["status_code"] = new_code
                                         device.local_strategy[new_dp_id] = new_local_strategy
+
+    def apply_virtual_states_to_status_list(self, device: XTDevice, status_in: list) -> list:
+        status = copy.deepcopy(status_in)
+        virtual_states = self.get_category_virtual_states(device.category)
+        for virtual_state in virtual_states:
+            if virtual_state.virtual_state_value == VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME:
+                for item in status:
+                    code, dpId, new_key_value, result_ok = self._read_code_dpid_value_from_state(device.id, item)
+                    if result_ok and code == virtual_state.key:
+                        cur_key_value = 0
+                        if code in device.status:
+                            cur_key_value = device.status[code]
+                        for state_name in virtual_state.vs_copy_to_state:
+                            code, dpId, new_key_value, result_ok = self._read_code_dpid_value_from_state(device.id, {"code": str(state_name), "value": new_key_value})
+                            if result_ok:
+                                new_status = {"code": code, "value": copy.copy(new_key_value), "dpId": dpId}
+                                status.append(new_status)
+                        for state_name in virtual_state.vs_copy_delta_to_state:
+                            code, dpId, new_key_value, result_ok = self._read_code_dpid_value_from_state(device.id, {"code": str(state_name), "value": new_key_value})
+                            current_value = None
+                            if code in device.status:
+                                current_value = device.status[code]
+                            if result_ok and current_value is not None:
+                                new_status = {"code": code, "value": copy.copy(new_key_value - cur_key_value), "dpId": dpId}
+                                status.append(new_status)
+            
+            if virtual_state.virtual_state_value == VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD:
+                if virtual_state.key not in device.status or device.status[virtual_state.key] is None:
+                    device.status[virtual_state.key] = 0
+                if virtual_state.key in device.status:
+                    for item in status:
+                        code, dpId, new_key_value, result_ok = self._read_code_dpid_value_from_state(device.id, item, False, True)
+                        if result_ok and code == virtual_state.key:
+                            item["value"] += device.status[virtual_state.key]
+                            continue
+        return status
 
     def allow_virtual_devices_not_set_up(self, device: XTDevice):
         if not device.id.startswith("vdevo"):
@@ -584,31 +639,6 @@ class MultiManager:  # noqa: F811
             else:
                 LOGGER.warning(f"convert_device_report_status_list code retrieval failed => {item} <=>{device_id}")
         return status
-    
-    def apply_virtual_states_to_status_list(self, device: XTDevice, status_in: list) -> list:
-        status = copy.deepcopy(status_in)
-        virtual_states = self.get_category_virtual_states(device.category)
-        for virtual_state in virtual_states:
-            if virtual_state.virtual_state_value == VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME:
-                for item in status:
-                    code, dpId, value, result_ok = self._read_code_dpid_value_from_state(device.id, item)
-                    if result_ok and code == virtual_state.key:
-                        for state_name in virtual_state.vs_copy_to_state:
-                            code, dpId, value, result_ok = self._read_code_dpid_value_from_state(device.id, {"code": str(state_name), "value": value})
-                            if result_ok:
-                                new_status = {"code": code, "value": copy.copy(value), "dpId": dpId}
-                                status.append(new_status)
-            
-            if virtual_state.virtual_state_value == VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD:
-                if virtual_state.key not in device.status or device.status[virtual_state.key] is None:
-                    device.status[virtual_state.key] = 0
-                if virtual_state.key in device.status:
-                    for item in status:
-                        code, dpId, value, result_ok = self._read_code_dpid_value_from_state(device.id, item, False, True)
-                        if result_ok and code == virtual_state.key:
-                            item["value"] += device.status[virtual_state.key]
-                            continue
-        return status
 
     def on_message_from_tuya_iot(self, msg:str):
         self.on_message(MESSAGE_SOURCE_TUYA_IOT, msg)
@@ -622,32 +652,14 @@ class MultiManager:  # noqa: F811
             LOGGER.warning(f"dev_id {dev_id} not found!")
             return
         
-        LOGGER.debug(f"on_message from {source} : {msg}")
-        
         new_message = self._convert_message_for_all_accounts(msg)
-        allowed_source = self.get_allowed_source(dev_id, source)
-        if source == MESSAGE_SOURCE_TUYA_SHARING and source == allowed_source:
+        if status_list := self._get_status_list_from_message(msg):
+            self.multi_source_handler.register_status_list_from_source(dev_id, source, status_list)
+        
+        if self.sharing_account and source == MESSAGE_SOURCE_TUYA_SHARING:
             self.sharing_account.device_manager.on_message(new_message)
-        elif source == MESSAGE_SOURCE_TUYA_IOT and source == allowed_source:
+        if self.iot_account and source == MESSAGE_SOURCE_TUYA_IOT:
             self.iot_account.device_manager.on_message(new_message)
-
-    def get_allowed_source(self, dev_id: str, original_source: str) -> str | None:
-        """if dev_id.startswith("vdevo"):
-            return MESSAGE_SOURCE_TUYA_IOT"""
-        in_iot = False
-        if self.iot_account and dev_id in self.iot_account.device_ids:
-            in_iot = True
-        in_sharing = False
-        if self.sharing_account and dev_id in self.sharing_account.device_ids:
-            in_sharing = True
-
-        if in_iot and in_sharing:
-            return MESSAGE_SOURCE_TUYA_SHARING
-        elif in_iot:
-            return MESSAGE_SOURCE_TUYA_IOT
-        elif in_sharing:
-            return MESSAGE_SOURCE_TUYA_SHARING
-        return None
 
     def _get_device_id_from_message(self, msg: str) -> str | None:
         protocol = msg.get("protocol", 0)
@@ -658,6 +670,13 @@ class MultiManager:  # noqa: F811
             if bizData := data.get("bizData", None):
                 if dev_id := bizData.get("devId", None):
                     return dev_id
+        return None
+    
+    def _get_status_list_from_message(self, msg: str) -> str | None:
+        protocol = msg.get("protocol", 0)
+        data = msg.get("data", {})
+        if protocol == PROTOCOL_DEVICE_REPORT and "status" in data:
+            return data["status"]
         return None
 
     def _convert_message_for_all_accounts(self, msg: str) -> str:

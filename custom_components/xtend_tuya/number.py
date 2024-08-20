@@ -28,7 +28,7 @@ from .util import (
     merge_device_descriptors
 )
 
-from .multi_manager import XTConfigEntry
+from .multi_manager.multi_manager import XTConfigEntry
 from .base import IntegerTypeData, TuyaEntity
 from .const import DEVICE_CLASS_UNITS, DOMAIN, TUYA_DISCOVERY_NEW, DPCode, DPType
 
@@ -87,6 +87,30 @@ NUMBERS: dict[str, tuple[NumberEntityDescription, ...]] = {
         NumberEntityDescription(
             key=DPCode.DEO_END_TIME,
             translation_key="deo_end_time",
+            entity_category=EntityCategory.CONFIG,
+        ),
+    ),
+    "mzj": (
+        NumberEntityDescription(
+            key=DPCode.TEMPSET,
+            translation_key="temp_set",
+            mode = NumberMode.SLIDER,
+            entity_category=EntityCategory.CONFIG,
+        ),
+        NumberEntityDescription(
+            key=DPCode.RECIPE,
+            translation_key="recipe",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        NumberEntityDescription(
+            key=DPCode.SETTIME,
+            translation_key="set_time",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        NumberEntityDescription(
+            key=DPCode.TEMPSC,
+            translation_key="tempsc",
+            mode = NumberMode.SLIDER,
             entity_category=EntityCategory.CONFIG,
         ),
     ),

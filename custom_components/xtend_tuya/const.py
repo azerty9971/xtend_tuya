@@ -106,6 +106,7 @@ class DescriptionVirtualState:
     virtual_state_name: str
     virtual_state_value: VirtualStates = None
     vs_copy_to_state: list[DPCode] = field(default_factory=list)
+    vs_copy_delta_to_state: list[DPCode] = field(default_factory=list)
 
 @dataclass
 class DescriptionVirtualFunction:
@@ -147,6 +148,9 @@ class DPCode(StrEnum):
     ADD_ELE_THIS_YEAR = "add_ele_this_year"
     ADD_ELE_TODAY = "add_ele_today"
     ADD_ELE2 = "add_ele2" #Added watt since last heartbeat
+    ADD_ELE2_THIS_MONTH = "add_ele2_this_month"
+    ADD_ELE2_THIS_YEAR = "add_ele2_this_year"
+    ADD_ELE2_TODAY = "add_ele2_today"
     AIR_QUALITY = "air_quality"
     ALARM_LOCK = "alarm_lock"
     ALARM_SWITCH = "alarm_switch"  # Alarm switch
@@ -276,6 +280,7 @@ class DPCode(StrEnum):
     FAN_VERTICAL = "fan_vertical"  # Vertical swing flap angle
     FAR_DETECTION = "far_detection"
     FAULT = "fault"
+    FAULT2 = "Fault"
     FEED_REPORT = "feed_report"
     FEED_STATE = "feed_state"
     FILTER = "filter"
@@ -369,6 +374,7 @@ class DPCode(StrEnum):
     POWDER_SET = "powder_set"  # Powder
     POWER = "power"
     POWERON = "poweron"
+    POWERONOFF = "PowerOnOff"
     POWER_GO = "power_go"
     PRESENCE_STATE = "presence_state"
     PRESSURE_STATE = "pressure_state"
@@ -378,9 +384,11 @@ class DPCode(StrEnum):
     QUIET_TIME_END = "quiet_time_end"
     QUIET_TIME_START = "quiet_time_start"
     REBOOT = "reboot"
+    RECIPE = "Recipe"
     RECORD_MODE = "record_mode"
     RECORD_SWITCH = "record_switch"  # Recording switch
     RELAY_STATUS = "relay_status"
+    REMAININGTIME = "RemainingTime"
     REMAIN_TIME = "remain_time"
     RESET_ADD_ELE = "reset_add_ele"
     RESET_DUSTER_CLOTH = "reset_duster_cloth"
@@ -389,6 +397,7 @@ class DPCode(StrEnum):
     RESET_MAP = "reset_map"
     RESET_ROLL_BRUSH = "reset_roll_brush"
     RESPIRATORY_RATE = "respiratory_rate"
+    REVERSE_ENERGY_TOTAL = "reverse_energy_total"
     ROLL_BRUSH = "roll_brush"
     RTC_TIME = "rtc_time"
     SAND_SURFACE_CALIBRATION = "sand_surface_calibration"
@@ -396,6 +405,7 @@ class DPCode(StrEnum):
     SENSITIVITY = "sensitivity"  # Sensitivity
     SENSOR_HUMIDITY = "sensor_humidity"
     SENSOR_TEMPERATURE = "sensor_temperature"
+    SETTIME = "SetTime"
     SHAKE = "shake"  # Oscillating
     SHOCK_STATE = "shock_state"  # Vibration status
     SIREN_SWITCH = "siren_switch"
@@ -454,8 +464,12 @@ class DPCode(StrEnum):
     SWITCH_VERTICAL = "switch_vertical"  # Vertical swing flap switch
     SWITCH_VOICE = "switch_voice"  # Voice switch
     TEMP = "temp"  # Temperature setting
+    TEMPCHANGER = "TempChanger"
     TEMPERATURE = "temperature"
     TEMPER_ALARM = "temper_alarm"  # Tamper alarm
+    TEMPSC = "TempSc"
+    TEMPSET = "TempSet"
+    TEMPSHOW = "TempShow"
     TEMP_ADC = "temp_adc"
     TEMP_BOILING_C = "temp_boiling_c"
     TEMP_BOILING_F = "temp_boiling_f"
@@ -513,6 +527,7 @@ class DPCode(StrEnum):
     WORK_MODE = "work_mode"  # Working mode
     WORK_POWER = "work_power"
     WORK_STAT = "work_stat"
+    WORK_STATUS = "WorkStatus"
 
 
 @dataclass

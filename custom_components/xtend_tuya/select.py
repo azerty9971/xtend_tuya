@@ -22,7 +22,7 @@ from .util import (
     merge_device_descriptors
 )
 
-from .multi_manager import XTConfigEntry
+from .multi_manager.multi_manager import XTConfigEntry
 from .base import TuyaEntity
 from .const import TUYA_DISCOVERY_NEW, DPCode, DPType
 
@@ -81,6 +81,13 @@ SELECTS: dict[str, tuple[SelectEntityDescription, ...]] = {
         SelectEntityDescription(
             key=DPCode.WORK_MODE,
             translation_key="cat_litter_box_work_mode",
+            entity_category=EntityCategory.CONFIG,
+        ),
+    ),
+    "mzj": (
+        SelectEntityDescription(
+            key=DPCode.TEMPCHANGER,
+            translation_key="change_temp_unit",
             entity_category=EntityCategory.CONFIG,
         ),
     ),

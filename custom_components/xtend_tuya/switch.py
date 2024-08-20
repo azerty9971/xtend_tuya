@@ -27,7 +27,7 @@ from .util import (
     merge_device_descriptors
 )
 
-from .multi_manager import XTConfigEntry
+from .multi_manager.multi_manager import XTConfigEntry
 from .base import TuyaEntity
 from .const import TUYA_DISCOVERY_NEW, DPCode
 
@@ -213,6 +213,13 @@ SWITCHES: dict[str, tuple[SwitchEntityDescription, ...]] = {
         SwitchEntityDescription(
             key=DPCode.UV,
             translation_key="uv",
+            entity_category=EntityCategory.CONFIG,
+        ),
+    ),
+    "mzj": (
+        SwitchEntityDescription(
+            key=DPCode.POWERONOFF,
+            translation_key="power",
             entity_category=EntityCategory.CONFIG,
         ),
     ),

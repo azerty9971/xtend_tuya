@@ -36,7 +36,7 @@ from .util import (
     merge_device_descriptors
 )
 
-from .multi_manager import XTConfigEntry, MultiManager
+from .multi_manager.multi_manager import XTConfigEntry, MultiManager
 from .base import ElectricityTypeData, EnumTypeData, IntegerTypeData, TuyaEntity
 from .const import (
     DEVICE_CLASS_UNITS,
@@ -57,6 +57,7 @@ class TuyaSensorEntityDescription(SensorEntityDescription):
 
     virtual_state: VirtualStates | None = None
     vs_copy_to_state: list[DPCode]  | None = field(default_factory=list)
+    vs_copy_delta_to_state: list[DPCode]  | None = field(default_factory=list)
 
     reset_daily: bool = False
     reset_monthly: bool = False
@@ -82,6 +83,8 @@ CONSUMPTION_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
     ),
     TuyaSensorEntityDescription(
         key=DPCode.ADD_ELE2,
+        virtual_state=VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME,
+        vs_copy_delta_to_state=[DPCode.ADD_ELE2_TODAY, DPCode.ADD_ELE2_THIS_MONTH, DPCode.ADD_ELE2_THIS_YEAR],
         translation_key="add_ele2",
         device_class=SensorDeviceClass.ENERGY,
         state_class=SensorStateClass.TOTAL_INCREASING,
@@ -123,6 +126,39 @@ CONSUMPTION_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
         reset_yearly=True
     ),
     TuyaSensorEntityDescription(
+        key=DPCode.ADD_ELE2_TODAY,
+        virtual_state=VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD,
+        translation_key="add_ele2_today",
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        entity_registry_enabled_default=False,
+        restoredata=True,
+        reset_daily=True
+    ),
+    TuyaSensorEntityDescription(
+        key=DPCode.ADD_ELE2_THIS_MONTH,
+        virtual_state=VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD,
+        translation_key="add_ele2_this_month",
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        entity_registry_enabled_default=False,
+        restoredata=True,
+        reset_monthly=True
+    ),
+    TuyaSensorEntityDescription(
+        key=DPCode.ADD_ELE2_THIS_YEAR,
+        virtual_state=VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD,
+        translation_key="add_ele2_this_year",
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        entity_registry_enabled_default=False,
+        restoredata=True,
+        reset_yearly=True
+    ),
+    TuyaSensorEntityDescription(
         key=DPCode.BALANCE_ENERGY,
         translation_key="balance_energy",
         device_class=SensorDeviceClass.ENERGY,
@@ -142,12 +178,28 @@ CONSUMPTION_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
     ),
     TuyaSensorEntityDescription(
         key=DPCode.TOTAL_FORWARD_ENERGY,
-        translation_key="total_forward_energy",
+        virtual_state=VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME,
+        vs_copy_delta_to_state=[DPCode.ADD_ELE2_TODAY, DPCode.ADD_ELE2_THIS_MONTH, DPCode.ADD_ELE2_THIS_YEAR],
+        translation_key="total_energy",
         device_class=SensorDeviceClass.ENERGY,
         state_class=SensorStateClass.TOTAL_INCREASING,
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         entity_registry_enabled_default=True,
         restoredata=False,
+    ),
+    TuyaSensorEntityDescription(
+        key=DPCode.FORWARD_ENERGY_TOTAL,
+        virtual_state=VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME,
+        vs_copy_delta_to_state=[DPCode.ADD_ELE2_TODAY, DPCode.ADD_ELE2_THIS_MONTH, DPCode.ADD_ELE2_THIS_YEAR],
+        translation_key="total_energy",
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+    ),
+    TuyaSensorEntityDescription(
+        key=DPCode.REVERSE_ENERGY_TOTAL,
+        translation_key="gross_generation",
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL_INCREASING,
     ),
     TuyaSensorEntityDescription(
         key=DPCode.CUR_POWER,
@@ -388,6 +440,23 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
         ),
         *TEMPERATURE_SENSORS,
     ),
+    "mzj": (
+        TuyaSensorEntityDescription(
+            key=DPCode.WORK_STATUS,
+            translation_key="mzj_work_status",
+            entity_registry_enabled_default=True,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.TEMPSHOW,
+            translation_key="temp_show",
+            entity_registry_enabled_default=True,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.REMAININGTIME,
+            translation_key="remaining_time",
+            entity_registry_enabled_default=True,
+        ),
+    ),
     "smd": (
         TuyaSensorEntityDescription(
             key=DPCode.HEART_RATE,
@@ -455,12 +524,13 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
 
 # Socket (duplicate of `kg`)
 # https://developer.tuya.com/en/docs/iot/s?id=K9gf7o5prgf7s
-SENSORS["cz"] = SENSORS["kg"]
+SENSORS["cz"]   = SENSORS["kg"]
 SENSORS["wkcz"] = SENSORS["kg"]
-SENSORS["dlq"] = SENSORS["kg"]
-SENSORS["tdq"] = SENSORS["kg"]
-SENSORS["pc"] = SENSORS["kg"]
+SENSORS["dlq"]  = SENSORS["kg"]
+SENSORS["tdq"]  = SENSORS["kg"]
+SENSORS["pc"]   = SENSORS["kg"]
 SENSORS["aqcz"] = SENSORS["kg"]
+SENSORS["zndb"] = SENSORS["kg"]
 
 async def async_setup_entry(
     hass: HomeAssistant, entry: XTConfigEntry, async_add_entities: AddEntitiesCallback
