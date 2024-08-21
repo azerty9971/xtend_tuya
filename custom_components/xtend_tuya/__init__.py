@@ -21,7 +21,7 @@ from .multi_manager.multi_manager import (
     MultiDeviceListener,
 )
 
-from .multi_manager.tuya_sharing.tuya_decorators import (
+from .multi_manager.tuya_sharing.ha_tuya_integration.tuya_decorators import (
     decorate_tuya_integration
 )
 
@@ -50,9 +50,10 @@ async def update_listener(hass, entry):
 async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
     #LOGGER.warning(f"async_setup_entry {entry.title} : {entry.data}")
     """Async setup hass config entry.""" 
-    multi_manager = MultiManager(hass, entry)
-    decorate_tuya_integration(multi_manager)
-    await multi_manager.setup_entry(hass)
+    multi_manager = MultiManager(hass)
+    await multi_manager.setup_entry(hass, entry)
+    if multi_manager.sharing_account and multi_manager.sharing_account.ha_tuya_integration_config_manager:
+        decorate_tuya_integration(multi_manager.sharing_account.ha_tuya_integration_config_manager)
 
     # Get all devices from Tuya
     try:
@@ -78,11 +79,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
     device_registry = dr.async_get(hass)
     aggregated_device_map = multi_manager.device_map
     for device in aggregated_device_map.values():
-        if multi_manager.reuse_config:
-            if device_registry.async_get_device(identifiers={(DOMAIN_ORIG, device.id)}, connections=None):
-                identifiers = {(DOMAIN_ORIG, device.id), (DOMAIN, device.id)}
-            else:
-                identifiers = {(DOMAIN, device.id)}
+        if ( 
+            multi_manager.reuse_config
+            and device_registry.async_get_device(identifiers={(DOMAIN_ORIG, device.id)}, connections=None)
+        ):
+            identifiers = {(DOMAIN_ORIG, device.id), (DOMAIN, device.id)}
         else:
             identifiers = {(DOMAIN, device.id)}
         device_registry.async_get_or_create(
