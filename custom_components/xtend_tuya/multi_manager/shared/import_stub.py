@@ -1,3 +1,5 @@
+from types import SimpleNamespace
+
 class MultiManager:
     pass
 
@@ -7,5 +9,5 @@ class HomeAssistantXTData:
 class XTConfigEntry:
     pass
 
-class XTDevice:
+class XTDevice(SimpleNamespace):
     pass
