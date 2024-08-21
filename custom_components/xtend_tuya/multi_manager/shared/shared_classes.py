@@ -3,6 +3,7 @@ from typing import Any, Optional, NamedTuple
 from types import SimpleNamespace
 import copy
 from dataclasses import dataclass, field
+from homeassistant.config_entries import ConfigEntry
 from ...util import (
     merge_iterables,
 )
@@ -119,3 +120,5 @@ class HomeAssistantXTData(NamedTuple):
     @property
     def manager(self) -> MultiManager:
         return self.multi_manager
+
+type XTConfigEntry = ConfigEntry[HomeAssistantXTData]
