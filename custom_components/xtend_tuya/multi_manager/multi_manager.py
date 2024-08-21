@@ -14,7 +14,6 @@ from homeassistant.helpers.entity import EntityDescription
 from tuya_iot import (
     AuthType,
     TuyaOpenAPI,
-    TuyaOpenMQ,
 )
 from tuya_iot.device import (
     PROTOCOL_DEVICE_REPORT,
@@ -103,6 +102,9 @@ from .tuya_iot.xt_tuya_iot import (
     XTIOTDeviceManager,
     XTIOTHomeManager,
 )
+from .tuya_iot.xt_iot_mq import (
+    XTIOTOpenMQ
+)
 
 class HomeAssistantXTData(NamedTuple):
     """Tuya data stored in the Home Assistant data object."""
@@ -117,7 +119,7 @@ class HomeAssistantXTData(NamedTuple):
 
 class TuyaIOTData(NamedTuple):
     device_manager: XTIOTDeviceManager
-    mq: TuyaOpenMQ
+    mq: XTIOTOpenMQ
     device_ids: list[str] #List of device IDs that are managed by the manager before the managers device merging process
     home_manager: XTIOTHomeManager
 
@@ -280,7 +282,7 @@ class MultiManager:  # noqa: F811
 
         if response.get("success", False) is False:
             raise ConfigEntryNotReady(response)
-        mq = TuyaOpenMQ(api)
+        mq = XTIOTOpenMQ(api)
         self.multi_mqtt_queue.iot_account_mq = mq
         mq.start()
         device_manager = XTIOTDeviceManager(self, api, mq)
