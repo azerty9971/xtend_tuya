@@ -5,7 +5,6 @@ from typing import Any
 
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.entity import EntityDescription
 
 from tuya_iot import (
@@ -36,7 +35,6 @@ from ..const import (
     CONF_TERMINAL_ID,
     CONF_TOKEN_INFO,
     CONF_USER_CODE,
-    DOMAIN_ORIG,
     LOGGER,
     TUYA_CLIENT_ID,
     VirtualStates,
@@ -111,7 +109,6 @@ class MultiManager:  # noqa: F811
     def __init__(self, hass: HomeAssistant) -> None:
         self.sharing_account: TuyaSharingData = None
         self.iot_account: TuyaIOTData = None
-        self.reuse_config: bool = False
         self.descriptors_with_virtual_state = {}
         self.descriptors_with_virtual_function = {}
         self.multi_mqtt_queue: MultiMQTTQueue = MultiMQTTQueue(self)
@@ -136,6 +133,7 @@ class MultiManager:  # noqa: F811
         ha_tuya_integration_config_manager = XTHATuyaIntegrationConfigEntryManager(self, config_entry)
         #See if our current entry is an override of a Tuya integration entry
         tuya_integration_runtime_data = get_overriden_tuya_integration_runtime_data(hass, config_entry)
+        reuse_config = False
         if tuya_integration_runtime_data:
             #We are using an override of the Tuya integration
             decorate_tuya_manager(tuya_integration_runtime_data.device_manager, ha_tuya_integration_config_manager)
@@ -145,7 +143,7 @@ class MultiManager:  # noqa: F811
             sharing_device_manager.customer_api     = tuya_integration_runtime_data.device_manager.customer_api
             tuya_integration_runtime_data.device_manager.device_listeners.clear()
             #self.convert_tuya_devices_to_xt(tuya_integration_runtime_data.device_manager)
-            self.reuse_config = True
+            reuse_config = True
         else:
             #We are using XT as a standalone integration
             sharing_device_manager = XTSharingDeviceManager(multi_manager=self, other_device_manager=None)
@@ -164,7 +162,12 @@ class MultiManager:  # noqa: F811
         sharing_device_manager.scene_repository = SceneRepository(sharing_device_manager.customer_api)
         sharing_device_manager.user_repository = UserRepository(sharing_device_manager.customer_api)
         sharing_device_manager.add_device_listener(self.multi_device_listener)
-        return TuyaSharingData(device_manager=sharing_device_manager, device_ids=[], ha_tuya_integration_config_manager=ha_tuya_integration_config_manager)
+        return TuyaSharingData(
+            device_manager=sharing_device_manager, 
+            device_ids=[], 
+            ha_tuya_integration_config_manager=ha_tuya_integration_config_manager, 
+            reuse_config=reuse_config
+            )
 
     async def get_iot_account(self, hass: HomeAssistant, entry: XTConfigEntry) -> TuyaIOTData | None:
         if (

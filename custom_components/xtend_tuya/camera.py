@@ -39,7 +39,7 @@ async def async_setup_entry(
     hass_data = entry.runtime_data
 
     merged_categories = CAMERAS
-    if not entry.runtime_data.multi_manager.reuse_config:
+    if not entry.runtime_data.multi_manager.sharing_account or not entry.runtime_data.multi_manager.sharing_account.reuse_config:
         merged_categories = tuple(append_lists(CAMERAS, CAMERAS_TUYA))
 
     @callback

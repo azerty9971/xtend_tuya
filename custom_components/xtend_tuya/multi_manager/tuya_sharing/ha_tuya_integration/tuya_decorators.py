@@ -2,9 +2,6 @@ from __future__ import annotations
 
 import functools
 
-from ...multi_manager import (
-    MultiManager,
-)
 from .config_entry_handler import (
     XTHATuyaIntegrationConfigEntryManager,
 )

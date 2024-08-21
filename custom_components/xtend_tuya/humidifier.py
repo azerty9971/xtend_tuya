@@ -54,7 +54,7 @@ async def async_setup_entry(
     hass_data = entry.runtime_data
 
     merged_categories = HUMIDIFIERS
-    if not entry.runtime_data.multi_manager.reuse_config:
+    if not entry.runtime_data.multi_manager.sharing_account or not entry.runtime_data.multi_manager.sharing_account.reuse_config:
         merged_categories = append_dictionnaries(HUMIDIFIERS, HUMIDIFIERS_TUYA)
 
     @callback

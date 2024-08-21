@@ -45,6 +45,7 @@ class TuyaSharingData(NamedTuple):
     device_manager: XTSharingDeviceManager
     device_ids: list[str] #List of device IDs that are managed by the manager before the managers device merging process
     ha_tuya_integration_config_manager: XTHATuyaIntegrationConfigEntryManager
+    reuse_config: bool
 
 class XTSharingTokenListener(SharingTokenListener):
     """Token listener for upstream token updates."""
