@@ -69,7 +69,7 @@ async def async_setup_entry(
     hass_data = entry.runtime_data
     
     merged_descriptions = CLIMATE_DESCRIPTIONS
-    if not entry.runtime_data.multi_manager.reuse_config:
+    if not entry.runtime_data.multi_manager.sharing_account or not entry.runtime_data.multi_manager.sharing_account.reuse_config:
         merged_descriptions = append_dictionnaries(CLIMATE_DESCRIPTIONS, CLIMATE_DESCRIPTIONS_TUYA)
 
     @callback

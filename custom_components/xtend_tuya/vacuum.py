@@ -56,7 +56,7 @@ async def async_setup_entry(
     """Set up Tuya vacuum dynamically through Tuya discovery."""
     hass_data = entry.runtime_data
     
-    if hass_data.multi_manager.reuse_config:
+    if not hass_data.multi_manager.sharing_account or hass_data.multi_manager.sharing_account.reuse_config:
         return
     
     @callback

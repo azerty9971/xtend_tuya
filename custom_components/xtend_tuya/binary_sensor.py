@@ -102,7 +102,7 @@ async def async_setup_entry(
     hass_data = entry.runtime_data
 
     merged_descriptors = BINARY_SENSORS
-    if not entry.runtime_data.multi_manager.reuse_config:
+    if not entry.runtime_data.multi_manager.sharing_account or not entry.runtime_data.multi_manager.sharing_account.reuse_config:
         merged_descriptors = merge_device_descriptors(BINARY_SENSORS, BINARY_SENSORS_TUYA)
 
     @callback

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 import logging
+from typing import NamedTuple
 
 from homeassistant.config_entries import ConfigEntry, ConfigEntryState
 from homeassistant.core import HomeAssistant
@@ -17,10 +18,13 @@ from .const import (
 from .multi_manager.multi_manager import (
     MultiManager,
     XTConfigEntry,
+)
+
+from .multi_manager.shared.shared_classes import (
     HomeAssistantXTData,
 )
 
-from .multi_manager.tuya_sharing.tuya_decorators import (
+from .multi_manager.tuya_sharing.ha_tuya_integration.tuya_decorators import (
     decorate_tuya_integration
 )
 
@@ -38,9 +42,10 @@ async def update_listener(hass, entry):
 async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
     #LOGGER.warning(f"async_setup_entry {entry.title} : {entry.data}")
     """Async setup hass config entry.""" 
-    multi_manager = MultiManager(hass, entry)
-    decorate_tuya_integration(multi_manager)
-    await multi_manager.setup_entry(hass)
+    multi_manager = MultiManager(hass)
+    await multi_manager.setup_entry(hass, entry)
+    if multi_manager.sharing_account and multi_manager.sharing_account.ha_tuya_integration_config_manager:
+        decorate_tuya_integration(multi_manager.sharing_account.ha_tuya_integration_config_manager)
 
     # Get all devices from Tuya
     try:
@@ -50,14 +55,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
         # we have no other way of detecting this case.
         if "sign invalid" in str(exc):
             msg = "Authentication failed. Please re-authenticate the Tuya integration"
-            if multi_manager.reuse_config:
+            if multi_manager.sharing_account and multi_manager.sharing_account.reuse_config:
                 raise ConfigEntryNotReady(msg) from exc
             else:
                 raise ConfigEntryAuthFailed("Authentication failed. Please re-authenticate.")
         raise
 
     # Connection is successful, store the manager & listener
-    entry.runtime_data = HomeAssistantXTData(multi_manager=multi_manager, reuse_config=multi_manager.reuse_config, listener=multi_manager.multi_device_listener)
+    entry.runtime_data = HomeAssistantXTData(multi_manager=multi_manager, listener=multi_manager.multi_device_listener)
 
     # Cleanup device registry
     await cleanup_device_registry(hass, multi_manager, entry)
@@ -66,11 +71,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
     device_registry = dr.async_get(hass)
     aggregated_device_map = multi_manager.device_map
     for device in aggregated_device_map.values():
-        if multi_manager.reuse_config:
-            if device_registry.async_get_device(identifiers={(DOMAIN_ORIG, device.id)}, connections=None):
-                identifiers = {(DOMAIN_ORIG, device.id), (DOMAIN, device.id)}
-            else:
-                identifiers = {(DOMAIN, device.id)}
+        if ( 
+            multi_manager.sharing_account
+            and multi_manager.sharing_account.reuse_config
+            and device_registry.async_get_device(identifiers={(DOMAIN_ORIG, device.id)}, connections=None)
+        ):
+            identifiers = {(DOMAIN_ORIG, device.id), (DOMAIN, device.id)}
         else:
             identifiers = {(DOMAIN, device.id)}
         device_registry.async_get_or_create(
@@ -154,6 +160,6 @@ async def async_remove_entry(hass: HomeAssistant, entry: XTConfigEntry) -> None:
 
     This will revoke the credentials from Tuya.
     """
-    if not entry.reuse_config:
+    if not entry.multi_manager.sharing_account or not entry.multi_manager.sharing_account.reuse_config:
         multi_manager = entry.multi_manager
         await hass.async_add_executor_job(multi_manager.unload)

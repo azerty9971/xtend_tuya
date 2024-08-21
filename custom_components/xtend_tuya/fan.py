@@ -47,7 +47,7 @@ async def async_setup_entry(
     hass_data = entry.runtime_data
 
     merged_categories = TUYA_SUPPORT_TYPE
-    if not entry.runtime_data.multi_manager.reuse_config:
+    if not entry.runtime_data.multi_manager.sharing_account or not entry.runtime_data.multi_manager.sharing_account.reuse_config:
         merged_categories = append_sets(TUYA_SUPPORT_TYPE, TUYA_SUPPORT_TYPE_TUYA)
 
     @callback
@@ -88,7 +88,7 @@ class TuyaFanEntity(TuyaEntity, FanEntity):
         super().__init__(device, device_manager)
 
         self._switch = self.find_dpcode(
-            (DPCode.SWITCH_FAN, DPCode.FAN_SWITCH, DPCode.SWITCH), prefer_function=True
+            (DPCode.SWITCH_FAN, DPCode.FAN_SWITCH, DPCode.SWITCH, DPCode.POWER, DPCode.POWER2), prefer_function=True
         )
 
         self._attr_preset_modes = []
@@ -128,6 +128,10 @@ class TuyaFanEntity(TuyaEntity, FanEntity):
         ):
             self._direction = enum_type
             self._attr_supported_features |= FanEntityFeature.DIRECTION
+        if self._switch is not None:
+            self._attr_supported_features |= (
+                FanEntityFeature.TURN_ON | FanEntityFeature.TURN_OFF
+            )
 
     def set_preset_mode(self, preset_mode: str) -> None:
         """Set the preset mode of the fan."""

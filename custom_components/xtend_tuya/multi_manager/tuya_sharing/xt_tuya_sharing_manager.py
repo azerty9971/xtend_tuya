@@ -3,7 +3,7 @@ This file contains all the code that inherit from Tuya integration
 """
 
 from __future__ import annotations
-from typing import Any
+from typing import Any, NamedTuple
 
 from homeassistant.core import HomeAssistant, callback
 
@@ -26,7 +26,7 @@ from tuya_sharing.device import (
 
 from ...const import (
     CONF_TOKEN_INFO,
-    LOGGER,
+#    LOGGER,
     DPType,
     MESSAGE_SOURCE_TUYA_SHARING,
 )
@@ -35,7 +35,17 @@ from ..multi_manager import (
     MultiManager,
 )
 
+from .ha_tuya_integration.config_entry_handler import (
+    XTHATuyaIntegrationConfigEntryManager,
+)
+
 from ...base import TuyaEntity
+
+class TuyaSharingData(NamedTuple):
+    device_manager: XTSharingDeviceManager
+    device_ids: list[str] #List of device IDs that are managed by the manager before the managers device merging process
+    ha_tuya_integration_config_manager: XTHATuyaIntegrationConfigEntryManager
+    reuse_config: bool
 
 class XTSharingTokenListener(SharingTokenListener):
     """Token listener for upstream token updates."""
