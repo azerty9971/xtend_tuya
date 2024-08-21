@@ -11,7 +11,7 @@ from tuya_iot import (
     TuyaOpenAPI,
     TuyaOpenMQ,
 )
-from typing import Any, NamedTuple
+from typing import Any
 
 from ...const import (
     LOGGER,
@@ -32,18 +32,6 @@ from ..multi_manager import (
     MultiManager,  # noqa: F811
 )
 from ...base import TuyaEntity
-from .xt_iot_mq import (
-    XTIOTOpenMQ,
-)
-from .xt_iot_home_manager import (
-    XTIOTHomeManager,
-)
-
-class TuyaIOTData(NamedTuple):
-    device_manager: XTIOTDeviceManager
-    mq: XTIOTOpenMQ
-    device_ids: list[str] #List of device IDs that are managed by the manager before the managers device merging process
-    home_manager: XTIOTHomeManager
 
 
 class XTIOTDeviceManager(TuyaDeviceManager):
