@@ -75,6 +75,7 @@ from .shared.import_stub import (
 from .shared.shared_classes import (
     XTDeviceProperties,
     XTDevice,
+    DeviceWatcher,
 )
 
 from .shared.multi_source_handler import (
@@ -142,6 +143,8 @@ class MultiDeviceListener:
         self.hass = hass
 
     def update_device(self, device: XTDevice):
+        if self.device_watcher.is_watched(device.id):
+            LOGGER.warning(f"WD: update_device => {device.id}")
         devices = self.multi_manager.get_devices_from_device_id(device.id)
         for cur_device in devices:
             XTDevice.copy_data_from_device(device, cur_device)
@@ -187,6 +190,7 @@ class MultiManager:  # noqa: F811
         self.config_entry = entry
         self.hass = hass
         self.multi_source_handler = MultiSourceHandler(self)
+        self.device_watcher = DeviceWatcher()
 
     @property
     def device_map(self):
@@ -652,9 +656,14 @@ class MultiManager:  # noqa: F811
             LOGGER.warning(f"dev_id {dev_id} not found!")
             return
         
+        if self.device_watcher.is_watched(dev_id):
+            LOGGER.warning(f"WD: on_message => {msg}")
+
         new_message = self._convert_message_for_all_accounts(msg)
         if status_list := self._get_status_list_from_message(msg):
             self.multi_source_handler.register_status_list_from_source(dev_id, source, status_list)
+            if self.device_watcher.is_watched(dev_id):
+                LOGGER.warning(f"WD: on_message status list => {status_list}")
         
         if self.sharing_account and source == MESSAGE_SOURCE_TUYA_SHARING:
             self.sharing_account.device_manager.on_message(new_message)
