@@ -373,6 +373,7 @@ class DPCode(StrEnum):
     POSITION = "position"
     POWDER_SET = "powder_set"  # Powder
     POWER = "power"
+    POWER2 = "Power"
     POWERON = "poweron"
     POWERONOFF = "PowerOnOff"
     POWER_GO = "power_go"
