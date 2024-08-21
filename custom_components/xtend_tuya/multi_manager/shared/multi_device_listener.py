@@ -31,13 +31,13 @@ class MultiDeviceListener:
         devices = self.multi_manager.get_devices_from_device_id(device.id)
         for cur_device in devices:
             XTDevice.copy_data_from_device(device, cur_device)
-        #if self.multi_manager.reuse_config:
+        #if self.multi_manager.sharing_acount and self.multi_manager.sharing_acount.reuse_config:
         dispatcher_send(self.hass, f"{TUYA_HA_SIGNAL_UPDATE_ENTITY_ORIG}_{device.id}")
         dispatcher_send(self.hass, f"{TUYA_HA_SIGNAL_UPDATE_ENTITY}_{device.id}")
 
     def add_device(self, device: XTDevice):
         self.hass.add_job(self.async_remove_device, device.id)
-        if self.multi_manager.reuse_config:
+        if self.multi_manager.sharing_account and self.multi_manager.sharing_account.reuse_config:
             dispatcher_send(self.hass, TUYA_DISCOVERY_NEW_ORIG, [device.id])
         dispatcher_send(self.hass, TUYA_DISCOVERY_NEW, [device.id])
 

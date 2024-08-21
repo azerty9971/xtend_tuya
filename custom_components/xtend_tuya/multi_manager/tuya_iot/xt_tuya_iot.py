@@ -8,7 +8,6 @@ import json
 import copy
 from tuya_iot import (
     TuyaDeviceManager,
-    TuyaHomeManager,
     TuyaOpenAPI,
     TuyaOpenMQ,
 )
@@ -33,26 +32,15 @@ from ...base import TuyaEntity
 from .xt_iot_mq import (
     XTIOTOpenMQ,
 )
+from .xt_iot_home_manager import (
+    XTIOTHomeManager,
+)
 
 class TuyaIOTData(NamedTuple):
     device_manager: XTIOTDeviceManager
     mq: XTIOTOpenMQ
     device_ids: list[str] #List of device IDs that are managed by the manager before the managers device merging process
     home_manager: XTIOTHomeManager
-
-class XTIOTHomeManager(TuyaHomeManager):
-    def __init__(
-        self, api: TuyaOpenAPI, 
-        mq: TuyaOpenMQ, 
-        device_manager: TuyaDeviceManager,
-        multi_manager: MultiManager
-    ):
-        super().__init__(api, mq, device_manager)
-        self.multi_manager = multi_manager
-
-    def update_device_cache(self):
-        super().update_device_cache()
-        #self.multi_manager.convert_tuya_devices_to_xt(self.device_manager)
 
 
 class XTIOTDeviceManager(TuyaDeviceManager):
@@ -97,14 +85,13 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                 #LOGGER.warning(f"Got response => {response} <=> {result}")
                 #result["online"] = result["is_online"]
                 return response
-            
-    def update_device_list_in_smart_home(self):
-        """Update devices status in project type SmartHome."""
-        response  = self.api.get(f"/v1.0/users/{self.api.token_info.uid}/devices")
-        response2 = self.api.get(f"/v1.0/users/{self.api.token_info.uid}/devices?from=sharing")
-        if response2["success"]:
-            for item in response2["result"]:
-                device = XTDevice(**item)
+
+    #Copy of the Tuya original method with some minor modifications
+    def update_device_list_in_smart_home_mod(self):
+        response = self.api.get(f"/v1.0/users/{self.api.token_info.uid}/devices")
+        if response["success"]:
+            for item in response["result"]:
+                device = XTDevice(**item)       #CHANGED
                 status = {}
                 for item_status in device.status:
                     if "code" in item_status and "value" in item_status:
@@ -113,6 +100,15 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                         status[code] = value
                 device.status = status
                 self.device_map[item["id"]] = device
+
+        #ADDED
+        self.update_device_list_in_smart_home_from_sharing()
+        #END ADDED
+
+        self.update_device_function_cache()
+
+    def update_device_list_in_smart_home_from_sharing(self):
+        response = self.api.get(f"/v1.0/users/{self.api.token_info.uid}/devices?from=sharing")
         if response["success"]:
             for item in response["result"]:
                 device = XTDevice(**item)
@@ -124,7 +120,9 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                         status[code] = value
                 device.status = status
                 self.device_map[item["id"]] = device
-        self.update_device_function_cache()
+
+    def update_device_list_in_smart_home(self):
+        self.update_device_list_in_smart_home_mod()
     
     def update_device_function_cache(self, devIds: list = []):
         super().update_device_function_cache(devIds)

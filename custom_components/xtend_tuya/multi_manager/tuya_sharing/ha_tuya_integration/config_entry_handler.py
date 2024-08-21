@@ -5,7 +5,7 @@ import homeassistant.components.tuya as tuya_integration
 
 from ....const import (
     DOMAIN_ORIG,
-    LOGGER,
+#    LOGGER,
 )
 from ...multi_manager import (
     MultiManager,
@@ -38,17 +38,14 @@ class XTHATuyaIntegrationConfigEntryManager:
             runtime_data.device_manager.add_device_listener(runtime_data.device_listener)
         else:
             if self.multi_manager.sharing_account and self.config_entry.title == entry.title:
-                self.reuse_config = False
+                self.multi_manager.sharing_account.reuse_config = False
                 self.multi_manager.sharing_account.device_manager.set_overriden_device_manager(None)
                 self.multi_manager.sharing_account.device_manager.mq = None
 
     async def on_tuya_remove_entry(self, before_call: bool, hass: HomeAssistant, entry: tuya_integration.TuyaConfigEntry):
         #LOGGER.warning(f"on_tuya_remove_entry {before_call} : {entry.__dict__}")
         if not before_call and self.multi_manager.sharing_account and self.config_entry.title == entry.title:
-            self.reuse_config = False
+            self.multi_manager.sharing_account.reuse_config = False
             self.multi_manager.sharing_account.device_manager.set_overriden_device_manager(None)
             self.multi_manager.sharing_account.device_manager.mq = None
             self.multi_manager.sharing_account.device_manager.refresh_mq()
-    
-    async def overriden_tuya_entry_updated(self, hass: HomeAssistant, config_entry: tuya_integration.TuyaConfigEntry) -> None:
-        LOGGER.warning("overriden_tuya_entry_updated")

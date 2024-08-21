@@ -13,7 +13,7 @@ class MultiMQTTQueue:
                 self.multi_manager.sharing_account 
                 and self.multi_manager.sharing_account.device_manager 
                 and self.multi_manager.sharing_account.device_manager.mq 
-                and not self.multi_manager.reuse_config
+                and not self.multi_manager.sharing_account.reuse_config
         ):
             self.multi_manager.sharing_account.device_manager.mq.stop()
         if self.multi_manager.iot_account and self.multi_manager.iot_account.device_manager and self.multi_manager.iot_account.device_manager.mq:

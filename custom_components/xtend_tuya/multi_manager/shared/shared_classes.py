@@ -1,10 +1,16 @@
 from __future__ import annotations
-from typing import Any, Optional
+from typing import Any, Optional, NamedTuple
 from types import SimpleNamespace
 import copy
 from dataclasses import dataclass, field
 from ...util import (
     merge_iterables,
+)
+from ..multi_manager import (
+    MultiManager,
+)
+from .multi_device_listener import (
+    MultiDeviceListener,
 )
 
 class DeviceWatcher:
@@ -103,3 +109,13 @@ class XTDevice(SimpleNamespace):
         if hasattr(source_device, "status") and hasattr(dest_device, "status"):
             for code, value in source_device.status.items():
                 dest_device.status[code] = value
+
+class HomeAssistantXTData(NamedTuple):
+    """Tuya data stored in the Home Assistant data object."""
+
+    multi_manager: MultiManager
+    listener: MultiDeviceListener = None
+
+    @property
+    def manager(self) -> MultiManager:
+        return self.multi_manager
