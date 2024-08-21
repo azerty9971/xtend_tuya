@@ -143,7 +143,7 @@ class MultiDeviceListener:
         self.hass = hass
 
     def update_device(self, device: XTDevice):
-        if self.device_watcher.is_watched(device.id):
+        if self.multi_manager.device_watcher.is_watched(device.id):
             LOGGER.warning(f"WD: update_device => {device.id}")
         devices = self.multi_manager.get_devices_from_device_id(device.id)
         for cur_device in devices:
