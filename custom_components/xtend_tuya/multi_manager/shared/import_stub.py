@@ -3,3 +3,6 @@ class MultiManager:
 
 class HomeAssistantXTData:
     pass
+
+class XTConfigEntry:
+    pass
