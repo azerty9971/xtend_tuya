@@ -1,14 +1,12 @@
 from __future__ import annotations
 import requests
 import copy
-from typing import NamedTuple, Any
+from typing import Any
 
-from homeassistant.core import HomeAssistant, callback
+from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.config_entries import ConfigEntry
 import homeassistant.components.tuya as tuya_integration
-from homeassistant.helpers.dispatcher import dispatcher_send
-from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.entity import EntityDescription
 
 from tuya_iot import (
@@ -20,9 +18,6 @@ from tuya_iot.device import (
     PROTOCOL_OTHER,
 )
 
-from tuya_sharing import (
-    SharingDeviceListener,
-)
 from tuya_sharing.customerapi import (
     CustomerTokenInfo,
     CustomerApi,
@@ -42,14 +37,9 @@ from ..const import (
     CONF_TERMINAL_ID,
     CONF_TOKEN_INFO,
     CONF_USER_CODE,
-    DOMAIN,
     DOMAIN_ORIG,
     LOGGER,
     TUYA_CLIENT_ID,
-    TUYA_DISCOVERY_NEW,
-    TUYA_DISCOVERY_NEW_ORIG,
-    TUYA_HA_SIGNAL_UPDATE_ENTITY,
-    TUYA_HA_SIGNAL_UPDATE_ENTITY_ORIG,
     VirtualStates,
     VirtualFunctions,
     DescriptionVirtualState,
@@ -85,6 +75,10 @@ from .shared.multi_mq import (
     MultiMQTTQueue,
 )
 
+from .shared.multi_device_listener import (
+    MultiDeviceListener,
+)
+
 from ..util import (
     get_overriden_tuya_integration_runtime_data,
     get_tuya_integration_runtime_data,
@@ -111,58 +105,6 @@ from .tuya_iot.xt_tuya_iot import (
 from .tuya_iot.xt_iot_mq import (
     XTIOTOpenMQ
 )
-
-class HomeAssistantXTData(NamedTuple):
-    """Tuya data stored in the Home Assistant data object."""
-
-    multi_manager: MultiManager
-    reuse_config: bool = False
-    listener: SharingDeviceListener = None
-
-    @property
-    def manager(self) -> MultiManager:
-        return self.multi_manager
-
-class MultiDeviceListener:
-    def __init__(self, hass: HomeAssistant, multi_manager: MultiManager) -> None:
-        self.multi_manager = multi_manager
-        self.hass = hass
-
-    def update_device(self, device: XTDevice):
-        if self.multi_manager.device_watcher.is_watched(device.id):
-            LOGGER.warning(f"WD: update_device => {device.id}")
-        devices = self.multi_manager.get_devices_from_device_id(device.id)
-        for cur_device in devices:
-            XTDevice.copy_data_from_device(device, cur_device)
-        #if self.multi_manager.reuse_config:
-        dispatcher_send(self.hass, f"{TUYA_HA_SIGNAL_UPDATE_ENTITY_ORIG}_{device.id}")
-        dispatcher_send(self.hass, f"{TUYA_HA_SIGNAL_UPDATE_ENTITY}_{device.id}")
-
-    def add_device(self, device: XTDevice):
-        self.hass.add_job(self.async_remove_device, device.id)
-        if self.multi_manager.reuse_config:
-            dispatcher_send(self.hass, TUYA_DISCOVERY_NEW_ORIG, [device.id])
-        dispatcher_send(self.hass, TUYA_DISCOVERY_NEW, [device.id])
-
-    def remove_device(self, device_id: str):
-        #log_stack("DeviceListener => async_remove_device")
-        device_registry = dr.async_get(self.hass)
-        device_entry = device_registry.async_get_device(
-            identifiers={(DOMAIN_ORIG, device_id), (DOMAIN, device_id)}
-        )
-        if device_entry is not None:
-            device_registry.async_remove_device(device_entry.id)
-    
-    @callback
-    def async_remove_device(self, device_id: str) -> None:
-        """Remove device from Home Assistant."""
-        #log_stack("DeviceListener => async_remove_device")
-        device_registry = dr.async_get(self.hass)
-        device_entry = device_registry.async_get_device(
-            identifiers={(DOMAIN_ORIG, device_id), (DOMAIN, device_id)}
-        )
-        if device_entry is not None:
-            device_registry.async_remove_device(device_entry.id)
     
 class MultiManager:  # noqa: F811
     def __init__(self, hass: HomeAssistant, entry: XTConfigEntry) -> None:
