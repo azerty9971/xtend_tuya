@@ -9,7 +9,7 @@ from ...util import (
 
 class DeviceWatcher:
     def __init__(self) -> None:
-        self.watched_dev_id = ["bf48bc174fe06d1ea3z7ja"]
+        self.watched_dev_id = []
     
     def is_watched(self, dev_id: str) -> bool:
         return dev_id in self.watched_dev_id
