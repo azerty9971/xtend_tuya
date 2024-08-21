@@ -55,13 +55,14 @@ from ..const import (
 
 from .shared.import_stub import (
     MultiManager,
+    XTConfigEntry,
 )
 
 from .shared.shared_classes import (
     XTDeviceProperties,
     XTDevice,
     DeviceWatcher,
-    XTConfigEntry,
+    XTConfigEntry,  # noqa: F811
 )
 
 from .shared.multi_source_handler import (
