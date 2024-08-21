@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 import logging
+from typing import NamedTuple
 
 from homeassistant.config_entries import ConfigEntry, ConfigEntryState
 from homeassistant.core import HomeAssistant
@@ -17,7 +18,7 @@ from .const import (
 from .multi_manager.multi_manager import (
     MultiManager,
     XTConfigEntry,
-    HomeAssistantXTData,
+    MultiDeviceListener,
 )
 
 from .multi_manager.tuya_sharing.tuya_decorators import (
@@ -27,6 +28,17 @@ from .multi_manager.tuya_sharing.tuya_decorators import (
 from .util import (
     get_tuya_integration_runtime_data
 )
+
+class HomeAssistantXTData(NamedTuple):
+    """Tuya data stored in the Home Assistant data object."""
+
+    multi_manager: MultiManager
+    reuse_config: bool = False
+    listener: MultiDeviceListener = None
+
+    @property
+    def manager(self) -> MultiManager:
+        return self.multi_manager
 
 # Suppress logs from the library, it logs unneeded on error
 logging.getLogger("tuya_sharing").setLevel(logging.CRITICAL)
