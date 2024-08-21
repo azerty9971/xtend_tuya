@@ -101,10 +101,12 @@ from .tuya_sharing.xt_tuya_sharing import (
     XTSharingDeviceManager,
     XTSharingTokenListener,
     XTSharingDeviceRepository,
+    TuyaSharingData,
 )
 from .tuya_iot.xt_tuya_iot import (
     XTIOTDeviceManager,
     XTIOTHomeManager,
+    TuyaIOTData
 )
 from .tuya_iot.xt_iot_mq import (
     XTIOTOpenMQ
@@ -120,16 +122,6 @@ class HomeAssistantXTData(NamedTuple):
     @property
     def manager(self) -> MultiManager:
         return self.multi_manager
-
-class TuyaIOTData(NamedTuple):
-    device_manager: XTIOTDeviceManager
-    mq: XTIOTOpenMQ
-    device_ids: list[str] #List of device IDs that are managed by the manager before the managers device merging process
-    home_manager: XTIOTHomeManager
-
-class TuyaSharingData(NamedTuple):
-    device_manager: XTSharingDeviceManager
-    device_ids: list[str] #List of device IDs that are managed by the manager before the managers device merging process
 
 class MultiDeviceListener:
     def __init__(self, hass: HomeAssistant, multi_manager: MultiManager) -> None:

@@ -2,7 +2,7 @@ from __future__ import annotations
 import copy
 
 from ..multi_manager import MultiManager
-from ...const import LOGGER
+#from ...const import LOGGER
 
 class SourceCodeCounter:
     def __init__(self, source: str) -> None:
