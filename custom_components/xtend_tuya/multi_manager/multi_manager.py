@@ -63,7 +63,6 @@ from .shared.device import (
 )
 
 from .shared.shared_classes import (
-    XTDeviceProperties,
     DeviceWatcher,
     XTConfigEntry,  # noqa: F811
 )
@@ -363,13 +362,6 @@ class MultiManager:  # noqa: F811
             self.iot_account.device_manager.remove_device_listener(self.multi_device_listener)
         if self.sharing_account:
             self.sharing_account.device_manager.remove_device_listener(self.multi_device_listener)
-
-    def get_device_properties(self, device: XTDevice) -> XTDeviceProperties:
-        dev_props = XTDeviceProperties()
-        if self.iot_account:
-            dev_props = self.iot_account.device_manager.get_device_properties(device)
-        
-        return dev_props
     
     def _read_dpId_from_code(self, code: str, device: XTDevice) -> int | None:
         if not hasattr(device, "local_strategy"):
