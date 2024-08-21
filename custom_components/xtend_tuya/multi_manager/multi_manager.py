@@ -81,6 +81,10 @@ from .shared.multi_source_handler import (
     MultiSourceHandler,
 )
 
+from .shared.multi_mq import (
+    MultiMQTTQueue,
+)
+
 from ..util import (
     get_overriden_tuya_integration_runtime_data,
     get_tuya_integration_runtime_data,
@@ -126,18 +130,6 @@ class TuyaIOTData(NamedTuple):
 class TuyaSharingData(NamedTuple):
     device_manager: XTSharingDeviceManager
     device_ids: list[str] #List of device IDs that are managed by the manager before the managers device merging process
-
-class MultiMQTTQueue:
-    def __init__(self, multi_manager: MultiManager) -> None:
-        self.multi_manager = multi_manager
-        self.sharing_account_mq = None
-        self.iot_account_mq = None
-
-    def stop(self) -> None:
-        if self.sharing_account_mq and not self.multi_manager.reuse_config:
-            self.sharing_account_mq.stop()
-        if self.iot_account_mq:
-            self.iot_account_mq.stop()
 
 class MultiDeviceListener:
     def __init__(self, hass: HomeAssistant, multi_manager: MultiManager) -> None:
@@ -235,7 +227,6 @@ class MultiManager:  # noqa: F811
                 token_listener,
             )
             sharing_device_manager.mq = None
-        self.multi_mqtt_queue.sharing_account_mq = sharing_device_manager.mq
         sharing_device_manager.home_repository = HomeRepository(sharing_device_manager.customer_api)
         sharing_device_manager.device_repository = XTSharingDeviceRepository(sharing_device_manager.customer_api, sharing_device_manager, self)
         sharing_device_manager.scene_repository = SceneRepository(sharing_device_manager.customer_api)
@@ -283,7 +274,6 @@ class MultiManager:  # noqa: F811
         if response.get("success", False) is False:
             raise ConfigEntryNotReady(response)
         mq = XTIOTOpenMQ(api)
-        self.multi_mqtt_queue.iot_account_mq = mq
         mq.start()
         device_manager = XTIOTDeviceManager(self, api, mq)
         device_ids: list[str] = list()
