@@ -19,10 +19,13 @@ from ...const import (
     MESSAGE_SOURCE_TUYA_IOT,
 )
 
+from ..shared.device import (
+    XTDevice,
+)
+
 from ..shared.shared_classes import (
     XTDeviceStatusRange,
     XTDeviceProperties,
-    XTDevice,
 )
 
 from ..multi_manager import (
