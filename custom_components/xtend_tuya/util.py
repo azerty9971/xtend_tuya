@@ -28,14 +28,8 @@ class TuyaIntegrationRuntimeData(NamedTuple):
     device_listener: SharingDeviceListener
     generic_runtime_data: any
 
-class LogStackException(Exception):
-    pass
-
 def log_stack(message: str):
-    stack = traceback.format_stack()
-    LOGGER.debug(message)
-    for stack_line in stack:
-        LOGGER.debug(stack_line)
+    LOGGER.debug(message, stack_info=True)
 
 def remap_value(
     value: float,
