@@ -1,12 +1,12 @@
 from typing import NamedTuple
 
-from .xt_iot_mq import (
+from .xt_tuya_iot_mq import (
     XTIOTOpenMQ,
 )
-from .xt_iot_home_manager import (
+from .xt_tuya_iot_home_manager import (
     XTIOTHomeManager,
 )
-from .xt_tuya_iot import (
+from .xt_tuya_iot_manager import (
     XTIOTDeviceManager
 )
 
