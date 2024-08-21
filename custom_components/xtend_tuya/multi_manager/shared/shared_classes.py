@@ -7,6 +7,9 @@ from homeassistant.config_entries import ConfigEntry
 from ...util import (
     merge_iterables,
 )
+from .import_stub import (
+    XTDevice,
+)
 from ..multi_manager import (
     MultiManager,
 )
