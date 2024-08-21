@@ -7,6 +7,13 @@ from ...util import (
     merge_iterables,
 )
 
+class DeviceWatcher:
+    def __init__(self) -> None:
+        self.watched_dev_id = ["bf48bc174fe06d1ea3z7ja"]
+    
+    def is_watched(self, dev_id: str) -> bool:
+        return dev_id in self.watched_dev_id
+
 @dataclass
 class XTDeviceProperties:
     local_strategy: dict[int, dict[str, Any]] = field(default_factory=dict)
