@@ -14,11 +14,15 @@ from ...const import (
     DOMAIN_ORIG,
 )
 
+from .import_stub import (
+    XTDevice,
+)
+
 from ..multi_manager import (
     MultiManager,
 )
 from .shared_classes import (
-    XTDevice,
+    XTDevice,  # noqa: F811
 )
 
 
