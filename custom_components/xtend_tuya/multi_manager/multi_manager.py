@@ -1,7 +1,7 @@
 from __future__ import annotations
 import requests
 import copy
-from typing import Any
+from typing import Any, Literal, Optional
 
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
@@ -660,6 +660,14 @@ class MultiManager:  # noqa: F811
                 self.iot_account.device_manager.send_property_update(device_id, property_commands)
             return
         self.sharing_account.device_manager.send_commands(device_id, commands)
+
+    def get_device_stream_allocate(
+            self, device_id: str, stream_type: Literal["flv", "hls", "rtmp", "rtsp"]
+    ) -> Optional[str]:
+        if self.sharing_account and device_id in self.sharing_account.device_ids:
+            return self.sharing_account.device_manager.get_device_stream_allocate(device_id, stream_type)
+        if self.iot_account and device_id in self.iot_account.device_ids:
+            return self.iot_account.device_manager.get_device_stream_allocate(device_id, stream_type)
 
     def _process_virtual_function(self, device_id: str, commands: list[dict[str, Any]]):
         devices = self.get_devices_from_device_id(device_id)
