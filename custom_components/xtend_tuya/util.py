@@ -28,14 +28,8 @@ class TuyaIntegrationRuntimeData(NamedTuple):
     device_listener: SharingDeviceListener
     generic_runtime_data: any
 
-class LogStackException(Exception):
-    pass
-
 def log_stack(message: str):
-    stack = traceback.format_stack()
-    LOGGER.debug(message)
-    for stack_line in stack:
-        LOGGER.debug(stack_line)
+    LOGGER.debug(message, stack_info=True)
 
 def remap_value(
     value: float,
@@ -100,7 +94,10 @@ def get_tuya_integration_runtime_data(hass: HomeAssistant, entry: ConfigEntry, d
                 device_manager = runtime_data.device_manager
             if hasattr(runtime_data, "manager"):
                 device_manager = runtime_data.manager
-            device_listener = runtime_data.device_listener
+            if hasattr(runtime_data, "device_listener"):
+                device_listener = runtime_data.device_listener
+            if hasattr(runtime_data, "listener"):
+                device_listener = runtime_data.listener
     else:
         runtime_data = entry.runtime_data
         device_manager = entry.runtime_data.manager

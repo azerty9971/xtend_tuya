@@ -65,7 +65,7 @@ async def async_setup_entry(
     hass_data = entry.runtime_data
 
     merged_descriptors = BUTTONS
-    if not entry.runtime_data.multi_manager.reuse_config:
+    if not entry.runtime_data.multi_manager.sharing_account or not entry.runtime_data.multi_manager.sharing_account.reuse_config:
         merged_descriptors = merge_device_descriptors(BUTTONS, BUTTONS_TUYA)
 
     @callback
