@@ -100,13 +100,17 @@ from .tuya_sharing.xt_tuya_sharing import (
     XTSharingDeviceRepository,
     TuyaSharingData,
 )
+from .tuya_iot.xt_tuya_iot_data import (
+    TuyaIOTData,
+)
 from .tuya_iot.xt_tuya_iot import (
     XTIOTDeviceManager,
-    XTIOTHomeManager,
-    TuyaIOTData
 )
 from .tuya_iot.xt_iot_mq import (
-    XTIOTOpenMQ
+    XTIOTOpenMQ,
+)
+from .tuya_iot.xt_iot_home_manager import (
+    XTIOTHomeManager,
 )
     
 class MultiManager:  # noqa: F811
