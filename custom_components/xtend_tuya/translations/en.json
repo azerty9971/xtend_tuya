@@ -546,9 +546,9 @@
         "state": {
           "last": "Remember last state",
           "memory": "Remember last state",
-          "off": "Off",
+          "off": "[%key:common::state::off%]",
           "on": "On",
-          "power_off": "Off",
+          "power_off": "[%key:common::state::off%]",
           "power_on": "On"
         }
       },
