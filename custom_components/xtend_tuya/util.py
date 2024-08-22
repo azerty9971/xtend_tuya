@@ -1,7 +1,6 @@
 """Utility methods for the Tuya integration."""
 
 from __future__ import annotations
-import traceback 
 import copy
 from typing import NamedTuple
 from homeassistant.core import HomeAssistant

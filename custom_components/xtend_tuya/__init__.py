@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 import logging
-from typing import NamedTuple
 
 from homeassistant.config_entries import ConfigEntry, ConfigEntryState
 from homeassistant.core import HomeAssistant
