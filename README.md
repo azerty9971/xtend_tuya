@@ -27,6 +27,7 @@ The table below shows the different functionnalities of each operating mode<br/>
 | Multiple account support        |     | X   | X        | X   | X        | Only for multiple accounts in XT, not the regular Tuya integration |
 | Shared device support           |     |     | X        |     | X        |                                                                    |
 | Shared home support             | X   | X   | X        | X   | X        |                                                                    |
+| Localized entity names          | X   |     |          |     |          | Due to a limitation with custom components                         |
 
 
 # Installation
