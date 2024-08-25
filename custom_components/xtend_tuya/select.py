@@ -5,19 +5,11 @@ from __future__ import annotations
 from tuya_sharing import CustomerDevice, Manager
 
 from homeassistant.components.select import SelectEntity, SelectEntityDescription
-from homeassistant.const import EntityCategory
+from homeassistant.const import EntityCategory, Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-try:
-    from custom_components.tuya.select import ( # type: ignore
-        SELECTS as SELECTS_TUYA
-    )
-except ImportError:
-    from homeassistant.components.tuya.select import (
-        SELECTS as SELECTS_TUYA
-    )
 from .util import (
     merge_device_descriptors
 )
@@ -101,8 +93,8 @@ async def async_setup_entry(
     hass_data = entry.runtime_data
 
     merged_descriptors = SELECTS
-    if not entry.runtime_data.multi_manager.sharing_account or not entry.runtime_data.multi_manager.sharing_account.reuse_config:
-        merged_descriptors = merge_device_descriptors(SELECTS, SELECTS_TUYA)
+    for new_descriptor in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(Platform.SELECT):
+        merged_descriptors = merge_device_descriptors(merged_descriptors, new_descriptor)
 
     @callback
     def async_discover_device(device_map) -> None:

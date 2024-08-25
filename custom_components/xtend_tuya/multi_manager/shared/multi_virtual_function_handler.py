@@ -51,7 +51,7 @@ class XTVirtualFunctionHandler:
                             to_return.append(found_virtual_function)
         return to_return
     
-    def _process_virtual_function(self, device_id: str, commands: list[dict[str, Any]]):
+    def process_virtual_function(self, device_id: str, commands: list[dict[str, Any]]):
         devices = self.multi_manager.get_devices_from_device_id(device_id)
         if not devices:
             return

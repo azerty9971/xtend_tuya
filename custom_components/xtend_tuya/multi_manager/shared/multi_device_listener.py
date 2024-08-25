@@ -37,15 +37,22 @@ class MultiDeviceListener:
 
     def add_device(self, device: XTDevice):
         self.hass.add_job(self.async_remove_device, device.id)
-        if self.multi_manager.sharing_account and self.multi_manager.sharing_account.reuse_config:
-            dispatcher_send(self.hass, TUYA_DISCOVERY_NEW_ORIG, [device.id])
+        for account in self.multi_manager.accounts.values():
+            account.on_add_device(device)
         dispatcher_send(self.hass, TUYA_DISCOVERY_NEW, [device.id])
 
     def remove_device(self, device_id: str):
         #log_stack("DeviceListener => async_remove_device")
         device_registry = dr.async_get(self.hass)
+        identifiers: set = {}
+        account_identifiers: set = {}
+        for account in self.multi_manager.accounts.values():
+            for account_identifier in account.get_device_registry_identifiers():
+                if account_identifier not in account_identifiers:
+                    identifiers.add(tuple(account_identifier, device_id))
+                    account_identifiers.add(account_identifier)
         device_entry = device_registry.async_get_device(
-            identifiers={(DOMAIN_ORIG, device_id), (DOMAIN, device_id)}
+            identifiers=identifiers
         )
         if device_entry is not None:
             device_registry.async_remove_device(device_entry.id)

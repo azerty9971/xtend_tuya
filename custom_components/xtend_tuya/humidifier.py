@@ -11,18 +11,11 @@ from homeassistant.components.humidifier import (
     HumidifierEntityDescription,
     HumidifierEntityFeature,
 )
+from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-try:
-    from custom_components.tuya.humidifier import ( # type: ignore
-        HUMIDIFIERS as HUMIDIFIERS_TUYA
-    )
-except ImportError:
-    from homeassistant.components.tuya.humidifier import (
-        HUMIDIFIERS as HUMIDIFIERS_TUYA
-    )
 from .util import (
     append_dictionnaries
 )
@@ -54,8 +47,8 @@ async def async_setup_entry(
     hass_data = entry.runtime_data
 
     merged_categories = HUMIDIFIERS
-    if not entry.runtime_data.multi_manager.sharing_account or not entry.runtime_data.multi_manager.sharing_account.reuse_config:
-        merged_categories = append_dictionnaries(HUMIDIFIERS, HUMIDIFIERS_TUYA)
+    for new_descriptor in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(Platform.HUMIDIFIER):
+        merged_categories = append_dictionnaries(HUMIDIFIERS, new_descriptor)
 
     @callback
     def async_discover_device(device_map) -> None:
