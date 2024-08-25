@@ -77,6 +77,7 @@ class TuyaOptionFlow(OptionsFlow):
             CONF_USERNAME: user_input[CONF_USERNAME],
             CONF_PASSWORD: user_input[CONF_PASSWORD],
             CONF_COUNTRY_CODE: country.country_code,
+            CONF_USE_OPEN_API: user_input[CONF_USE_OPEN_API],
         }
         LOGGER.warning(f"Options: {data}")
         if (
