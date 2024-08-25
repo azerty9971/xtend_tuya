@@ -93,11 +93,20 @@ from .tuya_sharing.ha_tuya_integration.config_entry_handler import (
     XTHATuyaIntegrationConfigEntryManager,
 )
 
+from .tuya_sharing.xt_tuya_sharing_data import (
+    TuyaSharingData,
+)
+
+from .tuya_sharing.xt_tuya_sharing_token_listener import (
+    XTSharingTokenListener,
+)
+
+from .tuya_sharing.xt_tuya_sharing_device_repository import (
+    XTSharingDeviceRepository,
+)
+
 from .tuya_sharing.xt_tuya_sharing_manager import (
     XTSharingDeviceManager,
-    XTSharingTokenListener,
-    XTSharingDeviceRepository,
-    TuyaSharingData,
 )
 from .tuya_iot.xt_tuya_iot_data import (
     TuyaIOTData,
