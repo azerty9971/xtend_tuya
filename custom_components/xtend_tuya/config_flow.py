@@ -79,11 +79,9 @@ class TuyaOptionFlow(OptionsFlow):
             CONF_COUNTRY_CODE: country.country_code,
             CONF_USE_OPEN_API: user_input[CONF_USE_OPEN_API],
         }
-        LOGGER.warning(f"Options: {data}")
         if (
                not data[CONF_USE_OPEN_API]
         ):
-            LOGGER.warning(f"Clear Options: {data}")
             data[CONF_ACCESS_ID] = None
             data[CONF_ACCESS_SECRET] = None
             data[CONF_USERNAME] = None
