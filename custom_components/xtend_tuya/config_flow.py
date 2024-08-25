@@ -77,10 +77,10 @@ class TuyaOptionFlow(OptionsFlow):
             CONF_COUNTRY_CODE: country.country_code,
         }
         if (
-               data[CONF_ACCESS_ID] == ""
-            or data[CONF_ACCESS_SECRET] == ""
-            or data[CONF_USERNAME] == ""
-            or data[CONF_PASSWORD] == ""
+               not data[CONF_ACCESS_ID]
+            or not data[CONF_ACCESS_SECRET]
+            or not data[CONF_USERNAME]
+            or not data[CONF_PASSWORD]
         ):
             return {TUYA_RESPONSE_SUCCESS: True}, data
 
