@@ -84,6 +84,7 @@ class TuyaOptionFlow(OptionsFlow):
             or not data[CONF_USERNAME]
             or not data[CONF_PASSWORD]
         ):
+            LOGGER.warning(f"Clear Options: {data}")
             return {TUYA_RESPONSE_SUCCESS: True}, data
 
         for app_type in ("", TUYA_SMART_APP, SMARTLIFE_APP):
