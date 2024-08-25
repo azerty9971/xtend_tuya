@@ -57,7 +57,7 @@ class MultiSourceHandler:
         if not devices:
             return
         
-        virtual_states = self.multi_manager.get_category_virtual_states(devices[0].category)
+        virtual_states = self.multi_manager.virtual_state_handler.get_category_virtual_states(devices[0].category)
         if not virtual_states:
             return
         
@@ -78,7 +78,7 @@ class MultiSourceHandler:
             return status_list
         
         #Only filter for devices that have a VirtualState in their status_list
-        virtual_states = self.multi_manager.get_category_virtual_states(devices[0].category)
+        virtual_states = self.multi_manager.virtual_state_handler.get_category_virtual_states(devices[0].category)
         if not virtual_states:
             return status_list
         
