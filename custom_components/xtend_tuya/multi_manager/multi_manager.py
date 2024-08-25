@@ -131,8 +131,8 @@ class MultiManager:  # noqa: F811
     def __init__(self, hass: HomeAssistant) -> None:
         self.sharing_account: TuyaSharingData = None
         self.iot_account: TuyaIOTData = None
-        self.virtual_state_handler = XTVirtualStateHandler()
-        self.virtual_function_handler = XTVirtualFunctionHandler()
+        self.virtual_state_handler = XTVirtualStateHandler(self)
+        self.virtual_function_handler = XTVirtualFunctionHandler(self)
         self.descriptors_with_virtual_function = {}
         self.multi_mqtt_queue: MultiMQTTQueue = MultiMQTTQueue(self)
         self.multi_device_listener: MultiDeviceListener = MultiDeviceListener(hass, self)
