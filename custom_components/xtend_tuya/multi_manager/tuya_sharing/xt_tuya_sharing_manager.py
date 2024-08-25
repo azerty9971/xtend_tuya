@@ -7,13 +7,20 @@ from typing import Any
 
 from tuya_sharing.manager import (
     Manager,
+    SceneRepository,
+    UserRepository,
 )
 
 from tuya_sharing.home import (
     SmartLifeHome,
+    HomeRepository,
 )
 from tuya_sharing.device import (
     CustomerDevice,
+)
+
+from .import_stub import (
+    XTSharingDeviceManager,
 )
 
 from ...const import (
@@ -25,7 +32,11 @@ from ..multi_manager import (
     MultiManager,
 )
 
-class XTSharingDeviceManager(Manager):
+from .xt_tuya_sharing_device_repository import (
+    XTSharingDeviceRepository
+)
+
+class XTSharingDeviceManager(Manager):  # noqa: F811
     def __init__(
         self,
         multi_manager: MultiManager,
@@ -35,10 +46,10 @@ class XTSharingDeviceManager(Manager):
         self.terminal_id = None
         self.mq = None
         self.customer_api = None
-        self.home_repository = None
-        self.device_repository = None
-        self.scene_repository = None
-        self.user_repository = None
+        self.home_repository: HomeRepository = None
+        self.device_repository: XTSharingDeviceRepository = None
+        self.scene_repository: SceneRepository = None
+        self.user_repository: UserRepository = None
         self.device_map: dict[str, CustomerDevice] = {}
         self.user_homes: list[SmartLifeHome] = []
         self.device_listeners = set()
@@ -74,7 +85,7 @@ class XTSharingDeviceManager(Manager):
             return
         status_new = self.multi_manager.convert_device_report_status_list(device_id, status)
         status_new = self.multi_manager.multi_source_handler.filter_status_list(device_id, MESSAGE_SOURCE_TUYA_SHARING, status_new)
-        status_new = self.multi_manager.apply_virtual_states_to_status_list(device, status_new)
+        status_new = self.multi_manager.virtual_state_handler.apply_virtual_states_to_status_list(device, status_new)
         super()._on_device_report(device_id, status_new)
     
     def send_commands(
