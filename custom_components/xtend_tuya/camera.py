@@ -4,20 +4,13 @@ from __future__ import annotations
 
 from tuya_sharing import CustomerDevice, Manager
 
+from homeassistant.const import Platform
 from homeassistant.components import ffmpeg
 from homeassistant.components.camera import Camera as CameraEntity, CameraEntityFeature
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-try:
-    from custom_components.tuya.camera import ( # type: ignore
-        CAMERAS as CAMERAS_TUYA
-    )
-except ImportError:
-    from homeassistant.components.tuya.camera import (
-        CAMERAS as CAMERAS_TUYA
-    )
 from .util import (
     append_lists
 )
@@ -39,8 +32,8 @@ async def async_setup_entry(
     hass_data = entry.runtime_data
 
     merged_categories = CAMERAS
-    if not entry.runtime_data.multi_manager.sharing_account or not entry.runtime_data.multi_manager.sharing_account.reuse_config:
-        merged_categories = tuple(append_lists(CAMERAS, CAMERAS_TUYA))
+    for new_descriptor in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(Platform.CAMERA):
+        merged_categories = tuple(append_lists(CAMERAS, new_descriptor))
 
     @callback
     def async_discover_device(device_map) -> None:

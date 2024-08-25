@@ -17,6 +17,7 @@ from homeassistant.components.sensor import (
 )
 from homeassistant.const import (
     UnitOfEnergy,
+    Platform,
 )
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
@@ -24,14 +25,6 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import StateType
 from homeassistant.helpers.event import async_track_time_change
 
-try:
-    from custom_components.tuya.sensor import ( # type: ignore
-        SENSORS as SENSORS_TUYA
-    )
-except ImportError:
-    from homeassistant.components.tuya.sensor import (
-        SENSORS as SENSORS_TUYA
-    )
 from .util import (
     merge_device_descriptors
 )
@@ -539,8 +532,8 @@ async def async_setup_entry(
     hass_data = entry.runtime_data
 
     merged_descriptors = SENSORS
-    if not entry.runtime_data.multi_manager.sharing_account or not entry.runtime_data.multi_manager.sharing_account.reuse_config:
-        merged_descriptors = merge_device_descriptors(SENSORS, SENSORS_TUYA)
+    for new_descriptor in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(Platform.SENSOR):
+        merged_descriptors = merge_device_descriptors(merged_descriptors, new_descriptor)
 
     @callback
     def async_discover_device(device_map) -> None:

@@ -54,6 +54,7 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
         self.user_homes: list[SmartLifeHome] = []
         self.device_listeners = set()
         self.other_device_manager = other_device_manager
+        self.reuse_config = False
     
     def on_external_refresh_mq(self):
         if self.other_device_manager is not None:

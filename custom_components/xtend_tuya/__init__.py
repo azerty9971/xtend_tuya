@@ -43,22 +43,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
     """Async setup hass config entry.""" 
     multi_manager = MultiManager(hass)
     await multi_manager.setup_entry(hass, entry)
-    if multi_manager.sharing_account and multi_manager.sharing_account.ha_tuya_integration_config_manager:
-        decorate_tuya_integration(multi_manager.sharing_account.ha_tuya_integration_config_manager)
 
     # Get all devices from Tuya
-    try:
-        await hass.async_add_executor_job(multi_manager.update_device_cache)
-    except Exception as exc:
-        # While in general, we should avoid catching broad exceptions,
-        # we have no other way of detecting this case.
-        if "sign invalid" in str(exc):
-            msg = "Authentication failed. Please re-authenticate the Tuya integration"
-            if multi_manager.sharing_account and multi_manager.sharing_account.reuse_config:
-                raise ConfigEntryNotReady(msg) from exc
-            else:
-                raise ConfigEntryAuthFailed("Authentication failed. Please re-authenticate.")
-        raise
+    await hass.async_add_executor_job(multi_manager.update_device_cache)
 
     # Connection is successful, store the manager & listener
     entry.runtime_data = HomeAssistantXTData(multi_manager=multi_manager, listener=multi_manager.multi_device_listener)
@@ -70,14 +57,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
     device_registry = dr.async_get(hass)
     aggregated_device_map = multi_manager.device_map
     for device in aggregated_device_map.values():
-        if ( 
-            multi_manager.sharing_account
-            and multi_manager.sharing_account.reuse_config
-            and device_registry.async_get_device(identifiers={(DOMAIN_ORIG, device.id)}, connections=None)
-        ):
-            identifiers = {(DOMAIN_ORIG, device.id), (DOMAIN, device.id)}
-        else:
-            identifiers = {(DOMAIN, device.id)}
+        domain_identifiers:list = multi_manager.get_domain_identifiers_of_device(device.id)
+        identifiers: set[tuple[str, str]] = {}
+        for domain_identifier in domain_identifiers:
+            identifiers.add(tuple(domain_identifier, device.id))
         device_registry.async_get_or_create(
             config_entry_id=entry.entry_id,
             identifiers=identifiers,

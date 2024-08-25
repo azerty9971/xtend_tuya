@@ -19,8 +19,6 @@ async def async_setup_entry(
     hass: HomeAssistant, entry: XTConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
     """Set up Tuya scenes."""
-    if not entry.runtime_data.multi_manager.sharing_account or not entry.runtime_data.multi_manager.sharing_account.reuse_config:
-        return
     hass_data = entry.runtime_data
     scenes = await hass.async_add_executor_job(hass_data.manager.query_scenes)
     async_add_entities(TuyaSceneEntity(hass_data.manager, scene) for scene in scenes)

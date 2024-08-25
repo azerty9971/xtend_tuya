@@ -17,18 +17,11 @@ from homeassistant.components.light import (
     LightEntityDescription,
     filter_supported_color_modes,
 )
+from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-try:
-    from custom_components.tuya.light import ( # type: ignore
-        LIGHTS as LIGHTS_TUYA
-    )
-except ImportError:
-    from homeassistant.components.tuya.light import (
-        LIGHTS as LIGHTS_TUYA
-    )
 from .util import (
     merge_device_descriptors
 )
@@ -110,8 +103,8 @@ async def async_setup_entry(
     hass_data = entry.runtime_data
 
     merged_descriptors = LIGHTS
-    if not entry.runtime_data.multi_manager.sharing_account or not entry.runtime_data.multi_manager.sharing_account.reuse_config:
-        merged_descriptors = merge_device_descriptors(LIGHTS, LIGHTS_TUYA)
+    for new_descriptor in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(Platform.LIGHT):
+        merged_descriptors = merge_device_descriptors(merged_descriptors, new_descriptor)
 
     @callback
     def async_discover_device(device_map):

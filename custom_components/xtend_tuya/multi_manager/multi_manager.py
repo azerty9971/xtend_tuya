@@ -3,9 +3,9 @@ import requests
 import copy
 from typing import Any, Literal, Optional
 
+from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
-from homeassistant.helpers.entity import EntityDescription
 
 from tuya_iot import (
     AuthType,
@@ -16,29 +16,8 @@ from tuya_iot.device import (
     PROTOCOL_OTHER,
 )
 
-from tuya_sharing.customerapi import (
-    CustomerTokenInfo,
-    CustomerApi,
-)
-from tuya_sharing.home import (
-    HomeRepository,
-)
-from tuya_sharing.scenes import (
-    SceneRepository,
-)
-from tuya_sharing.user import (
-    UserRepository,
-)
-
 from ..const import (
-    CONF_ENDPOINT,
-    CONF_TERMINAL_ID,
-    CONF_TOKEN_INFO,
-    CONF_USER_CODE,
     LOGGER,
-    TUYA_CLIENT_ID,
-    VirtualFunctions,
-    DescriptionVirtualFunction,
     CONF_ACCESS_ID,
     CONF_ACCESS_SECRET,
     CONF_APP_TYPE,
@@ -86,34 +65,11 @@ from .shared.multi_virtual_function_handler import (
 )
 
 from ..util import (
-    get_overriden_tuya_integration_runtime_data,
     prepare_value_for_property_update,
     merge_iterables,
     append_lists,
 )
 
-from .tuya_sharing.ha_tuya_integration.tuya_decorators import (
-    decorate_tuya_manager,
-)
-from .tuya_sharing.ha_tuya_integration.config_entry_handler import (
-    XTHATuyaIntegrationConfigEntryManager,
-)
-
-from .tuya_sharing.xt_tuya_sharing_data import (
-    TuyaSharingData,
-)
-
-from .tuya_sharing.xt_tuya_sharing_token_listener import (
-    XTSharingTokenListener,
-)
-
-from .tuya_sharing.xt_tuya_sharing_device_repository import (
-    XTSharingDeviceRepository,
-)
-
-from .tuya_sharing.xt_tuya_sharing_manager import (
-    XTSharingDeviceManager,
-)
 from .tuya_iot.xt_tuya_iot_data import (
     TuyaIOTData,
 )
@@ -126,10 +82,13 @@ from .tuya_iot.xt_tuya_iot_mq import (
 from .tuya_iot.xt_tuya_iot_home_manager import (
     XTIOTHomeManager,
 )
+
+from .shared.interface.device_manager import (
+    XTDeviceManagerInterface,
+)
     
 class MultiManager:  # noqa: F811
     def __init__(self, hass: HomeAssistant) -> None:
-        self.sharing_account: TuyaSharingData = None
         self.iot_account: TuyaIOTData = None
         self.virtual_state_handler = XTVirtualStateHandler(self)
         self.virtual_function_handler = XTVirtualFunctionHandler(self)
@@ -139,6 +98,7 @@ class MultiManager:  # noqa: F811
         self.hass = hass
         self.multi_source_handler = MultiSourceHandler(self)
         self.device_watcher = DeviceWatcher()
+        self.accounts: dict[str, XTDeviceManagerInterface] = {}
 
     @property
     def device_map(self):
@@ -148,49 +108,28 @@ class MultiManager:  # noqa: F811
     def mq(self):
         return self.multi_mqtt_queue
 
-    async def setup_entry(self, hass: HomeAssistant, config_entry: XTConfigEntry) -> None:
-        self.sharing_account = await self.get_sharing_account(hass, config_entry)
-        self.iot_account     = await self.get_iot_account(hass, config_entry)
+    def get_account_by_name(self, account_name:str) -> XTDeviceManagerInterface | None:
+        if account_name in self.accounts:
+            return self.accounts[account_name]
+        return None
 
-    async def get_sharing_account(self, hass: HomeAssistant, config_entry: XTConfigEntry) -> TuyaSharingData | None:
-        ha_tuya_integration_config_manager = XTHATuyaIntegrationConfigEntryManager(self, config_entry)
-        #See if our current entry is an override of a Tuya integration entry
-        tuya_integration_runtime_data = get_overriden_tuya_integration_runtime_data(hass, config_entry)
-        reuse_config = False
-        if tuya_integration_runtime_data:
-            #We are using an override of the Tuya integration
-            decorate_tuya_manager(tuya_integration_runtime_data.device_manager, ha_tuya_integration_config_manager)
-            sharing_device_manager = XTSharingDeviceManager(multi_manager=self, other_device_manager=tuya_integration_runtime_data.device_manager)
-            sharing_device_manager.terminal_id      = tuya_integration_runtime_data.device_manager.terminal_id
-            sharing_device_manager.mq               = tuya_integration_runtime_data.device_manager.mq
-            sharing_device_manager.customer_api     = tuya_integration_runtime_data.device_manager.customer_api
-            tuya_integration_runtime_data.device_manager.device_listeners.clear()
-            #self.convert_tuya_devices_to_xt(tuya_integration_runtime_data.device_manager)
-            reuse_config = True
-        else:
-            #We are using XT as a standalone integration
-            sharing_device_manager = XTSharingDeviceManager(multi_manager=self, other_device_manager=None)
-            token_listener = XTSharingTokenListener(hass, config_entry)
-            sharing_device_manager.terminal_id = config_entry.data[CONF_TERMINAL_ID]
-            sharing_device_manager.customer_api = CustomerApi(
-                CustomerTokenInfo(config_entry.data[CONF_TOKEN_INFO]),
-                TUYA_CLIENT_ID,
-                config_entry.data[CONF_USER_CODE],
-                config_entry.data[CONF_ENDPOINT],
-                token_listener,
-            )
-            sharing_device_manager.mq = None
-        sharing_device_manager.home_repository = HomeRepository(sharing_device_manager.customer_api)
-        sharing_device_manager.device_repository = XTSharingDeviceRepository(sharing_device_manager.customer_api, sharing_device_manager, self)
-        sharing_device_manager.scene_repository = SceneRepository(sharing_device_manager.customer_api)
-        sharing_device_manager.user_repository = UserRepository(sharing_device_manager.customer_api)
-        sharing_device_manager.add_device_listener(self.multi_device_listener)
-        return TuyaSharingData(
-            device_manager=sharing_device_manager, 
-            device_ids=[], 
-            ha_tuya_integration_config_manager=ha_tuya_integration_config_manager, 
-            reuse_config=reuse_config
-            )
+    async def setup_entry(self, hass: HomeAssistant, config_entry: XTConfigEntry) -> None:
+        self.iot_account     = await self.get_iot_account(hass, config_entry)
+        for account in self.accounts.values():
+            account.on_post_setup()
+    
+    def get_domain_identifiers_of_device(self, device_id: str) -> list:
+        return_list: list = []
+        for account in self.accounts.values():
+            return_list = append_lists(return_list, account.get_domain_identifiers_of_device())
+        return return_list
+    
+    def get_platform_descriptors_to_merge(self, platform: Platform) -> list:
+        return_list: list = []
+        for account in self.accounts.values():
+            if new_descriptors := account.get_platform_descriptors_to_merge(platform):
+                return_list.append(new_descriptors)
+        return return_list
 
     async def get_iot_account(self, hass: HomeAssistant, entry: XTConfigEntry) -> TuyaIOTData | None:
         if (
@@ -244,11 +183,8 @@ class MultiManager:  # noqa: F811
             home_manager=home_manager)
     
     def update_device_cache(self):
-        if self.sharing_account:
-            self.sharing_account.device_manager.update_device_cache()
-            new_device_ids: list[str] = [device_id for device_id in self.sharing_account.device_manager.device_map]
-            self.sharing_account.device_ids.clear()
-            self.sharing_account.device_ids.extend(new_device_ids)
+        for manager in self.accounts.values():
+            manager.update_device_cache()
         if self.iot_account:
             self.iot_account.home_manager.update_device_cache()
             new_device_ids: list[str] = [device_id for device_id in self.iot_account.device_manager.device_map]
@@ -261,11 +197,10 @@ class MultiManager:  # noqa: F811
             manager.device_map[dev_id] = XTDevice.from_compatible_device(manager.device_map[dev_id])
 
     def _get_available_device_maps(self) -> list[dict[str, XTDevice]]:
-        return_list: list[dict[str, XTDevice]] = list()
-        if self.sharing_account:
-            if other_manager := self.sharing_account.device_manager.get_overriden_device_manager():
-                return_list.append(other_manager.device_map)
-            return_list.append(self.sharing_account.device_manager.device_map)
+        return_list: list[dict[str, XTDevice]] = []
+        for manager in self.accounts.values():
+            for device_map in manager.get_available_device_maps():
+                return_list.append(device_map)
         if self.iot_account:
             return_list.append(self.iot_account.device_manager.device_map)
         return return_list
@@ -306,23 +241,22 @@ class MultiManager:  # noqa: F811
         return aggregated_list
     
     def unload(self):
-        if self.sharing_account and not self.iot_account:
-            #Only call the unload of the Sharing Manager if there is no IOT account as this will revoke its credentials
-            self.sharing_account.device_manager.user_repository.unload(self.sharing_account.device_manager.terminal_id)
+        for manager in self.accounts.values():
+            manager.unload()
     
     def refresh_mq(self):
-        if self.sharing_account:
-            self.sharing_account.device_manager.refresh_mq()
+        for manager in self.accounts.values():
+            manager.refresh_mq()
 
     def register_device_descriptors(self, name: str, descriptors):
         self.virtual_state_handler.register_device_descriptors(name, descriptors)
         self.virtual_function_handler.register_device_descriptors(name, descriptors)
     
     def remove_device_listeners(self) -> None:
+        for manager in self.accounts.values():
+            manager.remove_device_listeners()
         if self.iot_account:
             self.iot_account.device_manager.remove_device_listener(self.multi_device_listener)
-        if self.sharing_account:
-            self.sharing_account.device_manager.remove_device_listener(self.multi_device_listener)
     
     def _read_dpId_from_code(self, code: str, device: XTDevice) -> int | None:
         if not hasattr(device, "local_strategy"):
@@ -421,8 +355,9 @@ class MultiManager:  # noqa: F811
             if self.device_watcher.is_watched(dev_id):
                 LOGGER.warning(f"WD: on_message status list => {status_list}")
         
-        if self.sharing_account and source == MESSAGE_SOURCE_TUYA_SHARING:
-            self.sharing_account.device_manager.on_message(new_message)
+        if source in self.accounts:
+            self.accounts[source].on_message(new_message)
+
         if self.iot_account and source == MESSAGE_SOURCE_TUYA_IOT:
             self.iot_account.device_manager.on_message(new_message)
 
@@ -460,9 +395,8 @@ class MultiManager:  # noqa: F811
 
     def query_scenes(self) -> list:
         return_list = []
-        if self.sharing_account:
-            temp_list = self.sharing_account.device_manager.query_scenes()
-            return_list = append_lists(return_list, temp_list)
+        for account in self.accounts.values():
+            return_list = append_lists(return_list, account.query_scenes())
         if self.iot_account:
             temp_list = self.iot_account.home_manager.query_scenes()
             return_list = append_lists(return_list, temp_list)
@@ -471,11 +405,37 @@ class MultiManager:  # noqa: F811
     def send_commands(
             self, device_id: str, commands: list[dict[str, Any]]
     ):
-        open_api_regular_commands: list[dict[str, Any]] = []
-        regular_commands: list[dict[str, Any]] = []
-        property_commands: list[dict[str, Any]] = []
         virtual_function_commands: list[dict[str, Any]] = []
-        device_map = self.get_aggregated_device_map()
+        regular_commands: list[dict[str, Any]] = []
+        if device := self.device_map.get(device_id, None):
+            virtual_function_list = self.virtual_function_handler.get_category_virtual_functions(device.category)
+            for command in commands:
+                command_code  = command["code"]
+                command_value = command["value"]
+                LOGGER.debug(f"Base command : {command}")
+                vf_found = False
+                for virtual_function in virtual_function_list:
+                    if (
+                        command_code == virtual_function.key or
+                        command_code in virtual_function.vf_reset_state
+                    ):
+                        command_dict = {"code": command_code, "value": command_value, "virtual_function": virtual_function}
+                        virtual_function_commands.append(command_dict)
+                        vf_found = True
+                        break
+                if not vf_found:
+                    regular_commands.append(command)
+        
+        if virtual_function_commands:
+            self.virtual_function_handler.process_virtual_function(device_id, virtual_function_commands)
+
+        if regular_commands:
+            for account in self.accounts.values():
+                account.send_commands(device_id, regular_commands)
+
+        open_api_regular_commands: list[dict[str, Any]] = []
+        property_commands: list[dict[str, Any]] = []
+        device_map = self.device_map
         if device := device_map.get(device_id, None):
             virtual_function_list = self.virtual_function_handler.get_category_virtual_functions(device.category)
             for command in commands:
@@ -509,10 +469,10 @@ class MultiManager:  # noqa: F811
                             break
             if virtual_function_commands:
                 LOGGER.debug(f"Sending virtual function command : {virtual_function_commands}")
-                self.virtual_function_handler._process_virtual_function(device_id, virtual_function_commands)
-            if regular_commands:
+                self.virtual_function_handler.process_virtual_function(device_id, virtual_function_commands)
+            """if regular_commands:
                 LOGGER.debug(f"Sending regular command : {regular_commands}")
-                self.sharing_account.device_manager.send_commands(device_id, regular_commands)
+                self.sharing_account.device_manager.send_commands(device_id, regular_commands)"""
             if open_api_regular_commands:
                 LOGGER.debug(f"Sending Open API regular command : {open_api_regular_commands}")
                 self.iot_account.device_manager.send_commands(device_id, open_api_regular_commands)
@@ -520,12 +480,13 @@ class MultiManager:  # noqa: F811
                 LOGGER.debug(f"Sending property command : {property_commands}")
                 self.iot_account.device_manager.send_property_update(device_id, property_commands)
             return
-        self.sharing_account.device_manager.send_commands(device_id, commands)
+        #self.sharing_account.device_manager.send_commands(device_id, commands)
 
     def get_device_stream_allocate(
             self, device_id: str, stream_type: Literal["flv", "hls", "rtmp", "rtsp"]
     ) -> Optional[str]:
-        if self.sharing_account and device_id in self.sharing_account.device_ids:
-            return self.sharing_account.device_manager.get_device_stream_allocate(device_id, stream_type)
+        for account in self.accounts.values():
+            if stream_allocate := account.get_device_stream_allocate(device_id, stream_type):
+                return stream_allocate
         if self.iot_account and device_id in self.iot_account.device_ids:
             return self.iot_account.device_manager.get_device_stream_allocate(device_id, stream_type)
