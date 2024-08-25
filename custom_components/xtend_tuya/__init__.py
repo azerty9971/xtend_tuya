@@ -89,7 +89,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
     for device in aggregated_device_map.values():
-        multi_manager.apply_init_virtual_states(device)
+        multi_manager.virtual_state_handler.apply_init_virtual_states(device)
         multi_manager.allow_virtual_devices_not_set_up(device)
     # If the device does not register any entities, the device does not need to subscribe
     # So the subscription is here
