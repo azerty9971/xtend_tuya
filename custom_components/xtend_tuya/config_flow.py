@@ -76,6 +76,13 @@ class TuyaOptionFlow(OptionsFlow):
             CONF_PASSWORD: user_input[CONF_PASSWORD],
             CONF_COUNTRY_CODE: country.country_code,
         }
+        if (
+               data[CONF_ACCESS_ID] == ""
+            or data[CONF_ACCESS_SECRET] == ""
+            or data[CONF_USERNAME] == ""
+            or data[CONF_PASSWORD] == ""
+        ):
+            return {TUYA_RESPONSE_SUCCESS: True}, data
 
         for app_type in ("", TUYA_SMART_APP, SMARTLIFE_APP):
             data[CONF_APP_TYPE] = app_type
