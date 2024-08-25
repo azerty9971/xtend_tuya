@@ -44,6 +44,7 @@ from .const import (
     TUYA_COUNTRIES,
     TUYA_SMART_APP,
     TUYA_RESPONSE_PLATFORM_URL,
+    LOGGER,
 )
 
 
@@ -76,6 +77,7 @@ class TuyaOptionFlow(OptionsFlow):
             CONF_PASSWORD: user_input[CONF_PASSWORD],
             CONF_COUNTRY_CODE: country.country_code,
         }
+        LOGGER.warning(f"Options: {data}")
         if (
                not data[CONF_ACCESS_ID]
             or not data[CONF_ACCESS_SECRET]
