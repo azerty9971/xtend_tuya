@@ -104,5 +104,5 @@ class XTSharingDeviceRepository(DeviceRepository):
             except ValueError:
                 func.type = TuyaEntity.determine_dptype(func.type)
 
-        self.multi_manager.apply_init_virtual_states(device)
+        self.multi_manager.virtual_state_handler.apply_init_virtual_states(device)
         self.multi_manager.allow_virtual_devices_not_set_up(device)
