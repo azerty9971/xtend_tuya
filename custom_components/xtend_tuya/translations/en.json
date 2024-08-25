@@ -30,11 +30,12 @@
       "init": {
         "description": "Add a Tuya OpenAPI credential to improve the compatibility with some Tuya devices",
         "data": {
+          "use_open_api": "Use OpenAPI credentials",
           "country_code": "Country",
           "access_id": "Tuya IoT Access ID",
           "access_secret": "Tuya IoT Access Secret",
-          "username": "Account",
-          "password": "Password"
+          "username": "SmartLife/Tuya account",
+          "password": "SmartLife/Tuya account password"
         },
         "title": "Add Tuya OpenAPI credentials"
       }
