@@ -70,20 +70,28 @@ from ..multi_manager import (
 )
 from ...const import (
     DOMAIN,
+    MESSAGE_SOURCE_TUYA_SHARING,
 )
 
+def get_plugin_instance() -> XTTuyaSharingDeviceManagerInterface | None:
+    return XTTuyaSharingDeviceManagerInterface()
+
 class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
-    def __init__(self, hass: HomeAssistant) -> None:
+    def __init__(self) -> None:
         super().__init__()
         self.sharing_account: TuyaSharingData = None,
-        self.hass = hass
+        self.hass: HomeAssistant = None
 
-    async def setup_from_entry(self, hass: HomeAssistant, config_entry: XTConfigEntry, multi_manager: MultiManager) -> XTDeviceManagerInterface | None:
+    def get_type_name(self) -> str:
+        return MESSAGE_SOURCE_TUYA_SHARING
+
+    async def setup_from_entry(self, hass: HomeAssistant, config_entry: XTConfigEntry, multi_manager: MultiManager) -> bool:
         self.multi_manager: MultiManager = multi_manager
+        self.hass = hass
         self.sharing_account: TuyaSharingData = self._init_from_entry(hass, config_entry)
         if self.sharing_account:
-            return self
-        return None
+            return True
+        return False
     
     def _init_from_entry(self, hass: HomeAssistant, config_entry: XTConfigEntry) -> TuyaSharingData | None:
         ha_tuya_integration_config_manager: XTHATuyaIntegrationConfigEntryManager = None
