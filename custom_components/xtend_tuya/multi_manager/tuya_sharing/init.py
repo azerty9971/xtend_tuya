@@ -174,6 +174,7 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
     def query_scenes(self) -> list:
         if not self.sharing_account.device_manager.reuse_config:
             return self.sharing_account.device_manager.query_scenes()
+        return []
     
     def get_device_stream_allocate(
             self, device_id: str, stream_type: Literal["flv", "hls", "rtmp", "rtsp"]
