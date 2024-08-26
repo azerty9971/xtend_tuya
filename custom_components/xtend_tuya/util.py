@@ -31,19 +31,6 @@ def remap_value(
         value = from_max - value + from_min
     return ((value - from_min) / (from_max - from_min)) * (to_max - to_min) + to_min
 
-def prepare_value_for_property_update(dp_item, value) -> str:
-    #LOGGER.warning(f"prepare_value_for_property_update => {dp_item} <=> {value}")
-    config_item = dp_item.get("config_item", None)
-    if config_item is not None:
-        value_type = config_item.get("valueType", None)
-        if value_type is not None:
-            if value_type == DPType.BOOLEAN:
-                if bool(value):
-                    return 'true'
-                else:
-                    return 'false'
-    return str(value)
-
 class ConfigEntryRuntimeData(NamedTuple):
     device_manager: any
     device_listener: any

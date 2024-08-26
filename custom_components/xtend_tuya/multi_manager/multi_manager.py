@@ -1,5 +1,4 @@
 from __future__ import annotations
-import requests
 import copy
 import importlib
 import os
@@ -7,12 +6,7 @@ from typing import Any, Literal, Optional
 
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ConfigEntryNotReady
 
-from tuya_iot import (
-    AuthType,
-    TuyaOpenAPI,
-)
 from tuya_iot.device import (
     PROTOCOL_DEVICE_REPORT,
     PROTOCOL_OTHER,
@@ -20,14 +14,6 @@ from tuya_iot.device import (
 
 from ..const import (
     LOGGER,
-    CONF_ACCESS_ID,
-    CONF_ACCESS_SECRET,
-    CONF_APP_TYPE,
-    CONF_AUTH_TYPE,
-    CONF_COUNTRY_CODE,
-    CONF_ENDPOINT_OT,
-    CONF_PASSWORD,
-    CONF_USERNAME,
     MESSAGE_SOURCE_TUYA_IOT,
 )
 
@@ -66,22 +52,8 @@ from .shared.multi_virtual_function_handler import (
 )
 
 from ..util import (
-    prepare_value_for_property_update,
     merge_iterables,
     append_lists,
-)
-
-from .tuya_iot.xt_tuya_iot_data import (
-    TuyaIOTData,
-)
-from .tuya_iot.xt_tuya_iot_manager import (
-    XTIOTDeviceManager,
-)
-from .tuya_iot.xt_tuya_iot_mq import (
-    XTIOTOpenMQ,
-)
-from .tuya_iot.xt_tuya_iot_home_manager import (
-    XTIOTHomeManager,
 )
 
 from .shared.interface.device_manager import (
@@ -90,7 +62,6 @@ from .shared.interface.device_manager import (
     
 class MultiManager:  # noqa: F811
     def __init__(self, hass: HomeAssistant) -> None:
-        self.iot_account: TuyaIOTData = None
         self.virtual_state_handler = XTVirtualStateHandler(self)
         self.virtual_function_handler = XTVirtualFunctionHandler(self)
         self.descriptors_with_virtual_function = {}
@@ -130,7 +101,6 @@ class MultiManager:  # noqa: F811
                 except ModuleNotFoundError:
                     pass
 
-        self.iot_account     = await self.get_iot_account(hass, config_entry)
         for account in self.accounts.values():
             account.on_post_setup()
     
@@ -146,66 +116,10 @@ class MultiManager:  # noqa: F811
             if new_descriptors := account.get_platform_descriptors_to_merge(platform):
                 return_list.append(new_descriptors)
         return return_list
-
-    async def get_iot_account(self, hass: HomeAssistant, entry: XTConfigEntry) -> TuyaIOTData | None:
-        if (
-            entry.options is None
-            or CONF_AUTH_TYPE     not in entry.options
-            or CONF_ENDPOINT_OT   not in entry.options
-            or CONF_ACCESS_ID     not in entry.options
-            or CONF_ACCESS_SECRET not in entry.options
-            or CONF_USERNAME      not in entry.options
-            or CONF_PASSWORD      not in entry.options
-            or CONF_COUNTRY_CODE  not in entry.options
-            or CONF_APP_TYPE      not in entry.options
-            ):
-            return None
-        auth_type = AuthType(entry.options[CONF_AUTH_TYPE])
-        api = TuyaOpenAPI(
-            endpoint=entry.options[CONF_ENDPOINT_OT],
-            access_id=entry.options[CONF_ACCESS_ID],
-            access_secret=entry.options[CONF_ACCESS_SECRET],
-            auth_type=auth_type,
-        )
-        api.set_dev_channel("hass")
-        try:
-            if auth_type == AuthType.CUSTOM:
-                response = await hass.async_add_executor_job(
-                    api.connect, entry.options[CONF_USERNAME], entry.options[CONF_PASSWORD]
-                )
-            else:
-                response = await hass.async_add_executor_job(
-                    api.connect,
-                    entry.options[CONF_USERNAME],
-                    entry.options[CONF_PASSWORD],
-                    entry.options[CONF_COUNTRY_CODE],
-                    entry.options[CONF_APP_TYPE],
-                )
-        except requests.exceptions.RequestException as err:
-            raise ConfigEntryNotReady(err) from err
-
-        if response.get("success", False) is False:
-            raise ConfigEntryNotReady(response)
-        mq = XTIOTOpenMQ(api)
-        mq.start()
-        device_manager = XTIOTDeviceManager(self, api, mq)
-        device_ids: list[str] = list()
-        home_manager = XTIOTHomeManager(api, mq, device_manager, self)
-        device_manager.add_device_listener(self.multi_device_listener)
-        return TuyaIOTData(
-            device_manager=device_manager,
-            mq=mq,
-            device_ids=device_ids,
-            home_manager=home_manager)
     
     def update_device_cache(self):
         for manager in self.accounts.values():
             manager.update_device_cache()
-        if self.iot_account:
-            self.iot_account.home_manager.update_device_cache()
-            new_device_ids: list[str] = [device_id for device_id in self.iot_account.device_manager.device_map]
-            self.iot_account.device_ids.clear()
-            self.iot_account.device_ids.extend(new_device_ids)
         self._merge_devices_from_multiple_sources()
     
     def convert_tuya_devices_to_xt(self, manager):
@@ -217,8 +131,6 @@ class MultiManager:  # noqa: F811
         for manager in self.accounts.values():
             for device_map in manager.get_available_device_maps():
                 return_list.append(device_map)
-        if self.iot_account:
-            return_list.append(self.iot_account.device_manager.device_map)
         return return_list
 
     def _merge_devices_from_multiple_sources(self):
@@ -271,8 +183,6 @@ class MultiManager:  # noqa: F811
     def remove_device_listeners(self) -> None:
         for manager in self.accounts.values():
             manager.remove_device_listeners()
-        if self.iot_account:
-            self.iot_account.device_manager.remove_device_listener(self.multi_device_listener)
     
     def _read_dpId_from_code(self, code: str, device: XTDevice) -> int | None:
         if not hasattr(device, "local_strategy"):
@@ -371,9 +281,6 @@ class MultiManager:  # noqa: F811
         if source in self.accounts:
             self.accounts[source].on_message(new_message)
 
-        if self.iot_account and source == MESSAGE_SOURCE_TUYA_IOT:
-            self.iot_account.device_manager.on_message(new_message)
-
     def _get_device_id_from_message(self, msg: str) -> str | None:
         protocol = msg.get("protocol", 0)
         data = msg.get("data", {})
@@ -410,9 +317,6 @@ class MultiManager:  # noqa: F811
         return_list = []
         for account in self.accounts.values():
             return_list = append_lists(return_list, account.query_scenes())
-        if self.iot_account:
-            temp_list = self.iot_account.home_manager.query_scenes()
-            return_list = append_lists(return_list, temp_list)
         return return_list
 
     def send_commands(
@@ -446,60 +350,9 @@ class MultiManager:  # noqa: F811
             for account in self.accounts.values():
                 account.send_commands(device_id, regular_commands)
 
-        open_api_regular_commands: list[dict[str, Any]] = []
-        property_commands: list[dict[str, Any]] = []
-        device_map = self.device_map
-        if device := device_map.get(device_id, None):
-            virtual_function_list = self.virtual_function_handler.get_category_virtual_functions(device.category)
-            for command in commands:
-                command_code  = command["code"]
-                command_value = command["value"]
-                LOGGER.debug(f"Base command : {command}")
-                vf_found = False
-                for virtual_function in virtual_function_list:
-                    if (command_code == virtual_function.key or
-                        command_code in virtual_function.vf_reset_state):
-                        command_dict = {"code": command_code, "value": command_value, "virtual_function": virtual_function}
-                        virtual_function_commands.append(command_dict)
-                        vf_found = True
-                        break
-                if vf_found:
-                    continue
-                for dp_item in device.local_strategy.values():
-                    dp_item_code = dp_item.get("status_code", None)
-                    if command_code == dp_item_code:
-                        if not dp_item.get("use_open_api", False):
-                            #command_dict = {"code": code, "value": value}
-                            regular_commands.append(command)
-                        else:
-                            if dp_item.get("property_update", False):
-                                command_value = prepare_value_for_property_update(dp_item, command_value)
-                                property_dict = {str(dp_item_code): command_value}
-                                property_commands.append(property_dict)
-                            else:
-                                command_dict = {"code": dp_item_code, "value": command_value}
-                                open_api_regular_commands.append(command_dict)
-                            break
-            if virtual_function_commands:
-                LOGGER.debug(f"Sending virtual function command : {virtual_function_commands}")
-                self.virtual_function_handler.process_virtual_function(device_id, virtual_function_commands)
-            """if regular_commands:
-                LOGGER.debug(f"Sending regular command : {regular_commands}")
-                self.sharing_account.device_manager.send_commands(device_id, regular_commands)"""
-            if open_api_regular_commands:
-                LOGGER.debug(f"Sending Open API regular command : {open_api_regular_commands}")
-                self.iot_account.device_manager.send_commands(device_id, open_api_regular_commands)
-            if property_commands:
-                LOGGER.debug(f"Sending property command : {property_commands}")
-                self.iot_account.device_manager.send_property_update(device_id, property_commands)
-            return
-        #self.sharing_account.device_manager.send_commands(device_id, commands)
-
     def get_device_stream_allocate(
             self, device_id: str, stream_type: Literal["flv", "hls", "rtmp", "rtsp"]
     ) -> Optional[str]:
         for account in self.accounts.values():
             if stream_allocate := account.get_device_stream_allocate(device_id, stream_type):
                 return stream_allocate
-        if self.iot_account and device_id in self.iot_account.device_ids:
-            return self.iot_account.device_manager.get_device_stream_allocate(device_id, stream_type)
