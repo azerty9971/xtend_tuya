@@ -29,7 +29,6 @@ from ..const import (
     CONF_PASSWORD,
     CONF_USERNAME,
     MESSAGE_SOURCE_TUYA_IOT,
-    MESSAGE_SOURCE_TUYA_SHARING,
 )
 
 from .shared.import_stub import (
