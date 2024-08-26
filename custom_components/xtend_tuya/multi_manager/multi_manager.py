@@ -117,7 +117,7 @@ class MultiManager:  # noqa: F811
 
     async def setup_entry(self, hass: HomeAssistant, config_entry: XTConfigEntry) -> None:
         #Load all the plugins
-        subdirs = [x[0] for x in os.walk(os.getcwd())]
+        subdirs = [x[0] for x in os.walk(os.path.dirname(__file__))]
         LOGGER.warning(f"Found subdirectories: {subdirs}")
         for directory in subdirs:
             plugin = importlib.import_module(f"{directory}.init")
