@@ -118,10 +118,10 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
             raise ConfigEntryNotReady(response)
         mq = XTIOTOpenMQ(api)
         mq.start()
-        device_manager = XTIOTDeviceManager(self, api, mq)
+        device_manager = XTIOTDeviceManager(self.multi_manager, api, mq)
         device_ids: list[str] = list()
-        home_manager = XTIOTHomeManager(api, mq, device_manager, self)
-        device_manager.add_device_listener(self.multi_device_listener)
+        home_manager = XTIOTHomeManager(api, mq, device_manager, self.multi_manager)
+        device_manager.add_device_listener(self.multi_manager.multi_device_listener)
         return TuyaIOTData(
             device_manager=device_manager,
             mq=mq,

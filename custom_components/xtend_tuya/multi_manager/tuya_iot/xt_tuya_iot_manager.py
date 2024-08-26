@@ -38,8 +38,11 @@ class XTIOTDeviceManager(TuyaDeviceManager):
     def __init__(self, multi_manager: MultiManager, api: TuyaOpenAPI, mq: TuyaOpenMQ) -> None:
         super().__init__(api, mq)
         mq.remove_message_listener(self.on_message)
-        mq.add_message_listener(multi_manager.on_message_from_tuya_iot)
+        mq.add_message_listener(self.forward_message_to_multi_manager)
         self.multi_manager = multi_manager
+
+    def forward_message_to_multi_manager(self, msg:str):
+        self.multi_manager.on_message(MESSAGE_SOURCE_TUYA_IOT, msg)
 
     def get_device_info(self, device_id: str) -> dict[str, Any]:
         """Get device info.
