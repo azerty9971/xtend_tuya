@@ -140,7 +140,7 @@ class MultiManager:  # noqa: F811
     def get_domain_identifiers_of_device(self, device_id: str) -> list:
         return_list: list = []
         for account in self.accounts.values():
-            return_list = append_lists(return_list, account.get_domain_identifiers_of_device())
+            return_list = append_lists(return_list, account.get_domain_identifiers_of_device(device_id))
         return return_list
     
     def get_platform_descriptors_to_merge(self, platform: Platform) -> list:
