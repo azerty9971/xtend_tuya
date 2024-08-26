@@ -14,7 +14,6 @@ from tuya_iot.device import (
 
 from ..const import (
     LOGGER,
-    MESSAGE_SOURCE_TUYA_IOT,
 )
 
 from .shared.import_stub import (
@@ -259,9 +258,6 @@ class MultiManager:  # noqa: F811
             else:
                 LOGGER.warning(f"convert_device_report_status_list code retrieval failed => {item} <=>{device_id}")
         return status
-
-    def on_message_from_tuya_iot(self, msg:str):
-        self.on_message(MESSAGE_SOURCE_TUYA_IOT, msg)
 
     def on_message(self, source: str, msg: str):
         dev_id = self._get_device_id_from_message(msg)
