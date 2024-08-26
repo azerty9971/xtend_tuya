@@ -14,7 +14,7 @@ from ..xt_tuya_sharing_manager import (
     XTSharingDeviceManager,
 )
 from ..util import (
-    get_tuya_integration_runtime_data,
+    get_config_entry_runtime_data,
 )
 
 class XTHATuyaIntegrationConfigEntryManager:
@@ -36,7 +36,7 @@ class XTHATuyaIntegrationConfigEntryManager:
         #LOGGER.warning(f"on_tuya_unload_entry {before_call} : {entry.__dict__}")
         if before_call:
             #If before the call, we need to add the regular device listener back
-            runtime_data = get_tuya_integration_runtime_data(hass, entry, DOMAIN_ORIG)
+            runtime_data = get_config_entry_runtime_data(hass, entry, DOMAIN_ORIG)
             runtime_data.device_manager.add_device_listener(runtime_data.device_listener)
         else:
             if self.config_entry.title == entry.title:
