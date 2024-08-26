@@ -5,7 +5,6 @@ import logging
 
 from homeassistant.config_entries import ConfigEntry, ConfigEntryState
 from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady
 from homeassistant.helpers import device_registry as dr
 
 from .const import (
@@ -23,12 +22,8 @@ from .multi_manager.shared.shared_classes import (
     HomeAssistantXTData,
 )
 
-from .multi_manager.tuya_sharing.ha_tuya_integration.tuya_decorators import (
-    decorate_tuya_integration
-)
-
 from .util import (
-    get_tuya_integration_runtime_data
+    get_config_entry_runtime_data
 )
 
 # Suppress logs from the library, it logs unneeded on error
@@ -106,7 +101,7 @@ def get_domain_device_map(hass: HomeAssistant, domain: str) -> dict[str, any]:
     device_map = {}
     config_entries = hass.config_entries.async_entries(domain, False, False)
     for config_entry in config_entries:
-        runtime_data = get_tuya_integration_runtime_data(hass, config_entry, domain)
+        runtime_data = get_config_entry_runtime_data(hass, config_entry, domain)
         for device_id in runtime_data.device_manager.device_map:
             if device_id not in device_map:
                 device_map[device_id] = runtime_data.device_manager.device_map[device_id]
