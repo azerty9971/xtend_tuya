@@ -16,6 +16,10 @@ from ..device import (
 class XTDeviceManagerInterface(ABC):
 
     @abstractmethod
+    def get_type_name(self) -> str:
+        return None
+
+    @abstractmethod
     async def setup_from_entry(self, hass: HomeAssistant, config_entry: XTConfigEntry) -> XTDeviceManagerInterface:
         return None
 
