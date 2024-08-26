@@ -12,6 +12,9 @@ from ..shared_classes import (
 from ..device import (
     XTDevice,
 )
+from ...multi_manager import (
+    MultiManager,
+)
 
 class XTDeviceManagerInterface(ABC):
 
@@ -20,7 +23,7 @@ class XTDeviceManagerInterface(ABC):
         return None
 
     @abstractmethod
-    async def setup_from_entry(self, hass: HomeAssistant, config_entry: XTConfigEntry) -> XTDeviceManagerInterface:
+    async def setup_from_entry(self, hass: HomeAssistant, config_entry: XTConfigEntry, multi_manager: MultiManager) -> XTDeviceManagerInterface:
         return None
 
     @abstractmethod

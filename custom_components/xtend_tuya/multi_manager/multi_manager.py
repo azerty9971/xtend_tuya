@@ -128,7 +128,7 @@ class MultiManager:  # noqa: F811
                     plugin = importlib.import_module(load_path, package=__package__)
                     LOGGER.warning(f"Plugin {load_path} loaded")
                     instance: XTDeviceManagerInterface = plugin.get_plugin_instance()
-                    if await instance.setup_from_entry(hass, config_entry):
+                    if await instance.setup_from_entry(hass, config_entry, self):
                         self.accounts[instance.get_type_name()] = instance
                 except ModuleNotFoundError:
                     pass
