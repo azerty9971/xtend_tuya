@@ -120,13 +120,11 @@ class MultiManager:  # noqa: F811
         subdirs = os.listdir(os.path.dirname(__file__))
 
         for directory in subdirs:
-            LOGGER.warning(f"Listing: {directory}")
             if os.path.isdir(os.path.dirname(__file__) + os.sep + directory):
                 load_path = f".{directory}.init"
-                LOGGER.warning(f"Trying to load: {load_path}")
                 try:
                     plugin = importlib.import_module(load_path, package=__package__)
-                    LOGGER.warning(f"Plugin {load_path} loaded")
+                    LOGGER.debug(f"Plugin {load_path} loaded")
                     instance: XTDeviceManagerInterface = plugin.get_plugin_instance()
                     if await instance.setup_from_entry(hass, config_entry, self):
                         self.accounts[instance.get_type_name()] = instance
@@ -355,9 +353,6 @@ class MultiManager:  # noqa: F811
 
     def on_message_from_tuya_iot(self, msg:str):
         self.on_message(MESSAGE_SOURCE_TUYA_IOT, msg)
-    
-    def on_message_from_tuya_sharing(self, msg:str):
-        self.on_message(MESSAGE_SOURCE_TUYA_SHARING, msg)
 
     def on_message(self, source: str, msg: str):
         dev_id = self._get_device_id_from_message(msg)

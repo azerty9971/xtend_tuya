@@ -56,10 +56,13 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
         self.other_device_manager = other_device_manager
         self.reuse_config = False
     
+    def forward_message_to_multi_manager(self, msg:str):
+        self.multi_manager.on_message(MESSAGE_SOURCE_TUYA_SHARING, msg)
+
     def on_external_refresh_mq(self):
         if self.other_device_manager is not None:
             self.mq = self.other_device_manager.mq
-            self.mq.add_message_listener(self.multi_manager.on_message_from_tuya_sharing)
+            self.mq.add_message_listener(self.forward_message_to_multi_manager)
             self.mq.remove_message_listener(self.other_device_manager.on_message)
 
     def refresh_mq(self):
@@ -69,7 +72,7 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
             self.other_device_manager.refresh_mq()
             return
         super().refresh_mq()
-        self.mq.add_message_listener(self.multi_manager.on_message_from_tuya_sharing)
+        self.mq.add_message_listener(self.forward_message_to_multi_manager)
         self.mq.remove_message_listener(self.on_message)
 
     def set_overriden_device_manager(self, other_device_manager: Manager) -> None:
