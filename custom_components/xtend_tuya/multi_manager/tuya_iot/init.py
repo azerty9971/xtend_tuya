@@ -72,8 +72,8 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
     async def setup_from_entry(self, hass: HomeAssistant, config_entry: XTConfigEntry, multi_manager: MultiManager) -> bool:
         self.multi_manager: MultiManager = multi_manager
         self.hass = hass
-        self.sharing_account: TuyaIOTData = await self._init_from_entry(hass, config_entry)
-        if self.sharing_account:
+        self.iot_account: TuyaIOTData = await self._init_from_entry(hass, config_entry)
+        if self.iot_account:
             return True
         return False
     
