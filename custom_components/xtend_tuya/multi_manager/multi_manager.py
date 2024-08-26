@@ -119,10 +119,11 @@ class MultiManager:  # noqa: F811
         #Load all the plugins
         subdirs = os.listdir(os.path.dirname(__file__))
         
-        LOGGER.warning(f"Found subdirectories: {subdirs}")
         for directory in subdirs:
             if os.path.isdir(directory):
-                plugin = importlib.import_module(f"{directory}.init")
+                load_path = f"{directory}.init"
+                LOGGER.warning(f"Trying to load: {load_path}")
+                plugin = importlib.import_module(load_path)
                 instance: XTDeviceManagerInterface = plugin.get_plugin_instance()
                 if await instance.setup_from_entry(hass, config_entry):
                     self.accounts[instance.get_type_name()] = instance
