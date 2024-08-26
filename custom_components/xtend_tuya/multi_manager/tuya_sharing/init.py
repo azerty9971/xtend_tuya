@@ -6,7 +6,7 @@ from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.dispatcher import dispatcher_send
 from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady
-from homeassistant.helpers import device_registry
+from homeassistant.helpers import device_registry as dr
 
 from tuya_sharing.home import (
     HomeRepository,
@@ -187,6 +187,7 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
         return [DOMAIN]
     
     def get_domain_identifiers_of_device(self, device_id: str) -> list:
+        device_registry = dr.async_get(self.hass)
         if (
             self.sharing_account.device_manager.reuse_config
             and device_registry.async_get_device(identifiers={(DOMAIN_ORIG, device_id)}, connections=None)
