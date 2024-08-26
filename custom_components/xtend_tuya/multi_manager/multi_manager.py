@@ -122,7 +122,7 @@ class MultiManager:  # noqa: F811
         for directory in subdirs:
             LOGGER.warning(f"Listing: {directory}")
             if os.path.isdir(directory):
-                load_path = f"{directory}.init"
+                load_path = f"{directory}{os.sep}init"
                 LOGGER.warning(f"Trying to load: {load_path}")
                 plugin = importlib.import_module(load_path)
                 instance: XTDeviceManagerInterface = plugin.get_plugin_instance()
