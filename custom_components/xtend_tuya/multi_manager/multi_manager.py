@@ -121,7 +121,7 @@ class MultiManager:  # noqa: F811
 
         for directory in subdirs:
             LOGGER.warning(f"Listing: {directory}")
-            if os.path.isdir(os.listdir(os.path.dirname(__file__)) + os.sep + directory):
+            if os.path.isdir(os.path.dirname(__file__) + os.sep + directory):
                 load_path = f".{directory}.init"
                 LOGGER.warning(f"Trying to load: {load_path}")
                 plugin = importlib.import_module(load_path)
