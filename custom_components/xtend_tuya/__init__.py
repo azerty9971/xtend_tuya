@@ -53,7 +53,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
     aggregated_device_map = multi_manager.device_map
     for device in aggregated_device_map.values():
         domain_identifiers:list = multi_manager.get_domain_identifiers_of_device(device.id)
-        identifiers: set[tuple[str, str]] = {}
+        identifiers: set[tuple[str, str]] = set()
         for domain_identifier in domain_identifiers:
             identifiers.add(tuple(domain_identifier, device.id))
         device_registry.async_get_or_create(
