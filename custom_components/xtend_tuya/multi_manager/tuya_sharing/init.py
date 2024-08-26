@@ -88,12 +88,12 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
     async def setup_from_entry(self, hass: HomeAssistant, config_entry: XTConfigEntry, multi_manager: MultiManager) -> bool:
         self.multi_manager: MultiManager = multi_manager
         self.hass = hass
-        self.sharing_account: TuyaSharingData = self._init_from_entry(hass, config_entry)
+        self.sharing_account: TuyaSharingData = await self._init_from_entry(hass, config_entry)
         if self.sharing_account:
             return True
         return False
     
-    def _init_from_entry(self, hass: HomeAssistant, config_entry: XTConfigEntry) -> TuyaSharingData | None:
+    async def _init_from_entry(self, hass: HomeAssistant, config_entry: XTConfigEntry) -> TuyaSharingData | None:
         ha_tuya_integration_config_manager: XTHATuyaIntegrationConfigEntryManager = None
         #See if our current entry is an override of a Tuya integration entry
         tuya_integration_runtime_data = get_overriden_tuya_integration_runtime_data(hass, config_entry)
