@@ -124,7 +124,7 @@ class MultiManager:  # noqa: F811
             if os.path.isdir(os.path.dirname(__file__) + os.sep + directory):
                 load_path = f".{directory}.init"
                 LOGGER.warning(f"Trying to load: {load_path}")
-                plugin = importlib.import_module(load_path)
+                plugin = importlib.import_module(load_path, package=__package__)
                 instance: XTDeviceManagerInterface = plugin.get_plugin_instance()
                 if await instance.setup_from_entry(hass, config_entry):
                     self.accounts[instance.get_type_name()] = instance
