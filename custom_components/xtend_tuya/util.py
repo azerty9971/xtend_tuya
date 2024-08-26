@@ -7,7 +7,6 @@ from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.entity import EntityDescription
 from .const import (
-    DPType,
     LOGGER,
 )
 
