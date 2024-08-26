@@ -117,12 +117,12 @@ class MultiManager:  # noqa: F811
 
     async def setup_entry(self, hass: HomeAssistant, config_entry: XTConfigEntry) -> None:
         #Load all the plugins
-        subdirs = ["." + x for x in os.listdir(os.path.dirname(__file__))]
-        
+        subdirs = os.listdir(os.path.dirname(__file__))
+
         for directory in subdirs:
             LOGGER.warning(f"Listing: {directory}")
-            if os.path.isdir(directory):
-                load_path = f"{directory}.init"
+            if os.path.isdir(os.listdir(os.path.dirname(__file__)) + os.sep + directory):
+                load_path = f".{directory}.init"
                 LOGGER.warning(f"Trying to load: {load_path}")
                 plugin = importlib.import_module(load_path)
                 instance: XTDeviceManagerInterface = plugin.get_plugin_instance()
