@@ -117,15 +117,15 @@ class MultiManager:  # noqa: F811
 
     async def setup_entry(self, hass: HomeAssistant, config_entry: XTConfigEntry) -> None:
         #Load all the plugins
-        subdirs = [x[0] for x in os.walk(os.path.dirname(__file__))]
+        subdirs = os.listdir(os.path.dirname(__file__))
         
         LOGGER.warning(f"Found subdirectories: {subdirs}")
-        LOGGER.warning(f"Found subdirectories2: {os.listdir(os.path.dirname(__file__))}")
         for directory in subdirs:
-            plugin = importlib.import_module(f"{directory}.init")
-            instance: XTDeviceManagerInterface = plugin.get_plugin_instance()
-            if await instance.setup_from_entry(hass, config_entry):
-                self.accounts[instance.get_type_name()] = instance
+            if os.path.isdir(directory):
+                plugin = importlib.import_module(f"{directory}.init")
+                instance: XTDeviceManagerInterface = plugin.get_plugin_instance()
+                if await instance.setup_from_entry(hass, config_entry):
+                    self.accounts[instance.get_type_name()] = instance
 
         self.iot_account     = await self.get_iot_account(hass, config_entry)
         for account in self.accounts.values():
