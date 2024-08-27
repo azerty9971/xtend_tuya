@@ -1,4 +1,5 @@
 from __future__ import annotations
+from functools import partial
 import copy
 import importlib
 import os
@@ -91,7 +92,7 @@ class MultiManager:  # noqa: F811
             if os.path.isdir(os.path.dirname(__file__) + os.sep + directory):
                 load_path = f".{directory}.init"
                 try:
-                    plugin = await self.hass.async_add_executor_job(importlib.import_module, load_path, package=__package__)
+                    plugin = await self.hass.async_add_executor_job(partial(importlib.import_module, name=load_path, package=__package__))
                     LOGGER.debug(f"Plugin {load_path} loaded")
                     instance: XTDeviceManagerInterface = plugin.get_plugin_instance()
                     if await instance.setup_from_entry(hass, config_entry, self):
