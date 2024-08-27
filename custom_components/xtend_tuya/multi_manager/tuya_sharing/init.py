@@ -166,7 +166,6 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
         self.sharing_account.device_manager.remove_device_listener(self.multi_manager.multi_device_listener)
     
     def unload(self):
-        #TODO: Only call the unload of the Sharing Manager if there is no IOT account as this will revoke its credentials
         if not self.multi_manager.get_account_by_name(MESSAGE_SOURCE_TUYA_IOT):
             self.sharing_account.device_manager.user_repository.unload(self.sharing_account.device_manager.terminal_id)
     
