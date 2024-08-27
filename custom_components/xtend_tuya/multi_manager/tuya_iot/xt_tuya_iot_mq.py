@@ -1,13 +1,17 @@
 from __future__ import annotations
 
-#from typing import Any, Optional
+from typing import Any, Optional
 
 from tuya_iot import (
     TuyaOpenMQ,
     TuyaOpenAPI,
 )
 
-"""from tuya_iot.openmq import (
+from ...const import (
+    LOGGER,
+)
+
+from tuya_iot.openmq import (
     CONNECT_FAILED_NOT_AUTHORISED,
     mqtt,
     TuyaMQConfig,
@@ -17,15 +21,17 @@ from tuya_iot import (
     LINK_ID
 )
 
-from ...const import (
-    LOGGER,
-)"""
-
 class XTIOTOpenMQ(TuyaOpenMQ):
     def __init__(self, api: TuyaOpenAPI) -> None:
         super().__init__(api)
 
-    """def _get_mqtt_config(self) -> Optional[TuyaMQConfig]:
+    def _on_disconnect(self, client, userdata, rc):
+        if rc != 0:
+            LOGGER.error(f"Unexpected disconnection.{rc}")
+        else:
+            LOGGER.warning("disconnect")
+
+    def _get_mqtt_config(self) -> Optional[TuyaMQConfig]:
         response = self.api.post(
             TO_C_CUSTOM_MQTT_CONFIG_API
             if (self.api.auth_type == AuthType.CUSTOM)
@@ -41,10 +47,10 @@ class XTIOTOpenMQ(TuyaOpenMQ):
             },
         )
 
+        LOGGER.warning(f"_get_mqtt_config => {response}")
+
         if response.get("success", False) is False:
             return None
-        
-        LOGGER.warning(f"_get_mqtt_config => {response}")
 
         return TuyaMQConfig(response)
 
@@ -54,4 +60,4 @@ class XTIOTOpenMQ(TuyaOpenMQ):
                 LOGGER.warning(f"Subscribing tp {value}")
                 mqttc.subscribe(value)
         elif rc == CONNECT_FAILED_NOT_AUTHORISED:
-            self.__run_mqtt()"""
+            self.__run_mqtt()
