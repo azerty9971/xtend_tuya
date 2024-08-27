@@ -71,6 +71,7 @@ from ..multi_manager import (
 from ...const import (
     DOMAIN,
     MESSAGE_SOURCE_TUYA_SHARING,
+    MESSAGE_SOURCE_TUYA_IOT,
 )
 
 def get_plugin_instance() -> XTTuyaSharingDeviceManagerInterface | None:
@@ -166,7 +167,8 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
     
     def unload(self):
         #TODO: Only call the unload of the Sharing Manager if there is no IOT account as this will revoke its credentials
-        self.sharing_account.device_manager.user_repository.unload(self.sharing_account.device_manager.terminal_id)
+        if not self.multi_manager.get_account_by_name(MESSAGE_SOURCE_TUYA_IOT):
+            self.sharing_account.device_manager.user_repository.unload(self.sharing_account.device_manager.terminal_id)
     
     def on_message(self, msg: str):
         self.sharing_account.device_manager.on_message(msg)
