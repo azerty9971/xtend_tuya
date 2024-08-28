@@ -57,7 +57,7 @@ class XTIOTOpenMQ(TuyaOpenMQ):
     def _on_connect(self, mqttc: mqtt.Client, user_data: Any, flags, rc):
         if rc == 0:
             for (key, value) in self.mq_config.source_topic.items():
-                LOGGER.warning(f"Subscribing tp {value}")
+                LOGGER.warning(f"Subscribing to {value}")
                 mqttc.subscribe(value)
         elif rc == CONNECT_FAILED_NOT_AUTHORISED:
             self.__run_mqtt()
