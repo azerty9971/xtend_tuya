@@ -11,6 +11,10 @@ from ...const import (
     LOGGER,
 )
 
+from ...util import (
+    log_stack,
+)
+
 from tuya_iot.openmq import (
     CONNECT_FAILED_NOT_AUTHORISED,
     mqtt,
@@ -47,9 +51,8 @@ class XTIOTOpenMQ(TuyaOpenMQ):
             },
         )
 
-        LOGGER.warning(f"_get_mqtt_config => {response}")
-
         if response.get("success", False) is False:
+            log_stack(f"_get_mqtt_config failed: {response}")
             return None
 
         return TuyaMQConfig(response)
