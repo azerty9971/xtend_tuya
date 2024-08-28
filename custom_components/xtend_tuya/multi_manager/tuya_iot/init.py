@@ -141,7 +141,7 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
         pass
     
     def remove_device_listeners(self) -> None:
-        self.iot_account.device_manager.remove_device_listener(self.multi_device_listener)
+        self.iot_account.device_manager.remove_device_listener(self.multi_manager.multi_device_listener)
     
     def unload(self):
         pass
