@@ -69,6 +69,12 @@ BINARY_SENSORS: dict[str, tuple[TuyaBinarySensorEntityDescription, ...]] = {
             entity_registry_enabled_default=False,
         ),
     ),
+    "pir": (
+        TuyaBinarySensorEntityDescription(
+            key=DPCode.PIR2,
+            device_class=BinarySensorDeviceClass.MOTION,
+        ),
+    ),
     "smd": (
         TuyaBinarySensorEntityDescription(
             key=DPCode.OFF_BED,
