@@ -19,7 +19,7 @@ from .multi_device_listener import (
 
 class DeviceWatcher:
     def __init__(self) -> None:
-        self.watched_dev_id = []
+        self.watched_dev_id = ["bf0b40e8bb7732ac1drh8t", "bf38f31b4a36fc3ea5wlg9"]
     
     def is_watched(self, dev_id: str) -> bool:
         return dev_id in self.watched_dev_id
