@@ -365,6 +365,7 @@ class DPCode(StrEnum):
     PHASE_B = "phase_b"
     PHASE_C = "phase_c"
     PIR = "pir"  # Motion sensor
+    PIR2 = "PIR"
     PIR_RADAR = "PIR_RADAR"
     PM1 = "pm1"
     PM10 = "pm10"
