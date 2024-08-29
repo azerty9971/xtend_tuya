@@ -59,6 +59,19 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
     def forward_message_to_multi_manager(self, msg:str):
         self.multi_manager.on_message(MESSAGE_SOURCE_TUYA_SHARING, msg)
 
+    def update_device_cache(self):
+        super().update_device_cache()
+
+        #Adjust local strategies mapping data to match boolean
+        for device in self.device_map.values():
+            for local_strategy in device.local_strategy.values():
+                if config_item := local_strategy.get("config_item", None):
+                    if mappings := config_item.get("enumMappingMap", None):
+                        if "false" in mappings:
+                            mappings["False"] = mappings["false"]
+                        if "true" in mappings:
+                            mappings["True"] = mappings["true"]
+
     def on_external_refresh_mq(self):
         if self.other_device_manager is not None:
             self.mq = self.other_device_manager.mq

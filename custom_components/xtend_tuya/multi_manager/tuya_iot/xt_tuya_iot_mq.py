@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Optional
 
 from tuya_iot import (
     TuyaOpenMQ,
@@ -16,8 +16,8 @@ from ...util import (
 )
 
 from tuya_iot.openmq import (
-    CONNECT_FAILED_NOT_AUTHORISED,
-    mqtt,
+    #CONNECT_FAILED_NOT_AUTHORISED,
+    #mqtt,
     TuyaMQConfig,
     TO_C_CUSTOM_MQTT_CONFIG_API,
     AuthType,
@@ -54,14 +54,13 @@ class XTIOTOpenMQ(TuyaOpenMQ):
         if response.get("success", False) is False:
             log_stack(f"_get_mqtt_config failed: {response}")
             return None
-        LOGGER.debug(f"Successfully got MQTT config : {response}")
 
         return TuyaMQConfig(response)
 
-    def _on_connect(self, mqttc: mqtt.Client, user_data: Any, flags, rc):
+    """def _on_connect(self, mqttc: mqtt.Client, user_data: Any, flags, rc):
         if rc == 0:
             for (key, value) in self.mq_config.source_topic.items():
                 LOGGER.warning(f"Subscribing to {value}")
                 mqttc.subscribe(value)
         elif rc == CONNECT_FAILED_NOT_AUTHORISED:
-            self.__run_mqtt()
+            self.__run_mqtt()"""
