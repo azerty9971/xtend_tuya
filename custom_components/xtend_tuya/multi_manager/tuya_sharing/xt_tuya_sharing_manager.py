@@ -63,17 +63,21 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
         super().update_device_cache()
 
         #Adjust local strategies mapping data to match boolean
-        for device in self.device_map.values():
-            for local_strategy in device.local_strategy.values():
-                if config_item := local_strategy.get("config_item", None):
-                    if mappings := config_item.get("enumMappingMap", None):
-                        LOGGER.warning(f"values: {str(True)} <=> {str(False)}")
-                        LOGGER.warning(f"Found mappings: { mappings}")
-                        if 'false' in mappings:
-                            mappings[str(False)] = mappings['false']
-                        if 'true' in mappings:
-                            mappings[str(True)] = mappings['true']
-                        LOGGER.warning(f"Found mappings AFTER: { mappings}")
+        for device_id in self.device_map:
+            devices = self.multi_manager.get_devices_from_device_id(device_id)
+            for device in devices:
+                if not hasattr(device, "local_strategy"):
+                    continue
+                for local_strategy in device.local_strategy.values():
+                    if config_item := local_strategy.get("config_item", None):
+                        if mappings := config_item.get("enumMappingMap", None):
+                            LOGGER.warning(f"values: {str(True)} <=> {str(False)}")
+                            LOGGER.warning(f"Found mappings: { mappings}")
+                            if 'false' in mappings:
+                                mappings[str(False)] = mappings['false']
+                            if 'true' in mappings:
+                                mappings[str(True)] = mappings['true']
+                            LOGGER.warning(f"Found mappings AFTER: { mappings}")
 
     def on_external_refresh_mq(self):
         if self.other_device_manager is not None:
