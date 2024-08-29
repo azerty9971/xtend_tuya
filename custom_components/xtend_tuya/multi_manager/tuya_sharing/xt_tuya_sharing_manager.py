@@ -69,10 +69,11 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
                     if mappings := config_item.get("enumMappingMap", None):
                         LOGGER.warning(f"values: {str(True)} <=> {str(False)}")
                         LOGGER.warning(f"Found mappings: { mappings}")
-                        if "false" in mappings:
-                            mappings["False"] = mappings["false"]
-                        if "true" in mappings:
-                            mappings["True"] = mappings["true"]
+                        if 'false' in mappings:
+                            mappings[str(False)] = mappings['false']
+                        if 'true' in mappings:
+                            mappings[str(True)] = mappings['true']
+                        LOGGER.warning(f"Found mappings AFTER: { mappings}")
 
     def on_external_refresh_mq(self):
         if self.other_device_manager is not None:
