@@ -9,7 +9,10 @@ from homeassistant.exceptions import ConfigEntryNotReady
 
 from tuya_iot import (
     AuthType,
-    TuyaOpenAPI,
+)
+
+from .xt_tuya_iot_openapi import (
+    XTIOTOpenAPI,
 )
 
 from .xt_tuya_iot_manager import (
@@ -91,7 +94,7 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
             ):
             return None
         auth_type = AuthType(config_entry.options[CONF_AUTH_TYPE])
-        api = TuyaOpenAPI(
+        api = XTIOTOpenAPI(
             endpoint=config_entry.options[CONF_ENDPOINT_OT],
             access_id=config_entry.options[CONF_ACCESS_ID],
             access_secret=config_entry.options[CONF_ACCESS_SECRET],
