@@ -15,6 +15,7 @@ from tuya_iot.device import (
 
 from ..const import (
     LOGGER,
+    AllowedPlugins,
 )
 
 from .shared.import_stub import (
@@ -86,8 +87,8 @@ class MultiManager:  # noqa: F811
 
     async def setup_entry(self, hass: HomeAssistant, config_entry: XTConfigEntry) -> None:
         #Load all the plugins
-        subdirs = await self.hass.async_add_executor_job(os.listdir, os.path.dirname(__file__))
-
+        #subdirs = await self.hass.async_add_executor_job(os.listdir, os.path.dirname(__file__))
+        subdirs = AllowedPlugins.get_plugins_to_load()
         for directory in subdirs:
             if os.path.isdir(os.path.dirname(__file__) + os.sep + directory):
                 load_path = f".{directory}.init"
