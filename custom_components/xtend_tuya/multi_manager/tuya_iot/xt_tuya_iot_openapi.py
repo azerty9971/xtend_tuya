@@ -10,9 +10,9 @@ from tuya_iot.openapi import (
     TUYA_ERROR_CODE_TOKEN_INVALID,
 )
 
-from ...const import (
+"""from ...const import (
     LOGGER,
-)
+)"""
 
 class XTIOTOpenAPI(TuyaOpenAPI):
     def __init__(
@@ -34,12 +34,10 @@ class XTIOTOpenAPI(TuyaOpenAPI):
         schema: str = "",
     ) -> dict[str, Any]:
         self.connect_response = super().connect(username=username, password=password, country_code=country_code, schema=schema)
-        LOGGER.warning(f"Connect response: {self.connect_response}")
         return self.connect_response
     
     def get(self, path: str, params: dict[str, Any] | None = None) -> dict[str, Any]:
         normal_result = super().get(path=path, params=params)
-        LOGGER.warning(f"get1 : {path} <=> {params} <=> {normal_result}")
         if ( 
             normal_result.get("code", -1) == TUYA_ERROR_CODE_TOKEN_INVALID and
             self.connect_response is not None and
@@ -50,12 +48,10 @@ class XTIOTOpenAPI(TuyaOpenAPI):
         ):
             normal_result = self.connect_response
             self.connect_response = None
-        LOGGER.warning(f"get2: {normal_result}")
         return normal_result
 
     def post(self, path: str, body: dict[str, Any] | None = None) -> dict[str, Any]:
         normal_result = super().post(path=path, body=body)
-        LOGGER.warning(f"post1: {path} <=> {body} <=> {normal_result}")
         if ( 
             normal_result.get("code", -1) == TUYA_ERROR_CODE_TOKEN_INVALID and
             self.connect_response is not None and
@@ -66,5 +62,4 @@ class XTIOTOpenAPI(TuyaOpenAPI):
         ):
             normal_result = self.connect_response
             self.connect_response = None
-        LOGGER.warning(f"post2: {normal_result}")
         return normal_result
