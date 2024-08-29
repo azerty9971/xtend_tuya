@@ -90,6 +90,11 @@ PLATFORMS = [
     Platform.VACUUM,
 ]
 
+class AllowedPlugins:
+    @staticmethod
+    def get_plugins_to_load() -> list[str]:
+        return [MESSAGE_SOURCE_TUYA_SHARING, MESSAGE_SOURCE_TUYA_IOT]
+
 class VirtualStates(IntFlag):
     """Virtual states"""
     STATE_COPY_TO_MULTIPLE_STATE_NAME           = 0X0001,   #Copy the state so that it can be used with other virtual states
