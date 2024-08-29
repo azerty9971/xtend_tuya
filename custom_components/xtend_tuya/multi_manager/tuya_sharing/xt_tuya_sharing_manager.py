@@ -24,7 +24,7 @@ from .import_stub import (
 )
 
 from ...const import (
-#    LOGGER,
+    LOGGER,  # noqa: F401
     MESSAGE_SOURCE_TUYA_SHARING,
 )
 
@@ -67,6 +67,8 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
             for local_strategy in device.local_strategy.values():
                 if config_item := local_strategy.get("config_item", None):
                     if mappings := config_item.get("enumMappingMap", None):
+                        LOGGER.warning(f"values: {str(True)} <=> {str(False)}")
+                        LOGGER.warning(f"Found mappings: { mappings}")
                         if "false" in mappings:
                             mappings["False"] = mappings["false"]
                         if "true" in mappings:
