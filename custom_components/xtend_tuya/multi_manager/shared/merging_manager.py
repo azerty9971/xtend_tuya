@@ -122,8 +122,8 @@ class XTMergingManager:
         if key in dict1:
             val1 = dict1[key]
         val2 = None
-        if key in dict1:
-            val2 = dict1[key]
+        if key in dict2:
+            val2 = dict2[key]
         
         if val1 == val2:
             return True, val1, val2
