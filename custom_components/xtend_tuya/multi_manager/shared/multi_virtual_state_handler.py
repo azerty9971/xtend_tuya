@@ -41,10 +41,8 @@ class XTVirtualStateHandler:
                     descriptors_with_vs[category] = tuple(description_list_vs)
         if len(descriptors_with_vs) > 0:
             self.descriptors_with_virtual_state[name] = descriptors_with_vs
-            for device_id in self.multi_manager.device_map:
-                devices = self.multi_manager.get_devices_from_device_id(device_id)
-                for device in devices:
-                    self.apply_init_virtual_states(device)
+            for device in self.multi_manager.device_map.values():
+                self.apply_init_virtual_states(device)
 
     def get_category_virtual_states(self,category: str) -> list[DescriptionVirtualState]:
         to_return = []

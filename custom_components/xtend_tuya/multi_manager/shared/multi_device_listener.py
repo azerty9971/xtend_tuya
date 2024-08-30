@@ -25,12 +25,6 @@ class MultiDeviceListener:
         self.hass = hass
 
     def update_device(self, device: XTDevice):
-        if self.multi_manager.device_watcher.is_watched(device.id):
-            LOGGER.warning(f"WD: update_device => {device.id}")
-        devices = self.multi_manager.get_devices_from_device_id(device.id)
-        for cur_device in devices:
-            XTDevice.copy_data_from_device(device, cur_device)
-        #if self.multi_manager.sharing_acount and self.multi_manager.sharing_acount.reuse_config:
         dispatcher_send(self.hass, f"{TUYA_HA_SIGNAL_UPDATE_ENTITY_ORIG}_{device.id}")
         dispatcher_send(self.hass, f"{TUYA_HA_SIGNAL_UPDATE_ENTITY}_{device.id}")
 

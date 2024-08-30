@@ -32,6 +32,14 @@ from .shared.shared_classes import (
     XTConfigEntry,  # noqa: F811
 )
 
+from .shared.merging_manager import (
+    XTMergingManager,
+)
+
+from .shared.cloud_fix import (
+    CloudFixes,
+)
+
 from .shared.multi_source_handler import (
     MultiSourceHandler,
 )
@@ -71,10 +79,11 @@ class MultiManager:  # noqa: F811
         self.multi_source_handler = MultiSourceHandler(self)
         self.device_watcher = DeviceWatcher()
         self.accounts: dict[str, XTDeviceManagerInterface] = {}
+        self.master_device_map: dict[str, XTDevice] = {}
 
     @property
     def device_map(self):
-        return self.get_aggregated_device_map()
+        return self.master_device_map
     
     @property
     def mq(self):
@@ -120,13 +129,30 @@ class MultiManager:  # noqa: F811
     def update_device_cache(self):
         for manager in self.accounts.values():
             manager.update_device_cache()
-        self._merge_devices_from_multiple_sources()
-    
-    def convert_tuya_devices_to_xt(self, manager):
-        for dev_id in manager.device_map:
-            manager.device_map[dev_id] = XTDevice.from_compatible_device(manager.device_map[dev_id])
 
-    def _get_available_device_maps(self) -> list[dict[str, XTDevice]]:
+            #New devices have been created in their own device maps
+            #let's convert them to XTDevice
+            for device_map in manager.get_available_device_maps():
+                for device_id in device_map:
+                    device_map[device_id] = manager.convert_to_xt_device(device_map[device_id])
+        
+        #Register all devices in the master device map
+        self._update_master_device_map()
+
+        #Now let's aggregate all of these devices into a single
+        #"All functionnality" device
+        self._merge_devices_from_multiple_sources()
+        for device in self.device_map.values():
+            CloudFixes.apply_fixes(device)
+
+    def _update_master_device_map(self):
+        for manager in self.accounts.values():
+            for device_map in manager.get_available_device_maps():
+                for device_id in device_map:
+                    if device_id not in self.master_device_map:
+                        self.master_device_map[device_id] = device_map[device_id]
+
+    def __get_available_device_maps(self) -> list[dict[str, XTDevice]]:
         return_list: list[dict[str, XTDevice]] = []
         for manager in self.accounts.values():
             for device_map in manager.get_available_device_maps():
@@ -135,38 +161,13 @@ class MultiManager:  # noqa: F811
 
     def _merge_devices_from_multiple_sources(self):
         #Merge the device function, status_range and status between managers
-        device_maps = self._get_available_device_maps()
-        aggregated_device_list = self.device_map
-        for device in aggregated_device_list.values():
+        for device in self.device_map.values():
             to_be_merged: list[XTDevice] = []
-            devices = self.get_devices_from_device_id(device.id)
+            devices = self.__get_devices_from_device_id(device.id)
             for current_device in devices:
                 for prev_device in to_be_merged:
-                    self._merge_devices(current_device, prev_device)
+                    XTMergingManager.merge_devices(current_device, prev_device)
                 to_be_merged.append(current_device)
-        for device_map in device_maps:
-            merge_iterables(device_map, aggregated_device_list)
-        
-    def _merge_devices(self, receiving_device: XTDevice, giving_device: XTDevice):
-        merge_iterables(receiving_device.status_range, giving_device.status_range)
-        merge_iterables(receiving_device.function, giving_device.function)
-        merge_iterables(receiving_device.status, giving_device.status)
-        if hasattr(receiving_device, "local_strategy") and hasattr(giving_device, "local_strategy"):
-            merge_iterables(receiving_device.local_strategy, giving_device.local_strategy)
-        if hasattr(receiving_device, "data_model") and hasattr(giving_device, "data_model"):
-            if receiving_device.data_model == "" and giving_device.data_model != "":
-                receiving_device.data_model = copy.deepcopy(giving_device.data_model)
-            if giving_device.data_model == "" and receiving_device.data_model != "":
-                giving_device.data_model = copy.deepcopy(receiving_device.data_model)
-    
-    def get_aggregated_device_map(self) -> dict[str, XTDevice]:
-        aggregated_list: dict[str, XTDevice] = {}
-        device_maps = self._get_available_device_maps()
-        for device_map in device_maps:
-            for device_id in device_map:
-                if device_id not in aggregated_list:
-                    aggregated_list[device_id] = device_map[device_id]
-        return aggregated_list
     
     def unload(self):
         LOGGER.warning("Unload")
@@ -205,22 +206,21 @@ class MultiManager:  # noqa: F811
         if not getattr(device, "set_up", True):
             setattr(device, "set_up", True)
     
-    def get_devices_from_device_id(self, device_id: str) -> list[XTDevice] | None:
+    def __get_devices_from_device_id(self, device_id: str) -> list[XTDevice] | None:
         return_list = []
-        device_maps = self._get_available_device_maps()
+        device_maps = self.__get_available_device_maps()
         for device_map in device_maps:
             if device_id in device_map:
                 return_list.append(device_map[device_id])
         return return_list
 
     def _read_code_dpid_value_from_state(self, device_id: str, state, fail_if_dpid_not_found = True, fail_if_code_not_found = True):
-        devices = self.get_devices_from_device_id(device_id)
         code = None
         dpId = None
         value = None
         if "value" in state:
             value = state["value"]
-        for device in devices:
+        if device := self.device_map.get(device_id, None):
             if code is None and "code" in state:
                 code = state["code"]
             if dpId is None and "dpId" in state:

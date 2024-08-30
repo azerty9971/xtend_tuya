@@ -53,11 +53,11 @@ class MultiSourceHandler:
         self.device_map: dict[str, dict[str, MultiSourceCodeCounter]] = {}
     
     def register_status_list_from_source(self, dev_id: str, source: str, status_in) -> None:
-        devices = self.multi_manager.get_devices_from_device_id(dev_id)
-        if not devices:
+        device = self.multi_manager.device_map.get(dev_id, None)
+        if not device:
             return
         
-        virtual_states = self.multi_manager.virtual_state_handler.get_category_virtual_states(devices[0].category)
+        virtual_states = self.multi_manager.virtual_state_handler.get_category_virtual_states(device.category)
         if not virtual_states:
             return
         
@@ -73,12 +73,12 @@ class MultiSourceHandler:
 
     def filter_status_list(self, dev_id: str, original_source: str, status_in) -> str:
         status_list = copy.deepcopy(status_in)
-        devices = self.multi_manager.get_devices_from_device_id(dev_id)
-        if not devices:
+        device = self.multi_manager.device_map.get(dev_id, None)
+        if not device:
             return status_list
         
         #Only filter for devices that have a VirtualState in their status_list
-        virtual_states = self.multi_manager.virtual_state_handler.get_category_virtual_states(devices[0].category)
+        virtual_states = self.multi_manager.virtual_state_handler.get_category_virtual_states(device.category)
         if not virtual_states:
             return status_list
         

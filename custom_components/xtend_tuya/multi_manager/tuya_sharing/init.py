@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Optional, Literal, Any
+from typing import Optional, Literal, Any, overload
 
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
@@ -8,6 +8,9 @@ from homeassistant.helpers.dispatcher import dispatcher_send
 from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady
 from homeassistant.helpers import device_registry as dr
 
+from tuya_sharing import (
+    CustomerDevice,
+)
 from tuya_sharing.home import (
     HomeRepository,
 )
@@ -16,6 +19,10 @@ from tuya_sharing.scenes import (
 )
 from tuya_sharing.user import (
     UserRepository,
+)
+from tuya_sharing.customerapi import (
+    CustomerTokenInfo,
+    CustomerApi,
 )
 
 from .xt_tuya_sharing_manager import (
@@ -38,10 +45,6 @@ from .xt_tuya_sharing_token_listener import (
 )
 from .xt_tuya_sharing_device_repository import (
     XTSharingDeviceRepository,
-)
-from tuya_sharing.customerapi import (
-    CustomerTokenInfo,
-    CustomerApi,
 )
 from .ha_tuya_integration.config_entry_handler import (
     XTHATuyaIntegrationConfigEntryManager
@@ -237,3 +240,10 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
         
         if regular_commands:
             self.sharing_account.device_manager.send_commands(device_id, regular_commands)
+    
+
+    @overload
+    def convert_to_xt_device(self, Any) -> XTDevice: ...
+    
+    def convert_to_xt_device(self, device: CustomerDevice) -> XTDevice:
+        return XTDevice.from_compatible_device(device)

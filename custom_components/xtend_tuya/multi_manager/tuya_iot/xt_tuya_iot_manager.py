@@ -202,7 +202,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                             }
                         #Sometimes the default returned typeSpec from the regular Tuya Properties is wrong
                         #override it with the QueryThingsDataModel one
-                        if real_type == DPType.ENUM: #Enums should not be altered since sometimes the model is wrong about them
+                        """if real_type == DPType.ENUM: #Enums should not be altered since sometimes the model is wrong about them
                             continue
                         devices = self.multi_manager.get_devices_from_device_id(device.id)
                         for cur_device in devices:
@@ -211,7 +211,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                                 if code in cur_device.status_range:
                                     cur_device.status_range[code].values = typeSpec_json
                                 if code in cur_device.function:
-                                    cur_device.function[code].values = typeSpec_json
+                                    cur_device.function[code].values = typeSpec_json"""
 
 
         if response.get("success"):

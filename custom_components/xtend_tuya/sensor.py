@@ -155,7 +155,7 @@ CONSUMPTION_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
         key=DPCode.BALANCE_ENERGY,
         translation_key="balance_energy",
         device_class=SensorDeviceClass.ENERGY,
-        state_class=SensorStateClass.TOTAL_INCREASING,
+        state_class=SensorStateClass.TOTAL,
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         entity_registry_enabled_default=True,
         restoredata=False,
@@ -691,8 +691,7 @@ class TuyaSensorEntity(TuyaEntity, RestoreSensor):
                 should_reset = True
             
             if should_reset:
-                devices = self.device_manager.get_devices_from_device_id(self.device.id)
-                for device in devices:
+                if device := self.device_manager.device_map.get(self.device.id, None):
                     device.status[self.entity_description.key] = float(0)
                 self.entity_description.last_reset = now
                 self.async_write_ha_state()
@@ -718,6 +717,5 @@ class TuyaSensorEntity(TuyaEntity, RestoreSensor):
             scaled_value_back = self._type_data.scale_value_back(state.native_value)
             state.native_value = scaled_value_back
 
-        devices = self.device_manager.get_devices_from_device_id(self.device.id)
-        for device in devices:
+        if device := self.device_manager.device_map.get(self.device.id, None):
             device.status[self.entity_description.key] = float(state.native_value)
