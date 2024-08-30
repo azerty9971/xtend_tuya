@@ -111,10 +111,10 @@ class XTMergingManager:
                 dict1[key] = "{}"
                 dict2[key] = dict1[key]
             return
-        json_dict1 = json.load(dict1[key])
-        json_dict2 = json.load(dict2[key])
+        json_dict1 = json.loads(dict1[key])
+        json_dict2 = json.loads(dict2[key])
         XTMergingManager._merge_dict(json_dict1, json_dict2)
-        dict1[key] = json.dump(json_dict1)
+        dict1[key] = json.dumps(json_dict1)
         dict2[key] = dict1[key]
 
     def _is_dict_entry_the_same(dict1: dict, dict2: dict, key: any):
