@@ -180,12 +180,10 @@ class MultiManager:  # noqa: F811
                 to_be_merged.append(current_device)
     
     def unload(self):
-        LOGGER.warning("Unload")
         for manager in self.accounts.values():
             manager.unload()
     
     def refresh_mq(self):
-        LOGGER.warning("Refresh MQ")
         for manager in self.accounts.values():
             manager.refresh_mq()
 
