@@ -239,6 +239,12 @@ class MultiManager:  # noqa: F811
             if dpId is None and code is not None:
                 dpId = self._read_dpId_from_code(code, device)
 
+            #For alias in state, replace provided code with the main code from the dpId
+            if dpId is not None:
+                code_non_alias = self._read_code_from_dpId(dpId, device)
+                if code_non_alias is not None:
+                    code = code_non_alias
+
             if dpId is None and code is None:
                 for temp_dpId in state:
                     temp_code = self._read_code_from_dpId(int(temp_dpId), device)
