@@ -85,3 +85,7 @@ class XTDeviceManagerInterface(ABC):
             if device_id in device_map:
                 return_list.append(device_map[device_id])
         return return_list
+    
+    @abstractmethod
+    def convert_to_xt_device(self, Any) -> XTDevice:
+        pass

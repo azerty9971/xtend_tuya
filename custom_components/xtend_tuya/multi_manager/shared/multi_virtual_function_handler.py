@@ -9,6 +9,10 @@ from ...const import (
     DescriptionVirtualFunction,
 )
 
+from .device import (
+    XTDevice,
+)
+
 from ..multi_manager import (
     MultiManager,
 )
@@ -52,8 +56,8 @@ class XTVirtualFunctionHandler:
         return to_return
     
     def process_virtual_function(self, device_id: str, commands: list[dict[str, Any]]):
-        devices = self.multi_manager.get_devices_from_device_id(device_id)
-        if not devices:
+        device: XTDevice = self.multi_manager.device_map.get(device_id, None)
+        if not device:
             return
         for command in commands:
             virtual_function: DescriptionVirtualFunction = command["virtual_function"]
@@ -62,8 +66,7 @@ class XTVirtualFunctionHandler:
             device = None
             if virtual_function.virtual_function_value == VirtualFunctions.FUNCTION_RESET_STATE:
                 for state_to_reset in virtual_function.vf_reset_state:
-                    for device in devices:
-                        if state_to_reset in device.status:
-                            device.status[state_to_reset] = 0
-                            self.multi_manager.multi_device_listener.update_device(device)
-                            break
+                    if state_to_reset in device.status:
+                        device.status[state_to_reset] = 0
+                        self.multi_manager.multi_device_listener.update_device(device)
+                        break

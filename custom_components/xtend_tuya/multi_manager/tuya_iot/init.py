@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import requests
-from typing import Optional, Literal, Any
+from typing import Optional, Literal, Any, overload
 
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
@@ -218,3 +218,10 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
         if property_commands:
             LOGGER.debug(f"Sending property command : {property_commands}")
             self.iot_account.device_manager.send_property_update(device_id, property_commands)
+
+    @overload
+    def convert_to_xt_device(self, Any) -> XTDevice: ...
+    
+    def convert_to_xt_device(self, device: XTDevice) -> XTDevice:
+        #Nothing to do, tuya_iot initializes XTDevice by default...
+        return device
