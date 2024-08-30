@@ -81,7 +81,7 @@ class MultiManager:  # noqa: F811
         self.accounts: dict[str, XTDeviceManagerInterface] = {}
         self.master_device_map: dict[str, XTDevice] = {}
         self.is_ready_for_messages = False
-        self.pending_messages = list[tuple[str, str]]
+        self.pending_messages: list[tuple[str, str]] = []
 
     @property
     def device_map(self):
