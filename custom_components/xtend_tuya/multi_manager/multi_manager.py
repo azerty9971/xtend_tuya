@@ -243,10 +243,12 @@ class MultiManager:  # noqa: F811
             if code is not None and dpId is not None:
                 return code, dpId, value, True
         if code is None and fail_if_code_not_found:
-            LOGGER.warning(f"_read_code_value_from_state FAILED => {device.id} <=> {device.name} <=> {state} <=> {device.local_strategy}")
+            if device:
+                LOGGER.warning(f"_read_code_value_from_state FAILED => {device.id} <=> {device.name} <=> {state} <=> {device.local_strategy}")
             return None, None, None, False
         if dpId is None and fail_if_dpid_not_found:
-            LOGGER.warning(f"_read_code_value_from_state FAILED => {device.id} <=> {device.name} <=> {state} <=> {device.local_strategy}")
+            if device:
+                LOGGER.warning(f"_read_code_value_from_state FAILED => {device.id} <=> {device.name} <=> {state} <=> {device.local_strategy}")
             return None, None, None, False
         return code, dpId, value, True
 
