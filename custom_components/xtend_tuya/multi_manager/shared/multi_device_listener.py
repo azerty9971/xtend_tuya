@@ -8,7 +8,7 @@ from ...const import (
     TUYA_HA_SIGNAL_UPDATE_ENTITY,
     TUYA_HA_SIGNAL_UPDATE_ENTITY_ORIG,
     TUYA_DISCOVERY_NEW,
-    LOGGER,
+    LOGGER,  # noqa: F401
     DOMAIN,
     DOMAIN_ORIG,
 )
