@@ -191,7 +191,7 @@ class MultiManager:  # noqa: F811
         if not hasattr(device, "local_strategy"):
             return None
         for dpId in device.local_strategy:
-            if device.local_strategy[dpId]["status_code"] == code:
+            if device.local_strategy[dpId]["status_code"] == code or code in device.local_strategy[dpId]["status_code_alias"]:
                 return dpId
         return None
     
