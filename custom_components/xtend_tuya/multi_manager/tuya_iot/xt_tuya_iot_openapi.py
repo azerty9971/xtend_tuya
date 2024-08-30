@@ -10,9 +10,9 @@ from tuya_iot.openapi import (
     TUYA_ERROR_CODE_TOKEN_INVALID,
 )
 
-"""from ...const import (
-    LOGGER,
-)"""
+from ...const import (
+    LOGGER,  # noqa: F401
+)
 
 class XTIOTOpenAPI(TuyaOpenAPI):
     def __init__(
