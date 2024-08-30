@@ -80,6 +80,8 @@ class MultiManager:  # noqa: F811
         self.device_watcher = DeviceWatcher()
         self.accounts: dict[str, XTDeviceManagerInterface] = {}
         self.master_device_map: dict[str, XTDevice] = {}
+        self.is_ready_for_messages = False
+        self.pending_messages = list[tuple[str, str]]
 
     @property
     def device_map(self):
@@ -127,6 +129,7 @@ class MultiManager:  # noqa: F811
         return return_list
     
     def update_device_cache(self):
+        self.is_ready_for_messages = False
         for manager in self.accounts.values():
             manager.update_device_cache()
 
@@ -144,6 +147,13 @@ class MultiManager:  # noqa: F811
         self._merge_devices_from_multiple_sources()
         for device in self.device_map.values():
             CloudFixes.apply_fixes(device)
+        self._process_pending_messages()
+
+    def _process_pending_messages(self):
+        self.is_ready_for_messages = True
+        for messages in self.pending_messages:
+            self.on_message(messages[0], messages[1])
+        self.pending_messages.clear()
 
     def _update_master_device_map(self):
         for manager in self.accounts.values():
@@ -265,6 +275,9 @@ class MultiManager:  # noqa: F811
         return status
 
     def on_message(self, source: str, msg: str):
+        if not self.is_ready_for_messages:
+            self.pending_messages.append((source, msg))
+            return
         dev_id = self._get_device_id_from_message(msg)
         if not dev_id:
             LOGGER.warning(f"dev_id {dev_id} not found!")
