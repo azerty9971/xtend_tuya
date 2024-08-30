@@ -15,7 +15,6 @@ from typing import Any
 
 from ...const import (
     LOGGER,
-    DPType,
     MESSAGE_SOURCE_TUYA_IOT,
 )
 

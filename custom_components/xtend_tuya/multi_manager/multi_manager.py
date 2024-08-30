@@ -61,7 +61,6 @@ from .shared.multi_virtual_function_handler import (
 )
 
 from ..util import (
-    merge_iterables,
     append_lists,
 )
 
