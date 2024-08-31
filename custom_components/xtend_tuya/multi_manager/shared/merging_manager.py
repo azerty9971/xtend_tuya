@@ -78,8 +78,8 @@ class XTMergingManager:
                 device2.local_strategy[dpId] = device1.local_strategy[dpId]
 
     def _merge_config_item(conf1: dict, conf2: dict):
-        XTMergingManager._merge_json_dict(conf1, conf2, "statusFormat")
-        XTMergingManager._merge_json_dict(conf1, conf2, "valueDesc")
+        XTMergingManager._merge_json_dict(conf2, conf1, "statusFormat")
+        XTMergingManager._merge_json_dict(conf2, conf1, "valueDesc")
         XTMergingManager._copy_if_different(conf1, conf2, "valueType")
         if "enumMappingMap" in conf1 and "enumMappingMap" in conf2:
             XTMergingManager._merge_dict(conf1["enumMappingMap"], conf2["enumMappingMap"])
