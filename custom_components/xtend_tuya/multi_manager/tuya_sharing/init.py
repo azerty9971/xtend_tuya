@@ -60,7 +60,6 @@ from .const import (
     CONF_ENDPOINT,
     TUYA_CLIENT_ID,
     DOMAIN_ORIG,
-    TUYA_DISCOVERY_NEW_ORIG,
 )
 from .util import (
     get_overriden_tuya_integration_runtime_data,
@@ -75,6 +74,10 @@ from ...const import (
     DOMAIN,
     MESSAGE_SOURCE_TUYA_SHARING,
     MESSAGE_SOURCE_TUYA_IOT,
+    TUYA_DISCOVERY_NEW,
+    TUYA_DISCOVERY_NEW_ORIG,
+    TUYA_HA_SIGNAL_UPDATE_ENTITY,
+    TUYA_HA_SIGNAL_UPDATE_ENTITY_ORIG,
 )
 
 def get_plugin_instance() -> XTTuyaSharingDeviceManagerInterface | None:
@@ -201,9 +204,25 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
         else:
             return [DOMAIN]
 
-    def on_add_device(self, device: XTDevice):
+    def on_update_device(self, device: XTDevice) -> list[str] | None:
+        return_list: list[str] = []
+        if device.id in self.sharing_account.device_ids:
+            return_list.append(TUYA_HA_SIGNAL_UPDATE_ENTITY)
         if self.sharing_account.device_manager.reuse_config:
-            dispatcher_send(self.hass, TUYA_DISCOVERY_NEW_ORIG, [device.id])
+            return_list.append(TUYA_HA_SIGNAL_UPDATE_ENTITY_ORIG)
+        if return_list:
+            return return_list
+        return None
+    
+    def on_add_device(self, device: XTDevice) -> list[str] | None:
+        return_list: list[str] = []
+        if device.id in self.sharing_account.device_ids:
+            return_list.append(TUYA_DISCOVERY_NEW)
+        if self.sharing_account.device_manager.reuse_config:
+            return_list.append(TUYA_DISCOVERY_NEW_ORIG)
+        if return_list:
+            return return_list
+        return None
     
     def on_mqtt_stop(self):
         if (

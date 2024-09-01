@@ -116,9 +116,10 @@ def append_dictionnaries(dict1: dict, dict2: dict) -> dict:
 
 def append_lists(list1: list, list2: list) -> list:
     return_list = copy.deepcopy(list(list1))
-    for item in list2:
-        if item not in return_list:
-            return_list.append(copy.deepcopy(item))
+    if list2:
+        for item in list2:
+            if item not in return_list:
+                return_list.append(copy.deepcopy(item))
     return return_list
 
 def append_sets(set1: set, set2: set) -> set:

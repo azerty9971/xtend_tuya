@@ -58,6 +58,8 @@ from ...const import (
     DOMAIN,
     MESSAGE_SOURCE_TUYA_IOT,
     LOGGER,
+    TUYA_DISCOVERY_NEW,
+    TUYA_HA_SIGNAL_UPDATE_ENTITY,
 )
 
 def get_plugin_instance() -> XTTuyaIOTDeviceManagerInterface | None:
@@ -167,8 +169,15 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
     def get_domain_identifiers_of_device(self, device_id: str) -> list:
         return [DOMAIN]
 
-    def on_add_device(self, device: XTDevice):
-        pass
+    def on_update_device(self, device: XTDevice) -> list[str] | None:
+        if device.id in self.iot_account.device_ids:
+            return [TUYA_HA_SIGNAL_UPDATE_ENTITY]
+        return None
+    
+    def on_add_device(self, device: XTDevice) -> list[str] | None:
+        if device.id in self.iot_account.device_ids:
+            return [TUYA_DISCOVERY_NEW]
+        return None
     
     def on_mqtt_stop(self):
         if self.iot_account.device_manager.mq:

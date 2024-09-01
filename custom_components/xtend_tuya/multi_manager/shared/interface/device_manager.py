@@ -63,8 +63,11 @@ class XTDeviceManagerInterface(ABC):
     def get_domain_identifiers_of_device(self, device_id: str) -> list:
         pass
 
-    def on_add_device(self, device: XTDevice):
-        pass
+    def on_update_device(self, device: XTDevice) -> list[str] | None:
+        return None
+
+    def on_add_device(self, device: XTDevice) -> list[str] | None:
+        return None
 
     def on_mqtt_stop(self):
         pass
