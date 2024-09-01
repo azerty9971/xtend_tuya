@@ -18,6 +18,10 @@ from ..multi_manager import (
     XTDevice,
 )
 
+from ...util import (
+    append_lists
+)
+
 
 class MultiDeviceListener:
     def __init__(self, hass: HomeAssistant, multi_manager: MultiManager) -> None:
@@ -25,14 +29,19 @@ class MultiDeviceListener:
         self.hass = hass
 
     def update_device(self, device: XTDevice):
-        dispatcher_send(self.hass, f"{TUYA_HA_SIGNAL_UPDATE_ENTITY_ORIG}_{device.id}")
-        dispatcher_send(self.hass, f"{TUYA_HA_SIGNAL_UPDATE_ENTITY}_{device.id}")
+        signal_list: list[str] = []
+        for account in self.multi_manager.accounts.values():
+            signal_list = append_lists(signal_list, account.on_update_device(device))
+        for signal in signal_list:
+            dispatcher_send(self.hass, f"{signal}_{device.id}")
 
     def add_device(self, device: XTDevice):
         self.hass.add_job(self.async_remove_device, device.id)
+        signal_list: list[str] = []
         for account in self.multi_manager.accounts.values():
-            account.on_add_device(device)
-        dispatcher_send(self.hass, TUYA_DISCOVERY_NEW, [device.id])
+            signal_list = append_lists(signal_list, account.on_add_device(device))
+        for signal in signal_list:
+            dispatcher_send(self.hass, signal, [device.id])
 
     def remove_device(self, device_id: str):
         #log_stack("DeviceListener => async_remove_device")
