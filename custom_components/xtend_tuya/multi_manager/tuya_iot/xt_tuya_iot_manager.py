@@ -146,7 +146,6 @@ class XTIOTDeviceManager(TuyaDeviceManager):
     def _update_device_list_info_cache(self, devIds: list[str]):
         response = self.get_device_list_info(devIds)
         result = response.get("result", {})
-        #LOGGER.warning(f"_update_device_list_info_cache => {devIds} <=> {response}")
         for item in result.get("list", []):
             device_id = item["id"]
             self.device_map[device_id] = XTDevice(**item)
@@ -200,18 +199,6 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                                 "use_open_api": True,
                                 "status_code_alias": []
                             }
-                        #Sometimes the default returned typeSpec from the regular Tuya Properties is wrong
-                        #override it with the QueryThingsDataModel one
-                        """if real_type == DPType.ENUM: #Enums should not be altered since sometimes the model is wrong about them
-                            continue
-                        devices = self.multi_manager.get_devices_from_device_id(device.id)
-                        for cur_device in devices:
-                            if dp_id in cur_device.local_strategy:
-                                cur_device.local_strategy[dp_id]["config_item"]["valueDesc"] = typeSpec_json
-                                if code in cur_device.status_range:
-                                    cur_device.status_range[code].values = typeSpec_json
-                                if code in cur_device.function:
-                                    cur_device.function[code].values = typeSpec_json"""
 
 
         if response.get("success"):
