@@ -159,8 +159,8 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
     
     def get_available_device_maps(self) -> list[dict[str, XTDevice]]:
         return_list: list[dict[str, XTDevice]] = []
-        if other_manager := self.sharing_account.device_manager.get_overriden_device_manager():
-            return_list.append(other_manager.device_map)
+        """if other_manager := self.sharing_account.device_manager.get_overriden_device_manager():
+            return_list.append(other_manager.device_map)"""
         return_list.append(self.sharing_account.device_manager.device_map)
         return return_list
     
@@ -208,6 +208,7 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
         if device.id in self.sharing_account.device_ids:
             return_list.append(TUYA_HA_SIGNAL_UPDATE_ENTITY)
         if self.sharing_account.device_manager.reuse_config:
+            self.sharing_account.device_manager.copy_statuses_to_tuya(device)
             return_list.append(TUYA_HA_SIGNAL_UPDATE_ENTITY_ORIG)
         if return_list:
             return return_list

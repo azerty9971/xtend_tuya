@@ -32,6 +32,9 @@ from ...const import (
 from ..multi_manager import (
     MultiManager,
 )
+from ..shared.device import (
+    XTDevice,
+)
 
 from .xt_tuya_sharing_device_repository import (
     XTSharingDeviceRepository
@@ -51,7 +54,7 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
         self.device_repository: XTSharingDeviceRepository = None
         self.scene_repository: SceneRepository = None
         self.user_repository: UserRepository = None
-        self.device_map: dict[str, CustomerDevice] = {}
+        self.device_map: dict[str, XTDevice] = {}
         self.user_homes: list[SmartLifeHome] = []
         self.device_listeners = set()
         self.other_device_manager = other_device_manager
@@ -80,9 +83,13 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
         self.other_device_manager = other_device_manager
     
     def get_overriden_device_manager(self) -> Manager | None:
-        if self.other_device_manager is not None:
-            return self.other_device_manager
-        return None
+        return self.other_device_manager
+    
+    def copy_statuses_to_tuya(self, device: XTDevice):
+        if other_manager := self.get_overriden_device_manager():
+            if device.id in other_manager.device_map:
+                for code in device.status:
+                    other_manager.device_map[device.id].status[code] = device.status[code]
     
     def _on_device_report(self, device_id: str, status: list):
         device = self.device_map.get(device_id, None)
@@ -92,31 +99,6 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
         status_new = self.multi_manager.multi_source_handler.filter_status_list(device_id, MESSAGE_SOURCE_TUYA_SHARING, status_new)
         status_new = self.multi_manager.virtual_state_handler.apply_virtual_states_to_status_list(device, status_new)
 
-        #DEBUG
-        device = self.device_map.get(device_id, None)
-        if not device:
-            return
-        if self.multi_manager.device_watcher.is_watched(device_id):
-            LOGGER.warning(f"mq _on_device_report-> {status}")
-        if device.support_local:
-            for item in status:
-                if "dpId" in item and "value" in item:
-                    dp_id_item = device.local_strategy[item["dpId"]]
-                    strategy_name = dp_id_item["value_convert"]
-                    config_item = dp_id_item["config_item"]
-                    dp_item = (dp_id_item["status_code"], item["value"])
-                    if self.multi_manager.device_watcher.is_watched(device_id):
-                        LOGGER.warning(
-                            f"mq _on_device_report before strategy convert strategy_name={strategy_name},dp_item={dp_item},config_item={config_item}")
-                    code, value = strategy.convert(strategy_name, dp_item, config_item)
-                    if self.multi_manager.device_watcher.is_watched(device_id):
-                        LOGGER.warning(f"mq _on_device_report after strategy convert code={code},value={value}")
-        else:
-            for item in status:
-                if "code" in item and "value" in item:
-                    code = item["code"]
-                    value = item["value"]
-        #ENDDEBUG
         super()._on_device_report(device_id, status_new)
     
     def send_commands(
