@@ -197,7 +197,8 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                                     "pid": device.product_id,
                                 },
                                 "property_update": property_update,
-                                "use_open_api": True
+                                "use_open_api": True,
+                                "status_code_alias": []
                             }
                         #Sometimes the default returned typeSpec from the regular Tuya Properties is wrong
                         #override it with the QueryThingsDataModel one
@@ -238,7 +239,8 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                                 "pid": device.product_id,
                             },
                             "property_update": property_update,
-                            "use_open_api": True
+                            "use_open_api": True,
+                            "status_code_alias": []
                         }
                 if (    "code"  in dp_property 
                     and "dp_id" in dp_property 
