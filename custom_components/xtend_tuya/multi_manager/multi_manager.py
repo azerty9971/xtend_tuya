@@ -198,8 +198,12 @@ class MultiManager:  # noqa: F811
         if not hasattr(device, "local_strategy"):
             return None
         for dpId in device.local_strategy:
-            if device.local_strategy[dpId]["status_code"] == code or code in device.local_strategy[dpId]["status_code_alias"]:
+            if device.local_strategy[dpId]["status_code"] == code:
                 return dpId
+            if "status_code_alias" in device.local_strategy[dpId] and code in device.local_strategy[dpId]["status_code_alias"]:
+                return dpId
+            elif "status_code_alias" not in device.local_strategy[dpId]:
+                LOGGER.warning(f"Device {device.name} ({device.id}) has no status_code_alias dict for dpId {dpId}, please contact the developer about this")
         return None
     
     def _read_code_from_dpId(self, dpId: int, device: XTDevice) -> str | None:
