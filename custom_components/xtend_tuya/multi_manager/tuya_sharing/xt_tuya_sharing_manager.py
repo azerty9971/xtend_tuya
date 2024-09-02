@@ -98,6 +98,7 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
         if not device:
             return
         status_new = self.multi_manager.convert_device_report_status_list(device_id, status)
+        self.multi_manager.device_watcher.report_message(f"device report {MESSAGE_SOURCE_TUYA_SHARING}: {status_new}")
         status_new = self.multi_manager.multi_source_handler.filter_status_list(device_id, MESSAGE_SOURCE_TUYA_SHARING, status_new)
         status_new = self.multi_manager.virtual_state_handler.apply_virtual_states_to_status_list(device, status_new)
 
