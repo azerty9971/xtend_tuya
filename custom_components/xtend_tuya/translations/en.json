@@ -43,8 +43,8 @@
   },
   "entity": {
     "binary_sensor": {
-      "lock_motor_state": {
-        "name": "Lock motor state"
+      "jtmspro_lock_motor_state": {
+        "name": "Lock opened"
       },
       "off_bed": {
         "name": "Out of bed"
@@ -101,9 +101,6 @@
     "button": {
       "manual_lock": {
         "name": "Manual lock"
-      },
-      "remote_no_dp_key": {
-        "name": "Remote unlock"
       },
       "reset_add_ele": {
         "name": "Reset consumption"
@@ -692,7 +689,7 @@
         }
       },
       "jtmspro_closed_opened": {
-        "name": "Open/Closed",
+        "name": "Door Open/Closed",
         "state": {
           "0": "Unknown",
           "1": "Open",

@@ -40,11 +40,6 @@ CONSUMPTION_BUTTONS: tuple[TuyaButtonEntityDescription, ...] = (
 BUTTONS: dict[str, tuple[TuyaButtonEntityDescription, ...]] = {
     "jtmspro": (
         TuyaButtonEntityDescription(
-            key=DPCode.REMOTE_NO_DP_KEY,
-            translation_key="remote_no_dp_key",
-            entity_category=EntityCategory.CONFIG,
-        ),
-        TuyaButtonEntityDescription(
             key=DPCode.MANUAL_LOCK,
             translation_key="manual_lock",
             entity_category=EntityCategory.CONFIG,

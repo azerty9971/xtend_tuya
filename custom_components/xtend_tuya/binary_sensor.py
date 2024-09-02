@@ -52,7 +52,8 @@ BINARY_SENSORS: dict[str, tuple[TuyaBinarySensorEntityDescription, ...]] = {
     "jtmspro": (
         TuyaBinarySensorEntityDescription(
             key=DPCode.LOCK_MOTOR_STATE,
-            translation_key="lock_motor_state",
+            translation_key="jtmspro_lock_motor_state",
+            device_class=BinarySensorDeviceClass.LOCK
         ),
     ),
     "msp": (
