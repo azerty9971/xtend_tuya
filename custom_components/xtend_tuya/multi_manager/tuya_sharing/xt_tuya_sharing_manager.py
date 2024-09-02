@@ -115,27 +115,5 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
     def send_lock_unlock_command(
             self, device_id: str, lock: bool
     ) -> bool:
-        supported_unlock_types: list[str] = []
-        if lock:
-            open = "false"
-        else:
-            open = "true"
-
-        remote_unlock_types = self.customer_api.get(f"/v1.0/devices/{device_id}/door-lock/remote-unlocks")
-        LOGGER.warning(f"1: {remote_unlock_types}")
-        if remote_unlock_types.get("success", False):
-            results = remote_unlock_types.get("result", [])
-            for result in results:
-                if result.get("open", False):
-                    if supported_unlock_type := result.get("remote_unlock_type", None):
-                        supported_unlock_types.append(supported_unlock_type)
-        if "remoteUnlockWithoutPwd" in supported_unlock_types:
-            ticket = self.customer_api.post(f"/v1.0/devices/{device_id}/door-lock/password-ticket")
-            LOGGER.warning(f"2: {ticket}")
-            if ticket.get("success", False):
-                result = ticket.get("result", {})
-                if ticket_id := result.get("ticket_id", None):
-                    lock_operation = self.customer_api.post(f"/v1.0/smart-lock/devices/{device_id}/password-free/door-operate", {"ticket_id": ticket_id, "open": open})
-                    LOGGER.warning(f"3: {lock_operation}")
-                    return lock_operation.get("success", False)
+        #I didn't find a way to implement this using the Sharing SDK...
         return False
