@@ -245,4 +245,5 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
     def send_lock_unlock_command(
             self, device_id: str, lock: bool
     ) -> bool:
+        return False
         return self.iot_account.device_manager.send_lock_unlock_command(device_id, lock)
