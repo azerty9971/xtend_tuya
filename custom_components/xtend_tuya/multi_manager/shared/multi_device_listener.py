@@ -32,6 +32,9 @@ class MultiDeviceListener:
         signal_list: list[str] = []
         for account in self.multi_manager.accounts.values():
             signal_list = append_lists(signal_list, account.on_update_device(device))
+        self.trigger_device_discovery(device, signal_list)
+
+    def trigger_device_discovery(self, device: XTDevice, signal_list: list[str]):
         for signal in signal_list:
             dispatcher_send(self.hass, f"{signal}_{device.id}")
 

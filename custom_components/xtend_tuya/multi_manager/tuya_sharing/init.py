@@ -146,6 +146,12 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
             new_device_ids: list[str] = [device_id for device_id in self.sharing_account.device_manager.device_map]
             self.sharing_account.device_ids.clear()
             self.sharing_account.device_ids.extend(new_device_ids)
+
+            #Copy statuses back to Tuya's device and update them if necessary
+            for device in self.sharing_account.device_manager.device_map.values():
+                if self.sharing_account.device_manager.copy_statuses_to_tuya(device):
+                    #New statuses were copied, let's rediscover the device
+                    self.multi_manager.multi_device_listener.trigger_device_discovery(device, [TUYA_DISCOVERY_NEW_ORIG])
         except Exception as exc:
             # While in general, we should avoid catching broad exceptions,
             # we have no other way of detecting this case.

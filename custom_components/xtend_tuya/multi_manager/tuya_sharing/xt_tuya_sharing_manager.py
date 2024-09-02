@@ -15,10 +15,6 @@ from tuya_sharing.home import (
     SmartLifeHome,
     HomeRepository,
 )
-from tuya_sharing.device import (
-    CustomerDevice,
-)
-from tuya_sharing.strategy import strategy
 
 from .import_stub import (
     XTSharingDeviceManager,
@@ -85,12 +81,16 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
     def get_overriden_device_manager(self) -> Manager | None:
         return self.other_device_manager
     
-    def copy_statuses_to_tuya(self, device: XTDevice):
+    def copy_statuses_to_tuya(self, device: XTDevice) -> bool:
+        added_new_statuses: bool = False
         if other_manager := self.get_overriden_device_manager():
             if device.id in other_manager.device_map:
                 for code in device.status:
+                    if code not in other_manager.device_map[device.id].status:
+                        added_new_statuses = True
                     other_manager.device_map[device.id].status[code] = device.status[code]
-    
+        return added_new_statuses
+
     def _on_device_report(self, device_id: str, status: list):
         device = self.device_map.get(device_id, None)
         if not device:
