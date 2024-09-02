@@ -53,7 +53,6 @@ class XTMergingManager:
                 device1.function[function_key] = device2.function[function_key]
 
     def _determine_most_plausible(value1: dict, value2: dict, key: str) -> int | None:
-        LOGGER.warning(f"_determine_most_plausible: {value1} <=> {value2} <=> {key}")
         if key in value1 and key in value2:
             if value1[key] == value2[key]:
                 return None
