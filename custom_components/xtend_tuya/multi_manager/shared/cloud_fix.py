@@ -9,6 +9,7 @@ from .device import (
 class CloudFixes:
     def apply_fixes(device: XTDevice):
         CloudFixes._fix_missing_local_strategy_enum_mapping_map(device)
+        CloudFixes._fix_incorrect_status_range_min_scale(device)
         CloudFixes._fix_missing_aliases_using_status_format(device)
         CloudFixes._remove_status_that_are_local_strategy_aliases(device)
 
@@ -43,7 +44,7 @@ class CloudFixes:
                                         device.function[code].values = valueDesc
                             case 1:
                                 device.function[code].values = valueDesc
-                                
+
     def _determine_most_plausible(value1: dict, value2: dict, key: str) -> int | None:
         if key in value1 and key in value2:
             if value1[key] == value2[key]:
