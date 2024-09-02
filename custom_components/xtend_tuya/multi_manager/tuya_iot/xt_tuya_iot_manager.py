@@ -200,7 +200,6 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                                 "status_code_alias": []
                             }
 
-
         if response.get("success"):
             result = response.get("result", {})
             for dp_property in result["properties"]:
