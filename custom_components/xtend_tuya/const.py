@@ -81,6 +81,7 @@ PLATFORMS = [
     Platform.FAN,
     Platform.HUMIDIFIER,
     Platform.LIGHT,
+    Platform.LOCK,
     Platform.NUMBER,
     Platform.SCENE,
     Platform.SELECT,
