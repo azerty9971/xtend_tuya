@@ -17,6 +17,7 @@ from homeassistant.components.sensor import (
 )
 from homeassistant.const import (
     UnitOfEnergy,
+    Platform,
 )
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
@@ -24,14 +25,6 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import StateType
 from homeassistant.helpers.event import async_track_time_change
 
-try:
-    from custom_components.tuya.sensor import ( # type: ignore
-        SENSORS as SENSORS_TUYA
-    )
-except ImportError:
-    from homeassistant.components.tuya.sensor import (
-        SENSORS as SENSORS_TUYA
-    )
 from .util import (
     merge_device_descriptors
 )
@@ -162,7 +155,7 @@ CONSUMPTION_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
         key=DPCode.BALANCE_ENERGY,
         translation_key="balance_energy",
         device_class=SensorDeviceClass.ENERGY,
-        state_class=SensorStateClass.TOTAL_INCREASING,
+        state_class=SensorStateClass.TOTAL,
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         entity_registry_enabled_default=True,
         restoredata=False,
@@ -245,6 +238,28 @@ HUMIDITY_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
 # end up being a sensor.
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
 SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
+    "jtmspro": (
+        TuyaSensorEntityDescription(
+            key=DPCode.ALARM_LOCK,
+            translation_key="jtmspro_alarm_lock",
+            entity_registry_enabled_default=True,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.CLOSED_OPENED,
+            translation_key="jtmspro_closed_opened",
+            entity_registry_enabled_default=True,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.CURRENT_YD,
+            translation_key="current",
+            entity_registry_enabled_default=False,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.VOL_YD,
+            translation_key="voltage",
+            entity_registry_enabled_default=False,
+        ),
+    ),
     # Switch
     # https://developer.tuya.com/en/docs/iot/s?id=K9gf7o5prgf7s
     "kg": (
@@ -539,8 +554,8 @@ async def async_setup_entry(
     hass_data = entry.runtime_data
 
     merged_descriptors = SENSORS
-    if not entry.runtime_data.multi_manager.sharing_account or not entry.runtime_data.multi_manager.sharing_account.reuse_config:
-        merged_descriptors = merge_device_descriptors(SENSORS, SENSORS_TUYA)
+    for new_descriptor in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(Platform.SENSOR):
+        merged_descriptors = merge_device_descriptors(merged_descriptors, new_descriptor)
 
     @callback
     def async_discover_device(device_map) -> None:
@@ -698,11 +713,11 @@ class TuyaSensorEntity(TuyaEntity, RestoreSensor):
                 should_reset = True
             
             if should_reset:
-                devices = self.device_manager.get_devices_from_device_id(self.device.id)
-                for device in devices:
-                    device.status[self.entity_description.key] = float(0)
-                self.entity_description.last_reset = now
-                self.async_write_ha_state()
+                if device := self.device_manager.device_map.get(self.device.id, None):
+                    if self.entity_description.key in device.status:
+                        device.status[self.entity_description.key] = float(0)
+                        self.entity_description.last_reset = now
+                        self.async_write_ha_state()
 
         if (
            ( hasattr(self.entity_description, "reset_daily") and self.entity_description.reset_daily )
@@ -725,6 +740,5 @@ class TuyaSensorEntity(TuyaEntity, RestoreSensor):
             scaled_value_back = self._type_data.scale_value_back(state.native_value)
             state.native_value = scaled_value_back
 
-        devices = self.device_manager.get_devices_from_device_id(self.device.id)
-        for device in devices:
+        if device := self.device_manager.device_map.get(self.device.id, None):
             device.status[self.entity_description.key] = float(state.native_value)

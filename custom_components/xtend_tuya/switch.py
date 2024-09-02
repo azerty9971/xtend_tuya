@@ -10,19 +10,11 @@ from homeassistant.components.switch import (
     SwitchEntity,
     SwitchEntityDescription,
 )
-from homeassistant.const import EntityCategory
+from homeassistant.const import EntityCategory, Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-try:
-    from custom_components.tuya.switch import ( # type: ignore
-        SWITCHES as SWITCHES_TUYA
-    )
-except ImportError:
-    from homeassistant.components.tuya.switch import (
-        SWITCHES as SWITCHES_TUYA
-    )
 from .util import (
     merge_device_descriptors
 )
@@ -39,16 +31,6 @@ SWITCHES: dict[str, tuple[SwitchEntityDescription, ...]] = {
         SwitchEntityDescription(
             key=DPCode.AUTOMATIC_LOCK,
             translation_key="automatic_lock",
-            entity_category=EntityCategory.CONFIG,
-        ),
-        SwitchEntityDescription(
-            key=DPCode.RTC_TIME,
-            translation_key="rtc_time",
-            entity_category=EntityCategory.CONFIG,
-        ),
-        SwitchEntityDescription(
-            key=DPCode.MANUAL_LOCK,
-            translation_key="manual_lock",
             entity_category=EntityCategory.CONFIG,
         ),
         SwitchEntityDescription(
@@ -240,8 +222,8 @@ async def async_setup_entry(
     hass_data = entry.runtime_data
 
     merged_descriptors = SWITCHES
-    if not entry.runtime_data.multi_manager.sharing_account or not entry.runtime_data.multi_manager.sharing_account.reuse_config:
-        merged_descriptors = merge_device_descriptors(SWITCHES, SWITCHES_TUYA)
+    for new_descriptor in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(Platform.SWITCH):
+        merged_descriptors = merge_device_descriptors(merged_descriptors, new_descriptor)
 
     @callback
     def async_discover_device(device_map) -> None:

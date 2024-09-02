@@ -30,11 +30,12 @@
       "init": {
         "description": "Add a Tuya OpenAPI credential to improve the compatibility with some Tuya devices",
         "data": {
+          "use_open_api": "Use OpenAPI credentials",
           "country_code": "Country",
           "access_id": "Tuya IoT Access ID",
           "access_secret": "Tuya IoT Access Secret",
-          "username": "Account",
-          "password": "Password"
+          "username": "SmartLife/Tuya account",
+          "password": "SmartLife/Tuya account password"
         },
         "title": "Add Tuya OpenAPI credentials"
       }
@@ -42,6 +43,9 @@
   },
   "entity": {
     "binary_sensor": {
+      "jtmspro_lock_motor_state": {
+        "name": "Lock status"
+      },
       "off_bed": {
         "name": "Out of bed"
       },
@@ -95,6 +99,9 @@
       }
     },
     "button": {
+      "manual_lock": {
+        "name": "Manual lock"
+      },
       "reset_add_ele": {
         "name": "Reset consumption"
       },
@@ -399,50 +406,6 @@
           "ringtone_5": "Ringtone 5"
         }
       },
-      "alarm_lock": {
-        "name": "Alarm lock",
-        "state": {
-          "0": "Wrong fingerprint",
-          "1": "Wrong password",
-          "2": "Wrong card",
-          "3": "Wrong face",
-          "4": "Bad tongue",
-          "5": "Too hot",
-          "6": "Unclosed time",
-          "7": "Tongue not out",
-          "8": "Pry",
-          "9": "Key in",
-          "10": "Low battery",
-          "11": "Power off",
-          "12": "Shock",
-          "13": "Defense",
-          "wrong_finger": "Wrong fingerprint",
-          "wrong_password": "Wrong password",
-          "wrong_card": "Wrong card",
-          "wrong_face": "Wrong face",
-          "tongue_bad": "Bad tongue",
-          "too_hot": "Too hot",
-          "unclosed_time": "Unclosed time",
-          "tongue_not_out": "Tongue not out",
-          "pry": "Pry",
-          "key_in": "Key in",
-          "low_battery": "Low battery",
-          "power_off": "Power off",
-          "shock": "Shock",
-          "defense": "Defense"
-        }
-      },
-      "closed_opened": {
-        "name": "Open/Closed",
-        "state": {
-          "0": "Unknown",
-          "1": "Open",
-          "2": "Closed",
-          "unknown": "Unknown",
-          "open": "Open",
-          "closed": "Closed"
-        }
-      },
       "cups": {
         "name": "Cups"
       },
@@ -692,6 +655,50 @@
       }
     },
     "sensor": {
+      "jtmspro_alarm_lock": {
+        "name": "Alarm lock",
+        "state": {
+          "0": "Wrong fingerprint",
+          "1": "Wrong password",
+          "2": "Wrong card",
+          "3": "Wrong face",
+          "4": "Latch stuck",
+          "5": "Too hot",
+          "6": "Not closed after timeout",
+          "7": "Deadbolt stuck",
+          "8": "Anti-pry alarm",
+          "9": "Not calibrated",
+          "10": "Low battery",
+          "11": "Battery exhausted",
+          "12": "Vibration alarm",
+          "13": "Arm alarm",
+          "wrong_finger": "Wrong fingerprint",
+          "wrong_password": "Wrong password",
+          "wrong_card": "Wrong card",
+          "wrong_face": "Wrong face",
+          "tongue_bad": "Latch stuck",
+          "too_hot": "Too hot",
+          "unclosed_time": "Not closed after timeout",
+          "tongue_not_out": "Deadbolt stuck",
+          "pry": "Anti-pry alarm",
+          "key_in": "Not calibrated",
+          "low_battery": "Low battery",
+          "power_off": "Battery exhausted",
+          "shock": "Vibration alarm",
+          "defense": "Arm alarm"
+        }
+      },
+      "jtmspro_closed_opened": {
+        "name": "Door Open/Closed",
+        "state": {
+          "0": "Unknown",
+          "1": "Open",
+          "2": "Closed",
+          "unknown": "Unknown",
+          "open": "Open",
+          "closed": "Closed"
+        }
+      },
       "temp_show":
       {
         "name": "Current temperature"
@@ -1152,9 +1159,6 @@
       },
       "rtc_lock": {
         "name": "RTC lock"
-      },
-      "manual_lock": {
-        "name": "Manual lock"
       },
       "alarm_switch": {
         "name": "Alarm switch"

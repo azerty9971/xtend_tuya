@@ -12,6 +12,7 @@ from homeassistant.components.fan import (
     FanEntity,
     FanEntityFeature,
 )
+from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -20,14 +21,6 @@ from homeassistant.util.percentage import (
     percentage_to_ordered_list_item,
 )
 
-try:
-    from custom_components.tuya.fan import ( # type: ignore
-        TUYA_SUPPORT_TYPE as TUYA_SUPPORT_TYPE_TUYA
-    )
-except ImportError:
-    from homeassistant.components.tuya.fan import (
-        TUYA_SUPPORT_TYPE as TUYA_SUPPORT_TYPE_TUYA
-    )
 from .util import (
     append_sets
 )
@@ -47,8 +40,8 @@ async def async_setup_entry(
     hass_data = entry.runtime_data
 
     merged_categories = TUYA_SUPPORT_TYPE
-    if not entry.runtime_data.multi_manager.sharing_account or not entry.runtime_data.multi_manager.sharing_account.reuse_config:
-        merged_categories = append_sets(TUYA_SUPPORT_TYPE, TUYA_SUPPORT_TYPE_TUYA)
+    for new_descriptor in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(Platform.FAN):
+        merged_categories = append_sets(merged_categories, new_descriptor)
 
     @callback
     def async_discover_device(device_map) -> None:

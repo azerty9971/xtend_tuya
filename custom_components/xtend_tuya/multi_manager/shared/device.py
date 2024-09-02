@@ -58,14 +58,26 @@ class XTDevice(SimpleNamespace):
         """If devices are the same one."""
         return self.id == other.id
 
-    def from_compatible_device(device):
-        return XTDevice(**(device.__dict__))
+    def from_compatible_device(device: Any):
+        new_device = XTDevice(**(device.__dict__))
+        
+        #Reuse the references from the original device
+        if hasattr(device, "local_strategy"):
+            new_device.local_strategy = device.local_strategy
+        if hasattr(device, "status"):
+            new_device.status = device.status
+        if hasattr(device, "function"):
+            new_device.function = device.function
+        if hasattr(device, "status_range"):
+            new_device.status_range = device.status_range
+
+        return new_device
     
-    def copy_data_from_device(source_device, dest_device) -> None:
+    """def copy_data_from_device(source_device, dest_device) -> None:
         if hasattr(source_device, "online") and hasattr(dest_device, "online"):
             dest_device.online = source_device.online
         if hasattr(source_device, "name") and hasattr(dest_device, "name"):
             dest_device.name = source_device.name
         if hasattr(source_device, "status") and hasattr(dest_device, "status"):
             for code, value in source_device.status.items():
-                dest_device.status[code] = value
+                dest_device.status[code] = value"""

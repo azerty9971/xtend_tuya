@@ -13,7 +13,7 @@ from homeassistant.components.vacuum import (
     StateVacuumEntity,
     VacuumEntityFeature,
 )
-from homeassistant.const import STATE_IDLE, STATE_PAUSED
+from homeassistant.const import STATE_IDLE, STATE_PAUSED, Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -21,6 +21,9 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from .multi_manager.multi_manager import XTConfigEntry
 from .base import EnumTypeData, IntegerTypeData, TuyaEntity
 from .const import TUYA_DISCOVERY_NEW, DPCode, DPType
+from .util import (
+    append_lists
+)
 
 TUYA_MODE_RETURN_HOME = "chargego"
 TUYA_STATUS_TO_HA = {
@@ -56,8 +59,9 @@ async def async_setup_entry(
     """Set up Tuya vacuum dynamically through Tuya discovery."""
     hass_data = entry.runtime_data
     
-    if not hass_data.multi_manager.sharing_account or hass_data.multi_manager.sharing_account.reuse_config:
-        return
+    category_list: list[str] = []
+    for new_descriptor in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(Platform.VACUUM):
+        category_list = append_lists(category_list, new_descriptor)
     
     @callback
     def async_discover_device(device_map) -> None:
@@ -66,7 +70,7 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if device.category == "sd":
+                if device.category in category_list:
                     entities.append(TuyaVacuumEntity(device, hass_data.manager))
         async_add_entities(entities)
 
