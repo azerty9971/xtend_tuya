@@ -16,13 +16,23 @@ from ..multi_manager import (
 from .multi_device_listener import (
     MultiDeviceListener,
 )
+from ...const import (
+    LOGGER,
+)
 
 class DeviceWatcher:
-    def __init__(self) -> None:
-        self.watched_dev_id = ["bf0b40e8bb7732ac1drh8t", "bf6f1f75f33555426fnips"]
-    
+    def __init__(self, multi_manager: MultiManager) -> None:
+        self.watched_dev_id = ["bff293d192d6b7e657hv1h"]
+        self.multi_manager = multi_manager
+
     def is_watched(self, dev_id: str) -> bool:
         return dev_id in self.watched_dev_id
+    
+    def report_message(self, dev_id: str, message: str):
+        if self.is_watched(dev_id):
+            if dev_id in self.multi_manager.device_map:
+                device = self.multi_manager.device_map[dev_id]
+                LOGGER.warning(f"DeviceWatcher for {device.name} ({dev_id}): {message}")
 
 @dataclass
 class XTDeviceProperties:
