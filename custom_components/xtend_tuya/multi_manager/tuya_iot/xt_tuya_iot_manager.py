@@ -15,7 +15,6 @@ from typing import Any
 
 from ...const import (
     LOGGER,
-    DPType,
     MESSAGE_SOURCE_TUYA_IOT,
 )
 
@@ -38,8 +37,11 @@ class XTIOTDeviceManager(TuyaDeviceManager):
     def __init__(self, multi_manager: MultiManager, api: TuyaOpenAPI, mq: TuyaOpenMQ) -> None:
         super().__init__(api, mq)
         mq.remove_message_listener(self.on_message)
-        mq.add_message_listener(multi_manager.on_message_from_tuya_iot)
+        mq.add_message_listener(self.forward_message_to_multi_manager)
         self.multi_manager = multi_manager
+
+    def forward_message_to_multi_manager(self, msg:str):
+        self.multi_manager.on_message(MESSAGE_SOURCE_TUYA_IOT, msg)
 
     def get_device_info(self, device_id: str) -> dict[str, Any]:
         """Get device info.
@@ -121,7 +123,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
             device = self.device_map[device_id]
             device_properties = self.get_device_properties(device)
             device_properties.merge_in_device(device)
-            self.multi_manager.apply_init_virtual_states(device)
+            self.multi_manager.virtual_state_handler.apply_init_virtual_states(device)
             self.multi_manager.allow_virtual_devices_not_set_up(device)
 
 
@@ -138,13 +140,12 @@ class XTIOTDeviceManager(TuyaDeviceManager):
             return
         status_new = self.multi_manager.convert_device_report_status_list(device_id, status)
         status_new = self.multi_manager.multi_source_handler.filter_status_list(device_id, MESSAGE_SOURCE_TUYA_IOT, status_new)
-        status_new = self.multi_manager.apply_virtual_states_to_status_list(device, status_new)
+        status_new = self.multi_manager.virtual_state_handler.apply_virtual_states_to_status_list(device, status_new)
         super()._on_device_report(device_id, status_new)
 
     def _update_device_list_info_cache(self, devIds: list[str]):
         response = self.get_device_list_info(devIds)
         result = response.get("result", {})
-        #LOGGER.warning(f"_update_device_list_info_cache => {devIds} <=> {response}")
         for item in result.get("list", []):
             device_id = item["id"]
             self.device_map[device_id] = XTDevice(**item)
@@ -159,6 +160,8 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         response = self.api.get(f"/v2.0/cloud/thing/{device.id}/shadow/properties")
         response2 = self.api.get(f"/v2.0/cloud/thing/{device.id}/model")
         if not response.get("success") or not response2.get("success"):
+            LOGGER.warning(f"Response1: {response}")
+            LOGGER.warning(f"Response1: {response2}")
             return
         
         if response2.get("success"):
@@ -193,21 +196,9 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                                     "pid": device.product_id,
                                 },
                                 "property_update": property_update,
-                                "use_open_api": True
+                                "use_open_api": True,
+                                "status_code_alias": []
                             }
-                        #Sometimes the default returned typeSpec from the regular Tuya Properties is wrong
-                        #override it with the QueryThingsDataModel one
-                        if real_type == DPType.ENUM: #Enums should not be altered since sometimes the model is wrong about them
-                            continue
-                        devices = self.multi_manager.get_devices_from_device_id(device.id)
-                        for cur_device in devices:
-                            if dp_id in cur_device.local_strategy:
-                                cur_device.local_strategy[dp_id]["config_item"]["valueDesc"] = typeSpec_json
-                                if code in cur_device.status_range:
-                                    cur_device.status_range[code].values = typeSpec_json
-                                if code in cur_device.function:
-                                    cur_device.function[code].values = typeSpec_json
-
 
         if response.get("success"):
             result = response.get("result", {})
@@ -234,7 +225,8 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                                 "pid": device.product_id,
                             },
                             "property_update": property_update,
-                            "use_open_api": True
+                            "use_open_api": True,
+                            "status_code_alias": []
                         }
                 if (    "code"  in dp_property 
                     and "dp_id" in dp_property 
@@ -258,3 +250,28 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                 #LOGGER.warning(f"send_property_update => {property_str}")
                 self.api.post(f"/v2.0/cloud/thing/{device_id}/shadow/properties/issue", {"properties": property_str}
         )
+    
+    def send_lock_unlock_command(
+            self, device_id: str, lock: bool
+    ) -> bool:
+        supported_unlock_types: list[str] = []
+        if lock:
+            open = "false"
+        else:
+            open = "true"
+
+        remote_unlock_types = self.api.get(f"/v1.0/devices/{device_id}/door-lock/remote-unlocks")
+        if remote_unlock_types.get("success", False):
+            results = remote_unlock_types.get("result", [])
+            for result in results:
+                if result.get("open", False):
+                    if supported_unlock_type := result.get("remote_unlock_type", None):
+                        supported_unlock_types.append(supported_unlock_type)
+        if "remoteUnlockWithoutPwd" in supported_unlock_types:
+            ticket = self.api.post(f"/v1.0/devices/{device_id}/door-lock/password-ticket")
+            if ticket.get("success", False):
+                result = ticket.get("result", {})
+                if ticket_id := result.get("ticket_id", None):
+                    lock_operation = self.api.post(f"/v1.0/smart-lock/devices/{device_id}/password-free/door-operate", {"ticket_id": ticket_id, "open": open})
+                    return lock_operation.get("success", False)
+        return False

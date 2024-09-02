@@ -11,19 +11,10 @@ from homeassistant.components.binary_sensor import (
     BinarySensorEntity,
     BinarySensorEntityDescription,
 )
-from homeassistant.const import EntityCategory
+from homeassistant.const import EntityCategory, Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-
-try:
-    from custom_components.tuya.binary_sensor import ( # type: ignore
-        BINARY_SENSORS as BINARY_SENSORS_TUYA
-    )
-except ImportError:
-    from homeassistant.components.tuya.binary_sensor import (
-        BINARY_SENSORS as BINARY_SENSORS_TUYA
-    )
 from .util import (
     merge_device_descriptors
 )
@@ -58,6 +49,13 @@ TAMPER_BINARY_SENSOR = TuyaBinarySensorEntityDescription(
 # end up being a binary sensor.
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
 BINARY_SENSORS: dict[str, tuple[TuyaBinarySensorEntityDescription, ...]] = {
+    "jtmspro": (
+        TuyaBinarySensorEntityDescription(
+            key=DPCode.LOCK_MOTOR_STATE,
+            translation_key="jtmspro_lock_motor_state",
+            device_class=BinarySensorDeviceClass.LOCK
+        ),
+    ),
     "msp": (
         #If 1 is reported, it will be counted once. 
         #If 0 is reported, it will not be counted
@@ -108,8 +106,8 @@ async def async_setup_entry(
     hass_data = entry.runtime_data
 
     merged_descriptors = BINARY_SENSORS
-    if not entry.runtime_data.multi_manager.sharing_account or not entry.runtime_data.multi_manager.sharing_account.reuse_config:
-        merged_descriptors = merge_device_descriptors(BINARY_SENSORS, BINARY_SENSORS_TUYA)
+    for new_descriptor in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(Platform.BINARY_SENSOR):
+        merged_descriptors = merge_device_descriptors(merged_descriptors, new_descriptor)
 
     @callback
     def async_discover_device(device_map) -> None:

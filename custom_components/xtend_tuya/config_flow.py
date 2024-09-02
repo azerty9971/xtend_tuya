@@ -32,6 +32,7 @@ from .const import (
     TUYA_RESPONSE_RESULT,
     TUYA_RESPONSE_SUCCESS,
     TUYA_SCHEMA,
+    CONF_USE_OPEN_API,
     CONF_ACCESS_ID,
     CONF_ACCESS_SECRET,
     CONF_APP_TYPE,
@@ -44,6 +45,7 @@ from .const import (
     TUYA_COUNTRIES,
     TUYA_SMART_APP,
     TUYA_RESPONSE_PLATFORM_URL,
+    LOGGER,
 )
 
 
@@ -75,7 +77,16 @@ class TuyaOptionFlow(OptionsFlow):
             CONF_USERNAME: user_input[CONF_USERNAME],
             CONF_PASSWORD: user_input[CONF_PASSWORD],
             CONF_COUNTRY_CODE: country.country_code,
+            CONF_USE_OPEN_API: user_input[CONF_USE_OPEN_API],
         }
+        if (
+               not data[CONF_USE_OPEN_API]
+        ):
+            data[CONF_ACCESS_ID] = None
+            data[CONF_ACCESS_SECRET] = None
+            data[CONF_USERNAME] = None
+            data[CONF_PASSWORD] = None
+            return {TUYA_RESPONSE_SUCCESS: True}, data
 
         for app_type in ("", TUYA_SMART_APP, SMARTLIFE_APP):
             data[CONF_APP_TYPE] = app_type
@@ -150,6 +161,10 @@ class TuyaOptionFlow(OptionsFlow):
             step_id="init",
             data_schema=vol.Schema(
                 {
+                    vol.Optional(
+                        CONF_USE_OPEN_API, 
+                        default=bool(user_input.get(CONF_ACCESS_ID, self.options.get(CONF_ACCESS_ID, "")))
+                    ): bool,
                     vol.Optional(
                         CONF_COUNTRY_CODE, 
                         default=user_input.get(CONF_COUNTRY_CODE, default_country)

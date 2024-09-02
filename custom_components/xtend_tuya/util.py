@@ -1,32 +1,18 @@
 """Utility methods for the Tuya integration."""
 
 from __future__ import annotations
-import traceback 
 import copy
 from typing import NamedTuple
 from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.entity import EntityDescription
 from .const import (
-    DPType,
     LOGGER,
-    DOMAIN_ORIG,
-)
-
-from tuya_sharing import (
-    Manager as TuyaSharingManager,
-    SharingDeviceListener,
-
 )
 
 from .multi_manager.multi_manager import (
     XTConfigEntry,
 )
-
-class TuyaIntegrationRuntimeData(NamedTuple):
-    device_manager: TuyaSharingManager
-    device_listener: SharingDeviceListener
-    generic_runtime_data: any
 
 def log_stack(message: str):
     LOGGER.debug(message, stack_info=True)
@@ -44,38 +30,12 @@ def remap_value(
         value = from_max - value + from_min
     return ((value - from_min) / (from_max - from_min)) * (to_max - to_min) + to_min
 
-def prepare_value_for_property_update(dp_item, value) -> str:
-    #LOGGER.warning(f"prepare_value_for_property_update => {dp_item} <=> {value}")
-    config_item = dp_item.get("config_item", None)
-    if config_item is not None:
-        value_type = config_item.get("valueType", None)
-        if value_type is not None:
-            if value_type == DPType.BOOLEAN:
-                if bool(value):
-                    return 'true'
-                else:
-                    return 'false'
-    return str(value)
+class ConfigEntryRuntimeData(NamedTuple):
+    device_manager: any
+    device_listener: any
+    generic_runtime_data: any
 
-def get_domain_config_entries(hass: HomeAssistant, domain: str) -> list[ConfigEntry]:
-    return hass.config_entries.async_entries(domain, False, False)
-
-def get_overriden_config_entry(hass: HomeAssistant, entry: XTConfigEntry, other_domain: str) -> ConfigEntry:
-    other_domain_config_entries = get_domain_config_entries(hass, other_domain)
-    for od_config_entry in other_domain_config_entries:
-        if entry.title == od_config_entry.title:
-            return od_config_entry
-    return None
-
-def merge_iterables(iter1, iter2):
-    for item1 in iter1:
-        if item1 not in iter2:
-            iter2[item1] = copy.deepcopy(iter1[item1])
-    for item2 in iter2:
-        if item2 not in iter1:
-            iter1[item2] = copy.deepcopy(iter2[item2])
-
-def get_tuya_integration_runtime_data(hass: HomeAssistant, entry: ConfigEntry, domain: str) -> TuyaIntegrationRuntimeData | None:
+def get_config_entry_runtime_data(hass: HomeAssistant, entry: ConfigEntry, domain: str) -> ConfigEntryRuntimeData | None:
     if not entry:
         return None
     runtime_data = None
@@ -103,14 +63,27 @@ def get_tuya_integration_runtime_data(hass: HomeAssistant, entry: ConfigEntry, d
         device_manager = entry.runtime_data.manager
         device_listener = entry.runtime_data.listener
     if device_manager:
-        return TuyaIntegrationRuntimeData(device_manager=device_manager, generic_runtime_data=runtime_data, device_listener=device_listener)
+        return ConfigEntryRuntimeData(device_manager=device_manager, generic_runtime_data=runtime_data, device_listener=device_listener)
     else:
         return None
 
-def get_overriden_tuya_integration_runtime_data(hass: HomeAssistant, entry: ConfigEntry) -> TuyaIntegrationRuntimeData | None:
-    if (overriden_config_entry := get_overriden_config_entry(hass,entry, DOMAIN_ORIG)):
-        return get_tuya_integration_runtime_data(hass, overriden_config_entry, DOMAIN_ORIG)
+def get_domain_config_entries(hass: HomeAssistant, domain: str) -> list[ConfigEntry]:
+    return hass.config_entries.async_entries(domain, False, False)
+
+def get_overriden_config_entry(hass: HomeAssistant, entry: XTConfigEntry, other_domain: str) -> ConfigEntry:
+    other_domain_config_entries = get_domain_config_entries(hass, other_domain)
+    for od_config_entry in other_domain_config_entries:
+        if entry.title == od_config_entry.title:
+            return od_config_entry
     return None
+
+def merge_iterables(iter1, iter2):
+    for item1 in iter1:
+        if item1 not in iter2:
+            iter2[item1] = copy.deepcopy(iter1[item1])
+    for item2 in iter2:
+        if item2 not in iter1:
+            iter1[item2] = copy.deepcopy(iter2[item2])
 
 def merge_device_descriptors(descriptors1, descriptors2):
     return_descriptors = copy.deepcopy(descriptors1)
@@ -143,9 +116,10 @@ def append_dictionnaries(dict1: dict, dict2: dict) -> dict:
 
 def append_lists(list1: list, list2: list) -> list:
     return_list = copy.deepcopy(list(list1))
-    for item in list2:
-        if item not in return_list:
-            return_list.append(copy.deepcopy(item))
+    if list2:
+        for item in list2:
+            if item not in return_list:
+                return_list.append(copy.deepcopy(item))
     return return_list
 
 def append_sets(set1: set, set2: set) -> set:
