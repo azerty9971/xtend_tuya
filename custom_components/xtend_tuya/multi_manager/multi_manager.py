@@ -76,7 +76,7 @@ class MultiManager:  # noqa: F811
         self.multi_device_listener: MultiDeviceListener = MultiDeviceListener(hass, self)
         self.hass = hass
         self.multi_source_handler = MultiSourceHandler(self)
-        self.device_watcher = DeviceWatcher()
+        self.device_watcher = DeviceWatcher(self)
         self.accounts: dict[str, XTDeviceManagerInterface] = {}
         self.master_device_map: dict[str, XTDevice] = {}
         self.is_ready_for_messages = False
@@ -290,14 +290,12 @@ class MultiManager:  # noqa: F811
             LOGGER.warning(f"dev_id {dev_id} not found!")
             return
         
-        if self.device_watcher.is_watched(dev_id):
-            LOGGER.warning(f"WD: on_message ({source}) => {msg}")
+        self.device_watcher.report_message(dev_id, f"on_message ({source}) => {msg}")
 
         new_message = self._convert_message_for_all_accounts(msg)
         if status_list := self._get_status_list_from_message(msg):
             self.multi_source_handler.register_status_list_from_source(dev_id, source, status_list)
-            if self.device_watcher.is_watched(dev_id):
-                LOGGER.warning(f"WD: on_message ({source}) status list => {status_list}")
+            self.device_watcher.report_message(dev_id, f"on_message ({source}) status list => {status_list}")
         
         if source in self.accounts:
             self.accounts[source].on_message(new_message)

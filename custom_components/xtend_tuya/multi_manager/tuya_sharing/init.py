@@ -147,8 +147,20 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
             self.sharing_account.device_ids.clear()
             self.sharing_account.device_ids.extend(new_device_ids)
 
+            if other_manager := self.sharing_account.device_manager.get_overriden_device_manager():
+                for device in other_manager.device_map.values():
+                    self.multi_manager.device_watcher.report_message(device.id, f"Update device cache TUYA: status: {device.status}")
+                    self.multi_manager.device_watcher.report_message(device.id, f"Update device cache TUYA: status_range: {device.status_range}")
+                    self.multi_manager.device_watcher.report_message(device.id, f"Update device cache TUYA: function: {device.function}")
+                    self.multi_manager.device_watcher.report_message(device.id, f"Update device cache TUYA: local_strategy: {device.local_strategy}")
+
             #Copy statuses back to Tuya's device and update them if necessary
             for device in self.sharing_account.device_manager.device_map.values():
+                self.multi_manager.device_watcher.report_message(device.id, f"Update device cache {MESSAGE_SOURCE_TUYA_SHARING}: status: {device.status}")
+                self.multi_manager.device_watcher.report_message(device.id, f"Update device cache {MESSAGE_SOURCE_TUYA_SHARING}: status_range: {device.status_range}")
+                self.multi_manager.device_watcher.report_message(device.id, f"Update device cache {MESSAGE_SOURCE_TUYA_SHARING}: function: {device.function}")
+                self.multi_manager.device_watcher.report_message(device.id, f"Update device cache {MESSAGE_SOURCE_TUYA_SHARING}: local_strategy: {device.local_strategy}")
+
                 if self.sharing_account.device_manager.copy_statuses_to_tuya(device):
                     #New statuses were copied, let's rediscover the device
                     self.multi_manager.multi_device_listener.trigger_device_discovery(device, [TUYA_DISCOVERY_NEW_ORIG])
