@@ -29,7 +29,7 @@ from .util import (
 # Suppress logs from the library, it logs unneeded on error
 logging.getLogger("tuya_sharing").setLevel(logging.CRITICAL)
 
-async def update_listener(hass, entry):
+async def update_listener(hass: HomeAssistant, entry: XTConfigEntry):
     """Handle options update."""
     hass.config_entries.async_schedule_reload(entry.entry_id)
 
@@ -99,7 +99,7 @@ def are_all_domain_config_loaded(hass: HomeAssistant, domain: str, current_entry
 
 def get_domain_device_map(hass: HomeAssistant, domain: str) -> dict[str, any]:
     device_map = {}
-    config_entries = hass.config_entries.async_entries(domain, False, False)
+    config_entries: XTConfigEntry = hass.config_entries.async_entries(domain, False, False)
     for config_entry in config_entries:
         runtime_data = get_config_entry_runtime_data(hass, config_entry, domain)
         for device_id in runtime_data.device_manager.device_map:
@@ -137,6 +137,4 @@ async def async_remove_entry(hass: HomeAssistant, entry: XTConfigEntry) -> None:
 
     This will revoke the credentials from Tuya.
     """
-    if not entry.multi_manager.sharing_account or not entry.multi_manager.sharing_account.reuse_config:
-        multi_manager = entry.multi_manager
-        await hass.async_add_executor_job(multi_manager.unload)
+    await hass.async_add_executor_job(entry.runtime_data.multi_manager.unload)
