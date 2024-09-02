@@ -87,7 +87,7 @@ class TuyaLockEntity(TuyaEntity, LockEntity):
         self.device_manager = device_manager
         self.last_action: str = None
 
-    @cached_property
+    @property
     def is_locked(self) -> bool | None:
         """Return true if the lock is locked."""
         is_unlocked = self._get_state_value((DPCode.LOCK_MOTOR_STATE))
@@ -98,14 +98,14 @@ class TuyaLockEntity(TuyaEntity, LockEntity):
                 self._attr_is_locked = False
         return self._attr_is_locked
     
-    @cached_property
+    @property
     def is_locking(self) -> bool | None:
         """Return true if the lock is locking."""
         if self._attr_is_locking and self.is_locked():
             self._attr_is_locking = False
         return self._attr_is_locking
 
-    @cached_property
+    @property
     def is_unlocking(self) -> bool | None:
         """Return true if the lock is unlocking."""
         if self._attr_is_unlocking and not self.is_locked():
@@ -121,13 +121,13 @@ class TuyaLockEntity(TuyaEntity, LockEntity):
     def lock(self, **kwargs: Any) -> None:
         """Lock the lock."""
         if self.device_manager.send_lock_unlock_command(self.device.id, True):
-            self._attr_is_locking = True
+            #self._attr_is_locking = True
             pass
     
     def unlock(self, **kwargs: Any) -> None:
         """Unlock the lock."""
         if self.device_manager.send_lock_unlock_command(self.device.id, False):
-            self._attr_is_unlocking = True
+            #self._attr_is_unlocking = True
             pass
     
     def open(self, **kwargs: Any) -> None:
