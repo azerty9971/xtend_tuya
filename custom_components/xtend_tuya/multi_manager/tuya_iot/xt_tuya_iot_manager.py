@@ -56,7 +56,6 @@ class XTIOTDeviceManager(TuyaDeviceManager):
             response = self.api.get(f"/v2.0/cloud/thing/{device_id}")
             if response["success"]:
                 result = response["result"]
-                #LOGGER.warning(f"Got response => {response} <=> {result}")
                 result["online"] = result["is_online"]
                 return response
     def get_device_status(self, device_id: str) -> dict[str, Any]:
@@ -74,9 +73,6 @@ class XTIOTDeviceManager(TuyaDeviceManager):
             LOGGER.warning(f"get_device_status failed, trying other method {e}")
             response = self.api.get(f"/v1.0/iot-03/devices/{device_id}/status")
             if response["success"]:
-                #result = response["result"]
-                #LOGGER.warning(f"Got response => {response} <=> {result}")
-                #result["online"] = result["is_online"]
                 return response
 
     #Copy of the Tuya original method with some minor modifications
@@ -247,7 +243,6 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         for property in properties:
             for prop_key in property:
                 property_str = f"{{\"{prop_key}\":{property[prop_key]}}}"
-                #LOGGER.warning(f"send_property_update => {property_str}")
                 self.api.post(f"/v2.0/cloud/thing/{device_id}/shadow/properties/issue", {"properties": property_str}
         )
     

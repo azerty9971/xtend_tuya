@@ -45,7 +45,7 @@ from .const import (
     TUYA_COUNTRIES,
     TUYA_SMART_APP,
     TUYA_RESPONSE_PLATFORM_URL,
-    LOGGER,
+    LOGGER,  # noqa: F401
 )
 
 

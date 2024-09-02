@@ -5,7 +5,6 @@ from ...const import (
 )
 
 def prepare_value_for_property_update(dp_item, value) -> str:
-    #LOGGER.warning(f"prepare_value_for_property_update => {dp_item} <=> {value}")
     config_item = dp_item.get("config_item", None)
     if config_item is not None:
         value_type = config_item.get("valueType", None)

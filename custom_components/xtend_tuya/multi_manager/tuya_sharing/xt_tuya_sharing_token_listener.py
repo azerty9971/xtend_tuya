@@ -8,7 +8,7 @@ from tuya_sharing.customerapi import (
 
 from ...const import (
     CONF_TOKEN_INFO,
-#    LOGGER,
+    LOGGER,  # noqa: F401
 )
 
 from homeassistant.core import HomeAssistant, callback
