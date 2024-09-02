@@ -7,7 +7,7 @@ from .device import (
 )
 
 from ...const import (
-    LOGGER,
+    LOGGER,  # noqa: F401
 )
 
 class XTMergingManager:
