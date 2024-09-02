@@ -84,20 +84,29 @@ class TuyaLockEntity(TuyaEntity, LockEntity):
         super().__init__(device, device_manager)
         self.device = device
         self.device_manager = device_manager
+        self.last_action: str = None
 
     def is_locked(self) -> bool | None:
         """Return true if the lock is locked."""
         is_unlocked = self._get_state_value((DPCode.LOCK_MOTOR_STATE))
         if is_unlocked is not None:
             if not is_unlocked:
-                if self._attr_is_locking:
-                    self._attr_is_locking = False
                 self._attr_is_locked = True
             else:
-                if self._attr_is_unlocking:
-                    self._attr_is_unlocking = False
                 self._attr_is_locked = False
         return self._attr_is_locked
+    
+    def is_locking(self) -> bool | None:
+        """Return true if the lock is locking."""
+        if self._attr_is_locking and self.is_locked():
+            self._attr_is_locking = False
+        return self._attr_is_locking
+
+    def is_unlocking(self) -> bool | None:
+        """Return true if the lock is unlocking."""
+        if self._attr_is_unlocking and not self.is_locked():
+            self._attr_is_unlocking = False
+        return self._attr_is_unlocking
 
     def _get_state_value(self, codes: tuple[DPCode, ...]) -> Any | None:
         for code in codes:
