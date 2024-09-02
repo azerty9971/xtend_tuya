@@ -241,3 +241,8 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
     def convert_to_xt_device(self, device: XTDevice) -> XTDevice:
         #Nothing to do, tuya_iot initializes XTDevice by default...
         return device
+    
+    def send_lock_unlock_command(
+            self, device_id: str, lock: bool
+    ) -> bool:
+        return self.iot_account.device_manager.send_lock_unlock_command(device_id, lock)

@@ -81,14 +81,16 @@ class TuyaLockEntity(TuyaEntity, LockEntity):
     ) -> None:
         """Init Tuya binary sensor."""
         super().__init__(device, device_manager)
+        self.device = device
+        self.device_manager = device_manager
 
     def lock(self, **kwargs: Any) -> None:
         """Lock the lock."""
-        raise NotImplementedError
+        self.device_manager.send_lock_unlock_command(self.device.id, True)
     
     def unlock(self, **kwargs: Any) -> None:
         """Unlock the lock."""
-        raise NotImplementedError
+        self.device_manager.send_lock_unlock_command(self.device.id, False)
     
     def open(self, **kwargs: Any) -> None:
         """Open the door latch."""
