@@ -30,8 +30,8 @@ class XTMergingManager:
         for function_key in device1.function:
             if function_key in device2.function:
                 #determine the most plausible correct function
-                value1 = device1.function[function_key].values
-                value2 = device2.function[function_key].values
+                value1 = json.loads(device1.function[function_key].values)
+                value2 = json.loads(device2.function[function_key].values)
                 match XTMergingManager._determine_most_plausible(value1, value2, "scale"):
                     case None:
                         match XTMergingManager._determine_most_plausible(value1, value2, "min"):
@@ -73,8 +73,8 @@ class XTMergingManager:
         for status_range_key in device1.status_range:
             if status_range_key in device2.status_range:
                 #determine the most plausible correct status_range
-                value1 = device1.status_range[status_range_key].values
-                value2 = device2.status_range[status_range_key].values
+                value1 = json.loads(device1.status_range[status_range_key].values)
+                value2 = json.loads(device2.status_range[status_range_key].values)
                 match XTMergingManager._determine_most_plausible(value1, value2, "scale"):
                     case None:
                         match XTMergingManager._determine_most_plausible(value1, value2, "min"):
