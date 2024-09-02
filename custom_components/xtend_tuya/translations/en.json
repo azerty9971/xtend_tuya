@@ -44,7 +44,7 @@
   "entity": {
     "binary_sensor": {
       "jtmspro_lock_motor_state": {
-        "name": "Lock opened"
+        "name": "Lock status"
       },
       "off_bed": {
         "name": "Out of bed"
