@@ -249,6 +249,7 @@ class DPCode(StrEnum):
     COUNTDOWN_SET = "countdown_set"  # Countdown setting
     CRY_DETECTION_SWITCH = "cry_detection_switch"
     CUP_NUMBER = "cup_number"  # NUmber of cups
+    CURRENT_YD = "current_yd"
     CUR_CURRENT = "cur_current"  # Actual current
     CUR_POWER = "cur_power"  # Actual power
     CUR_VOLTAGE = "cur_voltage"  # Actual voltage
@@ -328,6 +329,7 @@ class DPCode(StrEnum):
     LIQUID_LEVEL_PERCENT = "liquid_level_percent"
     LIQUID_STATE = "liquid_state"
     LOCK = "lock"  # Lock / Child lock
+    LOCK_MOTOR_STATE = "lock_motor_state"
     MASTER_MODE = "master_mode"  # alarm mode
     MACH_OPERATE = "mach_operate"
     MAGNETNUM = "magnetNum"
@@ -399,6 +401,7 @@ class DPCode(StrEnum):
     RELAY_STATUS = "relay_status"
     REMAININGTIME = "RemainingTime"
     REMAIN_TIME = "remain_time"
+    REMOTE_NO_DP_KEY = "remote_no_dp_key"
     RESET_ADD_ELE = "reset_add_ele"
     RESET_DUSTER_CLOTH = "reset_duster_cloth"
     RESET_EDGE_BRUSH = "reset_edge_brush"
@@ -519,6 +522,7 @@ class DPCode(StrEnum):
     VOICE_SWITCH = "voice_switch"
     VOICE_TIMES = "voice_times"
     VOLUME_SET = "volume_set"
+    VOL_YD = "vol_yd"
     WAKEUP = "wakeup"
     WARM = "warm"  # Heat preservation
     WARM_TIME = "warm_time"  # Heat preservation time

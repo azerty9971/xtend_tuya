@@ -238,6 +238,28 @@ HUMIDITY_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
 # end up being a sensor.
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
 SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
+    "jtmspro": (
+        TuyaSensorEntityDescription(
+            key=DPCode.ALARM_LOCK,
+            translation_key="jtmspro_alarm_lock",
+            entity_registry_enabled_default=True,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.CLOSED_OPENED,
+            translation_key="jtmspro_closed_opened",
+            entity_registry_enabled_default=True,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.CURRENT_YD,
+            translation_key="current",
+            entity_registry_enabled_default=True,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.VOL_YD,
+            translation_key="voltage",
+            entity_registry_enabled_default=True,
+        ),
+    ),
     # Switch
     # https://developer.tuya.com/en/docs/iot/s?id=K9gf7o5prgf7s
     "kg": (
