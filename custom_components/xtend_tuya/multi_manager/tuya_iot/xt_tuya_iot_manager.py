@@ -250,3 +250,30 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                 #LOGGER.warning(f"send_property_update => {property_str}")
                 self.api.post(f"/v2.0/cloud/thing/{device_id}/shadow/properties/issue", {"properties": property_str}
         )
+    
+    def send_lock_unlock_command(
+            self, device_id: str, lock: bool
+    ) -> bool:
+        supported_unlock_types: str = None
+        if lock:
+            open = "false"
+        else:
+            open = "true"
+
+        remote_unlock_types = self.api.get(f"/v1.0/devices/{device_id}/door-lock/remote-unlocks")
+        LOGGER.warning(f"send_lock_unlock_command1: {remote_unlock_types}")
+        if remote_unlock_types.get("success", False):
+            result = remote_unlock_types.get("result", {})
+            if result.get("open", False):
+                supported_unlock_types = result.get("remote_unlock_type", None)
+        match supported_unlock_types:
+            case "remoteUnlockWithoutPwd":
+                ticket = self.api.post(f"/v1.0/devices/{device_id}/door-lock/password-ticket")
+                if ticket.get("success", False):
+                    result = ticket.get("result", {})
+                    if ticket_id := result.get("ticket_id", None):
+                        lock_operation = self.api.post(f"/v1.0/smart-lock/devices/{device_id}/password-free/door-operate", {"ticket_id": ticket_id, "open": open})
+                        return lock_operation.get("success", False)
+            case "remoteUnlockWithPwd":
+                return False
+        return False

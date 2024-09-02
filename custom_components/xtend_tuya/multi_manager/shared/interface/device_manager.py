@@ -54,6 +54,11 @@ class XTDeviceManagerInterface(ABC):
             self, device_id: str, stream_type: Literal["flv", "hls", "rtmp", "rtsp"]
     ) -> Optional[str]:
         pass
+
+    def send_lock_unlock_command(
+            self, device_id: str, lock: bool
+    ) -> bool:
+        return False
     
     @abstractmethod
     def get_device_registry_identifiers(self) -> list:
