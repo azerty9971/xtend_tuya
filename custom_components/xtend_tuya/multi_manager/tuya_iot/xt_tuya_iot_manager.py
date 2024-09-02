@@ -254,7 +254,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
     def send_lock_unlock_command(
             self, device_id: str, lock: bool
     ) -> bool:
-        supported_unlock_types: str = None
+        supported_unlock_types: list[str] = []
         if lock:
             open = "false"
         else:
@@ -263,17 +263,16 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         remote_unlock_types = self.api.get(f"/v1.0/devices/{device_id}/door-lock/remote-unlocks")
         LOGGER.warning(f"send_lock_unlock_command1: {remote_unlock_types}")
         if remote_unlock_types.get("success", False):
-            result = remote_unlock_types.get("result", {})
-            if result.get("open", False):
-                supported_unlock_types = result.get("remote_unlock_type", None)
-        match supported_unlock_types:
-            case "remoteUnlockWithoutPwd":
-                ticket = self.api.post(f"/v1.0/devices/{device_id}/door-lock/password-ticket")
-                if ticket.get("success", False):
-                    result = ticket.get("result", {})
-                    if ticket_id := result.get("ticket_id", None):
-                        lock_operation = self.api.post(f"/v1.0/smart-lock/devices/{device_id}/password-free/door-operate", {"ticket_id": ticket_id, "open": open})
-                        return lock_operation.get("success", False)
-            case "remoteUnlockWithPwd":
-                return False
+            results = remote_unlock_types.get("result", [])
+            for result in results:
+                if result.get("open", False):
+                    if supported_unlock_type := result.get("remote_unlock_type", None):
+                        supported_unlock_types.append(supported_unlock_type)
+        if "remoteUnlockWithoutPwd" in supported_unlock_types:
+            ticket = self.api.post(f"/v1.0/devices/{device_id}/door-lock/password-ticket")
+            if ticket.get("success", False):
+                result = ticket.get("result", {})
+                if ticket_id := result.get("ticket_id", None):
+                    lock_operation = self.api.post(f"/v1.0/smart-lock/devices/{device_id}/password-free/door-operate", {"ticket_id": ticket_id, "open": open})
+                    return lock_operation.get("success", False)
         return False
