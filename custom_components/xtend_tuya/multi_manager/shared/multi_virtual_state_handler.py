@@ -136,7 +136,9 @@ class XTVirtualStateHandler:
                                 status.append(new_status)
             
             if virtual_state.virtual_state_value == VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD:
-                if virtual_state.key not in device.status or device.status[virtual_state.key] is None:
+                if virtual_state.key not in device.status:
+                    continue
+                if device.status[virtual_state.key] is None:
                     device.status[virtual_state.key] = 0
                 if virtual_state.key in device.status:
                     for item in status:
