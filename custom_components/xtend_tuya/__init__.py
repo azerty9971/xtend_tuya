@@ -34,7 +34,6 @@ async def update_listener(hass: HomeAssistant, entry: XTConfigEntry):
     hass.config_entries.async_schedule_reload(entry.entry_id)
 
 async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
-    #LOGGER.warning(f"async_setup_entry {entry.title} : {entry.data}")
     """Async setup hass config entry.""" 
     multi_manager = MultiManager(hass)
     await multi_manager.setup_entry(hass, entry)
@@ -121,7 +120,6 @@ def is_device_in_domain_device_maps(hass: HomeAssistant, domains: list[str], dev
     return False
 
 async def async_unload_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
-    #LOGGER.warning(f"async_unload_entry {entry.title} : {entry.data}")
     """Unloading the Tuya platforms."""
     if unload_ok := await hass.config_entries.async_unload_platforms(entry, PLATFORMS):
         tuya = entry.runtime_data
@@ -132,7 +130,6 @@ async def async_unload_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
 
 
 async def async_remove_entry(hass: HomeAssistant, entry: XTConfigEntry) -> None:
-    #LOGGER.warning(f"async_remove_entry {entry.title} : {entry.data}")
     """Remove a config entry.
 
     This will revoke the credentials from Tuya.

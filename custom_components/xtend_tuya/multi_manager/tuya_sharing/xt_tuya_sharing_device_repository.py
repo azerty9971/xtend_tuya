@@ -11,7 +11,7 @@ from tuya_sharing.device import (
 )
 
 from ...const import (
-#    LOGGER,
+    LOGGER,  # noqa: F401
     DPType,
 )
 
@@ -61,9 +61,6 @@ class XTSharingDeviceRepository(DeviceRepository):
             device.support_local = support_local
             #if support_local:                      #CHANGED
             device.local_strategy = dp_id_map       #CHANGED
-
-            #LOGGER.debug(
-            #    f"device status strategy dev_id = {device_id} support_local = {support_local} local_strategy = {dp_id_map}")
 
     def update_device_strategy_info(self, device: CustomerDevice):
         #super().update_device_strategy_info(device)
