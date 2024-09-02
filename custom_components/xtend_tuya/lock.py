@@ -13,7 +13,7 @@ from homeassistant.const import Platform
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 
 from .const import (
-    DPCode,
+    LOGGER,  # noqa: F401
     TUYA_DISCOVERY_NEW,
 )
 from .util import (
@@ -43,6 +43,7 @@ async def async_setup_entry(
     """Set up Tuya binary sensor dynamically through Tuya discovery."""
     hass_data = entry.runtime_data
 
+    LOGGER.warning("Loading locks")
     merged_descriptors = LOCKS
     for new_descriptor in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(Platform.LOCK):
         merged_descriptors = append_sets(merged_descriptors, new_descriptor)
@@ -54,7 +55,8 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if device and device.category in merged_descriptors:
+                if device.category in merged_descriptors:
+                    LOGGER.warning(f"Adding LOCK device {device.name}")
                     entities.append(TuyaLockEntity(
                                     device, hass_data.manager
                                 ))
