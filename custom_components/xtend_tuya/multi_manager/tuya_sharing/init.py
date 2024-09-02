@@ -160,10 +160,6 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
                 self.multi_manager.device_watcher.report_message(device.id, f"Update device cache {MESSAGE_SOURCE_TUYA_SHARING}: status_range: {device.status_range}", device)
                 self.multi_manager.device_watcher.report_message(device.id, f"Update device cache {MESSAGE_SOURCE_TUYA_SHARING}: function: {device.function}", device)
                 self.multi_manager.device_watcher.report_message(device.id, f"Update device cache {MESSAGE_SOURCE_TUYA_SHARING}: local_strategy: {device.local_strategy}", device)
-
-                if self.sharing_account.device_manager.copy_statuses_to_tuya(device):
-                    #New statuses were copied, let's rediscover the device
-                    self.multi_manager.multi_device_listener.trigger_device_discovery(device, [TUYA_DISCOVERY_NEW_ORIG])
         except Exception as exc:
             # While in general, we should avoid catching broad exceptions,
             # we have no other way of detecting this case.
@@ -252,6 +248,10 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
     def on_post_setup(self):
         if self.sharing_account.ha_tuya_integration_config_manager:
             decorate_tuya_integration(self.sharing_account.ha_tuya_integration_config_manager)
+        for device in self.sharing_account.device_manager.device_map.values():
+            if self.sharing_account.device_manager.copy_statuses_to_tuya(device):
+                #New statuses were copied, let's rediscover the device
+                self.multi_manager.multi_device_listener.trigger_device_discovery(device, [TUYA_DISCOVERY_NEW_ORIG])
     
     def get_platform_descriptors_to_merge(self, platform: Platform) -> Any:
         if self.sharing_account.device_manager.reuse_config:
