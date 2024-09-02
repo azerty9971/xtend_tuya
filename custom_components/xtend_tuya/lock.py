@@ -102,7 +102,7 @@ class TuyaLockEntity(TuyaEntity, LockEntity):
     @property
     def is_locking(self) -> bool | None:
         """Return true if the lock is locking."""
-        is_locked = self.is_locked
+        is_locked = self.is_locked()
         if self._attr_is_locking and is_locked:
             self._attr_is_locking = False
         return self._attr_is_locking
@@ -110,7 +110,7 @@ class TuyaLockEntity(TuyaEntity, LockEntity):
     @property
     def is_unlocking(self) -> bool | None:
         """Return true if the lock is unlocking."""
-        is_locked = self.is_locked
+        is_locked = self.is_locked()
         if self._attr_is_unlocking and not is_locked:
             self._attr_is_unlocking = False
         return self._attr_is_unlocking
