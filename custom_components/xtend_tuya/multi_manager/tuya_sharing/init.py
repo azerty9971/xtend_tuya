@@ -103,7 +103,6 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
         ha_tuya_integration_config_manager: XTHATuyaIntegrationConfigEntryManager = None
         #See if our current entry is an override of a Tuya integration entry
         tuya_integration_runtime_data = get_overriden_tuya_integration_runtime_data(hass, config_entry)
-        reuse_config = False
         if tuya_integration_runtime_data:
             #We are using an override of the Tuya integration
             sharing_device_manager = XTSharingDeviceManager(multi_manager=self.multi_manager, other_device_manager=tuya_integration_runtime_data.device_manager)
@@ -114,7 +113,6 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
             sharing_device_manager.customer_api     = tuya_integration_runtime_data.device_manager.customer_api
             tuya_integration_runtime_data.device_manager.device_listeners.clear()
             #self.convert_tuya_devices_to_xt(tuya_integration_runtime_data.device_manager)
-            reuse_config = True
         else:
             #We are using XT as a standalone integration
             sharing_device_manager = XTSharingDeviceManager(multi_manager=self.multi_manager, other_device_manager=None)
@@ -128,7 +126,6 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
                 token_listener,
             )
             sharing_device_manager.mq = None
-        sharing_device_manager.reuse_config = reuse_config
         sharing_device_manager.home_repository = HomeRepository(sharing_device_manager.customer_api)
         sharing_device_manager.device_repository = XTSharingDeviceRepository(sharing_device_manager.customer_api, sharing_device_manager, self.multi_manager)
         sharing_device_manager.scene_repository = SceneRepository(sharing_device_manager.customer_api)
