@@ -48,7 +48,7 @@ async def async_setup_entry(
 
     merged_categories = HUMIDIFIERS
     for new_descriptor in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(Platform.HUMIDIFIER):
-        merged_categories = append_dictionnaries(HUMIDIFIERS, new_descriptor)
+        merged_categories = append_dictionnaries(merged_categories, new_descriptor)
 
     @callback
     def async_discover_device(device_map) -> None:

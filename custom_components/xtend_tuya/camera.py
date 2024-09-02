@@ -33,7 +33,7 @@ async def async_setup_entry(
 
     merged_categories = CAMERAS
     for new_descriptor in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(Platform.CAMERA):
-        merged_categories = tuple(append_lists(CAMERAS, new_descriptor))
+        merged_categories = tuple(append_lists(merged_categories, new_descriptor))
 
     @callback
     def async_discover_device(device_map) -> None:
