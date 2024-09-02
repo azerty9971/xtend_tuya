@@ -5,7 +5,6 @@ from typing import Optional, Literal, Any, overload
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady
-from homeassistant.helpers import device_registry as dr
 
 from tuya_sharing import (
     CustomerDevice,

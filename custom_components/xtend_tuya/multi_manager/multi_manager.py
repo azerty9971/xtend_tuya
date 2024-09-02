@@ -376,11 +376,11 @@ class MultiManager:  # noqa: F811
             if stream_allocate := account.get_device_stream_allocate(device_id, stream_type):
                 LOGGER.warning(f"get_device_stream_allocate: {stream_allocate}")
                 return stream_allocate
+
     def send_lock_unlock_command(
             self, device_id: str, lock: bool
     ) -> bool:
         for account in self.accounts.values():
             if account.send_lock_unlock_command(device_id, lock):
-                LOGGER.warning("send_lock_unlock_command: OK")
                 return True
         return False
