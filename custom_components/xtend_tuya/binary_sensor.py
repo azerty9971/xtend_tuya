@@ -49,6 +49,12 @@ TAMPER_BINARY_SENSOR = TuyaBinarySensorEntityDescription(
 # end up being a binary sensor.
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
 BINARY_SENSORS: dict[str, tuple[TuyaBinarySensorEntityDescription, ...]] = {
+    "jtmspro": (
+        TuyaBinarySensorEntityDescription(
+            key=DPCode.LOCK_MOTOR_STATE,
+            translation_key="lock_motor_state",
+        ),
+    ),
     "msp": (
         #If 1 is reported, it will be counted once. 
         #If 0 is reported, it will not be counted

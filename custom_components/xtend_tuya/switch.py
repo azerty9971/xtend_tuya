@@ -34,16 +34,6 @@ SWITCHES: dict[str, tuple[SwitchEntityDescription, ...]] = {
             entity_category=EntityCategory.CONFIG,
         ),
         SwitchEntityDescription(
-            key=DPCode.RTC_TIME,
-            translation_key="rtc_time",
-            entity_category=EntityCategory.CONFIG,
-        ),
-        SwitchEntityDescription(
-            key=DPCode.MANUAL_LOCK,
-            translation_key="manual_lock",
-            entity_category=EntityCategory.CONFIG,
-        ),
-        SwitchEntityDescription(
             key=DPCode.ALARM_SWITCH,
             translation_key="alarm_switch",
             entity_category=EntityCategory.CONFIG,

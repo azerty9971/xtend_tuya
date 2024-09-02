@@ -29,11 +29,6 @@ SELECTS: dict[str, tuple[SelectEntityDescription, ...]] = {
             entity_category=EntityCategory.CONFIG,
         ),
         SelectEntityDescription(
-            key=DPCode.SPECIAL_FUNCTION,
-            translation_key="special_function",
-            entity_category=EntityCategory.CONFIG,
-        ),
-        SelectEntityDescription(
             key=DPCode.ALARM_VOLUME,
             translation_key="alarm_volume",
             entity_category=EntityCategory.CONFIG,
@@ -41,16 +36,6 @@ SELECTS: dict[str, tuple[SelectEntityDescription, ...]] = {
         SelectEntityDescription(
             key=DPCode.SOUND_MODE,
             translation_key="sound_mode",
-            entity_category=EntityCategory.CONFIG,
-        ),
-        SelectEntityDescription(
-            key=DPCode.ALARM_LOCK,
-            translation_key="alarm_lock",
-            entity_category=EntityCategory.CONFIG,
-        ),
-        SelectEntityDescription(
-            key=DPCode.CLOSED_OPENED,
-            translation_key="close_opened",
             entity_category=EntityCategory.CONFIG,
         ),
     ),
