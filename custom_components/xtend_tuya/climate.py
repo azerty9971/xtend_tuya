@@ -62,7 +62,7 @@ async def async_setup_entry(
     
     merged_descriptions = CLIMATE_DESCRIPTIONS
     for new_descriptor in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(Platform.CLIMATE):
-        merged_descriptions = append_dictionnaries(CLIMATE_DESCRIPTIONS, new_descriptor)
+        merged_descriptions = append_dictionnaries(merged_descriptions, new_descriptor)
 
     @callback
     def async_discover_device(device_map) -> None:

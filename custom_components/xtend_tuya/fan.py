@@ -41,7 +41,7 @@ async def async_setup_entry(
 
     merged_categories = TUYA_SUPPORT_TYPE
     for new_descriptor in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(Platform.FAN):
-        merged_categories = append_sets(TUYA_SUPPORT_TYPE, new_descriptor)
+        merged_categories = append_sets(merged_categories, new_descriptor)
 
     @callback
     def async_discover_device(device_map) -> None:
