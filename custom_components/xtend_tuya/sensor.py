@@ -252,12 +252,12 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
         TuyaSensorEntityDescription(
             key=DPCode.CURRENT_YD,
             translation_key="current",
-            entity_registry_enabled_default=True,
+            entity_registry_enabled_default=False,
         ),
         TuyaSensorEntityDescription(
             key=DPCode.VOL_YD,
             translation_key="voltage",
-            entity_registry_enabled_default=True,
+            entity_registry_enabled_default=False,
         ),
     ),
     # Switch
