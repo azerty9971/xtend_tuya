@@ -54,8 +54,13 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
         self.user_homes: list[SmartLifeHome] = []
         self.device_listeners = set()
         self.other_device_manager = other_device_manager
-        self.reuse_config = False
     
+    @property
+    def reuse_config(self) -> bool:
+        if self.other_device_manager:
+            return True
+        return False
+
     def forward_message_to_multi_manager(self, msg:str):
         self.multi_manager.on_message(MESSAGE_SOURCE_TUYA_SHARING, msg)
 

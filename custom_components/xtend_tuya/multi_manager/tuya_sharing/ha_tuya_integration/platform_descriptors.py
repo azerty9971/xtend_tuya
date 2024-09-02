@@ -37,6 +37,8 @@ def get_tuya_platform_descriptors(platform: Platform) -> Any:
             return HUMIDIFIERS_TUYA
         case Platform.LIGHT:
             return LIGHTS_TUYA
+        case Platform.LOCK:
+            return []
         case Platform.NUMBER:
             return NUMBERS_TUYA
         case Platform.SELECT:
