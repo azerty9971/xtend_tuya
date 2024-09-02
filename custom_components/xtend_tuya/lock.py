@@ -87,7 +87,6 @@ class TuyaLockEntity(TuyaEntity, LockEntity):
         self.device_manager = device_manager
         self.last_action: str = None
 
-    @property
     def is_locked(self) -> bool | None:
         """Return true if the lock is locked."""
         is_unlocked = self._get_state_value((DPCode.LOCK_MOTOR_STATE))
