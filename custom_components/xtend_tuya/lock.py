@@ -15,6 +15,7 @@ from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from .const import (
     LOGGER,  # noqa: F401
     TUYA_DISCOVERY_NEW,
+    DPCode,
 )
 from .util import (
     append_sets
@@ -84,13 +85,33 @@ class TuyaLockEntity(TuyaEntity, LockEntity):
         self.device = device
         self.device_manager = device_manager
 
+    def is_locked(self) -> bool | None:
+        """Return true if the lock is locked."""
+        is_unlocked = self._get_state_value((DPCode.LOCK_MOTOR_STATE))
+        if not is_unlocked:
+            if self._attr_is_locking:
+                self._attr_is_locking = False
+            self._attr_is_locked = True
+        else:
+            if self._attr_is_unlocking:
+                self._attr_is_unlocking = False
+        return self._attr_is_locked
+
+    def _get_state_value(self, codes: tuple[DPCode, ...]) -> Any | None:
+        for code in codes:
+            if code in self.device.status:
+                return self.device.status[code]
+        return None
+
     def lock(self, **kwargs: Any) -> None:
         """Lock the lock."""
-        self.device_manager.send_lock_unlock_command(self.device.id, True)
+        if self.device_manager.send_lock_unlock_command(self.device.id, True):
+            self._attr_is_locking = True
     
     def unlock(self, **kwargs: Any) -> None:
         """Unlock the lock."""
-        self.device_manager.send_lock_unlock_command(self.device.id, False)
+        if self.device_manager.send_lock_unlock_command(self.device.id, False):
+            self._attr_is_unlocking = True
     
     def open(self, **kwargs: Any) -> None:
         """Open the door latch."""
