@@ -23,6 +23,14 @@ except ImportError:
         BUTTONS as BUTTONS_TUYA  # noqa: F401
     )
 try:
+    from custom_components.tuya.camera import ( # type: ignore
+        CAMERAS as CAMERAS_TUYA  # noqa: F401
+    )
+except ImportError:
+    from homeassistant.components.tuya.camera import (
+        CAMERAS as CAMERAS_TUYA  # noqa: F401
+    )
+try:
     from custom_components.tuya.climate import ( # type: ignore
         CLIMATE_DESCRIPTIONS as CLIMATE_DESCRIPTIONS_TUYA
     )

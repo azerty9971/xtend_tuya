@@ -7,6 +7,7 @@ from .tuya_integration_imports import (
     ALARM_TUYA,
     BINARY_SENSORS_TUYA,
     BUTTONS_TUYA,
+    CAMERAS_TUYA,
     CLIMATE_DESCRIPTIONS_TUYA,
     COVERS_TUYA,
     FANS_TUYA,
@@ -27,6 +28,8 @@ def get_tuya_platform_descriptors(platform: Platform) -> Any:
             return BINARY_SENSORS_TUYA
         case Platform.BUTTON:
             return BUTTONS_TUYA
+        case Platform.CAMERA:
+            return CAMERAS_TUYA
         case Platform.CLIMATE:
             return CLIMATE_DESCRIPTIONS_TUYA
         case Platform.COVER:

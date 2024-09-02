@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Any
-from functools import cached_property
 
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.components.lock import (
