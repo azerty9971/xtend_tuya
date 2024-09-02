@@ -117,8 +117,9 @@ class TuyaLockEntity(TuyaEntity, LockEntity):
 
     def _get_state_value(self, codes: tuple[DPCode, ...]) -> Any | None:
         for code in codes:
+            LOGGER.warning(f"Searching for code : {code} format {str(code)}")
             if str(code) in self.device.status:
-                return self.device.status[code]
+                return self.device.status[str(code)]
         return None
 
     def lock(self, **kwargs: Any) -> None:
