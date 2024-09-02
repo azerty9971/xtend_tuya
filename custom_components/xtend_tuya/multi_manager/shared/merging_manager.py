@@ -25,6 +25,22 @@ class XTMergingManager:
     def _merge_function(device1: XTDevice, device2: XTDevice):
         for function_key in device1.function:
             if function_key in device2.function:
+                #determine the most plausible correct function
+                value1 = device1.function[function_key].values
+                value2 = device2.function[function_key].values
+                match XTMergingManager._determine_most_plausible(value1, value2, "scale"):
+                    case None:
+                        match XTMergingManager._determine_most_plausible(value1, value2, "min"):
+                            case None:
+                                pass
+                            case 1:
+                                device2.function[function_key].values = device1.function[function_key].values
+                            case 2:
+                                device1.function[function_key].values = device2.function[function_key].values
+                    case 1:
+                        device2.function[function_key].values = device1.function[function_key].values
+                    case 2:
+                        device1.function[function_key].values = device2.function[function_key].values
                 XTMergingManager._merge_dict(device1.function[function_key].values, device2.function[function_key].values)
             else:
                 device2.function[function_key] = device1.function[function_key]
@@ -32,8 +48,47 @@ class XTMergingManager:
             if function_key not in device1.function:
                 device1.function[function_key] = device2.function[function_key]
 
+    def _determine_most_plausible(value1: dict, value2: dict, key: str) -> int | None:
+        if key in value1 and key in value2:
+            if value1[key] == value2[key]:
+                return None
+            if not value1[key]:
+                return 2
+            if not value2[key]:
+                return 1
+            return None
+
+        elif key in value1:
+            return 1
+        elif key in value2:
+            return 2
+        return None
+
     def _merge_status_range(device1: XTDevice, device2: XTDevice):
-        XTMergingManager._merge_dict(device1.status_range, device2.status_range)
+        for status_range_key in device1.status_range:
+            if status_range_key in device2.status_range:
+                #determine the most plausible correct status_range
+                value1 = device1.status_range[status_range_key].values
+                value2 = device2.status_range[status_range_key].values
+                match XTMergingManager._determine_most_plausible(value1, value2, "scale"):
+                    case None:
+                        match XTMergingManager._determine_most_plausible(value1, value2, "min"):
+                            case None:
+                                pass
+                            case 1:
+                                device2.status_range[status_range_key].values = device1.status_range[status_range_key].values
+                            case 2:
+                                device1.status_range[status_range_key].values = device2.status_range[status_range_key].values
+                    case 1:
+                        device2.status_range[status_range_key].values = device1.status_range[status_range_key].values
+                    case 2:
+                        device1.status_range[status_range_key].values = device2.status_range[status_range_key].values
+                XTMergingManager._merge_dict(device1.status_range[status_range_key].values, device2.status_range[status_range_key].values)
+            else:
+                device2.status_range[status_range_key] = device1.status_range[status_range_key]
+        for status_range_key in device2.status_range:
+            if status_range_key not in device1.status_range:
+                device1.status_range[status_range_key] = device2.status_range[status_range_key]
     
     def _merge_local_strategy(device1: XTDevice, device2: XTDevice):
         for dpId in device1.local_strategy:
