@@ -9,11 +9,11 @@ from .device import (
 class CloudFixes:
     def apply_fixes(device: XTDevice):
         CloudFixes._fix_missing_local_strategy_enum_mapping_map(device)
-        CloudFixes._fix_incorrect_status_range_min_scale(device)
+        CloudFixes._fix_incorrect_status_range_scale(device)
         CloudFixes._fix_missing_aliases_using_status_format(device)
         CloudFixes._remove_status_that_are_local_strategy_aliases(device)
 
-    def _fix_incorrect_status_range_min_scale(device: XTDevice):
+    def _fix_incorrect_status_range_scale(device: XTDevice):
         for local_strategy in device.local_strategy.values():
             if "status_code" not in local_strategy:
                 continue

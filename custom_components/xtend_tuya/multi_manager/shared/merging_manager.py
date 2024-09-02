@@ -138,6 +138,22 @@ class XTMergingManager:
 
     def _merge_config_item(conf1: dict, conf2: dict):
         XTMergingManager._merge_json_dict(conf2, conf1, "statusFormat")
+        if "valueDesc" in conf1 and "valueDesc" in conf2:
+            value1 = json.loads(conf1["valueDesc"])
+            value2 = json.loads(conf2["valueDesc"])
+            match XTMergingManager._determine_most_plausible(value1, value2, "scale"):
+                case None:
+                    match XTMergingManager._determine_most_plausible(value1, value2, "min"):
+                        case None:
+                            pass
+                        case 1:
+                            conf2["valueDesc"] = conf1["valueDesc"]
+                        case 2:
+                            conf1["valueDesc"] = conf2["valueDesc"]
+                case 1:
+                    conf2["valueDesc"] = conf1["valueDesc"]
+                case 2:
+                    conf1["valueDesc"] = conf2["valueDesc"]
         XTMergingManager._merge_json_dict(conf2, conf1, "valueDesc")
         XTMergingManager._copy_if_different(conf1, conf2, "valueType")
         if "enumMappingMap" in conf1 and "enumMappingMap" in conf2:
