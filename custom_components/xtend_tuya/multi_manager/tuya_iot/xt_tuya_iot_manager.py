@@ -261,7 +261,6 @@ class XTIOTDeviceManager(TuyaDeviceManager):
             open = "true"
 
         remote_unlock_types = self.api.get(f"/v1.0/devices/{device_id}/door-lock/remote-unlocks")
-        LOGGER.warning(f"send_lock_unlock_command1: {remote_unlock_types}")
         if remote_unlock_types.get("success", False):
             results = remote_unlock_types.get("result", [])
             for result in results:
