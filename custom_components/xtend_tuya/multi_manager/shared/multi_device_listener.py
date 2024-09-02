@@ -5,9 +5,6 @@ from homeassistant.helpers.dispatcher import dispatcher_send
 from homeassistant.helpers import device_registry as dr
 
 from ...const import (
-    TUYA_HA_SIGNAL_UPDATE_ENTITY,
-    TUYA_HA_SIGNAL_UPDATE_ENTITY_ORIG,
-    TUYA_DISCOVERY_NEW,
     LOGGER,  # noqa: F401
     DOMAIN,
     DOMAIN_ORIG,
