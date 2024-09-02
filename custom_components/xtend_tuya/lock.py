@@ -96,19 +96,23 @@ class TuyaLockEntity(TuyaEntity, LockEntity):
                 self._attr_is_locked = True
             else:
                 self._attr_is_locked = False
+        else:
+            self._attr_is_locked = None
         return self._attr_is_locked
     
     @property
     def is_locking(self) -> bool | None:
         """Return true if the lock is locking."""
-        if self._attr_is_locking and self.is_locked:
+        is_locked = self.is_locked
+        if self._attr_is_locking and is_locked:
             self._attr_is_locking = False
         return self._attr_is_locking
 
     @property
     def is_unlocking(self) -> bool | None:
         """Return true if the lock is unlocking."""
-        if self._attr_is_unlocking and not self.is_locked:
+        is_locked = self.is_locked
+        if self._attr_is_unlocking and not is_locked:
             self._attr_is_unlocking = False
         return self._attr_is_unlocking
 
@@ -121,13 +125,13 @@ class TuyaLockEntity(TuyaEntity, LockEntity):
     def lock(self, **kwargs: Any) -> None:
         """Lock the lock."""
         if self.device_manager.send_lock_unlock_command(self.device.id, True):
-            #self._attr_is_locking = True
+            self._attr_is_locking = True
             pass
     
     def unlock(self, **kwargs: Any) -> None:
         """Unlock the lock."""
         if self.device_manager.send_lock_unlock_command(self.device.id, False):
-            #self._attr_is_unlocking = True
+            self._attr_is_unlocking = True
             pass
     
     def open(self, **kwargs: Any) -> None:
