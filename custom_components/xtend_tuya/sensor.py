@@ -692,9 +692,10 @@ class TuyaSensorEntity(TuyaEntity, RestoreSensor):
             
             if should_reset:
                 if device := self.device_manager.device_map.get(self.device.id, None):
-                    device.status[self.entity_description.key] = float(0)
-                self.entity_description.last_reset = now
-                self.async_write_ha_state()
+                    if self.entity_description.key in device.status:
+                        device.status[self.entity_description.key] = float(0)
+                        self.entity_description.last_reset = now
+                        self.async_write_ha_state()
 
         if (
            ( hasattr(self.entity_description, "reset_daily") and self.entity_description.reset_daily )
