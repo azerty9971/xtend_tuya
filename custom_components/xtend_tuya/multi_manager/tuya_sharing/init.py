@@ -208,10 +208,9 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
         return [DOMAIN]
     
     def get_domain_identifiers_of_device(self, device_id: str) -> list:
-        device_registry = dr.async_get(self.hass)
         if (
             self.sharing_account.device_manager.reuse_config
-            and device_registry.async_get_device(identifiers={(DOMAIN_ORIG, device_id)}, connections=None)
+            and device_id in self.sharing_account.device_manager.get_overriden_device_manager().device_map
         ):
             return [DOMAIN_ORIG, DOMAIN]
         else:
