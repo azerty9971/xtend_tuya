@@ -88,7 +88,7 @@ class TuyaLockEntity(TuyaEntity, LockEntity):
     @property
     def is_locked(self) -> bool | None:
         """Return true if the lock is locked."""
-        is_unlocked = self._get_state_value((DPCode.LOCK_MOTOR_STATE))
+        is_unlocked = self._get_state_value([DPCode.LOCK_MOTOR_STATE])
         LOGGER.warning(f"Lock is unlocked : {is_unlocked} <=> states: {self.device.status}")
         if is_unlocked is not None:
             if not is_unlocked:
@@ -115,9 +115,8 @@ class TuyaLockEntity(TuyaEntity, LockEntity):
             self._attr_is_unlocking = False
         return self._attr_is_unlocking
 
-    def _get_state_value(self, codes: tuple[DPCode, ...]) -> Any | None:
+    def _get_state_value(self, codes: list[DPCode]) -> Any | None:
         for code in codes:
-            LOGGER.warning(f"Searching for code : {code} format {str(code)}")
             if str(code) in self.device.status:
                 return self.device.status[str(code)]
         return None
