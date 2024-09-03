@@ -213,7 +213,7 @@ class MultiManager:  # noqa: F811
 
     def allow_devices_not_set_up(self, device: XTDevice):
         if not getattr(device, "set_up", True):
-            setattr(device, "set_up", True)
+            device.set_up = True
     
     def __get_devices_from_device_id(self, device_id: str) -> list[XTDevice] | None:
         return_list = []
