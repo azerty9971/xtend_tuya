@@ -169,8 +169,8 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
     
     def get_available_device_maps(self) -> list[dict[str, XTDevice]]:
         return_list: list[dict[str, XTDevice]] = []
-        """if other_manager := self.sharing_account.device_manager.get_overriden_device_manager():
-            return_list.append(other_manager.device_map)"""
+        if other_manager := self.sharing_account.device_manager.get_overriden_device_manager():
+            return_list.append(other_manager.device_map)
         return_list.append(self.sharing_account.device_manager.device_map)
         return return_list
     
@@ -243,6 +243,7 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
     def on_post_setup(self):
         if self.sharing_account.ha_tuya_integration_config_manager:
             decorate_tuya_integration(self.sharing_account.ha_tuya_integration_config_manager)
+
         for device in self.sharing_account.device_manager.device_map.values():
             if self.sharing_account.device_manager.copy_statuses_to_tuya(device):
                 #New statuses were copied, let's rediscover the device
@@ -257,8 +258,8 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
         regular_commands: list[dict[str, Any]] = []
         devices = self.get_devices_from_device_id(device_id)
         for command in commands:
-            command_code  = command["code"]
-            """command_value = command["value"]"""
+            command_code: str  = command["code"]
+            """command_value: str = command["value"]"""
 
             #Filter commands that require the use of OpenAPI
             skip_command = False

@@ -5,10 +5,10 @@ import functools
 from .config_entry_handler import (
     XTHATuyaIntegrationConfigEntryManager,
 )
-try:
-    import custom_components.tuya as tuya_integration # type: ignore
-except ImportError:
-    import homeassistant.components.tuya as tuya_integration
+
+from .tuya_integration_imports import (
+    tuya_integration
+)
 
 from tuya_sharing import (
     Manager,

@@ -9,6 +9,10 @@ from homeassistant.helpers.entity import EntityDescription
 from .const import (
     LOGGER,
 )
+from tuya_sharing.manager import (
+    Manager,
+    SharingDeviceListener,
+)
 
 from .multi_manager.multi_manager import (
     XTConfigEntry,
@@ -31,8 +35,8 @@ def remap_value(
     return ((value - from_min) / (from_max - from_min)) * (to_max - to_min) + to_min
 
 class ConfigEntryRuntimeData(NamedTuple):
-    device_manager: any
-    device_listener: any
+    device_manager: Manager
+    device_listener: SharingDeviceListener
     generic_runtime_data: any
 
 def get_config_entry_runtime_data(hass: HomeAssistant, entry: ConfigEntry, domain: str) -> ConfigEntryRuntimeData | None:

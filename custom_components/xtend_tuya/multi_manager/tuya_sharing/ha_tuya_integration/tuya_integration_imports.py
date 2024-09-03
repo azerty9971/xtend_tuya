@@ -110,3 +110,7 @@ except ImportError:
     from homeassistant.components.tuya.switch import (
         SWITCHES as SWITCHES_TUYA  # noqa: F401
     )
+try:
+    import custom_components.tuya as tuya_integration # type: ignore
+except ImportError:
+    import homeassistant.components.tuya as tuya_integration  # noqa: F401

@@ -10,6 +10,7 @@ class CloudFixes:
     def apply_fixes(device: XTDevice):
         CloudFixes._fix_missing_local_strategy_enum_mapping_map(device)
         CloudFixes._fix_incorrect_status_range_scale(device)
+        CloudFixes._fix_missing_range_values_using_local_strategy(device)
         CloudFixes._fix_missing_aliases_using_status_format(device)
         CloudFixes._remove_status_that_are_local_strategy_aliases(device)
 
@@ -70,6 +71,30 @@ class CloudFixes:
                     if 'true' in mappings and str(True) not in mappings:
                         mappings[str(True)] = mappings['true']
     
+    def _fix_missing_range_values_using_local_strategy(device: XTDevice):
+        for local_strategy in device.local_strategy.values():
+            status_code = local_strategy.get("status_code", None)
+            if status_code not in device.status_range and status_code not in device.function:
+                continue
+            if config_item := local_strategy.get("config_item", None):
+                if config_item.get("valueType", None) != "Enum":
+                    continue
+                if valueDesc := config_item.get("valueDesc", None):
+                    value_dict = json.loads(valueDesc)
+                    if valueDescr_range := value_dict.get("range", {}):
+                        if status_range := device.status_range.get(status_code, None):
+                            if status_range_values := json.loads(status_range.values):
+                                status_range_range_dict: list = status_range_values.get("range")
+                                new_range_list: list = []
+                                for new_range_value in valueDescr_range:
+                                    new_range_list.append(new_range_value)
+                                for new_range_value in status_range_range_dict:
+                                    if new_range_value not in new_range_list:
+                                        new_range_list.append(new_range_value)
+                                status_range_values["range"] = new_range_list
+                                status_range.values = json.dumps(status_range_values)
+
+
     def _fix_missing_aliases_using_status_format(device: XTDevice):
         for local_strategy in device.local_strategy.values():
             status_code = local_strategy.get("status_code", None)
