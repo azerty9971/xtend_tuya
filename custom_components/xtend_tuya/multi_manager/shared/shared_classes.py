@@ -1,6 +1,5 @@
 from __future__ import annotations
 from typing import Any, NamedTuple
-import copy
 from dataclasses import dataclass, field
 from homeassistant.config_entries import ConfigEntry
 from ...util import (
