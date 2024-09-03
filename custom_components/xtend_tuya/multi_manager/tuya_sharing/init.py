@@ -243,6 +243,12 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
     def on_post_setup(self):
         if self.sharing_account.ha_tuya_integration_config_manager:
             decorate_tuya_integration(self.sharing_account.ha_tuya_integration_config_manager)
+
+        #Copy devices to Tuya's device_map so that they register in the MQTT queue
+        if other_manager := self.sharing_account.device_manager.get_overriden_device_manager():
+            for device in self.sharing_account.device_manager.device_map.values():
+                if device.id not in other_manager.device_map:
+                    other_manager.device_map[device.id] = device
         for device in self.sharing_account.device_manager.device_map.values():
             if self.sharing_account.device_manager.copy_statuses_to_tuya(device):
                 #New statuses were copied, let's rediscover the device
