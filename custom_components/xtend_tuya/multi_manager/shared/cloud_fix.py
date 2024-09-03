@@ -85,10 +85,13 @@ class CloudFixes:
                         if status_range := device.status_range.get(status_code, None):
                             if status_range_values := json.loads(status_range.values):
                                 status_range_range_dict: list = status_range_values.get("range")
+                                new_range_list: list = []
                                 for new_range_value in valueDescr_range:
-                                    if new_range_value not in status_range_range_dict:
-                                        status_range_range_dict.append(new_range_value)
-                                status_range_values["range"] = status_range_range_dict
+                                    new_range_list.append(new_range_value)
+                                for new_range_value in status_range_range_dict:
+                                    if new_range_value not in new_range_list:
+                                        new_range_list.append(new_range_value)
+                                status_range_values["range"] = new_range_list
                                 status_range.values = json.dumps(status_range_values)
 
 
