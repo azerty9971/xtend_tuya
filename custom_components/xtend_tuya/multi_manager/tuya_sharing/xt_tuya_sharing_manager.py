@@ -80,7 +80,7 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
                     self.multi_manager.device_watcher.report_message(device.id, "Added to Tuya's device_map")
                     self.other_device_manager.device_map[device.id] = device
                 else:
-                    self.multi_manager.device_watcher.report_message(device.id, "Already in Tuya's device_map")
+                    self.multi_manager.device_watcher.report_message(device.id, f"Already in Tuya's device_map (set_up: {device.set_up})")
             self.other_device_manager.refresh_mq()
             for device in self.other_device_manager.mq.device:
                 self.multi_manager.device_watcher.report_message(device.id, "Registered in MQTT")
