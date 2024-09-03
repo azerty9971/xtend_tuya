@@ -9,6 +9,7 @@ from ...util import (
 from .device import (
     XTDeviceFunction,
     XTDeviceStatusRange,
+    XTDevice,
 )
 from ..multi_manager import (
     MultiManager,
@@ -44,21 +45,12 @@ class XTDeviceProperties:
     status_range: dict[str, XTDeviceStatusRange] = field(default_factory=dict)
     data_model: str = field(default_factory=str)
 
-    def merge_in_device(self, device):
-        if hasattr(device, "local_strategy"):
-            merge_iterables(device.local_strategy, self.local_strategy)
-            #device.local_strategy.update(self.local_strategy)
-        if hasattr(device, "status"):
-            merge_iterables(device.status, self.status)
-            #device.status.update(self.status)
-        if hasattr(device, "function"):
-            merge_iterables(device.function, self.function)
-            #device.function.update(self.function)
-        if hasattr(device, "status_range"):
-            merge_iterables(device.status_range, self.status_range)
-            #device.status_range.update(self.status_range)
-        if hasattr(device, "data_model"):
-            device.data_model = copy.deepcopy(self.data_model)
+    def merge_in_device(self, device: XTDevice):
+        merge_iterables(device.local_strategy, self.local_strategy)
+        merge_iterables(device.status, self.status)
+        merge_iterables(device.function, self.function)
+        merge_iterables(device.status_range, self.status_range)
+        device.data_model = self.data_model
 
 class HomeAssistantXTData(NamedTuple):
     """Tuya data stored in the Home Assistant data object."""
