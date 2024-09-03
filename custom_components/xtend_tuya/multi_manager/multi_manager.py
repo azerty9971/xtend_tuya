@@ -175,7 +175,7 @@ class MultiManager:  # noqa: F811
             devices = self.__get_devices_from_device_id(device.id)
             for current_device in devices:
                 for prev_device in to_be_merged:
-                    XTMergingManager.merge_devices(current_device, prev_device)
+                    XTMergingManager.merge_devices(prev_device, current_device)
                 to_be_merged.append(current_device)
     
     def unload(self):
@@ -211,11 +211,9 @@ class MultiManager:  # noqa: F811
             return dp_id_item["status_code"]
         return None
 
-    def allow_virtual_devices_not_set_up(self, device: XTDevice):
-        if not device.id.startswith("vdevo"):
-            return
+    def allow_devices_not_set_up(self, device: XTDevice):
         if not getattr(device, "set_up", True):
-            setattr(device, "set_up", True)
+            device.set_up = True
     
     def __get_devices_from_device_id(self, device_id: str) -> list[XTDevice] | None:
         return_list = []
@@ -289,6 +287,7 @@ class MultiManager:  # noqa: F811
         if not dev_id:
             LOGGER.warning(f"dev_id {dev_id} not found!")
             return
+        self.device_watcher.report_message(dev_id, f"On Message ({source}): {msg}")
         
         #self.device_watcher.report_message(dev_id, f"on_message ({source}) => {msg}")
 

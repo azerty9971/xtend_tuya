@@ -56,7 +56,8 @@ class XTSharingDeviceRepository(DeviceRepository):
                         "valueType": dp_status_relation["valueType"],
                         "enumMappingMap": dp_status_relation["enumMappingMap"],
                         "pid": pid,
-                    }
+                    },                              #CHANGED
+                    "status_code_alias": []         #CHANGED
                 }
             device.support_local = support_local
             #if support_local:                      #CHANGED
@@ -64,7 +65,7 @@ class XTSharingDeviceRepository(DeviceRepository):
 
     def update_device_strategy_info(self, device: CustomerDevice):
         #super().update_device_strategy_info(device)
-        self._update_device_strategy_info_mod(device=device)
+        self._update_device_strategy_info_mod(device)
         #Sometimes the Type provided by Tuya is ill formed,
         #replace it with the one from the local strategy
         for loc_strat in device.local_strategy.values():
@@ -83,7 +84,7 @@ class XTSharingDeviceRepository(DeviceRepository):
                 code not in device.status_range and
                 code not in device.function
                 ):
-                device.status_range[code] = DeviceStatusRange()
+                device.status_range[code] = DeviceStatusRange()   #CHANGED
                 device.status_range[code].code   = code
                 device.status_range[code].type   = value_type
                 device.status_range[code].values = loc_strat["valueDesc"]
@@ -102,4 +103,4 @@ class XTSharingDeviceRepository(DeviceRepository):
                 func.type = TuyaEntity.determine_dptype(func.type)
 
         self.multi_manager.virtual_state_handler.apply_init_virtual_states(device)
-        self.multi_manager.allow_virtual_devices_not_set_up(device)
+        self.multi_manager.allow_devices_not_set_up(device)

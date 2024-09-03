@@ -22,6 +22,14 @@ class XTMergingManager:
         device2.function = device1.function
         device2.status = device1.status
         device2.local_strategy = device1.local_strategy
+        if device1.data_model:
+            device2.data_model = device1.data_model
+        elif device2.data_model:
+            device1.data_model = device2.data_model
+        if device1.set_up:
+            device2.set_up = device1.set_up
+        elif device2.set_up:
+            device1.set_up = device2.set_up
 
     def _merge_status(device1: XTDevice, device2: XTDevice):
         XTMergingManager._merge_dict(device1.status, device2.status)
@@ -135,6 +143,9 @@ class XTMergingManager:
                     strategy2["use_open_api"] = strategy1["use_open_api"]
             else:
                 device2.local_strategy[dpId] = device1.local_strategy[dpId]
+        for dpId in device2.local_strategy:
+            if dpId not in device1.local_strategy:
+                device1.local_strategy[dpId] = device2.local_strategy[dpId]
 
     def _merge_config_item(conf1: dict, conf2: dict):
         XTMergingManager._merge_json_dict(conf2, conf1, "statusFormat")

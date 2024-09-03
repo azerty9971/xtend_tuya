@@ -71,10 +71,12 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
             self.mq.remove_message_listener(self.other_device_manager.on_message)
 
     def refresh_mq(self):
-        if self.other_device_manager is not None:
+        if self.other_device_manager:
             if self.mq and self.mq != self.other_device_manager.mq:
                 self.mq.stop()
             self.other_device_manager.refresh_mq()
+            for device in self.other_device_manager.mq.device:
+                self.multi_manager.device_watcher.report_message(device.id, "Registered in MQTT")
             return
         super().refresh_mq()
         self.mq.add_message_listener(self.forward_message_to_multi_manager)
@@ -103,7 +105,7 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
         if not device:
             return
         status_new = self.multi_manager.convert_device_report_status_list(device_id, status)
-        self.multi_manager.device_watcher.report_message(f"device report {MESSAGE_SOURCE_TUYA_SHARING}: {status_new}")
+        self.multi_manager.device_watcher.report_message(device_id, f"device report {MESSAGE_SOURCE_TUYA_SHARING}: {status_new}")
         status_new = self.multi_manager.multi_source_handler.filter_status_list(device_id, MESSAGE_SOURCE_TUYA_SHARING, status_new)
         status_new = self.multi_manager.virtual_state_handler.apply_virtual_states_to_status_list(device, status_new)
 
@@ -112,6 +114,7 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
     def send_commands(
             self, device_id: str, commands: list[dict[str, Any]]
     ):
+        self.multi_manager.device_watcher.report_message(device_id, f"Sending Tuya commands: {commands}")
         if other_manager := self.get_overriden_device_manager():
             other_manager.send_commands(device_id, commands)
             return
