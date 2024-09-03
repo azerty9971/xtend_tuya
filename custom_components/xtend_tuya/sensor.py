@@ -57,6 +57,7 @@ class TuyaSensorEntityDescription(SensorEntityDescription):
     reset_daily: bool = False
     reset_monthly: bool = False
     reset_yearly: bool = False
+    reset_after_x_seconds: int = 0
     restoredata: bool = False
 
 # Commonly used battery sensors, that are re-used in the sensors down below.
@@ -705,6 +706,7 @@ class TuyaSensorEntity(TuyaEntity, RestoreSensor):
 
     @property
     def native_value(self) -> StateType:
+        self.device_manager.device_watcher.report_message(self.device.id, f"Native value of sensor {self.entity_description.key}")
         """Return the value reported by the sensor."""
         # Only continue if data type is known
         if self._type not in (
