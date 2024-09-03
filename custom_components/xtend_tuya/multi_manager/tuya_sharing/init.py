@@ -271,7 +271,7 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
                         break
             if not skip_command:
                 regular_commands.append(command)
-                if command_value in (str(False), str(True)):
+                if command_value in [str(False), str(True)]:
                     new_command = copy.deepcopy(command)
                     new_command["value"] = command_value.lower()
                     regular_commands.append(new_command)
