@@ -65,6 +65,7 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
         self.multi_manager.on_message(MESSAGE_SOURCE_TUYA_SHARING, msg)
 
     def on_external_refresh_mq(self):
+        LOGGER.warning("External Refresh MQ")
         if self.other_device_manager is not None:
             self.mq = self.other_device_manager.mq
             self.mq.add_message_listener(self.forward_message_to_multi_manager)
