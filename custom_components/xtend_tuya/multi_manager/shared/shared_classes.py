@@ -1,6 +1,5 @@
 from __future__ import annotations
 from typing import Any, NamedTuple
-import copy
 from dataclasses import dataclass, field
 from homeassistant.config_entries import ConfigEntry
 from ...util import (
@@ -23,7 +22,7 @@ from ...const import (
 
 class DeviceWatcher:
     def __init__(self, multi_manager: MultiManager) -> None:
-        self.watched_dev_id = []
+        self.watched_dev_id = ["bf91f775714d6cff441zfh"]
         self.multi_manager = multi_manager
 
     def is_watched(self, dev_id: str) -> bool:
