@@ -250,6 +250,8 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
                 if device.id not in other_manager.device_map:
                     self.multi_manager.device_watcher.report_message(device.id, "Added to Tuya's device_map")
                     other_manager.device_map[device.id] = device
+                else:
+                    self.multi_manager.device_watcher.report_message(device.id, "Already in Tuya's device_map")
         for device in self.sharing_account.device_manager.device_map.values():
             if self.sharing_account.device_manager.copy_statuses_to_tuya(device):
                 #New statuses were copied, let's rediscover the device
