@@ -143,6 +143,9 @@ class XTMergingManager:
                     strategy2["use_open_api"] = strategy1["use_open_api"]
             else:
                 device2.local_strategy[dpId] = device1.local_strategy[dpId]
+        for dpId in device2.local_strategy:
+            if dpId not in device1.local_strategy:
+                device1.local_strategy[dpId] = device2.local_strategy[dpId]
 
     def _merge_config_item(conf1: dict, conf2: dict):
         XTMergingManager._merge_json_dict(conf2, conf1, "statusFormat")
