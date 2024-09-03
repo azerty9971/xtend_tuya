@@ -299,6 +299,18 @@
       }
     },
     "select": {
+      "key_tone":
+      {
+        "name": "Key tone",
+        "state": {
+          "0": "High",
+          "1": "Normal",
+          "2": "Mute",
+          "high": "High",
+          "normal": "Normal",
+          "mute": "Mute"
+        }
+      },
       "change_temp_unit":
       {
         "name": "Temperature unit",
@@ -655,6 +667,31 @@
       }
     },
     "sensor": {
+      "ms_category_alarm_lock": {
+        "name": "Keypad alarm",
+        "state": {
+          "0": "Wrong fingerprint",
+          "1": "Wrong password",
+          "2": "Wrong card",
+          "3": "Wrong face",
+          "4": "Too hot",
+          "5": "Not closed after timeout",
+          "6": "Anti-pry alarm",
+          "7": "Low battery",
+          "8": "Battery exhausted",
+          "9": "Vibration alarm",
+          "wrong_finger": "Wrong fingerprint",
+          "wrong_password": "Wrong password",
+          "wrong_card": "Wrong card",
+          "wrong_face": "Wrong face",
+          "too_hot": "Too hot",
+          "unclosed_time": "Not closed after timeout",
+          "pry": "Anti-pry alarm",
+          "low_battery": "Low battery",
+          "power_off": "Battery exhausted",
+          "shock": "Vibration alarm"
+        }
+      },
       "jtmspro_alarm_lock": {
         "name": "Alarm lock",
         "state": {
