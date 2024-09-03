@@ -65,7 +65,7 @@ class XTSharingDeviceRepository(DeviceRepository):
 
     def update_device_strategy_info(self, device: CustomerDevice):
         #super().update_device_strategy_info(device)
-        self._update_device_strategy_info_mod(device=device)
+        self._update_device_strategy_info_mod(device)
         #Sometimes the Type provided by Tuya is ill formed,
         #replace it with the one from the local strategy
         for loc_strat in device.local_strategy.values():

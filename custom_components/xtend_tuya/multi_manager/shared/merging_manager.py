@@ -26,6 +26,10 @@ class XTMergingManager:
             device2.data_model = device1.data_model
         elif device2.data_model:
             device1.data_model = device2.data_model
+        if device1.set_up:
+            device2.set_up = device1.set_up
+        elif device2.set_up:
+            device1.set_up = device2.set_up
 
     def _merge_status(device1: XTDevice, device2: XTDevice):
         XTMergingManager._merge_dict(device1.status, device2.status)
