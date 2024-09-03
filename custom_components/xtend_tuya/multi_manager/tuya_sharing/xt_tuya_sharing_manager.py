@@ -125,7 +125,7 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
             command_code  = command["code"]
             command_value = command["value"]
             if str(command_value) in [str(True), str(False)]:
-                return_list.append(f'"code": "{command_code}", "value": {str(command_value).lower()}')
+                return_list.append(f'"{{code": "{command_code}", "value": {str(command_value).lower()}}}')
             else:
                 return_list.append(str(command))
         return return_list
