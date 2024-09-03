@@ -171,12 +171,12 @@ class MultiManager:  # noqa: F811
     def _merge_devices_from_multiple_sources(self):
         #Merge the device function, status_range and status between managers
         for device in self.device_map.values():
-            to_be_merged: list[XTDevice] = []
             devices = self.__get_devices_from_device_id(device.id)
+            previous_device = None
             for current_device in devices:
-                for prev_device in to_be_merged:
-                    XTMergingManager.merge_devices(current_device, prev_device)
-                to_be_merged.append(current_device)
+                if previous_device:
+                    XTMergingManager.merge_devices(previous_device, current_device)
+                previous_device = current_device
     
     def unload(self):
         for manager in self.accounts.values():
