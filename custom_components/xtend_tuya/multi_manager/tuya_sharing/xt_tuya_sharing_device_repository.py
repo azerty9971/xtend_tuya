@@ -84,7 +84,7 @@ class XTSharingDeviceRepository(DeviceRepository):
                 code not in device.status_range and
                 code not in device.function
                 ):
-                device.status_range[code] = DeviceStatusRange()
+                device.status_range[code] = DeviceStatusRange()   #CHANGED
                 device.status_range[code].code   = code
                 device.status_range[code].type   = value_type
                 device.status_range[code].values = loc_strat["valueDesc"]
@@ -103,4 +103,4 @@ class XTSharingDeviceRepository(DeviceRepository):
                 func.type = TuyaEntity.determine_dptype(func.type)
 
         self.multi_manager.virtual_state_handler.apply_init_virtual_states(device)
-        self.multi_manager.allow_virtual_devices_not_set_up(device)
+        self.multi_manager.allow_devices_not_set_up(device)

@@ -211,9 +211,7 @@ class MultiManager:  # noqa: F811
             return dp_id_item["status_code"]
         return None
 
-    def allow_virtual_devices_not_set_up(self, device: XTDevice):
-        if not device.id.startswith("vdevo"):
-            return
+    def allow_devices_not_set_up(self, device: XTDevice):
         if not getattr(device, "set_up", True):
             setattr(device, "set_up", True)
     
