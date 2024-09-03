@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import time
+from datetime import time, datetime
+import time as i_time
 
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.components.time import (
@@ -94,6 +95,11 @@ class TuyaTimeEntity(TuyaEntity, TimeEntity):
         self.entity_description = description
         self.device = device
         self.device_manager = device_manager
+
+    @property
+    def native_value(self) -> time | None:
+        """Return the latest value."""
+        return datetime.now().time()
 
     def set_value(self, value: time) -> None:
         """Change the time."""
