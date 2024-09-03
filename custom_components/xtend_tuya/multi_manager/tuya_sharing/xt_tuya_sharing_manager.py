@@ -71,16 +71,16 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
             self.mq.remove_message_listener(self.other_device_manager.on_message)
 
     def refresh_mq(self):
-        if self.other_device_manager is not None:
+        if self.other_device_manager:
             if self.mq and self.mq != self.other_device_manager.mq:
                 self.mq.stop()
-                #Copy devices to Tuya's device_map so that they register in the MQTT queue
-                for device in self.other_device_manager.device_map.values():
-                    if device.id not in self.other_device_manager.device_map:
-                        self.multi_manager.device_watcher.report_message(device.id, "Added to Tuya's device_map")
-                        self.other_device_manager.device_map[device.id] = device
-                    else:
-                        self.multi_manager.device_watcher.report_message(device.id, "Already in Tuya's device_map")
+            #Copy devices to Tuya's device_map so that they register in the MQTT queue
+            for device in self.other_device_manager.device_map.values():
+                if device.id not in self.other_device_manager.device_map:
+                    self.multi_manager.device_watcher.report_message(device.id, "Added to Tuya's device_map")
+                    self.other_device_manager.device_map[device.id] = device
+                else:
+                    self.multi_manager.device_watcher.report_message(device.id, "Already in Tuya's device_map")
             self.other_device_manager.refresh_mq()
             for device in self.other_device_manager.mq.device:
                 self.multi_manager.device_watcher.report_message(device.id, "Registered in MQTT")
