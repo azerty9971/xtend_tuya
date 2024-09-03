@@ -56,7 +56,8 @@ class XTSharingDeviceRepository(DeviceRepository):
                         "valueType": dp_status_relation["valueType"],
                         "enumMappingMap": dp_status_relation["enumMappingMap"],
                         "pid": pid,
-                    }
+                    },                              #CHANGED
+                    "status_code_alias": []         #CHANGED
                 }
             device.support_local = support_local
             #if support_local:                      #CHANGED
