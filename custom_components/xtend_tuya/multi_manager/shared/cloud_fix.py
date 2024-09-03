@@ -83,12 +83,12 @@ class CloudFixes:
                     value_dict = json.loads(valueDesc)
                     if valueDescr_range := value_dict.get("range", {}):
                         if status_range := device.status_range.get(status_code, None):
-                            if status_range_range := status_range.get("range", None):
+                            if status_range_range := status_range.values.get("range", None):
                                 status_range_range_dict: list = json.loads(status_range_range)
                                 for new_range_value in valueDescr_range:
                                     if new_range_value not in status_range_range_dict:
                                         status_range_range_dict.append(new_range_value)
-                                status_range["range"] = json.dumps(status_range_range_dict)
+                                status_range.values["range"] = json.dumps(status_range_range_dict)
 
     def _fix_missing_aliases_using_status_format(device: XTDevice):
         for local_strategy in device.local_strategy.values():
