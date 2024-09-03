@@ -10,6 +10,7 @@ class CloudFixes:
     def apply_fixes(device: XTDevice):
         CloudFixes._fix_missing_local_strategy_enum_mapping_map(device)
         CloudFixes._fix_incorrect_status_range_scale(device)
+        CloudFixes._fix_missing_range_values_using_local_strategy(device)
         CloudFixes._fix_missing_aliases_using_status_format(device)
         CloudFixes._remove_status_that_are_local_strategy_aliases(device)
 
@@ -70,6 +71,25 @@ class CloudFixes:
                     if 'true' in mappings and str(True) not in mappings:
                         mappings[str(True)] = mappings['true']
     
+    def _fix_missing_range_values_using_local_strategy(device: XTDevice):
+        for local_strategy in device.local_strategy.values():
+            status_code = local_strategy.get("status_code", None)
+            if status_code not in device.status_range and status_code not in device.function:
+                continue
+            if config_item := local_strategy.get("config_item", None):
+                if config_item.get("valueType", None) != "Enum":
+                    continue
+                if valueDesc := config_item.get("valueDesc", None):
+                    value_dict = json.loads(valueDesc)
+                    if valueDescr_range := value_dict.get("range", {}):
+                        if status_range := device.status_range.get(status_code, None):
+                            if status_range_range := status_range.get("range", None):
+                                status_range_range_dict: list = json.loads(status_range_range)
+                                for new_range_value in valueDescr_range:
+                                    if new_range_value not in status_range_range_dict:
+                                        status_range_range_dict.append(new_range_value)
+                                status_range["range"] = json.dumps(status_range_range_dict)
+
     def _fix_missing_aliases_using_status_format(device: XTDevice):
         for local_strategy in device.local_strategy.values():
             status_code = local_strategy.get("status_code", None)
