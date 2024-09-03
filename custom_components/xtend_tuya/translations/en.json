@@ -693,7 +693,7 @@
         }
       },
       "jtmspro_alarm_lock": {
-        "name": "Alarm lock",
+        "name": "Lock alarm",
         "state": {
           "0": "Wrong fingerprint",
           "1": "Wrong password",
