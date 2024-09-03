@@ -248,6 +248,7 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
         if other_manager := self.sharing_account.device_manager.get_overriden_device_manager():
             for device in self.sharing_account.device_manager.device_map.values():
                 if device.id not in other_manager.device_map:
+                    self.multi_manager.device_watcher.report_message(device.id, "Added to Tuya's device_map")
                     other_manager.device_map[device.id] = device
         for device in self.sharing_account.device_manager.device_map.values():
             if self.sharing_account.device_manager.copy_statuses_to_tuya(device):
