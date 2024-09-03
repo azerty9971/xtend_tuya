@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from typing import Optional, Literal, Any, overload
 
-import copy
-
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady
