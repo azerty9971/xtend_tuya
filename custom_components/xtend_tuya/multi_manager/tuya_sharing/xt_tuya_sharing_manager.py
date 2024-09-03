@@ -112,6 +112,7 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
     def send_commands(
             self, device_id: str, commands: list[dict[str, Any]]
     ):
+        self.multi_manager.device_watcher.report_message(device_id, f"Sending Tuya commands: {commands}")
         if other_manager := self.get_overriden_device_manager():
             other_manager.send_commands(device_id, commands)
             return

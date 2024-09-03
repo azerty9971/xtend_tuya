@@ -28,13 +28,15 @@ class DeviceWatcher:
     def is_watched(self, dev_id: str) -> bool:
         return dev_id in self.watched_dev_id
     
-    def report_message(self, dev_id: str, message: str, device: any = None):
+    def report_message(self, dev_id: str, message: str, device: XTDevice = None):
         if self.is_watched(dev_id):
             if dev_id in self.multi_manager.device_map:
                 managed_device = self.multi_manager.device_map[dev_id]
                 LOGGER.warning(f"DeviceWatcher for {managed_device.name} ({dev_id}): {message}")
             elif device:
                 LOGGER.warning(f"DeviceWatcher for {device.name} ({dev_id}): {message}")
+            else:
+                LOGGER.warning(f"DeviceWatcher for {dev_id}: {message}")
 
 @dataclass
 class XTDeviceProperties:
