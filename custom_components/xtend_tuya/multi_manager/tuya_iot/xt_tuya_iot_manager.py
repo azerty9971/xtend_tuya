@@ -116,6 +116,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
     def update_device_function_cache(self, devIds: list = []):
         super().update_device_function_cache(devIds)
         for device_id in self.device_map:
+            self.device_map[device_id] = XTDevice.from_compatible_device(self.device_map[device_id])
             device = self.device_map[device_id]
             device_properties = self.get_device_properties(device)
             device_properties.merge_in_device(device)
