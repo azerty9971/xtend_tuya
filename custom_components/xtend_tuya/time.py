@@ -86,13 +86,14 @@ class TuyaTimeEntity(TuyaEntity, TimeEntity):
     def __init__(
         self,
         device: XTDevice,
-        device_manager: MultiManager
+        device_manager: MultiManager,
+        description: TuyaTimeEntityDescription,
     ) -> None:
         """Init Tuya binary sensor."""
         super().__init__(device, device_manager)
+        self.entity_description = description
         self.device = device
         self.device_manager = device_manager
-        self.last_action: str = None
 
     def set_value(self, value: time) -> None:
         """Change the time."""
