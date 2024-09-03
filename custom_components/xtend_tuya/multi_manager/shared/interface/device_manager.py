@@ -97,3 +97,8 @@ class XTDeviceManagerInterface(ABC):
     @abstractmethod
     def convert_to_xt_device(self, Any) -> XTDevice:
         pass
+
+    def inform_device_has_an_entity(self, device_id: str):
+        for device_map in self.get_available_device_maps():
+            if device_id in device_map:
+                device_map[device_id].set_up = True

@@ -67,7 +67,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
 
     for device in aggregated_device_map.values():
         multi_manager.virtual_state_handler.apply_init_virtual_states(device)
-        multi_manager.allow_devices_not_set_up(device)
+        
     # If the device does not register any entities, the device does not need to subscribe
     # So the subscription is here
     await hass.async_add_executor_job(multi_manager.refresh_mq)
