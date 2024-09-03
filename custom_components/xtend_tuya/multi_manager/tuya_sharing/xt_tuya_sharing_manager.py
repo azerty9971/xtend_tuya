@@ -113,11 +113,23 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
             self, device_id: str, commands: list[dict[str, Any]]
     ):
         self.multi_manager.device_watcher.report_message(device_id, f"Sending Tuya commands: {commands}")
+        formated_commands = self._format_commands(commands)
         if other_manager := self.get_overriden_device_manager():
-            other_manager.send_commands(device_id, commands)
+            other_manager.send_commands(device_id, formated_commands)
             return
-        super().send_commands(device_id, commands)
+        super().send_commands(device_id, formated_commands)
     
+    def _format_commands(self, commands: list[dict[str, Any]]) -> list[str]:
+        return_list: list[str] = []
+        for command in commands:
+            command_code  = command["code"]
+            command_value = command["value"]
+            if str(command_value) in [str(True), str(False)]:
+                return_list.append(f'"code": "{command_code}", "value": {str(command_value).lower()}')
+            else:
+                return_list.append(str(command))
+        return return_list
+
     def send_lock_unlock_command(
             self, device_id: str, lock: bool
     ) -> bool:
