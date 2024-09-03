@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import time, datetime
-import time as i_time
 
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.components.time import (
@@ -36,13 +35,7 @@ class TuyaTimeEntityDescription(TimeEntityDescription):
     pass
 
 TIMES: dict[str, tuple[TuyaTimeEntityDescription, ...]] = {
-    "cz": (
-        TuyaTimeEntityDescription(
-            key=DPCode.COUNTDOWN_1,
-            translation_key="countdown_1",
-            entity_category=EntityCategory.CONFIG,
-        ),
-    ),
+    
 }
 
 async def async_setup_entry(
