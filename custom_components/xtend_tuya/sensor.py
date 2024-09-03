@@ -18,6 +18,8 @@ from homeassistant.components.sensor import (
 from homeassistant.const import (
     UnitOfEnergy,
     Platform,
+    PERCENTAGE,
+    EntityCategory,
 )
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
@@ -59,6 +61,41 @@ class TuyaSensorEntityDescription(SensorEntityDescription):
 
 # Commonly used battery sensors, that are re-used in the sensors down below.
 BATTERY_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
+    TuyaSensorEntityDescription(
+        key=DPCode.BATTERY_PERCENTAGE,
+        translation_key="battery",
+        native_unit_of_measurement=PERCENTAGE,
+        device_class=SensorDeviceClass.BATTERY,
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_category=EntityCategory.DIAGNOSTIC,
+    ),
+    TuyaSensorEntityDescription(
+        key=DPCode.BATTERY,  # Used by non-standard contact sensor implementations
+        translation_key="battery",
+        native_unit_of_measurement=PERCENTAGE,
+        device_class=SensorDeviceClass.BATTERY,
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_category=EntityCategory.DIAGNOSTIC,
+    ),
+    TuyaSensorEntityDescription(
+        key=DPCode.BATTERY_STATE,
+        translation_key="battery_state",
+        entity_category=EntityCategory.DIAGNOSTIC,
+    ),
+    TuyaSensorEntityDescription(
+        key=DPCode.BATTERY_VALUE,
+        translation_key="battery",
+        device_class=SensorDeviceClass.BATTERY,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        state_class=SensorStateClass.MEASUREMENT,
+    ),
+    TuyaSensorEntityDescription(
+        key=DPCode.VA_BATTERY,
+        translation_key="battery",
+        device_class=SensorDeviceClass.BATTERY,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        state_class=SensorStateClass.MEASUREMENT,
+    ),
 )
 
 #Commonlu sed energy sensors, that are re-used in the sensors down below.
@@ -454,6 +491,14 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
             entity_registry_enabled_default=False,
         ),
         *TEMPERATURE_SENSORS,
+    ),
+    "ms_category": (
+        TuyaSensorEntityDescription(
+            key=DPCode.ALARM_LOCK,
+            translation_key="ms_category_alarm_lock",
+            entity_registry_enabled_default=True,
+        ),
+        *BATTERY_SENSORS,
     ),
     "mzj": (
         TuyaSensorEntityDescription(
