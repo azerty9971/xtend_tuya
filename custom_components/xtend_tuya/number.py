@@ -24,6 +24,49 @@ from .multi_manager.multi_manager import XTConfigEntry
 from .base import IntegerTypeData, TuyaEntity
 from .const import DEVICE_CLASS_UNITS, DOMAIN, TUYA_DISCOVERY_NEW, DPCode, DPType
 
+COUNTDOWNS: tuple[NumberEntityDescription, ...] = (
+    NumberEntityDescription(
+        key=DPCode.COUNTDOWN_1,
+        translation_key="countdown_1",
+        entity_category=EntityCategory.CONFIG,
+    ),
+    NumberEntityDescription(
+        key=DPCode.COUNTDOWN_2,
+        translation_key="countdown_2",
+        entity_category=EntityCategory.CONFIG,
+    ),
+    NumberEntityDescription(
+        key=DPCode.COUNTDOWN_3,
+        translation_key="countdown_3",
+        entity_category=EntityCategory.CONFIG,
+    ),
+    NumberEntityDescription(
+        key=DPCode.COUNTDOWN_4,
+        translation_key="countdown_4",
+        entity_category=EntityCategory.CONFIG,
+    ),
+    NumberEntityDescription(
+        key=DPCode.COUNTDOWN_5,
+        translation_key="countdown_5",
+        entity_category=EntityCategory.CONFIG,
+    ),
+    NumberEntityDescription(
+        key=DPCode.COUNTDOWN_6,
+        translation_key="countdown_6",
+        entity_category=EntityCategory.CONFIG,
+    ),
+    NumberEntityDescription(
+        key=DPCode.COUNTDOWN_7,
+        translation_key="countdown_7",
+        entity_category=EntityCategory.CONFIG,
+    ),
+    NumberEntityDescription(
+        key=DPCode.COUNTDOWN_8,
+        translation_key="countdown_8",
+        entity_category=EntityCategory.CONFIG,
+    ),
+)
+
 # All descriptions can be found here. Mostly the Integer data types in the
 # default instructions set of each category end up being a number.
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
@@ -34,6 +77,9 @@ NUMBERS: dict[str, tuple[NumberEntityDescription, ...]] = {
             translation_key="auto_lock_time",
             entity_category=EntityCategory.CONFIG,
         ),
+    ),
+    "kg": (
+        *COUNTDOWNS,
     ),
     "msp": (
         NumberEntityDescription(
