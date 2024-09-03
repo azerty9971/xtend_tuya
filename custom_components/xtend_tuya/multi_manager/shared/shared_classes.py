@@ -28,7 +28,7 @@ class DeviceWatcher:
     def is_watched(self, dev_id: str) -> bool:
         return dev_id in self.watched_dev_id
     
-    def report_message(self, dev_id: str, message: str, device: XTDevice = None):
+    def report_message(self, dev_id: str, message: str, device: XTDevice | None = None):
         if self.is_watched(dev_id):
             if dev_id in self.multi_manager.device_map:
                 managed_device = self.multi_manager.device_map[dev_id]
