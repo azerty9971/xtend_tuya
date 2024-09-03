@@ -316,6 +316,7 @@ class DPCode(StrEnum):
     INSTALLATION_HEIGHT = "installation_height"
     IPC_WORK_MODE = "ipc_work_mode"
     IR_CONTROL = "ir_control"
+    KEY_TONE = "key_tone"
     KILL = "kill"
     LED_TYPE_1 = "led_type_1"
     LED_TYPE_2 = "led_type_2"
