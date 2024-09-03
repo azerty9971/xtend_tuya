@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import Optional, Literal, Any, overload
 
+import copy
+
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady
@@ -256,8 +258,8 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
         regular_commands: list[dict[str, Any]] = []
         devices = self.get_devices_from_device_id(device_id)
         for command in commands:
-            command_code  = command["code"]
-            """command_value = command["value"]"""
+            command_code: str  = command["code"]
+            command_value: str = command["value"]
 
             #Filter commands that require the use of OpenAPI
             skip_command = False
@@ -268,6 +270,10 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
                         break
             if not skip_command:
                 regular_commands.append(command)
+                if command_value in (str(False), str(True)):
+                    new_command = copy.deepcopy(command)
+                    new_command["value"] = command_value.lower()
+                    regular_commands.append(new_command)
         
         if regular_commands:
             self.sharing_account.device_manager.send_commands(device_id, regular_commands)
