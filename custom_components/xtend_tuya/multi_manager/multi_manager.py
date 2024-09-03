@@ -289,6 +289,7 @@ class MultiManager:  # noqa: F811
         if not dev_id:
             LOGGER.warning(f"dev_id {dev_id} not found!")
             return
+        self.device_watcher.report_message(dev_id, f"On Message ({source}): {msg}")
         
         #self.device_watcher.report_message(dev_id, f"on_message ({source}) => {msg}")
 
