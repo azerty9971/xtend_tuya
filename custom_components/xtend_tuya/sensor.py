@@ -824,4 +824,4 @@ class TuyaSensorEntity(TuyaEntity, RestoreSensor):
     @callback
     async def _on_event(self, event: Event[EventStateChangedData]):
         new_state: State = event.data.get("new_state")
-        self.device_manager.device_watcher.report_message(self.device.id, f"On State Changed event: {new_state}")
+        self.device_manager.device_watcher.report_message(self.device.id, f"On State Changed event: {new_state.state}")
