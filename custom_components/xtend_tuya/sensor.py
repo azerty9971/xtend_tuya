@@ -661,6 +661,7 @@ class TuyaSensorEntity(TuyaEntity, RestoreSensor):
         self._attr_unique_id = (
             f"{super().unique_id}{description.key}{description.subkey or ''}"
         )
+        self.cancel_reset_after_x_seconds = None
 
         if int_type := self.find_dpcode(description.key, dptype=DPType.INTEGER):
             self._type_data = int_type
@@ -758,6 +759,7 @@ class TuyaSensorEntity(TuyaEntity, RestoreSensor):
     
 
     def reset_value(self, _: datetime) -> None:
+        self.cancel_reset_after_x_seconds = None
         value = self.device.status.get(self.entity_description.key)
         default_value = get_default_value(self._type)
         if value is None or value == default_value:
@@ -824,4 +826,10 @@ class TuyaSensorEntity(TuyaEntity, RestoreSensor):
     @callback
     async def _on_event(self, event: Event[EventStateChangedData]):
         new_state: State = event.data.get("new_state")
+        default_value = get_default_value(self._type)
         self.device_manager.device_watcher.report_message(self.device.id, f"On State Changed event: {new_state.state}")
+        if not new_state.state or new_state.state == default_value:
+            return
+        if self.cancel_reset_after_x_seconds:
+            self.cancel_reset_after_x_seconds()
+        self.cancel_reset_after_x_seconds = async_call_later(self.hass, self.entity_description.reset_after_x_seconds, self.reset_value)
