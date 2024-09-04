@@ -74,6 +74,8 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
         if self.other_device_manager:
             if self.mq and self.mq != self.other_device_manager.mq:
                 self.mq.stop()
+            for device in self.other_device_manager.device_map.values():
+                device.set_up = True
             self.other_device_manager.refresh_mq()
             for device in self.other_device_manager.mq.device:
                 self.multi_manager.device_watcher.report_message(device.id, "Registered in MQTT")
