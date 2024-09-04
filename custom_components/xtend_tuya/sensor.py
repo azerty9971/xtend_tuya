@@ -765,7 +765,7 @@ class TuyaSensorEntity(TuyaEntity, RestoreSensor):
         if value is None or value == default_value:
             return
         self.device.status[self.entity_description.key] = default_value
-        self.async_write_ha_state()
+        self.schedule_update_ha_state()
 
     async def async_added_to_hass(self) -> None:
         """Call when entity about to be added to hass."""
