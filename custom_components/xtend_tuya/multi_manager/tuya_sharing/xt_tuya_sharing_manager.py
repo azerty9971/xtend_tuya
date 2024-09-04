@@ -97,6 +97,8 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
             return
         #super().refresh_mq()
         self.refresh_mq_mod()
+        for device in self.mq.device:
+            self.multi_manager.device_watcher.report_message(device.id, "Registered in MQTT")
         self.mq.add_message_listener(self.forward_message_to_multi_manager)
         self.mq.remove_message_listener(self.on_message)
 
