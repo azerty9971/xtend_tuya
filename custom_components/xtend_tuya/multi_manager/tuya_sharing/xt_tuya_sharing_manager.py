@@ -35,9 +35,6 @@ from ..shared.device import (
 from .xt_tuya_sharing_device_repository import (
     XTSharingDeviceRepository
 )
-from .xt_tuya_shaing_mq import (
-    XTSharingMQ
-)
 
 class XTSharingDeviceManager(Manager):  # noqa: F811
     def __init__(
@@ -73,20 +70,6 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
             self.mq.add_message_listener(self.forward_message_to_multi_manager)
             self.mq.remove_message_listener(self.other_device_manager.on_message)
 
-    def refresh_mq_mod(self):
-        if self.mq is not None:
-            self.mq.stop()
-            self.mq = None
-
-        home_ids = [home.id for home in self.user_homes]
-        device = [device for device in self.device_map.values() if
-                  hasattr(device, "id") and getattr(device, "set_up", False)]
-
-        sharing_mq = XTSharingMQ(self.customer_api, home_ids, device)
-        sharing_mq.start()
-        sharing_mq.add_message_listener(self.on_message)
-        self.mq = sharing_mq
-
     def refresh_mq(self):
         if self.other_device_manager:
             if self.mq and self.mq != self.other_device_manager.mq:
@@ -95,8 +78,7 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
             for device in self.other_device_manager.mq.device:
                 self.multi_manager.device_watcher.report_message(device.id, "Registered in MQTT")
             return
-        #super().refresh_mq()
-        self.refresh_mq_mod()
+        super().refresh_mq()
         self.mq.add_message_listener(self.forward_message_to_multi_manager)
         self.mq.remove_message_listener(self.on_message)
 
