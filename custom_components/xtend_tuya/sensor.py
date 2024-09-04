@@ -21,14 +21,15 @@ from homeassistant.const import (
     PERCENTAGE,
     EntityCategory,
 )
-from homeassistant.core import HomeAssistant, callback
+from homeassistant.core import HomeAssistant, callback, Event, EventStateChangedData, State
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import StateType
-from homeassistant.helpers.event import async_track_time_change
+from homeassistant.helpers.event import async_track_time_change, async_call_later, async_track_state_change_event
 
 from .util import (
-    merge_device_descriptors
+    merge_device_descriptors,
+    get_default_value
 )
 
 from .multi_manager.multi_manager import XTConfigEntry, MultiManager
@@ -41,6 +42,7 @@ from .const import (
     DPType,
     UnitOfMeasurement,
     VirtualStates,
+    LOGGER,
 )
 
 
@@ -753,6 +755,15 @@ class TuyaSensorEntity(TuyaEntity, RestoreSensor):
         # Valid string or enum value
         return value
     
+
+    def reset_value(self, _: datetime) -> None:
+        value = self.device.status.get(self.entity_description.key)
+        default_value = get_default_value(self._type)
+        if value is None or value == default_value:
+            return
+        self.device.status[self.entity_description.key] = default_value
+        self.async_write_ha_state()
+
     async def async_added_to_hass(self) -> None:
         """Call when entity about to be added to hass."""
         await super().async_added_to_hass()
@@ -785,6 +796,16 @@ class TuyaSensorEntity(TuyaEntity, RestoreSensor):
                     self.hass, reset_status_daily, hour=0, minute=0, second=0
                 )
             )
+        if (
+           ( hasattr(self.entity_description, "reset_after_x_seconds") and self.entity_description.reset_after_x_seconds ) 
+        ):
+            self.async_on_remove(
+                async_track_state_change_event(
+                    self.hass,
+                    self.entity_id,
+                    self._on_event,
+                )
+            )
 
         if not hasattr(self.entity_description, "restoredata") or not self.entity_description.restoredata:
             return
@@ -798,3 +819,8 @@ class TuyaSensorEntity(TuyaEntity, RestoreSensor):
 
         if device := self.device_manager.device_map.get(self.device.id, None):
             device.status[self.entity_description.key] = float(state.native_value)
+    
+    @callback
+    async def _on_event(self, event: Event[EventStateChangedData]):
+        new_state: State = event.data.get("new_state")
+        self.device_manager.device_watcher.report_message(self.device.id, f"On State Changed event: {new_state}")
