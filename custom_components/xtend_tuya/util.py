@@ -8,6 +8,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.entity import EntityDescription
 from .const import (
     LOGGER,
+    DPType,
 )
 from tuya_sharing.manager import (
     Manager,
@@ -20,6 +21,23 @@ from .multi_manager.multi_manager import (
 
 def log_stack(message: str):
     LOGGER.debug(message, stack_info=True)
+
+def get_default_value(dp_type: DPType) -> any:
+    match dp_type:
+        case DPType.BOOLEAN:
+            return False
+        case DPType.ENUM:
+            return None
+        case DPType.INTEGER:
+            return 0
+        case DPType.JSON:
+            return "{}"
+        case DPType.RAW:
+            return None
+        case DPType.STRING:
+            return ""
+    return None
+        
 
 def remap_value(
     value: float,
