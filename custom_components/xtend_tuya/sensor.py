@@ -786,7 +786,8 @@ class TuyaSensorEntity(TuyaEntity, RestoreSensor):
                 if device := self.device_manager.device_map.get(self.device.id, None):
                     if self.entity_description.key in device.status:
                         device.status[self.entity_description.key] = float(0)
-                        self.entity_description.last_reset = now
+                        if self.entity_description.state_class == SensorStateClass.TOTAL:
+                            self.entity_description.last_reset = now
                         self.async_write_ha_state()
 
         if (
