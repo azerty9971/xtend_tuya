@@ -42,7 +42,7 @@ from .const import (
     DPType,
     UnitOfMeasurement,
     VirtualStates,
-    LOGGER,
+    LOGGER,  # noqa: F401
 )
 
 
