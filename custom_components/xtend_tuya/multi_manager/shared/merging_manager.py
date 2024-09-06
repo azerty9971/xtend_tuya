@@ -53,7 +53,10 @@ class XTMergingManager:
                         device2.function[function_key].values = device1.function[function_key].values
                     case 2:
                         device1.function[function_key].values = device2.function[function_key].values
-                XTMergingManager._merge_dict(device1.function[function_key].values, device2.function[function_key].values)
+                XTMergingManager._merge_dict(value1, value2)
+                
+                device1.function[function_key].values = json.dumps(value1)
+                device2.function[function_key].values = device1.function[function_key].values
             else:
                 device2.function[function_key] = device1.function[function_key]
         for function_key in device2.function:
@@ -95,7 +98,9 @@ class XTMergingManager:
                         device2.status_range[status_range_key].values = device1.status_range[status_range_key].values
                     case 2:
                         device1.status_range[status_range_key].values = device2.status_range[status_range_key].values
-                XTMergingManager._merge_dict(device1.status_range[status_range_key].values, device2.status_range[status_range_key].values)
+                XTMergingManager._merge_dict(value1, value2)
+                device1.status_range[status_range_key].values = json.dumps(value1)
+                device2.status_range[status_range_key].values = device1.status_range[status_range_key].values
             else:
                 device2.status_range[status_range_key] = device1.status_range[status_range_key]
         for status_range_key in device2.status_range:
