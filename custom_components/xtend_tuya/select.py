@@ -32,11 +32,13 @@ SELECTS: dict[str, tuple[SelectEntityDescription, ...]] = {
             key=DPCode.ALARM_VOLUME,
             translation_key="alarm_volume",
             entity_category=EntityCategory.CONFIG,
+            entity_registry_enabled_default=False
         ),
         SelectEntityDescription(
             key=DPCode.SOUND_MODE,
             translation_key="sound_mode",
             entity_category=EntityCategory.CONFIG,
+            entity_registry_enabled_default=False
         ),
     ),
     "msp": (
