@@ -290,7 +290,7 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
         TuyaSensorEntityDescription(
             key=DPCode.ALARM_LOCK,
             translation_key="jtmspro_alarm_lock",
-            entity_registry_enabled_default=True,
+            entity_registry_enabled_default=False,
         ),
         TuyaSensorEntityDescription(
             key=DPCode.CLOSED_OPENED,
@@ -508,7 +508,7 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
         TuyaSensorEntityDescription(
             key=DPCode.ALARM_LOCK,
             translation_key="ms_category_alarm_lock",
-            entity_registry_enabled_default=True,
+            entity_registry_enabled_default=False,
             reset_after_x_seconds=1
         ),
         *BATTERY_SENSORS,
