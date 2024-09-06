@@ -74,10 +74,14 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
         if self.other_device_manager:
             if self.mq and self.mq != self.other_device_manager.mq:
                 self.mq.stop()
+            for device in self.other_device_manager.device_map.values():
+                device.set_up = True
             self.other_device_manager.refresh_mq()
             for device in self.other_device_manager.mq.device:
                 self.multi_manager.device_watcher.report_message(device.id, "Registered in MQTT")
             return
+        for device in self.device_map.values():
+            device.set_up = True
         super().refresh_mq()
         self.mq.add_message_listener(self.forward_message_to_multi_manager)
         self.mq.remove_message_listener(self.on_message)
@@ -92,12 +96,12 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
         added_new_statuses: bool = False
         if other_manager := self.get_overriden_device_manager():
             if device.id in other_manager.device_map:
-                self.multi_manager.device_watcher.report_message(device.id, f"BEFORE copy_statuses_to_tuya: {other_manager.device_map[device.id].status}", device)
+                #self.multi_manager.device_watcher.report_message(device.id, f"BEFORE copy_statuses_to_tuya: {other_manager.device_map[device.id].status}", device)
                 for code in device.status:
                     if code not in other_manager.device_map[device.id].status:
                         added_new_statuses = True
                     other_manager.device_map[device.id].status[code] = device.status[code]
-                self.multi_manager.device_watcher.report_message(device.id, f"AFTER copy_statuses_to_tuya: {other_manager.device_map[device.id].status}", device)
+                #self.multi_manager.device_watcher.report_message(device.id, f"AFTER copy_statuses_to_tuya: {other_manager.device_map[device.id].status}", device)
         return added_new_statuses
 
     def _on_device_report(self, device_id: str, status: list):

@@ -21,14 +21,15 @@ from homeassistant.const import (
     PERCENTAGE,
     EntityCategory,
 )
-from homeassistant.core import HomeAssistant, callback
+from homeassistant.core import HomeAssistant, callback, Event, EventStateChangedData, State
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import StateType
-from homeassistant.helpers.event import async_track_time_change
+from homeassistant.helpers.event import async_track_time_change, async_call_later, async_track_state_change_event
 
 from .util import (
-    merge_device_descriptors
+    merge_device_descriptors,
+    get_default_value
 )
 
 from .multi_manager.multi_manager import XTConfigEntry, MultiManager
@@ -41,6 +42,7 @@ from .const import (
     DPType,
     UnitOfMeasurement,
     VirtualStates,
+    LOGGER,
 )
 
 
@@ -57,6 +59,7 @@ class TuyaSensorEntityDescription(SensorEntityDescription):
     reset_daily: bool = False
     reset_monthly: bool = False
     reset_yearly: bool = False
+    reset_after_x_seconds: int = 0
     restoredata: bool = False
 
 # Commonly used battery sensors, that are re-used in the sensors down below.
@@ -506,6 +509,7 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
             key=DPCode.ALARM_LOCK,
             translation_key="ms_category_alarm_lock",
             entity_registry_enabled_default=True,
+            reset_after_x_seconds=1
         ),
         *BATTERY_SENSORS,
     ),
@@ -657,6 +661,7 @@ class TuyaSensorEntity(TuyaEntity, RestoreSensor):
         self._attr_unique_id = (
             f"{super().unique_id}{description.key}{description.subkey or ''}"
         )
+        self.cancel_reset_after_x_seconds = None
 
         if int_type := self.find_dpcode(description.key, dptype=DPType.INTEGER):
             self._type_data = int_type
@@ -705,6 +710,7 @@ class TuyaSensorEntity(TuyaEntity, RestoreSensor):
 
     @property
     def native_value(self) -> StateType:
+        self.device_manager.device_watcher.report_message(self.device.id, f"Native value of sensor {self.entity_description.key}")
         """Return the value reported by the sensor."""
         # Only continue if data type is known
         if self._type not in (
@@ -751,6 +757,16 @@ class TuyaSensorEntity(TuyaEntity, RestoreSensor):
         # Valid string or enum value
         return value
     
+
+    def reset_value(self, _: datetime) -> None:
+        self.cancel_reset_after_x_seconds = None
+        value = self.device.status.get(self.entity_description.key)
+        default_value = get_default_value(self._type)
+        if value is None or value == default_value:
+            return
+        self.device.status[self.entity_description.key] = default_value
+        self.schedule_update_ha_state()
+
     async def async_added_to_hass(self) -> None:
         """Call when entity about to be added to hass."""
         await super().async_added_to_hass()
@@ -770,7 +786,8 @@ class TuyaSensorEntity(TuyaEntity, RestoreSensor):
                 if device := self.device_manager.device_map.get(self.device.id, None):
                     if self.entity_description.key in device.status:
                         device.status[self.entity_description.key] = float(0)
-                        self.entity_description.last_reset = now
+                        if self.entity_description.state_class == SensorStateClass.TOTAL:
+                            self.entity_description.last_reset = now
                         self.async_write_ha_state()
 
         if (
@@ -781,6 +798,16 @@ class TuyaSensorEntity(TuyaEntity, RestoreSensor):
             self.async_on_remove(
                 async_track_time_change(
                     self.hass, reset_status_daily, hour=0, minute=0, second=0
+                )
+            )
+        if (
+           ( hasattr(self.entity_description, "reset_after_x_seconds") and self.entity_description.reset_after_x_seconds ) 
+        ):
+            self.async_on_remove(
+                async_track_state_change_event(
+                    self.hass,
+                    self.entity_id,
+                    self._on_event,
                 )
             )
 
@@ -796,3 +823,14 @@ class TuyaSensorEntity(TuyaEntity, RestoreSensor):
 
         if device := self.device_manager.device_map.get(self.device.id, None):
             device.status[self.entity_description.key] = float(state.native_value)
+    
+    @callback
+    async def _on_event(self, event: Event[EventStateChangedData]):
+        new_state: State = event.data.get("new_state")
+        default_value = get_default_value(self._type)
+        self.device_manager.device_watcher.report_message(self.device.id, f"On State Changed event: {new_state.state}")
+        if not new_state.state or new_state.state == default_value:
+            return
+        if self.cancel_reset_after_x_seconds:
+            self.cancel_reset_after_x_seconds()
+        self.cancel_reset_after_x_seconds = async_call_later(self.hass, self.entity_description.reset_after_x_seconds, self.reset_value)

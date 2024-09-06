@@ -210,10 +210,6 @@ class MultiManager:  # noqa: F811
         if dp_id_item := device.local_strategy.get(dpId, None):
             return dp_id_item["status_code"]
         return None
-
-    def allow_devices_not_set_up(self, device: XTDevice):
-        if not getattr(device, "set_up", True):
-            device.set_up = True
     
     def __get_devices_from_device_id(self, device_id: str) -> list[XTDevice] | None:
         return_list = []
@@ -287,12 +283,12 @@ class MultiManager:  # noqa: F811
         if not dev_id:
             LOGGER.warning(f"dev_id {dev_id} not found!")
             return
-        self.device_watcher.report_message(dev_id, f"On Message ({source}): {msg}")
         
         #self.device_watcher.report_message(dev_id, f"on_message ({source}) => {msg}")
 
         new_message = self._convert_message_for_all_accounts(msg)
         if status_list := self._get_status_list_from_message(msg):
+            self.device_watcher.report_message(dev_id, f"On Message reporting ({source}): {msg}")
             self.multi_source_handler.register_status_list_from_source(dev_id, source, status_list)
             #self.device_watcher.report_message(dev_id, f"on_message ({source}) status list => {status_list}")
         
@@ -382,3 +378,7 @@ class MultiManager:  # noqa: F811
             if account.send_lock_unlock_command(device_id, lock):
                 return True
         return False
+    
+    def inform_device_has_an_entity(self, device_id: str):
+        for account in self.accounts.values():
+            account.inform_device_has_an_entity(device_id)
