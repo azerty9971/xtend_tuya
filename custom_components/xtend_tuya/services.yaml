@@ -1,8 +1,0 @@
-get_camera_stream_url:
-  description: Get the camera stream URL
-  fields:
-    device_id:
-      decription: Device ID of the camera
-    source:
-      description: Source of the stream URL
-      example: tuya_sharing
