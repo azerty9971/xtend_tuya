@@ -25,6 +25,9 @@ from .multi_manager.shared.shared_classes import (
 from .util import (
     get_config_entry_runtime_data
 )
+from .services import (
+    ServiceManager,
+)
 
 # Suppress logs from the library, it logs unneeded on error
 logging.getLogger("tuya_sharing").setLevel(logging.CRITICAL)
@@ -36,13 +39,14 @@ async def update_listener(hass: HomeAssistant, entry: XTConfigEntry):
 async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
     """Async setup hass config entry.""" 
     multi_manager = MultiManager(hass)
+    service_manager = ServiceManager(multi_manager=multi_manager)
     await multi_manager.setup_entry(hass, entry)
 
     # Get all devices from Tuya
     await hass.async_add_executor_job(multi_manager.update_device_cache)
 
     # Connection is successful, store the manager & listener
-    entry.runtime_data = HomeAssistantXTData(multi_manager=multi_manager, listener=multi_manager.multi_device_listener)
+    entry.runtime_data = HomeAssistantXTData(multi_manager=multi_manager, listener=multi_manager.multi_device_listener, service_manager=service_manager)
 
     # Cleanup device registry
     await cleanup_device_registry(hass, multi_manager, entry)
@@ -71,6 +75,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
     # If the device does not register any entities, the device does not need to subscribe
     # So the subscription is here
     await hass.async_add_executor_job(multi_manager.refresh_mq)
+    service_manager.register_services()
     return True
 
 
