@@ -162,7 +162,9 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
         self.iot_account.device_manager.on_message(msg)
     
     def query_scenes(self) -> list:
-        return self.iot_account.home_manager.query_scenes()
+        #return self.iot_account.home_manager.query_scenes()
+        #Scenes should be handled by tuya_sharing
+        return []
     
     def get_device_stream_allocate(
             self, device_id: str, stream_type: Literal["flv", "hls", "rtmp", "rtsp"]
