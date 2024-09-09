@@ -41,6 +41,62 @@
       }
     }
   },
+  "services": {
+    "get_camera_stream_url": {
+      "name": "Get camera stream URL",
+      "description": "Get camera stream URL",
+      "fields": {
+        "device_id": {
+          "name": "Device ID",
+          "description": "The ID of the device."
+        },
+        "source": {
+          "name": "Source",
+          "description": "The source of the URL (tuya_sharing or tuya_iot)"
+        }
+      }
+    },
+    "call_api": {
+      "name": "Call API",
+      "description": "Call an API and return the result",
+      "fields": {
+        "source": {
+          "name": "Source",
+          "description": "The source of the URL (tuya_sharing or tuya_iot)"
+        },
+        "method": {
+          "name": "Method",
+          "description": "GET or POST"
+        },
+        "url": {
+          "name": "URL",
+          "description": "The URL of the API call"
+        },
+        "payload": {
+          "name": "Payload",
+          "description": "The payuload to provide to the API call"
+        }
+      }
+    },
+    "toggle": {
+      "name": "[%key:common::action::toggle%]",
+      "description": "Toggles (enable / disable) an automation."
+    },
+    "trigger": {
+      "name": "Trigger",
+      "description": "Triggers the actions of an automation.",
+      "fields": {
+        "skip_condition": {
+          "name": "Skip conditions",
+          "description": "Defines whether or not the conditions will be skipped."
+        }
+      }
+    },
+    "reload": {
+      "name": "[%key:common::action::reload%]",
+      "description": "Reloads the automation configuration."
+    }
+  },
   "entity": {
     "binary_sensor": {
       "jtmspro_lock_motor_state": {

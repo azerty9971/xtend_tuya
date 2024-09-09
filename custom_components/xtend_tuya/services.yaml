@@ -2,10 +2,8 @@ get_camera_stream_url:
   fields:
     device_id:
       required: true
-      name: "Device ID"
     source:
       required: false
-      name: "Source"
       example: "tuya_sharing"
       default: "tuya_sharing"
 
@@ -13,17 +11,13 @@ call_api:
   fields:
     source:
       required: true
-      name: "Source"
       example: "tuya_sharing"
     method:
       required: true
-      name: "Method"
       example: "GET"
       default: "GET"
     url:
       required: true
-      name: "URL"
       example: "/v1.0/devices/bf868d7b9a0e88ad5axl9h/webrtc-configs"
     payload:
       required: false
-      name: "Payload"
