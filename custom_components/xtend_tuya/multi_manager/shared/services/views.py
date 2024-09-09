@@ -77,3 +77,5 @@ class XTGeneralView(HomeAssistantView):
     async def handle(self, request: web.Request) -> web.StreamResponse:
         """Handle the entity request."""
         LOGGER.warning(f"Request: {request}")
+        LOGGER.warning(f"Request headers: {request.headers}")
+        LOGGER.warning(f"Request param: {request.config_dict}")
