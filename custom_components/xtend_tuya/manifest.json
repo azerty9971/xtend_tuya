@@ -4,7 +4,7 @@
   "after_dependencies": ["tuya"],
   "codeowners": ["@azerty9971"],
   "config_flow": true,
-  "dependencies": ["ffmpeg"],
+  "dependencies": ["ffmpeg", "http"],
   "dhcp": [
     {
       "macaddress": "105A17*"
