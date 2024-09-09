@@ -25,7 +25,7 @@ from .multi_manager.shared.shared_classes import (
 from .util import (
     get_config_entry_runtime_data
 )
-from .services import (
+from .multi_manager.shared.services.services import (
     ServiceManager,
 )
 

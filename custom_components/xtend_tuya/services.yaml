@@ -6,3 +6,18 @@ get_camera_stream_url:
     source:
       description: Source of the stream URL
       example: tuya_sharing
+
+call_api:
+  description: Call an API method and show the result in the system log
+  fields:
+    source:
+      description: Source of the stream URL
+      example: tuya_sharing
+    method:
+      description: GET or POST
+      example: GET
+    url:
+      description: The API URL to call
+      example: /v1.0/devices/bf868d7b9a0e88ad5axl9h/webrtc-configs
+    payload:
+      description: The payload to pass to the API call
