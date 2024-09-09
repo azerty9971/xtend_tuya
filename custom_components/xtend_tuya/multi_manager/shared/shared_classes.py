@@ -19,7 +19,7 @@ from .multi_device_listener import (
 from ...const import (
     LOGGER,
 )
-from ...services import (
+from .services.services import (
     ServiceManager,
 )
 
