@@ -58,7 +58,7 @@ class XTGeneralView(HomeAssistantView):
         self.callback = callback
 
 
-    async def get(self, request: web.Request, entity_id: str) -> web.StreamResponse:
+    async def get(self, request: web.Request) -> web.StreamResponse:
         """Start a GET request."""
         authenticated = (
             request[KEY_AUTHENTICATED]
