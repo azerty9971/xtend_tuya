@@ -78,4 +78,4 @@ class XTGeneralView(HomeAssistantView):
         """Handle the entity request."""
         LOGGER.warning(f"Request: {request}")
         LOGGER.warning(f"Request headers: {request.headers}")
-        LOGGER.warning(f"Request param: {request.config_dict}")
+        LOGGER.warning(f"Request param: {request.query}")
