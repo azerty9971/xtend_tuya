@@ -2,22 +2,36 @@ get_camera_stream_url:
   description: "Get the camera stream URL"
   fields:
     device_id:
+      required: true
+      name: "Device ID"
       decription: "Device ID of the camera"
     source:
-      description: "Source of the stream URL"
-      example: tuya_sharing
+      required: false
+      name: "Source"
+      description: "Source of the stream URL (tuya_sharing or tuya_iot)"
+      example: "tuya_sharing"
+      default: "tuya_sharing"
 
 call_api:
   description: "Call an API method and show the result in the system log"
   fields:
     source:
+      required: true
+      name: "Source"
       description: "Source of the stream URL"
-      example: tuya_sharing
+      example: "tuya_sharing"
     method:
+      required: true
+      name: "Method"
       description: "GET or POST"
-      example: GET
+      example: "GET"
+      default: "GET"
     url:
+      required: true
+      name: "URL"
       description: "The API URL to call"
-      example: /v1.0/devices/bf868d7b9a0e88ad5axl9h/webrtc-configs
+      example: "/v1.0/devices/bf868d7b9a0e88ad5axl9h/webrtc-configs"
     payload:
+      required: false
+      name: "Payload"
       description: "The payload to pass to the API call"
