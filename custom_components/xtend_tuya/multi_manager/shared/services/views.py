@@ -53,7 +53,7 @@ class XTGeneralView(HomeAssistantView):
     def __init__(self, name: str, callback, requires_auth: bool = True) -> None:
         """Initialize a basic camera view."""
         self.name = "api:" + DOMAIN + ":" + name
-        self.url = "/api/" + DOMAIN + name + "/{entity_id}"
+        self.url = "/api/" + DOMAIN + name
         self.requires_auth = requires_auth
         self.callback = callback
 
