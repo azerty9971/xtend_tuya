@@ -103,5 +103,5 @@ class XTDeviceManagerInterface(ABC):
             if device_id in device_map:
                 device_map[device_id].set_up = True
     
-    async def call_api(self, method: str, url: str, payload: str) -> str | None:
+    def call_api(self, method: str, url: str, payload: str) -> str | None:
         pass
