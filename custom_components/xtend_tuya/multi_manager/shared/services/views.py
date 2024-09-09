@@ -14,6 +14,12 @@ from ....const import (
     DOMAIN,
 )
 
+class XTEventData:
+    data: dict[str, any] = None
+
+    def __init__(self) -> None:
+        self.data = {}
+
 class XTEntityView(HomeAssistantView):
     """Base EntityView."""
 
@@ -80,9 +86,11 @@ class XTGeneralView(HomeAssistantView):
 
     async def handle(self, request: web.Request) -> web.StreamResponse:
         """Handle the entity request."""
-        LOGGER.warning(f"Request: {request}")
-        LOGGER.warning(f"Request headers: {request.headers}")
-        LOGGER.warning(f"Request param: {request.query}")
+        event_data: XTEventData = XTEventData()
         parameters: MultiMapping[str] = request.query
         for parameter in parameters:
-            LOGGER.warning(f"parameter: {parameter} => {parameters[parameter]}")
+            event_data.data[parameter] = parameters[parameter]
+        response = await self.callback(event_data)
+        if not response:
+            raise web.HTTPBadRequest
+        return web.Response(text=response)
