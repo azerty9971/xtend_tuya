@@ -287,7 +287,7 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
     ) -> bool:
         return self.sharing_account.device_manager.send_lock_unlock_command(device_id, lock)
     
-    def call_api(self, method: str, url: str, payload: str) -> str | None:
+    async def call_api(self, method: str, url: str, payload: str) -> str | None:
         params: dict[str, any] = None
         if payload:
             params = json.loads(payload)
