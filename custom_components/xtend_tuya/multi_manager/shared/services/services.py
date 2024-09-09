@@ -56,5 +56,9 @@ class ServiceManager:
         LOGGER.warning(f"_handle_get_camera_stream_url: {event}")
     
     async def _handle_call_api(self, event):
-        LOGGER.warning(f"_handle_call_api: {event}")
+        source  = event.data.get(CONF_SOURCE, None)
+        method  = event.data.get(CONF_METHOD, None)
+        url     = event.data.get(CONF_URL, None)
+        payload = event.data.get(CONF_PAYLOAD, None)
+        LOGGER.warning(f"_handle_call_api: {source} <=> {method} <=> {url} <=> {payload}")
     
