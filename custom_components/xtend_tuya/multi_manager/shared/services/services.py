@@ -61,4 +61,7 @@ class ServiceManager:
         url     = event.data.get(CONF_URL, None)
         payload = event.data.get(CONF_PAYLOAD, None)
         LOGGER.warning(f"_handle_call_api: {source} <=> {method} <=> {url} <=> {payload}")
+        if account := self.multi_manager.get_account_by_name(source):
+            if response := account.call_api(method, url, payload):
+                LOGGER.warning(f"API call response: {response}")
     
