@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+from multidict import (
+    MultiMapping,
+)
+
 from homeassistant.components.http import KEY_AUTHENTICATED, HomeAssistantView
 from homeassistant.helpers.entity_component import EntityComponent, entity
 
@@ -79,3 +83,6 @@ class XTGeneralView(HomeAssistantView):
         LOGGER.warning(f"Request: {request}")
         LOGGER.warning(f"Request headers: {request.headers}")
         LOGGER.warning(f"Request param: {request.query}")
+        parameters: MultiMapping[str] = request.query
+        for parameter in parameters:
+            LOGGER.warning(f"parameter: {parameter} => {parameters[parameter]}")
