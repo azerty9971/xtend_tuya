@@ -7,6 +7,10 @@ from ...multi_manager import (
     MultiManager,
 )
 
+from .views import (
+    XTGeneralView,
+)
+
 from ....const import (
     DOMAIN,
     LOGGER,  # noqa: F401
@@ -48,9 +52,12 @@ class ServiceManager:
         self.hass.services.async_register(
             DOMAIN, SERVICE_GET_CAMERA_STREAM_URL, self._handle_get_camera_stream_url, schema=SERVICE_GET_CAMERA_STREAM_URL_SCHEMA
         )
+        self.hass.http.register_view(XTGeneralView(SERVICE_GET_CAMERA_STREAM_URL, self._handle_get_camera_stream_url, True))
+
         self.hass.services.async_register(
             DOMAIN, SERVICE_CALL_API, self._handle_call_api, schema=SERVICE_CALL_API_SCHEMA
         )
+        self.hass.http.register_view(XTGeneralView(SERVICE_CALL_API, self._handle_call_api, True))
     
     async def _handle_get_camera_stream_url(self, event):
         LOGGER.warning(f"_handle_get_camera_stream_url: {event}")
