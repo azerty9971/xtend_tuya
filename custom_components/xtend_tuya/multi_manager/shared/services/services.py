@@ -61,6 +61,7 @@ class ServiceManager:
     
     async def _handle_get_camera_stream_url(self, event):
         LOGGER.warning(f"_handle_get_camera_stream_url: {event}")
+        return "hello"
     
     async def _handle_call_api(self, event):
         source  = event.data.get(CONF_SOURCE, None)

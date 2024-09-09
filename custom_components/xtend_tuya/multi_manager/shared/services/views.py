@@ -91,6 +91,7 @@ class XTGeneralView(HomeAssistantView):
         for parameter in parameters:
             event_data.data[parameter] = parameters[parameter]
         response = await self.callback(event_data)
+        LOGGER.warning(f"Response: {response}")
         if not response:
             raise web.HTTPBadRequest
         return web.Response(text=response)
