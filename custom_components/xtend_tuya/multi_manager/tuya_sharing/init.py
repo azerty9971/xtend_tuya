@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import Optional, Literal, Any, overload
+import json
 
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
@@ -285,3 +286,14 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
             self, device_id: str, lock: bool
     ) -> bool:
         return self.sharing_account.device_manager.send_lock_unlock_command(device_id, lock)
+    
+    def call_api(self, method: str, url: str, payload: str) -> str | None:
+        params: dict[str, any] = None
+        if payload:
+            params = json.loads(payload)
+        match method:
+            case "GET":
+                return self.sharing_account.device_manager.customer_api.get(url, params)
+            case "POST":
+                return self.sharing_account.device_manager.customer_api.post(url, params)
+        return None
