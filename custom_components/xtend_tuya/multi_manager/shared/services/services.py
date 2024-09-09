@@ -62,6 +62,10 @@ class ServiceManager:
         payload = event.data.get(CONF_PAYLOAD, None)
         LOGGER.warning(f"_handle_call_api: {source} <=> {method} <=> {url} <=> {payload}")
         if account := self.multi_manager.get_account_by_name(source):
-            if response := await self.hass.async_add_executor_job(account.call_api, method, url, payload):
-                LOGGER.warning(f"API call response: {response}")
+            try:
+                if response := await self.hass.async_add_executor_job(account.call_api, method, url, payload):
+                    LOGGER.warning(f"API call response: {response}")
+            except Exception as e:
+                LOGGER.warning(f"API Call failed: {e}")
+
     
