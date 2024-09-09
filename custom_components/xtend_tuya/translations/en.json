@@ -74,7 +74,7 @@
         },
         "payload": {
           "name": "Payload",
-          "description": "The payuload to provide to the API call"
+          "description": "The payload to provide to the API call"
         }
       }
     },
