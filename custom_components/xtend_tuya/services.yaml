@@ -10,7 +10,6 @@ get_camera_stream_url:
       default: "tuya_sharing"
 
 call_api:
-  description: "Call an API method and show the result in the system log"
   fields:
     source:
       required: true
