@@ -144,7 +144,6 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
             new_device_ids: list[str] = [device_id for device_id in self.sharing_account.device_manager.device_map]
             self.sharing_account.device_ids.clear()
             self.sharing_account.device_ids.extend(new_device_ids)
-            LOGGER.warning(f"After device cache update: {self.sharing_account.device_ids}")
 
             if other_manager := self.sharing_account.device_manager.get_overriden_device_manager():
                 for device in other_manager.device_map.values():
