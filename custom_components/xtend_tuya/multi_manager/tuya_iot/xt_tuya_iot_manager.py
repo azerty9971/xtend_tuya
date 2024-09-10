@@ -311,6 +311,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                     },
                 }
                 self._publish_to_ipc_mqtt(topic, json.dumps(payload))
+                time.sleep(60)
 
             
             if not auth_token or not moto_id:
