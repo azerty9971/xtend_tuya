@@ -113,7 +113,6 @@ class ServiceManager:
                 match event.content_type:
                     case "application/sdp":
                         LOGGER.warning(f"Content type is: {event.content_type}")
-                        event.payload = event.payload.replace("\r\n", " ")
                         if account := self.multi_manager.get_account_by_name(source):
                             LOGGER.warning(f"Account found: {source}")
                             if sdp_answer := await self.hass.async_add_executor_job(account.get_sdp_answer, device_id, event.payload):
