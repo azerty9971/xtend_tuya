@@ -9,6 +9,7 @@ from ...multi_manager import (
 
 from .views import (
     XTGeneralView,
+    XTEventData,
 )
 
 from ....const import (
@@ -73,7 +74,7 @@ class ServiceManager:
         if allow_from_api:
             self.hass.http.register_view(XTGeneralView(name, callback, requires_auth, use_cache))
     
-    async def _handle_get_camera_stream_url(self, event):
+    async def _handle_get_camera_stream_url(self, event: XTEventData):
         source      = event.data.get(CONF_SOURCE, MESSAGE_SOURCE_TUYA_SHARING)
         device_id   = event.data.get(CONF_DEVICE_ID, None)
         stream_type = event.data.get(CONF_STREAM_TYPE, "rtsp")
@@ -84,7 +85,7 @@ class ServiceManager:
             return response
         return None
     
-    async def _handle_call_api(self, event):
+    async def _handle_call_api(self, event: XTEventData):
         source  = event.data.get(CONF_SOURCE, None)
         method  = event.data.get(CONF_METHOD, None)
         url     = event.data.get(CONF_URL, None)
@@ -97,7 +98,6 @@ class ServiceManager:
             except Exception as e:
                 LOGGER.warning(f"API Call failed: {e}")
     
-    async def _handle_webrtc(self, event):
+    async def _handle_webrtc(self, event: XTEventData):
         LOGGER.warning(f"_handle_webrtc: {event}")
-        LOGGER.warning(f"_handle_webrtc data: {event.data}")
     
