@@ -20,7 +20,7 @@ class XTEventDataResultCache:
     def __init__(self, event_data, result, ttl: int = 60) -> None:
         self.event_data = event_data
         self.result = result
-        self.valid_until = datetime.now().time() + timedelta(0,ttl)
+        self.valid_until = datetime.now() + timedelta(0, ttl)
 
 class XTRequestCacheResult:
     def __init__(self, service_name: str) -> None:
@@ -28,7 +28,7 @@ class XTRequestCacheResult:
         self.cached_result: list[XTEventDataResultCache] = []
     
     def _clean_cache(self):
-        current_time = datetime.now().time()
+        current_time = datetime.now()
         for cache_entry in self.cached_result:
             if cache_entry.valid_until < current_time:
                 self.cached_result.remove(cache_entry)
