@@ -7,6 +7,7 @@ from __future__ import annotations
 import json
 import copy
 import time
+import uuid
 from tuya_iot import (
     TuyaDeviceManager,
     TuyaOpenAPI,
@@ -297,9 +298,9 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                         "pv":"2.2",
                         "t":time.time_ns() // 1_000_000,
                         "data":{
-                            "from":"TEST_FROM_HA",
+                            "from":f"tuya-iot-app-sdk-python.ipc.{uuid.uuid1()}",
                             "to":f"{device_id}",
-                            "session_id":"262626",
+                            "session_id":"00b00036521743319b4d4c01f1705c48",
                             "moto_id":f"{moto_id}",
                             "type":"offer"
                         },
@@ -319,6 +320,8 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         return None
 
     def _publish_to_ipc_mqtt(self, topic: str, msg: str):
+        LOGGER.warning("Sending payload:")
+        LOGGER.debug(f"{msg}")
         publish_result = self.ipc_mq.client.publish(topic=topic, payload=msg)
         publish_result.wait_for_publish(10)
         LOGGER.warning(f"Publish: {publish_result}")
