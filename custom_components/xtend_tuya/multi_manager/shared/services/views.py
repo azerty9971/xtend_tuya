@@ -211,22 +211,6 @@ class XTGeneralView(HomeAssistantView):
             raise web.HTTPForbidden
 
         return await self.handle(request)
-    
-    async def options(self, request: web.Request) -> web.StreamResponse:
-        """Start a OPTIONS request."""
-        authenticated = (
-            request[KEY_AUTHENTICATED]
-        )
-
-        if self.requires_auth and not authenticated:
-            # Attempt with invalid bearer token, raise unauthorized
-            # so ban middleware can handle it.
-            if hdrs.AUTHORIZATION in request.headers:
-                raise web.HTTPUnauthorized
-            # Invalid sigAuth or camera access token
-            raise web.HTTPForbidden
-
-        return await self.handle(request)
 
     async def handle(self, request: web.Request) -> web.StreamResponse:
         """Handle the entity request."""
