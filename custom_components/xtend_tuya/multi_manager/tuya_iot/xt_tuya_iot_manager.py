@@ -300,7 +300,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                         "data":{
                             "from":f"{self._get_from()}",
                             "to":f"{device_id}",
-                            "session_id":"",
+                            "session_id":"6fv4xg",
                             "moto_id":f"{moto_id}",
                             "type":"offer"
                         },
