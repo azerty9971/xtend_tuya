@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import voluptuous as vol
 import homeassistant.helpers.config_validation as cv
+from aiohttp import web
 
 from ...multi_manager import (
     MultiManager,
@@ -15,7 +16,8 @@ from .views import (
 from ....const import (
     DOMAIN,
     LOGGER,  # noqa: F401
-    MESSAGE_SOURCE_TUYA_SHARING
+    MESSAGE_SOURCE_TUYA_SHARING,
+    MESSAGE_SOURCE_TUYA_IOT,
 )
 
 from homeassistant.const import (
@@ -74,7 +76,7 @@ class ServiceManager:
         if allow_from_api:
             self.hass.http.register_view(XTGeneralView(name, callback, requires_auth, use_cache))
     
-    async def _handle_get_camera_stream_url(self, event: XTEventData):
+    async def _handle_get_camera_stream_url(self, event: XTEventData) -> web.Response | str | None:
         source      = event.data.get(CONF_SOURCE, MESSAGE_SOURCE_TUYA_SHARING)
         device_id   = event.data.get(CONF_DEVICE_ID, None)
         stream_type = event.data.get(CONF_STREAM_TYPE, "rtsp")
@@ -85,7 +87,7 @@ class ServiceManager:
             return response
         return None
     
-    async def _handle_call_api(self, event: XTEventData):
+    async def _handle_call_api(self, event: XTEventData) -> web.Response | str | None:
         source  = event.data.get(CONF_SOURCE, None)
         method  = event.data.get(CONF_METHOD, None)
         url     = event.data.get(CONF_URL, None)
@@ -98,6 +100,17 @@ class ServiceManager:
             except Exception as e:
                 LOGGER.warning(f"API Call failed: {e}")
     
-    async def _handle_webrtc(self, event: XTEventData):
+    async def _handle_webrtc(self, event: XTEventData) -> web.Response | str | None:
         LOGGER.warning(f"_handle_webrtc: {event}")
-    
+        source      = event.data.get(CONF_SOURCE, MESSAGE_SOURCE_TUYA_IOT)
+        device_id   = event.data.get(CONF_DEVICE_ID, None)
+        if not device_id:
+            return None
+        match event.method:
+            case "POST":
+                match event.content_type:
+                    case "application/sdp":
+                        if account := self.multi_manager.get_account_by_name(source):
+                            if sdp_answer := account.get_sdp_answer(device_id, event.payload):
+                                return web.Response(status=201, text=sdp_answer, content_type="application/sdp")
+                        return None

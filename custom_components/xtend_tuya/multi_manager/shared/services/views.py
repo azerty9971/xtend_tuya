@@ -60,7 +60,7 @@ class XTEventData:
         self.headers = {}
     
     def __eq__(self, other: XTEventData) -> bool:
-        return self.query_params == other.query_params
+        return self.query_params == other.query_params and self.method == other.method and self.payload == other.payload
 
     def __repr__(self) -> str:
         return f"Method: {self.method} <=> Headers: {self.headers} <=> Content-Type: {self.content_type} <=> Query parameters: {self.query_params} <=> Payload: {self.payload}"
@@ -234,4 +234,7 @@ class XTGeneralView(HomeAssistantView):
             raise web.HTTPBadRequest
         if self.use_cache:
             self.cache.append_to_cache(event_data, response, self.cache_ttl)
-        return web.Response(text=response)
+        if isinstance(response, str):
+            return web.Response(text=response)
+        else:
+            return response

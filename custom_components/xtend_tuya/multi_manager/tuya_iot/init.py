@@ -260,3 +260,6 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
             case "POST":
                 return self.iot_account.device_manager.api.post(url, params)
         return None
+    
+    def get_sdp_answer(self, device_id: str, sdp_offer: str) -> str | None:
+        return None

@@ -34,6 +34,9 @@ from ...base import TuyaEntity
 from .xt_tuya_iot_mq import (
     XTIOTOpenMQIPC,
 )
+from .xt_tuya_iot_ipc_listener import (
+    XTIOTIPCListener,
+)
 
 
 class XTIOTDeviceManager(TuyaDeviceManager):
@@ -43,7 +46,9 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         mq.add_message_listener(self.forward_message_to_multi_manager)
         self.multi_manager = multi_manager
         self.ipc_mq: XTIOTOpenMQIPC = XTIOTOpenMQIPC(api)
+        self.ipc_listener: XTIOTIPCListener = XTIOTIPCListener(self.multi_manager)
         self.ipc_mq.start()
+        self.ipc_mq.add_message_listener(self.ipc_listener.forward_message_to_multi_manager)
 
     def forward_message_to_multi_manager(self, msg:str):
         self.multi_manager.on_message(MESSAGE_SOURCE_TUYA_IOT, msg)
@@ -127,8 +132,6 @@ class XTIOTDeviceManager(TuyaDeviceManager):
             device_properties.merge_in_device(device)
             self.multi_manager.virtual_state_handler.apply_init_virtual_states(device)
 
-
-    
     def on_message(self, msg: str):
         super().on_message(msg)
     
@@ -275,3 +278,29 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                     lock_operation = self.api.post(f"/v1.0/smart-lock/devices/{device_id}/password-free/door-operate", {"ticket_id": ticket_id, "open": open})
                     return lock_operation.get("success", False)
         return False
+    
+    def get_sdp_answer(self, device_id: str, sdp_offer: str) -> str | None:
+        if webrtc_config := self._get_webrtc_config(device_id):
+            auth_token = webrtc_config.get("auth")
+            moto_id =  webrtc_config.get("moto_id")
+            for topic in self.ipc_mq.mq_config.sink_topic.values():
+                topic = topic.replace("{device_id}", device_id)
+                topic = topic.replace("{moto_id}", moto_id)
+                LOGGER.warning(f"Computed topic: {topic}")
+                subscribe_result = self.mq.client.subscribe(topic)
+                LOGGER.warning(f"Susbscribe result: {subscribe_result}")
+
+            
+            if not auth_token or not moto_id:
+                return None
+            
+        return None
+
+    def _publish_to_ipc_mqtt(self, msg: str):
+        self.ipc_mq.client.publish()
+
+    def _get_webrtc_config(self, device_id: str):
+        webrtc_config = self.api.get(f"/v1.0/devices/{device_id}/webrtc-configs")
+        if webrtc_config.get("success"):
+            return webrtc_config.get("result")
+        return None
