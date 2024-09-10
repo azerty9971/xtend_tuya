@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import Optional
+import uuid
 
 from tuya_iot import (
     TuyaOpenMQ,
@@ -68,7 +69,7 @@ class XTIOTOpenMQIPC(XTIOTOpenMQ):
             else TO_C_SMART_HOME_MQTT_CONFIG_API,
             {
                 "uid": self.api.token_info.uid,
-                "link_id": LINK_ID,
+                "link_id": f"tuya-iot-app-sdk-python.ipc.{uuid.uuid1()}",
                 "link_type": "mqtt",
                 "topics": "ipc",
                 "msg_encrypted_version": "2.0"
