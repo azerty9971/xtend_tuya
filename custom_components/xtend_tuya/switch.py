@@ -37,6 +37,7 @@ SWITCHES: dict[str, tuple[SwitchEntityDescription, ...]] = {
             key=DPCode.ALARM_SWITCH,
             translation_key="alarm_switch",
             entity_category=EntityCategory.CONFIG,
+            entity_registry_enabled_default=False
         ),
     ),
     # Automatic cat litter box

@@ -19,6 +19,9 @@ from .multi_device_listener import (
 from ...const import (
     LOGGER,
 )
+from .services.services import (
+    ServiceManager,
+)
 
 class DeviceWatcher:
     def __init__(self, multi_manager: MultiManager) -> None:
@@ -56,8 +59,9 @@ class XTDeviceProperties:
 class HomeAssistantXTData(NamedTuple):
     """Tuya data stored in the Home Assistant data object."""
 
-    multi_manager: MultiManager
+    multi_manager: MultiManager = None
     listener: MultiDeviceListener = None
+    service_manager: ServiceManager = None
 
     @property
     def manager(self) -> MultiManager:
