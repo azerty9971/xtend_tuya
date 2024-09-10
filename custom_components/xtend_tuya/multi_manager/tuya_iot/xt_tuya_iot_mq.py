@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-from typing import Optional
+from typing import Optional, Any
 import uuid
+from paho.mqtt import client as mqtt
 
 from tuya_iot import (
     TuyaOpenMQ,
@@ -84,3 +85,6 @@ class XTIOTOpenMQIPC(XTIOTOpenMQ):
             return None
 
         return TuyaMQConfig(response)
+    
+    def _on_message(self, mqttc: mqtt.Client, user_data: Any, msg: mqtt.MQTTMessage):
+        LOGGER.warning(f"ON MESSAGE: {msg}")
