@@ -49,6 +49,7 @@ class XTEventData:
     def data(self) -> dict[str, any]:
         return self.query_params
 
+    method: str = None
     query_params: dict[str, any] = None
     headers: dict[str, str] = None
     payload: str = None
@@ -62,7 +63,7 @@ class XTEventData:
         return self.query_params == other.query_params
 
     def __repr__(self) -> str:
-        return f"Headers: {self.headers} <=> Content-Type: {self.content_type} <=> Query parameters: {self.query_params} <=> Payload: {self.payload}"
+        return f"Method: {self.method} <=> Headers: {self.headers} <=> Content-Type: {self.content_type} <=> Query parameters: {self.query_params} <=> Payload: {self.payload}"
 
 class XTEntityView(HomeAssistantView):
     """Base EntityView."""
@@ -132,7 +133,87 @@ class XTGeneralView(HomeAssistantView):
         return await self.handle(request)
 
     async def post(self, request: web.Request) -> web.StreamResponse:
-        """Start a GET request."""
+        """Start a POST request."""
+        authenticated = (
+            request[KEY_AUTHENTICATED]
+        )
+
+        if self.requires_auth and not authenticated:
+            # Attempt with invalid bearer token, raise unauthorized
+            # so ban middleware can handle it.
+            if hdrs.AUTHORIZATION in request.headers:
+                raise web.HTTPUnauthorized
+            # Invalid sigAuth or camera access token
+            raise web.HTTPForbidden
+
+        return await self.handle(request)
+
+    async def delete(self, request: web.Request) -> web.StreamResponse:
+        """Start a DELETE request."""
+        authenticated = (
+            request[KEY_AUTHENTICATED]
+        )
+
+        if self.requires_auth and not authenticated:
+            # Attempt with invalid bearer token, raise unauthorized
+            # so ban middleware can handle it.
+            if hdrs.AUTHORIZATION in request.headers:
+                raise web.HTTPUnauthorized
+            # Invalid sigAuth or camera access token
+            raise web.HTTPForbidden
+
+        return await self.handle(request)
+
+    async def put(self, request: web.Request) -> web.StreamResponse:
+        """Start a PUT request."""
+        authenticated = (
+            request[KEY_AUTHENTICATED]
+        )
+
+        if self.requires_auth and not authenticated:
+            # Attempt with invalid bearer token, raise unauthorized
+            # so ban middleware can handle it.
+            if hdrs.AUTHORIZATION in request.headers:
+                raise web.HTTPUnauthorized
+            # Invalid sigAuth or camera access token
+            raise web.HTTPForbidden
+
+        return await self.handle(request)
+    
+    async def patch(self, request: web.Request) -> web.StreamResponse:
+        """Start a PATCH request."""
+        authenticated = (
+            request[KEY_AUTHENTICATED]
+        )
+
+        if self.requires_auth and not authenticated:
+            # Attempt with invalid bearer token, raise unauthorized
+            # so ban middleware can handle it.
+            if hdrs.AUTHORIZATION in request.headers:
+                raise web.HTTPUnauthorized
+            # Invalid sigAuth or camera access token
+            raise web.HTTPForbidden
+
+        return await self.handle(request)
+    
+    async def head(self, request: web.Request) -> web.StreamResponse:
+        """Start a HEAD request."""
+        authenticated = (
+            request[KEY_AUTHENTICATED]
+        )
+
+        if self.requires_auth and not authenticated:
+            # Attempt with invalid bearer token, raise unauthorized
+            # so ban middleware can handle it.
+            if hdrs.AUTHORIZATION in request.headers:
+                raise web.HTTPUnauthorized
+            # Invalid sigAuth or camera access token
+            raise web.HTTPForbidden
+
+        return await self.handle(request)
+    
+    async def options(self, request: web.Request) -> web.StreamResponse:
+        """Start a OPTIONS request."""
         authenticated = (
             request[KEY_AUTHENTICATED]
         )
@@ -151,6 +232,7 @@ class XTGeneralView(HomeAssistantView):
         """Handle the entity request."""
         event_data: XTEventData = XTEventData()
         parameters: MultiMapping[str] = request.query
+        event_data.method = request.method
         for parameter in parameters:
             event_data.query_params[parameter] = parameters[parameter]
         event_data.payload = request.content.read_nowait().decode()
