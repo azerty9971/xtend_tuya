@@ -45,13 +45,24 @@ class XTRequestCacheResult:
         self.cached_result.append(XTEventDataResultCache(event_data, result, ttl))
 
 class XTEventData:
-    data: dict[str, any] = None
+    @property
+    def data(self) -> dict[str, any]:
+        return self.query_params
+
+    query_params: dict[str, any] = None
+    headers: dict[str, str] = None
+    payload: str = None
+    content_type: str = None
 
     def __init__(self) -> None:
-        self.data = {}
+        self.query_params = {}
+        self.headers = {}
     
     def __eq__(self, other: XTEventData) -> bool:
-        return self.data == other.data
+        return self.query_params == other.query_params
+
+    def __repr__(self) -> str:
+        return f"Headers: {self.headers} <=> Content-Type: {self.content_type} <=> Query parameters: {self.query_params} <=> Payload: {self.payload}"
 
 class XTEntityView(HomeAssistantView):
     """Base EntityView."""
@@ -139,13 +150,10 @@ class XTGeneralView(HomeAssistantView):
     async def handle(self, request: web.Request) -> web.StreamResponse:
         """Handle the entity request."""
         event_data: XTEventData = XTEventData()
-        parameters: MultiMapping[str] = request.query
-        for parameter in parameters:
-            event_data.data[parameter] = parameters[parameter]
-        LOGGER.warning(f"Request content type: {request.content_type}")
-        LOGGER.warning(f"Request content: {str(request.content.read_nowait())}")
-        LOGGER.warning(f"Request parameters: {request.query}")
-        LOGGER.warning(f"Request headers: {request.headers}")
+        event_data.query_params = request.query.__dict__
+        event_data.payload = request.content.read_nowait().decode()
+        event_data.content_type = request.content_type
+        event_data.headers = request.headers.__dict__
         if self.use_cache:
             if result := self.cache.find_in_cache(event_data):
                 LOGGER.warning(f"Response from cache: {result}")
