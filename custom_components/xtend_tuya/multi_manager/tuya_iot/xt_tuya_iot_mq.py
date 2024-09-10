@@ -86,6 +86,18 @@ class XTIOTOpenMQIPC(XTIOTOpenMQ):
 
         return TuyaMQConfig(response)
     
+    def _on_connect(self, mqttc: mqtt.Client, user_data: Any, flags, rc):
+        LOGGER.debug(f"connect flags->{flags}, rc->{rc}")
+        if rc == 0:
+            for (key, value) in self.mq_config.source_topic.items():
+                LOGGER.debug(f"Subscribing to {value}")
+                mqttc.subscribe(value)
+        elif rc == 5:
+            self.__run_mqtt()
+
     def _on_message(self, mqttc: mqtt.Client, user_data: Any, msg: mqtt.MQTTMessage):
         LOGGER.warning(f"ON MESSAGE: {msg}")
         super()._on_message(mqttc, user_data, msg)
+    
+    def _on_subscribe(self, mqttc: mqtt.Client, user_data: Any, mid, granted_qos):
+        LOGGER.debug(f"_on_subscribe: {mid}")
