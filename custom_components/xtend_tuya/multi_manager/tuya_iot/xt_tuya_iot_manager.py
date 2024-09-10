@@ -298,7 +298,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                         "pv":"2.2",
                         "t":time.time_ns() // 1_000_000,
                         "data":{
-                            "from":f"tuya-iot-app-sdk-python.ipc.{uuid.uuid1()}",
+                            "from":f"{self._get_from()}",
                             "to":f"{device_id}",
                             "session_id":"00b00036521743319b4d4c01f1705c48",
                             "moto_id":f"{moto_id}",
@@ -318,6 +318,9 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                 return None
             
         return None
+
+    def _get_from(self) -> str:
+        return self.ipc_mq.mq_config.username.split("cloud_")[1]
 
     def _publish_to_ipc_mqtt(self, topic: str, msg: str):
         LOGGER.warning("Sending payload:")
