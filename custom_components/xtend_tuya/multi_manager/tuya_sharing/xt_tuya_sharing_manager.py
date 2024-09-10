@@ -9,6 +9,7 @@ from tuya_sharing.manager import (
     Manager,
     SceneRepository,
     UserRepository,
+    CustomerApi,
 )
 
 from tuya_sharing.home import (
@@ -45,7 +46,7 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
         self.multi_manager = multi_manager
         self.terminal_id = None
         self.mq = None
-        self.customer_api = None
+        self.customer_api: CustomerApi = None
         self.home_repository: HomeRepository = None
         self.device_repository: XTSharingDeviceRepository = None
         self.scene_repository: SceneRepository = None

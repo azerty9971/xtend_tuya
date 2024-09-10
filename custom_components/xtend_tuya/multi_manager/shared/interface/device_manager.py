@@ -102,3 +102,9 @@ class XTDeviceManagerInterface(ABC):
         for device_map in self.get_available_device_maps():
             if device_id in device_map:
                 device_map[device_id].set_up = True
+    
+    def call_api(self, method: str, url: str, payload: str) -> str | None:
+        pass
+
+    def trigger_scene(self, home_id: str, scene_id: str) -> False:
+        return False

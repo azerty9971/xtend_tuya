@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import requests
+import json
 from typing import Optional, Literal, Any, overload
 
 from homeassistant.const import Platform
@@ -162,7 +163,9 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
         self.iot_account.device_manager.on_message(msg)
     
     def query_scenes(self) -> list:
-        return self.iot_account.home_manager.query_scenes()
+        #return self.iot_account.home_manager.query_scenes()
+        #Scenes should be handled by tuya_sharing
+        return []
     
     def get_device_stream_allocate(
             self, device_id: str, stream_type: Literal["flv", "hls", "rtmp", "rtsp"]
@@ -246,3 +249,14 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
             self, device_id: str, lock: bool
     ) -> bool:
         return self.iot_account.device_manager.send_lock_unlock_command(device_id, lock)
+    
+    def call_api(self, method: str, url: str, payload: str) -> str | None:
+        params: dict[str, any] = None
+        if payload:
+            params = json.loads(payload)
+        match method:
+            case "GET":
+                return self.iot_account.device_manager.api.get(url, params)
+            case "POST":
+                return self.iot_account.device_manager.api.post(url, params)
+        return None

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import Optional, Literal, Any, overload
+import json
 
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
@@ -188,9 +189,8 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
         self.sharing_account.device_manager.on_message(msg)
     
     def query_scenes(self) -> list:
-        if not self.sharing_account.device_manager.reuse_config:
-            return self.sharing_account.device_manager.query_scenes()
-        return []
+        #Regular Tuya scenes will be deleted by the cleanup_device_registry, readd them regardless of if we override or not
+        return self.sharing_account.device_manager.query_scenes()
     
     def get_device_stream_allocate(
             self, device_id: str, stream_type: Literal["flv", "hls", "rtmp", "rtsp"]
@@ -285,3 +285,18 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
             self, device_id: str, lock: bool
     ) -> bool:
         return self.sharing_account.device_manager.send_lock_unlock_command(device_id, lock)
+    
+    def call_api(self, method: str, url: str, payload: str) -> str | None:
+        params: dict[str, any] = None
+        if payload:
+            params = json.loads(payload)
+        match method:
+            case "GET":
+                return self.sharing_account.device_manager.customer_api.get(url, params)
+            case "POST":
+                return self.sharing_account.device_manager.customer_api.post(url, params)
+        return None
+    
+    def trigger_scene(self, home_id: str, scene_id: str) -> bool:
+        self.sharing_account.device_manager.trigger_scene(home_id, scene_id)
+        return True
