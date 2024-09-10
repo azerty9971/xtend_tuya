@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from multidict import (
     MultiMapping,
 )
+import gzip
 
 from homeassistant.components.http import KEY_AUTHENTICATED, HomeAssistantView
 from homeassistant.helpers.entity_component import EntityComponent, entity
@@ -142,7 +143,7 @@ class XTGeneralView(HomeAssistantView):
         for parameter in parameters:
             event_data.data[parameter] = parameters[parameter]
         LOGGER.warning(f"Request content type: {request.content_type}")
-        LOGGER.warning(f"Request content: {request.content}")
+        LOGGER.warning(f"Request content: {str(gzip.decompress(request.content.read_nowait()))}")
         LOGGER.warning(f"Request parameters: {request.query}")
         LOGGER.warning(f"Request headers: {request.headers}")
         if self.use_cache:
