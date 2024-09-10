@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Optional, Any
 import uuid
 from paho.mqtt import client as mqtt
+from urllib.parse import urlsplit
 
 from tuya_iot import (
     TuyaOpenMQ,
@@ -101,3 +102,26 @@ class XTIOTOpenMQIPC(XTIOTOpenMQ):
     
     def _on_subscribe(self, mqttc: mqtt.Client, user_data: Any, mid, granted_qos):
         LOGGER.debug(f"_on_subscribe: {mid}")
+    
+    def _on_publish(self, mqttc: mqtt.Client, user_data: Any, mid):
+        LOGGER.debug(f"_on_publish: {mid} <=> {user_data}")
+
+    def _start(self, mq_config: TuyaMQConfig) -> mqtt.Client:
+        mqttc = mqtt.Client(mq_config.client_id)
+        mqttc.username_pw_set(mq_config.username, mq_config.password)
+        mqttc.user_data_set({"mqConfig": mq_config})
+        mqttc.on_connect = self._on_connect
+        mqttc.on_message = self._on_message
+        mqttc.on_subscribe = self._on_subscribe
+        mqttc.on_log = self._on_log
+        mqttc.on_disconnect = self._on_disconnect
+        mqttc.on_publish = self._on_publish
+
+        url = urlsplit(mq_config.url)
+        if url.scheme == "ssl":
+            mqttc.tls_set()
+
+        mqttc.connect(url.hostname, url.port)
+
+        mqttc.loop_start()
+        return mqttc

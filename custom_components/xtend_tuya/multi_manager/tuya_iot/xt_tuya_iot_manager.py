@@ -319,7 +319,9 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         return None
 
     def _publish_to_ipc_mqtt(self, topic: str, msg: str):
-        LOGGER.warning(f"Publish: {self.ipc_mq.client.publish(topic=topic, payload=msg)}")
+        publish_result = self.ipc_mq.client.publish(topic=topic, payload=msg)
+        publish_result.wait_for_publish(10)
+        LOGGER.warning(f"Publish: {publish_result}")
 
     def _get_webrtc_config(self, device_id: str):
         webrtc_config = self.api.get(f"/v1.0/devices/{device_id}/webrtc-configs")
