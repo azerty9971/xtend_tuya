@@ -293,14 +293,14 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                 payload = {
                     "protocol":302,
                     "pv":"2.2",
-                    "t":time.time(),
+                    "t":int(time.time()),
                     "data":{
                         "header":{
+                            "type":"offer",
                             "from":f"{self._get_from()}",
                             "to":f"{device_id}",
                             "session_id":"6fv4xg",
-                            "moto_id":f"{moto_id}",
-                            "type":"offer"
+                            "moto_id":f"{moto_id}"
                         },
                         "msg":{
                             "mode":"webrtc",
