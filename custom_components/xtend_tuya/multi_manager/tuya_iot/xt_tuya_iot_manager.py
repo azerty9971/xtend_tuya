@@ -288,7 +288,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
             moto_id =  webrtc_config.get("moto_id")
             for topic in self.ipc_mq.mq_config.sink_topic.values():
                 topic = topic.replace("{device_id}", device_id)
-                topic = topic.replace("{moto_id}", moto_id)
+                topic = topic.replace("moto_id", moto_id)
                 LOGGER.warning(f"Computed topic: {topic}")
                 result, mid = self.mq.client.subscribe(topic)
                 if result == 0:
