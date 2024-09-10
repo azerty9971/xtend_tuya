@@ -280,6 +280,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         return False
     
     def get_sdp_answer(self, device_id: str, sdp_offer: str) -> str | None:
+        LOGGER.warning(f"get_sdp_answer for {device_id}")
         if webrtc_config := self._get_webrtc_config(device_id):
             auth_token = webrtc_config.get("auth")
             moto_id =  webrtc_config.get("moto_id")
@@ -296,8 +297,8 @@ class XTIOTDeviceManager(TuyaDeviceManager):
             
         return None
 
-    def _publish_to_ipc_mqtt(self, msg: str):
-        self.ipc_mq.client.publish()
+    def _publish_to_ipc_mqtt(self, topic: str, msg: str):
+        self.ipc_mq.client.publish(topic=topic, payload=msg)
 
     def _get_webrtc_config(self, device_id: str):
         webrtc_config = self.api.get(f"/v1.0/devices/{device_id}/webrtc-configs")
