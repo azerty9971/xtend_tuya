@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import datetime
 import voluptuous as vol
 import homeassistant.helpers.config_validation as cv
 
