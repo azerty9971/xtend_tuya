@@ -48,6 +48,9 @@ class XTEventData:
 
     def __init__(self) -> None:
         self.data = {}
+    
+    def __eq__(self, other: XTEventData) -> bool:
+        return self.data == other.data
 
 class XTEntityView(HomeAssistantView):
     """Base EntityView."""
