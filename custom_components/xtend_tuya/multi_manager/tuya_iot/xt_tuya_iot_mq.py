@@ -88,3 +88,4 @@ class XTIOTOpenMQIPC(XTIOTOpenMQ):
     
     def _on_message(self, mqttc: mqtt.Client, user_data: Any, msg: mqtt.MQTTMessage):
         LOGGER.warning(f"ON MESSAGE: {msg}")
+        super()._on_message(mqttc, user_data, msg)
