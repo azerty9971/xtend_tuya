@@ -3,7 +3,7 @@ This file contains all the code that inherit from Tuya integration
 """
 
 from __future__ import annotations
-from typing import Any
+from typing import Any, Literal, Optional
 
 from tuya_sharing.manager import (
     Manager,
@@ -130,3 +130,24 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
     ) -> bool:
         #I didn't find a way to implement this using the Sharing SDK...
         return False
+    
+    def get_device_stream_allocate(
+            self, device_id: str, stream_type: Literal["flv", "hls", "rtmp", "rtsp"]
+    ) -> Optional[str]:
+        """Get the live streaming address by device ID and the video type.
+
+        These live streaming video protocol types are available: RTSP, HLS, FLV, and RTMP.
+
+        Args:
+          device_id(str): device id
+          stream_type(str): type of stream
+
+        Returns:
+            None or URL to the requested stream
+        """
+        response = self.customer_api.post(f"/v1.0/m/ipc/{device_id}/stream/actions/allocate", None,
+                                          {"type": stream_type})
+        LOGGER.warning(f"API Response: {response}")
+        if response["success"]:
+            return response["result"]["url"]
+        return None
