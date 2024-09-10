@@ -70,7 +70,7 @@ class ServiceManager:
     async def _handle_get_camera_stream_url(self, event):
         source      = event.data.get(CONF_SOURCE, MESSAGE_SOURCE_TUYA_SHARING)
         device_id   = event.data.get(CONF_DEVICE_ID, None)
-        stream_type = event.data.get(CONF_STREAM_TYPE, "rtsp")
+        stream_type = event.data.get(CONF_STREAM_TYPE, 'rtsp')
         LOGGER.warning(f"_handle_get_camera_stream_url: {source} <=> {device_id} <=> {stream_type}")
         if not source or not device_id:
             return None

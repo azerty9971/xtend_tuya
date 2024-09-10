@@ -77,6 +77,7 @@ from ...const import (
     TUYA_DISCOVERY_NEW_ORIG,
     TUYA_HA_SIGNAL_UPDATE_ENTITY,
     TUYA_HA_SIGNAL_UPDATE_ENTITY_ORIG,
+    LOGGER,  # noqa: F401
 )
 
 def get_plugin_instance() -> XTTuyaSharingDeviceManagerInterface | None:
@@ -196,6 +197,7 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
             self, device_id: str, stream_type: Literal["flv", "hls", "rtmp", "rtsp"]
     ) -> Optional[str]:
         if device_id in self.sharing_account.device_ids:
+            LOGGER.warning("Device in device_map")
             return self.sharing_account.device_manager.get_device_stream_allocate(device_id, stream_type)
     
     def get_device_registry_identifiers(self) -> list:
