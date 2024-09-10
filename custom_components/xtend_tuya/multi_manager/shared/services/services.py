@@ -61,7 +61,13 @@ class ServiceManager:
     
     async def _handle_get_camera_stream_url(self, event):
         LOGGER.warning(f"_handle_get_camera_stream_url: {event}")
-        return "hello"
+        source    = event.data.get(CONF_SOURCE, None)
+        device_id = event.data.get(CONF_DEVICE_ID, None)
+        if not source or not device_id:
+            return None
+        if account := self.multi_manager.get_account_by_name(source):
+            return account.get_device_stream_allocate(device_id, "rtsp")
+        return None
     
     async def _handle_call_api(self, event):
         source  = event.data.get(CONF_SOURCE, None)
