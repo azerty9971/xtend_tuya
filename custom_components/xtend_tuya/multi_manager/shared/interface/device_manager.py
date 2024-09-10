@@ -105,3 +105,6 @@ class XTDeviceManagerInterface(ABC):
     
     def call_api(self, method: str, url: str, payload: str) -> str | None:
         pass
+
+    def trigger_scene(self, home_id: str, scene_id: str) -> False:
+        return False
