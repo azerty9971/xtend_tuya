@@ -150,10 +150,14 @@ class XTGeneralView(HomeAssistantView):
     async def handle(self, request: web.Request) -> web.StreamResponse:
         """Handle the entity request."""
         event_data: XTEventData = XTEventData()
-        event_data.query_params = request.query.__dict__
+        parameters: MultiMapping[str] = request.query
+        for parameter in parameters:
+            event_data.query_params[parameter] = parameters[parameter]
         event_data.payload = request.content.read_nowait().decode()
         event_data.content_type = request.content_type
-        event_data.headers = request.headers.__dict__
+        for header in request.headers:
+            event_data.headers[header] = request.headers[header]
+        #event_data.headers = request.headers.__dict__
         if self.use_cache:
             if result := self.cache.find_in_cache(event_data):
                 LOGGER.warning(f"Response from cache: {result}")
