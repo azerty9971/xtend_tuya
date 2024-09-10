@@ -38,9 +38,6 @@ from .xt_tuya_iot_mq import (
 from .xt_tuya_iot_ipc_listener import (
     XTIOTIPCListener,
 )
-from paho.mqtt.enums import (
-    MQTTErrorCode,
-)
 
 
 class XTIOTDeviceManager(TuyaDeviceManager):
@@ -293,7 +290,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                 topic = topic.replace("{moto_id}", moto_id)
                 LOGGER.warning(f"Computed topic: {topic}")
                 result, mid = self.mq.client.subscribe(topic)
-                if result == MQTTErrorCode.MQTT_ERR_SUCCESS:
+                if result == 0:
                     payload = {
                         "protocol":302,
                         "pv":"2.2",
