@@ -143,7 +143,7 @@ class XTGeneralView(HomeAssistantView):
         for parameter in parameters:
             event_data.data[parameter] = parameters[parameter]
         LOGGER.warning(f"Request content type: {request.content_type}")
-        LOGGER.warning(f"Request content: {str(gzip.decompress(request.content.read_nowait()))}")
+        LOGGER.warning(f"Request content: {str(request.content.read_nowait())}")
         LOGGER.warning(f"Request parameters: {request.query}")
         LOGGER.warning(f"Request headers: {request.headers}")
         if self.use_cache:
