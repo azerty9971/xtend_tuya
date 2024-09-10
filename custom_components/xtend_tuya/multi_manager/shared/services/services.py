@@ -14,6 +14,7 @@ from .views import (
 from ....const import (
     DOMAIN,
     LOGGER,  # noqa: F401
+    MESSAGE_SOURCE_TUYA_SHARING
 )
 
 from homeassistant.const import (
@@ -21,6 +22,7 @@ from homeassistant.const import (
 )
 
 CONF_SOURCE = "source"
+CONF_STREAM_TYPE = "stream_type"
 CONF_METHOD = "method"
 CONF_URL = "url"
 CONF_PAYLOAD = "payload"
@@ -30,6 +32,7 @@ SERVICE_GET_CAMERA_STREAM_URL_SCHEMA = vol.Schema(
     {
         vol.Required(CONF_DEVICE_ID): cv.string,
         vol.Optional(CONF_SOURCE): cv.string,
+        vol.Optional(CONF_STREAM_TYPE): cv.string,
     }
 )
 
@@ -49,27 +52,29 @@ class ServiceManager:
         self.hass = multi_manager.hass
         
     def register_services(self):
+        self._register_get_camera_stream_url()
+        self._register_call_api()
+    
+    def _register_get_camera_stream_url(self):
         self.hass.services.async_register(
             DOMAIN, SERVICE_GET_CAMERA_STREAM_URL, self._handle_get_camera_stream_url, schema=SERVICE_GET_CAMERA_STREAM_URL_SCHEMA
         )
         self.hass.http.register_view(XTGeneralView(SERVICE_GET_CAMERA_STREAM_URL, self._handle_get_camera_stream_url, True))
-
+    
+    def _register_call_api(self):
         self.hass.services.async_register(
             DOMAIN, SERVICE_CALL_API, self._handle_call_api, schema=SERVICE_CALL_API_SCHEMA
         )
         self.hass.http.register_view(XTGeneralView(SERVICE_CALL_API, self._handle_call_api, True))
     
     async def _handle_get_camera_stream_url(self, event):
-        LOGGER.warning(f"_handle_get_camera_stream_url: {event}")
-        source    = event.data.get(CONF_SOURCE, None)
-        device_id = event.data.get(CONF_DEVICE_ID, None)
-        LOGGER.warning(f"Source: {source}, device_id: {device_id}")
+        source      = event.data.get(CONF_SOURCE, MESSAGE_SOURCE_TUYA_SHARING)
+        device_id   = event.data.get(CONF_DEVICE_ID, None)
+        stream_type = event.data.get(CONF_STREAM_TYPE, "rtsp")
         if not source or not device_id:
             return None
         if account := self.multi_manager.get_account_by_name(source):
-            LOGGER.warning("Account found")
-            response = await self.hass.async_add_executor_job(account.get_device_stream_allocate, device_id, "rtsp")
-            LOGGER.warning(f"Resoonse: {response}")
+            response = await self.hass.async_add_executor_job(account.get_device_stream_allocate, device_id, stream_type)
             return response
         return None
     
