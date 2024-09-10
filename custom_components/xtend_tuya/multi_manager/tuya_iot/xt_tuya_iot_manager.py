@@ -291,6 +291,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                 LOGGER.warning(f"Computed topic: {topic}")
                 result, mid = self.mq.client.subscribe(topic)
                 if result == 0:
+                    time.sleep(1.0)
                     payload = {
                         "protocol":302,
                         "pv":"2.2",
