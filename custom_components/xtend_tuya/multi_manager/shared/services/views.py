@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import datetime
+
 from multidict import (
     MultiMapping,
 )
@@ -13,6 +15,33 @@ from ....const import (
     LOGGER,  # noqa: F401
     DOMAIN,
 )
+
+class XTEventDataResultCache:
+    def __init__(self, event_data, result, ttl: int = 60) -> None:
+        self.event_data = event_data
+        self.result = result
+        self.valid_until = datetime.now().time() + ttl
+
+class XTRequestCacheResult:
+    def __init__(self, service_name: str) -> None:
+        self.service_name = service_name
+        self.cached_result: list[XTEventDataResultCache] = []
+    
+    def _clean_cache(self):
+        current_time = datetime.now().time()
+        for cache_entry in self.cached_result:
+            if cache_entry.valid_until < current_time:
+                self.cached_result.remove(cache_entry)
+
+    def find_in_cache(self, event_data) -> any | None:
+        self._clean_cache()
+        for cache_entry in self.cached_result:
+            if cache_entry.event_data == event_data:
+                return cache_entry.result
+        return None
+    
+    def append_to_cache(self, event_data, result, ttl: int = 60) -> None:
+        self.cached_result.append(XTEventDataResultCache(event_data, result, ttl))
 
 class XTEventData:
     data: dict[str, any] = None
@@ -60,12 +89,15 @@ class XTEntityView(HomeAssistantView):
 class XTGeneralView(HomeAssistantView):
     requires_auth = True
 
-    def __init__(self, name: str, callback, requires_auth: bool = True) -> None:
+    def __init__(self, name: str, callback, requires_auth: bool = True, use_cache: bool = True, cache_ttl: int = 60) -> None:
         """Initialize a basic camera view."""
         self.name = "api:" + DOMAIN + ":" + name
         self.url = "/api/" + DOMAIN + "/" + name
         self.requires_auth = requires_auth
         self.callback = callback
+        self.use_cache = use_cache
+        self.cache: XTRequestCacheResult = XTRequestCacheResult(name)
+        self.cache_ttl = cache_ttl
 
 
     async def get(self, request: web.Request) -> web.StreamResponse:
@@ -90,8 +122,14 @@ class XTGeneralView(HomeAssistantView):
         parameters: MultiMapping[str] = request.query
         for parameter in parameters:
             event_data.data[parameter] = parameters[parameter]
+        if self.use_cache:
+            if result := self.cache.find_in_cache(event_data):
+                LOGGER.warning(f"Response from cache: {result}")
+                return web.Response(text=result)
         response = await self.callback(event_data)
         LOGGER.warning(f"Response: {response}")
         if not response:
             raise web.HTTPBadRequest
+        if self.use_cache:
+            self.cache.append_to_cache(event_data, response, self.cache_ttl)
         return web.Response(text=response)

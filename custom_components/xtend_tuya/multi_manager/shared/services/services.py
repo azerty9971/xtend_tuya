@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 import voluptuous as vol
 import homeassistant.helpers.config_validation as cv
 
@@ -26,6 +27,7 @@ CONF_STREAM_TYPE = "stream_type"
 CONF_METHOD = "method"
 CONF_URL = "url"
 CONF_PAYLOAD = "payload"
+CONF_USE_CACHE = "use_cache"
 
 SERVICE_GET_CAMERA_STREAM_URL = "get_camera_stream_url"
 SERVICE_GET_CAMERA_STREAM_URL_SCHEMA = vol.Schema(
@@ -33,6 +35,7 @@ SERVICE_GET_CAMERA_STREAM_URL_SCHEMA = vol.Schema(
         vol.Required(CONF_DEVICE_ID): cv.string,
         vol.Optional(CONF_SOURCE): cv.string,
         vol.Optional(CONF_STREAM_TYPE): cv.string,
+        vol.Optional(CONF_USE_CACHE): cv.string,
     }
 )
 
@@ -52,20 +55,15 @@ class ServiceManager:
         self.hass = multi_manager.hass
         
     def register_services(self):
-        self._register_get_camera_stream_url()
-        self._register_call_api()
-    
-    def _register_get_camera_stream_url(self):
+        self._register_service(DOMAIN, SERVICE_GET_CAMERA_STREAM_URL, self._handle_get_camera_stream_url, SERVICE_GET_CAMERA_STREAM_URL_SCHEMA, True, True, True)
+        self._register_service(DOMAIN, SERVICE_CALL_API, self._handle_call_api, SERVICE_CALL_API_SCHEMA, True, True, True)
+
+    def _register_service(self, domain: str, name: str, callback, schema, requires_auth: bool = True, allow_from_api:bool = True, use_cache:bool = True):
         self.hass.services.async_register(
-            DOMAIN, SERVICE_GET_CAMERA_STREAM_URL, self._handle_get_camera_stream_url, schema=SERVICE_GET_CAMERA_STREAM_URL_SCHEMA
+            domain, name, callback, schema=schema
         )
-        self.hass.http.register_view(XTGeneralView(SERVICE_GET_CAMERA_STREAM_URL, self._handle_get_camera_stream_url, True))
-    
-    def _register_call_api(self):
-        self.hass.services.async_register(
-            DOMAIN, SERVICE_CALL_API, self._handle_call_api, schema=SERVICE_CALL_API_SCHEMA
-        )
-        self.hass.http.register_view(XTGeneralView(SERVICE_CALL_API, self._handle_call_api, True))
+        if allow_from_api:
+            self.hass.http.register_view(XTGeneralView(name, callback, requires_auth, use_cache))
     
     async def _handle_get_camera_stream_url(self, event):
         source      = event.data.get(CONF_SOURCE, MESSAGE_SOURCE_TUYA_SHARING)
