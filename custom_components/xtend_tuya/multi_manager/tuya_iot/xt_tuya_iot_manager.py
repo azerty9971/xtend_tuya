@@ -296,7 +296,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                     payload = {
                         "protocol":302,
                         "pv":"2.2",
-                        "t":time.time_ns() // 1_000_000,
+                        "t":time.time(),
                         "data":{
                             "from":f"{self._get_from()}",
                             "to":f"{device_id}",
@@ -305,10 +305,10 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                             "type":"offer"
                         },
                         "msg":{
-                            "sdp":f"{sdp_offer}",
-                            "auth":f"{auth_token}",
                             "mode":"webrtc",
-                            "stream_type":1
+                            "sdp":f"{sdp_offer}",
+                            "stream_type":1,
+                            "auth":f"{auth_token}",
                         }
                     }
                     self._publish_to_ipc_mqtt(topic, json.dumps(payload))
