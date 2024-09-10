@@ -382,3 +382,8 @@ class MultiManager:  # noqa: F811
     def inform_device_has_an_entity(self, device_id: str):
         for account in self.accounts.values():
             account.inform_device_has_an_entity(device_id)
+    
+    def trigger_scene(self, home_id: str, scene_id: str):
+        for account in self.accounts.values():
+            if account.trigger_scene(home_id, scene_id):
+                return
