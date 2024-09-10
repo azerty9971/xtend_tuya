@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from multidict import (
     MultiMapping,
@@ -20,7 +20,7 @@ class XTEventDataResultCache:
     def __init__(self, event_data, result, ttl: int = 60) -> None:
         self.event_data = event_data
         self.result = result
-        self.valid_until = datetime.now().time() + ttl
+        self.valid_until = datetime.now().time() + timedelta(0,ttl)
 
 class XTRequestCacheResult:
     def __init__(self, service_name: str) -> None:
