@@ -290,14 +290,12 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                 topic = topic.replace("{device_id}", device_id)
                 topic = topic.replace("moto_id", moto_id)
                 LOGGER.warning(f"Computed topic: {topic}")
-                result, mid = self.mq.client.subscribe(topic)
-                if result == 0:
-                    time.sleep(1.0)
-                    payload = {
-                        "protocol":302,
-                        "pv":"2.2",
-                        "t":time.time(),
-                        "data":{
+                payload = {
+                    "protocol":302,
+                    "pv":"2.2",
+                    "t":time.time(),
+                    "data":{
+                        "header":{
                             "from":f"{self._get_from()}",
                             "to":f"{device_id}",
                             "session_id":"6fv4xg",
@@ -310,8 +308,9 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                             "stream_type":1,
                             "auth":f"{auth_token}",
                         }
-                    }
-                    self._publish_to_ipc_mqtt(topic, json.dumps(payload))
+                    },
+                }
+                self._publish_to_ipc_mqtt(topic, json.dumps(payload))
 
             
             if not auth_token or not moto_id:
