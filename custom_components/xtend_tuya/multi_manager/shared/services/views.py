@@ -141,6 +141,10 @@ class XTGeneralView(HomeAssistantView):
         parameters: MultiMapping[str] = request.query
         for parameter in parameters:
             event_data.data[parameter] = parameters[parameter]
+        LOGGER.warning(f"Request content type: {request.content_type}")
+        LOGGER.warning(f"Request content: {request.content}")
+        LOGGER.warning(f"Request parameters: {request.query}")
+        LOGGER.warning(f"Request headers: {request.headers}")
         if self.use_cache:
             if result := self.cache.find_in_cache(event_data):
                 LOGGER.warning(f"Response from cache: {result}")
