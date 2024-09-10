@@ -106,11 +106,15 @@ class ServiceManager:
         device_id   = event.data.get(CONF_DEVICE_ID, None)
         if not device_id:
             return None
+        LOGGER.warning(f"Device found: {device_id}")
         match event.method:
             case "POST":
+                LOGGER.warning(f"Method is: {event.method}")
                 match event.content_type:
                     case "application/sdp":
+                        LOGGER.warning(f"Content type is: {event.content_type}")
                         if account := self.multi_manager.get_account_by_name(source):
+                            LOGGER.warning(f"Account found: {source}")
                             if sdp_answer := account.get_sdp_answer(device_id, event.payload):
                                 return web.Response(status=201, text=sdp_answer, content_type="application/sdp")
                         return None
