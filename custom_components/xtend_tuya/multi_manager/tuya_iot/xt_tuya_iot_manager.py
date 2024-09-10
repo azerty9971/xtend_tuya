@@ -301,6 +301,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
 
     def _get_webrtc_config(self, device_id: str):
         webrtc_config = self.api.get(f"/v1.0/devices/{device_id}/webrtc-configs")
+        LOGGER.warning(f"webrtc_config: {webrtc_config}")
         if webrtc_config.get("success"):
             return webrtc_config.get("result")
         return None
