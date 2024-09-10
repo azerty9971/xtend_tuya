@@ -68,7 +68,7 @@ class ServiceManager:
             return None
         if account := self.multi_manager.get_account_by_name(source):
             LOGGER.warning("Account found")
-            response = account.get_device_stream_allocate(device_id, "rtsp")
+            response = await self.hass.async_add_executor_job(account.get_device_stream_allocate, device_id, "rtsp")
             LOGGER.warning(f"Resoonse: {response}")
             return response
         return None
