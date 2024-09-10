@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Optional, Any
 import uuid
+import json
 from paho.mqtt import client as mqtt
 from urllib.parse import urlsplit
 
@@ -98,7 +99,8 @@ class XTIOTOpenMQIPC(XTIOTOpenMQ):
 
     def _on_message(self, mqttc: mqtt.Client, user_data: Any, msg: mqtt.MQTTMessage):
         LOGGER.warning(f"ON MESSAGE: {msg}")
-        super()._on_message(mqttc, user_data, msg)
+        for listener in self.message_listeners:
+            listener(json.loads(msg.payload.decode("utf8")))
     
     def _on_subscribe(self, mqttc: mqtt.Client, user_data: Any, mid, granted_qos):
         LOGGER.debug(f"_on_subscribe: {mid}")
