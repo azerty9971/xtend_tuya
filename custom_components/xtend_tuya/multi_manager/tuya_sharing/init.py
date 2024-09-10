@@ -199,8 +199,6 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
         if device_id in self.sharing_account.device_ids:
             LOGGER.warning("Device in device_map")
             return self.sharing_account.device_manager.get_device_stream_allocate(device_id, stream_type)
-        else:
-            LOGGER.warning(f"Device map: {self.sharing_account.device_ids}")
     
     def get_device_registry_identifiers(self) -> list:
         if self.sharing_account.device_manager.reuse_config:
