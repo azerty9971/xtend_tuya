@@ -63,10 +63,14 @@ class ServiceManager:
         LOGGER.warning(f"_handle_get_camera_stream_url: {event}")
         source    = event.data.get(CONF_SOURCE, None)
         device_id = event.data.get(CONF_DEVICE_ID, None)
+        LOGGER.warning(f"Source: {source}, device_id: {device_id}")
         if not source or not device_id:
             return None
         if account := self.multi_manager.get_account_by_name(source):
-            return account.get_device_stream_allocate(device_id, "rtsp")
+            LOGGER.warning("Account found")
+            response = account.get_device_stream_allocate(device_id, "rtsp")
+            LOGGER.warning(f"Resoonse: {response}")
+            return response
         return None
     
     async def _handle_call_api(self, event):
