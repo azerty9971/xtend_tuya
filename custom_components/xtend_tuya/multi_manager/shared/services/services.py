@@ -4,7 +4,7 @@ import voluptuous as vol
 import homeassistant.helpers.config_validation as cv
 from aiohttp import web
 import json
-
+import gzip
 from ...multi_manager import (
     MultiManager,
 )
@@ -139,5 +139,5 @@ class ServiceManager:
                         if account := self.multi_manager.get_account_by_name(source):
                             if sdp_answer := await self.hass.async_add_executor_job(account.get_sdp_answer, device_id, session_id, event.payload):
                                 LOGGER.warning(f"Got SDP answer: {sdp_answer}")
-                                return web.Response(status=201, body=sdp_answer, content_type="application/sdp")
+                                return web.Response(status=201, body=gzip.compress(sdp_answer), content_type="application/sdp")
                         return None
