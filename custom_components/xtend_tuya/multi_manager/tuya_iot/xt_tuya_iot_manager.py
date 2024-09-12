@@ -316,16 +316,16 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                 if answer := self.ipc_listener.sdp_answers.get(session_id):
                     #Format SDP answer and send it back
                     sdp_answer: str = answer.answer.get("sdp", "")
-                    LOGGER.warning(f"Candidates: {answer.candidates}")
-                    candidates: str = ""
-                    for candidate in answer.candidates:
-                        candidates += candidate.get("candidate", "")
-                    sdp_answer = sdp_answer.replace("a=setup:", f"{candidates}a=setup:")
-
                     #This is a hacky fix, I'll try to remove it in the future!
                     sdp_answer = ".0\r\nm=".join(sdp_answer.split(".m="))
                     sdp_answer = ".0\r\nm=".join(sdp_answer.split(".0m="))
                     #
+                    LOGGER.warning(f"Candidates: {answer.candidates}")
+                    candidates: str = ""
+                    for candidate in answer.candidates:
+                        candidates += candidate.get("candidate", "")
+                    #sdp_answer = sdp_answer.replace("a=setup:", f"{candidates}a=setup:")
+                    sdp_answer += candidates
                     LOGGER.warning(f'Returning SDP answer: {sdp_answer}')
                     return sdp_answer
             
