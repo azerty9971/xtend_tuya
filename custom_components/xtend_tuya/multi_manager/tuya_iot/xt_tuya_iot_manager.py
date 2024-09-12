@@ -317,10 +317,11 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                     #Format SDP answer and send it back
                     sdp_answer: str = answer.answer.get("sdp", "")
                     LOGGER.warning(f"Candidates: {answer.candidates}")
+                    candidates: str = ""
                     for candidate in answer.candidates:
-                        cand_str: str = candidate.get("candidate", "")
-                        sdp_answer += cand_str
-                    LOGGER.warning(f'Returning SDP answer: {base64.b64encode(sdp_answer.encode())}')
+                        candidates += candidate.get("candidate", "")
+                    sdp_answer.replace("a=setup:", f"{candidates}a=setup:")
+                    LOGGER.warning(f'Returning SDP answer: {sdp_answer}')
                     return sdp_answer
             
             if not auth_token or not moto_id:
