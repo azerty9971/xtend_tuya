@@ -140,5 +140,5 @@ class ServiceManager:
                             if sdp_answer := await self.hass.async_add_executor_job(account.get_sdp_answer, device_id, session_id, event.payload):
                                 LOGGER.warning(f"SDP OFFER: {event.payload}")
                                 LOGGER.warning(f"Got SDP answer: {sdp_answer}")
-                                return web.Response(status=201, text=sdp_answer, content_type="application/sdp")
+                                return web.Response(status=201, text=sdp_answer, content_type="application/sdp", charset="ascii")
                         return None
