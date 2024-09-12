@@ -316,13 +316,10 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                 if answer := self.ipc_listener.sdp_answers.get(session_id):
                     #Format SDP answer and send it back
                     sdp_answer: str = answer.answer.get("sdp", "")
+                    LOGGER.warning(f"Candidates: {answer.candidates}")
                     for candidate in answer.candidates:
                         cand_str: str = candidate.get("candidate", "")
-                        LOGGER.warning(f'Candidate: |{cand_str}|')
-                        cand_str = cand_str.replace("\\r\\n", "").strip() + "\r\n"
-                        LOGGER.warning(f'Candidate AFTER: |{cand_str}|')
                         sdp_answer += cand_str
-                        break
                     LOGGER.warning(f'Returning SDP answer: {base64.b64encode(sdp_answer.encode())}')
                     return sdp_answer
             
