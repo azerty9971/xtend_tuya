@@ -97,10 +97,9 @@ class XTIOTOpenMQIPC(XTIOTOpenMQ):
         elif rc == 5:
             self.__run_mqtt()
 
-    def _on_message(self, mqttc: mqtt.Client, user_data: Any, msg: mqtt.MQTTMessage):
-        LOGGER.warning(f"ON MESSAGE: {msg}")
+    """def _on_message(self, mqttc: mqtt.Client, user_data: Any, msg: mqtt.MQTTMessage):
         for listener in self.message_listeners:
-            listener(json.loads(msg.payload.decode("utf8")))
+            listener(json.loads(msg.payload.decode("utf8")))"""
     
     def _on_subscribe(self, mqttc: mqtt.Client, user_data: Any, mid, granted_qos):
         LOGGER.debug(f"_on_subscribe: {mid}")
