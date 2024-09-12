@@ -316,7 +316,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                     #Format SDP answer and send it back
                     sdp_answer = answer.answer.get("sdp", "")
                     for candidate in answer.candidates:
-                        sdp_answer += candidate.get("candidate", "")
+                        sdp_answer += candidate.get("candidate", "").strip()
                         break
                     LOGGER.warning(f"Returning SDP answer: {sdp_answer}")
                     return sdp_answer
