@@ -21,7 +21,7 @@ class XTIOTIPCListener:
         self.multi_manager = multi_manager
         self.sdp_answers: dict[str, XTSDPContent] = {}
     
-    def handle_message(self, msg:str):
+    def handle_message(self, msg: str):
         LOGGER.warning(f"Received message from IPC MQTT: {msg}")
         protocol = msg.get("protocol")
         if not protocol:
