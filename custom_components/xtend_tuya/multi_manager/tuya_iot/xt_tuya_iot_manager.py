@@ -319,7 +319,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                     for candidate in answer.candidates:
                         cand_str: str = candidate.get("candidate", "")
                         LOGGER.warning(f'Candidate: |{cand_str}|')
-                        cand_str = cand_str.replace("\\r\\n", "").strip()
+                        cand_str = cand_str.replace("\\r\\n", "").strip() + "\r\n"
                         LOGGER.warning(f'Candidate AFTER: |{cand_str}|')
                         sdp_answer += cand_str
                         break
