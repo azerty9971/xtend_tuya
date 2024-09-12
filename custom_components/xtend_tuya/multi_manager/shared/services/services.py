@@ -119,7 +119,9 @@ class ServiceManager:
         if api_reponse := await self._handle_call_api(api_event_data):
             if api_reponse.get("success"):
                 result = api_reponse.get("result", {})
+                LOGGER.warning(f"result: {result}")
                 p2p_config = result.get("p2p_config", {})
+                LOGGER.warning(f"p2p_config: {p2p_config}")
                 if ices := p2p_config.get("ices"):
                     return ices
 
