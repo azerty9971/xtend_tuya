@@ -132,6 +132,7 @@ class ServiceManager:
         LOGGER.warning(f"_handle_webrtc: {event}")
         source      = event.data.get(CONF_SOURCE, MESSAGE_SOURCE_TUYA_IOT)
         device_id   = event.data.get(CONF_DEVICE_ID, None)
+        session_id  = event.session_id
         if not device_id:
             return None
         LOGGER.warning(f"Device found: {device_id}")
@@ -143,6 +144,6 @@ class ServiceManager:
                         LOGGER.warning(f"Content type is: {event.content_type}")
                         if account := self.multi_manager.get_account_by_name(source):
                             LOGGER.warning(f"Account found: {source}")
-                            if sdp_answer := await self.hass.async_add_executor_job(account.get_sdp_answer, device_id, event.payload):
+                            if sdp_answer := await self.hass.async_add_executor_job(account.get_sdp_answer, device_id, session_id, event.payload):
                                 return web.Response(status=201, text=sdp_answer, content_type="application/sdp")
                         return None

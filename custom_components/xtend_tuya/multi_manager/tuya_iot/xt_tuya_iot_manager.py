@@ -50,7 +50,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         self.ipc_mq: XTIOTOpenMQIPC = XTIOTOpenMQIPC(api)
         self.ipc_listener: XTIOTIPCListener = XTIOTIPCListener(self.multi_manager)
         self.ipc_mq.start()
-        self.ipc_mq.add_message_listener(self.ipc_listener.forward_message_to_multi_manager)
+        self.ipc_mq.add_message_listener(self.ipc_listener.handle_message)
 
     def forward_message_to_multi_manager(self, msg:str):
         self.multi_manager.on_message(MESSAGE_SOURCE_TUYA_IOT, msg)
@@ -281,15 +281,13 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                     return lock_operation.get("success", False)
         return False
     
-    def get_sdp_answer(self, device_id: str, sdp_offer: str) -> str | None:
-        LOGGER.warning(f"get_sdp_answer for {device_id}")
+    def get_sdp_answer(self, device_id: str, session_id: str, sdp_offer: str, wait_for_answers: int = 10) -> str | None:
         if webrtc_config := self._get_webrtc_config(device_id):
             auth_token = webrtc_config.get("auth")
             moto_id =  webrtc_config.get("moto_id")
             for topic in self.ipc_mq.mq_config.sink_topic.values():
                 topic = topic.replace("{device_id}", device_id)
                 topic = topic.replace("moto_id", moto_id)
-                LOGGER.warning(f"Computed topic: {topic}")
                 payload = {
                     "protocol":302,
                     "pv":"2.2",
@@ -300,7 +298,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                             "from":f"{self._get_from()}",
                             "to":f"{device_id}",
                             "sub_dev_id":"",
-                            "sessionid":"6fv4xg",
+                            "sessionid":f"{session_id}",
                             "moto_id":f"{moto_id}",
                             "tid":""
                         },
@@ -313,8 +311,13 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                     },
                 }
                 self._publish_to_ipc_mqtt(topic, json.dumps(payload))
-                time.sleep(60)
-
+                time.sleep(wait_for_answers) #Wait for MQTT responses
+                if answer := self.ipc_listener.sdp_answers.get(session_id):
+                    #Format SDP answer and send it back
+                    sdp_answer = answer.answer.get("sdp", "")
+                    for candidate in answer.candidates:
+                        sdp_answer += candidate.get("candidate", "")
+                    return sdp_answer
             
             if not auth_token or not moto_id:
                 return None
@@ -325,11 +328,8 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         return self.ipc_mq.mq_config.username.split("cloud_")[1]
 
     def _publish_to_ipc_mqtt(self, topic: str, msg: str):
-        LOGGER.warning("Sending payload:")
-        LOGGER.debug(f"{msg}")
         publish_result = self.ipc_mq.client.publish(topic=topic, payload=msg)
         publish_result.wait_for_publish(10)
-        LOGGER.warning(f"Publish: {publish_result}")
 
     def _get_webrtc_config(self, device_id: str):
         webrtc_config = self.api.get(f"/v1.0/devices/{device_id}/webrtc-configs")
