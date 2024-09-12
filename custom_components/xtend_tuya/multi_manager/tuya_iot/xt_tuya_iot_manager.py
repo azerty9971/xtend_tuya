@@ -8,6 +8,7 @@ import json
 import copy
 import time
 import uuid
+import base64
 from tuya_iot import (
     TuyaDeviceManager,
     TuyaOpenAPI,
@@ -322,7 +323,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                         LOGGER.warning(f'Candidate AFTER: |{cand_str}|')
                         sdp_answer += cand_str
                         break
-                    LOGGER.warning(f'Returning SDP answer: {sdp_answer}')
+                    LOGGER.warning(f'Returning SDP answer: {base64.b64encode(sdp_answer)}')
                     return sdp_answer
             
             if not auth_token or not moto_id:
