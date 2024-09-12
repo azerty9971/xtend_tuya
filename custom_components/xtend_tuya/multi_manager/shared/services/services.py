@@ -103,7 +103,6 @@ class ServiceManager:
         method  = event.data.get(CONF_METHOD, None)
         url     = event.data.get(CONF_URL, None)
         payload = event.data.get(CONF_PAYLOAD, None)
-        LOGGER.warning(f"_handle_call_api: {source} <=> {method} <=> {url} <=> {payload}")
         if account := self.multi_manager.get_account_by_name(source):
             try:
                 if response := await self.hass.async_add_executor_job(account.call_api, method, url, payload):
@@ -122,9 +121,7 @@ class ServiceManager:
         if api_reponse := await self._handle_call_api(api_event_data):
             if api_reponse.get("success"):
                 result = api_reponse.get("result", {})
-                LOGGER.warning(f"result: {result}")
                 p2p_config = result.get("p2p_config", {})
-                LOGGER.warning(f"p2p_config: {p2p_config}")
                 if ices := p2p_config.get("ices"):
                     return json.dumps(ices).replace(': ', ':').replace(', ', ',')
 
@@ -136,16 +133,12 @@ class ServiceManager:
         session_id  = event.session_id
         if not device_id:
             return None
-        LOGGER.warning(f"Device found: {device_id}")
         match event.method:
             case "POST":
-                LOGGER.warning(f"Method is: {event.method}")
                 match event.content_type:
                     case "application/sdp":
-                        LOGGER.warning(f"Content type is: {event.content_type}")
                         if account := self.multi_manager.get_account_by_name(source):
-                            LOGGER.warning(f"Account found: {source}")
                             if sdp_answer := await self.hass.async_add_executor_job(account.get_sdp_answer, device_id, session_id, event.payload):
                                 LOGGER.warning(f"Got SDP answer: {sdp_answer}")
-                                return web.Response(status=201, body=gzip.compress(sdp_answer), content_type="application/sdp")
+                                return web.Response(status=201, body=sdp_answer, content_type="application/sdp")
                         return None
