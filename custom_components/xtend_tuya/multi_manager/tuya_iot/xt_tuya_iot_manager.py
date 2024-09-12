@@ -323,7 +323,8 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                     sdp_answer = sdp_answer.replace("a=setup:", f"{candidates}a=setup:")
 
                     #This is a hacky fix, I'll try to remove it in the future!
-                    #sdp_answer = ".0\r\nm=".join(sdp_answer.split(".m="))
+                    sdp_answer = ".0\r\nm=".join(sdp_answer.split(".m="))
+                    sdp_answer = ".0\r\nm=".join(sdp_answer.split(".0m="))
                     #
                     LOGGER.warning(f'Returning SDP answer: {sdp_answer}')
                     return sdp_answer
