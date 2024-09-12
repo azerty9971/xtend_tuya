@@ -281,7 +281,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                     return lock_operation.get("success", False)
         return False
     
-    def get_sdp_answer(self, device_id: str, session_id: str, sdp_offer: str, wait_for_answers: int = 10) -> str | None:
+    def get_sdp_answer(self, device_id: str, session_id: str, sdp_offer: str, wait_for_answers: int = 5) -> str | None:
         if webrtc_config := self._get_webrtc_config(device_id):
             auth_token = webrtc_config.get("auth")
             moto_id =  webrtc_config.get("moto_id")
