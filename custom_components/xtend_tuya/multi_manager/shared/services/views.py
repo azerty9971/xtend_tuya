@@ -241,6 +241,8 @@ class XTGeneralView(HomeAssistantView):
         if self.use_cache:
             self.cache.append_to_cache(event_data, response, self.cache_ttl)
         if isinstance(response, str):
+            LOGGER.warning(f"Sending STR response: {response}")
             return web.Response(text=response)
         else:
+            LOGGER.warning("Sending RAW response")
             return response
