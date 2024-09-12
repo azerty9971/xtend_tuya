@@ -23,14 +23,13 @@ class XTIOTIPCListener:
     
     def handle_message(self, msg:str):
         LOGGER.warning(f"Received message from IPC MQTT: {msg}")
-        msg_dict = json.loads(msg)
-        protocol = msg_dict.get("protocol")
+        protocol = msg.get("protocol")
         if not protocol:
             return
         LOGGER.warning(f"Prorocol: {protocol}")
         match protocol:
             case 302: #SDP offer/answer/candidate
-                data: dict = msg_dict.get("data", {})
+                data: dict = msg.get("data", {})
                 header: dict = data.get("header", {})
                 sdp_type = header.get("type")
                 session_id = header.get("sessionid")
