@@ -6,6 +6,8 @@ import json
 from paho.mqtt import client as mqtt
 from urllib.parse import urlsplit
 
+import base64
+
 from tuya_iot import (
     TuyaOpenMQ,
     TuyaOpenAPI,
@@ -97,9 +99,10 @@ class XTIOTOpenMQIPC(XTIOTOpenMQ):
         elif rc == 5:
             self.__run_mqtt()
 
-    """def _on_message(self, mqttc: mqtt.Client, user_data: Any, msg: mqtt.MQTTMessage):
+    def _on_message(self, mqttc: mqtt.Client, user_data: Any, msg: mqtt.MQTTMessage):
+        LOGGER.warning(f"b64 payload: {base64.b64encode(msg.payload)}")
         for listener in self.message_listeners:
-            listener(json.loads(msg.payload.decode("utf8")))"""
+            listener(json.loads(msg.payload.decode("utf8")))
     
     def _on_subscribe(self, mqttc: mqtt.Client, user_data: Any, mid, granted_qos):
         LOGGER.debug(f"_on_subscribe: {mid}")
