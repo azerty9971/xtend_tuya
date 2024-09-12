@@ -318,10 +318,10 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                     for candidate in answer.candidates:
                         cand_str: str = candidate.get("candidate", "")
                         cand_str = cand_str.replace("\\r\\n", "").trim() + "\\r\\n"
-                        LOGGER.warning(f"Candidate: |{cand_str}|")
+                        LOGGER.warning(f'Candidate: |{cand_str}|')
                         sdp_answer += cand_str
                         break
-                    LOGGER.warning(f"Returning SDP answer: {sdp_answer}")
+                    LOGGER.warning(f'Returning SDP answer: {sdp_answer}')
                     return sdp_answer
             
             if not auth_token or not moto_id:
