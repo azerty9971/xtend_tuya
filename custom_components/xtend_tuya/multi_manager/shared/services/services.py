@@ -125,7 +125,7 @@ class ServiceManager:
                 p2p_config = result.get("p2p_config", {})
                 LOGGER.warning(f"p2p_config: {p2p_config}")
                 if ices := p2p_config.get("ices"):
-                    return json.dumps(ices)
+                    return json.dumps(ices).replace(': ', ':').replace(', ', ',')
 
 
     async def _handle_webrtc(self, event: XTEventData) -> web.Response | str | None:
