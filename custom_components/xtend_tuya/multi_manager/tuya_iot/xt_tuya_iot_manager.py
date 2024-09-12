@@ -320,7 +320,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                     candidates: str = ""
                     for candidate in answer.candidates:
                         candidates += candidate.get("candidate", "")
-                    sdp_answer.replace("a=setup:", f"{candidates}a=setup:")
+                    sdp_answer = sdp_answer.replace("a=setup:", f"{candidates}a=setup:")
                     LOGGER.warning(f'Returning SDP answer: {sdp_answer}')
                     return sdp_answer
             
