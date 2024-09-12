@@ -317,6 +317,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                     sdp_answer = answer.answer.get("sdp", "")
                     for candidate in answer.candidates:
                         sdp_answer += candidate.get("candidate", "")
+                    LOGGER.warning(f"Returning SDP answer: {sdp_answer}")
                     return sdp_answer
             
             if not auth_token or not moto_id:
