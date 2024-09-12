@@ -145,5 +145,5 @@ class ServiceManager:
                         if account := self.multi_manager.get_account_by_name(source):
                             LOGGER.warning(f"Account found: {source}")
                             if sdp_answer := await self.hass.async_add_executor_job(account.get_sdp_answer, device_id, session_id, event.payload):
-                                return web.Response(status=201, text=sdp_answer, content_type="application/sdp")
+                                return web.Response(status=201, body=sdp_answer, content_type="application/sdp")
                         return None
