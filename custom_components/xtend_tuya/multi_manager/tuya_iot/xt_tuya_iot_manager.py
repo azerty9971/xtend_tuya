@@ -316,7 +316,8 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                     #Format SDP answer and send it back
                     sdp_answer = answer.answer.get("sdp", "")
                     for candidate in answer.candidates:
-                        cand_str = candidate.get("candidate", "")
+                        cand_str: str = candidate.get("candidate", "")
+                        cand_str = cand_str.replace("\\r\\n", "").trim() + "\\r\\n"
                         LOGGER.warning(f"Candidate: |{cand_str}|")
                         sdp_answer += cand_str
                         break
