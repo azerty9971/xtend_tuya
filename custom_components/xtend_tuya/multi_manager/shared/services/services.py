@@ -4,7 +4,6 @@ import voluptuous as vol
 import homeassistant.helpers.config_validation as cv
 from aiohttp import web
 import json
-import gzip
 
 from ...multi_manager import (
     MultiManager,

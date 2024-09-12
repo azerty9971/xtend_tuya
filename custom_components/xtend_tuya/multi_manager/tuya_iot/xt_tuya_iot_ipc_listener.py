@@ -22,11 +22,9 @@ class XTIOTIPCListener:
         self.sdp_answers: dict[str, XTSDPContent] = {}
     
     def handle_message(self, msg: str):
-        LOGGER.warning(f"Received message from IPC MQTT: {msg}")
         protocol = msg.get("protocol")
         if not protocol:
             return
-        LOGGER.warning(f"Prorocol: {protocol}")
         match protocol:
             case 302: #SDP offer/answer/candidate
                 data: dict = msg.get("data", {})
