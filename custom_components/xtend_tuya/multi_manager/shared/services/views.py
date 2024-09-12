@@ -5,7 +5,8 @@ from datetime import datetime, timedelta
 from multidict import (
     MultiMapping,
 )
-import gzip
+import string
+import random
 
 from homeassistant.components.http import KEY_AUTHENTICATED, HomeAssistantView
 from homeassistant.helpers.entity_component import EntityComponent, entity
@@ -54,16 +55,21 @@ class XTEventData:
     headers: dict[str, str] = None
     payload: str = None
     content_type: str = None
+    session_id: str = None
 
     def __init__(self) -> None:
         self.query_params = {}
         self.headers = {}
+        self.session_id = self._id_generator()
     
     def __eq__(self, other: XTEventData) -> bool:
         return self.query_params == other.query_params and self.method == other.method and self.payload == other.payload
 
     def __repr__(self) -> str:
         return f"Method: {self.method} <=> Headers: {self.headers} <=> Content-Type: {self.content_type} <=> Query parameters: {self.query_params} <=> Payload: {self.payload}"
+
+    def _id_generator(size=20, chars=string.ascii_lowercase + string.ascii_uppercase + string.digits):
+        return ''.join(random.choice(chars) for _ in range(size))
 
 class XTEntityView(HomeAssistantView):
     """Base EntityView."""
