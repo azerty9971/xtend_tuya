@@ -236,7 +236,7 @@ class XTGeneralView(HomeAssistantView):
                 return web.Response(text=result)
         response = await self.callback(event_data)
         LOGGER.warning(f"Response: {response}")
-        if not response:
+        if response is None:
             raise web.HTTPBadRequest
         if self.use_cache:
             self.cache.append_to_cache(event_data, response, self.cache_ttl)
