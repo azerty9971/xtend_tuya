@@ -100,9 +100,24 @@ class XTIOTOpenMQIPC(XTIOTOpenMQ):
             self.__run_mqtt()
 
     def _on_message(self, mqttc: mqtt.Client, user_data: Any, msg: mqtt.MQTTMessage):
-        LOGGER.warning(f"b64 payload: {base64.b64encode(msg.payload)}")
+        LOGGER.debug(f"payload-> {msg.payload}")
+
+        msg_dict = json.loads(msg.payload.decode("utf8"))
+
+        """t = msg_dict.get("t", "")
+
+        mq_config = user_data["mqConfig"]
+        decrypted_data = self._decode_mq_message(
+            msg_dict["data"], mq_config.password, t
+        )
+        if decrypted_data is None:
+            return
+
+        msg_dict["data"] = decrypted_data"""
+        LOGGER.debug(f"on_message: {msg_dict}")
+
         for listener in self.message_listeners:
-            listener(json.loads(msg.payload.decode("utf8")))
+            listener(msg_dict)
     
     def _on_subscribe(self, mqttc: mqtt.Client, user_data: Any, mid, granted_qos):
         LOGGER.debug(f"_on_subscribe: {mid}")
