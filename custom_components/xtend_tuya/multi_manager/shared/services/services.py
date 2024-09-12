@@ -51,6 +51,14 @@ SERVICE_CALL_API_SCHEMA = vol.Schema(
     }
 )
 
+SERVICE_GET_ICE_SERVERS = "get_ice_servers"
+SERVICE_GET_ICE_SERVERS_SCHEMA = vol.Schema(
+    {
+        vol.Required(CONF_DEVICE_ID): cv.string,
+        vol.Required(CONF_SOURCE): cv.string,
+    }
+)
+
 SERVICE_WEBRTC = "webrtc"
 SERVICE_GET_CAMERA_STREAM_URL_SCHEMA = vol.Schema(
     {
@@ -67,6 +75,7 @@ class ServiceManager:
     def register_services(self):
         self._register_service(DOMAIN, SERVICE_GET_CAMERA_STREAM_URL, self._handle_get_camera_stream_url, SERVICE_GET_CAMERA_STREAM_URL_SCHEMA, True, True, True)
         self._register_service(DOMAIN, SERVICE_CALL_API, self._handle_call_api, SERVICE_CALL_API_SCHEMA, True, True, True)
+        self._register_service(DOMAIN, SERVICE_GET_ICE_SERVERS, self._handle_get_ice_servers, SERVICE_GET_ICE_SERVERS_SCHEMA, True, True, False)
         self._register_service(DOMAIN, SERVICE_WEBRTC, self._handle_webrtc, SERVICE_GET_CAMERA_STREAM_URL_SCHEMA, False, True, False)
 
     def _register_service(self, domain: str, name: str, callback, schema, requires_auth: bool = True, allow_from_api:bool = True, use_cache:bool = True):
@@ -100,6 +109,21 @@ class ServiceManager:
             except Exception as e:
                 LOGGER.warning(f"API Call failed: {e}")
     
+    async def _handle_get_ice_servers(self, event: XTEventData) -> web.Response | str | None:
+        source      = event.data.get(CONF_SOURCE, MESSAGE_SOURCE_TUYA_IOT)
+        device_id   = event.data.get(CONF_DEVICE_ID, None)
+        api_event_data: XTEventData = XTEventData()
+        api_event_data.query_params[CONF_SOURCE] = source
+        api_event_data.query_params[CONF_METHOD] = "GET"
+        api_event_data.query_params[CONF_URL]    = f"/v1.0/devices/{device_id}/webrtc-configs"
+        if api_reponse := await self._handle_call_api(api_event_data):
+            if api_reponse.get("success"):
+                result = api_reponse.get("result", {})
+                p2p_config = result.get("p2p_config", {})
+                if ices := p2p_config.get("ices"):
+                    return ices
+
+
     async def _handle_webrtc(self, event: XTEventData) -> web.Response | str | None:
         LOGGER.warning(f"_handle_webrtc: {event}")
         source      = event.data.get(CONF_SOURCE, MESSAGE_SOURCE_TUYA_IOT)
