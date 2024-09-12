@@ -75,9 +75,9 @@ class XTIOTOpenMQIPC(XTIOTOpenMQ):
                 "link_id": f"tuya-iot-app-sdk-python.ipc.{uuid.uuid1()}",
                 "link_type": "mqtt",
                 "topics": "ipc",
-                #"msg_encrypted_version": "2.0"
-                #if (self.api.auth_type == AuthType.CUSTOM)
-                #else "1.0",
+                "msg_encrypted_version": "2.0"
+                if (self.api.auth_type == AuthType.CUSTOM)
+                else "1.0",
             },
         )
 
