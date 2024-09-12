@@ -68,7 +68,7 @@ class XTEventData:
     def __repr__(self) -> str:
         return f"Method: {self.method} <=> Headers: {self.headers} <=> Content-Type: {self.content_type} <=> Query parameters: {self.query_params} <=> Payload: {self.payload}"
 
-    def _id_generator(size=20, chars=string.ascii_lowercase + string.ascii_uppercase + string.digits):
+    def _id_generator(self, size=20, chars=string.ascii_lowercase + string.ascii_uppercase + string.digits):
         return ''.join(random.choice(chars) for _ in range(size))
 
 class XTEntityView(HomeAssistantView):
