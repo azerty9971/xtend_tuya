@@ -14,7 +14,7 @@ class XTSDPContent:
 
     def __init__(self) -> None:
         self.answer = {}
-        self.candidates = {}
+        self.candidates = []
 
 class XTIOTIPCListener:
     def __init__(self, multi_manager: MultiManager) -> None:
