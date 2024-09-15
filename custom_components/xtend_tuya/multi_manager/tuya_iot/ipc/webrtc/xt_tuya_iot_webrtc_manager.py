@@ -93,7 +93,7 @@ class XTIOTWebRTCManager:
                     "data":{
                         "header":{
                             "type":"offer",
-                            "from":f"{self._get_from()}",
+                            "from":f"{self.ipc_manager.get_from()}",
                             "to":f"{device_id}",
                             "sub_dev_id":"",
                             "sessionid":f"{session_id}",

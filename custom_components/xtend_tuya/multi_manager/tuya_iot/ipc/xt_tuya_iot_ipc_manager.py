@@ -38,7 +38,7 @@ class XTIOTIPCManager:  # noqa: F811
     def get_sdp_answer(self, device_id: str, session_id: str, sdp_offer: str, wait_for_answers: int = 5) -> str | None:
         return self.webrtc_manager.get_sdp_answer(device_id, session_id, sdp_offer, wait_for_answers)
 
-    def _get_from(self) -> str:
+    def get_from(self) -> str:
         return self.ipc_mq.mq_config.username.split("cloud_")[1]
 
     def _publish_to_ipc_mqtt(self, topic: str, msg: str):
