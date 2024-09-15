@@ -37,9 +37,19 @@ class XTMergingManager:
     def _merge_function(device1: XTDevice, device2: XTDevice):
         for function_key in device1.function:
             if function_key in device2.function:
-                #determine the most plausible correct function
-                value1 = json.loads(device1.function[function_key].values)
-                value2 = json.loads(device2.function[function_key].values)
+                if device1.function[function_key].values is not None and device2.function[function_key].values is not None:
+                    #determine the most plausible correct function
+                    value1 = json.loads(device1.function[function_key].values)
+                    value2 = json.loads(device2.function[function_key].values)
+                elif device1.function[function_key].values is not None :
+                    value1 = json.loads(device1.function[function_key].values)
+                    value2 = value1
+                elif device2.function[function_key].values is not None:
+                    value1 = json.loads(device2.function[function_key].values)
+                    value2 = value1
+                else:
+                    value1 = json.loads("{}")
+                    value2 = value1
                 match XTMergingManager._determine_most_plausible(value1, value2, "scale"):
                     case None:
                         match XTMergingManager._determine_most_plausible(value1, value2, "min"):
