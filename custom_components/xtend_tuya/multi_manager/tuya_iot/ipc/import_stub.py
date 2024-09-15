@@ -1,0 +1,2 @@
+class XTIOTIPCManager:
+    pass

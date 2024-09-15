@@ -230,20 +230,15 @@ class XTGeneralView(HomeAssistantView):
         for header in request.headers:
             event_data.headers[header] = request.headers[header]
         #event_data.headers = request.headers.__dict__
-        LOGGER.warning(f"Event data: {event_data}")
         if self.use_cache:
             if result := self.cache.find_in_cache(event_data):
-                LOGGER.warning(f"Response from cache: {result}")
                 return web.Response(text=result)
         response = await self.callback(event_data)
-        LOGGER.warning(f"Response: {response}")
         if response is None:
             raise web.HTTPBadRequest
         if self.use_cache:
             self.cache.append_to_cache(event_data, response, self.cache_ttl)
         if isinstance(response, str):
-            LOGGER.warning(f"Sending STR response: {response}")
             return web.Response(text=response)
         else:
-            LOGGER.warning("Sending RAW response")
             return response
