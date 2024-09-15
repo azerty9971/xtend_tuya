@@ -6,9 +6,6 @@ https://github.com/tuya/tuya-iot-python-sdk
 from __future__ import annotations
 import json
 import copy
-import time
-import uuid
-import base64
 from tuya_iot import (
     TuyaDeviceManager,
     TuyaOpenAPI,
@@ -34,11 +31,8 @@ from ..multi_manager import (
     MultiManager,  # noqa: F811
 )
 from ...base import TuyaEntity
-from .xt_tuya_iot_mq import (
-    XTIOTOpenMQIPC,
-)
-from .xt_tuya_iot_ipc_listener import (
-    XTIOTIPCListener,
+from .ipc.xt_tuya_iot_ipc_manager import (
+    XTIOTIPCManager
 )
 
 
@@ -48,10 +42,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         mq.remove_message_listener(self.on_message)
         mq.add_message_listener(self.forward_message_to_multi_manager)
         self.multi_manager = multi_manager
-        self.ipc_mq: XTIOTOpenMQIPC = XTIOTOpenMQIPC(api)
-        self.ipc_listener: XTIOTIPCListener = XTIOTIPCListener(self.multi_manager)
-        self.ipc_mq.start()
-        self.ipc_mq.add_message_listener(self.ipc_listener.handle_message)
+        self.ipc_manager = XTIOTIPCManager(api, multi_manager)
 
     def forward_message_to_multi_manager(self, msg:str):
         self.multi_manager.on_message(MESSAGE_SOURCE_TUYA_IOT, msg)
@@ -281,71 +272,3 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                     lock_operation = self.api.post(f"/v1.0/smart-lock/devices/{device_id}/password-free/door-operate", {"ticket_id": ticket_id, "open": open})
                     return lock_operation.get("success", False)
         return False
-    
-    def get_sdp_answer(self, device_id: str, session_id: str, sdp_offer: str, wait_for_answers: int = 5) -> str | None:
-        sleep_step = 0.01
-        sleep_count: int = int(wait_for_answers / sleep_step)
-        if webrtc_config := self._get_webrtc_config(device_id):
-            auth_token = webrtc_config.get("auth")
-            moto_id =  webrtc_config.get("moto_id")
-            for topic in self.ipc_mq.mq_config.sink_topic.values():
-                topic = topic.replace("{device_id}", device_id)
-                topic = topic.replace("moto_id", moto_id)
-                payload = {
-                    "protocol":302,
-                    "pv":"2.2",
-                    "t":int(time.time()),
-                    "data":{
-                        "header":{
-                            "type":"offer",
-                            "from":f"{self._get_from()}",
-                            "to":f"{device_id}",
-                            "sub_dev_id":"",
-                            "sessionid":f"{session_id}",
-                            "moto_id":f"{moto_id}",
-                            "tid":""
-                        },
-                        "msg":{
-                            "mode":"webrtc",
-                            "sdp":f"{sdp_offer}",
-                            "stream_type":1,
-                            "auth":f"{auth_token}",
-                        }
-                    },
-                }
-                self._publish_to_ipc_mqtt(topic, json.dumps(payload))
-                for _ in range(sleep_count):
-                    if answer := self.ipc_listener.sdp_answers.get(session_id):
-                        if answer.has_all_candidates():
-                            break
-                    time.sleep(sleep_step) #Wait for MQTT responses
-                if answer := self.ipc_listener.sdp_answers.get(session_id):
-                    #Format SDP answer and send it back
-                    sdp_answer: str = answer.answer.get("sdp", "")
-                    LOGGER.warning(f"Found candidates: {answer.candidates}")
-                    candidates: str = ""
-                    for candidate in answer.candidates:
-                        candidates += candidate.get("candidate", "")
-                    #sdp_answer = sdp_answer.replace("a=setup:", f"{candidates}a=setup:")
-                    sdp_answer += candidates
-                    LOGGER.warning(f'Returning SDP answer: {sdp_answer}')
-                    return sdp_answer
-            
-            if not auth_token or not moto_id:
-                return None
-            
-        return None
-
-    def _get_from(self) -> str:
-        return self.ipc_mq.mq_config.username.split("cloud_")[1]
-
-    def _publish_to_ipc_mqtt(self, topic: str, msg: str):
-        publish_result = self.ipc_mq.client.publish(topic=topic, payload=msg)
-        publish_result.wait_for_publish(10)
-
-    def _get_webrtc_config(self, device_id: str):
-        webrtc_config = self.api.get(f"/v1.0/devices/{device_id}/webrtc-configs")
-        LOGGER.warning(f"webrtc_config: {webrtc_config}")
-        if webrtc_config.get("success"):
-            return webrtc_config.get("result")
-        return None
