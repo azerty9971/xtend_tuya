@@ -35,8 +35,11 @@ class XTIOTIPCManager:  # noqa: F811
         self.api = api
         self.webrtc_manager = XTIOTWebRTCManager(self)
     
-    def get_sdp_answer(self, device_id: str, session_id: str, sdp_offer: str, wait_for_answers: int = 5) -> str | None:
+    def get_webrtc_sdp_answer(self, device_id: str, session_id: str, sdp_offer: str, wait_for_answers: int = 5) -> str | None:
         return self.webrtc_manager.get_sdp_answer(device_id, session_id, sdp_offer, wait_for_answers)
+    
+    def get_webrtc_ice_servers(self, device_id: str, session_id: str) -> str | None:
+        return self.webrtc_manager.get_webrtc_ice_servers(device_id, session_id)
 
     def get_from(self) -> str:
         return self.ipc_mq.mq_config.username.split("cloud_")[1]

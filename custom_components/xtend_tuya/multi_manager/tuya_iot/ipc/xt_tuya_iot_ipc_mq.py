@@ -25,7 +25,7 @@ from ....util import (
     log_stack,
 )
 from ....const import (
-    LOGGER
+    LOGGER  # noqa: F401
 )
 
 class XTIOTIPCTuyaMQConfig(TuyaMQConfig):
@@ -80,10 +80,12 @@ class XTIOTOpenMQIPC(XTIOTOpenMQ):
             listener(msg_dict)
     
     def _on_subscribe(self, mqttc: mqtt.Client, user_data: Any, mid, granted_qos):
-        LOGGER.debug(f"_on_subscribe: {mid}")
+        #LOGGER.debug(f"_on_subscribe: {mid}")
+        pass
     
     def _on_publish(self, mqttc: mqtt.Client, user_data: Any, mid):
-        LOGGER.debug(f"_on_publish: {mid} <=> {user_data}")
+        #LOGGER.debug(f"_on_publish: {mid} <=> {user_data}")
+        pass
 
     def _start(self, mq_config: TuyaMQConfig) -> mqtt.Client:
         mqttc = mqtt.Client(mq_config.client_id)

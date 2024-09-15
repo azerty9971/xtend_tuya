@@ -230,14 +230,16 @@ class XTGeneralView(HomeAssistantView):
         for header in request.headers:
             event_data.headers[header] = request.headers[header]
         #event_data.headers = request.headers.__dict__
-        if self.use_cache:
+        query_use_cache = bool(event_data.query_params.get("use_cache", self.use_cache))
+        query_cache_ttl = int(event_data.query_params.get("cache_ttl", self.cache_ttl))
+        if query_use_cache:
             if result := self.cache.find_in_cache(event_data):
                 return web.Response(text=result)
         response = await self.callback(event_data)
         if response is None:
             raise web.HTTPBadRequest
-        if self.use_cache:
-            self.cache.append_to_cache(event_data, response, self.cache_ttl)
+        if query_use_cache:
+            self.cache.append_to_cache(event_data, response, query_cache_ttl)
         if isinstance(response, str):
             return web.Response(text=response)
         else:
