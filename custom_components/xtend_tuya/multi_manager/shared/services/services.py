@@ -133,6 +133,7 @@ class ServiceManager:
     async def _handle_webrtc_debug(self, event: XTEventData) -> web.Response | str | None:
         source      = event.data.get(CONF_SOURCE, MESSAGE_SOURCE_TUYA_IOT)
         session_id  = event.data.get(CONF_SESSION_ID, None)
+        LOGGER.warning(f"DEBUG CALL: {event}")
         if session_id is None:
             return None
         if account := self.multi_manager.get_account_by_name(source):
