@@ -152,6 +152,8 @@ class XTGeneralView(HomeAssistantView):
             request[KEY_AUTHENTICATED]
         )
         #TEMPORARY FOR GO2RTC DEBUGGING
+        if hdrs.AUTHORIZATION in request.headers:
+            LOGGER.warning(f"Auth: |{request.headers[hdrs.AUTHORIZATION]}|")
         if hdrs.AUTHORIZATION in request.headers and request.headers[hdrs.AUTHORIZATION] == " Bearer GO2RTC":
             authenticated = True
         
