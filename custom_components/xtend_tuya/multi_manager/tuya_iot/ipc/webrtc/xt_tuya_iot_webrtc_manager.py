@@ -13,15 +13,15 @@ from ..xt_tuya_iot_ipc_manager import (
 
 class XTIOTWebRTCContent:
     webrtc_config: dict[str, any]
-    offer: dict[str, any]
-    answer: dict[str, any]
+    offer: str
+    answer: str
     candidates: list[dict]
     has_all_candidates: bool
 
     def __init__(self, ttl: int = 10) -> None:
         self.webrtc_config = {}
-        self.answer = {}
-        self.offer = {}
+        self.answer = None
+        self.offer = None
         self.candidates = []
         self.valid_until = datetime.now() + timedelta(0, ttl)
         self.has_all_candidates = False
@@ -43,7 +43,7 @@ class XTIOTWebRTCManager:
             if self.sdp_exchange[session_id].valid_until < current_time:
                 self.sdp_exchange.pop(session_id)
     
-    def set_sdp_answer(self, session_id: str, answer: dict) -> None:
+    def set_sdp_answer(self, session_id: str, answer: str) -> None:
         self._create_session_if_necessary(session_id)
         self.sdp_exchange[session_id].answer = answer
     
@@ -63,7 +63,7 @@ class XTIOTWebRTCManager:
             p2p_config["ices"] = json.dumps(ices).replace(': ', ':').replace(', ', ',')
         self.sdp_exchange[session_id].webrtc_config = config
 
-    def set_sdp_offer(self, session_id: str, offer: dict) -> None:
+    def set_sdp_offer(self, session_id: str, offer: str) -> None:
         self._create_session_if_necessary(session_id)
         self.sdp_exchange[session_id].offer = offer
 
@@ -77,12 +77,16 @@ class XTIOTWebRTCManager:
                 return current_exchange.webrtc_config
         
         webrtc_config = self.ipc_manager.api.get(f"/v1.0/devices/{device_id}/webrtc-configs")
-        LOGGER.warning(f"webrtc_config: {webrtc_config}")
         if webrtc_config.get("success"):
             result = webrtc_config.get("result")
             self.set_webrtc_config(session_id, result)
             return result
         return None
+    
+    def get_webrtc_ice_servers(self, device_id: str, session_id: str) -> None:
+        if config := self.get_webrtc_config(device_id, session_id):
+            p2p_config: dict = config.get("p2p_config", {})
+            return p2p_config.get("ices", None)
 
     def get_sdp_answer(self, device_id: str, session_id: str, sdp_offer: str, wait_for_answers: int = 5) -> str | None:
         sleep_step = 0.01
@@ -129,7 +133,6 @@ class XTIOTWebRTCManager:
                     candidates: str = ""
                     for candidate in answer.candidates:
                         candidates += candidate.get("candidate", "")
-                    #sdp_answer = sdp_answer.replace("a=setup:", f"{candidates}a=setup:")
                     sdp_answer += candidates
                     return sdp_answer
             
