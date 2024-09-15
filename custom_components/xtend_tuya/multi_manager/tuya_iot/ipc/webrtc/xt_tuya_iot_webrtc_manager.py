@@ -78,6 +78,7 @@ class XTIOTWebRTCManager:
         self.sdp_exchange[session_id].offer = offer
 
     def _create_session_if_necessary(self, session_id: str) -> None:
+        self._clean_cache()
         if session_id not in self.sdp_exchange:
             self.sdp_exchange[session_id] = XTIOTWebRTCContent()
     
