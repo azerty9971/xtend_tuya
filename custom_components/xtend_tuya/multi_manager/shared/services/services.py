@@ -137,6 +137,7 @@ class ServiceManager:
             return None
         if account := self.multi_manager.get_account_by_name(source):
             if debug_output := await self.hass.async_add_executor_job(account.get_webrtc_exchange_debug, session_id):
+                LOGGER.warning(f"DEBUG OUTPUT: {debug_output}")
                 return debug_output
         return None
 
