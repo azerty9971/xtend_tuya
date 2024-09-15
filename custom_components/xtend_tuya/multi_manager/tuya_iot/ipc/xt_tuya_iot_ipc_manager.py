@@ -29,7 +29,7 @@ class XTIOTIPCManager:  # noqa: F811
     def __init__(self, api: TuyaOpenAPI, multi_manager: MultiManager) -> None:
         self.multi_manager = multi_manager
         self.ipc_mq: XTIOTOpenMQIPC = XTIOTOpenMQIPC(api)
-        self.ipc_listener: XTIOTIPCListener = XTIOTIPCListener(self.multi_manager)
+        self.ipc_listener: XTIOTIPCListener = XTIOTIPCListener(self)
         self.ipc_mq.start()
         self.ipc_mq.add_message_listener(self.ipc_listener.handle_message)
         self.api = api
