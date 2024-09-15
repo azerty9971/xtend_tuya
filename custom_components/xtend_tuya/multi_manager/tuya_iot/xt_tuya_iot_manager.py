@@ -283,6 +283,8 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         return False
     
     def get_sdp_answer(self, device_id: str, session_id: str, sdp_offer: str, wait_for_answers: int = 5) -> str | None:
+        sleep_step = 0.1
+        sleep_count: int = int(wait_for_answers / sleep_step)
         if webrtc_config := self._get_webrtc_config(device_id):
             auth_token = webrtc_config.get("auth")
             moto_id =  webrtc_config.get("moto_id")
@@ -312,14 +314,14 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                     },
                 }
                 self._publish_to_ipc_mqtt(topic, json.dumps(payload))
-                time.sleep(wait_for_answers) #Wait for MQTT responses
+                for _ in range(sleep_count):
+                    if answer := self.ipc_listener.sdp_answers.get(session_id):
+                        if answer.has_all_candidates():
+                            break
+                    time.sleep(sleep_step) #Wait for MQTT responses
                 if answer := self.ipc_listener.sdp_answers.get(session_id):
                     #Format SDP answer and send it back
                     sdp_answer: str = answer.answer.get("sdp", "")
-                    #This is a hacky fix, I'll try to remove it in the future!
-                    sdp_answer = ".0\r\nm=".join(sdp_answer.split(".m="))
-                    sdp_answer = ".0\r\nm=".join(sdp_answer.split(".0m="))
-                    #
                     LOGGER.warning(f"Candidates: {answer.candidates}")
                     candidates: str = ""
                     for candidate in answer.candidates:
