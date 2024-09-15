@@ -28,9 +28,9 @@ class XTIOTWebRTCContent:
     
     def __repr__(self) -> str:
         return (
-            "[From TUYA]Config:\r\n" + f"{self.webrtc_config}" +
-            "[From GO2RTC]Offer\r\n" + f"{self.offer}" +
-            "[From TUYA]Answer:\r\n" + f"{self.answer}"
+            "\r\n[From TUYA]Config:\r\n" + f"{self.webrtc_config}" +
+            "\r\n[From GO2RTC]Offer\r\n" + f"{self.offer}" +
+            "\r\n[From TUYA]Answer:\r\n" + f"{self.answer}"
             )
 
 class XTIOTWebRTCManager:
