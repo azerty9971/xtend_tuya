@@ -58,8 +58,8 @@ SERVICE_GET_ICE_SERVERS_SCHEMA = vol.Schema(
     }
 )
 
-SERVICE_WEBRTC = "webrtc_sdp_exchange"
-SERVICE_GET_CAMERA_STREAM_URL_SCHEMA = vol.Schema(
+SERVICE_WEBRTC_SDP_EXCHANGE = "webrtc_sdp_exchange"
+SERVICE_WEBRTC_SDP_EXCHANGE_SCHEMA = vol.Schema(
     {
         vol.Required(CONF_DEVICE_ID): cv.string,
         vol.Required(CONF_SESSION_ID): cv.string,
@@ -76,7 +76,7 @@ class ServiceManager:
         self._register_service(DOMAIN, SERVICE_GET_CAMERA_STREAM_URL, self._handle_get_camera_stream_url, SERVICE_GET_CAMERA_STREAM_URL_SCHEMA, True, True, True)
         self._register_service(DOMAIN, SERVICE_CALL_API, self._handle_call_api, SERVICE_CALL_API_SCHEMA, True, True, True)
         self._register_service(DOMAIN, SERVICE_GET_ICE_SERVERS, self._handle_get_ice_servers, SERVICE_GET_ICE_SERVERS_SCHEMA, True, True, False)
-        self._register_service(DOMAIN, SERVICE_WEBRTC, self._handle_webrtc, SERVICE_GET_CAMERA_STREAM_URL_SCHEMA, True, True, False)
+        self._register_service(DOMAIN, SERVICE_WEBRTC_SDP_EXCHANGE, self._handle_webrtc, SERVICE_WEBRTC_SDP_EXCHANGE_SCHEMA, False, True, False)
 
     def _register_service(self, domain: str, name: str, callback, schema, requires_auth: bool = True, allow_from_api:bool = True, use_cache:bool = True):
         self.hass.services.async_register(
