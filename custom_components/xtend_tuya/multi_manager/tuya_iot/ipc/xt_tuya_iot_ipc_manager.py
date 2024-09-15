@@ -1,10 +1,11 @@
 from __future__ import annotations
 
-import time
-import json
-
 from tuya_iot import (
     TuyaOpenAPI,
+)
+
+from .import_stub import (
+    XTIOTIPCManager,
 )
 
 from .xt_tuya_iot_ipc_listener import (
@@ -18,13 +19,13 @@ from ...multi_manager import (
     MultiManager,
 )
 from ....const import (
-    LOGGER,
+    LOGGER,  # noqa: F401
 )
 from .webrtc.xt_tuya_iot_webrtc_manager import (
     XTIOTWebRTCManager,
 )
 
-class XTIOTIPCManager:
+class XTIOTIPCManager:  # noqa: F811
     def __init__(self, api: TuyaOpenAPI, multi_manager: MultiManager) -> None:
         self.multi_manager = multi_manager
         self.ipc_mq: XTIOTOpenMQIPC = XTIOTOpenMQIPC(api)
