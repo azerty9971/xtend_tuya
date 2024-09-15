@@ -33,7 +33,7 @@ class XTIOTIPCManager:  # noqa: F811
         self.ipc_mq.start()
         self.ipc_mq.add_message_listener(self.ipc_listener.handle_message)
         self.api = api
-        self.webrtc_manager = XTIOTWebRTCManager()
+        self.webrtc_manager = XTIOTWebRTCManager(self)
     
     def get_sdp_answer(self, device_id: str, session_id: str, sdp_offer: str, wait_for_answers: int = 5) -> str | None:
         return self.webrtc_manager.get_sdp_answer(device_id, session_id, sdp_offer, wait_for_answers)
