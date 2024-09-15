@@ -19,6 +19,10 @@ class XTSDPContent:
     def has_all_candidates(self) -> bool:
         for candidate in self.candidates:
             LOGGER.warning(f"Candidate: {candidate}")
+            candidate_dict: dict = json.loads(candidate)
+            candidate_str = candidate_dict.get("candidate", None)
+            if candidate_str == '':
+                return True
         return False
 
 class XTIOTIPCListener:
