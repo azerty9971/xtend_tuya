@@ -13,6 +13,7 @@ from ..xt_tuya_iot_ipc_manager import (
 
 class XTIOTWebRTCContent:
     webrtc_config: dict[str, any]
+    offer: dict[str, any]
     answer: dict[str, any]
     candidates: list[dict]
     has_all_candidates: bool
@@ -20,6 +21,7 @@ class XTIOTWebRTCContent:
     def __init__(self, ttl: int = 10) -> None:
         self.webrtc_config = {}
         self.answer = {}
+        self.offer = {}
         self.candidates = []
         self.valid_until = datetime.now() + timedelta(0, ttl)
         self.has_all_candidates = False
@@ -54,7 +56,16 @@ class XTIOTWebRTCManager:
 
     def set_webrtc_config(self, session_id: str, config: dict[str, any]):
         self._create_session_if_necessary(session_id)
+
+        #Format ICE Servers so that they can be used by GO2RTC
+        p2p_config: dict = config.get("p2p_config", {})
+        if ices := p2p_config.get("ices"):
+            p2p_config["ices"] = json.dumps(ices).replace(': ', ':').replace(', ', ',')
         self.sdp_exchange[session_id].webrtc_config = config
+
+    def set_sdp_offer(self, session_id: str, offer: dict) -> None:
+        self._create_session_if_necessary(session_id)
+        self.sdp_exchange[session_id].offer = offer
 
     def _create_session_if_necessary(self, session_id: str) -> None:
         if session_id not in self.sdp_exchange:
@@ -76,6 +87,7 @@ class XTIOTWebRTCManager:
     def get_sdp_answer(self, device_id: str, session_id: str, sdp_offer: str, wait_for_answers: int = 5) -> str | None:
         sleep_step = 0.01
         sleep_count: int = int(wait_for_answers / sleep_step)
+        self.set_sdp_offer(session_id, sdp_offer)
         if webrtc_config := self.get_webrtc_config(device_id, session_id):
             auth_token = webrtc_config.get("auth")
             moto_id =  webrtc_config.get("moto_id")
@@ -114,13 +126,11 @@ class XTIOTWebRTCManager:
                 if answer := self.get_sdp_exchange(session_id):
                     #Format SDP answer and send it back
                     sdp_answer: str = answer.answer.get("sdp", "")
-                    LOGGER.warning(f"Found candidates: {answer.candidates}")
                     candidates: str = ""
                     for candidate in answer.candidates:
                         candidates += candidate.get("candidate", "")
                     #sdp_answer = sdp_answer.replace("a=setup:", f"{candidates}a=setup:")
                     sdp_answer += candidates
-                    LOGGER.warning(f'Returning SDP answer: {sdp_answer}')
                     return sdp_answer
             
             if not auth_token or not moto_id:
