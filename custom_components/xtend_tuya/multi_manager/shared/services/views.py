@@ -115,8 +115,10 @@ class XTGeneralView(HomeAssistantView):
         """Initialize a basic camera view."""
         self.name = "api:" + DOMAIN + ":" + name
         self.url = "/api/" + DOMAIN + "/" + name
+        #TEMPORARY FOR GO2RTC DEBUGGING
         self.requires_auth = False
         self.debug_requires_auth = requires_auth
+        #END TEMPORARY FOR GO2RTC DEBUGGING
         self.callback = callback
         self.use_cache = use_cache
         self.cache: XTRequestCacheResult = XTRequestCacheResult(name)
@@ -153,10 +155,9 @@ class XTGeneralView(HomeAssistantView):
             request[KEY_AUTHENTICATED]
         )
         #TEMPORARY FOR GO2RTC DEBUGGING
-        if hdrs.AUTHORIZATION in request.headers:
-            LOGGER.warning(f"Auth: |{request.headers[hdrs.AUTHORIZATION]}|")
         if hdrs.AUTHORIZATION in request.headers and request.headers[hdrs.AUTHORIZATION] == "Bearer GO2RTC":
             authenticated = True
+        #END TEMPORARY FOR GO2RTC DEBUGGING
         
         if self.debug_requires_auth and not authenticated:
             # Attempt with invalid bearer token, raise unauthorized
