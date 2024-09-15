@@ -25,6 +25,13 @@ class XTIOTWebRTCContent:
         self.candidates = []
         self.valid_until = datetime.now() + timedelta(0, ttl)
         self.has_all_candidates = False
+    
+    def __repr__(self) -> str:
+        return (
+            "[From TUYA]Config:\r\n" + self.webrtc_config +
+            "[From GO2RTC]Offer\r\n" + self.offer +
+            "[From TUYA]Answer:\r\n" + self.answer
+            )
 
 class XTIOTWebRTCManager:
     def __init__(self, ipc_manager: XTIOTIPCManager) -> None:
@@ -39,9 +46,12 @@ class XTIOTWebRTCManager:
     
     def _clean_cache(self) -> None:
         current_time = datetime.now()
+        to_clean = []
         for session_id in self.sdp_exchange:
             if self.sdp_exchange[session_id].valid_until < current_time:
-                self.sdp_exchange.pop(session_id)
+                to_clean.append(session_id)
+        for session_id in to_clean:
+            self.sdp_exchange.pop(session_id)
     
     def set_sdp_answer(self, session_id: str, answer: str) -> None:
         self._create_session_if_necessary(session_id)
@@ -54,7 +64,7 @@ class XTIOTWebRTCManager:
         if candidate_str == '':
             self.sdp_exchange[session_id].has_all_candidates = True
 
-    def set_webrtc_config(self, session_id: str, config: dict[str, any]):
+    def set_config(self, session_id: str, config: dict[str, any]):
         self._create_session_if_necessary(session_id)
 
         #Format ICE Servers so that they can be used by GO2RTC
@@ -71,7 +81,7 @@ class XTIOTWebRTCManager:
         if session_id not in self.sdp_exchange:
             self.sdp_exchange[session_id] = XTIOTWebRTCContent()
     
-    def get_webrtc_config(self, device_id: str, session_id: str) -> dict | None:
+    def get_config(self, device_id: str, session_id: str) -> dict | None:
         if current_exchange := self.get_sdp_exchange(session_id):
             if current_exchange.webrtc_config:
                 return current_exchange.webrtc_config
@@ -79,12 +89,12 @@ class XTIOTWebRTCManager:
         webrtc_config = self.ipc_manager.api.get(f"/v1.0/devices/{device_id}/webrtc-configs")
         if webrtc_config.get("success"):
             result = webrtc_config.get("result")
-            self.set_webrtc_config(session_id, result)
+            self.set_config(session_id, result)
             return result
         return None
     
-    def get_webrtc_ice_servers(self, device_id: str, session_id: str) -> None:
-        if config := self.get_webrtc_config(device_id, session_id):
+    def get_ice_servers(self, device_id: str, session_id: str) -> None:
+        if config := self.get_config(device_id, session_id):
             p2p_config: dict = config.get("p2p_config", {})
             return p2p_config.get("ices", None)
 
@@ -92,7 +102,7 @@ class XTIOTWebRTCManager:
         sleep_step = 0.01
         sleep_count: int = int(wait_for_answers / sleep_step)
         self.set_sdp_offer(session_id, sdp_offer)
-        if webrtc_config := self.get_webrtc_config(device_id, session_id):
+        if webrtc_config := self.get_config(device_id, session_id):
             auth_token = webrtc_config.get("auth")
             moto_id =  webrtc_config.get("moto_id")
             topic: str = None
