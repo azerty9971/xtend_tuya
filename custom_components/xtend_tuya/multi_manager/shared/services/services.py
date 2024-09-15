@@ -146,6 +146,7 @@ class ServiceManager:
         source      = event.data.get(CONF_SOURCE, MESSAGE_SOURCE_TUYA_IOT)
         device_id   = event.data.get(CONF_DEVICE_ID, None)
         session_id  = event.data.get(CONF_SESSION_ID, None)
+        LOGGER.warning(f"DEBUG SDP CALL: {event}")
         if device_id is None or session_id is None:
             return None
         match event.method:
