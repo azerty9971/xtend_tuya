@@ -15,6 +15,11 @@ class XTSDPContent:
     def __init__(self) -> None:
         self.answer = {}
         self.candidates = []
+    
+    def has_all_candidates(self) -> bool:
+        for candidate in self.candidates:
+            LOGGER.warning(f"Candidate: {candidate}")
+        return False
 
 class XTIOTIPCListener:
     def __init__(self, multi_manager: MultiManager) -> None:
