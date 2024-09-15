@@ -23,9 +23,6 @@ class XTIOTWebRTCContent:
         self.candidates = []
         self.valid_until = datetime.now() + timedelta(0, ttl)
         self.has_all_candidates = False
-    
-    def has_all_candidates(self) -> bool:
-        return self.has_all_candidates
 
 class XTIOTWebRTCManager:
     def __init__(self, ipc_manager: XTIOTIPCManager) -> None:
@@ -111,7 +108,7 @@ class XTIOTWebRTCManager:
                 self.ipc_manager._publish_to_ipc_mqtt(topic, json.dumps(payload))
                 for _ in range(sleep_count):
                     if answer := self.get_sdp_exchange(session_id):
-                        if answer.has_all_candidates():
+                        if answer.has_all_candidates:
                             break
                     time.sleep(sleep_step) #Wait for MQTT responses
                 if answer := self.get_sdp_exchange(session_id):
