@@ -159,6 +159,8 @@ class XTGeneralView(HomeAssistantView):
             authenticated = True
         #END TEMPORARY FOR GO2RTC DEBUGGING
         
+        LOGGER.warning(f"Checking AUTH: {self.debug_requires_auth} <=> {authenticated}")
+
         if self.debug_requires_auth and not authenticated:
             # Attempt with invalid bearer token, raise unauthorized
             # so ban middleware can handle it.
