@@ -18,7 +18,6 @@ class XTSDPContent:
     
     def has_all_candidates(self) -> bool:
         for candidate in self.candidates:
-            LOGGER.warning(f"Candidate: {candidate}")
             candidate_str = candidate.get("candidate", None)
             if candidate_str == '':
                 return True
@@ -44,7 +43,5 @@ class XTIOTIPCListener:
                     case "answer":
                         self.sdp_answers[session_id] = XTSDPContent()
                         self.sdp_answers[session_id].answer = msg_content
-                        LOGGER.warning(f"Stored SDP answer {session_id} => {msg_content}")
                     case "candidate":
                         self.sdp_answers[session_id].candidates.append(msg_content)
-                        LOGGER.warning(f"Stored SDP candidate {session_id} => {msg_content}")

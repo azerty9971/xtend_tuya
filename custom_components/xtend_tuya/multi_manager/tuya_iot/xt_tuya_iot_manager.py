@@ -283,7 +283,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         return False
     
     def get_sdp_answer(self, device_id: str, session_id: str, sdp_offer: str, wait_for_answers: int = 5) -> str | None:
-        sleep_step = 0.1
+        sleep_step = 0.01
         sleep_count: int = int(wait_for_answers / sleep_step)
         if webrtc_config := self._get_webrtc_config(device_id):
             auth_token = webrtc_config.get("auth")
@@ -322,7 +322,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                 if answer := self.ipc_listener.sdp_answers.get(session_id):
                     #Format SDP answer and send it back
                     sdp_answer: str = answer.answer.get("sdp", "")
-                    LOGGER.warning(f"Candidates: {answer.candidates}")
+                    LOGGER.warning(f"Found candidates: {answer.candidates}")
                     candidates: str = ""
                     for candidate in answer.candidates:
                         candidates += candidate.get("candidate", "")
