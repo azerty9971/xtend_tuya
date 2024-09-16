@@ -13,6 +13,7 @@ from ..xt_tuya_iot_ipc_manager import (
 
 class XTIOTWebRTCContent:
     webrtc_config: dict[str, any]
+    original_offer: str
     offer: str
     answer: dict
     candidates: list[dict]
@@ -21,6 +22,7 @@ class XTIOTWebRTCContent:
     def __init__(self, ttl: int = 600) -> None:
         self.webrtc_config = {}
         self.answer = {}
+        self.original_offer = None
         self.offer = None
         self.candidates = []
         self.valid_until = datetime.now() + timedelta(0, ttl)
@@ -29,6 +31,7 @@ class XTIOTWebRTCContent:
     def __repr__(self) -> str:
         return (
             "\r\n[From TUYA]Config:\r\n" + f"{self.webrtc_config}" +
+            "\r\n[From GO2RTC]Original Offer\r\n" + f"{self.original_offer}" +
             "\r\n[From GO2RTC]Offer\r\n" + f"{self.offer}" +
             "\r\n[From TUYA]Answer:\r\n" + f"{self.answer}"
             )
@@ -76,6 +79,10 @@ class XTIOTWebRTCManager:
     def set_sdp_offer(self, session_id: str, offer: str) -> None:
         self._create_session_if_necessary(session_id)
         self.sdp_exchange[session_id].offer = offer
+    
+    def set_original_sdp_offer(self, session_id: str, offer: str) -> None:
+        self._create_session_if_necessary(session_id)
+        self.sdp_exchange[session_id].original_offer = offer
 
     def _create_session_if_necessary(self, session_id: str) -> None:
         self._clean_cache()
@@ -125,6 +132,7 @@ class XTIOTWebRTCManager:
         sleep_step = 0.01
         sleep_count: int = int(wait_for_answers / sleep_step)
         ENDLINE = "\r\n"
+        self.set_original_sdp_offer(session_id, sdp_offer)
         if webrtc_config := self.get_config(device_id, session_id):
             auth_token = webrtc_config.get("auth")
             moto_id =  webrtc_config.get("moto_id")
