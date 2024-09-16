@@ -198,5 +198,8 @@ class ServiceManager:
                     case "application/sdp":
                         if account := self.multi_manager.get_account_by_name(source):
                             if sdp_answer := await self.hass.async_add_executor_job(account.get_webrtc_sdp_answer, device_id, session_id, event.payload):
-                                return web.Response(status=201, text=sdp_answer, content_type="application/sdp", charset="utf-8")
+                                response = web.Response(status=201, text=sdp_answer, content_type="application/sdp", charset="utf-8")
+                                response.headers["ETag"] = session_id
+                                response.headers["Location"] = event.location
+                                return response
                         return None
