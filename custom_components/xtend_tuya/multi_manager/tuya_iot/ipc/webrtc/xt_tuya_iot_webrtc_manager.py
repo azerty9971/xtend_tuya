@@ -11,12 +11,12 @@ from ..xt_tuya_iot_ipc_manager import (
     XTIOTIPCManager,
 )
 
-class XTIOTWebRTCContent:
+class XTIOTWebRTCSession:
     webrtc_config: dict[str, any]
     original_offer: str
     offer: str
     answer: dict
-    candidates: list[dict]
+    answer_candidates: list[dict]
     has_all_candidates: bool
 
     def __init__(self, ttl: int = 600) -> None:
@@ -24,7 +24,7 @@ class XTIOTWebRTCContent:
         self.answer = {}
         self.original_offer = None
         self.offer = None
-        self.candidates = []
+        self.answer_candidates = []
         self.valid_until = datetime.now() + timedelta(0, ttl)
         self.has_all_candidates = False
     
@@ -37,17 +37,17 @@ class XTIOTWebRTCContent:
                 answer = f"{self.answer}"
         return (
             "\r\n[From TUYA]Config:\r\n" + f"{self.webrtc_config}" +
-            "\r\n[From GO2RTC]Original Offer\r\n" + f"{self.original_offer}" +
-            "\r\n[From GO2RTC]Offer\r\n" + f"{self.offer}" +
+            "\r\n[From client]Original Offer\r\n" + f"{self.original_offer}" +
+            "\r\n[From client]Offer\r\n" + f"{self.offer}" +
             "\r\n[From TUYA]Answer:\r\n" + f"{answer}"
             )
 
 class XTIOTWebRTCManager:
     def __init__(self, ipc_manager: XTIOTIPCManager) -> None:
-        self.sdp_exchange: dict[str, XTIOTWebRTCContent] = {}
+        self.sdp_exchange: dict[str, XTIOTWebRTCSession] = {}
         self.ipc_manager = ipc_manager
     
-    def get_sdp_exchange(self, session_id: str) -> XTIOTWebRTCContent | None:
+    def get_webrtc_session(self, session_id: str) -> XTIOTWebRTCSession | None:
         self._clean_cache()
         if result := self.sdp_exchange.get(session_id):
             return result
@@ -66,9 +66,9 @@ class XTIOTWebRTCManager:
         self._create_session_if_necessary(session_id)
         self.sdp_exchange[session_id].answer = answer
     
-    def add_sdp_candidate(self, session_id: str, candidate: dict) -> None:
+    def add_sdp_answer_candidate(self, session_id: str, candidate: dict) -> None:
         self._create_session_if_necessary(session_id)
-        self.sdp_exchange[session_id].candidates.append(candidate)
+        self.sdp_exchange[session_id].answer_candidates.append(candidate)
         candidate_str = candidate.get("candidate", None)
         if candidate_str == '':
             self.sdp_exchange[session_id].has_all_candidates = True
@@ -93,10 +93,10 @@ class XTIOTWebRTCManager:
     def _create_session_if_necessary(self, session_id: str) -> None:
         self._clean_cache()
         if session_id not in self.sdp_exchange:
-            self.sdp_exchange[session_id] = XTIOTWebRTCContent()
+            self.sdp_exchange[session_id] = XTIOTWebRTCSession()
     
     def get_config(self, device_id: str, session_id: str) -> dict | None:
-        if current_exchange := self.get_sdp_exchange(session_id):
+        if current_exchange := self.get_webrtc_session(session_id):
             if current_exchange.webrtc_config:
                 return current_exchange.webrtc_config
         
@@ -120,8 +120,6 @@ class XTIOTWebRTCManager:
                     for ice in ice_list:
                         password: str = ice.get("credential", None)
                         username: str = ice.get("username", None)
-                        """if username is not None and username.find(":") != -1:
-                            username = username.split(":")[1]"""
                         url: str = ice.get("urls", None)
                         if url is None:
                             continue
@@ -230,16 +228,16 @@ class XTIOTWebRTCManager:
                     }
                     #self.ipc_manager.publish_to_ipc_mqtt(topic, json.dumps(payload))
                 for _ in range(sleep_count):
-                    if answer := self.get_sdp_exchange(session_id):
-                        if answer.has_all_candidates:
+                    if session := self.get_webrtc_session(session_id):
+                        if session.has_all_candidates:
                             break
                     time.sleep(sleep_step) #Wait for MQTT responses
-                if answer := self.get_sdp_exchange(session_id):
+                if session := self.get_webrtc_session(session_id):
                     #Format SDP answer and send it back
-                    sdp_answer: str = answer.answer.get("sdp", "")
+                    sdp_answer: str = session.answer.get("sdp", "")
                     candidates: str = ""
-                    if answer.candidates:
-                        for candidate in answer.candidates:
+                    if session.answer_candidates:
+                        for candidate in session.answer_candidates:
                             candidates += candidate.get("candidate", "")
                         sdp_answer += candidates + "a=end-of-candidates" + ENDLINE
                     return sdp_answer
