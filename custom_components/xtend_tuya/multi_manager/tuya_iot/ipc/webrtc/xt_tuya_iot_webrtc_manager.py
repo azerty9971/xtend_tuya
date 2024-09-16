@@ -164,7 +164,7 @@ class XTIOTWebRTCManager:
                         "msg":{
                             "mode":"webrtc",
                             "sdp":f"{sdp_offer}",
-                            "stream_type":1,
+                            "stream_type":2,
                             "auth":f"{auth_token}",
                         }
                     },
