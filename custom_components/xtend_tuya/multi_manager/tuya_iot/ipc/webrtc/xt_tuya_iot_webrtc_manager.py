@@ -114,7 +114,7 @@ class XTIOTWebRTCManager:
                             continue
                         if username is not None and password is not None:
                             #TURN server
-                            temp_str += " -T " + url.replace("turn:", "turn://").replace("turns:", "turns://").replace("://", f"://{username}:{password}@")
+                            temp_str += " -T " + url.replace("turn:", "turn://").replace("turns:", "turns://").replace("://", f"://{username}:{password}@") + "?transport=[udp,tcp]"
                         else:
                             #STUN server
                             temp_str += " -S " + url.replace("stun:", "stun://")
