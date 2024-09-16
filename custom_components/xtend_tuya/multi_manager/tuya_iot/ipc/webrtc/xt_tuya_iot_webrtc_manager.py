@@ -139,8 +139,11 @@ class XTIOTWebRTCManager:
                     if offset == -1:
                         candidate_found = False
                     end_offset = sdp_offer.find(ENDLINE, offset) + len(ENDLINE)
-                    LOGGER.warning(f"Candidate found: {sdp_offer[offset:end_offset]}")
-                    break
+                    candidate_str = sdp_offer[offset:end_offset]
+                    if candidate_str not in offer_candidates:
+                        offer_candidates.append(candidate_str)
+                    sdp_offer = sdp_offer.replace(candidate_str, "")
+                sdp_offer = sdp_offer.replace("a=end-of-candidates" + ENDLINE, "")
                 payload = {
                     "protocol":302,
                     "pv":"2.2",
