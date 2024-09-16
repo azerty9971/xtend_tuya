@@ -272,3 +272,6 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
     
     def delete_webrtc_session(self, device_id: str, session_id: str) -> str | None:
         return self.iot_account.device_manager.ipc_manager.webrtc_manager.delete_webrtc_session(device_id, session_id)
+    
+    def send_webrtc_trickle_ice(self, device_id: str, session_id: str, candidate: str) -> str | None:
+        return self.iot_account.device_manager.ipc_manager.webrtc_manager.send_webrtc_trickle_ice(device_id, session_id, candidate)
