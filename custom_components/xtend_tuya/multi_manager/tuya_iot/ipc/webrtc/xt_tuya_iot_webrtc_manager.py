@@ -140,6 +140,8 @@ class XTIOTWebRTCManager:
                     if offset == -1:
                         candidate_found = False
                     end_offset = sdp_offer.find(ENDLINE, offset) + len(ENDLINE)
+                    if end_offset < offset:
+                        break
                     candidate_str = sdp_offer[offset:end_offset]
                     if candidate_str not in offer_candidates:
                         offer_candidates.append(candidate_str)
