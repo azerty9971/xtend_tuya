@@ -226,6 +226,7 @@ class XTIOTWebRTCManager:
                     for candidate in answer.candidates:
                         candidates += candidate.get("candidate", "")
                     sdp_answer += candidates
+                    answer.answer = sdp_answer
                     return sdp_answer
             
             if not auth_token or not moto_id:
