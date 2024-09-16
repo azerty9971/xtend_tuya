@@ -124,29 +124,29 @@ class XTIOTWebRTCManager:
     def get_sdp_answer(self, device_id: str, session_id: str, sdp_offer: str, wait_for_answers: int = 5) -> str | None:
         sleep_step = 0.01
         sleep_count: int = int(wait_for_answers / sleep_step)
-        self.set_sdp_offer(session_id, sdp_offer)
         ENDLINE = "\r\n"
         if webrtc_config := self.get_config(device_id, session_id):
             auth_token = webrtc_config.get("auth")
             moto_id =  webrtc_config.get("moto_id")
             topic: str = None
+            offer_candidates = []
+            candidate_found = True
+            while candidate_found:
+                offset = sdp_offer.find("a=candidate:")
+                if offset == -1:
+                    candidate_found = False
+                end_offset = sdp_offer.find(ENDLINE, offset) + len(ENDLINE)
+                if end_offset < offset:
+                    break
+                candidate_str = sdp_offer[offset:end_offset]
+                if candidate_str not in offer_candidates:
+                    offer_candidates.append(candidate_str)
+                sdp_offer = sdp_offer.replace(candidate_str, "")
+            sdp_offer = sdp_offer.replace("a=end-of-candidates" + ENDLINE, "")
+            self.set_sdp_offer(session_id, sdp_offer)
             for topic in self.ipc_manager.ipc_mq.mq_config.sink_topic.values():
                 topic = topic.replace("{device_id}", device_id)
                 topic = topic.replace("moto_id", moto_id)
-                offer_candidates = []
-                candidate_found = True
-                while candidate_found:
-                    offset = sdp_offer.find("a=candidate:")
-                    if offset == -1:
-                        candidate_found = False
-                    end_offset = sdp_offer.find(ENDLINE, offset) + len(ENDLINE)
-                    if end_offset < offset:
-                        break
-                    candidate_str = sdp_offer[offset:end_offset]
-                    if candidate_str not in offer_candidates:
-                        offer_candidates.append(candidate_str)
-                    sdp_offer = sdp_offer.replace(candidate_str, "")
-                sdp_offer = sdp_offer.replace("a=end-of-candidates" + ENDLINE, "")
                 payload = {
                     "protocol":302,
                     "pv":"2.2",
