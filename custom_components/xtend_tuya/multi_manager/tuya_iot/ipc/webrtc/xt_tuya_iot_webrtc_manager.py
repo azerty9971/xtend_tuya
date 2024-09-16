@@ -29,11 +29,17 @@ class XTIOTWebRTCContent:
         self.has_all_candidates = False
     
     def __repr__(self) -> str:
+        answer = ""
+        if self.answer:
+            if isinstance(self.answer, dict):
+                answer = self.answer.get("sdp", f"{self.answer}")
+            else:
+                answer = f"{self.answer}"
         return (
             "\r\n[From TUYA]Config:\r\n" + f"{self.webrtc_config}" +
             "\r\n[From GO2RTC]Original Offer\r\n" + f"{self.original_offer}" +
             "\r\n[From GO2RTC]Offer\r\n" + f"{self.offer}" +
-            "\r\n[From TUYA]Answer:\r\n" + f"{self.answer}"
+            "\r\n[From TUYA]Answer:\r\n" + f"{answer}"
             )
 
 class XTIOTWebRTCManager:
