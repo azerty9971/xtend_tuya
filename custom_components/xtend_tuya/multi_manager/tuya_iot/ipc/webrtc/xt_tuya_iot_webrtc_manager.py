@@ -164,7 +164,7 @@ class XTIOTWebRTCManager:
                         "msg":{
                             "mode":"webrtc",
                             "sdp":f"{sdp_offer}",
-                            "stream_type":2,
+                            "stream_type":1,
                             "auth":f"{auth_token}",
                         }
                     },
@@ -213,7 +213,7 @@ class XTIOTWebRTCManager:
                             }
                         },
                     }
-                    self.ipc_manager.publish_to_ipc_mqtt(topic, json.dumps(payload))
+                    #self.ipc_manager.publish_to_ipc_mqtt(topic, json.dumps(payload))
                 for _ in range(sleep_count):
                     if answer := self.get_sdp_exchange(session_id):
                         if answer.has_all_candidates:
