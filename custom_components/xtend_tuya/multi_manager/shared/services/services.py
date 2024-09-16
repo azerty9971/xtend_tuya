@@ -29,6 +29,7 @@ CONF_METHOD = "method"
 CONF_URL = "url"
 CONF_PAYLOAD = "payload"
 CONF_SESSION_ID = "session_id"
+CONF_FORMAT = "format"
 
 SERVICE_GET_CAMERA_STREAM_URL = "get_camera_stream_url"
 SERVICE_GET_CAMERA_STREAM_URL_SCHEMA = vol.Schema(
@@ -55,6 +56,7 @@ SERVICE_GET_ICE_SERVERS_SCHEMA = vol.Schema(
         vol.Required(CONF_DEVICE_ID): cv.string,
         vol.Required(CONF_SESSION_ID): cv.string,
         vol.Optional(CONF_SOURCE): cv.string,
+        vol.Optional(CONF_FORMAT): cv.string,
     }
 )
 
@@ -162,10 +164,11 @@ class ServiceManager:
         source      = event.data.get(CONF_SOURCE, MESSAGE_SOURCE_TUYA_IOT)
         device_id   = event.data.get(CONF_DEVICE_ID, None)
         session_id  = event.data.get(CONF_SESSION_ID, None)
+        format      = event.data.get(CONF_FORMAT, "GO2RTC")
         if device_id is None or session_id is None:
             return None
         if account := self.multi_manager.get_account_by_name(source):
-            if ice_servers := await self.hass.async_add_executor_job(account.get_webrtc_ice_servers, device_id, session_id):
+            if ice_servers := await self.hass.async_add_executor_job(account.get_webrtc_ice_servers, device_id, session_id, format):
                 return ice_servers
         return None
 
