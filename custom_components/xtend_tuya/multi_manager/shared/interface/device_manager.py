@@ -120,3 +120,6 @@ class XTDeviceManagerInterface(ABC):
     
     def delete_webrtc_session(self, device_id: str, session_id: str) -> str | None:
         return None
+    
+    def send_webrtc_trickle_ice(self, device_id: str, session_id: str, candidate: str) -> str | None:
+        return None

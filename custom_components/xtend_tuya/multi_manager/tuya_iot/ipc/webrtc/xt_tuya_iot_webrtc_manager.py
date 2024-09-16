@@ -270,3 +270,31 @@ class XTIOTWebRTCManager:
                 self.ipc_manager.publish_to_ipc_mqtt(topic, json.dumps(payload))
             return ""
         return None
+    
+    def send_webrtc_trickle_ice(self, device_id: str, session_id: str, candidate: str) -> str | None:
+        if webrtc_config := self.get_config(device_id, session_id):
+            moto_id =  webrtc_config.get("moto_id")
+            payload = {
+                "protocol":302,
+                "pv":"2.2",
+                "t":int(time.time()),
+                "data":{
+                    "header":{
+                        "type":"candidate",
+                        "from":f"{self.ipc_manager.get_from()}",
+                        "to":f"{device_id}",
+                        "sub_dev_id":"",
+                        "sessionid":f"{session_id}",
+                        "moto_id":f"{moto_id}",
+                        "tid":""
+                    },
+                    "msg":{
+                        "mode":"webrtc",
+                        "candidate": candidate
+                    }
+                },
+            }
+            for topic in self.ipc_manager.ipc_mq.mq_config.sink_topic.values():
+                self.ipc_manager.publish_to_ipc_mqtt(topic, json.dumps(payload))
+            return ""
+        return None
