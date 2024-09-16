@@ -112,7 +112,7 @@ class XTDeviceManagerInterface(ABC):
     def get_webrtc_sdp_answer(self, device_id: str, session_id: str, sdp_offer: str) -> str | None:
         return None
     
-    def get_webrtc_ice_servers(self, device_id: str, session_id: str) -> str | None:
+    def get_webrtc_ice_servers(self, device_id: str, session_id: str, format: str) -> str | None:
         return None
     
     def get_webrtc_exchange_debug(self, session_id: str) -> str | None:

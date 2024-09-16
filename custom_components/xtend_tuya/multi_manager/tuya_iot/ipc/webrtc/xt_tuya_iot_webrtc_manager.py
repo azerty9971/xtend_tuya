@@ -94,7 +94,7 @@ class XTIOTWebRTCManager:
             return result
         return None
     
-    def get_ice_servers(self, device_id: str, session_id: str, format: str = "SimpleWHEP") -> None:
+    def get_ice_servers(self, device_id: str, session_id: str, format: str) -> None:
         if config := self.get_config(device_id, session_id):
             p2p_config: dict = config.get("p2p_config", {})
             ice_str = p2p_config.get("ices", None)
