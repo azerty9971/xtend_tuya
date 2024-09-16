@@ -76,6 +76,7 @@ class XTIOTOpenMQIPC(XTIOTOpenMQ):
 
     def _on_message(self, mqttc: mqtt.Client, user_data: Any, msg: mqtt.MQTTMessage):
         msg_dict = json.loads(msg.payload.decode("utf8"))
+        LOGGER.warning(f"IPC Message: {msg_dict}")
         for listener in self.message_listeners:
             listener(msg_dict)
     
