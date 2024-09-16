@@ -268,7 +268,7 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
         return self.iot_account.device_manager.ipc_manager.webrtc_manager.get_ice_servers(device_id, session_id, format)
     
     def get_webrtc_exchange_debug(self, session_id: str) -> str | None:
-        return f"{self.iot_account.device_manager.ipc_manager.webrtc_manager.get_sdp_exchange(session_id)}"
+        return f"{self.iot_account.device_manager.ipc_manager.webrtc_manager.get_webrtc_session(session_id)}"
     
     def delete_webrtc_session(self, device_id: str, session_id: str) -> str | None:
         return self.iot_account.device_manager.ipc_manager.webrtc_manager.delete_webrtc_session(device_id, session_id)
