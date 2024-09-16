@@ -118,7 +118,7 @@ class XTIOTWebRTCManager:
                         else:
                             #STUN server
                             temp_str += " -S " + url.replace("stun:", "stun://")
-                    return temp_str
+                    return temp_str.strip()
 
     def get_sdp_answer(self, device_id: str, session_id: str, sdp_offer: str, wait_for_answers: int = 5) -> str | None:
         sleep_step = 0.01
