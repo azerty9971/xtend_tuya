@@ -18,7 +18,7 @@ class XTIOTWebRTCContent:
     candidates: list[dict]
     has_all_candidates: bool
 
-    def __init__(self, ttl: int = 10) -> None:
+    def __init__(self, ttl: int = 600) -> None:
         self.webrtc_config = {}
         self.answer = {}
         self.offer = None
