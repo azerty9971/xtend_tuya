@@ -56,6 +56,7 @@ class XTEventData:
     payload: str = None
     content_type: str = None
     session_id: str = None
+    location: str = None
 
     def __init__(self) -> None:
         self.query_params = {}
@@ -179,6 +180,7 @@ class XTGeneralView(HomeAssistantView):
         event_data.content_type = request.content_type
         for header in request.headers:
             event_data.headers[header] = request.headers[header]
+        event_data.location = request.url
         #event_data.headers = request.headers.__dict__
         query_use_cache = bool(event_data.query_params.get("use_cache", self.use_cache))
         query_cache_ttl = int(event_data.query_params.get("cache_ttl", self.cache_ttl))
