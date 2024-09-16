@@ -131,6 +131,15 @@ class XTIOTWebRTCManager:
             for topic in self.ipc_manager.ipc_mq.mq_config.sink_topic.values():
                 topic = topic.replace("{device_id}", device_id)
                 topic = topic.replace("moto_id", moto_id)
+                offer_candidates = []
+                candidate_found = True
+                while candidate_found:
+                    offset = sdp_offer.find("a=candidate:")
+                    if offset == -1:
+                        candidate_found = False
+                    end_offset = sdp_offer.find("\r\n", offset)
+                    LOGGER.warning(f"Candidate found: {sdp_offer[offset:end_offset]}")
+                    break
                 payload = {
                     "protocol":302,
                     "pv":"2.2",
