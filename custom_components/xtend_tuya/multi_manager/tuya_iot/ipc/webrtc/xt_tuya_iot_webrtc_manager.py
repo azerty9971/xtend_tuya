@@ -114,18 +114,19 @@ class XTIOTWebRTCManager:
                     for ice in ice_list:
                         password: str = ice.get("credential", None)
                         username: str = ice.get("username", None)
-                        if username is not None and username.find(":") != -1:
-                            username = username.split(":")[1]
+                        """if username is not None and username.find(":") != -1:
+                            username = username.split(":")[1]"""
                         url: str = ice.get("urls", None)
                         if url is None:
                             continue
                         if username is not None and password is not None:
                             #TURN server
-                            #temp_str += " -T " + url.replace("turn:", "turn://").replace("turns:", "turns://").replace("://", f"://{username}:{password}@") + "?transport=[udp,tcp]"
+                            temp_str += " -T " + url.replace("turn:", "turn://").replace("turns:", "turns://").replace("://", f"://{username}:{password}@") + "?transport=udp"
                             pass
                         else:
                             #STUN server
                             temp_str += " -S " + url.replace("stun:", "stun://")
+                            pass
                     return temp_str.strip()
 
     def get_sdp_answer(self, device_id: str, session_id: str, sdp_offer: str, wait_for_answers: int = 5) -> str | None:
