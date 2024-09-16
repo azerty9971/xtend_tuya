@@ -107,12 +107,14 @@ class XTIOTWebRTCManager:
                     for ice in ice_list:
                         password: str = ice.get("credential", None)
                         username: str = ice.get("username", None)
+                        if username.find(":") != -1:
+                            username = username.split(":")[1]
                         url: str = ice.get("urls", None)
                         if url is None:
                             continue
                         if username is not None and password is not None:
                             #TURN server
-                            temp_str += " -T " + url.replace("turn:", "turn://").replace("turns:", "turns://").replace("://", f"://\"{username}\":\"{password}\"@")
+                            temp_str += " -T " + url.replace("turn:", "turn://").replace("turns:", "turns://").replace("://", f"://{username}:{password}@")
                         else:
                             #STUN server
                             temp_str += " -S " + url.replace("stun:", "stun://")
