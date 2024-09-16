@@ -167,6 +167,50 @@ class XTIOTWebRTCManager:
                     },
                 }
                 self.ipc_manager.publish_to_ipc_mqtt(topic, json.dumps(payload))
+                if offer_candidates:
+                    for candidate in offer_candidates:
+                        payload = {
+                            "protocol":302,
+                            "pv":"2.2",
+                            "t":int(time.time()),
+                            "data":{
+                                "header":{
+                                    "type":"candidate",
+                                    "from":f"{self.ipc_manager.get_from()}",
+                                    "to":f"{device_id}",
+                                    "sub_dev_id":"",
+                                    "sessionid":f"{session_id}",
+                                    "moto_id":f"{moto_id}",
+                                    "tid":""
+                                },
+                                "msg":{
+                                    "mode":"webrtc",
+                                    "candidate": candidate
+                                }
+                            },
+                        }
+                        self.ipc_manager.publish_to_ipc_mqtt(topic, json.dumps(payload))
+                    payload = {
+                        "protocol":302,
+                        "pv":"2.2",
+                        "t":int(time.time()),
+                        "data":{
+                            "header":{
+                                "type":"candidate",
+                                "from":f"{self.ipc_manager.get_from()}",
+                                "to":f"{device_id}",
+                                "sub_dev_id":"",
+                                "sessionid":f"{session_id}",
+                                "moto_id":f"{moto_id}",
+                                "tid":""
+                            },
+                            "msg":{
+                                "mode":"webrtc",
+                                "candidate": ""
+                            }
+                        },
+                    }
+                    self.ipc_manager.publish_to_ipc_mqtt(topic, json.dumps(payload))
                 for _ in range(sleep_count):
                     if answer := self.get_sdp_exchange(session_id):
                         if answer.has_all_candidates:
