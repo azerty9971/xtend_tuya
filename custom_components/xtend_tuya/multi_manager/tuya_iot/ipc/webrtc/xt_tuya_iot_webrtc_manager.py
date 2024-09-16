@@ -223,9 +223,10 @@ class XTIOTWebRTCManager:
                     #Format SDP answer and send it back
                     sdp_answer: str = answer.answer.get("sdp", "")
                     candidates: str = ""
-                    for candidate in answer.candidates:
-                        candidates += candidate.get("candidate", "")
-                    sdp_answer += candidates
+                    if answer.candidates:
+                        for candidate in answer.candidates:
+                            candidates += candidate.get("candidate", "")
+                        sdp_answer += candidates + "a=end-of-candidates" + ENDLINE
                     answer.answer = sdp_answer
                     return sdp_answer
             
