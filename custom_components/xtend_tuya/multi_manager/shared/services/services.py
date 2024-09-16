@@ -197,9 +197,15 @@ class ServiceManager:
                 match event.content_type:
                     case "application/sdp":
                         if account := self.multi_manager.get_account_by_name(source):
-                            if sdp_answer := await self.hass.async_add_executor_job(account.get_webrtc_sdp_answer, device_id, session_id, event.payload):
-                                response = web.Response(status=201, text=sdp_answer, content_type="application/sdp", charset="utf-8")
+                            if delete_answer := await self.hass.async_add_executor_job(account.get_webrtc_sdp_answer, device_id, session_id, event.payload):
+                                response = web.Response(status=201, text=delete_answer, content_type="application/sdp", charset="utf-8")
                                 response.headers["ETag"] = session_id
                                 response.headers["Location"] = event.location
                                 return response
                         return None
+            case "DELETE":
+                if account := self.multi_manager.get_account_by_name(source):
+                    if delete_answer := await self.hass.async_add_executor_job(account.delete_webrtc_session, device_id, session_id):
+                        response = web.Response(status=200, text=delete_answer, charset="utf-8")
+                        return response
+                return None
