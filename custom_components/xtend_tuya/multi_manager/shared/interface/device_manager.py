@@ -117,3 +117,6 @@ class XTDeviceManagerInterface(ABC):
     
     def get_webrtc_exchange_debug(self, session_id: str) -> str | None:
         return None
+    
+    def delete_webrtc_session(self, device_id: str, session_id: str) -> str | None:
+        return None
