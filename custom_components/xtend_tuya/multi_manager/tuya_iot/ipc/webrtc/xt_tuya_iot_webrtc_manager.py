@@ -94,10 +94,29 @@ class XTIOTWebRTCManager:
             return result
         return None
     
-    def get_ice_servers(self, device_id: str, session_id: str) -> None:
+    def get_ice_servers(self, device_id: str, session_id: str, format: str = "SimpleWHEP") -> None:
         if config := self.get_config(device_id, session_id):
             p2p_config: dict = config.get("p2p_config", {})
-            return p2p_config.get("ices", None)
+            ice_str = p2p_config.get("ices", None)
+            match format:
+                case "GO2RTC":
+                    return ice_str
+                case "SimpleWHEP":
+                    temp_str: str = ""
+                    ice_list = json.loads(ice_str)
+                    for ice in ice_list:
+                        password: str = ice.get("credential", None)
+                        username: str = ice.get("username", None)
+                        url: str = ice.get("urls", None)
+                        if url is None:
+                            continue
+                        if username is not None and password is not None:
+                            #TURN server
+                            temp_str += " -T " + url.replace("turn:", "turn://").replace("turns:", "turns://").replace("://", f"://{username}:{password}@")
+                        else:
+                            #STUN server
+                            temp_str += " -S " + url.replace("stun:", "stun://")
+                    return temp_str
 
     def get_sdp_answer(self, device_id: str, session_id: str, sdp_offer: str, wait_for_answers: int = 5) -> str | None:
         sleep_step = 0.01
