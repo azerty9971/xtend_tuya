@@ -124,6 +124,7 @@ class XTIOTWebRTCManager:
         sleep_step = 0.01
         sleep_count: int = int(wait_for_answers / sleep_step)
         self.set_sdp_offer(session_id, sdp_offer)
+        ENDLINE = "\r\n"
         if webrtc_config := self.get_config(device_id, session_id):
             auth_token = webrtc_config.get("auth")
             moto_id =  webrtc_config.get("moto_id")
@@ -137,7 +138,7 @@ class XTIOTWebRTCManager:
                     offset = sdp_offer.find("a=candidate:")
                     if offset == -1:
                         candidate_found = False
-                    end_offset = sdp_offer.find("\r\n", offset) + 2
+                    end_offset = sdp_offer.find(ENDLINE, offset) + len(ENDLINE)
                     LOGGER.warning(f"Candidate found: {sdp_offer[offset:end_offset]}")
                     break
                 payload = {
