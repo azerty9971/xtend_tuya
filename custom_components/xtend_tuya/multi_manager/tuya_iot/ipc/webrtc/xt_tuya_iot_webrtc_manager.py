@@ -14,13 +14,13 @@ from ..xt_tuya_iot_ipc_manager import (
 class XTIOTWebRTCContent:
     webrtc_config: dict[str, any]
     offer: str
-    answer: str
+    answer: dict
     candidates: list[dict]
     has_all_candidates: bool
 
     def __init__(self, ttl: int = 10) -> None:
         self.webrtc_config = {}
-        self.answer = None
+        self.answer = {}
         self.offer = None
         self.candidates = []
         self.valid_until = datetime.now() + timedelta(0, ttl)
