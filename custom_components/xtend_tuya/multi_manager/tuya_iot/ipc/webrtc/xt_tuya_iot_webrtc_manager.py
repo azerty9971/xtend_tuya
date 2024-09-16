@@ -132,7 +132,7 @@ class XTIOTWebRTCManager:
                         }
                     },
                 }
-                self.ipc_manager._publish_to_ipc_mqtt(topic, json.dumps(payload))
+                self.ipc_manager.publish_to_ipc_mqtt(topic, json.dumps(payload))
                 for _ in range(sleep_count):
                     if answer := self.get_sdp_exchange(session_id):
                         if answer.has_all_candidates:

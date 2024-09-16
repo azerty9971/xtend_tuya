@@ -38,6 +38,6 @@ class XTIOTIPCManager:  # noqa: F811
     def get_from(self) -> str:
         return self.ipc_mq.mq_config.username.split("cloud_")[1]
 
-    def _publish_to_ipc_mqtt(self, topic: str, msg: str):
+    def publish_to_ipc_mqtt(self, topic: str, msg: str):
         publish_result = self.ipc_mq.client.publish(topic=topic, payload=msg)
         publish_result.wait_for_publish(10)
