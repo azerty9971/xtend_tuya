@@ -108,8 +108,8 @@ class MultiManager:  # noqa: F811
                     instance: XTDeviceManagerInterface = plugin.get_plugin_instance()
                     if await instance.setup_from_entry(hass, config_entry, self):
                         self.accounts[instance.get_type_name()] = instance
-                except ModuleNotFoundError:
-                    pass
+                except ModuleNotFoundError as e:
+                    LOGGER.error(f"Loading module failed: {e}")
 
         for account in self.accounts.values():
             account.on_post_setup()
