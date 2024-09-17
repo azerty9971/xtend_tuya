@@ -31,6 +31,9 @@ from ..multi_manager import (
     MultiManager,  # noqa: F811
 )
 from ...base import TuyaEntity
+from .ipc.xt_tuya_iot_ipc_manager import (
+    XTIOTIPCManager
+)
 
 
 class XTIOTDeviceManager(TuyaDeviceManager):
@@ -39,6 +42,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         mq.remove_message_listener(self.on_message)
         mq.add_message_listener(self.forward_message_to_multi_manager)
         self.multi_manager = multi_manager
+        self.ipc_manager = XTIOTIPCManager(api, multi_manager)
 
     def forward_message_to_multi_manager(self, msg:str):
         self.multi_manager.on_message(MESSAGE_SOURCE_TUYA_IOT, msg)
@@ -58,6 +62,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                 result = response["result"]
                 result["online"] = result["is_online"]
                 return response
+    
     def get_device_status(self, device_id: str) -> dict[str, Any]:
         """Get device status.
 
@@ -121,8 +126,6 @@ class XTIOTDeviceManager(TuyaDeviceManager):
             device_properties.merge_in_device(device)
             self.multi_manager.virtual_state_handler.apply_init_virtual_states(device)
 
-
-    
     def on_message(self, msg: str):
         super().on_message(msg)
     

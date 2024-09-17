@@ -260,3 +260,18 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
             case "POST":
                 return self.iot_account.device_manager.api.post(url, params)
         return None
+    
+    def get_webrtc_sdp_answer(self, device_id: str, session_id: str, sdp_offer: str) -> str | None:
+        return self.iot_account.device_manager.ipc_manager.webrtc_manager.get_sdp_answer(device_id, session_id, sdp_offer)
+    
+    def get_webrtc_ice_servers(self, device_id: str, session_id: str, format: str) -> str | None:
+        return self.iot_account.device_manager.ipc_manager.webrtc_manager.get_ice_servers(device_id, session_id, format)
+    
+    def get_webrtc_exchange_debug(self, session_id: str) -> str | None:
+        return f"{self.iot_account.device_manager.ipc_manager.webrtc_manager.get_webrtc_session(session_id)}"
+    
+    def delete_webrtc_session(self, device_id: str, session_id: str) -> str | None:
+        return self.iot_account.device_manager.ipc_manager.webrtc_manager.delete_webrtc_session(device_id, session_id)
+    
+    def send_webrtc_trickle_ice(self, device_id: str, session_id: str, candidate: str) -> str | None:
+        return self.iot_account.device_manager.ipc_manager.webrtc_manager.send_webrtc_trickle_ice(device_id, session_id, candidate)
