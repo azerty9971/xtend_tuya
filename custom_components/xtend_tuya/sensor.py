@@ -614,8 +614,6 @@ async def async_setup_entry(
     merged_descriptors = SENSORS
     for new_descriptor in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(Platform.SENSOR):
         merged_descriptors = merge_device_descriptors(merged_descriptors, new_descriptor)
-    
-    LOGGER.warning(f"Sensor merged device descriptors: {merged_descriptors}")
 
     @callback
     def async_discover_device(device_map) -> None:
@@ -623,8 +621,14 @@ async def async_setup_entry(
         entities: list[TuyaSensorEntity] = []
         device_ids = [*device_map]
         for device_id in device_ids:
+            hass_data.manager.device_watcher.report_message(device_id, f"Adding sensors for {device_id}")
             if device := hass_data.manager.device_map.get(device_id):
+                hass_data.manager.device_watcher.report_message(device_id, f"Device found in map, statuses: {device.status}", device)
                 if descriptions := merged_descriptors.get(device.category):
+                    hass_data.manager.device_watcher.report_message(device_id, f"Device category found: {descriptions}", device)
+                    for description in descriptions:
+                        if description.key in device.status:
+                            hass_data.manager.device_watcher.report_message(device_id, f"Adding entity for : {description.key}", device)
                     entities.extend(
                         TuyaSensorEntity(device, hass_data.manager, description)
                         for description in descriptions
