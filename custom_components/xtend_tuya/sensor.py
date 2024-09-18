@@ -614,6 +614,8 @@ async def async_setup_entry(
     merged_descriptors = SENSORS
     for new_descriptor in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(Platform.SENSOR):
         merged_descriptors = merge_device_descriptors(merged_descriptors, new_descriptor)
+    
+    LOGGER.warning(f"Sensor merged device descriptors: {merged_descriptors}")
 
     @callback
     def async_discover_device(device_map) -> None:
