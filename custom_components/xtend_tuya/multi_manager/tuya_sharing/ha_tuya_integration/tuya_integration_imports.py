@@ -93,12 +93,10 @@ try:
     from custom_components.tuya.sensor import ( # type: ignore
         SENSORS as SENSORS_TUYA
     )
-    LOGGER.warning("Using SENSORS from custom_components.tuya.sensor")
 except ImportError:
     from homeassistant.components.tuya.sensor import (
         SENSORS as SENSORS_TUYA  # noqa: F401
     )
-    LOGGER.warning("Using SENSORS from homeassistant.components.tuya.sensor")
 try:
     from custom_components.tuya.siren import ( # type: ignore
         SIRENS as SIRENS_TUYA
