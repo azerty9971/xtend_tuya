@@ -13,6 +13,9 @@ from tuya_iot.openapi import (
 from ...const import (
     LOGGER,  # noqa: F401
 )
+from ...util import (
+    log_stack,
+)
 
 class XTIOTOpenAPI(TuyaOpenAPI):
     def __init__(
@@ -34,6 +37,8 @@ class XTIOTOpenAPI(TuyaOpenAPI):
         schema: str = "",
     ) -> dict[str, Any]:
         self.connect_response = super().connect(username=username, password=password, country_code=country_code, schema=schema)
+        
+        log_stack(f"Setting self.connect_response: {self.connect_response}")
         return self.connect_response
     
     def get(self, path: str, params: dict[str, Any] | None = None) -> dict[str, Any]:
