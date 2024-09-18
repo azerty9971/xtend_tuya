@@ -43,6 +43,7 @@ class XTIOTOpenAPI(TuyaOpenAPI):
     
     def get(self, path: str, params: dict[str, Any] | None = None) -> dict[str, Any]:
         normal_result = super().get(path=path, params=params)
+        log_stack(f"API Get normal result: {path} => {normal_result}")
         if ( 
             normal_result.get("code", -1) == TUYA_ERROR_CODE_TOKEN_INVALID and
             self.connect_response is not None and
@@ -57,6 +58,7 @@ class XTIOTOpenAPI(TuyaOpenAPI):
 
     def post(self, path: str, body: dict[str, Any] | None = None) -> dict[str, Any]:
         normal_result = super().post(path=path, body=body)
+        log_stack(f"API Post normal result: {path} => {normal_result}")
         if ( 
             normal_result.get("code", -1) == TUYA_ERROR_CODE_TOKEN_INVALID and
             self.connect_response is not None and
