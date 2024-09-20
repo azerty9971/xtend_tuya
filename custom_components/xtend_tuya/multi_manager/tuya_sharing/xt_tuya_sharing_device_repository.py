@@ -25,6 +25,7 @@ from ..multi_manager import (
 )
 from ..shared.device import (
     XTDevice,
+    XTDeviceStatusRange,
 )
 
 class XTSharingDeviceRepository(DeviceRepository):
@@ -85,6 +86,7 @@ class XTSharingDeviceRepository(DeviceRepository):
             device.support_local = support_local
             #if support_local:                      #CHANGED
             device.local_strategy = dp_id_map       #CHANGED
+            self.multi_manager.device_watcher.report_message(device_id, f"Local stategy: {device.local_strategy}", device)
 
     def update_device_strategy_info(self, device: XTDevice):
         #super().update_device_strategy_info(device)
@@ -107,7 +109,7 @@ class XTSharingDeviceRepository(DeviceRepository):
                 code not in device.status_range and
                 code not in device.function
                 ):
-                device.status_range[code] = DeviceStatusRange()   #CHANGED
+                device.status_range[code] = XTDeviceStatusRange()   #CHANGED
                 device.status_range[code].code   = code
                 device.status_range[code].type   = value_type
                 device.status_range[code].values = loc_strat["valueDesc"]
