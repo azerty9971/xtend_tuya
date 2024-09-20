@@ -9,9 +9,11 @@ from typing import Any
 
 import requests
 
-from tuya_iot.openlogging import filter_logger, logger
 from tuya_iot.tuya_enums import AuthType
 from tuya_iot.version import VERSION
+from ...const import (
+    LOGGER,  # noqa: F401
+)
 
 TUYA_ERROR_CODE_TOKEN_INVALID = 1010
 
@@ -256,11 +258,11 @@ class XTIOTOpenAPI:
             headers["dev_version"] = VERSION
             headers["dev_channel"] = self.dev_channel
 
-        logger.debug(
+        LOGGER.debug(
             f"Request: method = {method}, \
                 url = {self.endpoint + path},\
                 params = {params},\
-                body = {filter_logger(body)},\
+                body = {body},\
                 t = {int(time.time()*1000)}"
         )
 
@@ -269,15 +271,15 @@ class XTIOTOpenAPI:
         )
 
         if response.ok is False:
-            logger.error(
+            LOGGER.error(
                 f"Response error: code={response.status_code}, body={response.body}"
             )
             return None
 
         result = response.json()
 
-        logger.debug(
-            f"Response: {json.dumps(filter_logger(result), ensure_ascii=False, indent=2)}"
+        LOGGER.debug(
+            f"Response: {json.dumps(result, ensure_ascii=False, indent=2)}"
         )
 
         if result.get("code", -1) == TUYA_ERROR_CODE_TOKEN_INVALID:
