@@ -106,21 +106,13 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
         return added_new_statuses
 
     def update_device_cache(self):
-        self.device_map.clear()
-        homes = self.home_repository.query_homes()
-        self.user_homes = homes
-
-        for home in homes:
-            devices_by_home = self.device_repository.query_devices_by_home(home.id)
-            for device in devices_by_home:
-                self.device_map[device.id] = device
+        super().update_device_cache()
         
-        shared_device_ids: list[str] = [device.id for device in self.multi_manager.devices_shared.values()]
-        if shared_device_ids:
-            LOGGER.warning(f"Fetching SHARED DEVICES: {shared_device_ids}")
-            for device in self.device_repository.query_devices_by_ids(shared_device_ids):
-                if device.id not in self.device_map:
-                    self.device_map[device.id] = device
+        for device in self.multi_manager.devices_shared.values():
+            if device.id not in self.device_map:
+                new_device = device.get_copy()
+                self.device_repository.update_device_strategy_info(new_device)
+                self.device_map[device.id] = new_device
 
     def _on_device_report(self, device_id: str, status: list):
         device = self.device_map.get(device_id, None)
