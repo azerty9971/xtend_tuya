@@ -258,13 +258,13 @@ class XTIOTOpenAPI:
             headers["dev_version"] = VERSION
             headers["dev_channel"] = self.dev_channel
 
-        LOGGER.debug(
+        """ LOGGER.debug(
             f"Request: method = {method}, \
                 url = {self.endpoint + path},\
                 params = {params},\
                 body = {body},\
                 t = {int(time.time()*1000)}"
-        )
+        ) """
 
         response = self.session.request(
             method, self.endpoint + path, params=params, json=body, headers=headers
@@ -278,9 +278,9 @@ class XTIOTOpenAPI:
 
         result = response.json()
 
-        LOGGER.debug(
+        """ LOGGER.debug(
             f"Response: {json.dumps(result, ensure_ascii=False, indent=2)}"
-        )
+        ) """
 
         if result.get("code", -1) == TUYA_ERROR_CODE_TOKEN_INVALID:
             self.token_info = None
