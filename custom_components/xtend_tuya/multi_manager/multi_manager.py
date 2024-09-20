@@ -113,7 +113,7 @@ class MultiManager:  # noqa: F811
                     LOGGER.error(f"Loading module failed: {e}")
 
         for account in self.accounts.values():
-            account.on_post_setup()
+            await self.hass.async_add_executor_job(account.on_post_setup)
     
     def get_domain_identifiers_of_device(self, device_id: str) -> list:
         return_list: list = []
