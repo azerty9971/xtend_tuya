@@ -81,6 +81,7 @@ class MultiManager:  # noqa: F811
         self.master_device_map: dict[str, XTDevice] = {}
         self.is_ready_for_messages = False
         self.pending_messages: list[tuple[str, str]] = []
+        self.devices_shared: dict[str, XTDevice] = {}
 
     @property
     def device_map(self):

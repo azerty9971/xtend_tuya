@@ -105,6 +105,12 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
                 #self.multi_manager.device_watcher.report_message(device.id, f"AFTER copy_statuses_to_tuya: {other_manager.device_map[device.id].status}", device)
         return added_new_statuses
 
+    def update_device_cache(self):
+        super().update_device_cache()
+        for device in self.multi_manager.devices_shared.values():
+            if device.id not in self.device_map:
+                self.device_map[device.id] = device
+
     def _on_device_report(self, device_id: str, status: list):
         device = self.device_map.get(device_id, None)
         if not device:
