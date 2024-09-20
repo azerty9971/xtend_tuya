@@ -104,7 +104,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         self.update_device_function_cache()
 
     def get_devices_from_sharing(self) -> dict[str, XTDevice]:
-        return_list: dict[str, XTDevice] = {}
+        return_dict: dict[str, XTDevice] = {}
         response = self.api.get(f"/v1.0/users/{self.api.token_info.uid}/devices?from=sharing")
         if response["success"]:
             for item in response["result"]:
@@ -116,7 +116,8 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                         value = item_status["value"]
                         status[code] = value
                 device.status = status
-                return_list[item["id"]] = device
+                return_dict[item["id"]] = device
+        return return_dict
 
     def update_device_list_in_smart_home(self):
         self.update_device_list_in_smart_home_mod()
