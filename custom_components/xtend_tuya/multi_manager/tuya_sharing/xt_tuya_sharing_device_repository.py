@@ -5,7 +5,6 @@ from tuya_sharing.customerapi import (
 )
 
 from tuya_sharing.device import (
-    CustomerDevice,
     DeviceRepository,
     DeviceStatusRange,
 )
@@ -24,6 +23,9 @@ from .xt_tuya_sharing_manager import (
 from ..multi_manager import (
     MultiManager,
 )
+from ..shared.device import (
+    XTDevice,
+)
 
 class XTSharingDeviceRepository(DeviceRepository):
     def __init__(self, customer_api: CustomerApi, manager: XTSharingDeviceManager, multi_manager: MultiManager):
@@ -31,10 +33,31 @@ class XTSharingDeviceRepository(DeviceRepository):
         self.manager = manager
         self.multi_manager = multi_manager
 
-    def update_device_specification(self, device: CustomerDevice):
+    def update_device_specification(self, device: XTDevice):
         super().update_device_specification(device)
 
-    def _update_device_strategy_info_mod(self, device: CustomerDevice):
+    def query_devices_by_home(self, home_id: str) -> list[XTDevice]:
+        response = self.api.get("/v1.0/m/life/ha/home/devices", {"homeId": home_id})
+        return self._query_devices(response)
+    
+    def _query_devices(self, response) -> list[XTDevice]:
+        _devices = []
+        if response["success"]:
+            for item in response["result"]:
+                device = XTDevice(**item)
+                status = {}
+                for item_status in device.status:
+                    if "code" in item_status and "value" in item_status:
+                        code = item_status["code"]
+                        value = item_status["value"]
+                        status[code] = value
+                device.status = status
+                self.update_device_specification(device)
+                self.update_device_strategy_info(device)
+                _devices.append(device)
+        return _devices
+
+    def _update_device_strategy_info_mod(self, device: XTDevice):
         device_id = device.id
         response = self.api.get(f"/v1.0/m/life/devices/{device_id}/status")
         support_local = True
@@ -45,7 +68,7 @@ class XTSharingDeviceRepository(DeviceRepository):
             for dp_status_relation in result["dpStatusRelationDTOS"]:
                 if not dp_status_relation["supportLocal"]:
                     support_local = False
-                    break
+                    #break                          #REMOVED
                 # statusFormat valueDesc、valueType,enumMappingMap,pid
                 dp_id_map[dp_status_relation["dpId"]] = {
                     "value_convert": dp_status_relation["valueConvert"],
@@ -63,7 +86,7 @@ class XTSharingDeviceRepository(DeviceRepository):
             #if support_local:                      #CHANGED
             device.local_strategy = dp_id_map       #CHANGED
 
-    def update_device_strategy_info(self, device: CustomerDevice):
+    def update_device_strategy_info(self, device: XTDevice):
         #super().update_device_strategy_info(device)
         self._update_device_strategy_info_mod(device)
         #Sometimes the Type provided by Tuya is ill formed,
