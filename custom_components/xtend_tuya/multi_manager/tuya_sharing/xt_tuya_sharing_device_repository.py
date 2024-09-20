@@ -59,6 +59,7 @@ class XTSharingDeviceRepository(DeviceRepository):
         device_id = device.id
         response = self.api.get(f"/v1.0/m/life/devices/{device_id}/status")
         support_local = True
+        self.multi_manager.device_watcher.report_message(device_id, f"_update_device_strategy_info_mod: {response}", device)
         if response.get("success"):
             result = response.get("result", {})
             pid = result["productKey"]
