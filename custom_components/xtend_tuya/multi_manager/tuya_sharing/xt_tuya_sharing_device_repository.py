@@ -5,6 +5,7 @@ from tuya_sharing.customerapi import (
 )
 
 from tuya_sharing.device import (
+    CustomerDevice,
     DeviceRepository,
     DeviceStatusRange,
 )
@@ -23,10 +24,6 @@ from .xt_tuya_sharing_manager import (
 from ..multi_manager import (
     MultiManager,
 )
-from ..shared.device import (
-    XTDevice,
-    XTDeviceStatusRange,
-)
 
 class XTSharingDeviceRepository(DeviceRepository):
     def __init__(self, customer_api: CustomerApi, manager: XTSharingDeviceManager, multi_manager: MultiManager):
@@ -34,18 +31,18 @@ class XTSharingDeviceRepository(DeviceRepository):
         self.manager = manager
         self.multi_manager = multi_manager
 
-    def update_device_specification(self, device: XTDevice):
+    def update_device_specification(self, device: CustomerDevice):
         super().update_device_specification(device)
 
-    def query_devices_by_home(self, home_id: str) -> list[XTDevice]:
+    def query_devices_by_home(self, home_id: str) -> list[CustomerDevice]:
         response = self.api.get("/v1.0/m/life/ha/home/devices", {"homeId": home_id})
         return self._query_devices(response)
     
-    def _query_devices(self, response) -> list[XTDevice]:
+    def _query_devices(self, response) -> list[CustomerDevice]:
         _devices = []
         if response["success"]:
             for item in response["result"]:
-                device = XTDevice(**item)
+                device = CustomerDevice(**item)
                 status = {}
                 for item_status in device.status:
                     if "code" in item_status and "value" in item_status:
@@ -58,7 +55,7 @@ class XTSharingDeviceRepository(DeviceRepository):
                 _devices.append(device)
         return _devices
 
-    def _update_device_strategy_info_mod(self, device: XTDevice):
+    def _update_device_strategy_info_mod(self, device: CustomerDevice):
         device_id = device.id
         response = self.api.get(f"/v1.0/m/life/devices/{device_id}/status")
         support_local = True
@@ -86,9 +83,9 @@ class XTSharingDeviceRepository(DeviceRepository):
             device.support_local = support_local
             #if support_local:                      #CHANGED
             device.local_strategy = dp_id_map       #CHANGED
-            self.multi_manager.device_watcher.report_message(device_id, f"Local stategy: {device.local_strategy}", device)
+            self.multi_manager.device_watcher.report_message(device_id, f"Tuya Sharing local strat: {device.local_strategy}", device)
 
-    def update_device_strategy_info(self, device: XTDevice):
+    def update_device_strategy_info(self, device: CustomerDevice):
         #super().update_device_strategy_info(device)
         self._update_device_strategy_info_mod(device)
         #Sometimes the Type provided by Tuya is ill formed,
@@ -109,7 +106,7 @@ class XTSharingDeviceRepository(DeviceRepository):
                 code not in device.status_range and
                 code not in device.function
                 ):
-                device.status_range[code] = XTDeviceStatusRange()   #CHANGED
+                device.status_range[code] = DeviceStatusRange()   #CHANGED
                 device.status_range[code].code   = code
                 device.status_range[code].type   = value_type
                 device.status_range[code].values = loc_strat["valueDesc"]
