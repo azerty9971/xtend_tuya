@@ -117,6 +117,7 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
         
         shared_device_ids: list[str] = [device.id for device in self.multi_manager.devices_shared.values()]
         if shared_device_ids:
+            LOGGER.warning(f"Fetching SHARED DEVICES: {shared_device_ids}")
             for device in self.device_repository.query_devices_by_ids(shared_device_ids):
                 if device.id not in self.device_map:
                     self.device_map[device.id] = device
