@@ -265,6 +265,12 @@ TEMPERATURE_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
         entity_registry_enabled_default=True,
     ),
     TuyaSensorEntityDescription(
+        key=DPCode.TEMP_INDOOR,
+        translation_key="temperature",
+        device_class=SensorDeviceClass.TEMPERATURE,
+        state_class=SensorStateClass.MEASUREMENT,
+    ),
+    TuyaSensorEntityDescription(
         key=DPCode.TEMP_VALUE,
         translation_key="temperature",
         state_class=SensorStateClass.MEASUREMENT,
@@ -278,6 +284,12 @@ HUMIDITY_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
         translation_key="humidity",
         state_class=SensorStateClass.MEASUREMENT,
         entity_registry_enabled_default=True,
+    ),
+    TuyaSensorEntityDescription(
+        key=DPCode.HUMIDITY_INDOOR,
+        translation_key="humidity",
+        device_class=SensorDeviceClass.HUMIDITY,
+        state_class=SensorStateClass.MEASUREMENT,
     ),
 )
 
@@ -572,6 +584,27 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
             key=DPCode.IR_CONTROL,
             translation_key="wnykq_ir_control",
             entity_registry_enabled_default=True,
+        ),
+        *TEMPERATURE_SENSORS,
+        *HUMIDITY_SENSORS,
+    ),
+    "xfj": (
+        TuyaSensorEntityDescription(
+            key=DPCode.PM25,
+            translation_key="pm25",
+            device_class=SensorDeviceClass.PM25,
+            state_class=SensorStateClass.MEASUREMENT,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.ECO2,
+            translation_key="concentration_carbon_dioxide",
+            device_class=SensorDeviceClass.CO2,
+            state_class=SensorStateClass.MEASUREMENT,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.FILTER_LIFE,
+            translation_key="filter_life",
+            state_class=SensorStateClass.MEASUREMENT,
         ),
         *TEMPERATURE_SENSORS,
         *HUMIDITY_SENSORS,
