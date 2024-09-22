@@ -9,6 +9,7 @@ from homeassistant.helpers.entity import EntityDescription
 from .const import (
     LOGGER,
     DPType,
+    DOMAIN,
 )
 from tuya_sharing.manager import (
     Manager,
@@ -16,6 +17,7 @@ from tuya_sharing.manager import (
 )
 
 from .multi_manager.multi_manager import (
+    MultiManager,
     XTConfigEntry,
 )
 
@@ -84,7 +86,7 @@ def get_config_entry_runtime_data(hass: HomeAssistant, entry: ConfigEntry, domai
         runtime_data = entry.runtime_data
         device_manager = entry.runtime_data.manager
         device_listener = entry.runtime_data.listener
-    if device_manager:
+    if device_manager is not None:
         return ConfigEntryRuntimeData(device_manager=device_manager, generic_runtime_data=runtime_data, device_listener=device_listener)
     else:
         return None
@@ -150,3 +152,12 @@ def append_sets(set1: set, set2: set) -> set:
         if item not in return_set:
             return_set.add(copy.deepcopy(item))
     return return_set
+
+def get_all_multi_managers(hass: HomeAssistant) -> list[MultiManager]:
+    return_list: list[MultiManager] = []
+    config_entries = get_domain_config_entries(hass, DOMAIN)
+    for config_entry in config_entries:
+        if runtime_data := get_config_entry_runtime_data(hass, config_entry, DOMAIN):
+            return_list.append(runtime_data.device_manager)
+    LOGGER.warning(f"Found MultiManagers: {return_list}")
+    return return_list

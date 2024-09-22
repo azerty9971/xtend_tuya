@@ -69,18 +69,19 @@ class XTSharingDeviceRepository(DeviceRepository):
                     support_local = False
                     #break                          #REMOVED
                 # statusFormat valueDesc、valueType,enumMappingMap,pid
-                dp_id_map[dp_status_relation["dpId"]] = {
-                    "value_convert": dp_status_relation["valueConvert"],
-                    "status_code": dp_status_relation["statusCode"],
-                    "config_item": {
-                        "statusFormat": dp_status_relation["statusFormat"],
-                        "valueDesc": dp_status_relation["valueDesc"],
-                        "valueType": dp_status_relation["valueType"],
-                        "enumMappingMap": dp_status_relation["enumMappingMap"],
-                        "pid": pid,
-                    },                              #CHANGED
-                    "status_code_alias": []         #CHANGED
-                }
+                if "dpId" in dp_status_relation:    #ADDED
+                    dp_id_map[dp_status_relation["dpId"]] = {
+                        "value_convert": dp_status_relation["valueConvert"],
+                        "status_code": dp_status_relation["statusCode"],
+                        "config_item": {
+                            "statusFormat": dp_status_relation["statusFormat"],
+                            "valueDesc": dp_status_relation["valueDesc"],
+                            "valueType": dp_status_relation["valueType"],
+                            "enumMappingMap": dp_status_relation["enumMappingMap"],
+                            "pid": pid,
+                        },                              #CHANGED
+                        "status_code_alias": []         #CHANGED
+                    }
             device.support_local = support_local
             #if support_local:                      #CHANGED
             device.local_strategy = dp_id_map       #CHANGED
