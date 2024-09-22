@@ -21,10 +21,6 @@ from .multi_manager.multi_manager import (
     XTConfigEntry,
 )
 
-from .multi_manager.shared.shared_classes import (
-    HomeAssistantXTData,
-)
-
 def log_stack(message: str):
     LOGGER.debug(message, stack_info=True)
 
@@ -161,7 +157,7 @@ def get_all_multi_managers(hass: HomeAssistant) -> list[MultiManager]:
     return_list: list[MultiManager] = []
     config_entries = get_domain_config_entries(hass, DOMAIN)
     for config_entry in config_entries:
-        runtime_data: HomeAssistantXTData = get_config_entry_runtime_data(hass, config_entry, DOMAIN)
-        if isinstance(runtime_data.manager, MultiManager):
+        runtime_data = get_config_entry_runtime_data(hass, config_entry, DOMAIN)
+        if hasattr(runtime_data, "manager") and isinstance(runtime_data.manager, MultiManager):
             return_list.append(runtime_data.manager)
     return return_list
