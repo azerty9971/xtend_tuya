@@ -194,7 +194,11 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
             self.iot_account.device_manager.mq.stop()
     
     def on_post_setup(self):
-        pass
+        #Store the shared devices in the multi_manager's shared device list
+        shared_devices = self.iot_account.device_manager.get_devices_from_sharing()
+        for device in shared_devices.values():
+            if device.id not in self.multi_manager.devices_shared:
+                self.multi_manager.devices_shared[device.id] = device
     
     def get_platform_descriptors_to_merge(self, platform: Platform) -> Any:
         pass
