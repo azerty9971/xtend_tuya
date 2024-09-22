@@ -130,7 +130,6 @@ class MultiManager:  # noqa: F811
     
     def update_device_cache(self):
         self.is_ready_for_messages = False
-        LOGGER.warning(f"Account available: {self.accounts}")
         for manager in self.accounts.values():
             manager.update_device_cache()
 
