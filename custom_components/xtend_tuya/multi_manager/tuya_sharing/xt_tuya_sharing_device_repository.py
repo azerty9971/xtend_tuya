@@ -34,10 +34,32 @@ class XTSharingDeviceRepository(DeviceRepository):
     def update_device_specification(self, device: CustomerDevice):
         super().update_device_specification(device)
 
+    def query_devices_by_home(self, home_id: str) -> list[CustomerDevice]:
+        response = self.api.get("/v1.0/m/life/ha/home/devices", {"homeId": home_id})
+        return self._query_devices(response)
+    
+    def _query_devices(self, response) -> list[CustomerDevice]:
+        _devices = []
+        if response["success"]:
+            for item in response["result"]:
+                device = CustomerDevice(**item)
+                status = {}
+                for item_status in device.status:
+                    if "code" in item_status and "value" in item_status:
+                        code = item_status["code"]
+                        value = item_status["value"]
+                        status[code] = value
+                device.status = status
+                self.update_device_specification(device)
+                self.update_device_strategy_info(device)
+                _devices.append(device)
+        return _devices
+
     def _update_device_strategy_info_mod(self, device: CustomerDevice):
         device_id = device.id
         response = self.api.get(f"/v1.0/m/life/devices/{device_id}/status")
         support_local = True
+        self.multi_manager.device_watcher.report_message(device_id, f"_update_device_strategy_info_mod: {response}", device)
         if response.get("success"):
             result = response.get("result", {})
             pid = result["productKey"]
@@ -45,7 +67,7 @@ class XTSharingDeviceRepository(DeviceRepository):
             for dp_status_relation in result["dpStatusRelationDTOS"]:
                 if not dp_status_relation["supportLocal"]:
                     support_local = False
-                    break
+                    #break                          #REMOVED
                 # statusFormat valueDesc、valueType,enumMappingMap,pid
                 dp_id_map[dp_status_relation["dpId"]] = {
                     "value_convert": dp_status_relation["valueConvert"],
@@ -62,6 +84,7 @@ class XTSharingDeviceRepository(DeviceRepository):
             device.support_local = support_local
             #if support_local:                      #CHANGED
             device.local_strategy = dp_id_map       #CHANGED
+            self.multi_manager.device_watcher.report_message(device_id, f"Tuya Sharing local strat: {device.local_strategy}", device)
 
     def update_device_strategy_info(self, device: CustomerDevice):
         #super().update_device_strategy_info(device)

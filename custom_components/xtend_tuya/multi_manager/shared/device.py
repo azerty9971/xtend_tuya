@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Any, Optional
 from types import SimpleNamespace
 from dataclasses import dataclass, field
+import copy
 
 @dataclass
 class XTDeviceStatusRange:
@@ -81,3 +82,6 @@ class XTDevice(SimpleNamespace):
         if hasattr(source_device, "status") and hasattr(dest_device, "status"):
             for code, value in source_device.status.items():
                 dest_device.status[code] = value"""
+
+    def get_copy(self) -> XTDevice:
+        return copy.deepcopy(self)

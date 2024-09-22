@@ -81,6 +81,7 @@ class MultiManager:  # noqa: F811
         self.master_device_map: dict[str, XTDevice] = {}
         self.is_ready_for_messages = False
         self.pending_messages: list[tuple[str, str]] = []
+        self.devices_shared: dict[str, XTDevice] = {}
 
     @property
     def device_map(self):
@@ -112,7 +113,7 @@ class MultiManager:  # noqa: F811
                     LOGGER.error(f"Loading module failed: {e}")
 
         for account in self.accounts.values():
-            account.on_post_setup()
+            await self.hass.async_add_executor_job(account.on_post_setup)
     
     def get_domain_identifiers_of_device(self, device_id: str) -> list:
         return_list: list = []
