@@ -18,6 +18,9 @@ from ....const import (
     MESSAGE_SOURCE_TUYA_SHARING,
     MESSAGE_SOURCE_TUYA_IOT,
 )
+from ....util import (
+    get_all_multi_managers,
+)
 
 from homeassistant.const import (
     CONF_DEVICE_ID,
@@ -136,15 +139,24 @@ class ServiceManager:
         if allow_from_api:
             self.hass.http.register_view(XTGeneralView(name, callback, requires_auth, use_cache))
     
+    def _get_correct_multi_manager(self, source: str, device_id: str) -> MultiManager | None:
+        multi_manager_list = get_all_multi_managers(self.hass)
+        for multi_manager in multi_manager_list:
+            if account := multi_manager.get_account_by_name(source):
+                if account.get_devices_from_device_id(device_id):
+                    return multi_manager
+        return None
+    
     async def _handle_get_camera_stream_url(self, event: XTEventData) -> web.Response | str | None:
         source      = event.data.get(CONF_SOURCE, MESSAGE_SOURCE_TUYA_SHARING)
         device_id   = event.data.get(CONF_DEVICE_ID, None)
         stream_type = event.data.get(CONF_STREAM_TYPE, "rtsp")
         if not source or not device_id:
             return None
-        if account := self.multi_manager.get_account_by_name(source):
-            response = await self.hass.async_add_executor_job(account.get_device_stream_allocate, device_id, stream_type)
-            return response
+        if multi_manager := self._get_correct_multi_manager(source, device_id):
+            if account := multi_manager.get_account_by_name(source):
+                response = await self.hass.async_add_executor_job(account.get_device_stream_allocate, device_id, stream_type)
+                return response
         return None
     
     async def _handle_call_api(self, event: XTEventData) -> web.Response | str | None:
@@ -167,9 +179,10 @@ class ServiceManager:
         format      = event.data.get(CONF_FORMAT, "GO2RTC")
         if device_id is None or session_id is None:
             return None
-        if account := self.multi_manager.get_account_by_name(source):
-            if ice_servers := await self.hass.async_add_executor_job(account.get_webrtc_ice_servers, device_id, session_id, format):
-                return ice_servers
+        if multi_manager := self._get_correct_multi_manager(source, device_id):
+            if account := multi_manager.get_account_by_name(source):
+                if ice_servers := await self.hass.async_add_executor_job(account.get_webrtc_ice_servers, device_id, session_id, format):
+                    return ice_servers
         return None
 
 
@@ -179,10 +192,12 @@ class ServiceManager:
         LOGGER.warning(f"DEBUG CALL: {event}")
         if session_id is None:
             return None
-        if account := self.multi_manager.get_account_by_name(source):
-            if debug_output := await self.hass.async_add_executor_job(account.get_webrtc_exchange_debug, session_id):
-                LOGGER.warning(f"DEBUG OUTPUT: {debug_output}")
-                return debug_output
+        multi_manager_list = get_all_multi_managers(self.hass)
+        for multi_manager in multi_manager_list:
+            if account := multi_manager.get_account_by_name(source):
+                if debug_output := await self.hass.async_add_executor_job(account.get_webrtc_exchange_debug, session_id):
+                    LOGGER.warning(f"DEBUG OUTPUT: {debug_output}")
+                    return debug_output
         return None
 
     async def _handle_webrtc_sdp_exchange(self, event: XTEventData) -> web.Response | str | None:
@@ -192,11 +207,14 @@ class ServiceManager:
         LOGGER.warning(f"DEBUG SDP CALL: {event}")
         if device_id is None or session_id is None:
             return None
+        multi_manager = self._get_correct_multi_manager(source, device_id)
+        if multi_manager is None:
+            return None
         match event.method:
             case "POST":
                 match event.content_type:
                     case "application/sdp":
-                        if account := self.multi_manager.get_account_by_name(source):
+                        if account := multi_manager.get_account_by_name(source):
                             sdp_answer = await self.hass.async_add_executor_job(account.get_webrtc_sdp_answer, device_id, session_id, event.payload)
                             if sdp_answer is not None:
                                 response = web.Response(status=201, text=sdp_answer, content_type="application/sdp", charset="utf-8")
@@ -207,14 +225,14 @@ class ServiceManager:
             case "PATCH":
                 match event.content_type:
                     case "application/trickle-ice-sdpfrag":
-                        if account := self.multi_manager.get_account_by_name(source):
+                        if account := multi_manager.get_account_by_name(source):
                             patch_answer = await self.hass.async_add_executor_job(account.send_webrtc_trickle_ice, device_id, session_id, event.payload)
                             if patch_answer is not None:
                                 response = web.Response(status=204, text=patch_answer, charset="utf-8")
                                 return response
                         return None
             case "DELETE":
-                if account := self.multi_manager.get_account_by_name(source):
+                if account := multi_manager.get_account_by_name(source):
                     delete_answer = await self.hass.async_add_executor_job(account.delete_webrtc_session, device_id, session_id)
                     if delete_answer is not None:
                         response = web.Response(status=200, text=delete_answer, charset="utf-8")

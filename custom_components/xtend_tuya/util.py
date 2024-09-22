@@ -9,6 +9,7 @@ from homeassistant.helpers.entity import EntityDescription
 from .const import (
     LOGGER,
     DPType,
+    DOMAIN,
 )
 from tuya_sharing.manager import (
     Manager,
@@ -16,7 +17,12 @@ from tuya_sharing.manager import (
 )
 
 from .multi_manager.multi_manager import (
+    MultiManager,
     XTConfigEntry,
+)
+
+from .multi_manager.shared.shared_classes import (
+    HomeAssistantXTData,
 )
 
 def log_stack(message: str):
@@ -150,3 +156,12 @@ def append_sets(set1: set, set2: set) -> set:
         if item not in return_set:
             return_set.add(copy.deepcopy(item))
     return return_set
+
+def get_all_multi_managers(hass: HomeAssistant) -> list[MultiManager]:
+    return_list: list[MultiManager] = []
+    config_entries = get_domain_config_entries(hass, DOMAIN)
+    for config_entry in config_entries:
+        runtime_data: HomeAssistantXTData = get_config_entry_runtime_data(hass, config_entry, DOMAIN)
+        if isinstance(runtime_data.manager, MultiManager):
+            return_list.append(runtime_data.manager)
+    return return_list
