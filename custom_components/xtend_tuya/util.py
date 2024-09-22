@@ -86,7 +86,7 @@ def get_config_entry_runtime_data(hass: HomeAssistant, entry: ConfigEntry, domai
         runtime_data = entry.runtime_data
         device_manager = entry.runtime_data.manager
         device_listener = entry.runtime_data.listener
-    if device_manager:
+    if device_manager is not None:
         return ConfigEntryRuntimeData(device_manager=device_manager, generic_runtime_data=runtime_data, device_listener=device_listener)
     else:
         return None
