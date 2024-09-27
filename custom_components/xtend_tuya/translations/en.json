@@ -221,6 +221,27 @@
       }
     },
     "number": {
+      "presence_delay": {
+        "name": "Reset delay"
+      },
+      "movesensitivity": {
+        "name": "Motion detection sensitivity"
+      },
+      "movedistance_max": {
+        "name": "Motion detection upper limit"
+      },
+      "movedistance_min": {
+        "name": "Motion detection lower limit"
+      },
+      "breathsensitivity": {
+        "name": "Micro-motion detection sensitivity"
+      },
+      "breathdistance_max": {
+        "name": "Micro-motion detection upper limit"
+      },
+      "breathdistance_min": {
+        "name": "Micro-motion detection lower limit"
+      },
       "countdown_1": {
         "name": "Countdown 1"
       },

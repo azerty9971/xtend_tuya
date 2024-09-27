@@ -324,6 +324,13 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
     # Switch
     # https://developer.tuya.com/en/docs/iot/s?id=K9gf7o5prgf7s
     "kg": (
+        TuyaSensorEntityDescription(
+            key=DPCode.ILLUMINANCE_VALUE,
+            translation_key="illuminance_value",
+            device_class=SensorDeviceClass.ILLUMINANCE,
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_registry_enabled_default=True,
+        ),
         *CONSUMPTION_SENSORS,
     ),
     # Automatic cat litter box

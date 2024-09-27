@@ -79,6 +79,41 @@ NUMBERS: dict[str, tuple[NumberEntityDescription, ...]] = {
         ),
     ),
     "kg": (
+        NumberEntityDescription(
+            key=DPCode.PRESENCE_DELAY,
+            translation_key="presence_delay",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        NumberEntityDescription(
+            key=DPCode.MOVESENSITIVITY,
+            translation_key="movesensitivity",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        NumberEntityDescription(
+            key=DPCode.MOVEDISTANCE_MAX,
+            translation_key="movedistance_max",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        NumberEntityDescription(
+            key=DPCode.MOVEDISTANCE_MIN,
+            translation_key="movedistance_min",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        NumberEntityDescription(
+            key=DPCode.BREATHSENSITIVITY,
+            translation_key="breathsensitivity",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        NumberEntityDescription(
+            key=DPCode.BREATHDISTANCE_MAX,
+            translation_key="breathdistance_max",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        NumberEntityDescription(
+            key=DPCode.BREATHDISTANCE_MIN,
+            translation_key="breathdistance_min",
+            entity_category=EntityCategory.CONFIG,
+        ),
         *COUNTDOWNS,
     ),
     "msp": (
