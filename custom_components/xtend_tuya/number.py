@@ -82,6 +82,7 @@ NUMBERS: dict[str, tuple[NumberEntityDescription, ...]] = {
         NumberEntityDescription(
             key=DPCode.PRESENCE_DELAY,
             translation_key="presence_delay",
+            mode = NumberMode.BOX,
             entity_category=EntityCategory.CONFIG,
         ),
         NumberEntityDescription(
@@ -92,11 +93,13 @@ NUMBERS: dict[str, tuple[NumberEntityDescription, ...]] = {
         NumberEntityDescription(
             key=DPCode.MOVEDISTANCE_MAX,
             translation_key="movedistance_max",
+            mode = NumberMode.BOX,
             entity_category=EntityCategory.CONFIG,
         ),
         NumberEntityDescription(
             key=DPCode.MOVEDISTANCE_MIN,
             translation_key="movedistance_min",
+            mode = NumberMode.BOX,
             entity_category=EntityCategory.CONFIG,
         ),
         NumberEntityDescription(
@@ -107,11 +110,13 @@ NUMBERS: dict[str, tuple[NumberEntityDescription, ...]] = {
         NumberEntityDescription(
             key=DPCode.BREATHDISTANCE_MAX,
             translation_key="breathdistance_max",
+            mode = NumberMode.BOX,
             entity_category=EntityCategory.CONFIG,
         ),
         NumberEntityDescription(
             key=DPCode.BREATHDISTANCE_MIN,
             translation_key="breathdistance_min",
+            mode = NumberMode.BOX,
             entity_category=EntityCategory.CONFIG,
         ),
         *COUNTDOWNS,
