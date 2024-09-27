@@ -189,6 +189,9 @@ class DPCode(StrEnum):
     BATTERY_VALUE = "battery_value"  # Battery value
     BEEP = "beep"
     BEEP_VOLUME = "beep_volume"
+    BREATHDISTANCE_MAX = "breathdistance_max"
+    BREATHDISTANCE_MIN = "breathdistance_min"
+    BREATHSENSITIVITY = "breathsensitivity"
     BRIGHT_CONTROLLER = "bright_controller"
     BRIGHT_STATE = "bright_state"  # Brightness status
     BRIGHT_VALUE = "bright_value"  # Brightness
@@ -318,6 +321,7 @@ class DPCode(StrEnum):
     HUMIDITY_INDOOR = "humidity_indoor"  # Indoor humidity
     HUMIDITY_SET = "humidity_set"  # Humidity setting
     HUMIDITY_VALUE = "humidity_value"  # Humidity
+    ILLUMINANCE_VALUE = "illuminance_value"
     INDICATOR_LIGHT = "indicator_light"
     INDUCTION_CLEAN = "Induction_Clean"
     INDUCTION_DELAY = "induction_delay"
@@ -357,6 +361,9 @@ class DPCode(StrEnum):
     MOTION_SWITCH = "motion_switch"  # Motion switch
     MOTION_TRACKING = "motion_tracking"
     MOVEMENT_DETECT_PIC = "movement_detect_pic"
+    MOVEDISTANCE_MAX = "movedistance_max"
+    MOVEDISTANCE_MIN = "movedistance_min"
+    MOVESENSITIVITY = "movesensitivity"
     MUFFLING = "muffling"  # Muffling
     M_ADC_NUM = "M_ADC_NUM"
     NEAR_DETECTION = "near_detection"
@@ -397,6 +404,7 @@ class DPCode(StrEnum):
     POWERON = "poweron"
     POWERONOFF = "PowerOnOff"
     POWER_GO = "power_go"
+    PRESENCE_DELAY = "presence_delay"
     PRESENCE_STATE = "presence_state"
     PRESSURE_STATE = "pressure_state"
     PRESSURE_VALUE = "pressure_value"

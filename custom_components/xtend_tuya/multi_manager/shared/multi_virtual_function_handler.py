@@ -63,7 +63,6 @@ class XTVirtualFunctionHandler:
             virtual_function: DescriptionVirtualFunction = command["virtual_function"]
             """command_code: str = command["code"]
             command_value: Any = command["value"]"""
-            device = None
             if virtual_function.virtual_function_value == VirtualFunctions.FUNCTION_RESET_STATE:
                 for state_to_reset in virtual_function.vf_reset_state:
                     if state_to_reset in device.status:
