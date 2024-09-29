@@ -277,6 +277,7 @@ class DPCode(StrEnum):
     DETECTION_SENSITIVITY = "detection_sensitivity"
     DISINFECTION = "disinfection"
     DO_NOT_DISTURB = "do_not_disturb"
+    DOORBELL_VOLUME = "doorbell_volume"
     DOORCONTACT_STATE = "doorcontact_state"  # Status of door window sensor
     DOORCONTACT_STATE_2 = "doorcontact_state_2"
     DOORCONTACT_STATE_3 = "doorcontact_state_3"
@@ -389,6 +390,7 @@ class DPCode(StrEnum):
     PHASE_A = "phase_a"
     PHASE_B = "phase_b"
     PHASE_C = "phase_c"
+    PHOTO_AGAIN = "photo_again"
     PIR = "pir"  # Motion sensor
     PIR2 = "PIR"
     PIR_RADAR = "PIR_RADAR"

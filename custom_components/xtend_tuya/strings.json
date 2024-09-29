@@ -99,7 +99,7 @@
   },
   "entity": {
     "binary_sensor": {
-      "jtmspro_lock_motor_state": {
+      "lock_motor_state": {
         "name": "Lock status"
       },
       "off_bed": {
@@ -308,6 +308,9 @@
       "auto_lock_time": {
         "name": "Auto lock time"
       },
+      "alarm_time": {
+        "name": "Alarm time"
+      },
       "time": {
         "name": "Time"
       },
@@ -400,6 +403,14 @@
       }
     },
     "select": {
+      "doorbell_volume": {
+        "name": "Doorbell volume",
+        "state": {
+          "mute": "Mute",
+          "low": "Low",
+          "high": "High"
+        }
+      },
       "key_tone":
       {
         "name": "Key tone",
@@ -1273,6 +1284,10 @@
       }
     },
     "switch": {
+      "photo_again":
+      {
+        "name": "Take another photo"
+      },
       "one_click_cleanup":
       {
         "name": "One click cleanup"
