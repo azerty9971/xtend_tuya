@@ -40,6 +40,20 @@ SWITCHES: dict[str, tuple[SwitchEntityDescription, ...]] = {
             entity_registry_enabled_default=False
         ),
     ),
+    "mk": (
+        SwitchEntityDescription(
+            key=DPCode.AUTOMATIC_LOCK,
+            translation_key="automatic_lock",
+            entity_category=EntityCategory.CONFIG,
+            entity_registry_enabled_default=False
+        ),
+        SwitchEntityDescription(
+            key=DPCode.PHOTO_AGAIN,
+            translation_key="photo_again",
+            entity_category=EntityCategory.CONFIG,
+            entity_registry_enabled_default=False
+        ),
+    ),
     # Automatic cat litter box
     # Note: Undocumented
     "msp": (
