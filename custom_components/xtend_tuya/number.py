@@ -121,6 +121,18 @@ NUMBERS: dict[str, tuple[NumberEntityDescription, ...]] = {
         ),
         *COUNTDOWNS,
     ),
+    "mk": (
+        NumberEntityDescription(
+            key=DPCode.AUTO_LOCK_TIME,
+            translation_key="auto_lock_time",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        NumberEntityDescription(
+            key=DPCode.ALARM_TIME,
+            translation_key="alarm_time",
+            entity_category=EntityCategory.CONFIG,
+        ),
+    ),
     "msp": (
         NumberEntityDescription(
             key=DPCode.DELAY_CLEAN_TIME,

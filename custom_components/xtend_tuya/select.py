@@ -41,6 +41,13 @@ SELECTS: dict[str, tuple[SelectEntityDescription, ...]] = {
             entity_registry_enabled_default=False
         ),
     ),
+    "mk": (
+        SelectEntityDescription(
+            key=DPCode.DOORBELL_VOLUME,
+            translation_key="doorbell_volume",
+            entity_category=EntityCategory.CONFIG,
+        ),
+    ),
     "msp": (
         SelectEntityDescription(
             key=DPCode.CLEAN,
