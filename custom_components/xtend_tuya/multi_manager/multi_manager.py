@@ -130,14 +130,16 @@ class MultiManager:  # noqa: F811
     
     def update_device_cache(self):
         self.is_ready_for_messages = False
-        for manager in self.accounts.values():
+        for key, manager in self.accounts.items():
             manager.update_device_cache()
 
             #New devices have been created in their own device maps
             #let's convert them to XTDevice
             for device_map in manager.get_available_device_maps():
                 for device_id in device_map:
+                    self.device_watcher.report_message(device_id, f"Status before device conversion ({key}): {device_map[device_id].status}", device_map[device_id])
                     device_map[device_id] = manager.convert_to_xt_device(device_map[device_id])
+                    self.device_watcher.report_message(device_id, f"Status after device conversion ({key}): {device_map[device_id].status}", device_map[device_id])
         
         #Register all devices in the master device map
         self._update_master_device_map()
@@ -146,7 +148,9 @@ class MultiManager:  # noqa: F811
         #"All functionnality" device
         self._merge_devices_from_multiple_sources()
         for device in self.device_map.values():
+            self.device_watcher.report_message(device.id, f"Status before cloudfix: {device.status}", device)
             CloudFixes.apply_fixes(device)
+            self.device_watcher.report_message(device.id, f"Status before cloudfix: {device.status}", device)
         self._process_pending_messages()
 
     def _process_pending_messages(self):
