@@ -661,11 +661,9 @@ async def async_setup_entry(
         entities: list[TuyaSensorEntity] = []
         device_ids = [*device_map]
         for device_id in device_ids:
-            hass_data.manager.device_watcher.report_message(device_id, f"Adding sensors for {device_id}")
             if device := hass_data.manager.device_map.get(device_id):
                 hass_data.manager.device_watcher.report_message(device_id, f"Device found in map, statuses: {device.status}", device)
                 if descriptions := merged_descriptors.get(device.category):
-                    hass_data.manager.device_watcher.report_message(device_id, f"Device category found: {descriptions}", device)
                     for description in descriptions:
                         if description.key in device.status:
                             hass_data.manager.device_watcher.report_message(device_id, f"Adding entity for : {description.key}", device)
@@ -756,7 +754,6 @@ class TuyaSensorEntity(TuyaEntity, RestoreSensor):
 
     @property
     def native_value(self) -> StateType:
-        self.device_manager.device_watcher.report_message(self.device.id, f"Native value of sensor {self.entity_description.key}")
         """Return the value reported by the sensor."""
         # Only continue if data type is known
         if self._type not in (
@@ -874,7 +871,6 @@ class TuyaSensorEntity(TuyaEntity, RestoreSensor):
     async def _on_event(self, event: Event[EventStateChangedData]):
         new_state: State = event.data.get("new_state")
         default_value = get_default_value(self._type)
-        self.device_manager.device_watcher.report_message(self.device.id, f"On State Changed event: {new_state.state}")
         if not new_state.state or new_state.state == default_value:
             return
         if self.cancel_reset_after_x_seconds:
