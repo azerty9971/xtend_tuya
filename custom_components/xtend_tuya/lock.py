@@ -36,6 +36,7 @@ class TuyaLockEntityDescription(LockEntityDescription):
 
 LOCKS = {
     "jtmspro",
+    "mk",
 }
 
 async def async_setup_entry(
