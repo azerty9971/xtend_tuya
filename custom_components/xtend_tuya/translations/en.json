@@ -220,6 +220,11 @@
         "name": "Night light"
       }
     },
+    "lock": {
+      "generic_lock": {
+        "name": "Operate lock"
+      }
+    },
     "number": {
       "presence_delay": {
         "name": "Reset delay"
