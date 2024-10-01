@@ -63,13 +63,6 @@ BINARY_SENSORS: dict[str, tuple[TuyaBinarySensorEntityDescription, ...]] = {
             on_value="presence",
         ),
     ),
-    "mk": (
-        TuyaBinarySensorEntityDescription(
-            key=DPCode.LOCK_MOTOR_STATE,
-            translation_key="lock_motor_state",
-            device_class=BinarySensorDeviceClass.LOCK
-        ),
-    ),
     "msp": (
         #If 1 is reported, it will be counted once. 
         #If 0 is reported, it will not be counted
