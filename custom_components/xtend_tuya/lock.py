@@ -33,11 +33,13 @@ from .multi_manager.multi_manager import (
 class TuyaLockEntityDescription(LockEntityDescription):
     """Describes a Tuya lock."""
     unlock_status_list: list[DPCode] = field(default_factory=list)
+    temporary_unlock: bool = False
 
 LOCKS: dict[str, TuyaLockEntityDescription] = {
     "mk": TuyaLockEntityDescription(
             key=None,
             translation_key="generic_lock",
+            temporary_unlock = True,
         ),
     "jtmspro": TuyaLockEntityDescription(
             key=None,
@@ -97,6 +99,8 @@ class TuyaLockEntity(TuyaEntity, LockEntity):
     @property
     def is_locked(self) -> bool | None:
         """Return true if the lock is locked."""
+        if self.entity_description.temporary_unlock:
+            return True
         is_unlocked = self._get_state_value(self.entity_description.unlock_status_list)
         if is_unlocked is not None:
             if not is_unlocked:
@@ -109,6 +113,8 @@ class TuyaLockEntity(TuyaEntity, LockEntity):
     
     @property
     def is_locking(self) -> bool | None:
+        if self.entity_description.temporary_unlock:
+            return False
         """Return true if the lock is locking."""
         is_locked = self.is_locked
         if self._attr_is_locking and is_locked:
@@ -117,6 +123,8 @@ class TuyaLockEntity(TuyaEntity, LockEntity):
 
     @property
     def is_unlocking(self) -> bool | None:
+        if self.entity_description.temporary_unlock:
+            return False
         """Return true if the lock is unlocking."""
         is_locked = self.is_locked
         if self._attr_is_unlocking and not is_locked:
@@ -132,14 +140,14 @@ class TuyaLockEntity(TuyaEntity, LockEntity):
     def lock(self, **kwargs: Any) -> None:
         """Lock the lock."""
         if self.device_manager.send_lock_unlock_command(self.device.id, True):
-            self._attr_is_locking = True
-            pass
+            if not self.entity_description.temporary_unlock:
+                self._attr_is_locking = True
     
     def unlock(self, **kwargs: Any) -> None:
         """Unlock the lock."""
         if self.device_manager.send_lock_unlock_command(self.device.id, False):
-            self._attr_is_unlocking = True
-            pass
+            if not self.entity_description.temporary_unlock:
+                self._attr_is_unlocking = True
     
     def open(self, **kwargs: Any) -> None:
         """Open the door latch."""
