@@ -38,12 +38,12 @@ class TuyaLockEntityDescription(LockEntityDescription):
 LOCKS: dict[str, TuyaLockEntityDescription] = {
     "mk": TuyaLockEntityDescription(
             key=None,
-            translation_key="generic_lock",
+            translation_key="operate_lock",
             temporary_unlock = True,
         ),
     "jtmspro": TuyaLockEntityDescription(
             key=None,
-            translation_key="generic_lock",
+            translation_key="operate_lock",
             unlock_status_list=[DPCode.LOCK_MOTOR_STATE]
         ),
 }

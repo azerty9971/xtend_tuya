@@ -221,7 +221,7 @@
       }
     },
     "lock": {
-      "generic_lock": {
+      "operate_lock": {
         "name": "Operate lock"
       }
     },
