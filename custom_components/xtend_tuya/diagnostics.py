@@ -132,7 +132,7 @@ def _async_device_as_dict(
         with suppress(ValueError, TypeError, AttributeError):
             value = json.loads(cast(str, function.values))
 
-        property_update = False
+        property_update = None
         access_mode = None
 
         for dp_item in device.local_strategy.values():
@@ -154,7 +154,7 @@ def _async_device_as_dict(
         with suppress(ValueError, TypeError, AttributeError):
             value = json.loads(status_range.values)
 
-        property_update = False
+        property_update = None
         access_mode = None
 
         for dp_item in device.local_strategy.values():
