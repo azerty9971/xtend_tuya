@@ -204,6 +204,18 @@ NUMBERS: dict[str, tuple[NumberEntityDescription, ...]] = {
             entity_category=EntityCategory.CONFIG,
         ),
     ),
+    "qccdz": (
+        NumberEntityDescription(
+            key=DPCode.CHARGE_CUR_SET,
+            translation_key="charge_cur_set",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        NumberEntityDescription(
+            key=DPCode.TIMER_ON,
+            translation_key="timer_on",
+            entity_category=EntityCategory.CONFIG,
+        ),
+    ),
     "wnykq": (
         NumberEntityDescription(
             key=DPCode.BRIGHT_VALUE,

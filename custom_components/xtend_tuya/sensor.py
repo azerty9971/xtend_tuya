@@ -218,6 +218,14 @@ CONSUMPTION_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
         restoredata=False,
     ),
     TuyaSensorEntityDescription(
+        key=DPCode.CHARGE_ENERGY_ONCE,
+        translation_key="charge_energy_once",
+        device_class=SensorDeviceClass.ENERGY,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        entity_registry_enabled_default=True,
+        restoredata=False,
+    ),
+    TuyaSensorEntityDescription(
         key=DPCode.TOTAL_FORWARD_ENERGY,
         virtual_state=VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME,
         vs_copy_delta_to_state=[DPCode.ADD_ELE2_TODAY, DPCode.ADD_ELE2_THIS_MONTH, DPCode.ADD_ELE2_THIS_YEAR],
@@ -548,6 +556,35 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
             translation_key="remaining_time",
             entity_registry_enabled_default=True,
         ),
+    ),
+    "qccdz": (
+        TuyaSensorEntityDescription(
+            key=DPCode.WORK_STATE,
+            translation_key="qccdz_work_state",
+            entity_registry_enabled_default=True,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.SIGLE_PHASE_POWER,
+            translation_key="sigle_phase_power",
+            entity_registry_enabled_default=True,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.POWER_TOTAL,
+            translation_key="power_total",
+            entity_registry_enabled_default=True,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.CONNECTION_STATE,
+            translation_key="qccdz_connection_state",
+            entity_registry_enabled_default=True,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.SYSTEM_VERSION,
+            translation_key="system_version",
+            entity_registry_enabled_default=True,
+        ),
+        *CONSUMPTION_SENSORS,
+        *TEMPERATURE_SENSORS,
     ),
     "smd": (
         TuyaSensorEntityDescription(

@@ -213,7 +213,9 @@ class DPCode(StrEnum):
     CH2O_VALUE = "ch2o_value"
     CH4_SENSOR_STATE = "ch4_sensor_state"
     CH4_SENSOR_VALUE = "ch4_sensor_value"
+    CHARGE_CUR_SET = "charge_cur_set"
     CHARGE_ENERGY = "charge_energy"
+    CHARGE_ENERGY_ONCE = "charge_energy_once"
     CHILD_LOCK = "child_lock"  # Child lock
     CISTERN = "cistern"
     CLEAN = "clean"
@@ -225,6 +227,7 @@ class DPCode(StrEnum):
     CLEAN_TIME_SWITCH = "clean_time_switch"
     CLEANING = "cleaning"
     CLEANING_NUM = "cleaning_num"
+    CLEAR_ENERGY = "clear_energy"
     CLICK_SUSTAIN_TIME = "click_sustain_time"
     CLOUD_RECIPE_NUMBER = "cloud_recipe_number"
     CLOSED_OPENED = "closed_opened"
@@ -243,6 +246,7 @@ class DPCode(StrEnum):
     COOK_TEMPERATURE = "cook_temperature"
     COOK_TIME = "cook_time"
     CONCENTRATION_SET = "concentration_set"  # Concentration setting
+    CONNECTION_STATE = "connection_state"
     CONTROL = "control"
     CONTROL_2 = "control_2"
     CONTROL_3 = "control_3"
@@ -406,6 +410,7 @@ class DPCode(StrEnum):
     POWERON = "poweron"
     POWERONOFF = "PowerOnOff"
     POWER_GO = "power_go"
+    POWER_TOTAL = "power_total"
     PRESENCE_DELAY = "presence_delay"
     PRESENCE_STATE = "presence_state"
     PRESSURE_STATE = "pressure_state"
@@ -441,6 +446,7 @@ class DPCode(StrEnum):
     SETTIME = "SetTime"
     SHAKE = "shake"  # Oscillating
     SHOCK_STATE = "shock_state"  # Vibration status
+    SIGLE_PHASE_POWER = "sigle_phase_power"
     SIREN_SWITCH = "siren_switch"
     SITUATION_SET = "situation_set"
     SLEEP = "sleep"  # Sleep function
@@ -496,6 +502,7 @@ class DPCode(StrEnum):
     SWITCH_USB6 = "switch_usb6"  # USB 6
     SWITCH_VERTICAL = "switch_vertical"  # Vertical swing flap switch
     SWITCH_VOICE = "switch_voice"  # Voice switch
+    SYSTEM_VERSION = "system_version"
     TEMP = "temp"  # Temperature setting
     TEMPCHANGER = "TempChanger"
     TEMPERATURE = "temperature"
@@ -520,6 +527,7 @@ class DPCode(StrEnum):
     TOILET_NOTICE = "toilet_notice"
     TIME_GET_IN_BED = "time_get_in_bed"
     TIME_USE = "time_use"  # Total seconds of irrigation
+    TIMER_ON = "timer_on"
     TOTAL_CLEAN_AREA = "total_clean_area"
     TOTAL_CLEAN_COUNT = "total_clean_count"
     TOTAL_CLEAN_TIME = "total_clean_time"
@@ -561,6 +569,7 @@ class DPCode(StrEnum):
     WORK_MODE = "work_mode"  # Working mode
     WORK_POWER = "work_power"
     WORK_STAT = "work_stat"
+    WORK_STATE = "work_state"
     WORK_STATUS = "WorkStatus"
 
 
