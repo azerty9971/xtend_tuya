@@ -124,16 +124,16 @@ class XTMergingManager:
                 strategy2 = device2.local_strategy[dpId]
 
                 #Favor as the "main" strategy the one that doesn't use openAPI or Property Update
-                st1_prop = strategy1.get("property_update", False)
-                st2_prop = strategy2.get("property_update", False)
-                st1_oapi = strategy1.get("use_open_api", False)
-                st2_oapi = strategy2.get("use_open_api", False)
+                st1_prop = strategy1.get("property_update", None)
+                st2_prop = strategy2.get("property_update", None)
+                st1_oapi = strategy1.get("use_open_api", None)
+                st2_oapi = strategy2.get("use_open_api", None)
                 if st1_oapi != st2_oapi:
-                    if not st2_oapi:
+                    if st2_oapi is not None and not st2_oapi:
                         strategy1 = device2.local_strategy[dpId]
                         strategy2 = device1.local_strategy[dpId]
                 elif st1_prop != st2_prop:
-                    if not st2_prop:
+                    if st2_prop is not None and not st2_prop:
                         strategy1 = device2.local_strategy[dpId]
                         strategy2 = device1.local_strategy[dpId]
 
@@ -156,6 +156,14 @@ class XTMergingManager:
                 else:
                     strategy1["use_open_api"] = False
                     strategy2["use_open_api"] = strategy1["use_open_api"]
+                if "access_mode" in strategy1:
+                    strategy2["access_mode"] = strategy1["access_mode"]
+                elif "access_mode" in strategy2:
+                    strategy1["access_mode"] = strategy2["access_mode"]
+                else:
+                    strategy1["access_mode"] = None
+                    strategy2["access_mode"] = strategy1["access_mode"]
+
             else:
                 device2.local_strategy[dpId] = device1.local_strategy[dpId]
         for dpId in device2.local_strategy:
