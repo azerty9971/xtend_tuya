@@ -181,6 +181,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                         code  = property["code"]
                         typeSpec = property["typeSpec"]
                         real_type = TuyaEntity.determine_dptype(typeSpec["type"])
+                        access_mode = property["accessMode"]
                         typeSpec.pop("type")
                         typeSpec_json = json.dumps(typeSpec)
                         if dp_id not in device_properties.local_strategy:
@@ -199,6 +200,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                                 },
                                 "property_update": property_update,
                                 "use_open_api": True,
+                                "access_mode": access_mode,
                                 "status_code_alias": []
                             }
 

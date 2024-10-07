@@ -133,16 +133,19 @@ def _async_device_as_dict(
             value = json.loads(cast(str, function.values))
 
         property_update = False
+        access_mode = None
 
         for dp_item in device.local_strategy.values():
             if dp_item["status_code"] == function.code:
                 property_update = dp_item.get("property_update", False)
+                access_mode = dp_item.get("access_mode", None)
                 break
 
         data["function"][function.code] = {
             "type": function.type,
             "value": value,
             "property_update": property_update,
+            "accessMode": access_mode,
         }
 
     # Gather Tuya status ranges
@@ -152,16 +155,19 @@ def _async_device_as_dict(
             value = json.loads(status_range.values)
 
         property_update = False
+        access_mode = None
 
         for dp_item in device.local_strategy.values():
             if dp_item["status_code"] == status_range.code:
                 property_update = dp_item.get("property_update", False)
+                access_mode = dp_item.get("access_mode", None)
                 break
 
         data["status_range"][status_range.code] = {
             "type": status_range.type,
             "value": value,
             "property_update": property_update,
+            "access_mode": access_mode,
         }
 
     # Gather information how this Tuya device is represented in Home Assistant
