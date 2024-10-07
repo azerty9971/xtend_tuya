@@ -84,6 +84,13 @@ SELECTS: dict[str, tuple[SelectEntityDescription, ...]] = {
             entity_category=EntityCategory.CONFIG,
         ),
     ),
+    "qccdz": (
+        SelectEntityDescription(
+            key=DPCode.WORK_MODE,
+            translation_key="qccdz_work_mode",
+            entity_category=EntityCategory.CONFIG,
+        ),
+    ),
 }
 
 

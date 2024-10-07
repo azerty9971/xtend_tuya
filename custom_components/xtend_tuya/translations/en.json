@@ -155,6 +155,9 @@
       }
     },
     "button": {
+      "clear_energy": {
+        "name": "Clear energy"
+      },
       "manual_lock": {
         "name": "Manual lock"
       },
@@ -226,6 +229,12 @@
       }
     },
     "number": {
+      "timer_on": {
+        "name": "Delayed power on"
+      },
+      "charge_cur_set": {
+        "name": "Charging current"
+      },
       "presence_delay": {
         "name": "Reset delay"
       },
@@ -408,6 +417,21 @@
       }
     },
     "select": {
+      "qccdz_work_mode": {
+        "name": "Work mode",
+        "state": {
+          "0": "Charge now",
+          "1": "Charge to percentage",
+          "2": "Charge energy",
+          "3": "Scheduled charge",
+          "4": "Delayed charge",
+          "charge_now": "Charge now",
+          "charge_pct": "Charge to percentage",
+          "charge_energy": "Charge energy",
+          "charge_schedule": "Scheduled charge",
+          "charge_delay": "Delayed charge"
+        }
+      },
       "doorbell_volume": {
         "name": "Doorbell volume",
         "state": {
@@ -784,6 +808,55 @@
       }
     },
     "sensor": {
+      "system_version": {
+        "name": "System version"
+      },
+      "qccdz_connection_state": {
+        "name": "Connection state",
+        "state": {
+          "0": "12V",
+          "1": "12V PWN",
+          "2": "9V",
+          "3": "9V PWM",
+          "4": "6V",
+          "5": "6V PWM",
+          "6": "Error",
+          "controlpi_12v": "12V",
+          "controlpi_12v_pwm": "12V PWN",
+          "controlpi_9v": "9V",
+          "controlpi_9v_pwm": "9V PWM",
+          "controlpi_6v": "6V",
+          "controlpi_6v_pwm": "6V PWM",
+          "controlpi_error": "Error"
+        }
+      },
+      "power_total": {
+        "name": "Total power"
+      },
+      "sigle_phase_power": {
+        "name": "Single phase power"
+      },
+      "qccdz_work_state": {
+        "name": "Work state",
+        "state": {
+          "0": "Charger is free",
+          "1": "Charger inserted",
+          "2": "Charger is free (fault)",
+          "3": "Charger is waiting",
+          "4": "Charger is charging",
+          "5": "Charger is paused",
+          "6": "Charger has finished",
+          "7": "Charger fault",
+          "charger_free": "Charger is free",
+          "charger_insert": "Charger inserted",
+          "charger_free_fault": "Charger is free (fault)",
+          "charger_wait": "Charger is waiting",
+          "charger_charging": "Charger is charging",
+          "charger_pause": "Charger is paused",
+          "charger_end": "Charger has finished",
+          "charger_fault": "Charger fault"
+        }
+      },
       "ms_category_alarm_lock": {
         "name": "Keypad alarm",
         "state": {
@@ -941,6 +1014,9 @@
       },
       "charge_energy": {
         "name": "Charge energy"
+      },
+      "charge_energy_once": {
+        "name": "Charge energy (single)"
       },
       "total_forward_energy": {
         "name": "Total forward energy"
