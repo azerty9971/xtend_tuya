@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any
 
 from homeassistant.core import HomeAssistant, callback
@@ -18,7 +18,7 @@ from .const import (
     DPCode,
 )
 from .util import (
-    append_sets
+    append_dictionnaries,
 )
 from .base import TuyaEntity
 from .multi_manager.shared.device import (
@@ -32,11 +32,20 @@ from .multi_manager.multi_manager import (
 @dataclass(frozen=True)
 class TuyaLockEntityDescription(LockEntityDescription):
     """Describes a Tuya lock."""
-    pass
+    unlock_status_list: list[DPCode] = field(default_factory=list)
+    temporary_unlock: bool = False
 
-LOCKS = {
-    "jtmspro",
-    "mk",
+LOCKS: dict[str, TuyaLockEntityDescription] = {
+    "mk": TuyaLockEntityDescription(
+            key=None,
+            translation_key="operate_lock",
+            temporary_unlock = True,
+        ),
+    "jtmspro": TuyaLockEntityDescription(
+            key=None,
+            translation_key="operate_lock",
+            unlock_status_list=[DPCode.LOCK_MOTOR_STATE]
+        ),
 }
 
 async def async_setup_entry(
@@ -47,7 +56,7 @@ async def async_setup_entry(
 
     merged_descriptors = LOCKS
     for new_descriptor in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(Platform.LOCK):
-        merged_descriptors = append_sets(merged_descriptors, new_descriptor)
+        merged_descriptors = append_dictionnaries(merged_descriptors, new_descriptor)
 
     @callback
     def async_discover_device(device_map) -> None:
@@ -58,7 +67,7 @@ async def async_setup_entry(
             if device := hass_data.manager.device_map.get(device_id):
                 if device.category in merged_descriptors:
                     entities.append(TuyaLockEntity(
-                                    device, hass_data.manager
+                                    device, hass_data.manager, merged_descriptors[device.category]
                                 ))
         async_add_entities(entities)
 
@@ -70,25 +79,29 @@ async def async_setup_entry(
     )
 
 class TuyaLockEntity(TuyaEntity, LockEntity):
-    """Tuya Binary Sensor Entity."""
+    """Tuya Lock Sensor Entity."""
 
     entity_description: TuyaLockEntityDescription
 
     def __init__(
         self,
         device: XTDevice,
-        device_manager: MultiManager
+        device_manager: MultiManager,
+        description: TuyaLockEntityDescription,
     ) -> None:
-        """Init Tuya binary sensor."""
+        """Init Tuya Lock sensor."""
         super().__init__(device, device_manager)
         self.device = device
         self.device_manager = device_manager
         self.last_action: str = None
+        self.entity_description = description
 
     @property
     def is_locked(self) -> bool | None:
         """Return true if the lock is locked."""
-        is_unlocked = self._get_state_value([DPCode.LOCK_MOTOR_STATE])
+        if self.entity_description.temporary_unlock:
+            return True
+        is_unlocked = self._get_state_value(self.entity_description.unlock_status_list)
         if is_unlocked is not None:
             if not is_unlocked:
                 self._attr_is_locked = True
@@ -100,6 +113,8 @@ class TuyaLockEntity(TuyaEntity, LockEntity):
     
     @property
     def is_locking(self) -> bool | None:
+        if self.entity_description.temporary_unlock:
+            return False
         """Return true if the lock is locking."""
         is_locked = self.is_locked
         if self._attr_is_locking and is_locked:
@@ -108,6 +123,8 @@ class TuyaLockEntity(TuyaEntity, LockEntity):
 
     @property
     def is_unlocking(self) -> bool | None:
+        if self.entity_description.temporary_unlock:
+            return False
         """Return true if the lock is unlocking."""
         is_locked = self.is_locked
         if self._attr_is_unlocking and not is_locked:
@@ -123,14 +140,14 @@ class TuyaLockEntity(TuyaEntity, LockEntity):
     def lock(self, **kwargs: Any) -> None:
         """Lock the lock."""
         if self.device_manager.send_lock_unlock_command(self.device.id, True):
-            self._attr_is_locking = True
-            pass
+            if not self.entity_description.temporary_unlock:
+                self._attr_is_locking = True
     
     def unlock(self, **kwargs: Any) -> None:
         """Unlock the lock."""
         if self.device_manager.send_lock_unlock_command(self.device.id, False):
-            self._attr_is_unlocking = True
-            pass
+            if not self.entity_description.temporary_unlock:
+                self._attr_is_unlocking = True
     
     def open(self, **kwargs: Any) -> None:
         """Open the door latch."""
