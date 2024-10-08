@@ -381,7 +381,7 @@ class DPCode(StrEnum):
     OFF = "off"
     OFF_BED = "off_bed"
     OFF_BED_TIME = "off_bed_time"
-    ONLINE = "online"
+    ONLINE_STATE = "online_state"
     OPPOSITE = "opposite"
     OXYGEN = "oxygen"  # Oxygen bar
     PAUSE = "pause"
