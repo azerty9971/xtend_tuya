@@ -41,7 +41,8 @@ class XTIOTWebRTCSession:
             "\r\n[From TUYA]Config:\r\n" + f"{self.webrtc_config}" +
             "\r\n[From client]Original Offer\r\n" + f"{self.original_offer}" +
             "\r\n[From client]Offer\r\n" + f"{self.offer}" +
-            "\r\n[From TUYA]Final answer:\r\n" + f"{answer}"
+            "\r\n[From TUYA]Final answer:\r\n" + f"{answer}" + 
+            "\r\nEND DEBUG INFO"
             )
 
 class XTIOTWebRTCManager:
