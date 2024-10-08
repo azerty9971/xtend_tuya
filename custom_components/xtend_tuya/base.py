@@ -266,12 +266,7 @@ class TuyaEntity(Entity):
             order = ["function", "status_range"]
         for key in order:
             if dpcode in getattr(self.device, key):
-                try:
-                    return DPType(getattr(self.device, key)[dpcode].type)
-                except ValueError:
-                    fixed_type = TuyaEntity.determine_dptype(getattr(self.device, key)[dpcode].type)
-                    LOGGER.warning(f"Device {self.device.name} (id: {self.device.id}) has returned a bad model dpId type for code {dpcode} : \"{getattr(self.device, key)[dpcode].type}\", it should have been \"{fixed_type}\". Please contact the Tuya Support about this")
-                    return fixed_type
+                return TuyaEntity.determine_dptype(getattr(self.device, key)[dpcode].type)
 
         return None
     
@@ -281,22 +276,27 @@ class TuyaEntity(Entity):
         Sometimes, we get ill-formed DPTypes from the cloud,
         this fixes them and maps them to the correct DPType.
         """
-        match type:
-            case "value":
-                return DPType.INTEGER
-            case "bitmap":
-                return DPType.RAW
-            case "raw":
-                return DPType.RAW
-            case "enum":
-                return DPType.ENUM
-            case "bool":
-                return DPType.BOOLEAN
-            case "json":
-                return DPType.JSON
-            case "string":
-                return DPType.STRING
-        return None
+        try:
+            return DPType(type)
+        except ValueError:
+            return_result = None
+            match type:
+                case "value":
+                    return_result = DPType.INTEGER
+                case "bitmap":
+                    return_result = DPType.RAW
+                case "raw":
+                    return_result = DPType.RAW
+                case "enum":
+                    return_result = DPType.ENUM
+                case "bool":
+                    return_result = DPType.BOOLEAN
+                case "json":
+                    return_result = DPType.JSON
+                case "string":
+                    return_result = DPType.STRING
+        LOGGER.debug(f"Fixing DPType {type} with {return_result}")
+        return return_result
 
     async def async_added_to_hass(self) -> None:
         """Call when entity is added to hass."""
