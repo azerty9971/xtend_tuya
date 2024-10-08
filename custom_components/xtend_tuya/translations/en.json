@@ -99,6 +99,9 @@
   },
   "entity": {
     "binary_sensor": {
+      "online": {
+        "name": "Device online"
+      },
       "lock_motor_state": {
         "name": "Lock status"
       },
