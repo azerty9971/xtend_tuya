@@ -173,7 +173,7 @@ class TuyaBinarySensorEntity(TuyaEntity, BinarySensorEntity):
     @property
     def is_on(self) -> bool:
         is_on = self._is_on()
-        if self.entity_description.device_online:
+        if hasattr(self.entity_description, "device_online") and self.entity_description.device_online:
             self.device.online = is_on
         return is_on
     
