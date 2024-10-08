@@ -276,18 +276,26 @@ class TuyaEntity(Entity):
         return None
     
     def determine_dptype(type) -> DPType | None:
-        if type == "value":
-            return DPType(DPType.INTEGER)
-        if type == "bitmap" or type == "raw":
-            return DPType(DPType.RAW)
-        if type == "enum":
-            return DPType(DPType.ENUM)
-        if type == "bool":
-            return DPType(DPType.BOOLEAN)
-        if type == "json":
-            return DPType(DPType.JSON)
-        if type == "string":
-            return DPType(DPType.STRING)
+        """Determine the DPType.
+
+        Sometimes, we get ill-formed DPTypes from the cloud,
+        this fixes them and maps them to the correct DPType.
+        """
+        match type:
+            case "value":
+                return DPType.INTEGER
+            case "bitmap":
+                return DPType.RAW
+            case "raw":
+                return DPType.RAW
+            case "enum":
+                return DPType.ENUM
+            case "bool":
+                return DPType.BOOLEAN
+            case "json":
+                return DPType.JSON
+            case "string":
+                return DPType.STRING
         return None
 
     async def async_added_to_hass(self) -> None:
