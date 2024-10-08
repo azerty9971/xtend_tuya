@@ -16,14 +16,16 @@ class XTIOTWebRTCSession:
     original_offer: str
     offer: str
     answer: dict
+    final_answer: str
     answer_candidates: list[dict]
     has_all_candidates: bool
 
     def __init__(self, ttl: int = 600) -> None:
         self.webrtc_config = {}
-        self.answer = {}
         self.original_offer = None
         self.offer = None
+        self.answer = {}
+        self.final_answer = None
         self.answer_candidates = []
         self.valid_until = datetime.now() + timedelta(0, ttl)
         self.has_all_candidates = False
@@ -31,15 +33,15 @@ class XTIOTWebRTCSession:
     def __repr__(self) -> str:
         answer = ""
         if self.answer:
-            if isinstance(self.answer, dict):
+            if isinstance(self.final_answer, dict):
                 answer = self.answer.get("sdp", f"{self.answer}")
             else:
-                answer = f"{self.answer}"
+                answer = f"{self.final_answer}"
         return (
             "\r\n[From TUYA]Config:\r\n" + f"{self.webrtc_config}" +
             "\r\n[From client]Original Offer\r\n" + f"{self.original_offer}" +
             "\r\n[From client]Offer\r\n" + f"{self.offer}" +
-            "\r\n[From TUYA]Answer:\r\n" + f"{answer}"
+            "\r\n[From TUYA]Final answer:\r\n" + f"{answer}"
             )
 
 class XTIOTWebRTCManager:
@@ -240,6 +242,7 @@ class XTIOTWebRTCManager:
                         for candidate in session.answer_candidates:
                             candidates += candidate.get("candidate", "")
                         sdp_answer += candidates + "a=end-of-candidates" + ENDLINE
+                    session.final_answer = f"{sdp_answer}"
                     return sdp_answer
             
             if not auth_token or not moto_id:
