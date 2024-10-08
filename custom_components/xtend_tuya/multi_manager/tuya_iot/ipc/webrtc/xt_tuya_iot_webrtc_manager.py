@@ -73,6 +73,7 @@ class XTIOTWebRTCManager:
         self._create_session_if_necessary(session_id)
         self.sdp_exchange[session_id].answer_candidates.append(candidate)
         candidate_str = candidate.get("candidate", None)
+        LOGGER.warning(f"Adding SDP answer candidate {candidate_str}")
         if candidate_str == '':
             self.sdp_exchange[session_id].has_all_candidates = True
 
@@ -230,11 +231,11 @@ class XTIOTWebRTCManager:
                         },
                     }
                     #self.ipc_manager.publish_to_ipc_mqtt(topic, json.dumps(payload))
-                for _ in range(sleep_count):
+                """ for _ in range(sleep_count):
                     if session := self.get_webrtc_session(session_id):
                         if session.has_all_candidates:
                             break
-                    time.sleep(sleep_step) #Wait for MQTT responses
+                    time.sleep(sleep_step) #Wait for MQTT responses """
                 if session := self.get_webrtc_session(session_id):
                     #Format SDP answer and send it back
                     sdp_answer: str = session.answer.get("sdp", "")
