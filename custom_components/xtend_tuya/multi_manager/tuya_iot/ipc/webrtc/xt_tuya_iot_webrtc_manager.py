@@ -231,11 +231,13 @@ class XTIOTWebRTCManager:
                         },
                     }
                     #self.ipc_manager.publish_to_ipc_mqtt(topic, json.dumps(payload))
-                """ for _ in range(sleep_count):
+                for _ in range(sleep_count):
                     if session := self.get_webrtc_session(session_id):
                         if session.has_all_candidates:
                             break
-                    time.sleep(sleep_step) #Wait for MQTT responses """
+                        if session.answer.get("sdp"):
+                            break
+                    time.sleep(sleep_step) #Wait for MQTT responses
                 if session := self.get_webrtc_session(session_id):
                     #Format SDP answer and send it back
                     sdp_answer: str = session.answer.get("sdp", "")
