@@ -285,6 +285,8 @@ class TuyaEntity(Entity):
                     return_result = DPType.INTEGER
                 case "bitmap":
                     return_result = DPType.RAW
+                case "Bitmap":
+                    return_result = DPType.RAW
                 case "raw":
                     return_result = DPType.RAW
                 case "enum":
