@@ -34,6 +34,9 @@ class TuyaBinarySensorEntityDescription(BinarySensorEntityDescription):
     # Value or values to consider binary sensor to be "on"
     on_value: bool | float | int | str | set[bool | float | int | str] = True
 
+    # This DPCode represent the online status of a device
+    device_online: bool = False
+
 
 # Commonly used sensors
 TAMPER_BINARY_SENSOR = TuyaBinarySensorEntityDescription(
@@ -87,6 +90,13 @@ BINARY_SENSORS: dict[str, tuple[TuyaBinarySensorEntityDescription, ...]] = {
         TuyaBinarySensorEntityDescription(
             key=DPCode.PIR2,
             device_class=BinarySensorDeviceClass.MOTION,
+        ),
+    ),
+    "qccdz": (
+        TuyaBinarySensorEntityDescription(
+            key=DPCode.ONLINE,
+            translation_key="online",
+            device_online=True,
         ),
     ),
     "smd": (
@@ -162,6 +172,12 @@ class TuyaBinarySensorEntity(TuyaEntity, BinarySensorEntity):
 
     @property
     def is_on(self) -> bool:
+        is_on = self._is_on()
+        if hasattr(self.entity_description, "device_online") and self.entity_description.device_online:
+            self.device.online = is_on
+        return is_on
+    
+    def _is_on(self) -> bool:
         """Return true if sensor is on."""
         dpcode = self.entity_description.dpcode or self.entity_description.key
         if dpcode not in self.device.status:
