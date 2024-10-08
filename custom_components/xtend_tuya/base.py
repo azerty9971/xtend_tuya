@@ -279,26 +279,24 @@ class TuyaEntity(Entity):
         try:
             return DPType(type)
         except ValueError:
-            return_result = None
             match type:
                 case "value":
-                    return_result = DPType.INTEGER
+                    return DPType.INTEGER
                 case "bitmap":
-                    return_result = DPType.RAW
+                    return DPType.RAW
                 case "Bitmap":
-                    return_result = DPType.RAW
+                    return DPType.RAW
                 case "raw":
-                    return_result = DPType.RAW
+                    return DPType.RAW
                 case "enum":
-                    return_result = DPType.ENUM
+                    return DPType.ENUM
                 case "bool":
-                    return_result = DPType.BOOLEAN
+                    return DPType.BOOLEAN
                 case "json":
-                    return_result = DPType.JSON
+                    return DPType.JSON
                 case "string":
-                    return_result = DPType.STRING
-        LOGGER.debug(f"Fixing DPType {type} with {return_result}")
-        return return_result
+                    return DPType.STRING
+        return None
 
     async def async_added_to_hass(self) -> None:
         """Call when entity is added to hass."""
