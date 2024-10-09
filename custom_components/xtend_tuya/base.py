@@ -12,13 +12,22 @@ from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity import Entity
 
-from homeassistant.components.tuya.const import (
-    DPCode as DPCode_tuya
-)
+from homeassistant.components.tuya.const import DPCode as DPCode_tuya
 
 from .const import DOMAIN, TUYA_HA_SIGNAL_UPDATE_ENTITY, DPCode, DPType, LOGGER
 from .util import remap_value
 from .multi_manager.multi_manager import MultiManager, XTDevice
+
+_DPTYPE_MAPPING: dict[str, DPType] = {
+    "value": DPType.INTEGER,
+    "bitmap": DPType.RAW,
+    "Bitmap": DPType.RAW,
+    "raw": DPType.RAW,
+    "enum": DPType.ENUM,
+    "bool": DPType.BOOLEAN,
+    "json": DPType.JSON,
+    "string": DPType.STRING,
+}
 
 
 @dataclass
@@ -247,7 +256,9 @@ class TuyaEntity(Entity):
                             continue
                         return integer_type
                     except TypeError:
-                        LOGGER.warning(f"Device : {self.device.id} -> {self.device.name} -> {dpcode} failed to setup")
+                        LOGGER.warning(
+                            f"Device : {self.device.id} -> {self.device.name} -> {dpcode} failed to setup"
+                        )
 
                 if dptype not in (DPType.ENUM, DPType.INTEGER):
                     return dpcode
@@ -266,10 +277,12 @@ class TuyaEntity(Entity):
             order = ["function", "status_range"]
         for key in order:
             if dpcode in getattr(self.device, key):
-                return TuyaEntity.determine_dptype(getattr(self.device, key)[dpcode].type)
+                return TuyaEntity.determine_dptype(
+                    getattr(self.device, key)[dpcode].type
+                )
 
         return None
-    
+
     def determine_dptype(type) -> DPType | None:
         """Determine the DPType.
 
@@ -279,18 +292,7 @@ class TuyaEntity(Entity):
         try:
             return DPType(type)
         except ValueError:
-            mapping: dict[str, DPType] = {
-                "value": DPType.INTEGER,
-                "bitmap": DPType.RAW,
-                "Bitmap": DPType.RAW,
-                "raw": DPType.RAW,
-                "enum": DPType.ENUM,
-                "bool": DPType.BOOLEAN,
-                "json": DPType.JSON,
-                "string": DPType.STRING,
-            }
-            LOGGER.debug(f"Fixing DPType {type} with {mapping.get(type, None)}")
-            return mapping.get(type, None)
+            return _DPTYPE_MAPPING.get(type, None)
 
     async def async_added_to_hass(self) -> None:
         """Call when entity is added to hass."""
