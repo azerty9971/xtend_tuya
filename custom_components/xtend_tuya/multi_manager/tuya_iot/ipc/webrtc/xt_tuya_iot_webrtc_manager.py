@@ -16,14 +16,16 @@ class XTIOTWebRTCSession:
     original_offer: str
     offer: str
     answer: dict
+    final_answer: str
     answer_candidates: list[dict]
     has_all_candidates: bool
 
     def __init__(self, ttl: int = 600) -> None:
         self.webrtc_config = {}
-        self.answer = {}
         self.original_offer = None
         self.offer = None
+        self.answer = {}
+        self.final_answer = None
         self.answer_candidates = []
         self.valid_until = datetime.now() + timedelta(0, ttl)
         self.has_all_candidates = False
@@ -31,15 +33,16 @@ class XTIOTWebRTCSession:
     def __repr__(self) -> str:
         answer = ""
         if self.answer:
-            if isinstance(self.answer, dict):
+            if isinstance(self.final_answer, dict):
                 answer = self.answer.get("sdp", f"{self.answer}")
             else:
-                answer = f"{self.answer}"
+                answer = f"{self.final_answer}"
         return (
             "\r\n[From TUYA]Config:\r\n" + f"{self.webrtc_config}" +
             "\r\n[From client]Original Offer\r\n" + f"{self.original_offer}" +
             "\r\n[From client]Offer\r\n" + f"{self.offer}" +
-            "\r\n[From TUYA]Answer:\r\n" + f"{answer}"
+            "\r\n[From TUYA]Final answer:\r\n" + f"{answer}" + 
+            "\r\nEND DEBUG INFO"
             )
 
 class XTIOTWebRTCManager:
@@ -70,6 +73,7 @@ class XTIOTWebRTCManager:
         self._create_session_if_necessary(session_id)
         self.sdp_exchange[session_id].answer_candidates.append(candidate)
         candidate_str = candidate.get("candidate", None)
+        LOGGER.warning(f"Adding SDP answer candidate {candidate_str}")
         if candidate_str == '':
             self.sdp_exchange[session_id].has_all_candidates = True
 
@@ -231,6 +235,8 @@ class XTIOTWebRTCManager:
                     if session := self.get_webrtc_session(session_id):
                         if session.has_all_candidates:
                             break
+                        if session.answer.get("sdp"):
+                            break
                     time.sleep(sleep_step) #Wait for MQTT responses
                 if session := self.get_webrtc_session(session_id):
                     #Format SDP answer and send it back
@@ -240,6 +246,7 @@ class XTIOTWebRTCManager:
                         for candidate in session.answer_candidates:
                             candidates += candidate.get("candidate", "")
                         sdp_answer += candidates + "a=end-of-candidates" + ENDLINE
+                    session.final_answer = f"{sdp_answer}"
                     return sdp_answer
             
             if not auth_token or not moto_id:
