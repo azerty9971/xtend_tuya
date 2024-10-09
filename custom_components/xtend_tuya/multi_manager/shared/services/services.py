@@ -228,7 +228,8 @@ class ServiceManager:
                         if account := multi_manager.get_account_by_name(source):
                             patch_answer = await self.hass.async_add_executor_job(account.send_webrtc_trickle_ice, device_id, session_id, event.payload)
                             if patch_answer is not None:
-                                response = web.Response(status=204, text=patch_answer, charset="utf-8")
+                                response = web.Response(status=200, text=patch_answer, charset="utf-8")
+                                response.headers["ETag"] = session_id
                                 return response
                         return None
             case "DELETE":
