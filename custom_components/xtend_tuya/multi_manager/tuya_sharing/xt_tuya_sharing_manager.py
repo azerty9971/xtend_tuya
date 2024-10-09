@@ -114,10 +114,15 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
                 self.device_repository.update_device_strategy_info(new_device)
                 self.device_map[device.id] = new_device
 
+    def _on_device_other(self, device_id: str, biz_code: str, data: dict[str, Any]):
+        self.multi_manager.device_watcher.report_message(device_id, f"[SHARING]On device other: {biz_code} <=> {data}")
+        return super()._on_device_other(device_id, biz_code, data)
+
     def _on_device_report(self, device_id: str, status: list):
         device = self.device_map.get(device_id, None)
         if not device:
             return
+        self.multi_manager.device_watcher.report_message(device_id, f"[SHARING]On device other: {status}", device)
         status_new = self.multi_manager.convert_device_report_status_list(device_id, status)
         self.multi_manager.device_watcher.report_message(device_id, f"device report {MESSAGE_SOURCE_TUYA_SHARING}: {status_new}")
         status_new = self.multi_manager.multi_source_handler.filter_status_list(device_id, MESSAGE_SOURCE_TUYA_SHARING, status_new)
