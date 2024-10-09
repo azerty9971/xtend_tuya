@@ -220,6 +220,7 @@ class ServiceManager:
                                 response = web.Response(status=201, text=sdp_answer, content_type="application/sdp", charset="utf-8")
                                 response.headers["ETag"] = session_id
                                 response.headers["Location"] = event.location
+                                response.headers["Accept-Patch"] = "application/trickle-ice-sdpfrag"
                                 return response
                         return None
             case "PATCH":
