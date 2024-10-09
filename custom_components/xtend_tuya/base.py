@@ -289,6 +289,7 @@ class TuyaEntity(Entity):
                 "json": DPType.JSON,
                 "string": DPType.STRING,
             }
+            LOGGER.debug(f"Fixing DPType {type} with {mapping.get(type, None)}")
             return mapping.get(type, None)
 
     async def async_added_to_hass(self) -> None:
