@@ -97,7 +97,7 @@ BINARY_SENSORS: dict[str, tuple[TuyaBinarySensorEntityDescription, ...]] = {
             key=DPCode.ONLINE_STATE,
             translation_key="online",
             on_value="online",
-            device_online=True,
+            #device_online=True,
         ),
     ),
     "smd": (
