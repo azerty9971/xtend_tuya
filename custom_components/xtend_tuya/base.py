@@ -292,7 +292,8 @@ class TuyaEntity(Entity):
         try:
             return DPType(type)
         except ValueError:
-            return _DPTYPE_MAPPING.get(type, None)
+            LOGGER.debug(f"Fixing DPType {type} with {_DPTYPE_MAPPING.get(type)}")
+            return _DPTYPE_MAPPING.get(type)
 
     async def async_added_to_hass(self) -> None:
         """Call when entity is added to hass."""
