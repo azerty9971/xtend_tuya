@@ -428,7 +428,7 @@
           "2": "Charge energy",
           "3": "Scheduled charge",
           "4": "Delayed charge",
-          "charge_now": "Charge now",
+          "charge_now": "Real time charging",
           "charge_pct": "Charge to percentage",
           "charge_energy": "Charge energy",
           "charge_schedule": "Scheduled charge",
