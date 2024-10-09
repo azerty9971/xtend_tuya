@@ -92,14 +92,6 @@ BINARY_SENSORS: dict[str, tuple[TuyaBinarySensorEntityDescription, ...]] = {
             device_class=BinarySensorDeviceClass.MOTION,
         ),
     ),
-    "qccdz": (
-        TuyaBinarySensorEntityDescription(
-            key=DPCode.ONLINE_STATE,
-            translation_key="online",
-            on_value="online",
-            #device_online=True,
-        ),
-    ),
     "smd": (
         TuyaBinarySensorEntityDescription(
             key=DPCode.OFF_BED,
