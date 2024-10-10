@@ -19,14 +19,14 @@ from .util import remap_value
 from .multi_manager.multi_manager import MultiManager, XTDevice
 
 _DPTYPE_MAPPING: dict[str, DPType] = {
-    "value": DPType.INTEGER,
     "bitmap": DPType.RAW,
     "Bitmap": DPType.RAW,
-    "raw": DPType.RAW,
-    "enum": DPType.ENUM,
     "bool": DPType.BOOLEAN,
+    "enum": DPType.ENUM,
     "json": DPType.JSON,
+    "raw": DPType.RAW,
     "string": DPType.STRING,
+    "value": DPType.INTEGER,
 }
 
 
