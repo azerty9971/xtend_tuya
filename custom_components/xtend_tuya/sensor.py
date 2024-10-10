@@ -107,6 +107,13 @@ BATTERY_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
         state_class=SensorStateClass.MEASUREMENT,
         entity_category=EntityCategory.DIAGNOSTIC,
     ),
+    TuyaSensorEntityDescription(
+        key=DPCode.BATTERY_POWER,
+        translation_key="battery",
+        device_class=SensorDeviceClass.BATTERY,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        state_class=SensorStateClass.MEASUREMENT,
+    ),
 )
 
 #Commonlu sed energy sensors, that are re-used in the sensors down below.
@@ -306,6 +313,9 @@ HUMIDITY_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
 # end up being a sensor.
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
 SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
+    "cl": (
+        *BATTERY_SENSORS,
+    ),
     "jtmspro": (
         TuyaSensorEntityDescription(
             key=DPCode.ALARM_LOCK,
