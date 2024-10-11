@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 from homeassistant.core import HomeAssistant
-import homeassistant.components.tuya as tuya_integration
+from ...ha_tuya_integration.tuya_integration_imports import (
+    tuya_integration,
+)
 
 from ....const import (
     DOMAIN_ORIG,
