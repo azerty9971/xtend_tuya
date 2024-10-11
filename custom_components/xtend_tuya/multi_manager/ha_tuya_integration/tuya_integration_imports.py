@@ -1,4 +1,4 @@
-from ....const import (
+from ...const import (
     LOGGER,  # noqa: F401
 )
 try:
