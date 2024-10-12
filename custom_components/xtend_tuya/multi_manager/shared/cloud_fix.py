@@ -9,12 +9,43 @@ from .device import (
 class CloudFixes:
     def apply_fixes(device: XTDevice):
         CloudFixes._fix_missing_local_strategy_enum_mapping_map(device)
-        CloudFixes._fix_incorrect_status_range_scale(device)
+        CloudFixes._fix_missing_scale_using_local_strategy(device)
+        CloudFixes._fix_incorrect_percentage_scale(device)
         CloudFixes._fix_missing_range_values_using_local_strategy(device)
         CloudFixes._fix_missing_aliases_using_status_format(device)
         CloudFixes._remove_status_that_are_local_strategy_aliases(device)
 
-    def _fix_incorrect_status_range_scale(device: XTDevice):
+    def _fix_incorrect_percentage_scale(device: XTDevice):
+        for code in device.status_range:
+            value = json.loads(device.status_range[code].values)
+            if "unit" in value and "min" in value and "max" in value and "scale" in value:
+                unit = value["unit"]
+                min = value["min"]
+                max = value["max"]
+                if unit not in ("%"):
+                    continue
+                if max % 100 != 0:
+                    continue
+                if min not in (0, 1):
+                    continue
+                value["scale"] = int(max / 100) - 1
+                device.status_range[code].values = json.dumps(value)
+        for code in device.function:
+            value = json.loads(device.function[code].values)
+            if "unit" in value and "min" in value and "max" in value and "scale" in value:
+                unit = value["unit"]
+                min = value["min"]
+                max = value["max"]
+                if unit not in ("%"):
+                    continue
+                if max % 100 != 0:
+                    continue
+                if min not in (0, 1):
+                    continue
+                value["scale"] = int(max / 100) - 1
+                device.function[code].values = json.dumps(value)
+    
+    def _fix_missing_scale_using_local_strategy(device: XTDevice):
         for local_strategy in device.local_strategy.values():
             if "status_code" not in local_strategy:
                 continue
