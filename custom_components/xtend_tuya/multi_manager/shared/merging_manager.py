@@ -38,30 +38,13 @@ class XTMergingManager:
         for function_key in device1.function:
             if function_key in device2.function:
                 try:
-                    if device1.function[function_key].values is not None and device2.function[function_key].values is not None:
-                        #determine the most plausible correct function
-                        value1 = json.loads(device1.function[function_key].values)
-                        value2 = json.loads(device2.function[function_key].values)
-                    elif device1.function[function_key].values is not None :
-                        value1 = json.loads(device1.function[function_key].values)
-                        value2 = value1
-                    elif device2.function[function_key].values is not None:
-                        value1 = json.loads(device2.function[function_key].values)
-                        value2 = value1
-                    else:
-                        value1 = json.loads("{}")
-                        value2 = value1
+                    value1 = json.loads(device1.function[function_key].values)
                 except Exception:
-                    if device1.function[function_key].values is not None:
-                        val1 = device1.function[function_key].values
-                    else:
-                        val1 = "NONE"
-                    if device2.function[function_key].values is not None:
-                        val2 = device2.function[function_key].values
-                    else:
-                        val2 = "NONE"
-                    LOGGER.error(f"Error converting from JSON to struct: |{val1}| <=> |{val2}|")
-                    continue
+                    value1 = {}
+                try:
+                    value2 = json.loads(device2.function[function_key].values)
+                except Exception:
+                    value2 = {}
                 match XTMergingManager._determine_most_plausible(value1, value2, "scale"):
                     case None:
                         match XTMergingManager._determine_most_plausible(value1, value2, "min"):
@@ -105,8 +88,14 @@ class XTMergingManager:
         for status_range_key in device1.status_range:
             if status_range_key in device2.status_range:
                 #determine the most plausible correct status_range
-                value1 = json.loads(device1.status_range[status_range_key].values)
-                value2 = json.loads(device2.status_range[status_range_key].values)
+                try:
+                    value1 = json.loads(device1.status_range[status_range_key].values)
+                except Exception:
+                    value1 = {}
+                try:
+                    value2 = json.loads(device2.status_range[status_range_key].values)
+                except Exception:
+                    value2 = {}
                 match XTMergingManager._determine_most_plausible(value1, value2, "scale"):
                     case None:
                         match XTMergingManager._determine_most_plausible(value1, value2, "min"):
@@ -185,8 +174,14 @@ class XTMergingManager:
     def _merge_config_item(conf1: dict, conf2: dict):
         XTMergingManager._merge_json_dict(conf2, conf1, "statusFormat")
         if "valueDesc" in conf1 and "valueDesc" in conf2:
-            value1 = json.loads(conf1["valueDesc"])
-            value2 = json.loads(conf2["valueDesc"])
+            try:
+                value1 = json.loads(conf1["valueDesc"])
+            except Exception:
+                value1 = {}
+            try:
+                value2 = json.loads(conf2["valueDesc"])
+            except Exception:
+                value2 = {}
             match XTMergingManager._determine_most_plausible(value1, value2, "scale"):
                 case None:
                     match XTMergingManager._determine_most_plausible(value1, value2, "min"):
