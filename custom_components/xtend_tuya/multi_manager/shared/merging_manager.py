@@ -37,19 +37,31 @@ class XTMergingManager:
     def _merge_function(device1: XTDevice, device2: XTDevice):
         for function_key in device1.function:
             if function_key in device2.function:
-                if device1.function[function_key].values is not None and device2.function[function_key].values is not None:
-                    #determine the most plausible correct function
-                    value1 = json.loads(device1.function[function_key].values)
-                    value2 = json.loads(device2.function[function_key].values)
-                elif device1.function[function_key].values is not None :
-                    value1 = json.loads(device1.function[function_key].values)
-                    value2 = value1
-                elif device2.function[function_key].values is not None:
-                    value1 = json.loads(device2.function[function_key].values)
-                    value2 = value1
-                else:
-                    value1 = json.loads("{}")
-                    value2 = value1
+                try:
+                    if device1.function[function_key].values is not None and device2.function[function_key].values is not None:
+                        #determine the most plausible correct function
+                        value1 = json.loads(device1.function[function_key].values)
+                        value2 = json.loads(device2.function[function_key].values)
+                    elif device1.function[function_key].values is not None :
+                        value1 = json.loads(device1.function[function_key].values)
+                        value2 = value1
+                    elif device2.function[function_key].values is not None:
+                        value1 = json.loads(device2.function[function_key].values)
+                        value2 = value1
+                    else:
+                        value1 = json.loads("{}")
+                        value2 = value1
+                except Exception:
+                    if device1.function[function_key].values is not None:
+                        val1 = device1.function[function_key].values
+                    else:
+                        val1 = "NONE"
+                    if device2.function[function_key].values is not None:
+                        val2 = device2.function[function_key].values
+                    else:
+                        val2 = "NONE"
+                    LOGGER.error(f"Error converting from JSON to struct: |{val1}| <=> |{val2}|")
+                    continue
                 match XTMergingManager._determine_most_plausible(value1, value2, "scale"):
                     case None:
                         match XTMergingManager._determine_most_plausible(value1, value2, "min"):
