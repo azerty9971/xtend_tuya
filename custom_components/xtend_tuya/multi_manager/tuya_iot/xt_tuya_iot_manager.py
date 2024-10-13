@@ -160,12 +160,11 @@ class XTIOTDeviceManager(TuyaDeviceManager):
             self.device_map[device_id] = XTDevice(**item)
     
     def get_open_api_device(self, device: XTDevice) -> XTDevice | None:
-        device_properties = XTDevice()
-        #device_properties.function = copy.deepcopy(device.function)
-        #device_properties.status_range = copy.deepcopy(device.status_range)
-        #device_properties.status = copy.deepcopy(device.status)
-        #if (hasattr(device, "local_strategy")):
-        #    device_properties.local_strategy = copy.deepcopy(device.local_strategy)
+        device_properties = XTDevice.from_compatible_device(device)
+        device_properties.function = {}
+        device_properties.status_range = {}
+        device_properties.status = {}
+        device_properties.local_strategy = {}
         response = self.api.get(f"/v2.0/cloud/thing/{device.id}/shadow/properties")
         response2 = self.api.get(f"/v2.0/cloud/thing/{device.id}/model")
         if not response.get("success") or not response2.get("success"):
