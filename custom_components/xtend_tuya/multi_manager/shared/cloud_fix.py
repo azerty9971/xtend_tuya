@@ -32,9 +32,13 @@ class CloudFixes:
     
     def _unify_data_types(device: XTDevice):
         for key in device.status_range:
-            device.status_range[key] = XTDeviceStatusRange.from_compatible_status_range(device.status_range[key])
+            if not isinstance(device.status_range[key], XTDeviceStatusRange):
+                device.status_range[key] = XTDeviceStatusRange.from_compatible_status_range(device.status_range[key])
+            device.status_range[key].type = TuyaEntity.determine_dptype(device.status_range[key].type)
         for key in device.function:
-            device.function[key] = XTDeviceFunction.from_compatible_function(device.function[key])
+            if not isinstance(device.function[key], XTDeviceFunction):
+                device.function[key] = XTDeviceFunction.from_compatible_function(device.function[key])
+            device.function[key].type = TuyaEntity.determine_dptype(device.function[key].type)
         for dpId in device.local_strategy:
             if config_item := device.local_strategy[dpId].get("config_item"):
                 if "valueType" in config_item:
