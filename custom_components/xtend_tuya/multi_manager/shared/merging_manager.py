@@ -335,7 +335,7 @@ class XTMergingManager:
             else:
                 if left != right:
                     msg_queue.append(f"Merging string that are different: |{left}| <=> |{right}|, using left")
-                    return left
+                return left
         else:
             if left != right:
                 msg_queue.append(f"Merging {type(left)} that are different: |{left}| <=> |{right}|, using left")
