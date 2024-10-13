@@ -38,7 +38,7 @@ class CloudFixes:
             if not isinstance(device.function[key], XTDeviceFunction):
                 device.function[key] = XTDeviceFunction.from_compatible_function(device.function[key])
         for dpId in device.local_strategy:
-            if "valueType" in device.local_strategy[dpId]:
+            if "valueType" in device.local_strategy[dpId] and not isinstance(device.local_strategy[dpId]["valueType"], DPType):
                 device.local_strategy[dpId]["valueType"] = TuyaEntity.determine_dptype(device.local_strategy[dpId]["valueType"])
 
     def _fix_incorrect_percentage_scale(device: XTDevice):
