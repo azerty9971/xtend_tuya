@@ -32,11 +32,9 @@ class CloudFixes:
     
     def _unify_data_types(device: XTDevice):
         for key in device.status_range:
-            if not isinstance(device.status_range[key], XTDeviceStatusRange):
-                device.status_range[key] = XTDeviceStatusRange.from_compatible_status_range(device.status_range[key])
+            device.status_range[key] = XTDeviceStatusRange.from_compatible_status_range(device.status_range[key])
         for key in device.function:
-            if not isinstance(device.function[key], XTDeviceFunction):
-                device.function[key] = XTDeviceFunction.from_compatible_function(device.function[key])
+            device.function[key] = XTDeviceFunction.from_compatible_function(device.function[key])
         for dpId in device.local_strategy:
             if config_item := device.local_strategy[dpId].get("config_item"):
                 if "valueType" in config_item:
