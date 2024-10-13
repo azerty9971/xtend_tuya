@@ -21,10 +21,11 @@ from ..const import (
 from .shared.import_stub import (
     MultiManager,
     XTConfigEntry,
+    XTDevice,
 )
 
 from .shared.device import (
-    XTDevice
+    XTDevice  # noqa: F811
 )
 
 from .shared.shared_classes import (
