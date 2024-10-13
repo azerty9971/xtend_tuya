@@ -114,8 +114,3 @@ try:
     import custom_components.tuya as tuya_integration # type: ignore
 except ImportError:
     import homeassistant.components.tuya as tuya_integration  # noqa: F401
-
-try:
-    import custom_components.tuya.const as tuya_const # type: ignore
-except ImportError:
-    import homeassistant.components.tuya.const as tuya_const  # noqa: F401
