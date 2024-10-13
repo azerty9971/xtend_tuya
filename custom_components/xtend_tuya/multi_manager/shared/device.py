@@ -14,9 +14,9 @@ class XTDeviceStatusRange:
 @dataclass
 class XTDeviceFunction:
     code: str
+    type: str
     desc: str = None
     name: str = None
-    type: str
     values: dict[str, Any] = field(default_factory=dict)
 
 class XTDevice(SimpleNamespace):
