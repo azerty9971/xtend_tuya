@@ -29,6 +29,10 @@ from homeassistant.const import (
     UnitOfVolume,
 )
 
+from .multi_manager.ha_tuya_integration.tuya_integration_imports import (
+    tuya_const,
+)
+
 DOMAIN = "xtend_tuya"
 DOMAIN_ORIG = "tuya"
 LOGGER = logging.getLogger(__package__)
@@ -133,16 +137,7 @@ class WorkMode(StrEnum):
     SCENE = "scene"
     WHITE = "white"
 
-
-class DPType(StrEnum):
-    """Data point types."""
-
-    BOOLEAN = "Boolean"
-    ENUM = "Enum"
-    INTEGER = "Integer"
-    JSON = "Json"
-    RAW = "Raw"
-    STRING = "String"
+type DPType = tuya_const.DPType
 
 
 class DPCode(StrEnum):
