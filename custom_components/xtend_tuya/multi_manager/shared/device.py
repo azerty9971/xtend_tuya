@@ -104,7 +104,20 @@ class XTDevice(SimpleNamespace):
         return self.id == other.id
     
     def __repr__(self) -> str:
-        return f"Device {self.name}:\r\nfunctions: {self.function}\r\n\r\nstatus_ranges: {self.status_range}\r\n\r\nstatuses: {self.status}\r\n\r\nlocal_strategies: {self.local_strategy}"
+        function_str = "Functions:\r\n"
+        for function in self.function.values():
+            function_str += f"{function}\r\n"
+        status_range_str = "StatusRange:\r\n"
+        for status_range in self.status_range.values():
+            status_range_str += f"{status_range}\r\n"
+        status_str = "Status:\r\n"
+        for code in self.status:
+            status_str += f"{code}: {self.status[code]}\r\n"
+        local_strategy_str = "LocalStrategy:\r\n"
+        for dpId in self.local_strategy:
+            local_strategy_str += f"{dpId}\r\n{self.local_strategy[dpId]}\r\n"
+        
+        return f"Device {self.name}:\r\n{function_str}{status_range_str}{status_str}{local_strategy_str}"
 
     def from_compatible_device(device: Any):
         new_device = XTDevice(**(device.__dict__))
