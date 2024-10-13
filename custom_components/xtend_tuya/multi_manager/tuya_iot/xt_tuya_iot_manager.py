@@ -130,9 +130,9 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         for device_id in self.device_map:
             device = self.device_map[device_id]
             device_open_api = self.get_open_api_device(device)
-            self.multi_manager.device_watcher.report_message(device_id, f"About to merge {device_open_api} and {device}", device)
+            self.multi_manager.device_watcher.report_message(device_id, f"About to merge \r\n\r\n{device_open_api}\r\n\r\n and \r\n\r\n{device}\r\n\r\n", device)
             XTMergingManager.merge_devices(device, device_open_api)
-            self.multi_manager.device_watcher.report_message(device_id, f"Merging result {device}", device)
+            self.multi_manager.device_watcher.report_message(device_id, f"Merging result \r\n\r\n{device}\r\n\r\n", device)
             self.multi_manager.virtual_state_handler.apply_init_virtual_states(device)
 
     def on_message(self, msg: str):
