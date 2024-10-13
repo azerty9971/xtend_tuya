@@ -4,6 +4,7 @@ from typing import Any, Optional
 from types import SimpleNamespace
 from dataclasses import dataclass, field
 import copy
+import json
 
 @dataclass
 class XTDeviceStatusRange:
@@ -98,7 +99,7 @@ class XTDevice(SimpleNamespace):
         return self.id == other.id
     
     def __repr__(self) -> str:
-        return f"Device {self.name}:\r\nfunctions: {self.function}\r\n\r\nstatus_ranges: {self.status_range}\r\n\r\nstatuses: {self.status}\r\n\r\nlocal_strategies: {self.local_strategy}"
+        return f"Device {self.name}:\r\nfunctions: {json.dumps(self.function, indent=2)}\r\n\r\nstatus_ranges: {json.dumps(self.status_range, indent=2)}\r\n\r\nstatuses: {json.dumps(self.status, indent=2)}\r\n\r\nlocal_strategies: {json.dumps(self.local_strategy, indent=2)}"
 
     def from_compatible_device(device: Any):
         new_device = XTDevice(**(device.__dict__))
