@@ -24,7 +24,10 @@ from ..shared.device import (
 
 from ..shared.shared_classes import (
     XTDeviceStatusRange,
-    XTDeviceProperties,
+    XTDeviceFunction,
+)
+from ..shared.merging_manager import (
+    XTMergingManager,
 )
 
 from ..multi_manager import (
@@ -126,8 +129,10 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         super().update_device_function_cache(devIds)
         for device_id in self.device_map:
             device = self.device_map[device_id]
-            device_properties = self.get_device_properties(device)
-            device_properties.merge_in_device(device)
+            device_open_api = self.get_open_api_device(device)
+            self.multi_manager.device_watcher.report_message(device_id, f"About to merge {device_open_api} and {device}", device)
+            XTMergingManager.merge_devices(device, device_open_api)
+            self.multi_manager.device_watcher.report_message(device_id, f"Merging result {device}", device)
             self.multi_manager.virtual_state_handler.apply_init_virtual_states(device)
 
     def on_message(self, msg: str):
@@ -154,18 +159,18 @@ class XTIOTDeviceManager(TuyaDeviceManager):
             device_id = item["id"]
             self.device_map[device_id] = XTDevice(**item)
     
-    def get_device_properties(self, device: XTDevice) -> XTDeviceProperties | None:
-        device_properties = XTDeviceProperties()
-        device_properties.function = copy.deepcopy(device.function)
-        device_properties.status_range = copy.deepcopy(device.status_range)
-        device_properties.status = copy.deepcopy(device.status)
-        if (hasattr(device, "local_strategy")):
-            device_properties.local_strategy = copy.deepcopy(device.local_strategy)
+    def get_open_api_device(self, device: XTDevice) -> XTDevice | None:
+        device_properties = XTDevice()
+        #device_properties.function = copy.deepcopy(device.function)
+        #device_properties.status_range = copy.deepcopy(device.status_range)
+        #device_properties.status = copy.deepcopy(device.status)
+        #if (hasattr(device, "local_strategy")):
+        #    device_properties.local_strategy = copy.deepcopy(device.local_strategy)
         response = self.api.get(f"/v2.0/cloud/thing/{device.id}/shadow/properties")
         response2 = self.api.get(f"/v2.0/cloud/thing/{device.id}/model")
         if not response.get("success") or not response2.get("success"):
             LOGGER.warning(f"Response1: {response}")
-            LOGGER.warning(f"Response1: {response2}")
+            LOGGER.warning(f"Response2: {response2}")
             return
         
         if response2.get("success"):
@@ -239,10 +244,16 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                     and dp_id in device_properties.local_strategy
                     ):
                     code = dp_property["code"]
-                    if code not in device_properties.status_range and code not in device_properties.function :
-                        device_properties.status_range[code] = XTDeviceStatusRange(code=code, 
-                                                                                   type=device_properties.local_strategy[dp_id]["config_item"]["valueType"],
-                                                                                   values=device_properties.local_strategy[dp_id]["config_item"]["valueDesc"])
+                    if code not in device_properties.status_range and code not in device_properties.function:
+                        if ( "access_mode" in device_properties.local_strategy[dp_id] 
+                            and device_properties.local_strategy[dp_id]["access_mode"] in ("rw", "wr")):
+                            device_properties.function[code] = XTDeviceFunction(code=code, 
+                                                                                type=device_properties.local_strategy[dp_id]["config_item"]["valueType"],
+                                                                                values=device_properties.local_strategy[dp_id]["config_item"]["valueDesc"])
+                        else:
+                            device_properties.status_range[code] = XTDeviceStatusRange(code=code, 
+                                                                                    type=device_properties.local_strategy[dp_id]["config_item"]["valueType"],
+                                                                                    values=device_properties.local_strategy[dp_id]["config_item"]["valueDesc"])
                     if code not in device_properties.status:
                         device_properties.status[code] = dp_property.get("value",None)
         return device_properties

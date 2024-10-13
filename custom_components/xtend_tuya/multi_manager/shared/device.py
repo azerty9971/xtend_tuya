@@ -14,8 +14,8 @@ class XTDeviceStatusRange:
 @dataclass
 class XTDeviceFunction:
     code: str
-    desc: str
-    name: str
+    desc: str = None
+    name: str = None
     type: str
     values: dict[str, Any] = field(default_factory=dict)
 
@@ -58,6 +58,9 @@ class XTDevice(SimpleNamespace):
     def __eq__(self, other):
         """If devices are the same one."""
         return self.id == other.id
+    
+    def __repr__(self) -> str:
+        return f"Device {self.name}: functions: {self.function}, status_ranges: {self.status_range}, statuses: {self.status}, local_strategies: {self.local_strategy}"
 
     def from_compatible_device(device: Any):
         new_device = XTDevice(**(device.__dict__))
