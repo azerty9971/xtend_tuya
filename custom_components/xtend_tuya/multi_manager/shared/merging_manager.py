@@ -19,6 +19,7 @@ class XTMergingManager:
     def merge_devices(device1: XTDevice, device2: XTDevice):
         CloudFixes.apply_fixes(device1)
         CloudFixes.apply_fixes(device2)
+        XTMergingManager._align_api_usage(device1, device2)
         msg_queue: list[str] = []
         device1.status_range = XTMergingManager.smart_merge(device1.status_range, device2.status_range, msg_queue)
         device1.function = XTMergingManager.smart_merge(device1.function, device2.function, msg_queue)
@@ -46,6 +47,21 @@ class XTMergingManager:
             device2.set_up = device1.set_up
         elif device2.set_up:
             device1.set_up = device2.set_up
+
+    def _align_api_usage(device1: XTDevice, device2: XTDevice):
+        for dpId in device1.local_strategy:
+            if dpId in device2.local_strategy:
+                use_oapi1 = device1.local_strategy[dpId].get("use_open_api")
+                use_oapi2 = device2.local_strategy[dpId].get("use_open_api")
+                if not use_oapi1 or not use_oapi2:
+                    device1.local_strategy[dpId]["use_open_api"] = False
+                    device2.local_strategy[dpId]["use_open_api"] = False
+                prop_upd1 = device1.local_strategy[dpId].get("property_update")
+                prop_upd2 = device2.local_strategy[dpId].get("property_update")
+                if not prop_upd1 or not prop_upd2:
+                    device1.local_strategy[dpId]["property_update"] = False
+                    device2.local_strategy[dpId]["property_update"] = False
+            
 
     def _merge_status(device1: XTDevice, device2: XTDevice):
         XTMergingManager.smart_merge(device1.status, device2.status)
