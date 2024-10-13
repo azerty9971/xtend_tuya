@@ -40,7 +40,7 @@ class CloudFixes:
         for dpId in device.local_strategy:
             if config_item := device.local_strategy[dpId].get("config_item"):
                 if "valueType" in config_item:
-                    device.local_strategy[dpId]["valueType"] = TuyaEntity.determine_dptype(device.local_strategy[dpId]["valueType"])
+                    config_item["valueType"] = TuyaEntity.determine_dptype(config_item["valueType"])
 
     def _fix_incorrect_percentage_scale(device: XTDevice):
         for code in device.status_range:
