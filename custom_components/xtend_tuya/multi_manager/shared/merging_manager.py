@@ -269,10 +269,10 @@ class XTMergingManager:
             if left is not None:
                 return left
             return right
-        if not XTMergingManager._are_of_same_instance_of(left, right):
+        if type(left) is not type(right):
             LOGGER.warning(f"Merging tried to merge objects of different types: {type(left)} and {type(right)}, returning left")
             return left
-        if XTMergingManager._are_both_instances_of(left, right, dict):
+        if isinstance(left, dict):
             for key in left:
                 if key in right:
                     left[key] = XTMergingManager.smart_merge(left[key], right[key])
@@ -283,7 +283,7 @@ class XTMergingManager:
                 if key not in left:
                     left[key] = right[key]
             return left
-        elif XTMergingManager._are_both_instances_of(left, right, list):
+        elif isinstance(left, list):
             for key in left:
                 if key not in right:
                     right.append(key)
@@ -291,13 +291,13 @@ class XTMergingManager:
                 if key not in left:
                     left.append(key)
             return left
-        elif XTMergingManager._are_both_instances_of(left, right, tuple):
+        elif isinstance(left, tuple):
             left_list = list(left)
             right_list = list(right)
             return tuple(XTMergingManager.smart_merge(left_list, right_list))
-        elif XTMergingManager._are_both_instances_of(left, right, set):
+        elif isinstance(left, set):
             return left.update(right)
-        elif XTMergingManager._are_both_instances_of(left, right, str):
+        elif isinstance(left, str):
             #Strings could be strings or represent a json subtree
             try:
                 left_json = json.loads(left)
@@ -321,15 +321,4 @@ class XTMergingManager:
             if left != right:
                 LOGGER.warning(f"Merging {type(left)} that are different: |{left}| <=> |{right}|, using left")
             return left
-
-
-    def _are_of_same_instance_of(left: any, right: any) -> bool:
-        return type(left) is type(right)
-    
-    def _are_both_instances_of(left: any, right: any, type: any) -> bool:
-        type_left = type(left)
-        if type_left is not type(right):
-            return False
-        return type_left is type
-    
     
