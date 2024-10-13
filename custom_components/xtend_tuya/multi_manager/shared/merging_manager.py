@@ -5,6 +5,9 @@ import json
 from .device import (
     XTDevice
 )
+from .cloud_fix import (
+    CloudFixes,
+)
 
 from ...const import (
     LOGGER,  # noqa: F401
@@ -12,10 +15,16 @@ from ...const import (
 
 class XTMergingManager:
     def merge_devices(device1: XTDevice, device2: XTDevice):
-        XTMergingManager._merge_status(device1, device2)
-        XTMergingManager._merge_function(device1, device2)
-        XTMergingManager._merge_status_range(device1, device2)
-        XTMergingManager._merge_local_strategy(device1, device2)
+        CloudFixes.apply_fixes(device1)
+        CloudFixes.apply_fixes(device2)
+        device1.status_range = XTMergingManager.smart_merge(device1.status_range, device2.status_range)
+        device1.function = XTMergingManager.smart_merge(device1.function, device2.function)
+        device1.status = XTMergingManager.smart_merge(device1.status, device2.status)
+        device1.local_strategy = XTMergingManager.smart_merge(device1.local_strategy, device2.local_strategy)
+        #XTMergingManager._merge_status(device1, device2)
+        #XTMergingManager._merge_function(device1, device2)
+        #XTMergingManager._merge_status_range(device1, device2)
+        #XTMergingManager._merge_local_strategy(device1, device2)
 
         #Now link the references so that they point to the same structure in memory
         device2.status_range = device1.status_range
@@ -254,5 +263,73 @@ class XTMergingManager:
         for key in dict2:
             if key not in dict1:
                 dict1[key] = dict2[key]
+    
+    def smart_merge(left: any, right: any) -> any:
+        if left is None or right is None:
+            if left is not None:
+                return left
+            return right
+        if not XTMergingManager._are_of_same_instance_of(left, right):
+            LOGGER.warning(f"Merging tried to merge objects of different types: {type(left)} and {type(right)}, returning left")
+            return left
+        if XTMergingManager._are_both_instances_of(left, right, dict):
+            for key in left:
+                if key in right:
+                    left[key] = XTMergingManager.smart_merge(left[key], right[key])
+                    right[key] = left[key]
+                else:
+                    right[key] = left[key]
+            for key in right:
+                if key not in left:
+                    left[key] = right[key]
+            return left
+        elif XTMergingManager._are_both_instances_of(left, right, list):
+            for key in left:
+                if key not in right:
+                    right.append(key)
+            for key in right:
+                if key not in left:
+                    left.append(key)
+            return left
+        elif XTMergingManager._are_both_instances_of(left, right, tuple):
+            left_list = list(left)
+            right_list = list(right)
+            return tuple(XTMergingManager.smart_merge(left_list, right_list))
+        elif XTMergingManager._are_both_instances_of(left, right, set):
+            return left.update(right)
+        elif XTMergingManager._are_both_instances_of(left, right, str):
+            #Strings could be strings or represent a json subtree
+            try:
+                left_json = json.loads(left)
+            except Exception:
+                left_json = None
+            try:
+                right_json = json.loads(right)
+            except Exception:
+                right_json = None
+            if left_json is not None and right_json is not None:
+                return json.dumps(XTMergingManager.smart_merge(left_json, right_json))
+            elif left_json is not None:
+                return json.dumps(left_json)
+            elif right_json is not None:
+                return json.dumps(right_json)
+            else:
+                if left != right:
+                    LOGGER.warning(f"Merging string that are different: |{left}| <=> |{right}|, using left")
+                    return left
+        else:
+            if left != right:
+                LOGGER.warning(f"Merging {type(left)} that are different: |{left}| <=> |{right}|, using left")
+            return left
+
+
+    def _are_of_same_instance_of(left: any, right: any) -> bool:
+        return type(left) is type(right)
+    
+    def _are_both_instances_of(left: any, right: any, type: any) -> bool:
+        type_left = type(left)
+        if type_left is not type(right):
+            return False
+        return type_left is type
     
     

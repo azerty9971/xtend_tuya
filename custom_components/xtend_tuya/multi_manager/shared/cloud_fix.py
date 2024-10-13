@@ -8,12 +8,20 @@ from .device import (
 
 class CloudFixes:
     def apply_fixes(device: XTDevice):
+
         CloudFixes._fix_missing_local_strategy_enum_mapping_map(device)
         CloudFixes._fix_missing_scale_using_local_strategy(device)
         CloudFixes._fix_incorrect_percentage_scale(device)
         CloudFixes._fix_missing_range_values_using_local_strategy(device)
         CloudFixes._fix_missing_aliases_using_status_format(device)
         CloudFixes._remove_status_that_are_local_strategy_aliases(device)
+
+    def _unify_added_attributes(device: XTDevice):
+        for dpId in device.local_strategy:
+            if device.local_strategy[dpId].get("property_update") is None:
+                device.local_strategy[dpId]["property_update"] = False
+            if device.local_strategy[dpId].get("use_open_api") is None:
+                device.local_strategy[dpId]["use_open_api"] = False
 
     def _fix_incorrect_percentage_scale(device: XTDevice):
         for code in device.status_range:
@@ -124,6 +132,17 @@ class CloudFixes:
                                         new_range_list.append(new_range_value)
                                 status_range_values["range"] = new_range_list
                                 status_range.values = json.dumps(status_range_values)
+                        if function := device.function.get(status_code, None):
+                            if function_values := json.loads(function.values):
+                                function_range_dict: list = function_values.get("range")
+                                new_range_list: list = []
+                                for new_range_value in valueDescr_range:
+                                    new_range_list.append(new_range_value)
+                                for new_range_value in function_range_dict:
+                                    if new_range_value not in new_range_list:
+                                        new_range_list.append(new_range_value)
+                                function_values["range"] = new_range_list
+                                function.values = json.dumps(function_values)
 
 
     def _fix_missing_aliases_using_status_format(device: XTDevice):
