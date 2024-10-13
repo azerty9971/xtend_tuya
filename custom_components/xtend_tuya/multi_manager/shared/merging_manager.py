@@ -3,7 +3,9 @@ from __future__ import annotations
 import json
 
 from .device import (
-    XTDevice
+    XTDevice,
+    XTDeviceStatusRange,
+    XTDeviceFunction,
 )
 from .cloud_fix import (
     CloudFixes,
@@ -17,10 +19,15 @@ class XTMergingManager:
     def merge_devices(device1: XTDevice, device2: XTDevice):
         CloudFixes.apply_fixes(device1)
         CloudFixes.apply_fixes(device2)
-        device1.status_range = XTMergingManager.smart_merge(device1.status_range, device2.status_range)
-        device1.function = XTMergingManager.smart_merge(device1.function, device2.function)
-        device1.status = XTMergingManager.smart_merge(device1.status, device2.status)
-        device1.local_strategy = XTMergingManager.smart_merge(device1.local_strategy, device2.local_strategy)
+        msg_queue: list[str] = []
+        device1.status_range = XTMergingManager.smart_merge(device1.status_range, device2.status_range, msg_queue)
+        device1.function = XTMergingManager.smart_merge(device1.function, device2.function, msg_queue)
+        device1.status = XTMergingManager.smart_merge(device1.status, device2.status, msg_queue)
+        device1.local_strategy = XTMergingManager.smart_merge(device1.local_strategy, device2.local_strategy, msg_queue)
+        if msg_queue:
+            LOGGER.warning(f"Messages for merging of {device1} and {device2}:")
+            for msg in msg_queue:
+                LOGGER.warning(msg)
         #XTMergingManager._merge_status(device1, device2)
         #XTMergingManager._merge_function(device1, device2)
         #XTMergingManager._merge_status_range(device1, device2)
@@ -264,18 +271,30 @@ class XTMergingManager:
             if key not in dict1:
                 dict1[key] = dict2[key]
 
-    def smart_merge(left: any, right: any) -> any:
+    def smart_merge(left: any, right: any, msg_queue: list[str] = []) -> any:
         if left is None or right is None:
             if left is not None:
                 return left
             return right
         if type(left) is not type(right):
-            LOGGER.warning(f"Merging tried to merge objects of different types: {type(left)} and {type(right)}, returning left")
+            msg_queue.append(f"Merging tried to merge objects of different types: {type(left)} and {type(right)}, returning left")
             return left
-        if isinstance(left, dict):
+        if isinstance(left, XTDeviceStatusRange):
+            left.code = XTMergingManager.smart_merge(left.code, right.code, msg_queue)
+            left.type = XTMergingManager.smart_merge(left.type, right.type, msg_queue)
+            left.values = XTMergingManager.smart_merge(left.values, right.values, msg_queue)
+            return left
+        elif isinstance(left, XTDeviceFunction):
+            left.code = XTMergingManager.smart_merge(left.code, right.code, msg_queue)
+            left.type = XTMergingManager.smart_merge(left.type, right.type, msg_queue)
+            left.desc = XTMergingManager.smart_merge(left.desc, right.desc, msg_queue)
+            left.name = XTMergingManager.smart_merge(left.name, right.name, msg_queue)
+            left.values = XTMergingManager.smart_merge(left.values, right.values, msg_queue)
+            return left
+        elif isinstance(left, dict):
             for key in left:
                 if key in right:
-                    left[key] = XTMergingManager.smart_merge(left[key], right[key])
+                    left[key] = XTMergingManager.smart_merge(left[key], right[key], msg_queue)
                     right[key] = left[key]
                 else:
                     right[key] = left[key]
@@ -294,7 +313,7 @@ class XTMergingManager:
         elif isinstance(left, tuple):
             left_list = list(left)
             right_list = list(right)
-            return tuple(XTMergingManager.smart_merge(left_list, right_list))
+            return tuple(XTMergingManager.smart_merge(left_list, right_list, msg_queue))
         elif isinstance(left, set):
             return left.update(right)
         elif isinstance(left, str):
@@ -308,17 +327,17 @@ class XTMergingManager:
             except Exception:
                 right_json = None
             if left_json is not None and right_json is not None:
-                return json.dumps(XTMergingManager.smart_merge(left_json, right_json))
+                return json.dumps(XTMergingManager.smart_merge(left_json, right_json, msg_queue))
             elif left_json is not None:
                 return json.dumps(left_json)
             elif right_json is not None:
                 return json.dumps(right_json)
             else:
                 if left != right:
-                    LOGGER.warning(f"Merging string that are different: |{left}| <=> |{right}|, using left")
+                    msg_queue.append(f"Merging string that are different: |{left}| <=> |{right}|, using left")
                     return left
         else:
             if left != right:
-                LOGGER.warning(f"Merging {type(left)} that are different: |{left}| <=> |{right}|, using left")
+                msg_queue.append(f"Merging {type(left)} that are different: |{left}| <=> |{right}|, using left")
             return left
     
