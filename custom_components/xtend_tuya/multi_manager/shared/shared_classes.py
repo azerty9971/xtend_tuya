@@ -1,13 +1,7 @@
 from __future__ import annotations
-from typing import Any, NamedTuple
-from dataclasses import dataclass, field
+from typing import NamedTuple
 from homeassistant.config_entries import ConfigEntry
-from ...util import (
-    merge_iterables,
-)
 from .device import (
-    XTDeviceFunction,
-    XTDeviceStatusRange,
     XTDevice,
 )
 from ..multi_manager import (
