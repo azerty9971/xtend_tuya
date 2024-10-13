@@ -5,7 +5,6 @@ https://github.com/tuya/tuya-iot-python-sdk
 
 from __future__ import annotations
 import json
-import copy
 from tuya_iot import (
     TuyaDeviceManager,
     TuyaOpenAPI,
