@@ -12,7 +12,7 @@ class XTDeviceStatusRange:
     values: str
 
     def __repr__(self) -> str:
-        return f"Function(code={self.code}, type={self.type}, values={self.values})"
+        return f"StatusRange(code={self.code}, type={self.type}, values={self.values})"
 
     def from_compatible_status_range(status_range: Any):
         if hasattr(status_range, "code"):
