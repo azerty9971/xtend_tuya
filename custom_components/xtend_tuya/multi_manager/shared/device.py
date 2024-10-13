@@ -12,7 +12,19 @@ class XTDeviceStatusRange:
     values: str
 
     def from_compatible_status_range(status_range: Any):
-        return XTDeviceStatusRange(**(status_range.__dict__))
+        if hasattr(status_range, "code"):
+            code = status_range.code
+        else:
+            code = None
+        if hasattr(status_range, "type"):
+            type = status_range.type
+        else:
+            type = None
+        if hasattr(status_range, "values"):
+            values = status_range.values
+        else:
+            values = None
+        return XTDeviceStatusRange(code=code, type=type, values=values)
 
 @dataclass
 class XTDeviceFunction:
@@ -23,9 +35,27 @@ class XTDeviceFunction:
     values: dict[str, Any] = field(default_factory=dict)
     
     def from_compatible_function(function: Any):
-        new_function = XTDeviceFunction(**(function.__dict__))
-        new_function.values = function.values
-        return new_function
+        if hasattr(function, "code"):
+            code = function.code
+        else:
+            code = None
+        if hasattr(function, "type"):
+            type = function.type
+        else:
+            type = None
+        if hasattr(function, "values"):
+            values = function.values
+        else:
+            values = None
+        if hasattr(function, "desc"):
+            desc = function.desc
+        else:
+            desc = None
+        if hasattr(function, "name"):
+            name = function.name
+        else:
+            name = None
+        return XTDeviceFunction(code=code, type=type, desc=desc, name=name, values=values)
 
 class XTDevice(SimpleNamespace):
     id: str
