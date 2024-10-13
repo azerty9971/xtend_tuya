@@ -61,7 +61,40 @@ class XTMergingManager:
                 if not prop_upd1 or not prop_upd2:
                     device1.local_strategy[dpId]["property_update"] = False
                     device2.local_strategy[dpId]["property_update"] = False
-            
+    
+    def _align_DPTypes(device1: XTDevice, device2: XTDevice):
+        for key in device1.status_range:
+            if key in device2.status_range:
+                match CloudFixes.determine_most_plausible({"type": device1.status_range[key].type}, {"type": device2.status_range[key].type}, "type"):
+                    case 1:
+                        device2.status_range[key].type = device1.status_range[key].type
+                    case 2:
+                        device1.status_range[key].type = device2.status_range[key].type
+        for key in device1.function:
+            if key in device2.function:
+                match CloudFixes.determine_most_plausible({"type": device1.function[key].type}, {"type": device2.function[key].type}, "type"):
+                    case 1:
+                        device2.function[key].type = device1.function[key].type
+                    case 2:
+                        device1.function[key].type = device2.function[key].type
+        for dpId in device1.local_strategy:
+            if dpId in device2.local_strategy:
+                if config_item1 := device1.local_strategy[dpId].get("config_item"):
+                    if "valueType" not in config_item1:
+                        continue
+                else:
+                    continue
+                if config_item2 := device2.local_strategy[dpId].get("config_item"):
+                    if "valueType" not in config_item2:
+                        continue
+                else:
+                    continue
+                match CloudFixes.determine_most_plausible(config_item1, config_item2, "valueType"):
+                    case 1:
+                        config_item2["valueType"] = config_item1["valueType"]
+                    case 2:
+                        config_item1["valueType"] = config_item2["valueType"]
+                
 
     def _merge_status(device1: XTDevice, device2: XTDevice):
         XTMergingManager.smart_merge(device1.status, device2.status)
