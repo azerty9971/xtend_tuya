@@ -4,9 +4,6 @@ from typing import Any, Optional
 from types import SimpleNamespace
 from dataclasses import dataclass, field
 import copy
-from ...base import (
-    TuyaEntity,
-)
 
 @dataclass
 class XTDeviceStatusRange:
@@ -23,7 +20,7 @@ class XTDeviceStatusRange:
         else:
             code = None
         if hasattr(status_range, "type"):
-            type = TuyaEntity.determine_dptype(status_range.type)
+            type = status_range.type
         else:
             type = None
         if hasattr(status_range, "values"):
@@ -49,7 +46,7 @@ class XTDeviceFunction:
         else:
             code = None
         if hasattr(function, "type"):
-            type = TuyaEntity.determine_dptype(function.type)
+            type = function.type
         else:
             type = None
         if hasattr(function, "values"):
