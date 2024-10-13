@@ -7,6 +7,10 @@ from .device import (
     XTDeviceFunction,
     XTDeviceStatusRange,
 )
+from ...base import (
+    DPType,
+    TuyaEntity,
+)
 
 class CloudFixes:
     def apply_fixes(device: XTDevice):
@@ -74,9 +78,9 @@ class CloudFixes:
                     if code in device.status_range:
                         value1 = json.loads(valueDesc)
                         value2 = json.loads(device.status_range[code].values)
-                        match CloudFixes._determine_most_plausible(value1, value2, "scale"):
+                        match CloudFixes.determine_most_plausible(value1, value2, "scale"):
                             case None:
-                                match CloudFixes._determine_most_plausible(value1, value2, "min"):
+                                match CloudFixes.determine_most_plausible(value1, value2, "min"):
                                     case None:
                                         pass
                                     case 1:
@@ -86,9 +90,9 @@ class CloudFixes:
                     if code in device.function:
                         value1 = json.loads(valueDesc)
                         value2 = json.loads(device.function[code].values)
-                        match CloudFixes._determine_most_plausible(value1, value2, "scale"):
+                        match CloudFixes.determine_most_plausible(value1, value2, "scale"):
                             case None:
-                                match CloudFixes._determine_most_plausible(value1, value2, "min"):
+                                match CloudFixes.determine_most_plausible(value1, value2, "min"):
                                     case None:
                                         pass
                                     case 1:
@@ -96,13 +100,17 @@ class CloudFixes:
                             case 1:
                                 device.function[code].values = valueDesc
 
-    def _determine_most_plausible(value1: dict, value2: dict, key: str) -> int | None:
+    def determine_most_plausible(value1: dict, value2: dict, key: str) -> int | None:
         if key in value1 and key in value2:
             if value1[key] == value2[key]:
                 return None
             if not value1[key]:
                 return 2
             if not value2[key]:
+                return 1
+            if isinstance(value1[key], DPType) and value1[key] == DPType.RAW and TuyaEntity.determine_dptype(value2[key]) is not None:
+                return 2
+            if isinstance(value2[key], DPType) and value2[key] == DPType.RAW and TuyaEntity.determine_dptype(value1[key]) is not None:
                 return 1
             return None
 

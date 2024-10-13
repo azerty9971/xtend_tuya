@@ -12,10 +12,7 @@ from tuya_sharing.device import (
 
 from ...const import (
     LOGGER,  # noqa: F401
-    DPType,
 )
-
-from ...base import TuyaEntity
 
 from .xt_tuya_sharing_manager import (
     XTSharingDeviceManager,
