@@ -11,6 +11,9 @@ class XTDeviceStatusRange:
     type: str
     values: str
 
+    def from_compatible_status_range(status_range: Any):
+        return XTDeviceStatusRange(**(status_range.__dict__))
+
 @dataclass
 class XTDeviceFunction:
     code: str
@@ -18,6 +21,11 @@ class XTDeviceFunction:
     desc: str = None
     name: str = None
     values: dict[str, Any] = field(default_factory=dict)
+    
+    def from_compatible_function(function: Any):
+        new_function = XTDeviceFunction(**(function.__dict__))
+        new_function.values = function.values
+        return new_function
 
 class XTDevice(SimpleNamespace):
     id: str

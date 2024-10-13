@@ -263,7 +263,7 @@ class XTMergingManager:
         for key in dict2:
             if key not in dict1:
                 dict1[key] = dict2[key]
-    
+
     def smart_merge(left: any, right: any) -> any:
         if left is None or right is None:
             if left is not None:

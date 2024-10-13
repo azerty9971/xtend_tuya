@@ -113,17 +113,4 @@ class XTSharingDeviceRepository(DeviceRepository):
                 device.status_range[code].type   = value_type
                 device.status_range[code].values = loc_strat["valueDesc"]
 
-        #Sometimes the Type provided by Tuya is ill formed,
-        #Try to reformat it into the correct one
-        for status in device.status_range.values():
-            try:
-                DPType(status.type)
-            except ValueError:
-                status.type = TuyaEntity.determine_dptype(status.type)
-        for func in device.function.values():
-            try:
-                DPType(func.type)
-            except ValueError:
-                func.type = TuyaEntity.determine_dptype(func.type)
-
         self.multi_manager.virtual_state_handler.apply_init_virtual_states(device)

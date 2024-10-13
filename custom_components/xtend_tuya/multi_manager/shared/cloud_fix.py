@@ -4,11 +4,14 @@ import json
 
 from .device import (
     XTDevice,
+    XTDeviceFunction,
+    XTDeviceStatusRange,
 )
 
 class CloudFixes:
     def apply_fixes(device: XTDevice):
-
+        CloudFixes._unify_data_types(device)
+        CloudFixes._unify_added_attributes(device)
         CloudFixes._fix_missing_local_strategy_enum_mapping_map(device)
         CloudFixes._fix_missing_scale_using_local_strategy(device)
         CloudFixes._fix_incorrect_percentage_scale(device)
@@ -22,6 +25,14 @@ class CloudFixes:
                 device.local_strategy[dpId]["property_update"] = False
             if device.local_strategy[dpId].get("use_open_api") is None:
                 device.local_strategy[dpId]["use_open_api"] = False
+    
+    def _unify_data_types(device: XTDevice):
+        for key in device.status_range:
+            if not isinstance(device.status_range[key], XTDeviceStatusRange):
+                device.status_range[key] = XTDeviceStatusRange.from_compatible_status_range(device.status_range[key])
+        for key in device.function:
+            if not isinstance(device.function[key], XTDeviceFunction):
+                device.function[key] = XTDeviceFunction.from_compatible_function(device.function[key])
 
     def _fix_incorrect_percentage_scale(device: XTDevice):
         for code in device.status_range:
