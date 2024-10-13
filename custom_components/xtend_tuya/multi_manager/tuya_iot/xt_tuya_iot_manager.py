@@ -19,12 +19,10 @@ from ...const import (
 
 from ..shared.device import (
     XTDevice,
+    XTDeviceFunction,
+    XTDeviceStatusRange,
 )
 
-from ..shared.shared_classes import (
-    XTDeviceStatusRange,
-    XTDeviceFunction,
-)
 from ..shared.merging_manager import (
     XTMergingManager,
 )
