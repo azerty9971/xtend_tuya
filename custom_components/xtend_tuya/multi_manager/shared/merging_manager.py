@@ -21,6 +21,7 @@ class XTMergingManager:
         CloudFixes.apply_fixes(device2)
         XTMergingManager._align_DPTypes(device1, device2)
         XTMergingManager._align_api_usage(device1, device2)
+        XTMergingManager._prefer_non_default_value_convert(device1, device2)
         msg_queue: list[str] = []
         device1.status_range = XTMergingManager.smart_merge(device1.status_range, device2.status_range, msg_queue)
         device1.function = XTMergingManager.smart_merge(device1.function, device2.function, msg_queue)
@@ -95,7 +96,18 @@ class XTMergingManager:
                         config_item2["valueType"] = config_item1["valueType"]
                     case 2:
                         config_item1["valueType"] = config_item2["valueType"]
-                
+    
+    def _prefer_non_default_value_convert(device1: XTDevice, device2: XTDevice):
+        for dpId in device1.local_strategy:
+            if dpId in device2.local_strategy:
+                valConv1 = device1.local_strategy[dpId].get("value_convert")
+                valConv2 = device2.local_strategy[dpId].get("value_convert")
+                if valConv1 != valConv2:
+                    if valConv1 == "default" or valConv1 is None:
+                        device1.local_strategy[dpId]["value_convert"] = device2.local_strategy[dpId]["value_convert"]
+                    else:
+                        device2.local_strategy[dpId]["value_convert"] = device1.local_strategy[dpId]["value_convert"]
+
 
     def _merge_status(device1: XTDevice, device2: XTDevice):
         XTMergingManager.smart_merge(device1.status, device2.status)
