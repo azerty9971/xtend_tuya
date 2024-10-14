@@ -7,6 +7,9 @@ from .device import (
     XTDeviceFunction,
     XTDeviceStatusRange,
 )
+from ...const import (
+    LOGGER,
+)
 from ...base import (
     DPType,
     TuyaEntity,
@@ -45,6 +48,8 @@ class CloudFixes:
                     config_item["valueType"] = TuyaEntity.determine_dptype(config_item["valueType"])
                     if code := device.local_strategy[dpId].get("status_code"):
                         if code in device.status_range:
+                            if config_item["valueType"] != device.status_range[code].type:
+                                LOGGER.warning(f"Trying to fix DPType: {CloudFixes.determine_most_plausible(config_item, {"valueType": device.status_range[code].type}, "valueType")}")
                             match CloudFixes.determine_most_plausible(config_item, {"valueType": device.status_range[code].type}, "valueType"):
                                 case 1:
                                     device.status_range[code].type = config_item["valueType"]
