@@ -19,6 +19,7 @@ class XTMergingManager:
     def merge_devices(device1: XTDevice, device2: XTDevice):
         CloudFixes.apply_fixes(device1)
         CloudFixes.apply_fixes(device2)
+        XTMergingManager._align_DPTypes(device1, device2)
         XTMergingManager._align_api_usage(device1, device2)
         msg_queue: list[str] = []
         device1.status_range = XTMergingManager.smart_merge(device1.status_range, device2.status_range, msg_queue)
