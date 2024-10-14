@@ -55,14 +55,26 @@ class XTMergingManager:
             if dpId in device2.local_strategy:
                 use_oapi1 = device1.local_strategy[dpId].get("use_open_api")
                 use_oapi2 = device2.local_strategy[dpId].get("use_open_api")
-                if not use_oapi1 or not use_oapi2:
-                    device1.local_strategy[dpId]["use_open_api"] = False
-                    device2.local_strategy[dpId]["use_open_api"] = False
                 prop_upd1 = device1.local_strategy[dpId].get("property_update")
                 prop_upd2 = device2.local_strategy[dpId].get("property_update")
-                if not prop_upd1 or not prop_upd2:
-                    device1.local_strategy[dpId]["property_update"] = False
-                    device2.local_strategy[dpId]["property_update"] = False
+                if not use_oapi1:
+                    prefer = 1
+                elif not use_oapi2:
+                    prefer = 2
+                elif not prop_upd1:
+                    prefer = 1
+                elif not prop_upd2:
+                    prefer = 2
+
+                match prefer:
+                    case 1:
+                        device2.local_strategy[dpId]["use_open_api"] = device1.local_strategy[dpId]["use_open_api"]
+                        device2.local_strategy[dpId]["property_update"] = device1.local_strategy[dpId]["property_update"]
+                        device2.local_strategy[dpId]["status_code"] = device1.local_strategy[dpId]["status_code"]
+                    case 2:
+                        device1.local_strategy[dpId]["use_open_api"] = device2.local_strategy[dpId]["use_open_api"]
+                        device1.local_strategy[dpId]["property_update"] = device2.local_strategy[dpId]["property_update"]
+                        device1.local_strategy[dpId]["status_code"] = device2.local_strategy[dpId]["status_code"]
     
     def _align_DPTypes(device1: XTDevice, device2: XTDevice):
         for key in device1.status_range:
