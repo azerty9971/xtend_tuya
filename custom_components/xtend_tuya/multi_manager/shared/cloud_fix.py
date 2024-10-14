@@ -76,7 +76,7 @@ class CloudFixes:
                 unit = value["unit"]
                 min = value["min"]
                 max = value["max"]
-                if unit not in ("%"):
+                if unit not in ["%"]:
                     continue
                 if max % 100 != 0:
                     continue
