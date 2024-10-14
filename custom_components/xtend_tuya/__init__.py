@@ -30,7 +30,7 @@ from .multi_manager.shared.services.services import (
 )
 
 # Suppress logs from the library, it logs unneeded on error
-logging.getLogger("tuya_sharing").setLevel(logging.CRITICAL)
+logging.getLogger("tuya_sharing").setLevel(logging.ERROR)
 
 async def update_listener(hass: HomeAssistant, entry: XTConfigEntry):
     """Handle options update."""
