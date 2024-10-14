@@ -38,14 +38,10 @@ class CloudFixes:
             if not isinstance(device.status_range[key], XTDeviceStatusRange):
                 device.status_range[key] = XTDeviceStatusRange.from_compatible_status_range(device.status_range[key])
             device.status_range[key].type = TuyaEntity.determine_dptype(device.status_range[key].type)
-            if key == "movement_detect_pic":
-                device.status_range[key].type = DPType.JSON
         for key in device.function:
             if not isinstance(device.function[key], XTDeviceFunction):
                 device.function[key] = XTDeviceFunction.from_compatible_function(device.function[key])
             device.function[key].type = TuyaEntity.determine_dptype(device.function[key].type)
-            if key == "movement_detect_pic":
-                device.function[key].type = DPType.JSON
         for dpId in device.local_strategy:
             if config_item := device.local_strategy[dpId].get("config_item"):
                 if "valueType" in config_item:
@@ -208,10 +204,12 @@ class CloudFixes:
             status_code = local_strategy.get("status_code", None)
             if config_item := local_strategy.get("config_item", None):
                 if status_formats := config_item.get("statusFormat", None):
-                    status_formats_dict = json.loads(status_formats)
+                    status_formats_dict: dict = json.loads(status_formats)
                     for status in status_formats_dict:
                         if status != status_code and status not in local_strategy["status_code_alias"]:
+                            status_formats_dict.pop(status)
                             local_strategy["status_code_alias"].append(status)
+                    config_item["statusFormat"] = json.dumps(status_formats_dict)
     
     def _remove_status_that_are_local_strategy_aliases(device: XTDevice):
         for local_strategy in device.local_strategy.values():
