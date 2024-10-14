@@ -367,7 +367,7 @@ class XTMergingManager:
                 return json.dumps(right_json)
             else:
                 if left != right:
-                    msg_queue.append(f"Merging string that are different: |{left}| <=> |{right}|, using left")
+                    msg_queue.append(f"Merging {type(left)} that are different: |{left}| <=> |{right}|, using left")
                 return left
         else:
             if left != right:
