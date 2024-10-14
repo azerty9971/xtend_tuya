@@ -47,7 +47,10 @@ class CloudFixes:
                 if "valueType" in config_item:
                     config_item["valueType"] = TuyaEntity.determine_dptype(config_item["valueType"])
                     if code := device.local_strategy[dpId].get("status_code"):
+                        second_pass = False
                         if code in device.status_range:
+                            if code == "initiative_message":
+                                device.status_range[code].type = DPType.JSON
                             match CloudFixes.determine_most_plausible(config_item, {"valueType": device.status_range[code].type}, "valueType"):
                                 case 1:
                                     device.status_range[code].type = config_item["valueType"]
@@ -59,6 +62,14 @@ class CloudFixes:
                                     device.function[code].type = config_item["valueType"]
                                 case 2:
                                     config_item["valueType"] = device.function[code].type
+                                    second_pass = True
+                        if second_pass:
+                            if code in device.status_range:
+                                match CloudFixes.determine_most_plausible(config_item, {"valueType": device.status_range[code].type}, "valueType"):
+                                    case 1:
+                                        device.status_range[code].type = config_item["valueType"]
+                                    case 2:
+                                        config_item["valueType"] = device.status_range[code].type
 
     def _fix_incorrect_percentage_scale(device: XTDevice):
         for code in device.status_range:
