@@ -38,10 +38,14 @@ class CloudFixes:
             if not isinstance(device.status_range[key], XTDeviceStatusRange):
                 device.status_range[key] = XTDeviceStatusRange.from_compatible_status_range(device.status_range[key])
             device.status_range[key].type = TuyaEntity.determine_dptype(device.status_range[key].type)
+            if key == "initiative_message":
+                device.status_range[key].type = DPType.JSON
         for key in device.function:
             if not isinstance(device.function[key], XTDeviceFunction):
                 device.function[key] = XTDeviceFunction.from_compatible_function(device.function[key])
             device.function[key].type = TuyaEntity.determine_dptype(device.function[key].type)
+            if key == "initiative_message":
+                device.function[key].type = DPType.JSON
         for dpId in device.local_strategy:
             if config_item := device.local_strategy[dpId].get("config_item"):
                 if "valueType" in config_item:
@@ -49,8 +53,6 @@ class CloudFixes:
                     if code := device.local_strategy[dpId].get("status_code"):
                         second_pass = False
                         if code in device.status_range:
-                            if code == "initiative_message":
-                                device.status_range[code].type = DPType.JSON
                             match CloudFixes.determine_most_plausible(config_item, {"valueType": device.status_range[code].type}, "valueType"):
                                 case 1:
                                     device.status_range[code].type = config_item["valueType"]
