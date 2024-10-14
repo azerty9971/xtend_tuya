@@ -130,9 +130,13 @@ class CloudFixes:
                 return 2
             if not value2[key]:
                 return 1
-            if isinstance(value1[key], DPType) and value1[key] == DPType.RAW and TuyaEntity.determine_dptype(value2[key]) is not None:
+            if value1[key] == DPType.RAW and TuyaEntity.determine_dptype(value2[key]) is not None and isinstance(value1[key], DPType):
                 return 2
-            if isinstance(value2[key], DPType) and value2[key] == DPType.RAW and TuyaEntity.determine_dptype(value1[key]) is not None:
+            if value2[key] == DPType.RAW and TuyaEntity.determine_dptype(value1[key]) is not None and isinstance(value2[key], DPType):
+                return 1
+            if value1[key] == DPType.STRING and value2[key] == DPType.JSON and isinstance(value1[key], DPType) and isinstance(value2[key], DPType):
+                return 2
+            if value2[key] == DPType.STRING and value1[key] == DPType.JSON and isinstance(value1[key], DPType) and isinstance(value2[key], DPType):
                 return 1
             return None
 
