@@ -112,11 +112,11 @@ def get_domain_device_map(hass: HomeAssistant, domain: str) -> dict[str, any]:
     return device_map
 
 def is_device_in_domain_device_maps(hass: HomeAssistant, domains: list[str], device_entry_identifiers: list[str]):
-    device_id = device_entry_identifiers[1]
     device_domain = device_entry_identifiers[0]
     if device_domain in domains:
         for domain in domains:
             device_map = get_domain_device_map(hass, domain)
+            device_id = device_entry_identifiers[1]
             if device_id in device_map:
                 return True
     else:
