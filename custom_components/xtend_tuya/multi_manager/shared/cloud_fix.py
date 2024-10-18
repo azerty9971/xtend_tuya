@@ -148,7 +148,7 @@ class CloudFixes:
                     config_item["valueDesc"] = correct_value
 
     def _align_valuedescr(device: XTDevice):
-        all_codes: dict[str, int] = []
+        all_codes: dict[str, int] = {}
         for code in device.status_range:
             if code not in all_codes:
                 all_codes[code] = 1
