@@ -27,13 +27,13 @@ class XTMergingManager:
         XTMergingManager._align_DPTypes(device1, device2)
         XTMergingManager._align_api_usage(device1, device2)
         XTMergingManager._prefer_non_default_value_convert(device1, device2)
-        XTMergingManager._align_maxlen(device1, device2)
+        XTMergingManager._align_valuedescr(device1, device2)
 
         #Finally, align and extend both devices
         msg_queue: list[str] = []
         device1.status_range = XTMergingManager.smart_merge(device1.status_range, device2.status_range, msg_queue, "status_range")
         device1.function = XTMergingManager.smart_merge(device1.function, device2.function, msg_queue, "function")
-        device1.status = XTMergingManager.smart_merge(device1.status, device2.status, msg_queue, "status")
+        device1.status = XTMergingManager.smart_merge(device1.status, device2.status, [], "status")
         device1.local_strategy = XTMergingManager.smart_merge(device1.local_strategy, device2.local_strategy, msg_queue, "local_strategy")
         if msg_queue:
             LOGGER.warning(f"Messages for merging of {device1} and {device2}:")
@@ -119,8 +119,43 @@ class XTMergingManager:
                                 config_item["valueDesc"] = json.dumps(new_descriptor)
                                 config_item2["valueDesc"] = config_item["valueDesc"]
 
-    def _align_maxlen(device1: XTDevice, device2: XTDevice):
-        pass
+    def _align_valuedescr(device1: XTDevice, device2: XTDevice):
+        for code in device1.status_range:
+            if code in device2.status_range and device1.status_range[code].values != device2.status_range[code].values:
+                value1 = json.loads(device1.status_range[code].values)
+                value2 = json.loads(device2.status_range[code].values)
+                computed_diff = CloudFixes.compute_aligned_valuedescr(value1, value2, None)
+                for code in computed_diff:
+                    value1[code] = computed_diff[code]
+                    value2[code] = computed_diff[code]
+                device1.status_range[code].values = json.dumps(value1)
+                device2.status_range[code].values = json.dumps(value2)
+        for code in device1.function:
+            if code in device2.function and device1.function[code].values != device2.function[code].values:
+                value1 = json.loads(device1.function[code].values)
+                value2 = json.loads(device2.function[code].values)
+                computed_diff = CloudFixes.compute_aligned_valuedescr(value1, value2, None)
+                for code in computed_diff:
+                    value1[code] = computed_diff[code]
+                    value2[code] = computed_diff[code]
+                device1.function[code].values = json.dumps(value1)
+                device2.function[code].values = json.dumps(value2)
+        for dp_id in device1.local_strategy:
+            if dp_id in device2.local_strategy:
+                config_item1 = device1.local_strategy[dp_id].get("config_item")
+                config_item2 = device2.local_strategy[dp_id].get("config_item")
+                if config_item1 is not None and config_item2 is not None:
+                    value_descr1 = config_item1.get("valueDesc")
+                    value_descr2 = config_item2.get("valueDesc")
+                    if value_descr1 is not None and value_descr2 is not None:
+                        value1 = json.loads(value_descr1)
+                        value2 = json.loads(value_descr2)
+                        computed_diff = CloudFixes.compute_aligned_valuedescr(value1, value2, None)
+                        for code in computed_diff:
+                            value1[code] = computed_diff[code]
+                            value2[code] = computed_diff[code]
+                        config_item1["valueDesc"] = json.dumps(value1)
+                        config_item2["valueDesc"] = json.dumps(value2)
 
     def _align_api_usage(device1: XTDevice, device2: XTDevice):
         for dpId in device1.local_strategy:
