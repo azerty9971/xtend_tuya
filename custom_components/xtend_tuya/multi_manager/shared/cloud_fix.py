@@ -205,6 +205,7 @@ class CloudFixes:
         if len(maxlen_list) > 1:
             maxlen_cur = maxlen_list[0]
             for maxlen in maxlen_list:
+                maxlen = int(maxlen)
                 if maxlen > maxlen_cur:
                     maxlen_cur = maxlen
             return_dict["maxlen"] = maxlen_cur
@@ -212,6 +213,7 @@ class CloudFixes:
         if len(min_list) > 1:
             min_cur = min_list[0]
             for min in min_list:
+                min = int(min)
                 if min < min_cur:
                     min_cur = min
             return_dict["min"] = min_cur
@@ -219,6 +221,7 @@ class CloudFixes:
         if len(max_list) > 1:
             max_cur = max_list[0]
             for max in max_list:
+                max = int(max)
                 if max > max_cur:
                     max_cur = max
             return_dict["max"] = max_cur
@@ -226,6 +229,7 @@ class CloudFixes:
         if len(scale_list) > 1:
             scale_cur = scale_list[0]
             for scale in scale_list:
+                scale = int(scale)
                 if scale > scale_cur:
                     scale_cur = scale
             return_dict["scale"] = scale_cur
@@ -233,6 +237,7 @@ class CloudFixes:
         if len(step_list) > 1:
             step_cur = step_list[0]
             for step in step_list:
+                step = int(step)
                 if step < step_cur:
                     step_cur = step
             return_dict["step"] = step_cur
