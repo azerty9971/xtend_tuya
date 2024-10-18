@@ -66,7 +66,7 @@ class XTMergingManager:
                 if value_dict.get("ErrorValue1"):
                     need_fixing = True
             except Exception:
-                LOGGER.debug(f"Found invalid value descriptor, attempting fix: |{device1.function[code].values}|")
+                LOGGER.debug(f"Found invalid value descriptor for device {device1}, attempting fix: |{device1.function[code].values}|")
                 need_fixing = True
             if need_fixing:
                 if code in device2.function:
