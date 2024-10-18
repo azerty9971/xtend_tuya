@@ -31,10 +31,10 @@ class XTMergingManager:
 
         #Finally, align and extend both devices
         msg_queue: list[str] = []
-        device1.status_range = XTMergingManager.smart_merge(device1.status_range, device2.status_range, msg_queue)
-        device1.function = XTMergingManager.smart_merge(device1.function, device2.function, msg_queue)
-        device1.status = XTMergingManager.smart_merge(device1.status, device2.status, msg_queue)
-        device1.local_strategy = XTMergingManager.smart_merge(device1.local_strategy, device2.local_strategy, msg_queue)
+        device1.status_range = XTMergingManager.smart_merge(device1.status_range, device2.status_range, msg_queue, "status_range")
+        device1.function = XTMergingManager.smart_merge(device1.function, device2.function, msg_queue, "function")
+        device1.status = XTMergingManager.smart_merge(device1.status, device2.status, msg_queue, "status")
+        device1.local_strategy = XTMergingManager.smart_merge(device1.local_strategy, device2.local_strategy, msg_queue, "local_strategy")
         if msg_queue:
             LOGGER.warning(f"Messages for merging of {device1} and {device2}:")
             for msg in msg_queue:
@@ -401,32 +401,32 @@ class XTMergingManager:
             if key not in dict1:
                 dict1[key] = dict2[key]
 
-    def smart_merge(left: any, right: any, msg_queue: list[str] = []) -> any:
+    def smart_merge(left: any, right: any, msg_queue: list[str] = [], path: str = "") -> any:
         if left is None or right is None:
             if left is not None:
                 return left
             return right
         if type(left) is not type(right):
-            msg_queue.append(f"Merging tried to merge objects of different types: {type(left)} and {type(right)}, returning left")
+            msg_queue.append(f"Merging tried to merge objects of different types: {type(left)} and {type(right)}, returning left ({path})")
             return left
         if isinstance(left, XTDeviceStatusRange):
-            left.code = XTMergingManager.smart_merge(left.code, right.code, msg_queue)
-            left.type = XTMergingManager.smart_merge(left.type, right.type, msg_queue)
-            left.values = XTMergingManager.smart_merge(left.values, right.values, msg_queue)
-            left.dp_id = XTMergingManager.smart_merge(left.dp_id, right.dp_id, msg_queue)
+            left.code = XTMergingManager.smart_merge(left.code, right.code, msg_queue, f"{path}.code")
+            left.type = XTMergingManager.smart_merge(left.type, right.type, msg_queue, f"{path}.type")
+            left.values = XTMergingManager.smart_merge(left.values, right.values, msg_queue, f"{path}.values")
+            left.dp_id = XTMergingManager.smart_merge(left.dp_id, right.dp_id, msg_queue, f"{path}.dp_id")
             return left
         elif isinstance(left, XTDeviceFunction):
-            left.code = XTMergingManager.smart_merge(left.code, right.code, msg_queue)
-            left.type = XTMergingManager.smart_merge(left.type, right.type, msg_queue)
-            left.desc = XTMergingManager.smart_merge(left.desc, right.desc, msg_queue)
-            left.name = XTMergingManager.smart_merge(left.name, right.name, msg_queue)
-            left.values = XTMergingManager.smart_merge(left.values, right.values, msg_queue)
-            left.dp_id = XTMergingManager.smart_merge(left.dp_id, right.dp_id, msg_queue)
+            left.code = XTMergingManager.smart_merge(left.code, right.code, msg_queue, f"{path}.code")
+            left.type = XTMergingManager.smart_merge(left.type, right.type, msg_queue, f"{path}.type")
+            left.desc = XTMergingManager.smart_merge(left.desc, right.desc, msg_queue, f"{path}.desc")
+            left.name = XTMergingManager.smart_merge(left.name, right.name, msg_queue, f"{path}.name")
+            left.values = XTMergingManager.smart_merge(left.values, right.values, msg_queue, f"{path}.values")
+            left.dp_id = XTMergingManager.smart_merge(left.dp_id, right.dp_id, msg_queue, f"{path}.dp_id")
             return left
         elif isinstance(left, dict):
             for key in left:
                 if key in right:
-                    left[key] = XTMergingManager.smart_merge(left[key], right[key], msg_queue)
+                    left[key] = XTMergingManager.smart_merge(left[key], right[key], msg_queue, f"{path}[{key}]")
                     right[key] = left[key]
                 else:
                     right[key] = left[key]
@@ -459,17 +459,17 @@ class XTMergingManager:
             except Exception:
                 right_json = None
             if left_json is not None and right_json is not None:
-                return json.dumps(XTMergingManager.smart_merge(left_json, right_json, msg_queue))
+                return json.dumps(XTMergingManager.smart_merge(left_json, right_json, msg_queue, f"{path}.@JS@"))
             elif left_json is not None:
                 return json.dumps(left_json)
             elif right_json is not None:
                 return json.dumps(right_json)
             else:
                 if left != right:
-                    msg_queue.append(f"Merging {type(left)} that are different: |{left}| <=> |{right}|, using left")
+                    msg_queue.append(f"Merging {type(left)} that are different: |{left}| <=> |{right}|, using left ({path})")
                 return left
         else:
             if left != right:
-                msg_queue.append(f"Merging {type(left)} that are different: |{left}| <=> |{right}|, using left")
+                msg_queue.append(f"Merging {type(left)} that are different: |{left}| <=> |{right}|, using left ({path})")
             return left
     
