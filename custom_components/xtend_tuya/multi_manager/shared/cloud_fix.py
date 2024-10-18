@@ -203,7 +203,7 @@ class CloudFixes:
         return_dict: dict = {}
         maxlen_list: list = CloudFixes._get_field_of_valuedescr(value1, value2, value3, "maxlen")
         if len(maxlen_list) > 1:
-            maxlen_cur = maxlen_list[0]
+            maxlen_cur = int(maxlen_list[0])
             for maxlen in maxlen_list:
                 maxlen = int(maxlen)
                 if maxlen > maxlen_cur:
@@ -211,7 +211,7 @@ class CloudFixes:
             return_dict["maxlen"] = maxlen_cur
         min_list: list = CloudFixes._get_field_of_valuedescr(value1, value2, value3, "min")
         if len(min_list) > 1:
-            min_cur = min_list[0]
+            min_cur = int(min_list[0])
             for min in min_list:
                 min = int(min)
                 if min < min_cur:
@@ -219,7 +219,7 @@ class CloudFixes:
             return_dict["min"] = min_cur
         max_list: list = CloudFixes._get_field_of_valuedescr(value1, value2, value3, "max")
         if len(max_list) > 1:
-            max_cur = max_list[0]
+            max_cur = int(max_list[0])
             for max in max_list:
                 max = int(max)
                 if max > max_cur:
@@ -227,7 +227,7 @@ class CloudFixes:
             return_dict["max"] = max_cur
         scale_list: list = CloudFixes._get_field_of_valuedescr(value1, value2, value3, "scale")
         if len(scale_list) > 1:
-            scale_cur = scale_list[0]
+            scale_cur = int(scale_list[0])
             for scale in scale_list:
                 scale = int(scale)
                 if scale > scale_cur:
@@ -235,7 +235,7 @@ class CloudFixes:
             return_dict["scale"] = scale_cur
         step_list: list = CloudFixes._get_field_of_valuedescr(value1, value2, value3, "step")
         if len(step_list) > 1:
-            step_cur = step_list[0]
+            step_cur = int(step_list[0])
             for step in step_list:
                 step = int(step)
                 if step < step_cur:
