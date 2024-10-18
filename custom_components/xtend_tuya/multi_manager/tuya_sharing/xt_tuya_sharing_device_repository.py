@@ -21,6 +21,10 @@ from .xt_tuya_sharing_manager import (
 from ..multi_manager import (
     MultiManager,
 )
+from ..shared.device import (
+    XTDeviceFunction,
+    XTDeviceStatusRange,
+)
 
 class XTSharingDeviceRepository(DeviceRepository):
     def __init__(self, customer_api: CustomerApi, manager: XTSharingDeviceManager, multi_manager: MultiManager):
@@ -30,6 +34,12 @@ class XTSharingDeviceRepository(DeviceRepository):
 
     def update_device_specification(self, device: CustomerDevice):
         super().update_device_specification(device)
+
+        #Now convert the status_range and function to XT format
+        for code in device.status_range:
+            device.status_range[code] = XTDeviceStatusRange.from_compatible_status_range(device.status_range[code])
+        for code in device.function:
+            device.function[code] = XTDeviceFunction.from_compatible_function(device.function[code])
 
     def query_devices_by_home(self, home_id: str) -> list[CustomerDevice]:
         response = self.api.get("/v1.0/m/life/ha/home/devices", {"homeId": home_id})

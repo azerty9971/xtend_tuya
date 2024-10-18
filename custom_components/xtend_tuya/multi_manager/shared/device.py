@@ -10,9 +10,10 @@ class XTDeviceStatusRange:
     code: str
     type: str
     values: str
+    dp_id: int = None
 
     def __repr__(self) -> str:
-        return f"StatusRange(code={self.code}, type={self.type}, values={self.values})"
+        return f"StatusRange(code={self.code}, type={self.type}, values={self.values}n dp_id={self.dp_id})"
 
     def from_compatible_status_range(status_range: Any):
         if hasattr(status_range, "code"):
@@ -27,7 +28,11 @@ class XTDeviceStatusRange:
             values = status_range.values
         else:
             values = None
-        return XTDeviceStatusRange(code=code, type=type, values=values)
+        if hasattr(status_range, "dp_id"):
+            dp_id = status_range.dp_id
+        else:
+            dp_id = None
+        return XTDeviceStatusRange(code=code, type=type, values=values, dp_id=dp_id)
 
 @dataclass
 class XTDeviceFunction:
@@ -36,9 +41,10 @@ class XTDeviceFunction:
     desc: str = None
     name: str = None
     values: dict[str, Any] = field(default_factory=dict)
+    dp_id: int = None
     
     def __repr__(self) -> str:
-        return f"Function(code={self.code}, type={self.type}, desc={self.desc}, name={self.name}, values={self.values})"
+        return f"Function(code={self.code}, type={self.type}, desc={self.desc}, name={self.name}, values={self.values}, dp_id={self.dp_id})"
 
     def from_compatible_function(function: Any):
         if hasattr(function, "code"):
@@ -61,7 +67,11 @@ class XTDeviceFunction:
             name = function.name
         else:
             name = None
-        return XTDeviceFunction(code=code, type=type, desc=desc, name=name, values=values)
+        if hasattr(function, "dp_id"):
+            dp_id = function.dp_id
+        else:
+            dp_id = None
+        return XTDeviceFunction(code=code, type=type, desc=desc, name=name, values=values, dp_id=dp_id)
 
 class XTDevice(SimpleNamespace):
     id: str

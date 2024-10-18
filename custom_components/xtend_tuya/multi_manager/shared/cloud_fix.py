@@ -19,6 +19,8 @@ class CloudFixes:
     def apply_fixes(device: XTDevice):
         CloudFixes._unify_data_types(device)
         CloudFixes._unify_added_attributes(device)
+        CloudFixes._map_dpid_to_codes(device)
+        CloudFixes._fix_incorrect_valuedescr(device)
         CloudFixes._fix_missing_local_strategy_enum_mapping_map(device)
         CloudFixes._fix_missing_scale_using_local_strategy(device)
         CloudFixes._fix_incorrect_percentage_scale(device)
@@ -68,6 +70,72 @@ class CloudFixes:
                                         device.status_range[code].type = config_item["valueType"]
                                     case 2:
                                         config_item["valueType"] = device.status_range[code].type
+    
+    def _map_dpid_to_codes(device: XTDevice):
+        for dpId in device.local_strategy:
+            if code := device.local_strategy[dpId].get("status_code"):
+                if code in device.function:
+                    device.function[code].dp_id = dpId
+                if code in device.status_range:
+                    device.status_range[code].dp_id = dpId
+            if code_alias := device.local_strategy[dpId].get("status_code_alias"):
+                for code in code_alias:
+                    if code in device.function:
+                        device.function[code].dp_id = dpId
+                    if code in device.status_range:
+                        device.status_range[code].dp_id = dpId
+
+    def _fix_incorrect_valuedescr(device: XTDevice):
+        all_codes: list[str] = []
+        for code in device.status_range:
+            if code not in all_codes:
+                all_codes.append(code)
+        for code in device.function:
+            if code not in all_codes:
+                all_codes.append(code)
+        for dp_item in device.local_strategy.values():
+            if code := dp_item.get("status_code"):
+                if code not in all_codes:
+                    all_codes.append(code)
+        for code in all_codes:
+            correct_value = None
+            dp_id = None
+            need_fixing = False
+            sr_need_fixing = False
+            fn_need_fixing = False
+            ls_need_fixing = False
+            try:
+                if code in device.status_range:
+                    dp_id = device.status_range[code].dp_id
+                    json.loads(device.status_range[code].values)
+                    correct_value = device.status_range[code].values
+            except Exception:
+                sr_need_fixing = True
+                need_fixing = True
+            try:
+                if code in device.function:
+                    dp_id = device.function[code].dp_id
+                    json.loads(device.function[code].values)
+                    correct_value = device.function[code].values
+            except Exception:
+                fn_need_fixing = True
+                need_fixing = True
+            if dp_id is not None:
+                try:
+                    if dp_item := device.local_strategy.get(dp_id):
+                        if config_item := dp_item.get("config_item"):
+                            if value_descr := config_item.get("valueDesc"):
+                                json.loads(value_descr)
+                except Exception:
+                    ls_need_fixing = True
+                    need_fixing = True
+            if need_fixing and correct_value is not None:
+                if sr_need_fixing:
+                    device.status_range[code].values = correct_value
+                if fn_need_fixing:
+                    device.function[code].values = correct_value
+                if ls_need_fixing:
+                    config_item["valueDesc"] = correct_value
 
     def _fix_incorrect_percentage_scale(device: XTDevice):
         for code in device.status_range:
