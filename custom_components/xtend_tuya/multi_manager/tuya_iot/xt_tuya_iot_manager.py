@@ -206,6 +206,10 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                                 "access_mode": access_mode,
                                 "status_code_alias": []
                             }
+                            if code in device_properties.status_range:
+                                device_properties.status_range[code].dp_id = dp_id
+                            if code in device_properties.function:
+                                device_properties.function[code].dp_id = dp_id
 
         if response.get("success"):
             result = response.get("result", {})
@@ -245,11 +249,13 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                             and device_properties.local_strategy[dp_id]["access_mode"] in ("rw", "wr")):
                             device_properties.function[code] = XTDeviceFunction(code=code, 
                                                                                 type=device_properties.local_strategy[dp_id]["config_item"]["valueType"],
-                                                                                values=device_properties.local_strategy[dp_id]["config_item"]["valueDesc"])
+                                                                                values=device_properties.local_strategy[dp_id]["config_item"]["valueDesc"],
+                                                                                dp_id=dp_id)
                         else:
                             device_properties.status_range[code] = XTDeviceStatusRange(code=code, 
                                                                                     type=device_properties.local_strategy[dp_id]["config_item"]["valueType"],
-                                                                                    values=device_properties.local_strategy[dp_id]["config_item"]["valueDesc"])
+                                                                                    values=device_properties.local_strategy[dp_id]["config_item"]["valueDesc"],
+                                                                                    dp_id=dp_id)
                     if code not in device_properties.status:
                         device_properties.status[code] = dp_property.get("value",None)
         return device_properties

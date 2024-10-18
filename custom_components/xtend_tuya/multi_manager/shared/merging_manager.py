@@ -17,11 +17,19 @@ from ...const import (
 
 class XTMergingManager:
     def merge_devices(device1: XTDevice, device2: XTDevice):
+        #Make both devices compliant
+        XTMergingManager._fix_incorrect_valuedescr(device1, device2)
+        XTMergingManager._fix_incorrect_valuedescr(device2, device1)
         CloudFixes.apply_fixes(device1)
         CloudFixes.apply_fixes(device2)
+
+        #Now decide between each device which on has "the truth" and set it in both
         XTMergingManager._align_DPTypes(device1, device2)
         XTMergingManager._align_api_usage(device1, device2)
         XTMergingManager._prefer_non_default_value_convert(device1, device2)
+        XTMergingManager._align_maxlen(device1, device2)
+
+        #Finally, align and extend both devices
         msg_queue: list[str] = []
         device1.status_range = XTMergingManager.smart_merge(device1.status_range, device2.status_range, msg_queue)
         device1.function = XTMergingManager.smart_merge(device1.function, device2.function, msg_queue)
@@ -49,6 +57,70 @@ class XTMergingManager:
             device2.set_up = device1.set_up
         elif device2.set_up:
             device1.set_up = device2.set_up
+
+    def _fix_incorrect_valuedescr(device1: XTDevice, device2: XTDevice):
+        for code in device1.function:
+            need_fixing = False
+            try:
+                value_dict: dict = json.loads(device1.function[code].values)
+                if value_dict.get("ErrorValue1"):
+                    need_fixing = True
+            except Exception:
+                LOGGER.debug(f"Found invalid value descriptor, attempting fix: |{device1.function[code].values}|")
+                need_fixing = True
+            if need_fixing:
+                if code in device2.function:
+                    try:
+                        json.loads(device2.function[code].values)
+                        device1.function[code].values = device2.function[code].values
+                    except Exception:
+                        LOGGER.debug("Fix unsuccessful, clearing values")
+                        new_descriptor: dict = {"ErrorValue1": device1.function[code].values, "ErrorValue2": device2.function[code].values}
+                        device1.function[code].values = json.dumps(new_descriptor)
+                        device2.function[code].values = device1.function[code].values
+        for code in device1.status_range:
+            need_fixing = False
+            try:
+                value_dict: dict = json.loads(device1.status_range[code].values)
+                if value_dict.get("ErrorValue1"):
+                    need_fixing = True
+            except Exception:
+                LOGGER.debug(f"Found invalid value descriptor, attempting fix: |{device1.status_range[code].values}|")
+                need_fixing = True
+            if need_fixing:
+                if code in device2.status_range:
+                    try:
+                        json.loads(device2.status_range[code].values)
+                        device1.status_range[code].values = device2.status_range[code].values
+                    except Exception:
+                        LOGGER.debug("Fix unsuccessful, clearing values")
+        for dpId in device1.local_strategy:
+            need_fixing = False
+            if config_item := device1.local_strategy[dpId].get("config_item"):
+                if value_descr := config_item.get("valueDesc"):
+                    try:
+                        json.loads(value_descr)
+                    except Exception:
+                        #This json is ill-formed, mark it for fixing
+                        LOGGER.debug(f"Found invalid value descriptor, attempting fix: |{value_descr}|")
+                        need_fixing = True
+            if need_fixing:
+                #Let's see if the same descriptor is better in the other device
+                if dpId in device2.local_strategy:
+                    if config_item2 := device1.local_strategy[dpId].get("config_item"):
+                        if value_descr2 := config_item2.get("valueDesc"):
+                            try:
+                                json.loads(value_descr)
+                                config_item["valueDesc"] = config_item2["valueDesc"]
+                                LOGGER.debug("Fix was successful")
+                            except Exception:
+                                LOGGER.debug("Fix unsuccessful, clearing values")
+                                new_descriptor: dict = {"ErrorValue1": value_descr, "ErrorValue2": value_descr2}
+                                config_item["valueDesc"] = json.dumps(new_descriptor)
+                                config_item2["valueDesc"] = config_item["valueDesc"]
+
+    def _align_maxlen(device1: XTDevice, device2: XTDevice):
+        pass
 
     def _align_api_usage(device1: XTDevice, device2: XTDevice):
         for dpId in device1.local_strategy:
@@ -341,6 +413,7 @@ class XTMergingManager:
             left.code = XTMergingManager.smart_merge(left.code, right.code, msg_queue)
             left.type = XTMergingManager.smart_merge(left.type, right.type, msg_queue)
             left.values = XTMergingManager.smart_merge(left.values, right.values, msg_queue)
+            left.values = XTMergingManager.smart_merge(left.dp_id, right.dp_id, msg_queue)
             return left
         elif isinstance(left, XTDeviceFunction):
             left.code = XTMergingManager.smart_merge(left.code, right.code, msg_queue)
@@ -348,6 +421,7 @@ class XTMergingManager:
             left.desc = XTMergingManager.smart_merge(left.desc, right.desc, msg_queue)
             left.name = XTMergingManager.smart_merge(left.name, right.name, msg_queue)
             left.values = XTMergingManager.smart_merge(left.values, right.values, msg_queue)
+            left.values = XTMergingManager.smart_merge(left.dp_id, right.dp_id, msg_queue)
             return left
         elif isinstance(left, dict):
             for key in left:
