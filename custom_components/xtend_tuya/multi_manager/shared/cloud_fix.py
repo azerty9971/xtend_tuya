@@ -126,9 +126,18 @@ class CloudFixes:
                         if config_item := dp_item.get("config_item"):
                             if value_descr := config_item.get("valueDesc"):
                                 json.loads(value_descr)
+                                correct_value = value_descr
                 except Exception:
                     ls_need_fixing = True
                     need_fixing = True
+            if need_fixing and correct_value is None:
+                LOGGER.warning("Could not fix incorrect valueDesc")
+                if sr_need_fixing:
+                    LOGGER.warning(f"StatusRange: |{device.status_range[code].values}|")
+                if fn_need_fixing:
+                    LOGGER.warning(f"Function: |{device.function[code].values}|")
+                if ls_need_fixing:
+                    LOGGER.warning(f"LocalStrategy: |{value_descr}|")
             if need_fixing and correct_value is not None:
                 if sr_need_fixing:
                     device.status_range[code].values = correct_value
