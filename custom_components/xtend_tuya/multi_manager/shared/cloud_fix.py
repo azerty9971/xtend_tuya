@@ -184,13 +184,13 @@ class CloudFixes:
                         if value_descr := config_item.get("valueDesc"):
                             ls_value = json.loads(value_descr)
             fix_dict = CloudFixes.compute_aligned_valuedescr(sr_value, fn_value, ls_value)
-            for code in fix_dict:
+            for fix_code in fix_dict:
                 if sr_value:
-                    sr_value[code] = fix_dict[code]
+                    sr_value[fix_code] = fix_dict[fix_code]
                 if fn_value:
-                    fn_value[code] = fix_dict[code]
+                    fn_value[fix_code] = fix_dict[fix_code]
                 if ls_value:
-                    ls_value[code] = fix_dict[code]
+                    ls_value[fix_code] = fix_dict[fix_code]
             if sr_value:
                 device.status_range[code].values = json.dumps(sr_value)
             if fn_value:
