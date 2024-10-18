@@ -21,6 +21,7 @@ class CloudFixes:
         CloudFixes._unify_added_attributes(device)
         CloudFixes._map_dpid_to_codes(device)
         CloudFixes._fix_incorrect_valuedescr(device)
+        CloudFixes._align_valuedescr(device)
         CloudFixes._fix_missing_local_strategy_enum_mapping_map(device)
         CloudFixes._fix_missing_scale_using_local_strategy(device)
         CloudFixes._fix_incorrect_percentage_scale(device)
@@ -145,6 +146,115 @@ class CloudFixes:
                     device.function[code].values = correct_value
                 if ls_need_fixing:
                     config_item["valueDesc"] = correct_value
+
+    def _align_valuedescr(device: XTDevice):
+        all_codes: dict[str, int] = []
+        for code in device.status_range:
+            if code not in all_codes:
+                all_codes[code] = 1
+            else:
+                all_codes[code] += 1
+        for code in device.function:
+            if code not in all_codes:
+                all_codes[code] = 1
+            else:
+                all_codes[code] += 1
+        for dp_item in device.local_strategy.values():
+            if code := dp_item.get("status_code"):
+                if code not in all_codes:
+                    all_codes[code] = 1
+                else:
+                    all_codes[code] += 1
+        for code in all_codes:
+            if all_codes[code] < 2:
+                continue
+            sr_value = None
+            fn_value = None
+            ls_value = None
+            dp_id = None
+            if code in device.status_range:
+                sr_value = json.loads(device.status_range[code].values)
+                dp_id = device.status_range[code].dp_id
+            if code in device.function:
+                fn_value = json.loads(device.function[code].values)
+                dp_id = device.function[code].dp_id
+            if dp_id is not None:
+                if dp_item := device.local_strategy.get(dp_id):
+                    if config_item := dp_item.get("config_item"):
+                        if value_descr := config_item.get("valueDesc"):
+                            ls_value = json.loads(value_descr)
+            fix_dict = CloudFixes.compute_aligned_valuedescr(sr_value, fn_value, ls_value)
+            for code in fix_dict:
+                if sr_value:
+                    sr_value[code] = fix_dict[code]
+                if fn_value:
+                    fn_value[code] = fix_dict[code]
+                if ls_value:
+                    ls_value[code] = fix_dict[code]
+            if sr_value:
+                device.status_range[code].values = json.dumps(sr_value)
+            if fn_value:
+                device.function[code].values = json.dumps(fn_value)
+            if ls_value:
+                config_item["valueDesc"] = json.dumps(ls_value)
+
+    
+    def compute_aligned_valuedescr(value1: dict, value2: dict, value3: dict) -> dict:
+        return_dict: dict = {}
+        maxlen_list: list = CloudFixes._get_field_of_valuedescr(value1, value2, value3, "maxlen")
+        if len(maxlen_list) > 1:
+            maxlen_cur = maxlen_list[0]
+            for maxlen in maxlen_list:
+                if maxlen > maxlen_cur:
+                    maxlen_cur = maxlen
+            return_dict["maxlen"] = maxlen_cur
+        min_list: list = CloudFixes._get_field_of_valuedescr(value1, value2, value3, "min")
+        if len(min_list) > 1:
+            min_cur = min_list[0]
+            for min in min_list:
+                if min < min_cur:
+                    min_cur = min
+            return_dict["min"] = min_cur
+        max_list: list = CloudFixes._get_field_of_valuedescr(value1, value2, value3, "max")
+        if len(max_list) > 1:
+            max_cur = max_list[0]
+            for max in max_list:
+                if max > max_cur:
+                    max_cur = max
+            return_dict["max"] = max_cur
+        scale_list: list = CloudFixes._get_field_of_valuedescr(value1, value2, value3, "scale")
+        if len(scale_list) > 1:
+            scale_cur = scale_list[0]
+            for scale in scale_list:
+                if scale > scale_cur:
+                    scale_cur = scale
+            return_dict["scale"] = scale_cur
+        step_list: list = CloudFixes._get_field_of_valuedescr(value1, value2, value3, "step")
+        if len(step_list) > 1:
+            step_cur = step_list[0]
+            for step in step_list:
+                if step < step_cur:
+                    step_cur = step
+            return_dict["step"] = step_cur
+        return return_dict
+            
+
+    def _get_field_of_valuedescr(value1: dict, value2: dict, value3: dict, field: str) -> list:
+        return_list: list = []
+        if value1:
+            if value := value1.get(field):
+                if value not in return_list:
+                    return_list.append(value)
+        if value2:
+            if value := value2.get(field):
+                if value not in return_list:
+                    return_list.append(value)
+        if value3:
+            if value := value3.get(field):
+                if value not in return_list:
+                    return_list.append(value)
+        return return_list
+        
 
     def _fix_incorrect_percentage_scale(device: XTDevice):
         for code in device.status_range:
