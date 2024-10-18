@@ -413,7 +413,7 @@ class XTMergingManager:
             left.code = XTMergingManager.smart_merge(left.code, right.code, msg_queue)
             left.type = XTMergingManager.smart_merge(left.type, right.type, msg_queue)
             left.values = XTMergingManager.smart_merge(left.values, right.values, msg_queue)
-            left.values = XTMergingManager.smart_merge(left.dp_id, right.dp_id, msg_queue)
+            left.dp_id = XTMergingManager.smart_merge(left.dp_id, right.dp_id, msg_queue)
             return left
         elif isinstance(left, XTDeviceFunction):
             left.code = XTMergingManager.smart_merge(left.code, right.code, msg_queue)
@@ -421,7 +421,7 @@ class XTMergingManager:
             left.desc = XTMergingManager.smart_merge(left.desc, right.desc, msg_queue)
             left.name = XTMergingManager.smart_merge(left.name, right.name, msg_queue)
             left.values = XTMergingManager.smart_merge(left.values, right.values, msg_queue)
-            left.values = XTMergingManager.smart_merge(left.dp_id, right.dp_id, msg_queue)
+            left.dp_id = XTMergingManager.smart_merge(left.dp_id, right.dp_id, msg_queue)
             return left
         elif isinstance(left, dict):
             for key in left:
