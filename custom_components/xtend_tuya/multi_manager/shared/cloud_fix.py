@@ -21,10 +21,9 @@ class CloudFixes:
         CloudFixes._unify_added_attributes(device)
         CloudFixes._map_dpid_to_codes(device)
         CloudFixes._fix_incorrect_valuedescr(device)
+        CloudFixes._fix_incorrect_percentage_scale(device)
         CloudFixes._align_valuedescr(device)
         CloudFixes._fix_missing_local_strategy_enum_mapping_map(device)
-        CloudFixes._fix_missing_scale_using_local_strategy(device)
-        CloudFixes._fix_incorrect_percentage_scale(device)
         CloudFixes._fix_missing_range_values_using_local_strategy(device)
         CloudFixes._fix_missing_aliases_using_status_format(device)
         CloudFixes._remove_status_that_are_local_strategy_aliases(device)
@@ -282,7 +281,7 @@ class CloudFixes:
                 unit = value["unit"]
                 min = value["min"]
                 max = value["max"]
-                if unit not in ("%"):
+                if unit not in ["%"]:
                     continue
                 if max % 100 != 0:
                     continue
@@ -290,38 +289,6 @@ class CloudFixes:
                     continue
                 value["scale"] = int(max / 100) - 1
                 device.function[code].values = json.dumps(value)
-    
-    def _fix_missing_scale_using_local_strategy(device: XTDevice):
-        for local_strategy in device.local_strategy.values():
-            if "status_code" not in local_strategy:
-                continue
-            code = local_strategy["status_code"]
-            if config_item := local_strategy.get("config_item", None):
-                if valueDesc := config_item.get("valueDesc", None):
-                    if code in device.status_range:
-                        value1 = json.loads(valueDesc)
-                        value2 = json.loads(device.status_range[code].values)
-                        match CloudFixes.determine_most_plausible(value1, value2, "scale"):
-                            case None:
-                                match CloudFixes.determine_most_plausible(value1, value2, "min"):
-                                    case None:
-                                        pass
-                                    case 1:
-                                        device.status_range[code].values = valueDesc
-                            case 1:
-                                device.status_range[code].values = valueDesc
-                    if code in device.function:
-                        value1 = json.loads(valueDesc)
-                        value2 = json.loads(device.function[code].values)
-                        match CloudFixes.determine_most_plausible(value1, value2, "scale"):
-                            case None:
-                                match CloudFixes.determine_most_plausible(value1, value2, "min"):
-                                    case None:
-                                        pass
-                                    case 1:
-                                        device.function[code].values = valueDesc
-                            case 1:
-                                device.function[code].values = valueDesc
 
     def determine_most_plausible(value1: dict, value2: dict, key: str) -> int | None:
         if key in value1 and key in value2:
