@@ -125,9 +125,9 @@ class XTMergingManager:
                 value1 = json.loads(device1.status_range[code].values)
                 value2 = json.loads(device2.status_range[code].values)
                 computed_diff = CloudFixes.compute_aligned_valuedescr(value1, value2, None)
-                for code in computed_diff:
-                    value1[code] = computed_diff[code]
-                    value2[code] = computed_diff[code]
+                for fix_code in computed_diff:
+                    value1[fix_code] = computed_diff[fix_code]
+                    value2[fix_code] = computed_diff[fix_code]
                 device1.status_range[code].values = json.dumps(value1)
                 device2.status_range[code].values = json.dumps(value2)
         for code in device1.function:
@@ -135,9 +135,9 @@ class XTMergingManager:
                 value1 = json.loads(device1.function[code].values)
                 value2 = json.loads(device2.function[code].values)
                 computed_diff = CloudFixes.compute_aligned_valuedescr(value1, value2, None)
-                for code in computed_diff:
-                    value1[code] = computed_diff[code]
-                    value2[code] = computed_diff[code]
+                for fix_code in computed_diff:
+                    value1[fix_code] = computed_diff[fix_code]
+                    value2[fix_code] = computed_diff[fix_code]
                 device1.function[code].values = json.dumps(value1)
                 device2.function[code].values = json.dumps(value2)
         for dp_id in device1.local_strategy:
@@ -151,9 +151,9 @@ class XTMergingManager:
                         value1 = json.loads(value_descr1)
                         value2 = json.loads(value_descr2)
                         computed_diff = CloudFixes.compute_aligned_valuedescr(value1, value2, None)
-                        for code in computed_diff:
-                            value1[code] = computed_diff[code]
-                            value2[code] = computed_diff[code]
+                        for fix_code in computed_diff:
+                            value1[fix_code] = computed_diff[fix_code]
+                            value2[fix_code] = computed_diff[fix_code]
                         config_item1["valueDesc"] = json.dumps(value1)
                         config_item2["valueDesc"] = json.dumps(value2)
 
