@@ -246,17 +246,17 @@ class CloudFixes:
     def _get_field_of_valuedescr(value1: dict, value2: dict, value3: dict, field: str) -> list:
         return_list: list = []
         if value1:
-            if value := value1.get(field):
-                if value not in return_list:
-                    return_list.append(value)
+            value = value1.get(field)
+            if value is not None and value not in return_list:
+                return_list.append(value)
         if value2:
-            if value := value2.get(field):
-                if value not in return_list:
-                    return_list.append(value)
+            value = value2.get(field)
+            if value is not None and value not in return_list:
+                return_list.append(value)
         if value3:
-            if value := value3.get(field):
-                if value not in return_list:
-                    return_list.append(value)
+            value = value3.get(field)
+            if value is not None and value not in return_list:
+                return_list.append(value)
         return return_list
         
 
