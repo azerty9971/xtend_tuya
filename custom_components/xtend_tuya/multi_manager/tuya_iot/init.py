@@ -139,13 +139,6 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
         new_device_ids: list[str] = [device_id for device_id in self.iot_account.device_manager.device_map]
         self.iot_account.device_ids.clear()
         self.iot_account.device_ids.extend(new_device_ids)
-
-        for device in self.iot_account.device_manager.device_map.values():
-            self.multi_manager.device_watcher.report_message(device.id, f"Update device cache {MESSAGE_SOURCE_TUYA_IOT}: status: {device.status}", device)
-            self.multi_manager.device_watcher.report_message(device.id, f"Update device cache {MESSAGE_SOURCE_TUYA_IOT}: status_range: {device.status_range}", device)
-            self.multi_manager.device_watcher.report_message(device.id, f"Update device cache {MESSAGE_SOURCE_TUYA_IOT}: function: {device.function}", device)
-            if hasattr(device, "local_strategy"):
-                self.multi_manager.device_watcher.report_message(device.id, f"Update device cache {MESSAGE_SOURCE_TUYA_IOT}: local_strategy: {device.local_strategy}", device)
     
     def get_available_device_maps(self) -> list[dict[str, XTDevice]]:
         return [self.iot_account.device_manager.device_map]

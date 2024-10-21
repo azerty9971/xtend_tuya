@@ -709,11 +709,7 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                hass_data.manager.device_watcher.report_message(device_id, f"Device found in map, statuses: {device.status}", device)
                 if descriptions := merged_descriptors.get(device.category):
-                    for description in descriptions:
-                        if description.key in device.status:
-                            hass_data.manager.device_watcher.report_message(device_id, f"Adding entity for : {description.key}", device)
                     entities.extend(
                         TuyaSensorEntity(device, hass_data.manager, description)
                         for description in descriptions
