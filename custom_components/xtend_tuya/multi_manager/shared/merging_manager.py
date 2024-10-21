@@ -189,20 +189,40 @@ class XTMergingManager:
     def _align_DPTypes(device1: XTDevice, device2: XTDevice):
         for key in device1.status_range:
             if key in device2.status_range:
-                match CloudFixes.determine_most_plausible({"type": device1.status_range[key].type}, {"type": device2.status_range[key].type}, "type"):
+                state_value = device1.status.get(key)
+                if state_value is None:
+                    state_value = device2.status.get(key)
+                match CloudFixes.determine_most_plausible({"type": device1.status_range[key].type}, {"type": device2.status_range[key].type}, "type", state_value):
                     case 1:
                         device2.status_range[key].type = device1.status_range[key].type
+                        device2.status_range[key].values = device1.status_range[key].values
                     case 2:
                         device1.status_range[key].type = device2.status_range[key].type
+                        device1.status_range[key].values = device2.status_range[key].values
         for key in device1.function:
             if key in device2.function:
-                match CloudFixes.determine_most_plausible({"type": device1.function[key].type}, {"type": device2.function[key].type}, "type"):
+                state_value = device1.status.get(key)
+                if state_value is None:
+                    state_value = device2.status.get(key)
+                match CloudFixes.determine_most_plausible({"type": device1.function[key].type}, {"type": device2.function[key].type}, "type", state_value):
                     case 1:
                         device2.function[key].type = device1.function[key].type
+                        device2.function[key].values = device1.function[key].values
                     case 2:
                         device1.function[key].type = device2.function[key].type
+                        device1.function[key].values = device2.function[key].values
         for dpId in device1.local_strategy:
             if dpId in device2.local_strategy:
+                state_value = None
+                if code := device1.local_strategy[dpId].get("status_code"):
+                    state_value = device1.status.get(code)
+                    if state_value is None:
+                        state_value = device2.status.get(code)
+                if state_value is None:
+                    if code := device2.local_strategy[dpId].get("status_code"):
+                        state_value = device1.status.get(code)
+                        if state_value is None:
+                            state_value = device2.status.get(code)
                 if config_item1 := device1.local_strategy[dpId].get("config_item"):
                     if "valueType" not in config_item1:
                         continue
@@ -213,11 +233,13 @@ class XTMergingManager:
                         continue
                 else:
                     continue
-                match CloudFixes.determine_most_plausible(config_item1, config_item2, "valueType"):
+                match CloudFixes.determine_most_plausible(config_item1, config_item2, "valueType", state_value):
                     case 1:
                         config_item2["valueType"] = config_item1["valueType"]
+                        config_item2["valueDesc"] = config_item1["valueDesc"]
                     case 2:
                         config_item1["valueType"] = config_item2["valueType"]
+                        config_item1["valueDesc"] = config_item2["valueDesc"]
     
     def _prefer_non_default_value_convert(device1: XTDevice, device2: XTDevice):
         for dpId in device1.local_strategy:
