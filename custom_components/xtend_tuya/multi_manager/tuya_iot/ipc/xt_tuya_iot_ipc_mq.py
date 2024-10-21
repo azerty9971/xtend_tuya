@@ -46,6 +46,8 @@ class XTIOTOpenMQIPC(XTIOTOpenMQ):
         super().__init__(api)
     
     def _get_mqtt_config(self) -> Optional[XTIOTIPCTuyaMQConfig]:
+        if self.api.token_info is None:
+            return None
         response = self.api.post(
             TO_C_CUSTOM_MQTT_CONFIG_API
             if (self.api.auth_type == AuthType.CUSTOM)
