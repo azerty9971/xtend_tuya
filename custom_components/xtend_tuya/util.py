@@ -159,5 +159,4 @@ def get_all_multi_managers(hass: HomeAssistant) -> list[MultiManager]:
     for config_entry in config_entries:
         if runtime_data := get_config_entry_runtime_data(hass, config_entry, DOMAIN):
             return_list.append(runtime_data.device_manager)
-    LOGGER.warning(f"Found MultiManagers: {return_list}")
     return return_list

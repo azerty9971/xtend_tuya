@@ -215,27 +215,28 @@ class XTIOTWebRTCManager:
                         if session.has_all_candidates:
                             break
                     time.sleep(sleep_step) #Wait for MQTT responses
-                payload = {
-                    "protocol":302,
-                    "pv":"2.2",
-                    "t":int(time.time()),
-                    "data":{
-                        "header":{
-                            "type":"candidate",
-                            "from":f"{self.ipc_manager.get_from()}",
-                            "to":f"{device_id}",
-                            "sub_dev_id":"",
-                            "sessionid":f"{session_id}",
-                            "moto_id":f"{moto_id}",
-                            "tid":""
+                if offer_candidates:
+                    payload = {
+                        "protocol":302,
+                        "pv":"2.2",
+                        "t":int(time.time()),
+                        "data":{
+                            "header":{
+                                "type":"candidate",
+                                "from":f"{self.ipc_manager.get_from()}",
+                                "to":f"{device_id}",
+                                "sub_dev_id":"",
+                                "sessionid":f"{session_id}",
+                                "moto_id":f"{moto_id}",
+                                "tid":""
+                            },
+                            "msg":{
+                                "mode":"webrtc",
+                                "candidate": ""
+                            }
                         },
-                        "msg":{
-                            "mode":"webrtc",
-                            "candidate": ""
-                        }
-                    },
-                }
-                self.ipc_manager.publish_to_ipc_mqtt(topic, json.dumps(payload))
+                    }
+                    self.ipc_manager.publish_to_ipc_mqtt(topic, json.dumps(payload))
                 if session := self.get_webrtc_session(session_id):
                     #Format SDP answer and send it back
                     sdp_answer: str = session.answer.get("sdp", "")
