@@ -267,13 +267,14 @@ class CloudFixes:
         
 
     def _fix_incorrect_percentage_scale(device: XTDevice):
+        supported_units: list = ["%"]
         for code in device.status_range:
             value = json.loads(device.status_range[code].values)
             if "unit" in value and "min" in value and "max" in value and "scale" in value:
                 unit = value["unit"]
                 min = value["min"]
                 max = value["max"]
-                if unit not in ["%"]:
+                if unit not in supported_units:
                     continue
                 if max % 100 != 0:
                     continue
@@ -287,7 +288,7 @@ class CloudFixes:
                 unit = value["unit"]
                 min = value["min"]
                 max = value["max"]
-                if unit not in ["%"]:
+                if unit not in supported_units:
                     continue
                 if max % 100 != 0:
                     continue
@@ -295,6 +296,22 @@ class CloudFixes:
                     continue
                 value["scale"] = int(max / 100) - 1
                 device.function[code].values = json.dumps(value)
+        for dpId in device.local_strategy:
+            if config_item := device.local_strategy[dpId].get("config_item"):
+                if value_descr := config_item.get("valueDesc"):
+                    value = json.loads(value_descr)
+                    if "unit" in value and "min" in value and "max" in value and "scale" in value:
+                        unit = value["unit"]
+                        min = value["min"]
+                        max = value["max"]
+                        if unit not in supported_units:
+                            continue
+                        if max % 100 != 0:
+                            continue
+                        if min not in (0, 1):
+                            continue
+                        value["scale"] = int(max / 100) - 1
+                        config_item["valueDesc"] = json.dumps(value)
 
     def determine_most_plausible(value1: dict, value2: dict, key: str, state_value: any = None) -> int | None:
         if key in value1 and key in value2:
