@@ -49,15 +49,16 @@ class CloudFixes:
                 if "valueType" in config_item:
                     config_item["valueType"] = TuyaEntity.determine_dptype(config_item["valueType"])
                     if code := device.local_strategy[dpId].get("status_code"):
+                        state_value = device.status.get(code)
                         second_pass = False
                         if code in device.status_range:
-                            match CloudFixes.determine_most_plausible(config_item, {"valueType": device.status_range[code].type}, "valueType"):
+                            match CloudFixes.determine_most_plausible(config_item, {"valueType": device.status_range[code].type}, "valueType", state_value):
                                 case 1:
                                     device.status_range[code].type = config_item["valueType"]
                                 case 2:
                                     config_item["valueType"] = device.status_range[code].type
                         if code in device.function:
-                            match CloudFixes.determine_most_plausible(config_item, {"valueType": device.function[code].type}, "valueType"):
+                            match CloudFixes.determine_most_plausible(config_item, {"valueType": device.function[code].type}, "valueType", state_value):
                                 case 1:
                                     device.function[code].type = config_item["valueType"]
                                 case 2:
@@ -65,7 +66,7 @@ class CloudFixes:
                                     second_pass = True
                         if second_pass:
                             if code in device.status_range:
-                                match CloudFixes.determine_most_plausible(config_item, {"valueType": device.status_range[code].type}, "valueType"):
+                                match CloudFixes.determine_most_plausible(config_item, {"valueType": device.status_range[code].type}, "valueType", state_value):
                                     case 1:
                                         device.status_range[code].type = config_item["valueType"]
                                     case 2:
@@ -290,7 +291,7 @@ class CloudFixes:
                 value["scale"] = int(max / 100) - 1
                 device.function[code].values = json.dumps(value)
 
-    def determine_most_plausible(value1: dict, value2: dict, key: str) -> int | None:
+    def determine_most_plausible(value1: dict, value2: dict, key: str, state_value: any = None) -> int | None:
         if key in value1 and key in value2:
             if value1[key] == value2[key]:
                 return None
@@ -306,6 +307,10 @@ class CloudFixes:
                 return 2
             if value2[key] == DPType.STRING and value1[key] == DPType.JSON and isinstance(value1[key], DPType) and isinstance(value2[key], DPType):
                 return 1
+            if value1[key] == DPType.BOOLEAN and state_value in ["True", "False", "true", "false"] and isinstance(value1[key], DPType):
+                return 1
+            if value2[key] == DPType.BOOLEAN and state_value in ["True", "False", "true", "false"] and isinstance(value2[key], DPType):
+                return 2
             return None
 
         elif key in value1:
