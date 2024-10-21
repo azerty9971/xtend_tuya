@@ -6,8 +6,6 @@ from contextlib import suppress
 import json
 from typing import Any, cast
 
-from tuya_sharing import CustomerDevice
-
 from homeassistant.components.diagnostics import REDACTED
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import device_registry as dr, entity_registry as er

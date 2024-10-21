@@ -1,12 +1,6 @@
 from __future__ import annotations
 
-from typing import Optional, Any
-import uuid
-import json
-from paho.mqtt import client as mqtt
-from urllib.parse import urlsplit
-
-import base64
+from typing import Optional
 
 from tuya_iot import (
     TuyaOpenMQ,
