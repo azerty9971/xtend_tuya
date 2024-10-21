@@ -312,9 +312,9 @@ class CloudFixes:
                 return 2
             if value2[key] == DPType.STRING and value1[key] == DPType.JSON and isinstance(value1[key], DPType) and isinstance(value2[key], DPType):
                 return 1
-            if value1[key] == DPType.BOOLEAN and state_value in ["True", "False", "true", "false"] and isinstance(value1[key], DPType):
+            if value1[key] == DPType.BOOLEAN and state_value in ["True", "False", "true", "false", True, False] and isinstance(value1[key], DPType):
                 return 1
-            if value2[key] == DPType.BOOLEAN and state_value in ["True", "False", "true", "false"] and isinstance(value2[key], DPType):
+            if value2[key] == DPType.BOOLEAN and state_value in ["True", "False", "true", "false", True, False] and isinstance(value2[key], DPType):
                 return 2
             return None
 
