@@ -46,7 +46,7 @@ class CloudFixes:
             device.function[key].type = TuyaEntity.determine_dptype(device.function[key].type)
         for dpId in device.local_strategy:
             if config_item := device.local_strategy[dpId].get("config_item"):
-                if "valueType" in config_item:
+                if "valueType" in config_item and "valueDesc" in config_item:
                     config_item["valueType"] = TuyaEntity.determine_dptype(config_item["valueType"])
                     if code := device.local_strategy[dpId].get("status_code"):
                         state_value = device.status.get(code)
@@ -55,23 +55,28 @@ class CloudFixes:
                             match CloudFixes.determine_most_plausible(config_item, {"valueType": device.status_range[code].type}, "valueType", state_value):
                                 case 1:
                                     device.status_range[code].type = config_item["valueType"]
+                                    device.status_range[code].values = config_item["valueDesc"]
                                 case 2:
                                     config_item["valueType"] = device.status_range[code].type
+                                    config_item["valueDesc"] = device.status_range[code].values
                         if code in device.function:
                             match CloudFixes.determine_most_plausible(config_item, {"valueType": device.function[code].type}, "valueType", state_value):
                                 case 1:
                                     device.function[code].type = config_item["valueType"]
+                                    device.function[code].values = config_item["valueDesc"]
                                 case 2:
                                     config_item["valueType"] = device.function[code].type
+                                    config_item["valueDesc"] = device.function[code].values
                                     second_pass = True
                         if second_pass:
                             if code in device.status_range:
                                 match CloudFixes.determine_most_plausible(config_item, {"valueType": device.status_range[code].type}, "valueType", state_value):
                                     case 1:
                                         device.status_range[code].type = config_item["valueType"]
+                                        device.status_range[code].values = config_item["valueDesc"]
                                     case 2:
                                         config_item["valueType"] = device.status_range[code].type
-    
+                                        config_item["valueDesc"] = device.status_range[code].values
     def _map_dpid_to_codes(device: XTDevice):
         for dpId in device.local_strategy:
             if code := device.local_strategy[dpId].get("status_code"):
