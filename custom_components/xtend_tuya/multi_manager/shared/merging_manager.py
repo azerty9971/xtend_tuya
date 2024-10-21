@@ -36,7 +36,7 @@ class XTMergingManager:
         msg_queue: list[str] = []
         device1.status_range = XTMergingManager.smart_merge(device1.status_range, device2.status_range, msg_queue, "status_range")
         device1.function = XTMergingManager.smart_merge(device1.function, device2.function, msg_queue, "function")
-        device1.status = XTMergingManager.smart_merge(device1.status, device2.status, [], "status")
+        device1.status = XTMergingManager.smart_merge(device1.status, device2.status, None, "status")
         device1.local_strategy = XTMergingManager.smart_merge(device1.local_strategy, device2.local_strategy, msg_queue, "local_strategy")
         if msg_queue:
             LOGGER.warning(f"Messages for merging of {device1_bak} and {device2_bak}:")
@@ -248,13 +248,14 @@ class XTMergingManager:
                     else:
                         device2.local_strategy[dpId]["value_convert"] = device1.local_strategy[dpId]["value_convert"]
 
-    def smart_merge(left: any, right: any, msg_queue: list[str] = [], path: str = "") -> any:
+    def smart_merge(left: any, right: any, msg_queue: list[str] | None = None, path: str = "") -> any:
         if left is None or right is None:
             if left is not None:
                 return left
             return right
         if type(left) is not type(right):
-            msg_queue.append(f"Merging tried to merge objects of different types: {type(left)} and {type(right)}, returning left ({path})")
+            if msg_queue is not None:
+                msg_queue.append(f"Merging tried to merge objects of different types: {type(left)} and {type(right)}, returning left ({path})")
             return left
         if isinstance(left, XTDeviceStatusRange):
             left.code = XTMergingManager.smart_merge(left.code, right.code, msg_queue, f"{path}.code")
@@ -312,11 +313,11 @@ class XTMergingManager:
             elif right_json is not None:
                 return json.dumps(right_json)
             else:
-                if left != right:
+                if left != right and msg_queue is not None:
                     msg_queue.append(f"Merging {type(left)} that are different: |{left}| <=> |{right}|, using left ({path})")
                 return left
         else:
-            if left != right:
+            if left != right and msg_queue is not None:
                 msg_queue.append(f"Merging {type(left)} that are different: |{left}| <=> |{right}|, using left ({path})")
             return left
     
