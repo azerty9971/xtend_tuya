@@ -227,6 +227,15 @@ class XTIOTOpenAPI:
 
     def is_connect(self) -> bool:
         """Is connect to tuya cloud."""
+        if (
+            self.token_info is None
+            and self.__username 
+            and self.__password
+            and self.__country_code
+        ):
+            self.connect(
+                self.__username, self.__password, self.__country_code, self.__schema
+            )
         return self.token_info is not None and len(self.token_info.access_token) > 0
 
     def __request(
