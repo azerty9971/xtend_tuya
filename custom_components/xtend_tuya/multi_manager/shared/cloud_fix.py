@@ -188,7 +188,7 @@ class CloudFixes:
                     if config_item := dp_item.get("config_item"):
                         if value_descr := config_item.get("valueDesc"):
                             ls_value = json.loads(value_descr)
-            fix_dict = CloudFixes.compute_aligned_valuedescr(sr_value, fn_value, ls_value)
+            fix_dict = CloudFixes.compute_aligned_valuedescr(ls_value, sr_value, fn_value)
             for fix_code in fix_dict:
                 if sr_value:
                     sr_value[fix_code] = fix_dict[fix_code]
@@ -246,6 +246,25 @@ class CloudFixes:
                 if step < step_cur:
                     step_cur = step
             return_dict["step"] = step_cur
+        range_list: list = CloudFixes._get_field_of_valuedescr(value1, value2, value3, "range")
+        if len(range_list) > 1:
+            range_ref:list = range_list[0]
+            for range in range_list[1:]:
+                #Determine if the range should be merged or not
+
+                #We should only add the range values if they overlap
+                new_item: int = 0
+                overlap_item: int = 0
+                for item in range:
+                    if item in range_ref:
+                        overlap_item += 1
+                    else:
+                        new_item += 1
+                if new_item > 0 and overlap_item > 1:
+                    for item in range:
+                        if item not in range_ref:
+                            range_ref.append(item)
+            return_dict["range"] = range_ref
         return return_dict
             
 
