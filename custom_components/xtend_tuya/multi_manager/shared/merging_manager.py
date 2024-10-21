@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import copy
 
 from .device import (
     XTDevice,
@@ -17,6 +18,8 @@ from ...const import (
 
 class XTMergingManager:
     def merge_devices(device1: XTDevice, device2: XTDevice):
+        device1_bak = copy.deepcopy(device1)
+        device2_bak = copy.deepcopy(device2)
         #Make both devices compliant
         XTMergingManager._fix_incorrect_valuedescr(device1, device2)
         XTMergingManager._fix_incorrect_valuedescr(device2, device1)
@@ -36,9 +39,9 @@ class XTMergingManager:
         device1.status = XTMergingManager.smart_merge(device1.status, device2.status, [], "status")
         device1.local_strategy = XTMergingManager.smart_merge(device1.local_strategy, device2.local_strategy, msg_queue, "local_strategy")
         if msg_queue:
-            LOGGER.warning(f"Messages for merging of {device1} and {device2}:")
+            LOGGER.debug(f"Messages for merging of {device1_bak} and {device2_bak}:")
             for msg in msg_queue:
-                LOGGER.warning(msg)
+                LOGGER.debug(msg)
         #XTMergingManager._merge_status(device1, device2)
         #XTMergingManager._merge_function(device1, device2)
         #XTMergingManager._merge_status_range(device1, device2)
