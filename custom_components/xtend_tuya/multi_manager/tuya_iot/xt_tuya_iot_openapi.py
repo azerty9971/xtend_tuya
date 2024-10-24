@@ -72,6 +72,7 @@ class XTIOTOpenAPI:
         self.access_id = access_id
         self.access_secret = access_secret
         self.lang = lang
+        self.connecting: bool = False
 
         self.auth_type = auth_type
         if self.auth_type == AuthType.CUSTOM:
@@ -195,7 +196,7 @@ class XTIOTOpenAPI:
         self.__password = password
         self.__country_code = country_code
         self.__schema = schema
-
+        self.connecting = True
         if self.auth_type == AuthType.CUSTOM:
             response = self.post(
                 TO_C_CUSTOM_TOKEN_API,
@@ -216,7 +217,7 @@ class XTIOTOpenAPI:
                     "schema": schema,
                 },
             )
-
+        self.connecting = False
         if not response["success"]:
             return response
 
@@ -227,6 +228,16 @@ class XTIOTOpenAPI:
 
     def is_connect(self) -> bool:
         """Is connect to tuya cloud."""
+        if (
+            self.token_info is None
+            and not self.connecting
+            and self.__username 
+            and self.__password
+            and self.__country_code
+        ):
+            self.connect(
+                self.__username, self.__password, self.__country_code, self.__schema
+            )
         return self.token_info is not None and len(self.token_info.access_token) > 0
 
     def __request(

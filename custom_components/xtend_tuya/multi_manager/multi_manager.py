@@ -21,10 +21,11 @@ from ..const import (
 from .shared.import_stub import (
     MultiManager,
     XTConfigEntry,
+    XTDevice,
 )
 
 from .shared.device import (
-    XTDevice
+    XTDevice  # noqa: F811
 )
 
 from .shared.shared_classes import (
@@ -137,9 +138,7 @@ class MultiManager:  # noqa: F811
             #let's convert them to XTDevice
             for device_map in manager.get_available_device_maps():
                 for device_id in device_map:
-                    self.device_watcher.report_message(device_id, f"Status before device conversion ({key}): {device_map[device_id].status}", device_map[device_id])
                     device_map[device_id] = manager.convert_to_xt_device(device_map[device_id])
-                    self.device_watcher.report_message(device_id, f"Status after device conversion ({key}): {device_map[device_id].status}", device_map[device_id])
         
         #Register all devices in the master device map
         self._update_master_device_map()
@@ -148,12 +147,8 @@ class MultiManager:  # noqa: F811
         #"All functionnality" device
         self._merge_devices_from_multiple_sources()
         for device in self.device_map.values():
-            self.device_watcher.report_message(device.id, f"Status before cloudfix: {device.status}", device)
             CloudFixes.apply_fixes(device)
-            self.device_watcher.report_message(device.id, f"Status after cloudfix: {device.status}", device)
         self._process_pending_messages()
-        for device in self.device_map.values():
-            self.device_watcher.report_message(device.id, f"Final device status: {device.status}", device)
 
     def _process_pending_messages(self):
         self.is_ready_for_messages = True

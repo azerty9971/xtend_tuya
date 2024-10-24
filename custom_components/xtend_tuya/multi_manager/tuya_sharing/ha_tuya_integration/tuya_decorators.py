@@ -6,7 +6,7 @@ from .config_entry_handler import (
     XTHATuyaIntegrationConfigEntryManager,
 )
 
-from .tuya_integration_imports import (
+from ...ha_tuya_integration.tuya_integration_imports import (
     tuya_integration
 )
 
