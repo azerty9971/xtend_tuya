@@ -27,6 +27,13 @@ from .const import TUYA_DISCOVERY_NEW, DPCode
 # default instruction set of each category end up being a Switch.
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
 SWITCHES: dict[str, tuple[SwitchEntityDescription, ...]] = {
+    "gyd": {
+        SwitchEntityDescription(
+            key=DPCode.SWITCH_PIR,
+            translation_key="switch_pir",
+            entity_category=EntityCategory.CONFIG,
+        ),
+    },
     "jtmspro": (
         SwitchEntityDescription(
             key=DPCode.AUTOMATIC_LOCK,

@@ -232,6 +232,15 @@
       }
     },
     "number": {
+      "standby_time": {
+        "name": "Standby time"
+      },
+      "standby_bright": {
+        "name": "Standby brightness"
+      },
+      "pir_delay": {
+        "name": "PIR delay"
+      },
       "timer_on": {
         "name": "Delayed power on"
       },
@@ -258,6 +267,9 @@
       },
       "breathdistance_min": {
         "name": "Micro-motion detection lower limit"
+      },
+      "countdown": {
+        "name": "Countdown"
       },
       "countdown_1": {
         "name": "Countdown 1"
@@ -420,6 +432,32 @@
       }
     },
     "select": {
+      "pir_sensitivity": {
+        "name": "PIR sensitivity",
+        "state": {
+          "low": "Low",
+          "middle": "Middle",
+          "high": "High"
+        }
+      },
+      "cds": {
+        "name": "Sensitivity",
+        "state": {
+          "2000lux": "2000lux",
+          "300lux": "300lux",
+          "50lux": "50lux",
+          "10lux": "10lux",
+          "5lux": "5lux",
+          "now": "now"
+      },
+      "device_mode": {
+        "name": "Device mode",
+        "state": {
+          "0": "Automatic",
+          "1": "Manual",
+          "auto": "Automatic",
+          "manual": "Manual"
+      },
       "qccdz_work_mode": {
         "name": "Work mode",
         "state": {
@@ -1368,6 +1406,10 @@
       }
     },
     "switch": {
+      "switch_pir":
+      {
+        "name": "Switch PIR"
+      },
       "photo_again":
       {
         "name": "Take another photo"
