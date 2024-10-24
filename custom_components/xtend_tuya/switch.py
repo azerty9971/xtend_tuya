@@ -10,19 +10,11 @@ from homeassistant.components.switch import (
     SwitchEntity,
     SwitchEntityDescription,
 )
-from homeassistant.const import EntityCategory
+from homeassistant.const import EntityCategory, Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-try:
-    from custom_components.tuya.switch import ( # type: ignore
-        SWITCHES as SWITCHES_TUYA
-    )
-except ImportError:
-    from homeassistant.components.tuya.switch import (
-        SWITCHES as SWITCHES_TUYA
-    )
 from .util import (
     merge_device_descriptors
 )
@@ -35,6 +27,13 @@ from .const import TUYA_DISCOVERY_NEW, DPCode
 # default instruction set of each category end up being a Switch.
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
 SWITCHES: dict[str, tuple[SwitchEntityDescription, ...]] = {
+    "gyd": {
+        SwitchEntityDescription(
+            key=DPCode.SWITCH_PIR,
+            translation_key="switch_pir",
+            entity_category=EntityCategory.CONFIG,
+        ),
+    },
     "jtmspro": (
         SwitchEntityDescription(
             key=DPCode.AUTOMATIC_LOCK,
@@ -42,19 +41,24 @@ SWITCHES: dict[str, tuple[SwitchEntityDescription, ...]] = {
             entity_category=EntityCategory.CONFIG,
         ),
         SwitchEntityDescription(
-            key=DPCode.RTC_TIME,
-            translation_key="rtc_time",
-            entity_category=EntityCategory.CONFIG,
-        ),
-        SwitchEntityDescription(
-            key=DPCode.MANUAL_LOCK,
-            translation_key="manual_lock",
-            entity_category=EntityCategory.CONFIG,
-        ),
-        SwitchEntityDescription(
             key=DPCode.ALARM_SWITCH,
             translation_key="alarm_switch",
             entity_category=EntityCategory.CONFIG,
+            entity_registry_enabled_default=False
+        ),
+    ),
+    "mk": (
+        SwitchEntityDescription(
+            key=DPCode.AUTOMATIC_LOCK,
+            translation_key="automatic_lock",
+            entity_category=EntityCategory.CONFIG,
+            entity_registry_enabled_default=False
+        ),
+        SwitchEntityDescription(
+            key=DPCode.PHOTO_AGAIN,
+            translation_key="photo_again",
+            entity_category=EntityCategory.CONFIG,
+            entity_registry_enabled_default=False
         ),
     ),
     # Automatic cat litter box
@@ -223,10 +227,24 @@ SWITCHES: dict[str, tuple[SwitchEntityDescription, ...]] = {
             entity_category=EntityCategory.CONFIG,
         ),
     ),
+    "qccdz": (
+        SwitchEntityDescription(
+            key=DPCode.SWITCH,
+            translation_key="switch",
+            entity_category=EntityCategory.CONFIG,
+        ),
+    ),
     "wnykq": (
         SwitchEntityDescription(
             key=DPCode.POWERON,
             translation_key="power",
+            entity_category=EntityCategory.CONFIG,
+        ),
+    ),
+    "xfj": (
+        SwitchEntityDescription(
+            key=DPCode.SWITCH,
+            translation_key="switch",
             entity_category=EntityCategory.CONFIG,
         ),
     ),
@@ -240,8 +258,8 @@ async def async_setup_entry(
     hass_data = entry.runtime_data
 
     merged_descriptors = SWITCHES
-    if not entry.runtime_data.multi_manager.reuse_config:
-        merged_descriptors = merge_device_descriptors(SWITCHES, SWITCHES_TUYA)
+    for new_descriptor in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(Platform.SWITCH):
+        merged_descriptors = merge_device_descriptors(merged_descriptors, new_descriptor)
 
     @callback
     def async_discover_device(device_map) -> None:

@@ -16,19 +16,12 @@ from homeassistant.const import (
     STATE_ALARM_ARMED_HOME,
     STATE_ALARM_DISARMED,
     STATE_ALARM_TRIGGERED,
+    Platform
 )
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-try:
-    from custom_components.tuya.alarm_control_panel import ( # type: ignore
-        ALARM as ALARM_TUYA
-    )
-except ImportError:
-    from homeassistant.components.tuya.alarm_control_panel import (
-        ALARM as ALARM_TUYA
-    )
 from .util import (
     merge_device_descriptors
 )
@@ -68,8 +61,8 @@ async def async_setup_entry(
     hass_data = entry.runtime_data
 
     merged_descriptors = ALARM
-    if not entry.runtime_data.multi_manager.reuse_config:
-        merged_descriptors = merge_device_descriptors(ALARM, ALARM_TUYA)
+    for new_descriptor in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(Platform.ALARM_CONTROL_PANEL):
+        merged_descriptors = merge_device_descriptors(merged_descriptors, new_descriptor)
 
     @callback
     def async_discover_device(device_map) -> None:

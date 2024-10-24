@@ -6,8 +6,6 @@ from contextlib import suppress
 import json
 from typing import Any, cast
 
-from tuya_sharing import CustomerDevice
-
 from homeassistant.components.diagnostics import REDACTED
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import device_registry as dr, entity_registry as er
@@ -16,6 +14,9 @@ from homeassistant.util import dt as dt_util
 
 from .multi_manager.multi_manager import XTConfigEntry
 from .const import DOMAIN, DPCode
+from .multi_manager.shared.device import (
+    XTDevice,
+)
 
 
 async def async_get_config_entry_diagnostics(
@@ -72,7 +73,7 @@ def _async_get_diagnostics(
 
 @callback
 def _async_device_as_dict(
-    hass: HomeAssistant, device: CustomerDevice
+    hass: HomeAssistant, device: XTDevice
 ) -> dict[str, Any]:
     """Represent a Tuya device as a dictionary."""
 
@@ -132,17 +133,19 @@ def _async_device_as_dict(
         with suppress(ValueError, TypeError, AttributeError):
             value = json.loads(cast(str, function.values))
 
-        property_update = False
+        property_update = None
+        access_mode = None
 
-        for dp_item in device.local_strategy.values():
-            if dp_item["status_code"] == function.code:
-                property_update = dp_item.get("property_update", False)
-                break
+        if dp_item := device.local_strategy.get(function.dp_id):
+            property_update = dp_item.get("property_update", False)
+            access_mode = dp_item.get("access_mode", None)
 
         data["function"][function.code] = {
             "type": function.type,
             "value": value,
             "property_update": property_update,
+            "accessMode": access_mode,
+            "dpId": function.dp_id,
         }
 
     # Gather Tuya status ranges
@@ -151,17 +154,19 @@ def _async_device_as_dict(
         with suppress(ValueError, TypeError, AttributeError):
             value = json.loads(status_range.values)
 
-        property_update = False
+        property_update = None
+        access_mode = None
 
-        for dp_item in device.local_strategy.values():
-            if dp_item["status_code"] == status_range.code:
-                property_update = dp_item.get("property_update", False)
-                break
+        if dp_item := device.local_strategy.get(status_range.dp_id):
+            property_update = dp_item.get("property_update", False)
+            access_mode = dp_item.get("access_mode", None)
 
         data["status_range"][status_range.code] = {
             "type": status_range.type,
             "value": value,
             "property_update": property_update,
+            "access_mode": access_mode,
+            "dpId": status_range.dp_id,
         }
 
     # Gather information how this Tuya device is represented in Home Assistant

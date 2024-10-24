@@ -13,19 +13,13 @@ from homeassistant.components.cover import (
     CoverEntity,
     CoverEntityDescription,
     CoverEntityFeature,
+    CoverDeviceClass,
 )
+from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-try:
-    from custom_components.tuya.cover import ( # type: ignore
-        COVERS as COVERS_TUYA
-    )
-except ImportError:
-    from homeassistant.components.tuya.cover import (
-        COVERS as COVERS_TUYA
-    )
 from .util import (
     merge_device_descriptors
 )
@@ -49,6 +43,52 @@ class TuyaCoverEntityDescription(CoverEntityDescription):
 
 
 COVERS: dict[str, tuple[TuyaCoverEntityDescription, ...]] = {
+    # Curtain
+    # Note: Multiple curtains isn't documented
+    # https://developer.tuya.com/en/docs/iot/categorycl?id=Kaiuz1hnpo7df
+    "cl": (
+        TuyaCoverEntityDescription(
+            key=DPCode.CONTROL,
+            translation_key="curtain",
+            current_state=DPCode.SITUATION_SET,
+            current_position=(DPCode.PERCENT_CONTROL, DPCode.PERCENT_STATE),
+            set_position=DPCode.PERCENT_CONTROL,
+            device_class=CoverDeviceClass.CURTAIN,
+        ),
+        TuyaCoverEntityDescription(
+            key=DPCode.CONTROL_2,
+            translation_key="curtain_2",
+            current_position=DPCode.PERCENT_STATE_2,
+            set_position=DPCode.PERCENT_CONTROL_2,
+            device_class=CoverDeviceClass.CURTAIN,
+        ),
+        TuyaCoverEntityDescription(
+            key=DPCode.CONTROL_3,
+            translation_key="curtain_3",
+            current_position=DPCode.PERCENT_STATE_3,
+            set_position=DPCode.PERCENT_CONTROL_3,
+            device_class=CoverDeviceClass.CURTAIN,
+        ),
+        TuyaCoverEntityDescription(
+            key=DPCode.MACH_OPERATE,
+            translation_key="curtain",
+            current_position=DPCode.POSITION,
+            set_position=DPCode.POSITION,
+            device_class=CoverDeviceClass.CURTAIN,
+            open_instruction_value="FZ",
+            close_instruction_value="ZZ",
+            stop_instruction_value="STOP",
+        ),
+        # switch_1 is an undocumented code that behaves identically to control
+        # It is used by the Kogan Smart Blinds Driver
+        TuyaCoverEntityDescription(
+            key=DPCode.SWITCH_1,
+            translation_key="blind",
+            current_position=DPCode.PERCENT_CONTROL,
+            set_position=DPCode.PERCENT_CONTROL,
+            device_class=CoverDeviceClass.BLIND,
+        ),
+    ),
 }
 
 
@@ -59,8 +99,8 @@ async def async_setup_entry(
     hass_data = entry.runtime_data
 
     merged_descriptors = COVERS
-    if not entry.runtime_data.multi_manager.reuse_config:
-        merged_descriptors = merge_device_descriptors(COVERS, COVERS_TUYA)
+    for new_descriptor in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(Platform.COVER):
+        merged_descriptors = merge_device_descriptors(merged_descriptors, new_descriptor)
 
     @callback
     def async_discover_device(device_map) -> None:

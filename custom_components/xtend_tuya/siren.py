@@ -11,18 +11,11 @@ from homeassistant.components.siren import (
     SirenEntityDescription,
     SirenEntityFeature,
 )
+from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-try:
-    from custom_components.tuya.siren import ( # type: ignore
-        SIRENS as SIRENS_TUYA
-    )
-except ImportError:
-    from homeassistant.components.tuya.siren import (
-        SIRENS as SIRENS_TUYA
-    )
 from .util import (
     merge_device_descriptors
 )
@@ -44,8 +37,8 @@ async def async_setup_entry(
     hass_data = entry.runtime_data
 
     merged_descriptors = SIRENS
-    if not entry.runtime_data.multi_manager.reuse_config:
-        merged_descriptors = merge_device_descriptors(SIRENS, SIRENS_TUYA)
+    for new_descriptor in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(Platform.SIREN):
+        merged_descriptors = merge_device_descriptors(merged_descriptors, new_descriptor)
 
     @callback
     def async_discover_device(device_map) -> None:
