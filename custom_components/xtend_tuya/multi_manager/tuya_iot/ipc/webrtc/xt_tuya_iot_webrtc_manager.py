@@ -129,7 +129,7 @@ class XTIOTWebRTCManager:
                             continue
                         if username is not None and password is not None:
                             #TURN server
-                            temp_str += " -T " + url.replace("turn:", "turn://").replace("turns:", "turns://").replace("://", f"://{username}:{password}@") + "?transport=udp"
+                            temp_str += " -T " + url.replace("turn:", "turn://").replace("turns:", "turns://").replace("://", f"://{username}:{password}@") + "?transport=tcp"
                             pass
                         else:
                             #STUN server
@@ -152,8 +152,9 @@ class XTIOTWebRTCManager:
                 offset = sdp_offer.find("a=candidate:")
                 if offset == -1:
                     candidate_found = False
+                    break
                 end_offset = sdp_offer.find(ENDLINE, offset) + len(ENDLINE)
-                if end_offset < offset:
+                if end_offset <= offset:
                     break
                 candidate_str = sdp_offer[offset:end_offset]
                 if candidate_str not in offer_candidates:
@@ -210,6 +211,12 @@ class XTIOTWebRTCManager:
                             },
                         }
                         self.ipc_manager.publish_to_ipc_mqtt(topic, json.dumps(payload))
+                for _ in range(sleep_count):
+                    if session := self.get_webrtc_session(session_id):
+                        if session.has_all_candidates:
+                            break
+                    time.sleep(sleep_step) #Wait for MQTT responses
+                if offer_candidates:
                     payload = {
                         "protocol":302,
                         "pv":"2.2",
@@ -230,14 +237,7 @@ class XTIOTWebRTCManager:
                             }
                         },
                     }
-                    #self.ipc_manager.publish_to_ipc_mqtt(topic, json.dumps(payload))
-                for _ in range(sleep_count):
-                    if session := self.get_webrtc_session(session_id):
-                        if session.has_all_candidates:
-                            break
-                        if session.answer.get("sdp"):
-                            break
-                    time.sleep(sleep_step) #Wait for MQTT responses
+                    self.ipc_manager.publish_to_ipc_mqtt(topic, json.dumps(payload))
                 if session := self.get_webrtc_session(session_id):
                     #Format SDP answer and send it back
                     sdp_answer: str = session.answer.get("sdp", "")

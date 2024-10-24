@@ -1,13 +1,7 @@
 from __future__ import annotations
-from typing import Any, NamedTuple
-from dataclasses import dataclass, field
+from typing import NamedTuple
 from homeassistant.config_entries import ConfigEntry
-from ...util import (
-    merge_iterables,
-)
 from .device import (
-    XTDeviceFunction,
-    XTDeviceStatusRange,
     XTDevice,
 )
 from ..multi_manager import (
@@ -40,21 +34,6 @@ class DeviceWatcher:
                 LOGGER.warning(f"DeviceWatcher for {device.name} ({dev_id}): {message}")
             else:
                 LOGGER.warning(f"DeviceWatcher for {dev_id}: {message}")
-
-@dataclass
-class XTDeviceProperties:
-    local_strategy: dict[int, dict[str, Any]] = field(default_factory=dict)
-    status: dict[str, Any] = field(default_factory=dict)
-    function: dict[str, XTDeviceFunction] = field(default_factory=dict)
-    status_range: dict[str, XTDeviceStatusRange] = field(default_factory=dict)
-    data_model: str = field(default_factory=str)
-
-    def merge_in_device(self, device: XTDevice):
-        merge_iterables(device.local_strategy, self.local_strategy)
-        merge_iterables(device.status, self.status)
-        merge_iterables(device.function, self.function)
-        merge_iterables(device.status_range, self.status_range)
-        device.data_model = self.data_model
 
 class HomeAssistantXTData(NamedTuple):
     """Tuya data stored in the Home Assistant data object."""

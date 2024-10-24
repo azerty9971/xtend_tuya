@@ -6,3 +6,6 @@ class HomeAssistantXTData:
 
 class XTConfigEntry:
     pass
+
+class XTDevice:
+    pass

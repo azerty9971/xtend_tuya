@@ -185,6 +185,7 @@ class DPCode(StrEnum):
     BASIC_WDR = "basic_wdr"
     BATTERY = "battery"  # Used by non-standard contact sensor implementations
     BATTERY_PERCENTAGE = "battery_percentage"  # Battery percentage
+    BATTERY_POWER = "battery_power"
     BATTERY_STATE = "battery_state"  # Battery state
     BATTERY_VALUE = "battery_value"  # Battery value
     BEEP = "beep"
@@ -209,6 +210,7 @@ class DPCode(StrEnum):
     CALIBRATION = "calibration"
     CAPACITY_CALIBRATION = "capacity_calibration"
     CAT_WEIGHT = "cat_weight"
+    CDS = "cds"
     CH2O_STATE = "ch2o_state"
     CH2O_VALUE = "ch2o_value"
     CH4_SENSOR_STATE = "ch4_sensor_state"
@@ -279,6 +281,7 @@ class DPCode(StrEnum):
     DEO_START_TIME = "deo_start_time"
     DEO_END_TIME = "deo_end_time"
     DETECTION_SENSITIVITY = "detection_sensitivity"
+    DEVICE_MODE = "device_mode"
     DISINFECTION = "disinfection"
     DO_NOT_DISTURB = "do_not_disturb"
     DOORBELL_VOLUME = "doorbell_volume"
@@ -398,7 +401,9 @@ class DPCode(StrEnum):
     PHOTO_AGAIN = "photo_again"
     PIR = "pir"  # Motion sensor
     PIR2 = "PIR"
+    PIR_DELAY = "pir_delay"
     PIR_RADAR = "PIR_RADAR"
+    PIR_SENSITIVITY = "pir_sensitivity"
     PM1 = "pm1"
     PM10 = "pm10"
     PM25 = "pm25"
@@ -466,6 +471,8 @@ class DPCode(StrEnum):
     SPECIAL_FUNCTION = "special_function"
     SPEED = "speed"  # Speed level
     SPRAY_MODE = "spray_mode"  # Spraying mode
+    STANDBY_BRIGHT = "standby_bright"
+    STANDBY_TIME = "standby_time"
     START = "start"  # Start
     STATUS = "status"
     STERILIZATION = "sterilization"  # Sterilization
@@ -492,6 +499,7 @@ class DPCode(StrEnum):
     SWITCH_LED_2 = "switch_led_2"
     SWITCH_LED_3 = "switch_led_3"
     SWITCH_NIGHT_LIGHT = "switch_night_light"
+    SWITCH_PIR = "switch_pir"
     SWITCH_SAVE_ENERGY = "switch_save_energy"
     SWITCH_SOUND = "switch_sound"  # Voice switch
     SWITCH_SPRAY = "switch_spray"  # Spraying switch

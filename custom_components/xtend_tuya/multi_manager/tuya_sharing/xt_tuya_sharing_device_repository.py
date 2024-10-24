@@ -12,10 +12,7 @@ from tuya_sharing.device import (
 
 from ...const import (
     LOGGER,  # noqa: F401
-    DPType,
 )
-
-from ...base import TuyaEntity
 
 from .xt_tuya_sharing_manager import (
     XTSharingDeviceManager,
@@ -23,6 +20,10 @@ from .xt_tuya_sharing_manager import (
 
 from ..multi_manager import (
     MultiManager,
+)
+from ..shared.device import (
+    XTDeviceFunction,
+    XTDeviceStatusRange,
 )
 
 class XTSharingDeviceRepository(DeviceRepository):
@@ -33,6 +34,12 @@ class XTSharingDeviceRepository(DeviceRepository):
 
     def update_device_specification(self, device: CustomerDevice):
         super().update_device_specification(device)
+
+        #Now convert the status_range and function to XT format
+        for code in device.status_range:
+            device.status_range[code] = XTDeviceStatusRange.from_compatible_status_range(device.status_range[code])
+        for code in device.function:
+            device.function[code] = XTDeviceFunction.from_compatible_function(device.function[code])
 
     def query_devices_by_home(self, home_id: str) -> list[CustomerDevice]:
         response = self.api.get("/v1.0/m/life/ha/home/devices", {"homeId": home_id})
@@ -59,7 +66,6 @@ class XTSharingDeviceRepository(DeviceRepository):
         device_id = device.id
         response = self.api.get(f"/v1.0/m/life/devices/{device_id}/status")
         support_local = True
-        self.multi_manager.device_watcher.report_message(device_id, f"_update_device_strategy_info_mod: {response}", device)
         if response.get("success"):
             result = response.get("result", {})
             pid = result["productKey"]
@@ -85,7 +91,6 @@ class XTSharingDeviceRepository(DeviceRepository):
             device.support_local = support_local
             #if support_local:                      #CHANGED
             device.local_strategy = dp_id_map       #CHANGED
-            self.multi_manager.device_watcher.report_message(device_id, f"Tuya Sharing local strat: {device.local_strategy}", device)
 
     def update_device_strategy_info(self, device: CustomerDevice):
         #super().update_device_strategy_info(device)
@@ -112,18 +117,5 @@ class XTSharingDeviceRepository(DeviceRepository):
                 device.status_range[code].code   = code
                 device.status_range[code].type   = value_type
                 device.status_range[code].values = loc_strat["valueDesc"]
-
-        #Sometimes the Type provided by Tuya is ill formed,
-        #Try to reformat it into the correct one
-        for status in device.status_range.values():
-            try:
-                DPType(status.type)
-            except ValueError:
-                status.type = TuyaEntity.determine_dptype(status.type)
-        for func in device.function.values():
-            try:
-                DPType(func.type)
-            except ValueError:
-                func.type = TuyaEntity.determine_dptype(func.type)
 
         self.multi_manager.virtual_state_handler.apply_init_virtual_states(device)
