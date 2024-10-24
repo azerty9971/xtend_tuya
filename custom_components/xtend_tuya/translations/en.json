@@ -436,7 +436,7 @@
         "name": "PIR sensitivity",
         "state": {
           "low": "Low",
-          "middle": "Middle",
+          "middle": "Medium",
           "high": "High"
         }
       },
