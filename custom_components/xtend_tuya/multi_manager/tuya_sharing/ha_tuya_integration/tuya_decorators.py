@@ -2,13 +2,13 @@ from __future__ import annotations
 
 import functools
 
-from ..multi_manager import (
-    MultiManager
+from .config_entry_handler import (
+    XTHATuyaIntegrationConfigEntryManager,
 )
-try:
-    import custom_components.tuya as tuya_integration # type: ignore
-except ImportError:
-    import homeassistant.components.tuya as tuya_integration
+
+from ...ha_tuya_integration.tuya_integration_imports import (
+    tuya_integration
+)
 
 from tuya_sharing import (
     Manager,
@@ -54,10 +54,10 @@ class XTDecorator:
         new_func = decorator.wrapper(func, callback)
         return decorator, new_func
 
-def decorate_tuya_manager(tuya_manager: Manager, multi_manager: MultiManager) -> list[XTDecorator]:
+def decorate_tuya_manager(tuya_manager: Manager, ha_tuya_integration_config_manager: XTHATuyaIntegrationConfigEntryManager) -> list[XTDecorator]:
     return_list : list[XTDecorator] = []
 
-    decorator, tuya_manager.refresh_mq  = XTDecorator.get_decorator(tuya_manager.refresh_mq, multi_manager.on_tuya_refresh_mq)
+    decorator, tuya_manager.refresh_mq  = XTDecorator.get_decorator(tuya_manager.refresh_mq, ha_tuya_integration_config_manager.on_tuya_refresh_mq)
     return_list.append(decorator)
 
     decorator, tuya_manager.on_message  = XTDecorator.get_decorator(tuya_manager.on_message, None)
@@ -65,15 +65,15 @@ def decorate_tuya_manager(tuya_manager: Manager, multi_manager: MultiManager) ->
 
     return return_list
 
-def decorate_tuya_integration(multi_manager: MultiManager) -> list[XTDecorator]:
+def decorate_tuya_integration(ha_tuya_integration_config_manager: XTHATuyaIntegrationConfigEntryManager) -> list[XTDecorator]:
     return_list : list[XTDecorator] = []
 
-    decorator, tuya_integration.async_setup_entry  = XTDecorator.get_async_decorator(tuya_integration.async_setup_entry, multi_manager.on_tuya_setup_entry)
+    decorator, tuya_integration.async_setup_entry  = XTDecorator.get_async_decorator(tuya_integration.async_setup_entry, ha_tuya_integration_config_manager.on_tuya_setup_entry)
     return_list.append(decorator)
 
-    decorator, tuya_integration.async_unload_entry  = XTDecorator.get_async_decorator(tuya_integration.async_unload_entry, multi_manager.on_tuya_unload_entry)
+    decorator, tuya_integration.async_unload_entry  = XTDecorator.get_async_decorator(tuya_integration.async_unload_entry, ha_tuya_integration_config_manager.on_tuya_unload_entry)
     return_list.append(decorator)
 
-    decorator, tuya_integration.async_remove_entry  = XTDecorator.get_async_decorator(tuya_integration.async_remove_entry, multi_manager.on_tuya_remove_entry)
+    decorator, tuya_integration.async_remove_entry  = XTDecorator.get_async_decorator(tuya_integration.async_remove_entry, ha_tuya_integration_config_manager.on_tuya_remove_entry)
     return_list.append(decorator)
     return return_list

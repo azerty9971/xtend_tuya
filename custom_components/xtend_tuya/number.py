@@ -8,19 +8,11 @@ from homeassistant.components.number import (
     NumberEntity,
     NumberEntityDescription,
 )
-from homeassistant.const import EntityCategory
+from homeassistant.const import EntityCategory, Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-try:
-    from custom_components.tuya.number import ( # type: ignore
-        NUMBERS as NUMBERS_TUYA
-    )
-except ImportError:
-    from homeassistant.components.tuya.number import (
-        NUMBERS as NUMBERS_TUYA
-    )
 from homeassistant.components.number.const import (
     NumberMode,
 )
@@ -32,14 +24,134 @@ from .multi_manager.multi_manager import XTConfigEntry
 from .base import IntegerTypeData, TuyaEntity
 from .const import DEVICE_CLASS_UNITS, DOMAIN, TUYA_DISCOVERY_NEW, DPCode, DPType
 
+COUNTDOWNS: tuple[NumberEntityDescription, ...] = (
+    NumberEntityDescription(
+        key=DPCode.COUNTDOWN_1,
+        translation_key="countdown_1",
+        entity_category=EntityCategory.CONFIG,
+    ),
+    NumberEntityDescription(
+        key=DPCode.COUNTDOWN_2,
+        translation_key="countdown_2",
+        entity_category=EntityCategory.CONFIG,
+    ),
+    NumberEntityDescription(
+        key=DPCode.COUNTDOWN_3,
+        translation_key="countdown_3",
+        entity_category=EntityCategory.CONFIG,
+    ),
+    NumberEntityDescription(
+        key=DPCode.COUNTDOWN_4,
+        translation_key="countdown_4",
+        entity_category=EntityCategory.CONFIG,
+    ),
+    NumberEntityDescription(
+        key=DPCode.COUNTDOWN_5,
+        translation_key="countdown_5",
+        entity_category=EntityCategory.CONFIG,
+    ),
+    NumberEntityDescription(
+        key=DPCode.COUNTDOWN_6,
+        translation_key="countdown_6",
+        entity_category=EntityCategory.CONFIG,
+    ),
+    NumberEntityDescription(
+        key=DPCode.COUNTDOWN_7,
+        translation_key="countdown_7",
+        entity_category=EntityCategory.CONFIG,
+    ),
+    NumberEntityDescription(
+        key=DPCode.COUNTDOWN_8,
+        translation_key="countdown_8",
+        entity_category=EntityCategory.CONFIG,
+    ),
+)
+
 # All descriptions can be found here. Mostly the Integer data types in the
 # default instructions set of each category end up being a number.
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
 NUMBERS: dict[str, tuple[NumberEntityDescription, ...]] = {
+    "gyd": (
+        NumberEntityDescription(
+            key=DPCode.COUNTDOWN,
+            translation_key="countdown",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        NumberEntityDescription(
+            key=DPCode.PIR_DELAY,
+            translation_key="pir_delay",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        NumberEntityDescription(
+            key=DPCode.STANDBY_TIME,
+            translation_key="standby_time",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        NumberEntityDescription(
+            key=DPCode.STANDBY_BRIGHT,
+            translation_key="standby_bright",
+            entity_category=EntityCategory.CONFIG,
+        ),
+    ),
     "jtmspro": (
         NumberEntityDescription(
             key=DPCode.AUTO_LOCK_TIME,
             translation_key="auto_lock_time",
+            entity_category=EntityCategory.CONFIG,
+        ),
+    ),
+    "kg": (
+        NumberEntityDescription(
+            key=DPCode.PRESENCE_DELAY,
+            translation_key="presence_delay",
+            mode = NumberMode.BOX,
+            entity_category=EntityCategory.CONFIG,
+        ),
+        NumberEntityDescription(
+            key=DPCode.MOVESENSITIVITY,
+            translation_key="movesensitivity",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        NumberEntityDescription(
+            key=DPCode.MOVEDISTANCE_MAX,
+            translation_key="movedistance_max",
+            mode = NumberMode.BOX,
+            entity_category=EntityCategory.CONFIG,
+        ),
+        NumberEntityDescription(
+            key=DPCode.MOVEDISTANCE_MIN,
+            translation_key="movedistance_min",
+            mode = NumberMode.BOX,
+            entity_category=EntityCategory.CONFIG,
+        ),
+        NumberEntityDescription(
+            key=DPCode.BREATHSENSITIVITY,
+            translation_key="breathsensitivity",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        NumberEntityDescription(
+            key=DPCode.BREATHDISTANCE_MAX,
+            translation_key="breathdistance_max",
+            mode = NumberMode.BOX,
+            entity_category=EntityCategory.CONFIG,
+        ),
+        NumberEntityDescription(
+            key=DPCode.BREATHDISTANCE_MIN,
+            translation_key="breathdistance_min",
+            mode = NumberMode.BOX,
+            entity_category=EntityCategory.CONFIG,
+        ),
+        *COUNTDOWNS,
+    ),
+    "mk": (
+        NumberEntityDescription(
+            key=DPCode.AUTO_LOCK_TIME,
+            translation_key="auto_lock_time",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        NumberEntityDescription(
+            key=DPCode.ALARM_TIME,
+            translation_key="alarm_time",
             entity_category=EntityCategory.CONFIG,
         ),
     ),
@@ -114,6 +226,18 @@ NUMBERS: dict[str, tuple[NumberEntityDescription, ...]] = {
             entity_category=EntityCategory.CONFIG,
         ),
     ),
+    "qccdz": (
+        NumberEntityDescription(
+            key=DPCode.CHARGE_CUR_SET,
+            translation_key="charge_cur_set",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        NumberEntityDescription(
+            key=DPCode.TIMER_ON,
+            translation_key="timer_on",
+            entity_category=EntityCategory.CONFIG,
+        ),
+    ),
     "wnykq": (
         NumberEntityDescription(
             key=DPCode.BRIGHT_VALUE,
@@ -169,8 +293,8 @@ async def async_setup_entry(
     hass_data = entry.runtime_data
 
     merged_descriptors = NUMBERS
-    if not entry.runtime_data.multi_manager.reuse_config:
-        merged_descriptors = merge_device_descriptors(NUMBERS, NUMBERS_TUYA)
+    for new_descriptor in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(Platform.NUMBER):
+        merged_descriptors = merge_device_descriptors(merged_descriptors, new_descriptor)
 
     @callback
     def async_discover_device(device_map) -> None:

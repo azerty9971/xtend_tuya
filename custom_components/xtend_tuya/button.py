@@ -7,19 +7,11 @@ from dataclasses import dataclass, field
 from tuya_sharing import CustomerDevice, Manager
 
 from homeassistant.components.button import ButtonEntity, ButtonEntityDescription
-from homeassistant.const import EntityCategory
+from homeassistant.const import EntityCategory, Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-try:
-    from custom_components.tuya.button import ( # type: ignore
-        BUTTONS as BUTTONS_TUYA
-    )
-except ImportError:
-    from homeassistant.components.tuya.button import (
-        BUTTONS as BUTTONS_TUYA
-    )
 from .util import (
     merge_device_descriptors
 )
@@ -46,8 +38,22 @@ CONSUMPTION_BUTTONS: tuple[TuyaButtonEntityDescription, ...] = (
 # All descriptions can be found here.
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
 BUTTONS: dict[str, tuple[TuyaButtonEntityDescription, ...]] = {
+    "jtmspro": (
+        TuyaButtonEntityDescription(
+            key=DPCode.MANUAL_LOCK,
+            translation_key="manual_lock",
+            entity_category=EntityCategory.CONFIG,
+        ),
+    ),
     "kg": (
         *CONSUMPTION_BUTTONS,
+    ),
+    "qccdz": (
+        TuyaButtonEntityDescription(
+            key=DPCode.CLEAR_ENERGY,
+            translation_key="clear_energy",
+            entity_category=EntityCategory.CONFIG,
+        ),
     ),
 }
 
@@ -65,8 +71,8 @@ async def async_setup_entry(
     hass_data = entry.runtime_data
 
     merged_descriptors = BUTTONS
-    if not entry.runtime_data.multi_manager.reuse_config:
-        merged_descriptors = merge_device_descriptors(BUTTONS, BUTTONS_TUYA)
+    for new_descriptor in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(Platform.BUTTON):
+        merged_descriptors = merge_device_descriptors(merged_descriptors, new_descriptor)
 
     @callback
     def async_discover_device(device_map) -> None:

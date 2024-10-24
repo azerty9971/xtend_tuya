@@ -5,19 +5,11 @@ from __future__ import annotations
 from tuya_sharing import CustomerDevice, Manager
 
 from homeassistant.components.select import SelectEntity, SelectEntityDescription
-from homeassistant.const import EntityCategory
+from homeassistant.const import EntityCategory, Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-try:
-    from custom_components.tuya.select import ( # type: ignore
-        SELECTS as SELECTS_TUYA
-    )
-except ImportError:
-    from homeassistant.components.tuya.select import (
-        SELECTS as SELECTS_TUYA
-    )
 from .util import (
     merge_device_descriptors
 )
@@ -30,6 +22,23 @@ from .const import TUYA_DISCOVERY_NEW, DPCode, DPType
 # default instructions set of each category end up being a select.
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
 SELECTS: dict[str, tuple[SelectEntityDescription, ...]] = {
+    "gyd": (
+        SelectEntityDescription(
+            key=DPCode.DEVICE_MODE,
+            translation_key="device_mode",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        SelectEntityDescription(
+            key=DPCode.CDS,
+            translation_key="cds",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        SelectEntityDescription(
+            key=DPCode.PIR_SENSITIVITY,
+            translation_key="pir_sensitivity",
+            entity_category=EntityCategory.CONFIG,
+        ),
+    ),
     "jtmspro": (
         SelectEntityDescription(
             key=DPCode.BEEP_VOLUME,
@@ -37,28 +46,22 @@ SELECTS: dict[str, tuple[SelectEntityDescription, ...]] = {
             entity_category=EntityCategory.CONFIG,
         ),
         SelectEntityDescription(
-            key=DPCode.SPECIAL_FUNCTION,
-            translation_key="special_function",
-            entity_category=EntityCategory.CONFIG,
-        ),
-        SelectEntityDescription(
             key=DPCode.ALARM_VOLUME,
             translation_key="alarm_volume",
             entity_category=EntityCategory.CONFIG,
+            entity_registry_enabled_default=False
         ),
         SelectEntityDescription(
             key=DPCode.SOUND_MODE,
             translation_key="sound_mode",
             entity_category=EntityCategory.CONFIG,
+            entity_registry_enabled_default=False
         ),
+    ),
+    "mk": (
         SelectEntityDescription(
-            key=DPCode.ALARM_LOCK,
-            translation_key="alarm_lock",
-            entity_category=EntityCategory.CONFIG,
-        ),
-        SelectEntityDescription(
-            key=DPCode.CLOSED_OPENED,
-            translation_key="close_opened",
+            key=DPCode.DOORBELL_VOLUME,
+            translation_key="doorbell_volume",
             entity_category=EntityCategory.CONFIG,
         ),
     ),
@@ -84,10 +87,24 @@ SELECTS: dict[str, tuple[SelectEntityDescription, ...]] = {
             entity_category=EntityCategory.CONFIG,
         ),
     ),
+    "ms_category": (
+        SelectEntityDescription(
+            key=DPCode.KEY_TONE,
+            translation_key="key_tone",
+            entity_category=EntityCategory.CONFIG,
+        ),
+    ),
     "mzj": (
         SelectEntityDescription(
             key=DPCode.TEMPCHANGER,
             translation_key="change_temp_unit",
+            entity_category=EntityCategory.CONFIG,
+        ),
+    ),
+    "qccdz": (
+        SelectEntityDescription(
+            key=DPCode.WORK_MODE,
+            translation_key="qccdz_work_mode",
             entity_category=EntityCategory.CONFIG,
         ),
     ),
@@ -101,8 +118,8 @@ async def async_setup_entry(
     hass_data = entry.runtime_data
 
     merged_descriptors = SELECTS
-    if not entry.runtime_data.multi_manager.reuse_config:
-        merged_descriptors = merge_device_descriptors(SELECTS, SELECTS_TUYA)
+    for new_descriptor in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(Platform.SELECT):
+        merged_descriptors = merge_device_descriptors(merged_descriptors, new_descriptor)
 
     @callback
     def async_discover_device(device_map) -> None:

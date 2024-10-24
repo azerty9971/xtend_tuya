@@ -4,14 +4,17 @@ from __future__ import annotations
 
 from typing import Any
 
-from tuya_sharing import Manager, SharingScene
+from tuya_sharing import SharingScene
 
 from homeassistant.components.scene import Scene
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .multi_manager.multi_manager import XTConfigEntry
+from .multi_manager.multi_manager import (
+    MultiManager,
+    XTConfigEntry,
+)
 from .const import DOMAIN
 
 
@@ -19,8 +22,6 @@ async def async_setup_entry(
     hass: HomeAssistant, entry: XTConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
     """Set up Tuya scenes."""
-    if entry.runtime_data.multi_manager.reuse_config:
-        return
     hass_data = entry.runtime_data
     scenes = await hass.async_add_executor_job(hass_data.manager.query_scenes)
     async_add_entities(TuyaSceneEntity(hass_data.manager, scene) for scene in scenes)
@@ -33,11 +34,11 @@ class TuyaSceneEntity(Scene):
     _attr_has_entity_name = True
     _attr_name = None
 
-    def __init__(self, home_manager: Manager, scene: SharingScene) -> None:
+    def __init__(self, multi_manager: MultiManager, scene: SharingScene) -> None:
         """Init Tuya Scene."""
         super().__init__()
         self._attr_unique_id = f"tys{scene.scene_id}"
-        self.home_manager = home_manager
+        self.multi_manager = multi_manager
         self.scene = scene
 
     @property
@@ -57,4 +58,4 @@ class TuyaSceneEntity(Scene):
 
     def activate(self, **kwargs: Any) -> None:
         """Activate the scene."""
-        self.home_manager.trigger_scene(self.scene.home_id, self.scene.scene_id)
+        self.multi_manager.trigger_scene(self.scene.home_id, self.scene.scene_id)

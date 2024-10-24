@@ -30,18 +30,81 @@
       "init": {
         "description": "Add a Tuya OpenAPI credential to improve the compatibility with some Tuya devices",
         "data": {
+          "use_open_api": "Use OpenAPI credentials",
           "country_code": "Country",
           "access_id": "Tuya IoT Access ID",
           "access_secret": "Tuya IoT Access Secret",
-          "username": "Account",
-          "password": "Password"
+          "username": "SmartLife/Tuya account",
+          "password": "SmartLife/Tuya account password"
         },
         "title": "Add Tuya OpenAPI credentials"
       }
     }
   },
+  "services": {
+    "get_camera_stream_url": {
+      "name": "Get camera stream URL",
+      "description": "Get camera stream URL",
+      "fields": {
+        "device_id": {
+          "name": "Device ID",
+          "description": "The ID of the device."
+        },
+        "source": {
+          "name": "Source",
+          "description": "The source of the URL (tuya_sharing or tuya_iot)"
+        }
+      }
+    },
+    "call_api": {
+      "name": "Call API",
+      "description": "Call an API and return the result",
+      "fields": {
+        "source": {
+          "name": "Source",
+          "description": "The source of the URL (tuya_sharing or tuya_iot)"
+        },
+        "method": {
+          "name": "Method",
+          "description": "GET or POST"
+        },
+        "url": {
+          "name": "URL",
+          "description": "The URL of the API call"
+        },
+        "payload": {
+          "name": "Payload",
+          "description": "The payload to provide to the API call"
+        }
+      }
+    },
+    "toggle": {
+      "name": "[%key:common::action::toggle%]",
+      "description": "Toggles (enable / disable) an automation."
+    },
+    "trigger": {
+      "name": "Trigger",
+      "description": "Triggers the actions of an automation.",
+      "fields": {
+        "skip_condition": {
+          "name": "Skip conditions",
+          "description": "Defines whether or not the conditions will be skipped."
+        }
+      }
+    },
+    "reload": {
+      "name": "[%key:common::action::reload%]",
+      "description": "Reloads the automation configuration."
+    }
+  },
   "entity": {
     "binary_sensor": {
+      "online": {
+        "name": "Device online"
+      },
+      "lock_motor_state": {
+        "name": "Lock status"
+      },
       "off_bed": {
         "name": "Out of bed"
       },
@@ -95,6 +158,12 @@
       }
     },
     "button": {
+      "clear_energy": {
+        "name": "Clear energy"
+      },
+      "manual_lock": {
+        "name": "Manual lock"
+      },
       "reset_add_ele": {
         "name": "Reset consumption"
       },
@@ -157,7 +226,75 @@
         "name": "Night light"
       }
     },
+    "lock": {
+      "operate_lock": {
+        "name": "Operate lock"
+      }
+    },
     "number": {
+      "standby_time": {
+        "name": "Standby time"
+      },
+      "standby_bright": {
+        "name": "Standby brightness"
+      },
+      "pir_delay": {
+        "name": "PIR delay"
+      },
+      "timer_on": {
+        "name": "Delayed power on"
+      },
+      "charge_cur_set": {
+        "name": "Charging current"
+      },
+      "presence_delay": {
+        "name": "Reset delay"
+      },
+      "movesensitivity": {
+        "name": "Motion detection sensitivity"
+      },
+      "movedistance_max": {
+        "name": "Motion detection upper limit"
+      },
+      "movedistance_min": {
+        "name": "Motion detection lower limit"
+      },
+      "breathsensitivity": {
+        "name": "Micro-motion detection sensitivity"
+      },
+      "breathdistance_max": {
+        "name": "Micro-motion detection upper limit"
+      },
+      "breathdistance_min": {
+        "name": "Micro-motion detection lower limit"
+      },
+      "countdown": {
+        "name": "Countdown"
+      },
+      "countdown_1": {
+        "name": "Countdown 1"
+      },
+      "countdown_2": {
+        "name": "Countdown 2"
+      },
+      "countdown_3": {
+        "name": "Countdown 3"
+      },
+      "countdown_4": {
+        "name": "Countdown 4"
+      },
+      "countdown_5": {
+        "name": "Countdown 5"
+      },
+      "countdown_6": {
+        "name": "Countdown 6"
+      },
+      "countdown_7": {
+        "name": "Countdown 7"
+      },
+      "countdown_8": {
+        "name": "Countdown 8"
+      },
       "temp_set": {
         "name": "Temperature"
       },
@@ -199,6 +336,9 @@
       },
       "auto_lock_time": {
         "name": "Auto lock time"
+      },
+      "alarm_time": {
+        "name": "Alarm time"
       },
       "time": {
         "name": "Time"
@@ -292,6 +432,69 @@
       }
     },
     "select": {
+      "pir_sensitivity": {
+        "name": "PIR sensitivity",
+        "state": {
+          "low": "Low",
+          "middle": "Medium",
+          "high": "High"
+        }
+      },
+      "cds": {
+        "name": "Sensitivity",
+        "state": {
+          "2000lux": "2000lux",
+          "300lux": "300lux",
+          "50lux": "50lux",
+          "10lux": "10lux",
+          "5lux": "5lux",
+          "now": "now"
+        }
+      },
+      "device_mode": {
+        "name": "Device mode",
+        "state": {
+          "0": "Automatic",
+          "1": "Manual",
+          "auto": "Automatic",
+          "manual": "Manual"
+        }
+      },
+      "qccdz_work_mode": {
+        "name": "Work mode",
+        "state": {
+          "0": "Charge now",
+          "1": "Charge to percentage",
+          "2": "Charge energy",
+          "3": "Scheduled charge",
+          "4": "Delayed charge",
+          "charge_now": "Real time charging",
+          "charge_pct": "Charge to percentage",
+          "charge_energy": "Charge energy",
+          "charge_schedule": "Scheduled charge",
+          "charge_delay": "Delayed charge"
+        }
+      },
+      "doorbell_volume": {
+        "name": "Doorbell volume",
+        "state": {
+          "mute": "Mute",
+          "low": "Low",
+          "high": "High"
+        }
+      },
+      "key_tone":
+      {
+        "name": "Key tone",
+        "state": {
+          "0": "High",
+          "1": "Normal",
+          "2": "Mute",
+          "high": "High",
+          "normal": "Normal",
+          "mute": "Mute"
+        }
+      },
       "change_temp_unit":
       {
         "name": "Temperature unit",
@@ -397,50 +600,6 @@
           "ringtone_3": "Ringtone 3",
           "ringtone_4": "Ringtone 4",
           "ringtone_5": "Ringtone 5"
-        }
-      },
-      "alarm_lock": {
-        "name": "Alarm lock",
-        "state": {
-          "0": "Wrong fingerprint",
-          "1": "Wrong password",
-          "2": "Wrong card",
-          "3": "Wrong face",
-          "4": "Bad tongue",
-          "5": "Too hot",
-          "6": "Unclosed time",
-          "7": "Tongue not out",
-          "8": "Pry",
-          "9": "Key in",
-          "10": "Low battery",
-          "11": "Power off",
-          "12": "Shock",
-          "13": "Defense",
-          "wrong_finger": "Wrong fingerprint",
-          "wrong_password": "Wrong password",
-          "wrong_card": "Wrong card",
-          "wrong_face": "Wrong face",
-          "tongue_bad": "Bad tongue",
-          "too_hot": "Too hot",
-          "unclosed_time": "Unclosed time",
-          "tongue_not_out": "Tongue not out",
-          "pry": "Pry",
-          "key_in": "Key in",
-          "low_battery": "Low battery",
-          "power_off": "Power off",
-          "shock": "Shock",
-          "defense": "Defense"
-        }
-      },
-      "closed_opened": {
-        "name": "Open/Closed",
-        "state": {
-          "0": "Unknown",
-          "1": "Open",
-          "2": "Closed",
-          "unknown": "Unknown",
-          "open": "Open",
-          "closed": "Closed"
         }
       },
       "cups": {
@@ -692,6 +851,124 @@
       }
     },
     "sensor": {
+      "system_version": {
+        "name": "System version"
+      },
+      "qccdz_connection_state": {
+        "name": "Connection state",
+        "state": {
+          "0": "12V",
+          "1": "12V PWN",
+          "2": "9V",
+          "3": "9V PWM",
+          "4": "6V",
+          "5": "6V PWM",
+          "6": "Error",
+          "controlpi_12v": "12V",
+          "controlpi_12v_pwm": "12V PWN",
+          "controlpi_9v": "9V",
+          "controlpi_9v_pwm": "9V PWM",
+          "controlpi_6v": "6V",
+          "controlpi_6v_pwm": "6V PWM",
+          "controlpi_error": "Error"
+        }
+      },
+      "power_total": {
+        "name": "Total power"
+      },
+      "sigle_phase_power": {
+        "name": "Single phase power"
+      },
+      "qccdz_work_state": {
+        "name": "Work state",
+        "state": {
+          "0": "Charger is free",
+          "1": "Charger inserted",
+          "2": "Charger is free (fault)",
+          "3": "Charger is waiting",
+          "4": "Charger is charging",
+          "5": "Charger is paused",
+          "6": "Charger has finished",
+          "7": "Charger fault",
+          "charger_free": "Charger is free",
+          "charger_insert": "Charger inserted",
+          "charger_free_fault": "Charger is free (fault)",
+          "charger_wait": "Charger is waiting",
+          "charger_charging": "Charger is charging",
+          "charger_pause": "Charger is paused",
+          "charger_end": "Charger has finished",
+          "charger_fault": "Charger fault"
+        }
+      },
+      "ms_category_alarm_lock": {
+        "name": "Keypad alarm",
+        "state": {
+          "0": "Wrong fingerprint",
+          "1": "Wrong password",
+          "2": "Wrong card",
+          "3": "Wrong face",
+          "4": "Too hot",
+          "5": "Not closed after timeout",
+          "6": "Anti-pry alarm",
+          "7": "Low battery",
+          "8": "Battery exhausted",
+          "9": "Vibration alarm",
+          "wrong_finger": "Wrong fingerprint",
+          "wrong_password": "Wrong password",
+          "wrong_card": "Wrong card",
+          "wrong_face": "Wrong face",
+          "too_hot": "Too hot",
+          "unclosed_time": "Not closed after timeout",
+          "pry": "Anti-pry alarm",
+          "low_battery": "Low battery",
+          "power_off": "Battery exhausted",
+          "shock": "Vibration alarm"
+        }
+      },
+      "jtmspro_alarm_lock": {
+        "name": "Lock alarm",
+        "state": {
+          "0": "Wrong fingerprint",
+          "1": "Wrong password",
+          "2": "Wrong card",
+          "3": "Wrong face",
+          "4": "Latch stuck",
+          "5": "Too hot",
+          "6": "Not closed after timeout",
+          "7": "Deadbolt stuck",
+          "8": "Anti-pry alarm",
+          "9": "Not calibrated",
+          "10": "Low battery",
+          "11": "Battery exhausted",
+          "12": "Vibration alarm",
+          "13": "Arm alarm",
+          "wrong_finger": "Wrong fingerprint",
+          "wrong_password": "Wrong password",
+          "wrong_card": "Wrong card",
+          "wrong_face": "Wrong face",
+          "tongue_bad": "Latch stuck",
+          "too_hot": "Too hot",
+          "unclosed_time": "Not closed after timeout",
+          "tongue_not_out": "Deadbolt stuck",
+          "pry": "Anti-pry alarm",
+          "key_in": "Not calibrated",
+          "low_battery": "Low battery",
+          "power_off": "Battery exhausted",
+          "shock": "Vibration alarm",
+          "defense": "Arm alarm"
+        }
+      },
+      "jtmspro_closed_opened": {
+        "name": "Door Open/Closed",
+        "state": {
+          "0": "Unknown",
+          "1": "Open",
+          "2": "Closed",
+          "unknown": "Unknown",
+          "open": "Open",
+          "closed": "Closed"
+        }
+      },
       "temp_show":
       {
         "name": "Current temperature"
@@ -780,6 +1057,9 @@
       },
       "charge_energy": {
         "name": "Charge energy"
+      },
+      "charge_energy_once": {
+        "name": "Charge energy (single)"
       },
       "total_forward_energy": {
         "name": "Total forward energy"
@@ -1128,6 +1408,14 @@
       }
     },
     "switch": {
+      "switch_pir":
+      {
+        "name": "Switch PIR"
+      },
+      "photo_again":
+      {
+        "name": "Take another photo"
+      },
       "one_click_cleanup":
       {
         "name": "One click cleanup"
@@ -1152,9 +1440,6 @@
       },
       "rtc_lock": {
         "name": "RTC lock"
-      },
-      "manual_lock": {
-        "name": "Manual lock"
       },
       "alarm_switch": {
         "name": "Alarm switch"
@@ -1434,6 +1719,32 @@
       },
       "factory_reset": {
         "name": "Factory reset"
+      }
+    },
+    "time": {
+      "countdown_1": {
+        "name": "Countdown 1"
+      },
+      "countdown_2": {
+        "name": "Countdown 2"
+      },
+      "countdown_3": {
+        "name": "Countdown 3"
+      },
+      "countdown_4": {
+        "name": "Countdown 4"
+      },
+      "countdown_5": {
+        "name": "Countdown 5"
+      },
+      "countdown_6": {
+        "name": "Countdown 6"
+      },
+      "countdown_7": {
+        "name": "Countdown 7"
+      },
+      "countdown_8": {
+        "name": "Countdown 8"
       }
     }
   },

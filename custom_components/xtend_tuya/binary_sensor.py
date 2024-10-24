@@ -11,19 +11,10 @@ from homeassistant.components.binary_sensor import (
     BinarySensorEntity,
     BinarySensorEntityDescription,
 )
-from homeassistant.const import EntityCategory
+from homeassistant.const import EntityCategory, Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-
-try:
-    from custom_components.tuya.binary_sensor import ( # type: ignore
-        BINARY_SENSORS as BINARY_SENSORS_TUYA
-    )
-except ImportError:
-    from homeassistant.components.tuya.binary_sensor import (
-        BINARY_SENSORS as BINARY_SENSORS_TUYA
-    )
 from .util import (
     merge_device_descriptors
 )
@@ -43,6 +34,9 @@ class TuyaBinarySensorEntityDescription(BinarySensorEntityDescription):
     # Value or values to consider binary sensor to be "on"
     on_value: bool | float | int | str | set[bool | float | int | str] = True
 
+    # This DPCode represent the online status of a device
+    device_online: bool = False
+
 
 # Commonly used sensors
 TAMPER_BINARY_SENSOR = TuyaBinarySensorEntityDescription(
@@ -58,6 +52,20 @@ TAMPER_BINARY_SENSOR = TuyaBinarySensorEntityDescription(
 # end up being a binary sensor.
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
 BINARY_SENSORS: dict[str, tuple[TuyaBinarySensorEntityDescription, ...]] = {
+    "jtmspro": (
+        TuyaBinarySensorEntityDescription(
+            key=DPCode.LOCK_MOTOR_STATE,
+            translation_key="lock_motor_state",
+            device_class=BinarySensorDeviceClass.LOCK
+        ),
+    ),
+    "kg": (
+        TuyaBinarySensorEntityDescription(
+            key=DPCode.PRESENCE_STATE,
+            device_class=BinarySensorDeviceClass.MOTION,
+            on_value="presence",
+        ),
+    ),
     "msp": (
         #If 1 is reported, it will be counted once. 
         #If 0 is reported, it will not be counted
@@ -76,6 +84,12 @@ BINARY_SENSORS: dict[str, tuple[TuyaBinarySensorEntityDescription, ...]] = {
             key=DPCode.POWER,
             translation_key="power",
             entity_registry_enabled_default=False,
+        ),
+    ),
+    "pir": (
+        TuyaBinarySensorEntityDescription(
+            key=DPCode.PIR2,
+            device_class=BinarySensorDeviceClass.MOTION,
         ),
     ),
     "smd": (
@@ -102,8 +116,8 @@ async def async_setup_entry(
     hass_data = entry.runtime_data
 
     merged_descriptors = BINARY_SENSORS
-    if not entry.runtime_data.multi_manager.reuse_config:
-        merged_descriptors = merge_device_descriptors(BINARY_SENSORS, BINARY_SENSORS_TUYA)
+    for new_descriptor in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(Platform.BINARY_SENSOR):
+        merged_descriptors = merge_device_descriptors(merged_descriptors, new_descriptor)
 
     @callback
     def async_discover_device(device_map) -> None:
@@ -151,6 +165,12 @@ class TuyaBinarySensorEntity(TuyaEntity, BinarySensorEntity):
 
     @property
     def is_on(self) -> bool:
+        is_on = self._is_on()
+        if hasattr(self.entity_description, "device_online") and self.entity_description.device_online:
+            self.device.online = is_on
+        return is_on
+    
+    def _is_on(self) -> bool:
         """Return true if sensor is on."""
         dpcode = self.entity_description.dpcode or self.entity_description.key
         if dpcode not in self.device.status:

@@ -12,13 +12,22 @@ from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity import Entity
 
-from homeassistant.components.tuya.const import (
-    DPCode as DPCode_tuya
-)
+from homeassistant.components.tuya.const import DPCode as DPCode_tuya
 
 from .const import DOMAIN, TUYA_HA_SIGNAL_UPDATE_ENTITY, DPCode, DPType, LOGGER
 from .util import remap_value
 from .multi_manager.multi_manager import MultiManager, XTDevice
+
+_DPTYPE_MAPPING: dict[str, DPType] = {
+    "bitmap": DPType.RAW,
+    "Bitmap": DPType.RAW,
+    "bool": DPType.BOOLEAN,
+    "enum": DPType.ENUM,
+    "json": DPType.JSON,
+    "raw": DPType.RAW,
+    "string": DPType.STRING,
+    "value": DPType.INTEGER,
+}
 
 
 @dataclass
@@ -125,6 +134,8 @@ class ElectricityTypeData:
     def from_raw(cls, data: str) -> Self:
         """Decode base64 string and return a ElectricityTypeData object."""
         raw = base64.b64decode(data)
+        if len(raw) < 8:
+            return cls(electriccurrent=None, power=None, voltage=None)
         voltage = struct.unpack(">H", raw[0:2])[0] / 10.0
         electriccurrent = struct.unpack(">L", b"\x00" + raw[2:5])[0] / 1000.0
         power = struct.unpack(">L", b"\x00" + raw[5:8])[0] / 1000.0
@@ -245,7 +256,9 @@ class TuyaEntity(Entity):
                             continue
                         return integer_type
                     except TypeError:
-                        LOGGER.warning(f"Device : {self.device.id} -> {self.device.name} -> {dpcode} failed to setup")
+                        LOGGER.warning(
+                            f"Device : {self.device.id} -> {self.device.name} -> {dpcode} failed to setup"
+                        )
 
                 if dptype not in (DPType.ENUM, DPType.INTEGER):
                     return dpcode
@@ -264,29 +277,22 @@ class TuyaEntity(Entity):
             order = ["function", "status_range"]
         for key in order:
             if dpcode in getattr(self.device, key):
-                try:
-                    return DPType(getattr(self.device, key)[dpcode].type)
-                except ValueError:
-                    fixed_type = TuyaEntity.determine_dptype(getattr(self.device, key)[dpcode].type)
-                    LOGGER.warning(f"Device {self.device.name} (id: {self.device.id}) has returned a bad model dpId type for code {dpcode} : \"{getattr(self.device, key)[dpcode].type}\", it should have been \"{fixed_type}\". Please contact the Tuya Support about this")
-                    return fixed_type
+                return TuyaEntity.determine_dptype(
+                    getattr(self.device, key)[dpcode].type
+                )
 
         return None
-    
+
     def determine_dptype(type) -> DPType | None:
-        if type == "value":
-            return DPType(DPType.INTEGER)
-        if type == "bitmap" or type == "raw":
-            return DPType(DPType.RAW)
-        if type == "enum":
-            return DPType(DPType.ENUM)
-        if type == "bool":
-            return DPType(DPType.BOOLEAN)
-        if type == "json":
-            return DPType(DPType.JSON)
-        if type == "string":
-            return DPType(DPType.STRING)
-        return None
+        """Determine the DPType.
+
+        Sometimes, we get ill-formed DPTypes from the cloud,
+        this fixes them and maps them to the correct DPType.
+        """
+        try:
+            return DPType(type)
+        except ValueError:
+            return _DPTYPE_MAPPING.get(type)
 
     async def async_added_to_hass(self) -> None:
         """Call when entity is added to hass."""
@@ -300,5 +306,4 @@ class TuyaEntity(Entity):
 
     def _send_command(self, commands: list[dict[str, Any]]) -> None:
         """Send command to the device."""
-        #LOGGER.debug("Sending commands for device %s: %s", self.device.id, commands)
         self.device_manager.send_commands(self.device.id, commands)

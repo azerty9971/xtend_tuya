@@ -18,19 +18,11 @@ from homeassistant.components.climate import (
     ClimateEntityFeature,
     HVACMode,
 )
-from homeassistant.const import UnitOfTemperature
+from homeassistant.const import UnitOfTemperature, Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-try:
-    from custom_components.tuya.climate import ( # type: ignore
-        CLIMATE_DESCRIPTIONS as CLIMATE_DESCRIPTIONS_TUYA
-    )
-except ImportError:
-    from homeassistant.components.tuya.climate import (
-        CLIMATE_DESCRIPTIONS as CLIMATE_DESCRIPTIONS_TUYA
-    )
 from .util import (
     append_dictionnaries
 )
@@ -69,8 +61,8 @@ async def async_setup_entry(
     hass_data = entry.runtime_data
     
     merged_descriptions = CLIMATE_DESCRIPTIONS
-    if not entry.runtime_data.multi_manager.reuse_config:
-        merged_descriptions = append_dictionnaries(CLIMATE_DESCRIPTIONS, CLIMATE_DESCRIPTIONS_TUYA)
+    for new_descriptor in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(Platform.CLIMATE):
+        merged_descriptions = append_dictionnaries(merged_descriptions, new_descriptor)
 
     @callback
     def async_discover_device(device_map) -> None:

@@ -40,6 +40,7 @@ CONF_TOKEN_INFO = "token_info"
 CONF_USER_CODE = "user_code"
 CONF_USERNAME = "username"
 #OpenTuya specific conf
+CONF_USE_OPEN_API = "use_open_api"
 CONF_ENDPOINT_OT = "endpoint"
 CONF_AUTH_TYPE = "auth_type"
 CONF_ACCESS_ID = "access_id"
@@ -80,14 +81,21 @@ PLATFORMS = [
     Platform.FAN,
     Platform.HUMIDIFIER,
     Platform.LIGHT,
+    Platform.LOCK,
     Platform.NUMBER,
     Platform.SCENE,
     Platform.SELECT,
     Platform.SENSOR,
     Platform.SIREN,
     Platform.SWITCH,
+    Platform.TIME,
     Platform.VACUUM,
 ]
+
+class AllowedPlugins:
+    @staticmethod
+    def get_plugins_to_load() -> list[str]:
+        return [MESSAGE_SOURCE_TUYA_SHARING, MESSAGE_SOURCE_TUYA_IOT]
 
 class VirtualStates(IntFlag):
     """Virtual states"""
@@ -177,10 +185,14 @@ class DPCode(StrEnum):
     BASIC_WDR = "basic_wdr"
     BATTERY = "battery"  # Used by non-standard contact sensor implementations
     BATTERY_PERCENTAGE = "battery_percentage"  # Battery percentage
+    BATTERY_POWER = "battery_power"
     BATTERY_STATE = "battery_state"  # Battery state
     BATTERY_VALUE = "battery_value"  # Battery value
     BEEP = "beep"
     BEEP_VOLUME = "beep_volume"
+    BREATHDISTANCE_MAX = "breathdistance_max"
+    BREATHDISTANCE_MIN = "breathdistance_min"
+    BREATHSENSITIVITY = "breathsensitivity"
     BRIGHT_CONTROLLER = "bright_controller"
     BRIGHT_STATE = "bright_state"  # Brightness status
     BRIGHT_VALUE = "bright_value"  # Brightness
@@ -198,11 +210,14 @@ class DPCode(StrEnum):
     CALIBRATION = "calibration"
     CAPACITY_CALIBRATION = "capacity_calibration"
     CAT_WEIGHT = "cat_weight"
+    CDS = "cds"
     CH2O_STATE = "ch2o_state"
     CH2O_VALUE = "ch2o_value"
     CH4_SENSOR_STATE = "ch4_sensor_state"
     CH4_SENSOR_VALUE = "ch4_sensor_value"
+    CHARGE_CUR_SET = "charge_cur_set"
     CHARGE_ENERGY = "charge_energy"
+    CHARGE_ENERGY_ONCE = "charge_energy_once"
     CHILD_LOCK = "child_lock"  # Child lock
     CISTERN = "cistern"
     CLEAN = "clean"
@@ -214,6 +229,7 @@ class DPCode(StrEnum):
     CLEAN_TIME_SWITCH = "clean_time_switch"
     CLEANING = "cleaning"
     CLEANING_NUM = "cleaning_num"
+    CLEAR_ENERGY = "clear_energy"
     CLICK_SUSTAIN_TIME = "click_sustain_time"
     CLOUD_RECIPE_NUMBER = "cloud_recipe_number"
     CLOSED_OPENED = "closed_opened"
@@ -232,16 +248,26 @@ class DPCode(StrEnum):
     COOK_TEMPERATURE = "cook_temperature"
     COOK_TIME = "cook_time"
     CONCENTRATION_SET = "concentration_set"  # Concentration setting
+    CONNECTION_STATE = "connection_state"
     CONTROL = "control"
     CONTROL_2 = "control_2"
     CONTROL_3 = "control_3"
     CONTROL_BACK = "control_back"
     CONTROL_BACK_MODE = "control_back_mode"
     COUNTDOWN = "countdown"  # Countdown
+    COUNTDOWN_1 = "countdown_1"
+    COUNTDOWN_2 = "countdown_2"
+    COUNTDOWN_3 = "countdown_3"
+    COUNTDOWN_4 = "countdown_4"
+    COUNTDOWN_5 = "countdown_5"
+    COUNTDOWN_6 = "countdown_6"
+    COUNTDOWN_7 = "countdown_7"
+    COUNTDOWN_8 = "countdown_8"
     COUNTDOWN_LEFT = "countdown_left"
     COUNTDOWN_SET = "countdown_set"  # Countdown setting
     CRY_DETECTION_SWITCH = "cry_detection_switch"
     CUP_NUMBER = "cup_number"  # NUmber of cups
+    CURRENT_YD = "current_yd"
     CUR_CURRENT = "cur_current"  # Actual current
     CUR_POWER = "cur_power"  # Actual power
     CUR_VOLTAGE = "cur_voltage"  # Actual voltage
@@ -255,8 +281,10 @@ class DPCode(StrEnum):
     DEO_START_TIME = "deo_start_time"
     DEO_END_TIME = "deo_end_time"
     DETECTION_SENSITIVITY = "detection_sensitivity"
+    DEVICE_MODE = "device_mode"
     DISINFECTION = "disinfection"
     DO_NOT_DISTURB = "do_not_disturb"
+    DOORBELL_VOLUME = "doorbell_volume"
     DOORCONTACT_STATE = "doorcontact_state"  # Status of door window sensor
     DOORCONTACT_STATE_2 = "doorcontact_state_2"
     DOORCONTACT_STATE_3 = "doorcontact_state_3"
@@ -301,6 +329,7 @@ class DPCode(StrEnum):
     HUMIDITY_INDOOR = "humidity_indoor"  # Indoor humidity
     HUMIDITY_SET = "humidity_set"  # Humidity setting
     HUMIDITY_VALUE = "humidity_value"  # Humidity
+    ILLUMINANCE_VALUE = "illuminance_value"
     INDICATOR_LIGHT = "indicator_light"
     INDUCTION_CLEAN = "Induction_Clean"
     INDUCTION_DELAY = "induction_delay"
@@ -308,6 +337,7 @@ class DPCode(StrEnum):
     INSTALLATION_HEIGHT = "installation_height"
     IPC_WORK_MODE = "ipc_work_mode"
     IR_CONTROL = "ir_control"
+    KEY_TONE = "key_tone"
     KILL = "kill"
     LED_TYPE_1 = "led_type_1"
     LED_TYPE_2 = "led_type_2"
@@ -321,6 +351,7 @@ class DPCode(StrEnum):
     LIQUID_LEVEL_PERCENT = "liquid_level_percent"
     LIQUID_STATE = "liquid_state"
     LOCK = "lock"  # Lock / Child lock
+    LOCK_MOTOR_STATE = "lock_motor_state"
     MASTER_MODE = "master_mode"  # alarm mode
     MACH_OPERATE = "mach_operate"
     MAGNETNUM = "magnetNum"
@@ -338,6 +369,9 @@ class DPCode(StrEnum):
     MOTION_SWITCH = "motion_switch"  # Motion switch
     MOTION_TRACKING = "motion_tracking"
     MOVEMENT_DETECT_PIC = "movement_detect_pic"
+    MOVEDISTANCE_MAX = "movedistance_max"
+    MOVEDISTANCE_MIN = "movedistance_min"
+    MOVESENSITIVITY = "movesensitivity"
     MUFFLING = "muffling"  # Muffling
     M_ADC_NUM = "M_ADC_NUM"
     NEAR_DETECTION = "near_detection"
@@ -350,6 +384,7 @@ class DPCode(StrEnum):
     OFF = "off"
     OFF_BED = "off_bed"
     OFF_BED_TIME = "off_bed_time"
+    ONLINE_STATE = "online_state"
     OPPOSITE = "opposite"
     OXYGEN = "oxygen"  # Oxygen bar
     PAUSE = "pause"
@@ -363,8 +398,12 @@ class DPCode(StrEnum):
     PHASE_A = "phase_a"
     PHASE_B = "phase_b"
     PHASE_C = "phase_c"
+    PHOTO_AGAIN = "photo_again"
     PIR = "pir"  # Motion sensor
+    PIR2 = "PIR"
+    PIR_DELAY = "pir_delay"
     PIR_RADAR = "PIR_RADAR"
+    PIR_SENSITIVITY = "pir_sensitivity"
     PM1 = "pm1"
     PM10 = "pm10"
     PM25 = "pm25"
@@ -373,9 +412,12 @@ class DPCode(StrEnum):
     POSITION = "position"
     POWDER_SET = "powder_set"  # Powder
     POWER = "power"
+    POWER2 = "Power"
     POWERON = "poweron"
     POWERONOFF = "PowerOnOff"
     POWER_GO = "power_go"
+    POWER_TOTAL = "power_total"
+    PRESENCE_DELAY = "presence_delay"
     PRESENCE_STATE = "presence_state"
     PRESSURE_STATE = "pressure_state"
     PRESSURE_VALUE = "pressure_value"
@@ -390,12 +432,14 @@ class DPCode(StrEnum):
     RELAY_STATUS = "relay_status"
     REMAININGTIME = "RemainingTime"
     REMAIN_TIME = "remain_time"
+    REMOTE_NO_DP_KEY = "remote_no_dp_key"
     RESET_ADD_ELE = "reset_add_ele"
     RESET_DUSTER_CLOTH = "reset_duster_cloth"
     RESET_EDGE_BRUSH = "reset_edge_brush"
     RESET_FILTER = "reset_filter"
     RESET_MAP = "reset_map"
     RESET_ROLL_BRUSH = "reset_roll_brush"
+    RESIDUAL_ELECTRICITY = "residual_electricity"
     RESPIRATORY_RATE = "respiratory_rate"
     REVERSE_ENERGY_TOTAL = "reverse_energy_total"
     ROLL_BRUSH = "roll_brush"
@@ -408,6 +452,7 @@ class DPCode(StrEnum):
     SETTIME = "SetTime"
     SHAKE = "shake"  # Oscillating
     SHOCK_STATE = "shock_state"  # Vibration status
+    SIGLE_PHASE_POWER = "sigle_phase_power"
     SIREN_SWITCH = "siren_switch"
     SITUATION_SET = "situation_set"
     SLEEP = "sleep"  # Sleep function
@@ -426,6 +471,8 @@ class DPCode(StrEnum):
     SPECIAL_FUNCTION = "special_function"
     SPEED = "speed"  # Speed level
     SPRAY_MODE = "spray_mode"  # Spraying mode
+    STANDBY_BRIGHT = "standby_bright"
+    STANDBY_TIME = "standby_time"
     START = "start"  # Start
     STATUS = "status"
     STERILIZATION = "sterilization"  # Sterilization
@@ -452,6 +499,7 @@ class DPCode(StrEnum):
     SWITCH_LED_2 = "switch_led_2"
     SWITCH_LED_3 = "switch_led_3"
     SWITCH_NIGHT_LIGHT = "switch_night_light"
+    SWITCH_PIR = "switch_pir"
     SWITCH_SAVE_ENERGY = "switch_save_energy"
     SWITCH_SOUND = "switch_sound"  # Voice switch
     SWITCH_SPRAY = "switch_spray"  # Spraying switch
@@ -463,6 +511,7 @@ class DPCode(StrEnum):
     SWITCH_USB6 = "switch_usb6"  # USB 6
     SWITCH_VERTICAL = "switch_vertical"  # Vertical swing flap switch
     SWITCH_VOICE = "switch_voice"  # Voice switch
+    SYSTEM_VERSION = "system_version"
     TEMP = "temp"  # Temperature setting
     TEMPCHANGER = "TempChanger"
     TEMPERATURE = "temperature"
@@ -487,6 +536,7 @@ class DPCode(StrEnum):
     TOILET_NOTICE = "toilet_notice"
     TIME_GET_IN_BED = "time_get_in_bed"
     TIME_USE = "time_use"  # Total seconds of irrigation
+    TIMER_ON = "timer_on"
     TOTAL_CLEAN_AREA = "total_clean_area"
     TOTAL_CLEAN_COUNT = "total_clean_count"
     TOTAL_CLEAN_TIME = "total_clean_time"
@@ -510,6 +560,7 @@ class DPCode(StrEnum):
     VOICE_SWITCH = "voice_switch"
     VOICE_TIMES = "voice_times"
     VOLUME_SET = "volume_set"
+    VOL_YD = "vol_yd"
     WAKEUP = "wakeup"
     WARM = "warm"  # Heat preservation
     WARM_TIME = "warm_time"  # Heat preservation time
@@ -527,6 +578,7 @@ class DPCode(StrEnum):
     WORK_MODE = "work_mode"  # Working mode
     WORK_POWER = "work_power"
     WORK_STAT = "work_stat"
+    WORK_STATE = "work_state"
     WORK_STATUS = "WorkStatus"
 
 

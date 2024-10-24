@@ -17,23 +17,19 @@ from homeassistant.components.sensor import (
 )
 from homeassistant.const import (
     UnitOfEnergy,
+    Platform,
+    PERCENTAGE,
+    EntityCategory,
 )
-from homeassistant.core import HomeAssistant, callback
+from homeassistant.core import HomeAssistant, callback, Event, EventStateChangedData, State
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import StateType
-from homeassistant.helpers.event import async_track_time_change
+from homeassistant.helpers.event import async_track_time_change, async_call_later, async_track_state_change_event
 
-try:
-    from custom_components.tuya.sensor import ( # type: ignore
-        SENSORS as SENSORS_TUYA
-    )
-except ImportError:
-    from homeassistant.components.tuya.sensor import (
-        SENSORS as SENSORS_TUYA
-    )
 from .util import (
-    merge_device_descriptors
+    merge_device_descriptors,
+    get_default_value
 )
 
 from .multi_manager.multi_manager import XTConfigEntry, MultiManager
@@ -46,6 +42,7 @@ from .const import (
     DPType,
     UnitOfMeasurement,
     VirtualStates,
+    LOGGER,  # noqa: F401
 )
 
 
@@ -62,10 +59,61 @@ class TuyaSensorEntityDescription(SensorEntityDescription):
     reset_daily: bool = False
     reset_monthly: bool = False
     reset_yearly: bool = False
+    reset_after_x_seconds: int = 0
     restoredata: bool = False
 
 # Commonly used battery sensors, that are re-used in the sensors down below.
 BATTERY_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
+    TuyaSensorEntityDescription(
+        key=DPCode.BATTERY_PERCENTAGE,
+        translation_key="battery",
+        native_unit_of_measurement=PERCENTAGE,
+        device_class=SensorDeviceClass.BATTERY,
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_category=EntityCategory.DIAGNOSTIC,
+    ),
+    TuyaSensorEntityDescription(
+        key=DPCode.BATTERY,  # Used by non-standard contact sensor implementations
+        translation_key="battery",
+        native_unit_of_measurement=PERCENTAGE,
+        device_class=SensorDeviceClass.BATTERY,
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_category=EntityCategory.DIAGNOSTIC,
+    ),
+    TuyaSensorEntityDescription(
+        key=DPCode.BATTERY_STATE,
+        translation_key="battery_state",
+        entity_category=EntityCategory.DIAGNOSTIC,
+    ),
+    TuyaSensorEntityDescription(
+        key=DPCode.BATTERY_VALUE,
+        translation_key="battery",
+        device_class=SensorDeviceClass.BATTERY,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        state_class=SensorStateClass.MEASUREMENT,
+    ),
+    TuyaSensorEntityDescription(
+        key=DPCode.VA_BATTERY,
+        translation_key="battery",
+        device_class=SensorDeviceClass.BATTERY,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        state_class=SensorStateClass.MEASUREMENT,
+    ),
+    TuyaSensorEntityDescription(
+        key=DPCode.RESIDUAL_ELECTRICITY,
+        translation_key="battery",
+        native_unit_of_measurement=PERCENTAGE,
+        device_class=SensorDeviceClass.BATTERY,
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_category=EntityCategory.DIAGNOSTIC,
+    ),
+    TuyaSensorEntityDescription(
+        key=DPCode.BATTERY_POWER,
+        translation_key="battery",
+        device_class=SensorDeviceClass.BATTERY,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        state_class=SensorStateClass.MEASUREMENT,
+    ),
 )
 
 #Commonlu sed energy sensors, that are re-used in the sensors down below.
@@ -162,7 +210,7 @@ CONSUMPTION_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
         key=DPCode.BALANCE_ENERGY,
         translation_key="balance_energy",
         device_class=SensorDeviceClass.ENERGY,
-        state_class=SensorStateClass.TOTAL_INCREASING,
+        state_class=SensorStateClass.TOTAL,
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         entity_registry_enabled_default=True,
         restoredata=False,
@@ -172,6 +220,14 @@ CONSUMPTION_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
         translation_key="charge_energy",
         device_class=SensorDeviceClass.ENERGY,
         state_class=SensorStateClass.TOTAL_INCREASING,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        entity_registry_enabled_default=True,
+        restoredata=False,
+    ),
+    TuyaSensorEntityDescription(
+        key=DPCode.CHARGE_ENERGY_ONCE,
+        translation_key="charge_energy_once",
+        device_class=SensorDeviceClass.ENERGY,
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         entity_registry_enabled_default=True,
         restoredata=False,
@@ -224,6 +280,12 @@ TEMPERATURE_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
         entity_registry_enabled_default=True,
     ),
     TuyaSensorEntityDescription(
+        key=DPCode.TEMP_INDOOR,
+        translation_key="temperature",
+        device_class=SensorDeviceClass.TEMPERATURE,
+        state_class=SensorStateClass.MEASUREMENT,
+    ),
+    TuyaSensorEntityDescription(
         key=DPCode.TEMP_VALUE,
         translation_key="temperature",
         state_class=SensorStateClass.MEASUREMENT,
@@ -238,6 +300,12 @@ HUMIDITY_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
         state_class=SensorStateClass.MEASUREMENT,
         entity_registry_enabled_default=True,
     ),
+    TuyaSensorEntityDescription(
+        key=DPCode.HUMIDITY_INDOOR,
+        translation_key="humidity",
+        device_class=SensorDeviceClass.HUMIDITY,
+        state_class=SensorStateClass.MEASUREMENT,
+    ),
 )
 
 # All descriptions can be found here. Mostly the Integer data types in the
@@ -245,9 +313,42 @@ HUMIDITY_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
 # end up being a sensor.
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
 SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
+    "cl": (
+        *BATTERY_SENSORS,
+    ),
+    "jtmspro": (
+        TuyaSensorEntityDescription(
+            key=DPCode.ALARM_LOCK,
+            translation_key="jtmspro_alarm_lock",
+            entity_registry_enabled_default=False,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.CLOSED_OPENED,
+            translation_key="jtmspro_closed_opened",
+            entity_registry_enabled_default=True,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.CURRENT_YD,
+            translation_key="current",
+            entity_registry_enabled_default=False,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.VOL_YD,
+            translation_key="voltage",
+            entity_registry_enabled_default=False,
+        ),
+        *BATTERY_SENSORS,
+    ),
     # Switch
     # https://developer.tuya.com/en/docs/iot/s?id=K9gf7o5prgf7s
     "kg": (
+        TuyaSensorEntityDescription(
+            key=DPCode.ILLUMINANCE_VALUE,
+            translation_key="illuminance_value",
+            device_class=SensorDeviceClass.ILLUMINANCE,
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_registry_enabled_default=True,
+        ),
         *CONSUMPTION_SENSORS,
     ),
     # Automatic cat litter box
@@ -440,6 +541,15 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
         ),
         *TEMPERATURE_SENSORS,
     ),
+    "ms_category": (
+        TuyaSensorEntityDescription(
+            key=DPCode.ALARM_LOCK,
+            translation_key="ms_category_alarm_lock",
+            entity_registry_enabled_default=False,
+            reset_after_x_seconds=1
+        ),
+        *BATTERY_SENSORS,
+    ),
     "mzj": (
         TuyaSensorEntityDescription(
             key=DPCode.WORK_STATUS,
@@ -456,6 +566,35 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
             translation_key="remaining_time",
             entity_registry_enabled_default=True,
         ),
+    ),
+    "qccdz": (
+        TuyaSensorEntityDescription(
+            key=DPCode.WORK_STATE,
+            translation_key="qccdz_work_state",
+            entity_registry_enabled_default=True,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.SIGLE_PHASE_POWER,
+            translation_key="sigle_phase_power",
+            entity_registry_enabled_default=True,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.POWER_TOTAL,
+            translation_key="power_total",
+            entity_registry_enabled_default=True,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.CONNECTION_STATE,
+            translation_key="qccdz_connection_state",
+            entity_registry_enabled_default=True,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.SYSTEM_VERSION,
+            translation_key="system_version",
+            entity_registry_enabled_default=True,
+        ),
+        *CONSUMPTION_SENSORS,
+        *TEMPERATURE_SENSORS,
     ),
     "smd": (
         TuyaSensorEntityDescription(
@@ -503,6 +642,27 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
         *TEMPERATURE_SENSORS,
         *HUMIDITY_SENSORS,
     ),
+    "xfj": (
+        TuyaSensorEntityDescription(
+            key=DPCode.PM25,
+            translation_key="pm25",
+            device_class=SensorDeviceClass.PM25,
+            state_class=SensorStateClass.MEASUREMENT,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.ECO2,
+            translation_key="concentration_carbon_dioxide",
+            device_class=SensorDeviceClass.CO2,
+            state_class=SensorStateClass.MEASUREMENT,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.FILTER_LIFE,
+            translation_key="filter_life",
+            state_class=SensorStateClass.MEASUREMENT,
+        ),
+        *TEMPERATURE_SENSORS,
+        *HUMIDITY_SENSORS,
+    ),
     "ywcgq": (
         TuyaSensorEntityDescription(
             key=DPCode.LIQUID_STATE,
@@ -539,8 +699,8 @@ async def async_setup_entry(
     hass_data = entry.runtime_data
 
     merged_descriptors = SENSORS
-    if not entry.runtime_data.multi_manager.reuse_config:
-        merged_descriptors = merge_device_descriptors(SENSORS, SENSORS_TUYA)
+    for new_descriptor in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(Platform.SENSOR):
+        merged_descriptors = merge_device_descriptors(merged_descriptors, new_descriptor)
 
     @callback
     def async_discover_device(device_map) -> None:
@@ -588,6 +748,7 @@ class TuyaSensorEntity(TuyaEntity, RestoreSensor):
         self._attr_unique_id = (
             f"{super().unique_id}{description.key}{description.subkey or ''}"
         )
+        self.cancel_reset_after_x_seconds = None
 
         if int_type := self.find_dpcode(description.key, dptype=DPType.INTEGER):
             self._type_data = int_type
@@ -682,6 +843,16 @@ class TuyaSensorEntity(TuyaEntity, RestoreSensor):
         # Valid string or enum value
         return value
     
+
+    def reset_value(self, _: datetime) -> None:
+        self.cancel_reset_after_x_seconds = None
+        value = self.device.status.get(self.entity_description.key)
+        default_value = get_default_value(self._type)
+        if value is None or value == default_value:
+            return
+        self.device.status[self.entity_description.key] = default_value
+        self.schedule_update_ha_state()
+
     async def async_added_to_hass(self) -> None:
         """Call when entity about to be added to hass."""
         await super().async_added_to_hass()
@@ -698,11 +869,12 @@ class TuyaSensorEntity(TuyaEntity, RestoreSensor):
                 should_reset = True
             
             if should_reset:
-                devices = self.device_manager.get_devices_from_device_id(self.device.id)
-                for device in devices:
-                    device.status[self.entity_description.key] = float(0)
-                self.entity_description.last_reset = now
-                self.async_write_ha_state()
+                if device := self.device_manager.device_map.get(self.device.id, None):
+                    if self.entity_description.key in device.status:
+                        device.status[self.entity_description.key] = float(0)
+                        if self.entity_description.state_class == SensorStateClass.TOTAL:
+                            self.entity_description.last_reset = now
+                        self.async_write_ha_state()
 
         if (
            ( hasattr(self.entity_description, "reset_daily") and self.entity_description.reset_daily )
@@ -712,6 +884,16 @@ class TuyaSensorEntity(TuyaEntity, RestoreSensor):
             self.async_on_remove(
                 async_track_time_change(
                     self.hass, reset_status_daily, hour=0, minute=0, second=0
+                )
+            )
+        if (
+           ( hasattr(self.entity_description, "reset_after_x_seconds") and self.entity_description.reset_after_x_seconds ) 
+        ):
+            self.async_on_remove(
+                async_track_state_change_event(
+                    self.hass,
+                    self.entity_id,
+                    self._on_event,
                 )
             )
 
@@ -725,6 +907,15 @@ class TuyaSensorEntity(TuyaEntity, RestoreSensor):
             scaled_value_back = self._type_data.scale_value_back(state.native_value)
             state.native_value = scaled_value_back
 
-        devices = self.device_manager.get_devices_from_device_id(self.device.id)
-        for device in devices:
+        if device := self.device_manager.device_map.get(self.device.id, None):
             device.status[self.entity_description.key] = float(state.native_value)
+    
+    @callback
+    async def _on_event(self, event: Event[EventStateChangedData]):
+        new_state: State = event.data.get("new_state")
+        default_value = get_default_value(self._type)
+        if not new_state.state or new_state.state == default_value:
+            return
+        if self.cancel_reset_after_x_seconds:
+            self.cancel_reset_after_x_seconds()
+        self.cancel_reset_after_x_seconds = async_call_later(self.hass, self.entity_description.reset_after_x_seconds, self.reset_value)
