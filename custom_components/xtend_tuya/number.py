@@ -71,6 +71,28 @@ COUNTDOWNS: tuple[NumberEntityDescription, ...] = (
 # default instructions set of each category end up being a number.
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
 NUMBERS: dict[str, tuple[NumberEntityDescription, ...]] = {
+    "gyd": (
+        NumberEntityDescription(
+            key=DPCode.COUNTDOWN,
+            translation_key="countdown",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        NumberEntityDescription(
+            key=DPCode.PIR_DELAY,
+            translation_key="pir_delay",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        NumberEntityDescription(
+            key=DPCode.STANDBY_TIME,
+            translation_key="standby_time",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        NumberEntityDescription(
+            key=DPCode.STANDBY_BRIGHT,
+            translation_key="standby_bright",
+            entity_category=EntityCategory.CONFIG,
+        ),
+    ),
     "jtmspro": (
         NumberEntityDescription(
             key=DPCode.AUTO_LOCK_TIME,
