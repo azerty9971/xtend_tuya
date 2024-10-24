@@ -449,6 +449,7 @@
           "10lux": "10lux",
           "5lux": "5lux",
           "now": "now"
+        }
       },
       "device_mode": {
         "name": "Device mode",
@@ -457,6 +458,7 @@
           "1": "Manual",
           "auto": "Automatic",
           "manual": "Manual"
+        }
       },
       "qccdz_work_mode": {
         "name": "Work mode",
