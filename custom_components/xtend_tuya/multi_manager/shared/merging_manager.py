@@ -64,13 +64,15 @@ class XTMergingManager:
                 value_dict: dict = json.loads(device1.function[code].values)
                 if value_dict.get("ErrorValue1"):
                     need_fixing = True
+                iter(value_dict)
             except Exception:
                 LOGGER.debug(f"Found invalid value descriptor for device {device1}, attempting fix: |{device1.function[code].values}|", stack_info=True)
                 need_fixing = True
             if need_fixing:
                 if code in device2.function:
                     try:
-                        json.loads(device2.function[code].values)
+                        value_dict: dict = json.loads(device2.function[code].values)
+                        iter(value_dict)
                         device1.function[code].values = device2.function[code].values
                     except Exception:
                         LOGGER.debug("Fix unsuccessful, clearing values")
@@ -83,13 +85,15 @@ class XTMergingManager:
                 value_dict: dict = json.loads(device1.status_range[code].values)
                 if value_dict.get("ErrorValue1"):
                     need_fixing = True
+                iter(value_dict)
             except Exception:
                 LOGGER.debug(f"Found invalid value descriptor, attempting fix: |{device1.status_range[code].values}|")
                 need_fixing = True
             if need_fixing:
                 if code in device2.status_range:
                     try:
-                        json.loads(device2.status_range[code].values)
+                        value_dict: dict = json.loads(device2.status_range[code].values)
+                        iter(value_dict)
                         device1.status_range[code].values = device2.status_range[code].values
                     except Exception:
                         LOGGER.debug("Fix unsuccessful, clearing values")
@@ -98,7 +102,10 @@ class XTMergingManager:
             if config_item := device1.local_strategy[dpId].get("config_item"):
                 if value_descr := config_item.get("valueDesc"):
                     try:
-                        json.loads(value_descr)
+                        value_dict: dict = json.loads(value_descr)
+                        if value_dict.get("ErrorValue1"):
+                            need_fixing = True
+                        iter(value_dict)
                     except Exception:
                         #This json is ill-formed, mark it for fixing
                         LOGGER.debug(f"Found invalid value descriptor, attempting fix: |{value_descr}|")
@@ -109,7 +116,8 @@ class XTMergingManager:
                     if config_item2 := device1.local_strategy[dpId].get("config_item"):
                         if value_descr2 := config_item2.get("valueDesc"):
                             try:
-                                json.loads(value_descr)
+                                value_dict: dict = json.loads(value_descr)
+                                iter(value_dict)
                                 config_item["valueDesc"] = config_item2["valueDesc"]
                                 LOGGER.debug("Fix was successful")
                             except Exception:
