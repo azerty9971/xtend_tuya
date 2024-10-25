@@ -56,7 +56,8 @@ BINARY_SENSORS: dict[str, tuple[TuyaBinarySensorEntityDescription, ...]] = {
         TuyaBinarySensorEntityDescription(
             key=DPCode.LOCK_MOTOR_STATE,
             translation_key="lock_motor_state",
-            device_class=BinarySensorDeviceClass.LOCK
+            device_class=BinarySensorDeviceClass.LOCK,
+            on_value="false"
         ),
     ),
     "kg": (
