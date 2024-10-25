@@ -113,7 +113,8 @@ class CloudFixes:
             try:
                 if code in device.status_range:
                     dp_id = device.status_range[code].dp_id
-                    json.loads(device.status_range[code].values)
+                    value_dict = json.loads(device.status_range[code].values)
+                    iter(value_dict)
                     correct_value = device.status_range[code].values
             except Exception:
                 sr_need_fixing = True
@@ -121,7 +122,8 @@ class CloudFixes:
             try:
                 if code in device.function:
                     dp_id = device.function[code].dp_id
-                    json.loads(device.function[code].values)
+                    value_dict = json.loads(device.function[code].values)
+                    iter(value_dict)
                     correct_value = device.function[code].values
             except Exception:
                 fn_need_fixing = True
@@ -131,7 +133,8 @@ class CloudFixes:
                     if dp_item := device.local_strategy.get(dp_id):
                         if config_item := dp_item.get("config_item"):
                             if value_descr := config_item.get("valueDesc"):
-                                json.loads(value_descr)
+                                value_dict = json.loads(value_descr)
+                                iter(value_dict)
                                 correct_value = value_descr
                 except Exception:
                     ls_need_fixing = True
