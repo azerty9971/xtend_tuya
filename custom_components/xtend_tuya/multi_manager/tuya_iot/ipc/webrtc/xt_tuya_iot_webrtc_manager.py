@@ -208,19 +208,19 @@ class XTIOTWebRTCManager:
                     "t":int(time.time()),
                     "data":{
                         "header":{
-                            "type":"offer",
                             "from":f"{self.ipc_manager.get_from()}",
                             "to":f"{device_id}",
-                            "sub_dev_id":"",
+                            #"sub_dev_id":"",
                             "sessionid":f"{session_id}",
                             "moto_id":f"{moto_id}",
-                            "tid":""
+                            #"tid":"",
+                            "type":"offer",
                         },
                         "msg":{
-                            "mode":"webrtc",
                             "sdp":f"{sdp_offer}",
-                            #"stream_type":self._get_stream_type(device_id, session_id, channel),
                             "auth":f"{auth_token}",
+                            "mode":"webrtc",
+                            "stream_type":self._get_stream_type(device_id, session_id, channel),
                         }
                     },
                 }
