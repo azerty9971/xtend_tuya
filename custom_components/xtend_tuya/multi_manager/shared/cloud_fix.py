@@ -34,6 +34,8 @@ class CloudFixes:
                 device.local_strategy[dpId]["property_update"] = False
             if device.local_strategy[dpId].get("use_open_api") is None:
                 device.local_strategy[dpId]["use_open_api"] = False
+            if device.local_strategy[dpId].get("status_code_alias") is None:
+                device.local_strategy[dpId]["status_code_alias"] = []
     
     def _unify_data_types(device: XTDevice):
         for key in device.status_range:
