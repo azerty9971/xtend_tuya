@@ -53,6 +53,10 @@
         "source": {
           "name": "Source",
           "description": "The source of the URL (tuya_sharing or tuya_iot)"
+        },
+        "stream_type": {
+          "name": "Stream type",
+          "description": "Stream type: rtsp/rtmp/hls/flv"
         }
       }
     },
@@ -75,6 +79,60 @@
         "payload": {
           "name": "Payload",
           "description": "The payload to provide to the API call"
+        }
+      }
+    },
+    "webrtc_get_ice_servers": {
+      "name": "Get ICE servers (WebRTC)",
+      "description": "Get the ICE servers needed for a WebRTC connection",
+      "fields": {
+        "device_id": {
+          "name": "Device ID",
+          "description": "The ID of the device."
+        },
+        "session_id": {
+          "name": "Session ID",
+          "description": "Any ID used to determine the uniqueness of the whole exchange (any value you want)."
+        },
+        "source": {
+          "name": "Source",
+          "description": "The source of the URL (tuya_sharing or tuya_iot)"
+        },
+        "format": {
+          "name": "Format",
+          "description": "The format of the ICE server return (GO2RTC/SimpleWHEP)"
+        }
+      }
+    },
+    "webrtc_sdp_exchange": {
+      "name": "SDP exchange (WebRTC)",
+      "description": "Perform a WebRTC SDP exchange",
+      "fields": {
+        "device_id": {
+          "name": "Device ID",
+          "description": "The ID of the device."
+        },
+        "session_id": {
+          "name": "Session ID",
+          "description": "Any ID used to determine the uniqueness of the whole exchange (any value you want)."
+        },
+        "source": {
+          "name": "Source",
+          "description": "The source of the URL (tuya_sharing or tuya_iot)"
+        }
+      }
+    },
+    "webrtc_debug": {
+      "name": "Debug WebRTC",
+      "description": "Get the traces of the WebRTC communication",
+      "fields": {
+        "session_id": {
+          "name": "Session ID",
+          "description": "Any ID used to determine the uniqueness of the whole exchange (any value you want)."
+        },
+        "source": {
+          "name": "Source",
+          "description": "The source of the URL (tuya_sharing or tuya_iot)"
         }
       }
     },
