@@ -120,7 +120,7 @@ class ServiceManager:
             SERVICE_WEBRTC_SDP_EXCHANGE, 
             self._handle_webrtc_sdp_exchange, 
             SERVICE_WEBRTC_SDP_EXCHANGE_SCHEMA, 
-            False, 
+            True, 
             True, 
             False
             )
