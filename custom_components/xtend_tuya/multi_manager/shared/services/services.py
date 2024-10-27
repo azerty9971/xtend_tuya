@@ -33,6 +33,7 @@ CONF_URL = "url"
 CONF_PAYLOAD = "payload"
 CONF_SESSION_ID = "session_id"
 CONF_FORMAT = "format"
+CONF_CHANNEL = "channel"
 
 SERVICE_GET_CAMERA_STREAM_URL = "get_camera_stream_url"
 SERVICE_GET_CAMERA_STREAM_URL_SCHEMA = vol.Schema(
@@ -69,6 +70,7 @@ SERVICE_WEBRTC_SDP_EXCHANGE_SCHEMA = vol.Schema(
         vol.Required(CONF_DEVICE_ID): cv.string,
         vol.Required(CONF_SESSION_ID): cv.string,
         vol.Optional(CONF_SOURCE): cv.string,
+        vol.Optional(CONF_CHANNEL): cv.string,
     }
 )
 
@@ -189,14 +191,14 @@ class ServiceManager:
     async def _handle_webrtc_debug(self, event: XTEventData) -> web.Response | str | None:
         source      = event.data.get(CONF_SOURCE, MESSAGE_SOURCE_TUYA_IOT)
         session_id  = event.data.get(CONF_SESSION_ID, None)
-        LOGGER.warning(f"DEBUG CALL: {event}")
+        #LOGGER.warning(f"DEBUG CALL: {event}")
         if session_id is None:
             return None
         multi_manager_list = get_all_multi_managers(self.hass)
         for multi_manager in multi_manager_list:
             if account := multi_manager.get_account_by_name(source):
                 if debug_output := await self.hass.async_add_executor_job(account.get_webrtc_exchange_debug, session_id):
-                    LOGGER.warning(f"DEBUG OUTPUT: {debug_output}")
+                    #LOGGER.warning(f"DEBUG OUTPUT: {debug_output}")
                     return debug_output
         return None
 
@@ -204,7 +206,8 @@ class ServiceManager:
         source      = event.data.get(CONF_SOURCE, MESSAGE_SOURCE_TUYA_IOT)
         device_id   = event.data.get(CONF_DEVICE_ID, None)
         session_id  = event.data.get(CONF_SESSION_ID, None)
-        LOGGER.warning(f"DEBUG SDP CALL: {event}")
+        channel     = event.data.get(CONF_CHANNEL, None)
+        #LOGGER.warning(f"DEBUG SDP CALL: {event}")
         if device_id is None or session_id is None:
             return None
         multi_manager = self._get_correct_multi_manager(source, device_id)
@@ -215,7 +218,7 @@ class ServiceManager:
                 match event.content_type:
                     case "application/sdp":
                         if account := multi_manager.get_account_by_name(source):
-                            sdp_answer = await self.hass.async_add_executor_job(account.get_webrtc_sdp_answer, device_id, session_id, event.payload)
+                            sdp_answer = await self.hass.async_add_executor_job(account.get_webrtc_sdp_answer, device_id, session_id, event.payload, channel)
                             if sdp_answer is not None:
                                 response = web.Response(status=201, text=sdp_answer, content_type="application/sdp", charset="utf-8")
                                 response.headers["ETag"] = session_id

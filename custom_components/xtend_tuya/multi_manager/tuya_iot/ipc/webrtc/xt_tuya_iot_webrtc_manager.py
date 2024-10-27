@@ -73,7 +73,6 @@ class XTIOTWebRTCManager:
         self._create_session_if_necessary(session_id)
         self.sdp_exchange[session_id].answer_candidates.append(candidate)
         candidate_str = candidate.get("candidate", None)
-        LOGGER.warning(f"Adding SDP answer candidate {candidate_str}")
         if candidate_str == '':
             self.sdp_exchange[session_id].has_all_candidates = True
 
@@ -137,7 +136,43 @@ class XTIOTWebRTCManager:
                             pass
                     return temp_str.strip()
 
-    def get_sdp_answer(self, device_id: str, session_id: str, sdp_offer: str, wait_for_answers: int = 5) -> str | None:
+    def _get_stream_type(self, device_id: str, session_id: str, requested_channel: str) -> int:
+        any_stream_type = 1
+        highest_res_stream_type = any_stream_type
+        cur_highest = 0
+        lowest_res_stream_type = any_stream_type
+        cur_lowest = 0
+        if webrtc_config := self.get_config(device_id, session_id):
+            if skill := webrtc_config.get("skill"):
+                try:
+                    skill_json: dict = json.loads(skill)
+                    video_list: list[dict[str, any]] = skill_json.get("videos")
+                    if video_list:
+                        for video_details in video_list:
+                            if (
+                                    "streamType" in video_details
+                                and "width" in video_details
+                                and "height" in video_details
+                            ):
+                                any_stream_type = video_details["streamType"]
+                                width = int(video_details["width"])
+                                height = int(video_details["height"])
+                                cur_value = width * height
+                                if cur_highest < cur_value:
+                                    cur_highest = cur_value
+                                    highest_res_stream_type = video_details["streamType"]
+                                if cur_lowest == 0 or cur_lowest < cur_value:
+                                    cur_lowest = cur_value
+                                    lowest_res_stream_type = video_details["streamType"]
+                    if requested_channel == "high":
+                        return highest_res_stream_type
+                    elif requested_channel == "low":
+                        return lowest_res_stream_type
+                except Exception:
+                    return any_stream_type
+        return any_stream_type
+
+    def get_sdp_answer(self, device_id: str, session_id: str, sdp_offer: str, channel: str, wait_for_answers: int = 5) -> str | None:
         sleep_step = 0.01
         sleep_count: int = int(wait_for_answers / sleep_step)
         ENDLINE = "\r\n"
@@ -182,7 +217,7 @@ class XTIOTWebRTCManager:
                         "msg":{
                             "mode":"webrtc",
                             "sdp":f"{sdp_offer}",
-                            "stream_type":1,
+                            "stream_type":self._get_stream_type(device_id, session_id, channel),
                             "auth":f"{auth_token}",
                         }
                     },
