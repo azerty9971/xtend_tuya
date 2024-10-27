@@ -219,7 +219,7 @@ class XTIOTWebRTCManager:
                         "msg":{
                             "mode":"webrtc",
                             "sdp":f"{sdp_offer}",
-                            "stream_type":self._get_stream_type(device_id, session_id, channel),
+                            #"stream_type":self._get_stream_type(device_id, session_id, channel),
                             "auth":f"{auth_token}",
                         }
                     },
