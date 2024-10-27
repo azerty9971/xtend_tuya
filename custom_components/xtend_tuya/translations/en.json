@@ -119,6 +119,10 @@
         "source": {
           "name": "Source",
           "description": "The source of the URL (tuya_sharing or tuya_iot)"
+        },
+        "channel": {
+          "name": "Channel",
+          "description": "Type of stream (low/high quality)"
         }
       }
     },
