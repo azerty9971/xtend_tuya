@@ -168,6 +168,8 @@ class XTIOTWebRTCManager:
                         return highest_res_stream_type
                     elif requested_channel == "low":
                         return lowest_res_stream_type
+                    else:
+                        return requested_channel
                 except Exception:
                     return any_stream_type
         return any_stream_type
