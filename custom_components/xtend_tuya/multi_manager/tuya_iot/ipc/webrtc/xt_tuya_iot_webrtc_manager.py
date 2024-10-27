@@ -161,7 +161,7 @@ class XTIOTWebRTCManager:
                                 if cur_highest < cur_value:
                                     cur_highest = cur_value
                                     highest_res_stream_type = video_details["streamType"]
-                                if cur_lowest == 0 or cur_lowest < cur_value:
+                                if cur_lowest == 0 or cur_lowest > cur_value:
                                     cur_lowest = cur_value
                                     lowest_res_stream_type = video_details["streamType"]
                     if requested_channel == "high":
