@@ -11,7 +11,7 @@ The reason why this is not merged in the official Tuya integration is because th
 ### Highlights
 
 - Adds entities needed by the Energy dashboard
-- Adds support for locks (see [here](./docs/configure_locks.md))
+- Adds support for locks (requires [additional configuration here](./docs/configure_locks.md))
 - Much more...
 
 ### Comparison
@@ -49,7 +49,7 @@ Easiest install is via [HACS](https://hacs.xyz/):
 
 You can choose to use this integration alongside the official Tuya integration or not. The choice is yours, but using it **without** the official Tuya integration will give you some perks (see comparison table above).
 
-When installed **without** the official Tuya integration, this integration itself will **provide all the devices** and entities available.
+When installed **without** the official Tuya integration, this integration will **provide all the devices and entities** by itself.
 
 When installed **alongside** the official Tuya integration, this integration will **add the missing entities** to the existing devices provided by the official Tuya integration.
 
