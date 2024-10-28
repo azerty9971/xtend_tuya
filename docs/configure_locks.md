@@ -15,4 +15,4 @@ https://github.com/azerty9971/xtend_tuya/blob/main/docs/cloud_credentials.md
 ![image](https://github.com/user-attachments/assets/2560d24c-d71c-49d5-9d22-00dc1efbc203)<br/>
 5- Verify that the "Smart Lock Open Service" is activated:<br/>
 ![image](https://github.com/user-attachments/assets/bfbb2c03-9a96-4ac3-9f7f-63a35cd4a7a6)<br/>
-6- You should now be able to open/close your locks using eXtended Tuya (XT)<br/>
+6- You should now be able to open/close your locks using Xtend Tuya<br/>
