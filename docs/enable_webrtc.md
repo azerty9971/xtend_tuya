@@ -15,4 +15,3 @@ https://github.com/azerty9971/xtend_tuya/blob/main/docs/cloud_credentials.md
 ![image](https://github.com/user-attachments/assets/61ffbae2-6978-42a9-a396-41a9bc5818f8)<br/>
 5- Verify that the "IoT Video Live Stream" is activated:<br/>
 ![image](https://github.com/user-attachments/assets/cd58e04d-632d-4e32-8d17-b5447480cb92)<br/>
-6- You should now be able to open/close your locks using eXtended Tuya (XT)<br/>
