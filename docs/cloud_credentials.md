@@ -1,5 +1,5 @@
 # Purpose
-The purpose of this documentation is to be able to configure the Tuya IOT Platform cloud credentials in eXtended Tuya (XT)
+The purpose of this documentation is to be able to configure the Tuya IOT Platform cloud credentials in Xtend Tuya.
 
 # READ THIS CAREFULLY
 Some initial configurations have to be done right the first time, this is because they are a pain to update afterward if you got them wrong.<br/>
@@ -57,7 +57,7 @@ DO NOT USE THE WESTERN EUROPE OR EASTERN AMERICA DATA CENTERS, THEY ARE RESERVED
 ![image](https://github.com/user-attachments/assets/57ac6999-742b-4622-9ad2-7a9670ebd1f7)<br/>
 5.2- Go to "Device & services"<br/>
 ![image](https://github.com/user-attachments/assets/aa3a20aa-ae0a-4341-9d9a-4ffed4e0c7a1)<br/>
-5.3- Click on "Xtended Tuya"<br/>
+5.3- Click on "Xtend Tuya"<br/>
 ![image](https://github.com/user-attachments/assets/462d302a-7154-4fc3-ada9-e766aa0b5d4b)<br/>
 5.4- Click on the "Configure" button next to the account you want to configure<br/>
 ![image](https://github.com/user-attachments/assets/be1e0eec-3743-4f7c-8497-eabbd2992fcb)<br/>
