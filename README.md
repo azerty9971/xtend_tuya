@@ -4,7 +4,7 @@ Extended Tuya integration for Home Assistant.
 
 ## Purpose
 
-This custom integration is there to add the missing entities for [Tuya's official integration](https://www.home-assistant.io/integrations/tuya/).
+This custom integration is there to add the missing entities for the [official Tuya integration](https://www.home-assistant.io/integrations/tuya/).
 
 The reason why this is not merged in the official Tuya integration is that the way this is done is not officially supported by Home Assistant (i.e. this integration is using _hacks_ to do its job).
 
