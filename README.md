@@ -8,6 +8,29 @@ This custom integration is there to add the missing entities for [Tuya's officia
 
 The reason why this is not merged in the official Tuya integration is that the way this is done is not officially supported by Home Assistant (i.e. this integration is using _hacks_ to do its job).
 
+### Comparison
+
+The following table compares the features of this integration with the official one, as well as the different modes this integration supports.
+
+Legend:
+
+- _OT_: Official Tuya integration
+- _OT+XT_: Xtend Tuya **without Tuya cloud credentials** but **alongside the official Tuya integration**
+- _OT+XT+Cloud_: Xtend Tuya **with Tuya cloud credentials** but **alongside the official Tuya integration**
+- _XT_: Xtend Tuya **without Tuya cloud credentials** and **without the official Tuya integration**
+- _XT+Cloud_: Xtend Tuya **with Tuya cloud credentials** and **without the official Tuya integration**
+
+| Functionality                   |         OT         |       OT+XT        |    OT+XT+Cloud     |         XT         |      XT+Cloud      | Remarks                                                                 |
+| :------------------------------ | :----------------: | :----------------: | :----------------: | :----------------: | :----------------: | :---------------------------------------------------------------------- |
+| Regular Tuya entities           | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |                                                                         |
+| Additional supported entities   |        :x:         | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |                                                                         |
+| All possible supported entities |        :x:         |        :x:         |        :x:         |        :x:         | :white_check_mark: | _OT+XT+Cloud_ is close but in some rare cases entitites will be missing |
+| Autocorrection of some entities |        :x:         |        :x:         |        :x:         |        :x:         | :white_check_mark: | _XT+Cloud_ uses multiple source to determine the entity props           |
+| Multiple account support        |        :x:         | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | Only for multiple accounts in _XT_, not the official Tuya integration   |
+| Shared device support           |        :x:         |        :x:         | :white_check_mark: |        :x:         | :white_check_mark: |                                                                         |
+| Shared home support             | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |                                                                         |
+| Localized entity names          | :white_check_mark: |        :x:         |        :x:         |        :x:         |        :x:         | Due to a limitation with custom components                              |
+
 ## Installation
 
 Easiest install is via [HACS](https://hacs.xyz/):
@@ -26,27 +49,4 @@ If you have more than one Tuya account, go to the Xtend Tuya integration page (_
 
 ### Adding your Tuya Cloud credentials
 
-If after adding this integration you still have entities which are missing, you can try inserting your Tuya Cloud credentials. The full procedure is described [here](./docs/cloud_credentials.md).
-
-### Supported operation modes
-
-This integration supports different operating modes:
-
-- Regular Tuya integration (RT) (without XT or the cloud)
-- Standalone without cloud credentials (ST) (use XT instead of the regular Tuya integration)
-- Standalone with cloud credentials (ST+Cloud)
-- Alongside Tuya without cloud credentials (TU) (use XT alongside the regular Tuya integration)
-- Alongside Tuya with cloud credentials (TU+Cloud)
-
-The table below shows the different functionalities of each operating mode:
-
-| Functionnality                  | RT  | ST  | ST+Cloud | TU  | TU+Cloud | Remarks                                                            |
-| :------------------------------ | :-: | :-: | :------: | :-: | :------: | :----------------------------------------------------------------- |
-| Regular Tuya entities           |  X  |  X  |    X     |  X  |    X     |                                                                    |
-| Additional supported entities   |     |  X  |    X     |  X  |    X     |                                                                    |
-| All possible supported entities |     |     |    X     |     |          | TU+Cloud is close but in some rare cases entitites will be missing |
-| Autocorrection of some entities |     |     |    X     |     |          | ST+Cloud uses multiple source to determine the entity props        |
-| Multiple account support        |     |  X  |    X     |  X  |    X     | Only for multiple accounts in XT, not the regular Tuya integration |
-| Shared device support           |     |     |    X     |     |    X     |                                                                    |
-| Shared home support             |  X  |  X  |    X     |  X  |    X     |                                                                    |
-| Localized entity names          |  X  |     |          |     |          | Due to a limitation with custom components                         |
+If after adding this integration you still have entities which are missing, you can try inserting your Tuya Cloud credentials (_XT+Cloud_ in the table above). The full procedure is described [here](./docs/cloud_credentials.md).
