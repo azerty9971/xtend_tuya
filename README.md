@@ -11,7 +11,7 @@ The reason why this is not merged in the official Tuya integration is because th
 ### Highlights
 
 - Adds entities needed by the Energy dashboard
-- Adds support for locks (requires [additional configuration here](./docs/configure_locks.md))
+- Adds support for locks (requires [additional configuration](./docs/configure_locks.md))
 - Much more...
 
 ### Comparison
