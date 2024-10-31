@@ -59,12 +59,11 @@ class XTMergingManager:
 
     def _fix_incorrect_valuedescr(device1: XTDevice, device2: XTDevice):
         for code in device1.function:
-            value1_dict, value1_raw = CloudFixes.get_value_descr_dict(device1.function[code].values)
             if code in device2.function:
+                value1_dict, value1_raw = CloudFixes.get_value_descr_dict(device1.function[code].values)
                 value2_dict, value2_raw = CloudFixes.get_value_descr_dict(device2.function[code].values)
             else:
-                value2_dict = None
-                value2_raw = None
+                continue
             if value1_dict is None or value2_dict is None:
                 if value1_dict is not None:
                     device2.function[code].values = device1.function[code].values
@@ -75,12 +74,11 @@ class XTMergingManager:
                     device2.function[code].values = device1.function[code].values
         
         for code in device1.status_range:
-            value1_dict, value1_raw = CloudFixes.get_value_descr_dict(device1.status_range[code].values)
             if code in device2.status_range:
+                value1_dict, value1_raw = CloudFixes.get_value_descr_dict(device1.status_range[code].values)
                 value2_dict, value2_raw = CloudFixes.get_value_descr_dict(device2.status_range[code].values)
             else:
-                value2_dict = None
-                value2_raw = None
+                continue
             if value1_dict is None or value2_dict is None:
                 if value1_dict is not None:
                     device2.status_range[code].values = device1.status_range[code].values
@@ -95,11 +93,13 @@ class XTMergingManager:
             value1_raw = None
             value2_dict = None
             value2_raw = None
-            if config_item1 := device1.local_strategy[dpId].get("config_item"):
-                value1_dict, value1_raw = CloudFixes.get_value_descr_dict(config_item1.get("valueDesc"))
             if dpId in device2.local_strategy:
+                if config_item1 := device1.local_strategy[dpId].get("config_item"):
+                    value1_dict, value1_raw = CloudFixes.get_value_descr_dict(config_item1.get("valueDesc"))
                 if config_item2 := device2.local_strategy[dpId].get("config_item"):
                     value2_dict, value2_raw = CloudFixes.get_value_descr_dict(config_item2.get("valueDesc"))
+            else:
+                continue
             if value1_raw is not None or value2_raw is not None:
                 #At least one local strategy has a value descriptor
                 if value1_dict is None or value2_dict is None:
