@@ -53,6 +53,10 @@
         "source": {
           "name": "Source",
           "description": "The source of the URL (tuya_sharing or tuya_iot)"
+        },
+        "stream_type": {
+          "name": "Stream type",
+          "description": "Stream type: rtsp/rtmp/hls/flv"
         }
       }
     },
@@ -78,6 +82,64 @@
         }
       }
     },
+    "webrtc_get_ice_servers": {
+      "name": "Get ICE servers (WebRTC)",
+      "description": "Get the ICE servers needed for a WebRTC connection",
+      "fields": {
+        "device_id": {
+          "name": "Device ID",
+          "description": "The ID of the device."
+        },
+        "session_id": {
+          "name": "Session ID",
+          "description": "Any ID used to determine the uniqueness of the whole exchange (any value you want)."
+        },
+        "source": {
+          "name": "Source",
+          "description": "The source of the URL (tuya_sharing or tuya_iot)"
+        },
+        "format": {
+          "name": "Format",
+          "description": "The format of the ICE server return (GO2RTC/SimpleWHEP)"
+        }
+      }
+    },
+    "webrtc_sdp_exchange": {
+      "name": "SDP exchange (WebRTC)",
+      "description": "Perform a WebRTC SDP exchange",
+      "fields": {
+        "device_id": {
+          "name": "Device ID",
+          "description": "The ID of the device."
+        },
+        "session_id": {
+          "name": "Session ID",
+          "description": "Any ID used to determine the uniqueness of the whole exchange (any value you want)."
+        },
+        "source": {
+          "name": "Source",
+          "description": "The source of the URL (tuya_sharing or tuya_iot)"
+        },
+        "channel": {
+          "name": "Channel",
+          "description": "Type of stream (low/high quality)"
+        }
+      }
+    },
+    "webrtc_debug": {
+      "name": "Debug WebRTC",
+      "description": "Get the traces of the WebRTC communication",
+      "fields": {
+        "session_id": {
+          "name": "Session ID",
+          "description": "Any ID used to determine the uniqueness of the whole exchange (any value you want)."
+        },
+        "source": {
+          "name": "Source",
+          "description": "The source of the URL (tuya_sharing or tuya_iot)"
+        }
+      }
+    },
     "toggle": {
       "name": "[%key:common::action::toggle%]",
       "description": "Toggles (enable / disable) an automation."
@@ -99,6 +161,9 @@
   },
   "entity": {
     "binary_sensor": {
+      "online": {
+        "name": "Device online"
+      },
       "lock_motor_state": {
         "name": "Lock status"
       },
@@ -155,6 +220,9 @@
       }
     },
     "button": {
+      "clear_energy": {
+        "name": "Clear energy"
+      },
       "manual_lock": {
         "name": "Manual lock"
       },
@@ -226,6 +294,21 @@
       }
     },
     "number": {
+      "standby_time": {
+        "name": "Standby time"
+      },
+      "standby_bright": {
+        "name": "Standby brightness"
+      },
+      "pir_delay": {
+        "name": "PIR delay"
+      },
+      "timer_on": {
+        "name": "Delayed power on"
+      },
+      "charge_cur_set": {
+        "name": "Charging current"
+      },
       "presence_delay": {
         "name": "Reset delay"
       },
@@ -246,6 +329,9 @@
       },
       "breathdistance_min": {
         "name": "Micro-motion detection lower limit"
+      },
+      "countdown": {
+        "name": "Countdown"
       },
       "countdown_1": {
         "name": "Countdown 1"
@@ -408,6 +494,49 @@
       }
     },
     "select": {
+      "pir_sensitivity": {
+        "name": "PIR sensitivity",
+        "state": {
+          "low": "Low",
+          "middle": "Medium",
+          "high": "High"
+        }
+      },
+      "cds": {
+        "name": "Sensitivity",
+        "state": {
+          "2000lux": "2000lux",
+          "300lux": "300lux",
+          "50lux": "50lux",
+          "10lux": "10lux",
+          "5lux": "5lux",
+          "now": "now"
+        }
+      },
+      "device_mode": {
+        "name": "Device mode",
+        "state": {
+          "0": "Automatic",
+          "1": "Manual",
+          "auto": "Automatic",
+          "manual": "Manual"
+        }
+      },
+      "qccdz_work_mode": {
+        "name": "Work mode",
+        "state": {
+          "0": "Charge now",
+          "1": "Charge to percentage",
+          "2": "Charge energy",
+          "3": "Scheduled charge",
+          "4": "Delayed charge",
+          "charge_now": "Real time charging",
+          "charge_pct": "Charge to percentage",
+          "charge_energy": "Charge energy",
+          "charge_schedule": "Scheduled charge",
+          "charge_delay": "Delayed charge"
+        }
+      },
       "doorbell_volume": {
         "name": "Doorbell volume",
         "state": {
@@ -784,6 +913,55 @@
       }
     },
     "sensor": {
+      "system_version": {
+        "name": "System version"
+      },
+      "qccdz_connection_state": {
+        "name": "Connection state",
+        "state": {
+          "0": "12V",
+          "1": "12V PWN",
+          "2": "9V",
+          "3": "9V PWM",
+          "4": "6V",
+          "5": "6V PWM",
+          "6": "Error",
+          "controlpi_12v": "12V",
+          "controlpi_12v_pwm": "12V PWN",
+          "controlpi_9v": "9V",
+          "controlpi_9v_pwm": "9V PWM",
+          "controlpi_6v": "6V",
+          "controlpi_6v_pwm": "6V PWM",
+          "controlpi_error": "Error"
+        }
+      },
+      "power_total": {
+        "name": "Total power"
+      },
+      "sigle_phase_power": {
+        "name": "Single phase power"
+      },
+      "qccdz_work_state": {
+        "name": "Work state",
+        "state": {
+          "0": "Charger is free",
+          "1": "Charger inserted",
+          "2": "Charger is free (fault)",
+          "3": "Charger is waiting",
+          "4": "Charger is charging",
+          "5": "Charger is paused",
+          "6": "Charger has finished",
+          "7": "Charger fault",
+          "charger_free": "Charger is free",
+          "charger_insert": "Charger inserted",
+          "charger_free_fault": "Charger is free (fault)",
+          "charger_wait": "Charger is waiting",
+          "charger_charging": "Charger is charging",
+          "charger_pause": "Charger is paused",
+          "charger_end": "Charger has finished",
+          "charger_fault": "Charger fault"
+        }
+      },
       "ms_category_alarm_lock": {
         "name": "Keypad alarm",
         "state": {
@@ -941,6 +1119,9 @@
       },
       "charge_energy": {
         "name": "Charge energy"
+      },
+      "charge_energy_once": {
+        "name": "Charge energy (single)"
       },
       "total_forward_energy": {
         "name": "Total forward energy"
@@ -1289,6 +1470,10 @@
       }
     },
     "switch": {
+      "switch_pir":
+      {
+        "name": "Switch PIR"
+      },
       "photo_again":
       {
         "name": "Take another photo"

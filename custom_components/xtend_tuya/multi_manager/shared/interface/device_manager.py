@@ -109,7 +109,7 @@ class XTDeviceManagerInterface(ABC):
     def trigger_scene(self, home_id: str, scene_id: str) -> False:
         return False
     
-    def get_webrtc_sdp_answer(self, device_id: str, session_id: str, sdp_offer: str) -> str | None:
+    def get_webrtc_sdp_answer(self, device_id: str, session_id: str, sdp_offer: str, channel: str) -> str | None:
         return None
     
     def get_webrtc_ice_servers(self, device_id: str, session_id: str, format: str) -> str | None:
