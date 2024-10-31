@@ -105,6 +105,10 @@ class CloudFixes:
             if code := dp_item.get("status_code"):
                 if code not in all_codes:
                     all_codes.append(code)
+            if aliases := dp_item.get("status_code_alias"):
+                for alias in aliases:
+                    if alias not in all_codes:
+                        all_codes.append(alias)
         for code in all_codes:
             correct_value = None
             dp_id = None
@@ -112,50 +116,92 @@ class CloudFixes:
             sr_need_fixing = False
             fn_need_fixing = False
             ls_need_fixing = False
-            try:
-                if code in device.status_range:
+            if code in device.status_range:
+                sr_value_dict, sr_value_raw = CloudFixes.get_value_descr_dict(device.status_range[code].values)
+                if device.status_range[code].dp_id is not None:
                     dp_id = device.status_range[code].dp_id
-                    value_dict = json.loads(device.status_range[code].values)
-                    iter(value_dict)
-                    correct_value = device.status_range[code].values
-            except Exception:
-                sr_need_fixing = True
-                need_fixing = True
-            try:
-                if code in device.function:
-                    dp_id = device.function[code].dp_id
-                    value_dict = json.loads(device.function[code].values)
-                    iter(value_dict)
-                    correct_value = device.function[code].values
-            except Exception:
-                fn_need_fixing = True
-                need_fixing = True
-            if dp_id is not None:
-                try:
-                    if dp_item := device.local_strategy.get(dp_id):
-                        if config_item := dp_item.get("config_item"):
-                            if value_descr := config_item.get("valueDesc"):
-                                value_dict = json.loads(value_descr)
-                                iter(value_dict)
-                                correct_value = value_descr
-                except Exception:
-                    ls_need_fixing = True
+                if sr_value_dict is None:
+                    sr_need_fixing = True
                     need_fixing = True
-            if need_fixing and correct_value is None:
-                LOGGER.warning("Could not fix incorrect valueDesc")
-                if sr_need_fixing:
-                    LOGGER.warning(f"StatusRange: |{device.status_range[code].values}|")
-                if fn_need_fixing:
-                    LOGGER.warning(f"Function: |{device.function[code].values}|")
-                if ls_need_fixing:
-                    LOGGER.warning(f"LocalStrategy: |{value_descr}|")
-            if need_fixing and correct_value is not None:
+                else:
+                    correct_value = sr_value_raw
+            if code in device.function:
+                fn_value_dict, fn_value_raw = CloudFixes.get_value_descr_dict(device.function[code].values)
+                if device.function[code].dp_id is not None:
+                    dp_id = device.function[code].dp_id
+                if fn_value_dict is None:
+                    fn_need_fixing = True
+                    need_fixing = True
+                else:
+                    correct_value = fn_value_raw
+            if dp_id is None:
+                #Try to find the code the manually (Should not happen in theory)
+                for dp_id_temp in device.local_strategy:
+                    if ls_code := device.local_strategy[dp_id_temp].get("status_code"):
+                        if ls_code == code:
+                            dp_id = dp_id_temp
+                            break
+                    if aliases := device.local_strategy[dp_id_temp].get("status_code_alias"):
+                        for alias in aliases:
+                            if alias == code:
+                                dp_id = dp_id_temp
+                                break
+            if dp_id is not None:
+                if dp_item := device.local_strategy.get(dp_id):
+                    if config_item := dp_item.get("config_item"):
+                        ls_value_dict, ls_value_raw = CloudFixes.get_value_descr_dict(config_item.get("valueDesc"))
+                        if ls_value_dict is None:
+                            ls_need_fixing = True
+                            need_fixing = True
+                        else:
+                            correct_value = ls_value_raw
+
+            if need_fixing:
+                if correct_value is None:
+                    error_values: list[str] = []
+                    if ls_need_fixing:
+                        error_values.append(ls_value_raw)
+                    if sr_need_fixing:
+                        error_values.append(sr_value_raw)
+                    if fn_need_fixing:
+                        error_values.append(fn_value_raw)
+                    if len(error_values) < 2:
+                        correct_value = CloudFixes.get_fixed_value_descr(error_values[0], None)
+                    else:
+                        correct_value = CloudFixes.get_fixed_value_descr(error_values[0], error_values[1])
                 if sr_need_fixing:
                     device.status_range[code].values = correct_value
                 if fn_need_fixing:
                     device.function[code].values = correct_value
                 if ls_need_fixing:
                     config_item["valueDesc"] = correct_value
+
+    def get_value_descr_dict(value_str: str):
+        try:
+            value_dict: dict = json.loads(value_str)
+            if value_dict.get("ErrorValue1"):
+                return None, value_dict["ErrorValue1"]
+            iter(value_dict)
+            return value_dict, value_str
+        except Exception:
+            return None, value_str
+    
+    def get_fixed_value_descr(value1_str: str, value2_str: str | None = None) -> str:
+        if value1_str is not None and value2_str is not None:
+            return json.dumps({
+                "ErrorValue1": value1_str,
+                "ErrorValue2": value2_str,
+            })
+        elif value1_str is not None:
+            return json.dumps({
+                "ErrorValue1": value1_str,
+            })
+        elif value2_str is not None:
+            return json.dumps({
+                "ErrorValue1": value2_str,
+            })
+        else:
+            return json.dumps({})
 
     def _align_valuedescr(device: XTDevice):
         all_codes: dict[str, int] = {}

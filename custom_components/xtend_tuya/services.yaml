@@ -6,6 +6,10 @@ get_camera_stream_url:
       required: false
       example: "tuya_sharing"
       default: "tuya_sharing"
+    stream_type:
+      required: false
+      example: "rtsp"
+      default: "rtsp"
 
 call_api:
   fields:
@@ -21,3 +25,41 @@ call_api:
       example: "/v1.0/devices/{device_id}/webrtc-configs"
     payload:
       required: false
+
+webrtc_get_ice_servers:
+  fields:
+    device_id:
+      required: true
+    session_id:
+      required: true
+      example: "test1"
+    source:
+      required: false
+      example: "tuya_iot"
+      default: "tuya_iot"
+    format:
+      required: false
+      example: "SimpleWHEP"
+      default: "GO2RTC"
+
+webrtc_sdp_exchange:
+  fields:
+    device_id:
+      required: true
+    session_id:
+      required: true
+      example: "test1"
+    source:
+      required: false
+      example: "tuya_iot"
+      default: "tuya_iot"
+
+webrtc_debug:
+  fields:
+    session_id:
+      required: true
+      example: "test1"
+    source:
+      required: false
+      example: "tuya_iot"
+      default: "tuya_iot"
