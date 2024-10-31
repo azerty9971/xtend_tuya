@@ -59,72 +59,57 @@ class XTMergingManager:
 
     def _fix_incorrect_valuedescr(device1: XTDevice, device2: XTDevice):
         for code in device1.function:
-            need_fixing = False
-            try:
-                value_dict: dict = json.loads(device1.function[code].values)
-                if value_dict.get("ErrorValue1"):
-                    need_fixing = True
-                iter(value_dict)
-            except Exception:
-                LOGGER.debug(f"Found invalid value descriptor for device {device1}, attempting fix: |{device1.function[code].values}|", stack_info=True)
-                need_fixing = True
-            if need_fixing:
-                if code in device2.function:
-                    try:
-                        value_dict: dict = json.loads(device2.function[code].values)
-                        iter(value_dict)
-                        device1.function[code].values = device2.function[code].values
-                    except Exception:
-                        LOGGER.debug("Fix unsuccessful, clearing values")
-                        new_descriptor: dict = {"ErrorValue1": device1.function[code].values, "ErrorValue2": device2.function[code].values}
-                        device1.function[code].values = json.dumps(new_descriptor)
-                        device2.function[code].values = device1.function[code].values
+            if code in device2.function:
+                value1_dict, value1_raw = CloudFixes.get_value_descr_dict(device1.function[code].values)
+                value2_dict, value2_raw = CloudFixes.get_value_descr_dict(device2.function[code].values)
+            else:
+                continue
+            if value1_dict is None or value2_dict is None:
+                if value1_dict is not None:
+                    device2.function[code].values = device1.function[code].values
+                elif value2_dict is not None:
+                    device1.function[code].values = device2.function[code].values
+                else:
+                    device1.function[code].values = CloudFixes.get_fixed_value_descr(value1_raw, value2_raw)
+                    device2.function[code].values = device1.function[code].values
+        
         for code in device1.status_range:
-            need_fixing = False
-            try:
-                value_dict: dict = json.loads(device1.status_range[code].values)
-                if value_dict.get("ErrorValue1"):
-                    need_fixing = True
-                iter(value_dict)
-            except Exception:
-                LOGGER.debug(f"Found invalid value descriptor, attempting fix: |{device1.status_range[code].values}|")
-                need_fixing = True
-            if need_fixing:
-                if code in device2.status_range:
-                    try:
-                        value_dict: dict = json.loads(device2.status_range[code].values)
-                        iter(value_dict)
-                        device1.status_range[code].values = device2.status_range[code].values
-                    except Exception:
-                        LOGGER.debug("Fix unsuccessful, clearing values")
+            if code in device2.status_range:
+                value1_dict, value1_raw = CloudFixes.get_value_descr_dict(device1.status_range[code].values)
+                value2_dict, value2_raw = CloudFixes.get_value_descr_dict(device2.status_range[code].values)
+            else:
+                continue
+            if value1_dict is None or value2_dict is None:
+                if value1_dict is not None:
+                    device2.status_range[code].values = device1.status_range[code].values
+                elif value2_dict is not None:
+                    device1.status_range[code].values = device2.status_range[code].values
+                else:
+                    device1.status_range[code].values = CloudFixes.get_fixed_value_descr(value1_raw, value2_raw)
+                    device2.status_range[code].values = device1.status_range[code].values
+        
         for dpId in device1.local_strategy:
-            need_fixing = False
-            if config_item := device1.local_strategy[dpId].get("config_item"):
-                if value_descr := config_item.get("valueDesc"):
-                    try:
-                        value_dict: dict = json.loads(value_descr)
-                        if value_dict.get("ErrorValue1"):
-                            need_fixing = True
-                        iter(value_dict)
-                    except Exception:
-                        #This json is ill-formed, mark it for fixing
-                        LOGGER.debug(f"Found invalid value descriptor, attempting fix: |{value_descr}|")
-                        need_fixing = True
-            if need_fixing:
-                #Let's see if the same descriptor is better in the other device
-                if dpId in device2.local_strategy:
-                    if config_item2 := device1.local_strategy[dpId].get("config_item"):
-                        if value_descr2 := config_item2.get("valueDesc"):
-                            try:
-                                value_dict: dict = json.loads(value_descr)
-                                iter(value_dict)
-                                config_item["valueDesc"] = config_item2["valueDesc"]
-                                LOGGER.debug("Fix was successful")
-                            except Exception:
-                                LOGGER.debug("Fix unsuccessful, clearing values")
-                                new_descriptor: dict = {"ErrorValue1": value_descr, "ErrorValue2": value_descr2}
-                                config_item["valueDesc"] = json.dumps(new_descriptor)
-                                config_item2["valueDesc"] = config_item["valueDesc"]
+            value1_dict = None
+            value1_raw = None
+            value2_dict = None
+            value2_raw = None
+            if dpId in device2.local_strategy:
+                if config_item1 := device1.local_strategy[dpId].get("config_item"):
+                    value1_dict, value1_raw = CloudFixes.get_value_descr_dict(config_item1.get("valueDesc"))
+                if config_item2 := device2.local_strategy[dpId].get("config_item"):
+                    value2_dict, value2_raw = CloudFixes.get_value_descr_dict(config_item2.get("valueDesc"))
+            else:
+                continue
+            if value1_raw is not None or value2_raw is not None:
+                #At least one local strategy has a value descriptor
+                if value1_dict is None or value2_dict is None:
+                    if value1_dict is not None:
+                        config_item2["valueDesc"] = config_item1["valueDesc"]
+                    elif value2_dict is not None:
+                        config_item1["valueDesc"] = config_item2["valueDesc"]
+                    else:
+                        config_item1["valueDesc"] = CloudFixes.get_fixed_value_descr(value1_raw, value2_raw)
+                        config_item2["valueDesc"] = config_item1["valueDesc"]
 
     def _align_valuedescr(device1: XTDevice, device2: XTDevice):
         for code in device1.status_range:
