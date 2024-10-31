@@ -156,6 +156,7 @@ class XTMergingManager:
                 use_oapi2 = device2.local_strategy[dpId].get("use_open_api")
                 prop_upd1 = device1.local_strategy[dpId].get("property_update")
                 prop_upd2 = device2.local_strategy[dpId].get("property_update")
+                prefer = None
                 if not use_oapi1:
                     prefer = 1
                 elif not use_oapi2:
