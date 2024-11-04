@@ -199,6 +199,11 @@ class MultiManager:  # noqa: F811
     def _read_dpId_from_code(self, code: str, device: XTDevice) -> int | None:
         if not hasattr(device, "local_strategy"):
             return None
+        if ( code in device.status_range 
+            and hasattr(device.status_range[code], "dp_id") 
+            and device.status_range[code].dp_id is not None
+            ):
+            return device.status_range[code].dp_id
         for dpId in device.local_strategy:
             if device.local_strategy[dpId]["status_code"] == code:
                 return dpId
