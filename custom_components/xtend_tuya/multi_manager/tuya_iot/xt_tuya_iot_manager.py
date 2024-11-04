@@ -85,7 +85,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         response = self.api.get(f"/v1.0/users/{self.api.token_info.uid}/devices")
         if response["success"]:
             for item in response["result"]:
-                device = XTDevice(**item)       #CHANGED
+                device = XTDevice(**item)               #CHANGED
                 status = {}
                 for item_status in device.status:
                     if "code" in item_status and "value" in item_status:
@@ -93,7 +93,9 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                         value = item_status["value"]
                         status[code] = value
                 device.status = status
-                self.device_map[item["id"]] = device
+                self.device_map[device.id] = device     #CHANGED
+                if "id" not in item:
+                    LOGGER.warning(f"Received invalid device info: {item}")
 
         #ADDED
         for device in self.multi_manager.devices_shared.values():
