@@ -12,10 +12,10 @@ from homeassistant.components.alarm_control_panel import (
     AlarmControlPanelEntityFeature,
 )
 from homeassistant.const import (
-    STATE_ALARM_ARMED_AWAY,
-    STATE_ALARM_ARMED_HOME,
-    STATE_ALARM_DISARMED,
-    STATE_ALARM_TRIGGERED,
+    AlarmControlPanelState.ARMED_AWAY,
+    AlarmControlPanelState.ARMED_HOME,
+    AlarmControlPanelState.DISARMED,
+    AlarmControlPanelState.TRIGGERED,
     Platform
 )
 from homeassistant.core import HomeAssistant, callback
