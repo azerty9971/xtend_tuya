@@ -139,6 +139,4 @@ async def async_remove_entry(hass: HomeAssistant, entry: XTConfigEntry) -> None:
 
     This will revoke the credentials from Tuya.
     """
-    runtime_data = get_config_entry_runtime_data(hass, entry, DOMAIN)
-    if runtime_data:
-        await hass.async_add_executor_job(runtime_data.device_manager.unload)
+    await hass.async_add_executor_job(entry.runtime_data.multi_manager.unload)
