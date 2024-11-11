@@ -283,7 +283,6 @@ class MultiManager:  # noqa: F811
         return status
 
     def on_message(self, source: str, msg: str):
-        LOGGER.warning(f"On message: {msg}", stack_info=True)
         if not self.is_ready_for_messages:
             self.pending_messages.append((source, msg))
             return
