@@ -10,12 +10,9 @@ from homeassistant.components.alarm_control_panel import (
     AlarmControlPanelEntity,
     AlarmControlPanelEntityDescription,
     AlarmControlPanelEntityFeature,
+    AlarmControlPanelState,
 )
 from homeassistant.const import (
-    AlarmControlPanelState.ARMED_AWAY,
-    AlarmControlPanelState.ARMED_HOME,
-    AlarmControlPanelState.DISARMED,
-    AlarmControlPanelState.TRIGGERED,
     Platform
 )
 from homeassistant.core import HomeAssistant, callback
@@ -41,10 +38,10 @@ class Mode(StrEnum):
 
 
 STATE_MAPPING: dict[str, str] = {
-    Mode.DISARMED: STATE_ALARM_DISARMED,
-    Mode.ARM: STATE_ALARM_ARMED_AWAY,
-    Mode.HOME: STATE_ALARM_ARMED_HOME,
-    Mode.SOS: STATE_ALARM_TRIGGERED,
+    Mode.DISARMED: AlarmControlPanelState.DISARMED,
+    Mode.ARM: AlarmControlPanelState.ARMED_AWAY,
+    Mode.HOME: AlarmControlPanelState.ARMED_HOME,
+    Mode.SOS: AlarmControlPanelState.TRIGGERED,
 }
 
 
