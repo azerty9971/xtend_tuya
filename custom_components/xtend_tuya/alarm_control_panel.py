@@ -10,10 +10,14 @@ from homeassistant.components.alarm_control_panel import (
     AlarmControlPanelEntity,
     AlarmControlPanelEntityDescription,
     AlarmControlPanelEntityFeature,
-    AlarmControlPanelState,
+    #AlarmControlPanelState,    #Activate somewhere around 2025.8
 )
 from homeassistant.const import (
-    Platform
+    Platform,
+    STATE_ALARM_ARMED_AWAY,     #Disable somewhere around 2025.8
+    STATE_ALARM_ARMED_HOME,     #Disable somewhere around 2025.8
+    STATE_ALARM_DISARMED,       #Disable somewhere around 2025.8
+    STATE_ALARM_TRIGGERED,      #Disable somewhere around 2025.8
 )
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
@@ -38,10 +42,14 @@ class Mode(StrEnum):
 
 
 STATE_MAPPING: dict[str, str] = {
-    Mode.DISARMED: AlarmControlPanelState.DISARMED,
-    Mode.ARM: AlarmControlPanelState.ARMED_AWAY,
-    Mode.HOME: AlarmControlPanelState.ARMED_HOME,
-    Mode.SOS: AlarmControlPanelState.TRIGGERED,
+    #Mode.DISARMED: AlarmControlPanelState.DISARMED,    #Activate somewhere around 2025.8
+    #Mode.ARM: AlarmControlPanelState.ARMED_AWAY,       #Activate somewhere around 2025.8
+    #Mode.HOME: AlarmControlPanelState.ARMED_HOME,      #Activate somewhere around 2025.8
+    #Mode.SOS: AlarmControlPanelState.TRIGGERED,        #Activate somewhere around 2025.8
+    Mode.DISARMED: STATE_ALARM_DISARMED,                #Disable somewhere around 2025.8
+    Mode.ARM: STATE_ALARM_ARMED_AWAY,                   #Disable somewhere around 2025.8
+    Mode.HOME: STATE_ALARM_ARMED_HOME,                  #Disable somewhere around 2025.8
+    Mode.SOS: STATE_ALARM_TRIGGERED,                    #Disable somewhere around 2025.8
 }
 
 
