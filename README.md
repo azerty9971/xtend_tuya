@@ -1,55 +1,62 @@
-# xtend_tuya
-HomeAssistant eXtend Tuya's integration
+# Xtend Tuya
 
-# Current status
-The custom component is working as expected
+Extended Tuya integration for Home Assistant.
 
-# Purpose
-This Custom Integration is there to add the missing entities in Tuya's integration.<br/>
-The reason why this is not merged in the main Tuya integration is that the way this is done is not officially supported by HomeAssistant (AKA this integration is using hacks to do its job)
+## Purpose
 
-# Supported operation modes
-This integration supports different operating modes:<br/>
-- Regular Tuya integration (RT) (without XT or the cloud)<br/>
-- Standalone without cloud credentials (ST) (use XT instead of the regular Tuya integration)<br/>
-- Standalone with cloud credentials (ST+Cloud)<br/>
-- Alongside Tuya without cloud credentials(TU) (use XT alongside the regular Tuya integration)<br/>
-- Alongside Tuya with cloud credentials(TU+Cloud)<br/>
-<br/>
-The table below shows the different functionnalities of each operating mode<br/>
+This custom integration is there to add the missing entities on the [official Tuya integration](https://www.home-assistant.io/integrations/tuya/).
 
-| Functionnality                  | RT  | ST  | ST+Cloud | TU  | TU+Cloud | Remarks                                                            |
-| :------------------------------ | :-: | :-: | :------: | :-: | :------: | :----------------------------------------------------------------- |
-| Regular Tuya entities           | X   | X   | X        | X   | X        |                                                                    |
-| Additional supported entities   |     | X   | X        | X   | X        |                                                                    |
-| All possible supported entities |     |     | X        |     |          | TU+Cloud is close but in some rare cases entitites will be missing |
-| Autocorrection of some entities |     |     | X        |     |          | ST + Cloud uses multiple source to determine the entity props      |
-| Multiple account support        |     | X   | X        | X   | X        | Only for multiple accounts in XT, not the regular Tuya integration |
-| Shared device support           |     |     | X        |     | X        |                                                                    |
-| Shared home support             | X   | X   | X        | X   | X        |                                                                    |
+The reason why this is not merged in the official Tuya integration is because the way this is done is not officially supported by Home Assistant core team (i.e. this integration uses _hacks_ to do its job).
 
+### Highlights
 
-# Installation
-You have 2 choices to install, either via Home Assistant Community Store (HACS) or using manual install:<br/>
-1- HACS (recommended)<br/>
-Add the current repository URL to your HACS repositories by going into HACS, click the 3 dots, add custom repository.<br/>
-In the screen, fill azerty9971/xtend_tuya as the repository, select integration as type and click add.<br/>
-Now you can download xtend_tuya directly from HACS (and get notified when I update it)<br/>
-<br/>
-2- Manual installation (advanced)<br/>
-Clone the repository and put all the files using SSH to your /homeassistant/custom_components folder (final folder will look like: /homeassistant/custom_components/xtend_tuya)<br/>
-Once this is done, restart your HomeAssistant instance, go to Settings -> Devices and integrations -> Add integration -> type "Tuya" and select Xtended Tuya<br/>
+- Adds entities needed by the Energy dashboard
+- Adds support for locks (requires [additional configuration](./docs/configure_locks.md))
+- Much more...
 
-# Usage
-Once installed, the base devices should have the new entities automatically added and they should be supported in the Energy dashboard for instance<br/>
-If you have more than 1 tuya account, click go to the Xtended Tuya configuration page (Settings -> Devices and integrations -> Xtended Tuya) and click "Add a bridge", this will pull the next available Tuya configuration available (repeat for more)
+### Comparison
 
-# Adding your Tuya Cloud credentials
-If you have missing entities, you can try inserting your Tuya Cloud API credentials.<br/>
-To do that, go to the Xtended Tuya integration page, next to your account, click the "configure" button.<br/>
-You'll be prompted for cloud credentials, for an assistance on how to get these, follow the following tutorial:<br/>
-https://www.youtube.com/watch?v=y6kNHIYcJ5c<br/>
-Please watch out that the username is the same as the username displayed in the regular Tuya integration<br/>
-(the gg-106053160716494114782 in the following screenshot)<br/>
-![image](https://github.com/user-attachments/assets/8f8ec9d3-1454-4ef5-8871-61ab4c12de90)
+The following table compares the features of this integration with the official one, as well as the different modes this integration supports. Legend:
 
+- **_OT_**: Official Tuya integration
+- **_OT+XT_**: Xtend Tuya **WITHOUT** Tuya cloud credentials and **ALONGSIDE** the official Tuya integration
+- **_OT+XT+Cloud_**: Xtend Tuya **WITH** Tuya cloud credentials and **ALONGSIDE** the official Tuya integration
+- **_XT_**: Xtend Tuya **WITHOUT** Tuya cloud credentials and **WITHOUT** the official Tuya integration
+- **_XT+Cloud_**: Xtend Tuya **WITH** Tuya cloud credentials and **WITHOUT** the official Tuya integration
+
+| Functionality                      |         OT         |       OT+XT        |    OT+XT+Cloud     |         XT         |      XT+Cloud      | Remarks                                                                                                   |
+| :--------------------------------- | :----------------: | :----------------: | :----------------: | :----------------: | :----------------: | :-------------------------------------------------------------------------------------------------------- |
+| official Tuya integration entities | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |                                                                                                           |
+| Additional entities support        |        :x:         | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |                                                                                                           |
+| All possible entities support      |        :x:         |        :x:         |        :x:         |        :x:         | :white_check_mark: | _OT+XT+Cloud_ is close but in some rare cases entities will be missing                                    |
+| Autocorrection of some entities    |        :x:         |        :x:         |        :x:         |        :x:         | :white_check_mark: | _XT+Cloud_ uses multiple sources to determine the entity properties                                       |
+| Multiple account support           |        :x:         | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | When using _OT+XT_, multiple accounts are only supported in Xtend Tuya, not the official Tuya integration |
+| Shared device support              |        :x:         |        :x:         | :white_check_mark: |        :x:         | :white_check_mark: |                                                                                                           |
+| Shared home support                | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |                                                                                                           |
+| Localized entity names             | :white_check_mark: |        :x:         |        :x:         |        :x:         |        :x:         | Due to a limitation with custom components                                                                |
+
+## Installation
+
+Easiest install is via [HACS](https://hacs.xyz/):
+
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=azerty9971&repository=xtend_tuya&category=integration)
+
+1. Click the button above, and install this integration via HACS.
+2. Restart Home Assistant.
+3. Go to _Settings_ -> _Devices and integrations_ -> _Add integration_ and select **Xtend Tuya**.
+
+## Usage
+
+You can choose to use this integration alongside the official Tuya integration or not. The choice is yours, but using it **without** the official Tuya integration will give you some perks (see comparison table above).
+
+When installed **without** the official Tuya integration, this integration will **provide all the devices and entities** by itself.
+
+When installed **alongside** the official Tuya integration, this integration will **add the missing entities** to the existing devices provided by the official Tuya integration.
+
+## Multiple accounts
+
+If you have more than one Tuya account, go to the Xtend Tuya integration page (_Settings_ -> _Devices and integrations_ -> _Xtend Tuya_) and click _Add hub_. This will prompt for your new account, or it will automatically pull the next account from the official Tuya integration (you can repeat for more).
+
+## Still missing entities?
+
+If after adding this integration you still have entities which are missing, you can try inserting your Tuya Cloud credentials (_XT+Cloud_ in the table above). The full procedure is described [here](./docs/cloud_credentials.md).
