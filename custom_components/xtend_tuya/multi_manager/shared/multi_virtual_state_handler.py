@@ -11,7 +11,6 @@ from .device import (
 from ...const import (
     VirtualStates,
     DescriptionVirtualState,
-    LOGGER,
 )
 
 from ..multi_manager import (
@@ -112,7 +111,6 @@ class XTVirtualStateHandler:
                                         device.local_strategy[new_dp_id] = new_local_strategy
 
     def apply_virtual_states_to_status_list(self, device: XTDevice, status_in: list) -> list:
-        LOGGER.warning(f"apply_virtual_states_to_status_list: {device.name} : {status_in}", stack_info=True)
         status = copy.deepcopy(status_in)
         virtual_states = self.get_category_virtual_states(device.category)
         for virtual_state in virtual_states:
