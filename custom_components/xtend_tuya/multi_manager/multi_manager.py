@@ -63,7 +63,6 @@ from .shared.multi_virtual_function_handler import (
 
 from ..util import (
     append_lists,
-    debug_func,
 )
 
 from .shared.interface.device_manager import (
@@ -204,7 +203,6 @@ class MultiManager:  # noqa: F811
             and hasattr(device.status_range[code], "dp_id") 
             and device.status_range[code].dp_id is not None
             ):
-            #debug_func(code, device, device.status_range[code].dp_id)
             return device.status_range[code].dp_id
         for dpId in device.local_strategy:
             if device.local_strategy[dpId]["status_code"] == code:
