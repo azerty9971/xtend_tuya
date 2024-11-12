@@ -38,6 +38,7 @@ from .ipc.xt_tuya_iot_ipc_manager import (
 
 class XTIOTDeviceManager(TuyaDeviceManager):
     def __init__(self, multi_manager: MultiManager, api: TuyaOpenAPI, mq: TuyaOpenMQ) -> None:
+        self.device_map: dict[str, XTDevice] = {}
         super().__init__(api, mq)
         mq.remove_message_listener(self.on_message)
         mq.add_message_listener(self.forward_message_to_multi_manager)
@@ -148,7 +149,22 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         status_new = self.multi_manager.convert_device_report_status_list(device_id, status)
         status_new = self.multi_manager.multi_source_handler.filter_status_list(device_id, MESSAGE_SOURCE_TUYA_IOT, status_new)
         status_new = self.multi_manager.virtual_state_handler.apply_virtual_states_to_status_list(device, status_new)
-        super()._on_device_report(device_id, status_new)
+        for item in status:
+            if "code" in item and "value" in item:
+                code = item["code"]
+                value = item["value"]
+                device.status[code] = value
+            if (
+                "dpId" in item 
+                and "value" in item 
+                and item["dpId"] in device.local_strategy
+                and "status_code_alias" in device.local_strategy[item["dpId"]]
+            ):
+                for alias in device.local_strategy[item["dpId"]]["status_code_alias"]:
+                    value = item["value"]
+                    device.status[alias] = value
+
+        super()._on_device_report(device_id, [])
 
     def _update_device_list_info_cache(self, devIds: list[str]):
         response = self.get_device_list_info(devIds)
