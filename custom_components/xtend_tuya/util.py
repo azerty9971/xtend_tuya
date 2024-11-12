@@ -168,6 +168,6 @@ def get_all_multi_managers(hass: HomeAssistant) -> list[MultiManager]:
     return return_list
 
 def debug_func(code: str, device: XTDevice, dpId: int) -> None:
-    stack = traceback.format_tb()
+    stack = traceback.format_stack()
     if len(stack) > 100:
         LOGGER.warning(f"Long stack detected {code} <=> {device} <=> {dpId}", stack_info=True)
