@@ -204,7 +204,7 @@ class MultiManager:  # noqa: F811
             and hasattr(device.status_range[code], "dp_id") 
             and device.status_range[code].dp_id is not None
             ):
-            debug_func(code, device, device.status_range[code].dp_id)
+            #debug_func(code, device, device.status_range[code].dp_id)
             return device.status_range[code].dp_id
         for dpId in device.local_strategy:
             if device.local_strategy[dpId]["status_code"] == code:
@@ -285,7 +285,6 @@ class MultiManager:  # noqa: F811
         return status
 
     def on_message(self, source: str, msg: str):
-        LOGGER.warning(f"Received message: {msg} from {source}")
         if not self.is_ready_for_messages:
             self.pending_messages.append((source, msg))
             return
