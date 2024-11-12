@@ -1,6 +1,6 @@
 {
   "domain": "xtend_tuya",
-  "name": "Xtended Tuya",
+  "name": "Xtend Tuya",
   "after_dependencies": ["tuya"],
   "codeowners": ["@azerty9971"],
   "config_flow": true,
