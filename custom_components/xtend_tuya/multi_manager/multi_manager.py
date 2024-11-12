@@ -203,7 +203,7 @@ class MultiManager:  # noqa: F811
             and hasattr(device.status_range[code], "dp_id") 
             and device.status_range[code].dp_id is not None
             ):
-            LOGGER.warning(f"Returning dpid {device.status_range[code].dp_id}", stack_info=True)
+            LOGGER.warning(f"Returning dpid {device.status_range[code].dp_id}")
             return device.status_range[code].dp_id
         for dpId in device.local_strategy:
             if device.local_strategy[dpId]["status_code"] == code:
