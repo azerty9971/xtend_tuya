@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 import copy
+import traceback
 from typing import NamedTuple
 from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
@@ -11,6 +12,11 @@ from .const import (
     DPType,
     DOMAIN,
 )
+
+from .multi_manager.shared.device import (
+    XTDevice,
+)
+
 from tuya_sharing.manager import (
     Manager,
     SharingDeviceListener,
