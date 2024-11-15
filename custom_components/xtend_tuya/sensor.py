@@ -349,6 +349,7 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
             state_class=SensorStateClass.MEASUREMENT,
             entity_registry_enabled_default=True,
         ),
+        *TEMPERATURE_SENSORS,
         *CONSUMPTION_SENSORS,
     ),
     # Automatic cat litter box
