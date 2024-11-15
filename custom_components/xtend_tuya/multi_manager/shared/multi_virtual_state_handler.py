@@ -132,7 +132,6 @@ class XTVirtualStateHandler:
                             code, dpId, new_key_value, result_ok = self.multi_manager._read_code_dpid_value_from_state(device.id, {"code": str(state_name), "value": new_key_value})
                             if result_ok:
                                 new_status = {"code": code, "value": copy.copy(new_key_value), "dpId": dpId}
-                                LOGGER.warning(f"Append1: {new_status}")
                                 status.append(new_status)
                         for state_name in virtual_state.vs_copy_delta_to_state:
                             code, dpId, new_key_value, result_ok = self.multi_manager._read_code_dpid_value_from_state(device.id, {"code": str(state_name), "value": new_key_value})
@@ -141,7 +140,6 @@ class XTVirtualStateHandler:
                                 current_value = device.status[code]
                             if result_ok and current_value is not None:
                                 new_status = {"code": code, "value": copy.copy(new_key_value - cur_key_value), "dpId": dpId}
-                                LOGGER.warning(f"Append2: {new_status}")
                                 status.append(new_status)
             
             if virtual_state.virtual_state_value == VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD:
