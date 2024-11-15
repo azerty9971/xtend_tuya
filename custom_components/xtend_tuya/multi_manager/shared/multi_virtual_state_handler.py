@@ -11,6 +11,7 @@ from .device import (
 from ...const import (
     VirtualStates,
     DescriptionVirtualState,
+    LOGGER,
 )
 
 from ..multi_manager import (
@@ -70,6 +71,7 @@ class XTVirtualStateHandler:
                                 device.status[new_code] = copy.deepcopy(device.status[virtual_state.key])
                             device.status_range[new_code] = copy.deepcopy(device.status_range[virtual_state.key])
                             device.status_range[new_code].code = new_code
+                            device.status_range[new_code].dp_id = None
                             if not self.multi_manager._read_dpId_from_code(new_code, device):
                                 if dp_id := self.multi_manager._read_dpId_from_code(virtual_state.key, device):
                                     if new_dp_id := self._get_empty_local_strategy_dp_id(device):
@@ -87,6 +89,7 @@ class XTVirtualStateHandler:
                                 device.status[new_code] = 0
                             device.status_range[new_code] = copy.deepcopy(device.status_range[virtual_state.key])
                             device.status_range[new_code].code = new_code
+                            device.status_range[new_code].dp_id = None
                             if not self.multi_manager._read_dpId_from_code(new_code, device):
                                 if dp_id := self.multi_manager._read_dpId_from_code(virtual_state.key, device):
                                     if new_dp_id := self._get_empty_local_strategy_dp_id(device):
@@ -105,6 +108,7 @@ class XTVirtualStateHandler:
                                 device.status[new_code] = copy.deepcopy(device.status[virtual_state.key])
                             device.function[new_code] = copy.deepcopy(device.function[virtual_state.key])
                             device.function[new_code].code = new_code
+                            device.function[new_code].dp_id = None
                             if not self.multi_manager._read_dpId_from_code(new_code, device):
                                 if dp_id := self.multi_manager._read_dpId_from_code(virtual_state.key, device):
                                     if new_dp_id := self._get_empty_local_strategy_dp_id(device):
@@ -118,7 +122,7 @@ class XTVirtualStateHandler:
         virtual_states = self.get_category_virtual_states(device.category)
         for virtual_state in virtual_states:
             if virtual_state.virtual_state_value == VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME:
-                for item in status_in:
+                for item in status:
                     code, dpId, new_key_value, result_ok = self.multi_manager._read_code_dpid_value_from_state(device.id, item)
                     if result_ok and code == virtual_state.key:
                         cur_key_value = 0
@@ -144,7 +148,7 @@ class XTVirtualStateHandler:
                 if device.status[virtual_state.key] is None:
                     device.status[virtual_state.key] = 0
                 if virtual_state.key in device.status:
-                    for item in status_in:
+                    for item in status:
                         code, dpId, new_key_value, result_ok = self.multi_manager._read_code_dpid_value_from_state(device.id, item, False, True)
                         if result_ok and code == virtual_state.key:
                             item["value"] += device.status[virtual_state.key]
