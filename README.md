@@ -60,3 +60,5 @@ If you have more than one Tuya account, go to the Xtend Tuya integration page (_
 ## Still missing entities?
 
 If after adding this integration you still have entities which are missing, you can try inserting your Tuya Cloud credentials (_XT+Cloud_ in the table above). The full procedure is described [here](./docs/cloud_credentials.md).
+
+After that, if you are still missing some entities, you can perform the [following procedure](./docs/enable_all_dpcodes.md)
