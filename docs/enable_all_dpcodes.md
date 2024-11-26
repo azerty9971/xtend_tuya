@@ -16,9 +16,9 @@ https://github.com/azerty9971/xtend_tuya/blob/main/docs/cloud_credentials.md
 5- Click the "3 dots" on the right of the page (bottom right in the next screenshot):<br/>
 ![image](https://github.com/user-attachments/assets/3adf6731-b4e2-4971-850f-380ab9bf656c)<br/>
 6- On the panel that opens, hover over a device category and click the "pencil" icon:<br/>
-![image](https://github.com/user-attachments/assets/04d723ad-8fb1-4c71-8999-e800ed2c756d)
+![image](https://github.com/user-attachments/assets/04d723ad-8fb1-4c71-8999-e800ed2c756d)<br/>
 7- In the new window, select the box "DP Instruction" and then click "Save configuration"<br/>
-![image](https://github.com/user-attachments/assets/b8571a23-cecc-4561-9b90-e85dc76571b1)
+![image](https://github.com/user-attachments/assets/b8571a23-cecc-4561-9b90-e85dc76571b1)<br/>
 8- Repeat step 5 to 7 for each device category<br/>
 9- Restart HA or reload Xtend Tuya<br/>
 10- Enjoy!
