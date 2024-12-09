@@ -11,7 +11,7 @@ from .device import (
 from ...const import (
     VirtualStates,
     DescriptionVirtualState,
-    LOGGER,
+    LOGGER,  # noqa: F401
 )
 
 from ..multi_manager import (
