@@ -596,6 +596,20 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
         *CONSUMPTION_SENSORS,
         *TEMPERATURE_SENSORS,
     ),
+    "sfkzq": (
+        TuyaSensorEntityDescription(
+            key=DPCode.WATER_ONCE,
+            translation_key="water_once",
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_registry_enabled_default=True,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.WATER_TOTAL,
+            translation_key="water_total",
+            state_class=SensorStateClass.TOTAL_INCREASING,
+            entity_registry_enabled_default=True,
+        ),
+    ),
     "smd": (
         TuyaSensorEntityDescription(
             key=DPCode.HEART_RATE,
