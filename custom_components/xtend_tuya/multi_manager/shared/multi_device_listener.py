@@ -46,8 +46,8 @@ class MultiDeviceListener:
     def remove_device(self, device_id: str):
         #log_stack("DeviceListener => async_remove_device")
         device_registry = dr.async_get(self.hass)
-        identifiers: set = {}
-        account_identifiers: set = {}
+        identifiers: set = set()
+        account_identifiers: set = set()
         for account in self.multi_manager.accounts.values():
             for account_identifier in account.get_device_registry_identifiers():
                 if account_identifier not in account_identifiers:
