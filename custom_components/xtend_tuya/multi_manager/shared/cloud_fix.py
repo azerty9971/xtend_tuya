@@ -435,7 +435,7 @@ class CloudFixes:
                     if valueDescr_range := value_dict.get("range", {}):
                         if status_range := device.status_range.get(status_code, None):
                             if status_range_values := json.loads(status_range.values):
-                                status_range_range_dict: list = status_range_values.get("range")
+                                status_range_range_dict: list = status_range_values.get("range", {})
                                 new_range_list: list = []
                                 for new_range_value in valueDescr_range:
                                     new_range_list.append(new_range_value)
@@ -446,7 +446,7 @@ class CloudFixes:
                                 status_range.values = json.dumps(status_range_values)
                         if function := device.function.get(status_code, None):
                             if function_values := json.loads(function.values):
-                                function_range_dict: list = function_values.get("range")
+                                function_range_dict: list = function_values.get("range", {})
                                 new_range_list: list = []
                                 for new_range_value in valueDescr_range:
                                     new_range_list.append(new_range_value)
