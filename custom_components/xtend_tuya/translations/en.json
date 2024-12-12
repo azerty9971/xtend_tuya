@@ -494,6 +494,14 @@
       }
     },
     "select": {
+      "sfkzq_work_state": {
+        "name": "Work state",
+        "state": {
+          "auto": "Auto",
+          "manual": "Manual",
+          "idle": "Idle"
+        }
+      },
       "pir_sensitivity": {
         "name": "PIR sensitivity",
         "state": {
@@ -913,6 +921,12 @@
       }
     },
     "sensor": {
+      "water_once": {
+        "name": "Instant flow rate"
+      },
+      "water_total": {
+        "name": "Total flow"
+      },
       "system_version": {
         "name": "System version"
       },
