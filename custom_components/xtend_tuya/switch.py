@@ -265,6 +265,16 @@ SWITCHES: dict[str, tuple[SwitchEntityDescription, ...]] = {
             translation_key="switch",
             entity_category=EntityCategory.CONFIG,
         ),
+        SwitchEntityDescription(
+            key=DPCode.UV_LIGHT,
+            translation_key="uv_light",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        SwitchEntityDescription(
+            key=DPCode.ANION,
+            translation_key="anion",
+            entity_category=EntityCategory.CONFIG,
+        ),
     ),
 }
 
