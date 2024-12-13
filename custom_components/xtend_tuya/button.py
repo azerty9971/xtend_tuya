@@ -55,6 +55,13 @@ BUTTONS: dict[str, tuple[TuyaButtonEntityDescription, ...]] = {
             entity_category=EntityCategory.CONFIG,
         ),
     ),
+    "xfj": (
+        TuyaButtonEntityDescription(
+            key=DPCode.FILTER_RESET,
+            translation_key="filter_reset",
+            entity_category=EntityCategory.CONFIG,
+        ),
+    ),
 }
 
 BUTTONS["cz"]   = BUTTONS["kg"]

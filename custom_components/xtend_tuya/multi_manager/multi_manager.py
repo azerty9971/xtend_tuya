@@ -262,11 +262,13 @@ class MultiManager:  # noqa: F811
                 return code, dpId, value, True
         if code is None and fail_if_code_not_found:
             if device:
-                LOGGER.warning(f"_read_code_value_from_state FAILED => {device.id} <=> {device.name} <=> {state} <=> {device.local_strategy}")
+                #LOGGER.warning(f"_read_code_value_from_state FAILED => {device.id} <=> {device.name} <=> {state} <=> {device.local_strategy}")
+                pass
             return None, None, None, False
         if dpId is None and fail_if_dpid_not_found:
             if device:
-                LOGGER.warning(f"_read_code_value_from_state FAILED => {device.id} <=> {device.name} <=> {state} <=> {device.local_strategy}")
+                #LOGGER.warning(f"_read_code_value_from_state FAILED => {device.id} <=> {device.name} <=> {state} <=> {device.local_strategy}")
+                pass
             return None, None, None, False
         return code, dpId, value, True
 
@@ -279,7 +281,8 @@ class MultiManager:  # noqa: F811
                 item["dpId"] = dpId
                 item["value"] = value
             else:
-                LOGGER.warning(f"convert_device_report_status_list code retrieval failed => {item} <=>{device_id}")
+                #LOGGER.warning(f"convert_device_report_status_list code retrieval failed => {item} <=>{device_id}")
+                pass
         return status
 
     def on_message(self, source: str, msg: str):
