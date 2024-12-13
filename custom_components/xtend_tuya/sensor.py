@@ -264,6 +264,17 @@ CONSUMPTION_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
         state_class=SensorStateClass.MEASUREMENT,
         entity_registry_enabled_default=True,
     ),
+    TuyaSensorEntityDescription(
+        key=DPCode.POWER_CONSUMPTION,
+        virtual_state=VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME | VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD,
+        vs_copy_to_state=[DPCode.ADD_ELE2, DPCode.ADD_ELE_TODAY, DPCode.ADD_ELE_THIS_MONTH, DPCode.ADD_ELE_THIS_YEAR],
+        translation_key="add_ele",
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        entity_registry_enabled_default=True,
+        restoredata=True,
+    ),
 )
 
 TEMPERATURE_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
@@ -288,6 +299,18 @@ TEMPERATURE_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
     TuyaSensorEntityDescription(
         key=DPCode.TEMP_VALUE,
         translation_key="temperature",
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_registry_enabled_default=True,
+    ),
+    TuyaSensorEntityDescription(
+        key=DPCode.TEMP_TOP,
+        translation_key="temp_top",
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_registry_enabled_default=True,
+    ),
+    TuyaSensorEntityDescription(
+        key=DPCode.TEMP_BOTTOM,
+        translation_key="temp_bottom",
         state_class=SensorStateClass.MEASUREMENT,
         entity_registry_enabled_default=True,
     ),
@@ -709,6 +732,10 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
             translation_key="liquid_level_percent",
             entity_registry_enabled_default=True,
         ),
+    ),
+    "znrb": (
+        *CONSUMPTION_SENSORS,
+        *TEMPERATURE_SENSORS,
     ),
 }
 
