@@ -316,6 +316,13 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
     "cl": (
         *BATTERY_SENSORS,
     ),
+    "dbl": (
+        TuyaSensorEntityDescription(
+            key=DPCode.COUNTDOWN_LEFT,
+            translation_key="countdown_left",
+            entity_registry_enabled_default=False,
+        ),
+    ),
     "jtmspro": (
         TuyaSensorEntityDescription(
             key=DPCode.ALARM_LOCK,

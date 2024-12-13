@@ -70,6 +70,13 @@ class TuyaLightEntityDescription(LightEntityDescription):
 
 
 LIGHTS: dict[str, tuple[TuyaLightEntityDescription, ...]] = {
+    "dbl": (
+        TuyaLightEntityDescription(
+            key=DPCode.LIGHT,
+            translation_key="light",
+            brightness=DPCode.BRIGHT_VALUE,
+        ),
+    ),
 }
 
 
