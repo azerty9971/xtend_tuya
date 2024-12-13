@@ -71,6 +71,13 @@ COUNTDOWNS: tuple[NumberEntityDescription, ...] = (
 # default instructions set of each category end up being a number.
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
 NUMBERS: dict[str, tuple[NumberEntityDescription, ...]] = {
+    "dbl": (
+        NumberEntityDescription(
+            key=DPCode.VOLUME_SET,
+            translation_key="volume",
+            entity_category=EntityCategory.CONFIG,
+        ),
+    ),
     "gyd": (
         NumberEntityDescription(
             key=DPCode.COUNTDOWN,

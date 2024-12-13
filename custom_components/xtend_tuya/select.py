@@ -22,6 +22,28 @@ from .const import TUYA_DISCOVERY_NEW, DPCode, DPType
 # default instructions set of each category end up being a select.
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
 SELECTS: dict[str, tuple[SelectEntityDescription, ...]] = {
+    "dbl": (
+        SelectEntityDescription(
+            key=DPCode.TEMP_UNIT_CONVERT,
+            translation_key="change_temp_unit",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        SelectEntityDescription(
+            key=DPCode.COUNTDOWN_SET,
+            translation_key="countdown",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        SelectEntityDescription(
+            key=DPCode.POWER_SET,
+            translation_key="dbl_power_set",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        SelectEntityDescription(
+            key=DPCode.SOUND_MODE,
+            translation_key="sound_mode",
+            entity_category=EntityCategory.CONFIG,
+        ),
+    ),
     "gyd": (
         SelectEntityDescription(
             key=DPCode.DEVICE_MODE,
@@ -105,6 +127,20 @@ SELECTS: dict[str, tuple[SelectEntityDescription, ...]] = {
         SelectEntityDescription(
             key=DPCode.WORK_MODE,
             translation_key="qccdz_work_mode",
+            entity_category=EntityCategory.CONFIG,
+        ),
+    ),
+    "sfkzq": (
+        SelectEntityDescription(
+            key=DPCode.WORK_STATE,
+            translation_key="sfkzq_work_state",
+            entity_category=EntityCategory.CONFIG,
+        ),
+    ),
+    "xfj": (
+        SelectEntityDescription(
+            key=DPCode.MODE,
+            translation_key="xfj_mode",
             entity_category=EntityCategory.CONFIG,
         ),
     ),
