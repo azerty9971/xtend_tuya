@@ -415,7 +415,9 @@ class DPCode(StrEnum):
     POWER2 = "Power"
     POWERON = "poweron"
     POWERONOFF = "PowerOnOff"
+    POWER_CONSUMPTION = "power_consumption"
     POWER_GO = "power_go"
+    POWER_SET = "power_set"
     POWER_TOTAL = "power_total"
     PRESENCE_DELAY = "presence_delay"
     PRESENCE_STATE = "presence_state"
@@ -467,6 +469,7 @@ class DPCode(StrEnum):
     SMOKE_SENSOR_VALUE = "smoke_sensor_value"
     SOS = "sos"  # Emergency State
     SOS_STATE = "sos_state"  # Emergency mode
+    SOUND = "sound"
     SOUND_MODE = "sound_mode"
     SPECIAL_FUNCTION = "special_function"
     SPEED = "speed"  # Speed level
@@ -522,6 +525,7 @@ class DPCode(StrEnum):
     TEMP_ADC = "temp_adc"
     TEMP_BOILING_C = "temp_boiling_c"
     TEMP_BOILING_F = "temp_boiling_f"
+    TEMP_BOTTOM = "temp_bottom"
     TEMP_CALIBRATION = "temp_calibration"
     TEMP_CONTROLLER = "temp_controller"
     TEMP_CURRENT = "temp_current"  # Current temperature in °C
@@ -532,6 +536,7 @@ class DPCode(StrEnum):
     TEMP_UNIT_CONVERT = "temp_unit_convert"  # Temperature unit switching
     TEMP_VALUE = "temp_value"  # Color temperature
     TEMP_VALUE_V2 = "temp_value_v2"
+    TEMP_TOP = "temp_top"
     TIME_TOTAL = "time_total"
     TOILET_NOTICE = "toilet_notice"
     TIME_GET_IN_BED = "time_get_in_bed"
@@ -552,6 +557,7 @@ class DPCode(StrEnum):
     UV = "uv"  # UV sterilization
     UV_START_TIME = "uv_start_time"
     UV_END_TIME = "uv_end_time"
+    UV_LIGHT = "uv_light"
     VA_BATTERY = "va_battery"
     VA_HUMIDITY = "va_humidity"
     VA_TEMPERATURE = "va_temperature"
@@ -565,8 +571,10 @@ class DPCode(StrEnum):
     WARM = "warm"  # Heat preservation
     WARM_TIME = "warm_time"  # Heat preservation time
     WATER = "water"
+    WATER_ONCE = "water_once"
     WATER_RESET = "water_reset"  # Resetting of water usage days
     WATER_SET = "water_set"  # Water level
+    WATER_TOTAL = "water_total"
     WATERSENSOR_STATE = "watersensor_state"
     WEATHER_DELAY = "weather_delay"
     WET = "wet"  # Humidification

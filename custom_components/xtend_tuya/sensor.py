@@ -264,6 +264,17 @@ CONSUMPTION_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
         state_class=SensorStateClass.MEASUREMENT,
         entity_registry_enabled_default=True,
     ),
+    TuyaSensorEntityDescription(
+        key=DPCode.POWER_CONSUMPTION,
+        virtual_state=VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME | VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD,
+        vs_copy_to_state=[DPCode.ADD_ELE2, DPCode.ADD_ELE_TODAY, DPCode.ADD_ELE_THIS_MONTH, DPCode.ADD_ELE_THIS_YEAR],
+        translation_key="add_ele",
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        entity_registry_enabled_default=True,
+        restoredata=True,
+    ),
 )
 
 TEMPERATURE_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
@@ -291,6 +302,18 @@ TEMPERATURE_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
         state_class=SensorStateClass.MEASUREMENT,
         entity_registry_enabled_default=True,
     ),
+    TuyaSensorEntityDescription(
+        key=DPCode.TEMP_TOP,
+        translation_key="temp_top",
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_registry_enabled_default=True,
+    ),
+    TuyaSensorEntityDescription(
+        key=DPCode.TEMP_BOTTOM,
+        translation_key="temp_bottom",
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_registry_enabled_default=True,
+    ),
 )
 
 HUMIDITY_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
@@ -315,6 +338,13 @@ HUMIDITY_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
 SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
     "cl": (
         *BATTERY_SENSORS,
+    ),
+    "dbl": (
+        TuyaSensorEntityDescription(
+            key=DPCode.COUNTDOWN_LEFT,
+            translation_key="countdown_left",
+            entity_registry_enabled_default=False,
+        ),
     ),
     "jtmspro": (
         TuyaSensorEntityDescription(
@@ -596,6 +626,20 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
         *CONSUMPTION_SENSORS,
         *TEMPERATURE_SENSORS,
     ),
+    "sfkzq": (
+        TuyaSensorEntityDescription(
+            key=DPCode.WATER_ONCE,
+            translation_key="water_once",
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_registry_enabled_default=True,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.WATER_TOTAL,
+            translation_key="water_total",
+            state_class=SensorStateClass.TOTAL_INCREASING,
+            entity_registry_enabled_default=True,
+        ),
+    ),
     "smd": (
         TuyaSensorEntityDescription(
             key=DPCode.HEART_RATE,
@@ -660,6 +704,15 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
             translation_key="filter_life",
             state_class=SensorStateClass.MEASUREMENT,
         ),
+        TuyaSensorEntityDescription(
+            key=DPCode.TVOC,
+            translation_key="tvoc",
+            state_class=SensorStateClass.MEASUREMENT,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.AIR_QUALITY,
+            translation_key="air_quality",
+        ),
         *TEMPERATURE_SENSORS,
         *HUMIDITY_SENSORS,
     ),
@@ -679,6 +732,10 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
             translation_key="liquid_level_percent",
             entity_registry_enabled_default=True,
         ),
+    ),
+    "znrb": (
+        *CONSUMPTION_SENSORS,
+        *TEMPERATURE_SENSORS,
     ),
 }
 
