@@ -137,6 +137,13 @@ SELECTS: dict[str, tuple[SelectEntityDescription, ...]] = {
             entity_category=EntityCategory.CONFIG,
         ),
     ),
+    "xfj": (
+        SelectEntityDescription(
+            key=DPCode.MODE,
+            translation_key="xfj_mode",
+            entity_category=EntityCategory.CONFIG,
+        ),
+    ),
 }
 
 

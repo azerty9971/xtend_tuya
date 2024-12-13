@@ -554,6 +554,7 @@ class DPCode(StrEnum):
     UV = "uv"  # UV sterilization
     UV_START_TIME = "uv_start_time"
     UV_END_TIME = "uv_end_time"
+    UV_LIGHT = "uv_light"
     VA_BATTERY = "va_battery"
     VA_HUMIDITY = "va_humidity"
     VA_TEMPERATURE = "va_temperature"

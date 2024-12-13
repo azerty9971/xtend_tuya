@@ -681,6 +681,15 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
             translation_key="filter_life",
             state_class=SensorStateClass.MEASUREMENT,
         ),
+        TuyaSensorEntityDescription(
+            key=DPCode.TVOC,
+            translation_key="tvoc",
+            state_class=SensorStateClass.MEASUREMENT,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.AIR_QUALITY,
+            translation_key="air_quality",
+        ),
         *TEMPERATURE_SENSORS,
         *HUMIDITY_SENSORS,
     ),

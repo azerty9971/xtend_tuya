@@ -220,6 +220,9 @@
       }
     },
     "button": {
+      "filter_reset": {
+        "name": "Filter reset"
+      },
       "clear_energy": {
         "name": "Clear energy"
       },
@@ -494,6 +497,14 @@
       }
     },
     "select": {
+      "xfj_mode": {
+        "name": "Mode",
+        "state": {
+          "auto": "Automatic",
+          "sleep": "Sleep",
+          "manual": "Manual"
+        }
+      },
       "dbl_power_set": {
         "name": "Set power",
         "state": {
@@ -939,6 +950,9 @@
       }
     },
     "sensor": {
+      "tvoc": {
+        "name": "TVOC"
+      },
       "countdown_left": {
         "name": "Countdown left"
       },
@@ -1500,21 +1514,23 @@
           "great": "Great",
           "mild": "Mild",
           "good": "Good",
-          "severe": "Severe"
+          "severe": "Severe",
+          "medium": "Medium",
+          "bad": "Bad"
         }
       }
     },
     "switch": {
-      "switch_pir":
-      {
+      "uv_light":{
+        "name": "UV light"
+      },
+      "switch_pir":{
         "name": "Switch PIR"
       },
-      "photo_again":
-      {
+      "photo_again":{
         "name": "Take another photo"
       },
-      "one_click_cleanup":
-      {
+      "one_click_cleanup":{
         "name": "One click cleanup"
       },
       "sleeping": {
