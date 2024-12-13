@@ -416,6 +416,7 @@ class DPCode(StrEnum):
     POWERON = "poweron"
     POWERONOFF = "PowerOnOff"
     POWER_GO = "power_go"
+    POWER_SET = "power_set"
     POWER_TOTAL = "power_total"
     PRESENCE_DELAY = "presence_delay"
     PRESENCE_STATE = "presence_state"
@@ -467,6 +468,7 @@ class DPCode(StrEnum):
     SMOKE_SENSOR_VALUE = "smoke_sensor_value"
     SOS = "sos"  # Emergency State
     SOS_STATE = "sos_state"  # Emergency mode
+    SOUND = "sound"
     SOUND_MODE = "sound_mode"
     SPECIAL_FUNCTION = "special_function"
     SPEED = "speed"  # Speed level
