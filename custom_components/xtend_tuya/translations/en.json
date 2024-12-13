@@ -220,6 +220,9 @@
       }
     },
     "button": {
+      "filter_reset": {
+        "name": "Filter reset"
+      },
       "clear_energy": {
         "name": "Clear energy"
       },
@@ -494,6 +497,32 @@
       }
     },
     "select": {
+      "xfj_mode": {
+        "name": "Mode",
+        "state": {
+          "auto": "Automatic",
+          "sleep": "Sleep",
+          "manual": "Manual"
+        }
+      },
+      "dbl_power_set": {
+        "name": "Set power",
+        "state": {
+          "level_1": "Level 1",
+          "level_2": "Level 2",
+          "level_3": "Level 3",
+          "level_4": "Level 4",
+          "level_5": "Level 5"
+        }
+      },
+      "sfkzq_work_state": {
+        "name": "Work state",
+        "state": {
+          "auto": "Auto",
+          "manual": "Manual",
+          "idle": "Idle"
+        }
+      },
       "pir_sensitivity": {
         "name": "PIR sensitivity",
         "state": {
@@ -564,7 +593,9 @@
           "0": "C°",
           "1": "F",
           "false": "C°",
-          "true": "F"
+          "true": "F",
+          "c": "C°",
+          "f": "F"
         }
       },
       "cat_litter_box_clean":
@@ -661,7 +692,13 @@
           "ringtone_2": "Ringtone 2",
           "ringtone_3": "Ringtone 3",
           "ringtone_4": "Ringtone 4",
-          "ringtone_5": "Ringtone 5"
+          "ringtone_5": "Ringtone 5",
+          "sound_0": "Sound 0",
+          "sound_1": "Sound 1",
+          "sound_2": "Sound 2",
+          "sound_3": "Sound 3",
+          "sound_4": "Sound 4",
+          "sound_5": "Sound 5"
         }
       },
       "cups": {
@@ -913,6 +950,24 @@
       }
     },
     "sensor": {
+      "temp_top": {
+        "name": "Max temperature"
+      },
+      "temp_bottom": {
+        "name": "Min temperature"
+      },
+      "tvoc": {
+        "name": "TVOC"
+      },
+      "countdown_left": {
+        "name": "Countdown left"
+      },
+      "water_once": {
+        "name": "Instant flow rate"
+      },
+      "water_total": {
+        "name": "Total flow"
+      },
       "system_version": {
         "name": "System version"
       },
@@ -1465,21 +1520,23 @@
           "great": "Great",
           "mild": "Mild",
           "good": "Good",
-          "severe": "Severe"
+          "severe": "Severe",
+          "medium": "Medium",
+          "bad": "Bad"
         }
       }
     },
     "switch": {
-      "switch_pir":
-      {
+      "uv_light":{
+        "name": "UV light"
+      },
+      "switch_pir":{
         "name": "Switch PIR"
       },
-      "photo_again":
-      {
+      "photo_again":{
         "name": "Take another photo"
       },
-      "one_click_cleanup":
-      {
+      "one_click_cleanup":{
         "name": "One click cleanup"
       },
       "sleeping": {
