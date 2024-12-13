@@ -415,6 +415,7 @@ class DPCode(StrEnum):
     POWER2 = "Power"
     POWERON = "poweron"
     POWERONOFF = "PowerOnOff"
+    POWER_CONSUMPTION = "power_consumption"
     POWER_GO = "power_go"
     POWER_SET = "power_set"
     POWER_TOTAL = "power_total"
@@ -524,6 +525,7 @@ class DPCode(StrEnum):
     TEMP_ADC = "temp_adc"
     TEMP_BOILING_C = "temp_boiling_c"
     TEMP_BOILING_F = "temp_boiling_f"
+    TEMP_BOTTOM = "temp_bottom"
     TEMP_CALIBRATION = "temp_calibration"
     TEMP_CONTROLLER = "temp_controller"
     TEMP_CURRENT = "temp_current"  # Current temperature in °C
@@ -534,6 +536,7 @@ class DPCode(StrEnum):
     TEMP_UNIT_CONVERT = "temp_unit_convert"  # Temperature unit switching
     TEMP_VALUE = "temp_value"  # Color temperature
     TEMP_VALUE_V2 = "temp_value_v2"
+    TEMP_TOP = "temp_top"
     TIME_TOTAL = "time_total"
     TOILET_NOTICE = "toilet_notice"
     TIME_GET_IN_BED = "time_get_in_bed"

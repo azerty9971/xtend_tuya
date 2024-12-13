@@ -950,6 +950,12 @@
       }
     },
     "sensor": {
+      "temp_top": {
+        "name": "Max temperature"
+      },
+      "temp_bottom": {
+        "name": "Min temperature"
+      },
       "tvoc": {
         "name": "TVOC"
       },
