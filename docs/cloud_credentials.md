@@ -8,6 +8,7 @@ To be prepared, please determine your correct data center:<br/>
 - If in US: Western America Data Center<br/>
 - If in China: China Data Center<br/>
 - If in India: India Data Center<br/>
+
 DO NOT USE THE WESTERN EUROPE OR EASTERN AMERICA DATA CENTERS, THEY ARE RESERVED FOR BUSINESS CONSUMERS<br/>
 
 # Steps
