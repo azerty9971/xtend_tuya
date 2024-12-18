@@ -734,10 +734,11 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
             entity_registry_enabled_default=True,
         ),
     ),
-    "znrb": (
-        *CONSUMPTION_SENSORS,
-        *TEMPERATURE_SENSORS,
-    ),
+    #ZNRB devices don't send correct cloud data, for these devices use https://github.com/make-all/tuya-local instead
+    #"znrb": (
+    #    *CONSUMPTION_SENSORS,
+    #    *TEMPERATURE_SENSORS,
+    #),
 }
 
 # Socket (duplicate of `kg`)
