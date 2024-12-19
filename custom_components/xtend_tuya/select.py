@@ -204,16 +204,21 @@ class TuyaSelectEntity(TuyaEntity, SelectEntity):
         if enum_type := self.find_dpcode(
             description.key, dptype=DPType.ENUM, prefer_function=True
         ):
-            self._attr_options = enum_type.range
-        if description.key == DPCode.CHARGINGOPERATION:
-            LOGGER.warning(f"Translation keys: {self.translation_key}")
+            try:
+                if device.id == "bf92335449ecfb0bb7ptu4" and description.key == DPCode.CHARGINGOPERATION:
+                    LOGGER.warning(f"Enum type range is {enum_type.range}")
+                for enum_key in enum_type.range:
+                    self._attr_options.append(enum_key.lower())
+            except Exception:
+                self._attr_options = enum_type.range
+            
 
     @property
     def current_option(self) -> str | None:
         """Return the selected entity option to represent the entity state."""
         # Raw value
         value: str = self.device.status.get(self.entity_description.key)
-        if value is None or value not in self._attr_options:
+        if value is None or ( value not in self._attr_options and value.lower() not in self._attr_options ):
             return None
 
         return value
