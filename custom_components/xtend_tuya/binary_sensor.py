@@ -177,10 +177,9 @@ class TuyaBinarySensorEntity(TuyaEntity, BinarySensorEntity):
     def is_on(self) -> bool:
         is_on = self._is_on()
         if hasattr(self.entity_description, "device_online") and self.entity_description.device_online and hasattr(self.device, "online_states"):
-            LOGGER.warning(f"Calling IS_ON: {is_on} for dpCode {self.entity_description.dpcode or self.entity_description.key} : {self.device.status[self.entity_description.dpcode or self.entity_description.key]}")
-            self.device.online_states[self.entity_description.dpcode or self.entity_description.key] = is_on
+            dpcode = self.entity_description.dpcode or self.entity_description.key
+            self.device.online_states[dpcode] = is_on
             if hasattr(self.device_manager, "update_device_online_status"):
-                LOGGER.warning("Updating ONLINE STATUS")
                 self.device_manager.update_device_online_status(self.device.id)
         return is_on
     
@@ -198,4 +197,4 @@ class TuyaBinarySensorEntity(TuyaEntity, BinarySensorEntity):
     async def async_added_to_hass(self) -> None:
         """Call when entity about to be added to hass."""
         await super().async_added_to_hass()
-        self.is_on #Update the online status if needed
+        #self.is_on #Update the online status if needed
