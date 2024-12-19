@@ -241,7 +241,7 @@ CONSUMPTION_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
     ),
     TuyaSensorEntityDescription(
         key=DPCode.DEVICEKWH,
-        translation_key="device_power",
+        translation_key="device_consumption",
         device_class=SensorDeviceClass.POWER,
         state_class=SensorStateClass.MEASUREMENT,
         entity_registry_enabled_default=True,
@@ -331,6 +331,11 @@ TEMPERATURE_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
         translation_key="device_temperature2",
         entity_registry_enabled_default=True,
     ),
+    TuyaSensorEntityDescription(
+        key=DPCode.TEMPSHOW,
+        translation_key="temp_show",
+        entity_registry_enabled_default=True,
+    ),
 )
 
 HUMIDITY_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
@@ -345,6 +350,94 @@ HUMIDITY_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
         translation_key="humidity",
         device_class=SensorDeviceClass.HUMIDITY,
         state_class=SensorStateClass.MEASUREMENT,
+    ),
+)
+
+ELECTRICITY_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
+    TuyaSensorEntityDescription(
+        key=DPCode.A_CURRENT,
+        translation_key="a_current",
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.CURRENT,
+        entity_registry_enabled_default=True,
+        entity_registry_visible_default=False,
+    ),
+    TuyaSensorEntityDescription(
+        key=DPCode.A_VOLTAGE,
+        translation_key="a_voltage",
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.VOLTAGE,
+        entity_registry_enabled_default=True,
+        entity_registry_visible_default=False,
+    ),
+    TuyaSensorEntityDescription(
+        key=DPCode.B_CURRENT,
+        translation_key="b_current",
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.CURRENT,
+        entity_registry_enabled_default=True,
+        entity_registry_visible_default=False,
+    ),
+    TuyaSensorEntityDescription(
+        key=DPCode.B_VOLTAGE,
+        translation_key="b_voltage",
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.VOLTAGE,
+        entity_registry_enabled_default=True,
+        entity_registry_visible_default=False,
+    ),
+    TuyaSensorEntityDescription(
+        key=DPCode.CURRENT_YD,
+        translation_key="current",
+        entity_registry_enabled_default=False,
+    ),
+    TuyaSensorEntityDescription(
+        key=DPCode.C_CURRENT,
+        translation_key="c_current",
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.CURRENT,
+        entity_registry_enabled_default=True,
+        entity_registry_visible_default=False,
+    ),
+    TuyaSensorEntityDescription(
+        key=DPCode.C_VOLTAGE,
+        translation_key="c_voltage",
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.VOLTAGE,
+        entity_registry_enabled_default=True,
+        entity_registry_visible_default=False,
+    ),
+    TuyaSensorEntityDescription(
+        key=DPCode.DEVICEKW,
+        translation_key="device_power",
+        entity_registry_enabled_default=True,
+    ),
+    TuyaSensorEntityDescription(
+        key=DPCode.DEVICEMAXSETA,
+        translation_key="device_max_set_a",
+        entity_registry_enabled_default=True,
+        entity_registry_visible_default=False,
+    ),
+    TuyaSensorEntityDescription(
+        key=DPCode.PHASEFLAG,
+        translation_key="phaseflag",
+        entity_registry_enabled_default=True,
+        entity_registry_visible_default=False,
+    ),
+    TuyaSensorEntityDescription(
+        key=DPCode.POWER_TOTAL,
+        translation_key="power_total",
+        entity_registry_enabled_default=True,
+    ),
+    TuyaSensorEntityDescription(
+        key=DPCode.SIGLE_PHASE_POWER,
+        translation_key="sigle_phase_power",
+        entity_registry_enabled_default=True,
+    ),
+    TuyaSensorEntityDescription(
+        key=DPCode.VOL_YD,
+        translation_key="voltage",
+        entity_registry_enabled_default=False,
     ),
 )
 
@@ -374,16 +467,7 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
             translation_key="jtmspro_closed_opened",
             entity_registry_enabled_default=True,
         ),
-        TuyaSensorEntityDescription(
-            key=DPCode.CURRENT_YD,
-            translation_key="current",
-            entity_registry_enabled_default=False,
-        ),
-        TuyaSensorEntityDescription(
-            key=DPCode.VOL_YD,
-            translation_key="voltage",
-            entity_registry_enabled_default=False,
-        ),
+        *ELECTRICITY_SENSORS,
         *BATTERY_SENSORS,
     ),
     # Switch
@@ -398,6 +482,7 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
         ),
         *TEMPERATURE_SENSORS,
         *CONSUMPTION_SENSORS,
+        *ELECTRICITY_SENSORS,
     ),
     # Automatic cat litter box
     # Note: Undocumented
@@ -605,30 +690,16 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
             entity_registry_enabled_default=True,
         ),
         TuyaSensorEntityDescription(
-            key=DPCode.TEMPSHOW,
-            translation_key="temp_show",
-            entity_registry_enabled_default=True,
-        ),
-        TuyaSensorEntityDescription(
             key=DPCode.REMAININGTIME,
             translation_key="remaining_time",
             entity_registry_enabled_default=True,
         ),
+        *TEMPERATURE_SENSORS,
     ),
     "qccdz": (
         TuyaSensorEntityDescription(
             key=DPCode.WORK_STATE,
             translation_key="qccdz_work_state",
-            entity_registry_enabled_default=True,
-        ),
-        TuyaSensorEntityDescription(
-            key=DPCode.SIGLE_PHASE_POWER,
-            translation_key="sigle_phase_power",
-            entity_registry_enabled_default=True,
-        ),
-        TuyaSensorEntityDescription(
-            key=DPCode.POWER_TOTAL,
-            translation_key="power_total",
             entity_registry_enabled_default=True,
         ),
         TuyaSensorEntityDescription(
@@ -648,6 +719,7 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
         ),
         *CONSUMPTION_SENSORS,
         *TEMPERATURE_SENSORS,
+        *ELECTRICITY_SENSORS,
     ),
     "sfkzq": (
         TuyaSensorEntityDescription(
@@ -902,11 +974,10 @@ class TuyaSensorEntity(TuyaEntity, RestoreSensor):
             return scaled_value
 
         # Unexpected enum value
-        if (
-            isinstance(self._type_data, EnumTypeData)
-            and value not in self._type_data.range
-        ):
-            return None
+        if isinstance(self._type_data, EnumTypeData):
+            value = value.lower()
+            if value not in self._type_data.range:
+                return None
 
         # Get subkey value from Json string.
         if self._type is DPType.JSON:

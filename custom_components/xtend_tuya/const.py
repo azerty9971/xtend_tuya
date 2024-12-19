@@ -174,6 +174,8 @@ class DPCode(StrEnum):
     AUTO_DEORDRIZER = "auto_deordrizer"
     AUTO_LOCK_TIME = "auto_lock_time"
     AUTOMATIC_LOCK = "automatic_lock"
+    A_CURRENT = "A_Current"
+    A_VOLTAGE = "A_Voltage"
     BALANCE_ENERGY = "balance_energy"
     BASIC_ANTI_FLICKER = "basic_anti_flicker"
     BASIC_DEVICE_VOLUME = "basic_device_volume"
@@ -206,6 +208,8 @@ class DPCode(StrEnum):
     BRIGHTNESS_MIN_1 = "brightness_min_1"
     BRIGHTNESS_MIN_2 = "brightness_min_2"
     BRIGHTNESS_MIN_3 = "brightness_min_3"
+    B_CURRENT = "B_Current"
+    B_VOLTAGE = "B_Voltage"
     C_F = "c_f"  # Temperature unit switching
     CALIBRATION = "calibration"
     CAPACITY_CALIBRATION = "capacity_calibration"
@@ -272,6 +276,8 @@ class DPCode(StrEnum):
     CUR_CURRENT = "cur_current"  # Actual current
     CUR_POWER = "cur_power"  # Actual power
     CUR_VOLTAGE = "cur_voltage"  # Actual voltage
+    C_CURRENT = "C_Current"
+    C_VOLTAGE = "C_Voltage"
     DECIBEL_SENSITIVITY = "decibel_sensitivity"
     DECIBEL_SWITCH = "decibel_switch"
     DEHUMIDITY_SET_ENUM = "dehumidify_set_enum"
@@ -282,7 +288,9 @@ class DPCode(StrEnum):
     DEO_START_TIME = "deo_start_time"
     DEO_END_TIME = "deo_end_time"
     DETECTION_SENSITIVITY = "detection_sensitivity"
+    DEVICEKW = "DeviceKw"
     DEVICEKWH = "DeviceKwh"
+    DEVICEMAXSETA = "DeviceMaxSetA"
     DEVICESTATE = "DeviceState"
     DEVICETEMP = "DeviceTemp"
     DEVICETEMP2 = "DeviceTemp2"
@@ -401,6 +409,7 @@ class DPCode(StrEnum):
     PERCENT_STATE = "percent_state"
     PERCENT_STATE_2 = "percent_state_2"
     PERCENT_STATE_3 = "percent_state_3"
+    PHASEFLAG = "PhaseFlag"
     PHASE_A = "phase_a"
     PHASE_B = "phase_b"
     PHASE_C = "phase_c"
