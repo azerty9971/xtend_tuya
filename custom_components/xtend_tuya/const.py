@@ -271,6 +271,8 @@ class DPCode(StrEnum):
     COUNTDOWN_LEFT = "countdown_left"
     COUNTDOWN_SET = "countdown_set"  # Countdown setting
     CRY_DETECTION_SWITCH = "cry_detection_switch"
+    CTIME = "Ctime"
+    CTIME2 = "CTime2"
     CUP_NUMBER = "cup_number"  # NUmber of cups
     CURRENT_YD = "current_yd"
     CUR_CURRENT = "cur_current"  # Actual current
@@ -467,7 +469,13 @@ class DPCode(StrEnum):
     SENSITIVITY = "sensitivity"  # Sensitivity
     SENSOR_HUMIDITY = "sensor_humidity"
     SENSOR_TEMPERATURE = "sensor_temperature"
+    SETDELAYTIME = "SetDelayTime"
+    SETDEFINETIME = "SetDefineTime"
     SETTIME = "SetTime"
+    SET16A = "Set16A"
+    SET32A = "Set32A"
+    SET40A = "Set40A"
+    SET50A = "Set50A"
     SHAKE = "shake"  # Oscillating
     SHOCK_STATE = "shock_state"  # Vibration status
     SIGLE_PHASE_POWER = "sigle_phase_power"

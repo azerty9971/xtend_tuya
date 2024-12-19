@@ -330,6 +330,7 @@ TEMPERATURE_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
         key=DPCode.DEVICETEMP2,
         translation_key="device_temperature2",
         entity_registry_enabled_default=True,
+        entity_registry_visible_default=False,
     ),
     TuyaSensorEntityDescription(
         key=DPCode.TEMPSHOW,
@@ -448,6 +449,20 @@ ELECTRICITY_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.VOLTAGE,
         entity_registry_enabled_default=False,
+    ),
+)
+
+TIMER_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
+    TuyaSensorEntityDescription(
+        key=DPCode.CTIME,
+        translation_key="ctime",
+        entity_registry_enabled_default=True,
+    ),
+    TuyaSensorEntityDescription(
+        key=DPCode.CTIME2,
+        translation_key="ctime2",
+        entity_registry_enabled_default=True,
+        entity_registry_visible_default=False,
     ),
 )
 
@@ -721,6 +736,7 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
             key=DPCode.SYSTEM_VERSION,
             translation_key="system_version",
             entity_registry_enabled_default=True,
+            entity_registry_visible_default=False,
         ),
         TuyaSensorEntityDescription(
             key=DPCode.DEVICESTATE,
@@ -730,6 +746,7 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
         *CONSUMPTION_SENSORS,
         *TEMPERATURE_SENSORS,
         *ELECTRICITY_SENSORS,
+        *TIMER_SENSORS,
     ),
     "sfkzq": (
         TuyaSensorEntityDescription(
