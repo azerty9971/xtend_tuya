@@ -161,6 +161,7 @@ class TuyaBinarySensorEntity(TuyaEntity, BinarySensorEntity):
     """Tuya Binary Sensor Entity."""
 
     entity_description: TuyaBinarySensorEntityDescription
+    block_update: bool
 
     def __init__(
         self,
@@ -171,6 +172,7 @@ class TuyaBinarySensorEntity(TuyaEntity, BinarySensorEntity):
         """Init Tuya binary sensor."""
         super().__init__(device, device_manager)
         self.entity_description = description
+        self.block_update = False
         self._attr_unique_id = f"{super().unique_id}{description.key}"
 
     @property
@@ -180,7 +182,10 @@ class TuyaBinarySensorEntity(TuyaEntity, BinarySensorEntity):
             dpcode = self.entity_description.dpcode or self.entity_description.key
             self.device.online_states[dpcode] = is_on
             if hasattr(self.device_manager, "update_device_online_status"):
-                self.device_manager.update_device_online_status(self.device.id)
+                if not self.block_update:
+                    self.block_update = True
+                    self.device_manager.update_device_online_status(self.device.id)
+                    self.block_update = False
         return is_on
     
     def _is_on(self) -> bool:
