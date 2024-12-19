@@ -233,15 +233,18 @@ CONSUMPTION_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
         restoredata=False,
     ),
     TuyaSensorEntityDescription(
-        key=DPCode.TOTAL_FORWARD_ENERGY,
-        virtual_state=VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME,
-        vs_copy_delta_to_state=[DPCode.ADD_ELE2_TODAY, DPCode.ADD_ELE2_THIS_MONTH, DPCode.ADD_ELE2_THIS_YEAR],
-        translation_key="total_energy",
-        device_class=SensorDeviceClass.ENERGY,
-        state_class=SensorStateClass.TOTAL_INCREASING,
-        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        key=DPCode.CUR_POWER,
+        translation_key="power",
+        device_class=SensorDeviceClass.POWER,
+        state_class=SensorStateClass.MEASUREMENT,
         entity_registry_enabled_default=True,
-        restoredata=False,
+    ),
+    TuyaSensorEntityDescription(
+        key=DPCode.DEVICEKWH,
+        translation_key="device_power",
+        device_class=SensorDeviceClass.POWER,
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_registry_enabled_default=True,
     ),
     TuyaSensorEntityDescription(
         key=DPCode.FORWARD_ENERGY_TOTAL,
@@ -250,19 +253,6 @@ CONSUMPTION_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
         translation_key="total_energy",
         device_class=SensorDeviceClass.ENERGY,
         state_class=SensorStateClass.TOTAL_INCREASING,
-    ),
-    TuyaSensorEntityDescription(
-        key=DPCode.REVERSE_ENERGY_TOTAL,
-        translation_key="gross_generation",
-        device_class=SensorDeviceClass.ENERGY,
-        state_class=SensorStateClass.TOTAL_INCREASING,
-    ),
-    TuyaSensorEntityDescription(
-        key=DPCode.CUR_POWER,
-        translation_key="power",
-        device_class=SensorDeviceClass.POWER,
-        state_class=SensorStateClass.MEASUREMENT,
-        entity_registry_enabled_default=True,
     ),
     TuyaSensorEntityDescription(
         key=DPCode.POWER_CONSUMPTION,
@@ -274,6 +264,23 @@ CONSUMPTION_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         entity_registry_enabled_default=True,
         restoredata=True,
+    ),
+    TuyaSensorEntityDescription(
+        key=DPCode.REVERSE_ENERGY_TOTAL,
+        translation_key="gross_generation",
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+    ),
+    TuyaSensorEntityDescription(
+        key=DPCode.TOTAL_FORWARD_ENERGY,
+        virtual_state=VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME,
+        vs_copy_delta_to_state=[DPCode.ADD_ELE2_TODAY, DPCode.ADD_ELE2_THIS_MONTH, DPCode.ADD_ELE2_THIS_YEAR],
+        translation_key="total_energy",
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        entity_registry_enabled_default=True,
+        restoredata=False,
     ),
 )
 
@@ -312,6 +319,16 @@ TEMPERATURE_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
         key=DPCode.TEMP_BOTTOM,
         translation_key="temp_bottom",
         state_class=SensorStateClass.MEASUREMENT,
+        entity_registry_enabled_default=True,
+    ),
+    TuyaSensorEntityDescription(
+        key=DPCode.DEVICETEMP,
+        translation_key="device_temperature",
+        entity_registry_enabled_default=True,
+    ),
+    TuyaSensorEntityDescription(
+        key=DPCode.DEVICETEMP2,
+        translation_key="device_temperature2",
         entity_registry_enabled_default=True,
     ),
 )
@@ -622,6 +639,11 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
         TuyaSensorEntityDescription(
             key=DPCode.SYSTEM_VERSION,
             translation_key="system_version",
+            entity_registry_enabled_default=True,
+        ),
+        TuyaSensorEntityDescription(
+            key=DPCode.DEVICESTATE,
+            translation_key="qccdz_devicestate",
             entity_registry_enabled_default=True,
         ),
         *CONSUMPTION_SENSORS,

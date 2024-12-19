@@ -497,6 +497,14 @@
       }
     },
     "select": {
+      "qccdz_chargingoperation": {
+        "name": "Charging operation",
+        "state": {
+          "OpenCharging": "Open charging",
+          "CloseCharging": "Close charging",
+          "WaitOperation": "Wait charging"
+        }
+      },
       "xfj_mode": {
         "name": "Mode",
         "state": {
@@ -950,6 +958,27 @@
       }
     },
     "sensor": {
+      "device_power": {
+        "name": "Device consumption"
+      },
+      "device_temperature": {
+        "name": "Device temperature"
+      },
+      "device_temperature2": {
+        "name": "Device temperature 2"
+      },
+      "qccdz_devicestate": {
+        "name": "Device state",
+        "state": {
+          "no_connet": "Not connected",
+          "connect": "Connected",
+          "charing": "Charging",
+          "wait_rfid": "Waiting for RFID",
+          "finish": "Finished",
+          "wait_charing": "Charge waiting",
+          "error": "Error"
+        }
+      },
       "temp_top": {
         "name": "Max temperature"
       },
@@ -1527,6 +1556,12 @@
       }
     },
     "switch": {
+      "id_verification_set":{
+        "name": "Set ID verification"
+      },
+      "rfid":{
+        "name": "RFID"
+      },
       "uv_light":{
         "name": "UV light"
       },

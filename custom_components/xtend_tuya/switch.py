@@ -251,6 +251,16 @@ SWITCHES: dict[str, tuple[SwitchEntityDescription, ...]] = {
             translation_key="switch",
             entity_category=EntityCategory.CONFIG,
         ),
+        SwitchEntityDescription(
+            key=DPCode.RFID,
+            translation_key="rfid",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        SwitchEntityDescription(
+            key=DPCode.IDVERIFICATIONSET,
+            translation_key="id_verification_set",
+            entity_category=EntityCategory.CONFIG,
+        ),
     ),
     "wnykq": (
         SwitchEntityDescription(
