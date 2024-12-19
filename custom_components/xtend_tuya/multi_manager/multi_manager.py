@@ -400,8 +400,10 @@ class MultiManager:  # noqa: F811
     
     def update_device_online_status(self, device_id: str):
         if device := self.device_map.get(device_id, None):
+            old_online_status = device.online
             for online_status in device.online_states:
                 device.online = online_status
                 if online_status: #Prefer to be more On than Off if multiple state are not in accordance
                     break
-            self.multi_device_listener.update_device(device, None)
+            if device.online != old_online_status:
+                self.multi_device_listener.update_device(device, None)
