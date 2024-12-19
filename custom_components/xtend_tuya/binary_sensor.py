@@ -177,8 +177,8 @@ class TuyaBinarySensorEntity(TuyaEntity, BinarySensorEntity):
     def is_on(self) -> bool:
         is_on = self._is_on()
         if hasattr(self.entity_description, "device_online") and self.entity_description.device_online and hasattr(self.device, "online_states"):
-            LOGGER.warning(f"Calling IS_ON: {is_on} for dpCode {self.entity_description.dpcode}")
-            self.device.online_states[self.entity_description.dpcode] = is_on
+            LOGGER.warning(f"Calling IS_ON: {is_on} for dpCode {self.entity_description.dpcode or self.entity_description.key} : {self.device.status[self.entity_description.dpcode or self.entity_description.key]}")
+            self.device.online_states[self.entity_description.dpcode or self.entity_description.key] = is_on
             if hasattr(self.device_manager, "update_device_online_status"):
                 LOGGER.warning("Updating ONLINE STATUS")
                 self.device_manager.update_device_online_status(self.device.id)
