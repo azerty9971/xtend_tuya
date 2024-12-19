@@ -16,7 +16,7 @@ from .util import (
 
 from .multi_manager.multi_manager import XTConfigEntry
 from .base import TuyaEntity
-from .const import TUYA_DISCOVERY_NEW, DPCode, DPType
+from .const import TUYA_DISCOVERY_NEW, DPCode, DPType, LOGGER
 
 # All descriptions can be found here. Mostly the Enum data types in the
 # default instructions set of each category end up being a select.
@@ -205,6 +205,8 @@ class TuyaSelectEntity(TuyaEntity, SelectEntity):
             description.key, dptype=DPType.ENUM, prefer_function=True
         ):
             try:
+                if device.id == "bf92335449ecfb0bb7ptu4" and description.key == DPCode.CHARGINGOPERATION:
+                    LOGGER.warning(f"Enum type range is {enum_type.range}")
                 for enum_key in enum_type.range:
                     self._attr_options.append(enum_key.lower())
             except Exception:
