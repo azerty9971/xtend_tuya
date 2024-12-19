@@ -397,3 +397,11 @@ class MultiManager:  # noqa: F811
         for account in self.accounts.values():
             if account.trigger_scene(home_id, scene_id):
                 return
+    
+    def update_device_online_status(self, device_id: str):
+        if device := self.device_map.get(device_id, None):
+            for online_status in device.online_states:
+                device.online = online_status
+                if online_status: #Prefer to be more On than Off if multiple state are not in accordance
+                    break
+            self.multi_device_listener.update_device(device, None)

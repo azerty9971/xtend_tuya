@@ -93,6 +93,15 @@ BINARY_SENSORS: dict[str, tuple[TuyaBinarySensorEntityDescription, ...]] = {
             device_class=BinarySensorDeviceClass.MOTION,
         ),
     ),
+    "qccdz": (
+        TuyaBinarySensorEntityDescription(
+            key=DPCode.ONLINE_STATE,
+            translation_key="online",
+            device_class=BinarySensorDeviceClass.CONNECTIVITY,
+            device_online=True,
+            on_value="online",
+        ),
+    ),
     "smd": (
         TuyaBinarySensorEntityDescription(
             key=DPCode.OFF_BED,
@@ -167,8 +176,10 @@ class TuyaBinarySensorEntity(TuyaEntity, BinarySensorEntity):
     @property
     def is_on(self) -> bool:
         is_on = self._is_on()
-        if hasattr(self.entity_description, "device_online") and self.entity_description.device_online:
-            self.device.online = is_on
+        if hasattr(self.entity_description, "device_online") and self.entity_description.device_online and hasattr(self.device, "online_states"):
+            self.device.online_states[self.entity_description.dpcode] = is_on
+            if hasattr(self.device_manager, "update_device_online_status"):
+                self.device_manager.update_device_online_status(self.device.id)
         return is_on
     
     def _is_on(self) -> bool:
