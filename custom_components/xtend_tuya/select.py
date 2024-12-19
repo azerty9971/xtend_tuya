@@ -129,6 +129,11 @@ SELECTS: dict[str, tuple[SelectEntityDescription, ...]] = {
             translation_key="qccdz_work_mode",
             entity_category=EntityCategory.CONFIG,
         ),
+        SelectEntityDescription(
+            key=DPCode.CHARGINGOPERATION,
+            translation_key="qccdz_chargingoperation",
+            entity_category=EntityCategory.CONFIG,
+        ),
     ),
     "sfkzq": (
         SelectEntityDescription(

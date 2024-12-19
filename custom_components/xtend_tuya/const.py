@@ -218,6 +218,7 @@ class DPCode(StrEnum):
     CHARGE_CUR_SET = "charge_cur_set"
     CHARGE_ENERGY = "charge_energy"
     CHARGE_ENERGY_ONCE = "charge_energy_once"
+    CHARGINGOPERATION = "ChargingOperation"
     CHILD_LOCK = "child_lock"  # Child lock
     CISTERN = "cistern"
     CLEAN = "clean"
@@ -281,6 +282,10 @@ class DPCode(StrEnum):
     DEO_START_TIME = "deo_start_time"
     DEO_END_TIME = "deo_end_time"
     DETECTION_SENSITIVITY = "detection_sensitivity"
+    DEVICEKWH = "DeviceKwh"
+    DEVICESTATE = "DeviceState"
+    DEVICETEMP = "DeviceTemp"
+    DEVICETEMP2 = "DeviceTemp2"
     DEVICE_MODE = "device_mode"
     DISINFECTION = "disinfection"
     DO_NOT_DISTURB = "do_not_disturb"
@@ -329,6 +334,7 @@ class DPCode(StrEnum):
     HUMIDITY_INDOOR = "humidity_indoor"  # Indoor humidity
     HUMIDITY_SET = "humidity_set"  # Humidity setting
     HUMIDITY_VALUE = "humidity_value"  # Humidity
+    IDVERIFICATIONSET = "IDVerificationSet"
     ILLUMINANCE_VALUE = "illuminance_value"
     INDICATOR_LIGHT = "indicator_light"
     INDUCTION_CLEAN = "Induction_Clean"
@@ -444,6 +450,7 @@ class DPCode(StrEnum):
     RESIDUAL_ELECTRICITY = "residual_electricity"
     RESPIRATORY_RATE = "respiratory_rate"
     REVERSE_ENERGY_TOTAL = "reverse_energy_total"
+    RFID = "RFID"
     ROLL_BRUSH = "roll_brush"
     RTC_TIME = "rtc_time"
     SAND_SURFACE_CALIBRATION = "sand_surface_calibration"
