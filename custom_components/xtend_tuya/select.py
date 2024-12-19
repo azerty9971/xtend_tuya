@@ -44,6 +44,18 @@ SELECTS: dict[str, tuple[SelectEntityDescription, ...]] = {
             entity_category=EntityCategory.CONFIG,
         ),
     ),
+    "dj": (
+        SelectEntityDescription(
+            key=DPCode.COLOR,
+            translation_key="dj_color",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        SelectEntityDescription(
+            key=DPCode.MODE2,
+            translation_key="dj_mode",
+            entity_category=EntityCategory.CONFIG,
+        ),
+    ),
     "gyd": (
         SelectEntityDescription(
             key=DPCode.DEVICE_MODE,

@@ -515,6 +515,32 @@
       }
     },
     "select": {
+      "dj_color": {
+        "name": "Color",
+        "state": {
+          "r": "Red",
+          "rg": "Yellow",
+          "g": "Green",
+          "gb": "Light blue",
+          "b": "Blue",
+          "rb": "Pink",
+          "rgb": "White",
+          "color": "Random color"
+        }
+      },
+      "dj_mode": {
+        "name": "Mode",
+        "state": {
+          "bright": "Bright",
+          "gradually": "Gradually",
+          "star": "Star",
+          "flower": "Flower",
+          "marquee": "Marquee",
+          "fireworks": "Fireworks",
+          "meteor": "Meteor",
+          "stream": "Stream"
+        }
+      },
       "qccdz_chargingoperation": {
         "name": "Charging operation",
         "state": {
