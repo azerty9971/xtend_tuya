@@ -21,7 +21,7 @@ from .util import (
 
 from .multi_manager.multi_manager import XTConfigEntry
 from .base import TuyaEntity
-from .const import TUYA_DISCOVERY_NEW, DPCode
+from .const import TUYA_DISCOVERY_NEW, DPCode, LOGGER
 
 
 @dataclass(frozen=True)
@@ -177,8 +177,10 @@ class TuyaBinarySensorEntity(TuyaEntity, BinarySensorEntity):
     def is_on(self) -> bool:
         is_on = self._is_on()
         if hasattr(self.entity_description, "device_online") and self.entity_description.device_online and hasattr(self.device, "online_states"):
+            LOGGER.warning(f"Calling IS_ON: {is_on} for dpCode {self.entity_description.dpcode}")
             self.device.online_states[self.entity_description.dpcode] = is_on
             if hasattr(self.device_manager, "update_device_online_status"):
+                LOGGER.warning("Updating ONLINE STATUS")
                 self.device_manager.update_device_online_status(self.device.id)
         return is_on
     
