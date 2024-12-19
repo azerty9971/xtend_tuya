@@ -24,7 +24,7 @@ from .multi_manager.multi_manager import XTConfigEntry
 from .base import IntegerTypeData, TuyaEntity
 from .const import DEVICE_CLASS_UNITS, DOMAIN, TUYA_DISCOVERY_NEW, DPCode, DPType
 
-COUNTDOWNS: tuple[NumberEntityDescription, ...] = (
+TIMER_SENSORS: tuple[NumberEntityDescription, ...] = (
     NumberEntityDescription(
         key=DPCode.COUNTDOWN_1,
         translation_key="countdown_1",
@@ -63,6 +63,16 @@ COUNTDOWNS: tuple[NumberEntityDescription, ...] = (
     NumberEntityDescription(
         key=DPCode.COUNTDOWN_8,
         translation_key="countdown_8",
+        entity_category=EntityCategory.CONFIG,
+    ),
+    NumberEntityDescription(
+        key=DPCode.SETDELAYTIME,
+        translation_key="set_delay_time",
+        entity_category=EntityCategory.CONFIG,
+    ),
+    NumberEntityDescription(
+        key=DPCode.SETDEFINETIME,
+        translation_key="set_define_time",
         entity_category=EntityCategory.CONFIG,
     ),
 )
@@ -148,7 +158,7 @@ NUMBERS: dict[str, tuple[NumberEntityDescription, ...]] = {
             mode = NumberMode.BOX,
             entity_category=EntityCategory.CONFIG,
         ),
-        *COUNTDOWNS,
+        *TIMER_SENSORS,
     ),
     "mk": (
         NumberEntityDescription(
@@ -243,6 +253,34 @@ NUMBERS: dict[str, tuple[NumberEntityDescription, ...]] = {
             key=DPCode.TIMER_ON,
             translation_key="timer_on",
             entity_category=EntityCategory.CONFIG,
+        ),
+        NumberEntityDescription(
+            key=DPCode.SET16A,
+            translation_key="set_16a",
+            entity_category=EntityCategory.CONFIG,
+            entity_registry_enabled_default=True,
+            entity_registry_visible_default=False,
+        ),
+        NumberEntityDescription(
+            key=DPCode.SET32A,
+            translation_key="set_32a",
+            entity_category=EntityCategory.CONFIG,
+            entity_registry_enabled_default=True,
+            entity_registry_visible_default=False,
+        ),
+        NumberEntityDescription(
+            key=DPCode.SET40A,
+            translation_key="set_40a",
+            entity_category=EntityCategory.CONFIG,
+            entity_registry_enabled_default=True,
+            entity_registry_visible_default=False,
+        ),
+        NumberEntityDescription(
+            key=DPCode.SET50A,
+            translation_key="set_50a",
+            entity_category=EntityCategory.CONFIG,
+            entity_registry_enabled_default=True,
+            entity_registry_visible_default=False,
         ),
     ),
     "wnykq": (

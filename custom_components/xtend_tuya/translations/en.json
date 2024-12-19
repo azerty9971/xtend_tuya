@@ -297,6 +297,24 @@
       }
     },
     "number": {
+      "set_delay_time": {
+        "name": "Set delay time"
+      },
+      "set_define_time": {
+        "name": "Set define time"
+      },
+      "set_16a": {
+        "name": "Set 16A"
+      },
+      "set_32a": {
+        "name": "Set 32A"
+      },
+      "set_40a": {
+        "name": "Set 40A"
+      },
+      "set_50a": {
+        "name": "Set 50A"
+      },
       "standby_time": {
         "name": "Standby time"
       },
@@ -958,6 +976,12 @@
       }
     },
     "sensor": {
+      "ctime": {
+        "name": "Timer"
+      },
+      "ctime2": {
+        "name": "Timer 2"
+      },
       "device_max_set_a": {
         "name": "Device Max A",
         "state": {
