@@ -197,4 +197,4 @@ class TuyaBinarySensorEntity(TuyaEntity, BinarySensorEntity):
     async def async_added_to_hass(self) -> None:
         """Call when entity about to be added to hass."""
         await super().async_added_to_hass()
-        #self.is_on #Update the online status if needed
+        self.is_on #Update the online status if needed
