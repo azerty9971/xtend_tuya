@@ -180,8 +180,7 @@ class TuyaBinarySensorEntity(TuyaEntity, BinarySensorEntity):
             dpcode = self.entity_description.dpcode or self.entity_description.key
             self.device.online_states[dpcode] = is_on
             if hasattr(self.device_manager, "update_device_online_status"):
-                if not self.block_update:
-                    self.device_manager.update_device_online_status(self.device.id)
+                self.device_manager.update_device_online_status(self.device.id)
         return is_on
     
     def _is_on(self) -> bool:
