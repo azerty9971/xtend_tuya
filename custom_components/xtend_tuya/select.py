@@ -204,7 +204,12 @@ class TuyaSelectEntity(TuyaEntity, SelectEntity):
         if enum_type := self.find_dpcode(
             description.key, dptype=DPType.ENUM, prefer_function=True
         ):
-            self._attr_options = enum_type.range
+            try:
+                for enum_key in enum_type.range:
+                    self._attr_options.append(enum_key.lower())
+            except Exception:
+                self._attr_options = enum_type.range
+            
 
     @property
     def current_option(self) -> str | None:
@@ -214,7 +219,7 @@ class TuyaSelectEntity(TuyaEntity, SelectEntity):
         if value is None or value not in self._attr_options:
             return None
 
-        return value
+        return value.lower()
 
     def select_option(self, option: str) -> None:
         """Change the selected option."""
