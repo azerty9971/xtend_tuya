@@ -389,6 +389,8 @@ ELECTRICITY_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
     TuyaSensorEntityDescription(
         key=DPCode.CURRENT_YD,
         translation_key="current",
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.CURRENT,
         entity_registry_enabled_default=False,
     ),
     TuyaSensorEntityDescription(
@@ -410,6 +412,8 @@ ELECTRICITY_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
     TuyaSensorEntityDescription(
         key=DPCode.DEVICEKW,
         translation_key="device_power",
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.POWER,
         entity_registry_enabled_default=True,
     ),
     TuyaSensorEntityDescription(
@@ -427,16 +431,22 @@ ELECTRICITY_SENSORS: tuple[TuyaSensorEntityDescription, ...] = (
     TuyaSensorEntityDescription(
         key=DPCode.POWER_TOTAL,
         translation_key="power_total",
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.POWER,
         entity_registry_enabled_default=True,
     ),
     TuyaSensorEntityDescription(
         key=DPCode.SIGLE_PHASE_POWER,
         translation_key="sigle_phase_power",
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.POWER,
         entity_registry_enabled_default=True,
     ),
     TuyaSensorEntityDescription(
         key=DPCode.VOL_YD,
         translation_key="voltage",
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.VOLTAGE,
         entity_registry_enabled_default=False,
     ),
 )
