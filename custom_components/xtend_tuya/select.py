@@ -215,11 +215,11 @@ class TuyaSelectEntity(TuyaEntity, SelectEntity):
     def current_option(self) -> str | None:
         """Return the selected entity option to represent the entity state."""
         # Raw value
-        value = self.device.status.get(self.entity_description.key)
-        if value is None or value not in self._attr_options:
+        value: str = self.device.status.get(self.entity_description.key)
+        if value is None or ( value not in self._attr_options and value.lower() not in self._attr_options ):
             return None
 
-        return value.lower()
+        return value
 
     def select_option(self, option: str) -> None:
         """Change the selected option."""
