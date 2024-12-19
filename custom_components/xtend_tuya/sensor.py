@@ -975,11 +975,9 @@ class TuyaSensorEntity(TuyaEntity, RestoreSensor):
 
         # Unexpected enum value
         if isinstance(self._type_data, EnumTypeData):
-            if self.entity_description.key == DPCode.DEVICEMAXSETA:
-                LOGGER.warning(f"Initial value of DPCode.DEVICEMAXSETA is {value}, data range is {self._type_data.range}")
-            value = value.lower()
             if value not in self._type_data.range:
                 return None
+            value = value.lower()
 
         # Get subkey value from Json string.
         if self._type is DPType.JSON:
