@@ -189,6 +189,8 @@ async def async_setup_entry(
 class TuyaSelectEntity(TuyaEntity, SelectEntity):
     """Tuya Select Entity."""
 
+    _attr_options_original: dict[str, str]
+
     def __init__(
         self,
         device: CustomerDevice,
@@ -197,6 +199,7 @@ class TuyaSelectEntity(TuyaEntity, SelectEntity):
     ) -> None:
         """Init Tuya sensor."""
         super().__init__(device, device_manager)
+        self._attr_options_original = {}
         self.entity_description = description
         self._attr_unique_id = f"{super().unique_id}{description.key}"
 
@@ -205,9 +208,9 @@ class TuyaSelectEntity(TuyaEntity, SelectEntity):
             description.key, dptype=DPType.ENUM, prefer_function=True
         ):
             try:
-                if device.id == "bf92335449ecfb0bb7ptu4" and description.key == DPCode.CHARGINGOPERATION:
-                    LOGGER.warning(f"Enum type range is {enum_type.range}")
                 for enum_key in enum_type.range:
+                    if enum_key.lower() != enum_key:
+                        self._attr_options_original[enum_key.lower()] = enum_key
                     self._attr_options.append(enum_key.lower())
             except Exception:
                 self._attr_options = enum_type.range
@@ -221,10 +224,12 @@ class TuyaSelectEntity(TuyaEntity, SelectEntity):
         if value is None or ( value not in self._attr_options and value.lower() not in self._attr_options ):
             return None
 
-        return value
+        return value.lower()
 
     def select_option(self, option: str) -> None:
         """Change the selected option."""
+        if option in self._attr_options_original:
+            option = self._attr_options_original[option]
         self._send_command(
             [
                 {
