@@ -246,6 +246,7 @@ class DPCode(StrEnum):
     CO2_STATE = "co2_state"
     CO2_VALUE = "co2_value"  # CO2 concentration
     COLLECTION_MODE = "collection_mode"
+    COLOR = "Color"
     COLOR_DATA_V2 = "color_data_v2"
     COLOUR_DATA = "colour_data"  # Colored light mode
     COLOUR_DATA_HSV = "colour_data_hsv"  # Colored light mode
@@ -379,6 +380,7 @@ class DPCode(StrEnum):
     MINI_SET = "mini_set"
     MONITORING = "monitoring"
     MODE = "mode"  # Working mode / Mode
+    MODE2 = "Mode"
     MOODLIGHTING = "moodlighting"  # Mood light
     MOTION_RECORD = "motion_record"
     MOTION_SENSITIVITY = "motion_sensitivity"
