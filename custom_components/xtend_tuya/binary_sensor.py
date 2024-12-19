@@ -192,3 +192,8 @@ class TuyaBinarySensorEntity(TuyaEntity, BinarySensorEntity):
             return self.device.status[dpcode] in self.entity_description.on_value
 
         return self.device.status[dpcode] == self.entity_description.on_value
+    
+    async def async_added_to_hass(self) -> None:
+        """Call when entity about to be added to hass."""
+        await super().async_added_to_hass()
+        self.is_on() #Update the online status if needed
