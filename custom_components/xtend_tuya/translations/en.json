@@ -500,9 +500,9 @@
       "qccdz_chargingoperation": {
         "name": "Charging operation",
         "state": {
-          "OpenCharging": "Open charging",
-          "CloseCharging": "Close charging",
-          "WaitOperation": "Wait charging"
+          "opencharging": "Open charging",
+          "closecharging": "Close charging",
+          "waitoperation": "Wait charging"
         }
       },
       "xfj_mode": {
