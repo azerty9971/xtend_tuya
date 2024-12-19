@@ -956,18 +956,16 @@ class TuyaSensorEntity(TuyaEntity, RestoreSensor):
                 )
             )
 
-        if not hasattr(self.entity_description, "restoredata") or not self.entity_description.restoredata:
-            return
-        state = await self.async_get_last_sensor_data()
-        if state is None or state.native_value is None:
-            return
-        # Scale integer/float value
-        if isinstance(self._type_data, IntegerTypeData):
-            scaled_value_back = self._type_data.scale_value_back(state.native_value)
-            state.native_value = scaled_value_back
+        if hasattr(self.entity_description, "restoredata") and self.entity_description.restoredata:
+            state = await self.async_get_last_sensor_data()
+            if state is not None and state.native_value is not None:
+                # Scale integer/float value
+                if isinstance(self._type_data, IntegerTypeData):
+                    scaled_value_back = self._type_data.scale_value_back(state.native_value)
+                    state.native_value = scaled_value_back
 
-        if device := self.device_manager.device_map.get(self.device.id, None):
-            device.status[self.entity_description.key] = float(state.native_value)
+                if device := self.device_manager.device_map.get(self.device.id, None):
+                    device.status[self.entity_description.key] = float(state.native_value)
     
     @callback
     async def _on_event(self, event: Event[EventStateChangedData]):
