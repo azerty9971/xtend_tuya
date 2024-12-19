@@ -282,6 +282,7 @@ NUMBERS: dict[str, tuple[NumberEntityDescription, ...]] = {
             entity_registry_enabled_default=True,
             entity_registry_visible_default=False,
         ),
+        *TIMER_SENSORS,
     ),
     "wnykq": (
         NumberEntityDescription(
