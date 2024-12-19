@@ -184,6 +184,7 @@ class TuyaBinarySensorEntity(TuyaEntity, BinarySensorEntity):
             if hasattr(self.device_manager, "update_device_online_status"):
                 if not self.block_update:
                     self.block_update = True
+                    LOGGER.warning(f"Updating device {self.device.id}")
                     self.device_manager.update_device_online_status(self.device.id)
                     self.block_update = False
         return is_on
