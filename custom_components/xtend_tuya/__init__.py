@@ -57,6 +57,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
     for device in aggregated_device_map.values():
         domain_identifiers:list = multi_manager.get_domain_identifiers_of_device(device.id)
         if dev_entry := device_registry.async_get(device.id):
+            multi_manager.device_watcher.report_message(device.id, "ID found in Tuya's DR", device)
             for domain_identifier in domain_identifiers:
                 if (domain_identifier, device.id) not in dev_entry.identifiers:
                     dev_entry.identifiers.add((domain_identifier, device.id))
