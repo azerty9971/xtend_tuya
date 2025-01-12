@@ -56,16 +56,21 @@ async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
     aggregated_device_map = multi_manager.device_map
     for device in aggregated_device_map.values():
         domain_identifiers:list = multi_manager.get_domain_identifiers_of_device(device.id)
-        identifiers: set[tuple[str, str]] = set()
-        for domain_identifier in domain_identifiers:
-            identifiers.add((domain_identifier, device.id))
-        device_registry.async_get_or_create(
-            config_entry_id=entry.entry_id,
-            identifiers=identifiers,
-            manufacturer="Tuya",
-            name=device.name,
-            model=f"{device.product_name} (unsupported)",
-        )
+        if dev_entry := device_registry.async_get(device.id):
+            for domain_identifier in domain_identifiers:
+                if (domain_identifier, device.id) not in dev_entry.identifiers:
+                    dev_entry.identifiers.add((domain_identifier, device.id))
+        else:
+            identifiers: set[tuple[str, str]] = set()
+            for domain_identifier in domain_identifiers:
+                identifiers.add((domain_identifier, device.id))
+            device_registry.async_get_or_create(
+                config_entry_id=entry.entry_id,
+                identifiers=identifiers,
+                manufacturer="Tuya",
+                name=device.name,
+                model=f"{device.product_name} (unsupported)",
+            )
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 

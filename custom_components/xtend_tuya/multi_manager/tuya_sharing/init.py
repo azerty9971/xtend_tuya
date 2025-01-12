@@ -194,13 +194,7 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
         return [DOMAIN]
     
     def get_domain_identifiers_of_device(self, device_id: str) -> list:
-        if (
-            self.sharing_account.device_manager.reuse_config
-            and device_id in self.sharing_account.device_manager.get_overriden_device_manager().device_map
-        ):
-            return [DOMAIN_ORIG, DOMAIN]
-        else:
-            return [DOMAIN]
+        return [DOMAIN]
 
     def on_update_device(self, device: XTDevice) -> list[str] | None:
         return_list: list[str] = []
