@@ -114,7 +114,10 @@ async def cleanup_device_registry(hass: HomeAssistant, multi_manager: MultiManag
                     device_entry_to_keep = device_entry
             for device_entry in processed_devices[device_id]:
                 if device_entry is not device_entry_to_keep:
-                    device_registry.async_remove_device(device_entry.id)
+                    try:
+                        device_registry.async_remove_device(device_entry.id)
+                    except Exception:
+                        pass
 
 def are_all_domain_config_loaded(hass: HomeAssistant, domain: str, current_entry: ConfigEntry) -> bool:
     config_entries = hass.config_entries.async_entries(domain, False, False)
