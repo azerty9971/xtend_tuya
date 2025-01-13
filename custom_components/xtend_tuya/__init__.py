@@ -59,10 +59,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
     aggregated_device_map = multi_manager.device_map
     for device in aggregated_device_map.values():
         domain_identifiers:list = multi_manager.get_domain_identifiers_of_device(device.id)
-        multi_manager.device_watcher.report_message(device.id, "Searching ID in DR", device)
         identifiers: set[tuple[str, str]] = set()
         if device_registry.async_get_device({(DOMAIN_ORIG, device.id)}) is not None:
-            multi_manager.device_watcher.report_message(device.id, "ID found in Tuya's DR", device)
             identifiers.add((DOMAIN_ORIG, device.id))
 
         for domain_identifier in domain_identifiers:
@@ -105,14 +103,12 @@ async def cleanup_device_registry(hass: HomeAssistant, multi_manager: MultiManag
                 if device_id not in processed_devices:
                     processed_devices[device_id] = []
                 if device_entry not in processed_devices[device_id]:
-                    multi_manager.device_watcher.report_message(device_id, f"Adding duplicate: {dev_id} <=> {device_entry.id} <=> {device_entry}")
                     processed_devices[device_id].append(device_entry)
     for device_id in processed_devices:
         if len(processed_devices[device_id]) > 1:
             device_entry_to_keep = processed_devices[device_id][0]
             for device_entry in processed_devices[device_id]:
                 if (DOMAIN_ORIG, device_id) in device_entry.identifiers:
-                    multi_manager.device_watcher.report_message(device_id, "Tuya ID found in duplicate")
                     device_entry_to_keep = device_entry
             for device_entry in processed_devices[device_id]:
                 if device_entry is not device_entry_to_keep:
