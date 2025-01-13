@@ -105,12 +105,14 @@ async def cleanup_device_registry(hass: HomeAssistant, multi_manager: MultiManag
                 if device_id not in processed_devices:
                     processed_devices[device_id] = []
                 if device_entry not in processed_devices[device_id]:
+                    multi_manager.device_watcher.report_message(device_id, f"Adding duplicate: {dev_id} <=> {device_entry.id} <=> {device_entry}")
                     processed_devices[device_id].append(device_entry)
     for device_id in processed_devices:
         if len(processed_devices[device_id]) > 1:
             device_entry_to_keep = processed_devices[device_id][0]
             for device_entry in processed_devices[device_id]:
                 if (DOMAIN_ORIG, device_id) in device_entry.identifiers:
+                    multi_manager.device_watcher.report_message(device_id, "Tuya ID found in duplicate")
                     device_entry_to_keep = device_entry
             for device_entry in processed_devices[device_id]:
                 if device_entry is not device_entry_to_keep:
