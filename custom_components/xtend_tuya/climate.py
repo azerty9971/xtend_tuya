@@ -40,6 +40,7 @@ TUYA_HVAC_TO_HA = {
     "manual": HVACMode.HEAT_COOL,
     "wet": HVACMode.DRY,
     "wind": HVACMode.FAN_ONLY,
+    "on": HVACMode.HEAT_COOL,
 }
 
 
