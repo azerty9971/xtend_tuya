@@ -28,6 +28,9 @@ from .util import (
 from .multi_manager.shared.services.services import (
     ServiceManager,
 )
+from .multi_manager.shared.device import (
+    XTDevice,
+)
 
 # Suppress logs from the library, it logs unneeded on error
 logging.getLogger("tuya_sharing").setLevel(logging.CRITICAL)
@@ -91,11 +94,27 @@ async def cleanup_device_registry(hass: HomeAssistant, multi_manager: MultiManag
     if not are_all_domain_config_loaded(hass, DOMAIN_ORIG, current_entry):
         return
     device_registry = dr.async_get(hass)
+    processed_devices: dict[str, list[dr.DeviceEntry]] = {}
     for dev_id, device_entry in list(device_registry.devices.items()):
         for item in device_entry.identifiers:
-            if not is_device_in_domain_device_maps(hass, [DOMAIN_ORIG, DOMAIN],item):
+            device_found, device_id = is_device_in_domain_device_maps(hass, [DOMAIN_ORIG, DOMAIN],item)
+            if not device_found:
                 device_registry.async_remove_device(dev_id)
                 break
+            if device_id is not None:
+                if device_id not in processed_devices:
+                    processed_devices[device_id] = []
+                if dev_id not in processed_devices[device_id]:
+                    processed_devices[device_id].append(dev_id)
+    for device_id in processed_devices:
+        if len(processed_devices[device_id]) > 1:
+            dev_id_to_keep = processed_devices[device_id][0]
+            for dev_id in processed_devices[device_id]:
+                if (DOMAIN_ORIG, device_id) in dev_id.identifiers:
+                    dev_id_to_keep = dev_id
+            for dev_id in processed_devices[device_id]:
+                if dev_id is not dev_id_to_keep:
+                    device_registry.async_remove_device(dev_id)
 
 def are_all_domain_config_loaded(hass: HomeAssistant, domain: str, current_entry: ConfigEntry) -> bool:
     config_entries = hass.config_entries.async_entries(domain, False, False)
@@ -123,11 +142,11 @@ def is_device_in_domain_device_maps(hass: HomeAssistant, domains: list[str], dev
             device_map = get_domain_device_map(hass, domain)
             device_id = device_entry_identifiers[1]
             if device_id in device_map:
-                return True
+                return True, device_id
     else:
-        return True
+        return True, None
     
-    return False
+    return False, None
 
 async def async_unload_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
     """Unloading the Tuya platforms."""
