@@ -57,22 +57,20 @@ async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
     for device in aggregated_device_map.values():
         domain_identifiers:list = multi_manager.get_domain_identifiers_of_device(device.id)
         multi_manager.device_watcher.report_message(device.id, "Searching ID in DR", device)
-        if dev_entry := device_registry.async_get_device({(DOMAIN_ORIG, device.id)}):
+        identifiers: set[tuple[str, str]] = set()
+        if device_registry.async_get_device({(DOMAIN_ORIG, device.id)}) is not None:
             multi_manager.device_watcher.report_message(device.id, "ID found in Tuya's DR", device)
-            for domain_identifier in domain_identifiers:
-                if (domain_identifier, device.id) not in dev_entry.identifiers:
-                    dev_entry.identifiers.add((domain_identifier, device.id))
-        else:
-            identifiers: set[tuple[str, str]] = set()
-            for domain_identifier in domain_identifiers:
-                identifiers.add((domain_identifier, device.id))
-            device_registry.async_get_or_create(
-                config_entry_id=entry.entry_id,
-                identifiers=identifiers,
-                manufacturer="Tuya",
-                name=device.name,
-                model=f"{device.product_name} (unsupported)",
-            )
+            identifiers.add((DOMAIN_ORIG, device.id))
+
+        for domain_identifier in domain_identifiers:
+            identifiers.add((domain_identifier, device.id))
+        device_registry.async_get_or_create(
+            config_entry_id=entry.entry_id,
+            identifiers=identifiers,
+            manufacturer="Tuya",
+            name=device.name,
+            model=f"{device.product_name} (unsupported)",
+        )
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
@@ -104,7 +102,7 @@ def are_all_domain_config_loaded(hass: HomeAssistant, domain: str, current_entry
     for config_entry in config_entries:
         if config_entry.entry_id == current_entry.entry_id:
             continue
-        if config_entry.state is not ConfigEntryState.LOADED:
+        if config_entry.state != ConfigEntryState.LOADED:
             return False
     return True
 
@@ -118,7 +116,7 @@ def get_domain_device_map(hass: HomeAssistant, domain: str) -> dict[str, any]:
                 device_map[device_id] = runtime_data.device_manager.device_map[device_id]
     return device_map
 
-def is_device_in_domain_device_maps(hass: HomeAssistant, domains: list[str], device_entry_identifiers: list[str]):
+def is_device_in_domain_device_maps(hass: HomeAssistant, domains: list[str], device_entry_identifiers: tuple[str, str]):
     device_domain = device_entry_identifiers[0]
     if device_domain in domains:
         for domain in domains:
