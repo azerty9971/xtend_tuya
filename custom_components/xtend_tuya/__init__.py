@@ -104,17 +104,17 @@ async def cleanup_device_registry(hass: HomeAssistant, multi_manager: MultiManag
             if device_id is not None:
                 if device_id not in processed_devices:
                     processed_devices[device_id] = []
-                if dev_id not in processed_devices[device_id]:
-                    processed_devices[device_id].append(dev_id)
+                if device_entry not in processed_devices[device_id]:
+                    processed_devices[device_id].append(device_entry)
     for device_id in processed_devices:
         if len(processed_devices[device_id]) > 1:
-            dev_id_to_keep = processed_devices[device_id][0]
-            for dev_id in processed_devices[device_id]:
-                if (DOMAIN_ORIG, device_id) in dev_id.identifiers:
-                    dev_id_to_keep = dev_id
-            for dev_id in processed_devices[device_id]:
-                if dev_id is not dev_id_to_keep:
-                    device_registry.async_remove_device(dev_id)
+            device_entry_to_keep = processed_devices[device_id][0]
+            for device_entry in processed_devices[device_id]:
+                if (DOMAIN_ORIG, device_id) in device_entry.identifiers:
+                    device_entry_to_keep = device_entry
+            for device_entry in processed_devices[device_id]:
+                if device_entry is not device_entry_to_keep:
+                    device_registry.async_remove_device(device_entry.id)
 
 def are_all_domain_config_loaded(hass: HomeAssistant, domain: str, current_entry: ConfigEntry) -> bool:
     config_entries = hass.config_entries.async_entries(domain, False, False)
