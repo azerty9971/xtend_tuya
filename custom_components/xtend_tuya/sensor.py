@@ -799,6 +799,9 @@ SENSORS: dict[str, tuple[TuyaSensorEntityDescription, ...]] = {
             entity_registry_enabled_default=False,
         ),
     ),
+    "wk": (
+        *BATTERY_SENSORS,
+    ),
     "wnykq": (
         TuyaSensorEntityDescription(
             key=DPCode.IR_CONTROL,
