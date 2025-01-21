@@ -33,6 +33,10 @@ from .shared.shared_classes import (
     XTConfigEntry,  # noqa: F811
 )
 
+from .shared.debug.debug_helper import (
+    DebugHelper,
+)
+
 from .shared.merging_manager import (
     XTMergingManager,
 )
@@ -83,6 +87,7 @@ class MultiManager:  # noqa: F811
         self.is_ready_for_messages = False
         self.pending_messages: list[tuple[str, str]] = []
         self.devices_shared: dict[str, XTDevice] = {}
+        self.debug_helper = DebugHelper(self)
 
     @property
     def device_map(self):
