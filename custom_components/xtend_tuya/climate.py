@@ -208,10 +208,13 @@ class TuyaClimateEntity(TuyaEntity, ClimateEntity):
                     unknown_hvac_modes.append(tuya_mode)
             
             #Clean presets that are in hvac_mode
+            new_hvac_to_tuya = {}
             for ha_mode in self._hvac_to_tuya:
                 if self._hvac_to_tuya[ha_mode] in unknown_hvac_modes:
-                    self._hvac_to_tuya.pop(ha_mode)
                     self._attr_hvac_modes.remove(ha_mode)
+                else:
+                    new_hvac_to_tuya[ha_mode] = self._hvac_to_tuya[ha_mode]
+            self._hvac_to_tuya = new_hvac_to_tuya
             if unknown_hvac_modes:  # Tuya modes are presets instead of hvac_modes
                 if description.switch_only_hvac_mode not in self._attr_hvac_modes:
                     self._attr_hvac_modes.append(description.switch_only_hvac_mode)
