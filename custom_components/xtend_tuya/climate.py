@@ -27,7 +27,10 @@ from .util import (
     append_dictionnaries
 )
 
-from .multi_manager.multi_manager import XTConfigEntry
+from .multi_manager.multi_manager import (
+    XTConfigEntry,
+    MultiManager,
+)
 from .base import IntegerTypeData, TuyaEntity
 from .const import TUYA_DISCOVERY_NEW, DPCode, DPType
 
@@ -106,7 +109,7 @@ class TuyaClimateEntity(TuyaEntity, ClimateEntity):
     def __init__(
         self,
         device: CustomerDevice,
-        device_manager: Manager,
+        device_manager: MultiManager,
         description: TuyaClimateEntityDescription,
         system_temperature_unit: UnitOfTemperature,
     ) -> None:
@@ -219,6 +222,7 @@ class TuyaClimateEntity(TuyaEntity, ClimateEntity):
                 HVACMode.OFF,
                 description.switch_only_hvac_mode,
             ]
+        self.device_manager.device_watcher.report_message(self.device.id, f"_hvac_to_tuya: {self._hvac_to_tuya} <=> _attr_hvac_modes: {self._attr_hvac_modes} <=> _attr_preset_modes: {self._attr_preset_modes}")
 
         # Determine dpcode to use for setting the humidity
         if int_type := self.find_dpcode(
