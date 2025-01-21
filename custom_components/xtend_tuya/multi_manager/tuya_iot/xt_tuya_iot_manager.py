@@ -145,11 +145,11 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         device = self.device_map.get(device_id, None)
         if not device:
             return
-        self.multi_manager.device_watcher.report_message(device_id, f"[IOT]On device report: {status}", device)
+        self.multi_manager.device_watcher.report_message(device_id, f"[{MESSAGE_SOURCE_TUYA_IOT}]On device report: {status}", device)
         status_new = self.multi_manager.convert_device_report_status_list(device_id, status)
         status_new = self.multi_manager.multi_source_handler.filter_status_list(device_id, MESSAGE_SOURCE_TUYA_IOT, status_new)
-        status_new = self.multi_manager.virtual_state_handler.apply_virtual_states_to_status_list(device, status_new)
-        for item in status:
+        status_new = self.multi_manager.virtual_state_handler.apply_virtual_states_to_status_list(device, status_new, MESSAGE_SOURCE_TUYA_IOT)
+        for item in status_new:
             if "code" in item and "value" in item:
                 code = item["code"]
                 value = item["value"]
