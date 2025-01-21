@@ -193,13 +193,25 @@ class TuyaClimateEntity(TuyaEntity, ClimateEntity):
             for tuya_mode in enum_type.range:
                 if tuya_mode in TUYA_HVAC_TO_HA:
                     ha_mode = TUYA_HVAC_TO_HA[tuya_mode]
+                    if previous_ha_mode := self._hvac_to_tuya.get(ha_mode):
+                        #This HVAC mode has more than one mode, add it to the presets
+                        if previous_ha_mode not in unknown_hvac_modes:
+                            unknown_hvac_modes.append(previous_ha_mode)
+                        unknown_hvac_modes.append(tuya_mode)
+                        continue
                     self._hvac_to_tuya[ha_mode] = tuya_mode
                     self._attr_hvac_modes.append(ha_mode)
                 else:
                     unknown_hvac_modes.append(tuya_mode)
-
+            
+            #Clean presets that are in hvac_mode
+            for ha_mode in self._hvac_to_tuya:
+                if self._hvac_to_tuya[ha_mode] in unknown_hvac_modes:
+                    self._hvac_to_tuya.pop(ha_mode)
+                    self._attr_hvac_modes.pop(ha_mode)
             if unknown_hvac_modes:  # Tuya modes are presets instead of hvac_modes
-                self._attr_hvac_modes.append(description.switch_only_hvac_mode)
+                if description.switch_only_hvac_mode not in self._attr_hvac_modes:
+                    self._attr_hvac_modes.append(description.switch_only_hvac_mode)
                 self._attr_preset_modes = unknown_hvac_modes
                 self._attr_supported_features |= ClimateEntityFeature.PRESET_MODE
         elif self.find_dpcode(DPCode.SWITCH, prefer_function=True):
