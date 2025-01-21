@@ -144,9 +144,9 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
             self.sharing_account.device_ids.clear()
             self.sharing_account.device_ids.extend(new_device_ids)
 
-            if other_manager := self.sharing_account.device_manager.get_overriden_device_manager():
-                for device in other_manager.device_map.values():
-                    self.multi_manager.device_watcher.report_message(device.id, f"Update device cache TUYA: {device}", device)
+            #if other_manager := self.sharing_account.device_manager.get_overriden_device_manager():
+            #    for device in other_manager.device_map.values():
+            #        self.multi_manager.device_watcher.report_message(device.id, f"Update device cache TUYA: {device}", device)
         except Exception as exc:
             # While in general, we should avoid catching broad exceptions,
             # we have no other way of detecting this case.
