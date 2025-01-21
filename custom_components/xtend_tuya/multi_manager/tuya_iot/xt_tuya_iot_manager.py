@@ -145,7 +145,8 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         device = self.device_map.get(device_id, None)
         if not device:
             return
-        self.multi_manager.device_watcher.report_message(device_id, f"[{MESSAGE_SOURCE_TUYA_IOT}]On device report: {status}", device)
+        if self.multi_manager.debug_helper.status_helper.is_status_in_status_list(device_id, "add_ele", status):
+            self.multi_manager.device_watcher.report_message(device_id, f"[{MESSAGE_SOURCE_TUYA_IOT}]On device report: {status}", device)
         status_new = self.multi_manager.convert_device_report_status_list(device_id, status)
         status_new = self.multi_manager.multi_source_handler.filter_status_list(device_id, MESSAGE_SOURCE_TUYA_IOT, status_new)
         status_new = self.multi_manager.virtual_state_handler.apply_virtual_states_to_status_list(device, status_new, MESSAGE_SOURCE_TUYA_IOT)
@@ -165,6 +166,8 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                     device.status[alias] = value
 
         super()._on_device_report(device_id, [])
+        if self.multi_manager.debug_helper.status_helper.is_status_in_status_list(device_id, "add_ele", status):
+            self.multi_manager.device_watcher.report_message(device_id, f"[{MESSAGE_SOURCE_TUYA_IOT}]Status after run: {device.status["add_ele"]}", device)
 
     def _update_device_list_info_cache(self, devIds: list[str]):
         response = self.get_device_list_info(devIds)
