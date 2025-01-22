@@ -1,4 +1,5 @@
-try:
+from .tuya_integration_imports_no_cc import *
+""" try:
     from custom_components.tuya.alarm_control_panel import ( # type: ignore
         ALARM as ALARM_TUYA,
         TuyaAlarmEntity as TuyaAlarmEntity,
@@ -49,12 +50,14 @@ try:
         CLIMATE_DESCRIPTIONS as CLIMATE_DESCRIPTIONS_TUYA,
         TuyaClimateEntity as TuyaClimateEntity,
         TuyaClimateEntityDescription as TuyaClimateEntityDescription,
+        TUYA_HVAC_TO_HA as TuyaClimateHVACToHA,
     )
 except ImportError:
     from homeassistant.components.tuya.climate import (
         CLIMATE_DESCRIPTIONS as CLIMATE_DESCRIPTIONS_TUYA,  # noqa: F401
         TuyaClimateEntity as TuyaClimateEntity,
         TuyaClimateEntityDescription as TuyaClimateEntityDescription,
+        TUYA_HVAC_TO_HA as TuyaClimateHVACToHA,
     )
 try:
     from custom_components.tuya.cover import ( # type: ignore
@@ -166,3 +169,22 @@ try:
     import custom_components.tuya as tuya_integration # type: ignore
 except ImportError:
     import homeassistant.components.tuya as tuya_integration  # noqa: F401
+try:
+    from custom_components.tuya.entity import ( # type: ignore
+        TuyaEntity as TuyaEntity,
+    )
+except ImportError:
+    from homeassistant.components.tuya.entity import (
+        TuyaEntity as TuyaEntity,   # noqa: F401
+    )
+try:
+    from custom_components.tuya.scene import (
+        TuyaSceneEntity as TuyaSceneEntity,
+        SharingScene as TuyaScene,
+    )
+except ImportError:
+    from homeassistant.components.tuya.scene import (
+        TuyaSceneEntity as TuyaSceneEntity,
+        SharingScene as TuyaScene,
+    )
+ """

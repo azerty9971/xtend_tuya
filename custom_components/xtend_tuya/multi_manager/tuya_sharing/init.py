@@ -200,9 +200,9 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
         return_list: list[str] = []
         if device.id in self.sharing_account.device_ids:
             return_list.append(TUYA_HA_SIGNAL_UPDATE_ENTITY)
+            return_list.append(TUYA_HA_SIGNAL_UPDATE_ENTITY_ORIG)
         if self.sharing_account.device_manager.reuse_config:
             self.sharing_account.device_manager.copy_statuses_to_tuya(device)
-            return_list.append(TUYA_HA_SIGNAL_UPDATE_ENTITY_ORIG)
         if return_list:
             return return_list
         return None

@@ -61,6 +61,7 @@ from ...const import (
     LOGGER,
     TUYA_DISCOVERY_NEW,
     TUYA_HA_SIGNAL_UPDATE_ENTITY,
+    TUYA_HA_SIGNAL_UPDATE_ENTITY_ORIG,
 )
 
 def get_plugin_instance() -> XTTuyaIOTDeviceManagerInterface | None:
@@ -174,7 +175,7 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
 
     def on_update_device(self, device: XTDevice) -> list[str] | None:
         if device.id in self.iot_account.device_ids:
-            return [TUYA_HA_SIGNAL_UPDATE_ENTITY]
+            return [TUYA_HA_SIGNAL_UPDATE_ENTITY, TUYA_HA_SIGNAL_UPDATE_ENTITY_ORIG]
         return None
     
     def on_add_device(self, device: XTDevice) -> list[str] | None:
