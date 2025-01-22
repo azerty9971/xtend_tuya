@@ -36,8 +36,8 @@ class XTBinarySensorEntityDescription(TuyaBinarySensorEntityDescription):
     # This DPCode represent the online status of a device
     device_online: bool = False
 
-    def __init__(self, *args, **kwargs):
-        super(XTBinarySensorEntityDescription, self).__init__(*args, **kwargs)
+    """ def __init__(self, *args, **kwargs):
+        super(XTBinarySensorEntityDescription, self).__init__(*args, **kwargs) """
 
 
 # Commonly used sensors
