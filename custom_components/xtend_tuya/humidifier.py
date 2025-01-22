@@ -56,7 +56,7 @@ async def async_setup_entry(
             if device := hass_data.manager.device_map.get(device_id):
                 if description := merged_categories.get(device.category):
                     entities.append(
-                        XTHumidifierEntity(device, hass_data.manager, description)
+                        XTHumidifierEntity(device, hass_data.manager, XTHumidifierEntityDescription(**description.__dict__))
                     )
         async_add_entities(entities)
 

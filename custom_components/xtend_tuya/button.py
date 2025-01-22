@@ -107,7 +107,7 @@ async def async_setup_entry(
                             for reset_state in description.vf_reset_state:
                                 if reset_state in device.status:
                                     entities.extend(
-                                        [XTButtonEntity(device, hass_data.manager, description)]
+                                        [XTButtonEntity(device, hass_data.manager, XTButtonEntityDescription(**description.__dict__))]
                                     )
                                 break
 

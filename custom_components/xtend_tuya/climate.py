@@ -66,7 +66,7 @@ async def async_setup_entry(
                         XTClimateEntity(
                             device,
                             hass_data.manager,
-                            merged_descriptions[device.category],
+                            XTClimateEntityDescription(**merged_descriptions[device.category].__dict__),
                             hass.config.units.temperature_unit,
                         )
                     )
