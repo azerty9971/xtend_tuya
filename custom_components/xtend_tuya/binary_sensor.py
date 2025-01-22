@@ -1,4 +1,4 @@
-"""Support for Tuya binary sensors."""
+"""Support for XT binary sensors."""
 
 from __future__ import annotations
 

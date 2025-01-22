@@ -1,4 +1,4 @@
-"""Support for Tuya Alarm."""
+"""Support for XT Alarm."""
 
 from __future__ import annotations
 
