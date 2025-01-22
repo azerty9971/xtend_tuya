@@ -23,7 +23,7 @@ async def async_setup_entry(
     """Set up Tuya scenes."""
     hass_data = entry.runtime_data
     scenes = await hass.async_add_executor_job(hass_data.manager.query_scenes)
-    async_add_entities(XTSceneEntity(hass_data.manager, scene) for scene in scenes)
+    async_add_entities(XTSceneEntity(hass_data.manager, XTScene(**scene.__dict__)) for scene in scenes)
 
 
 class XTSceneEntity(TuyaSceneEntity):

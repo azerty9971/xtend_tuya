@@ -366,7 +366,7 @@ async def async_setup_entry(
             if device := hass_data.manager.device_map.get(device_id):
                 if descriptions := merged_descriptors.get(device.category):
                     entities.extend(
-                        XTNumberEntity(device, hass_data.manager, description)
+                        XTNumberEntity(device, hass_data.manager, XTNumberEntityDescription(**description.__dict__))
                         for description in descriptions
                         if description.key in device.status
                     )
