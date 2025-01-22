@@ -132,7 +132,7 @@ async def async_setup_entry(
     @callback
     def async_discover_device(device_map) -> None:
         """Discover and add a discovered Tuya binary sensor."""
-        entities: list[XTBinarySensorEntityDescription] = []
+        entities: list[XTBinarySensorEntity] = []
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id, None):
@@ -141,7 +141,7 @@ async def async_setup_entry(
                         dpcode = description.dpcode or description.key
                         if dpcode in device.status:
                             entities.append(
-                                XTBinarySensorEntityDescription(
+                                XTBinarySensorEntity(
                                     device, hass_data.manager, description
                                 )
                             )
@@ -157,7 +157,7 @@ async def async_setup_entry(
     )
 
 
-class XTBinarySensorEntityDescription(TuyaBinarySensorEntity):
+class XTBinarySensorEntity(TuyaBinarySensorEntity):
     """XT Binary Sensor Entity."""
 
     entity_description: XTBinarySensorEntityDescription
@@ -169,28 +169,19 @@ class XTBinarySensorEntityDescription(TuyaBinarySensorEntity):
         description: XTBinarySensorEntityDescription,
     ) -> None:
         """Init Tuya binary sensor."""
-        super(XTBinarySensorEntityDescription, self).__init__(device, device_manager, description)
+        super(XTBinarySensorEntity, self).__init__(device, device_manager, description)
+        self.device = device
+        self.device_manager = device_manager
+        self.entity_description = description
 
     @property
     def is_on(self) -> bool:
-        is_on = self._is_on()
-        if hasattr(self.entity_description, "device_online") and self.entity_description.device_online and hasattr(self.device, "online_states"):
+        is_on = super().is_on()
+        if self.entity_description.device_online:
             dpcode = self.entity_description.dpcode or self.entity_description.key
             self.device.online_states[dpcode] = is_on
-            if hasattr(self.device_manager, "update_device_online_status"):
-                self.device_manager.update_device_online_status(self.device.id)
+            self.device_manager.update_device_online_status(self.device.id)
         return is_on
-    
-    def _is_on(self) -> bool:
-        """Return true if sensor is on."""
-        dpcode = self.entity_description.dpcode or self.entity_description.key
-        if dpcode not in self.device.status:
-            return False
-
-        if isinstance(self.entity_description.on_value, set):
-            return self.device.status[dpcode] in self.entity_description.on_value
-
-        return self.device.status[dpcode] == self.entity_description.on_value
     
     async def async_added_to_hass(self) -> None:
         """Call when entity about to be added to hass."""
