@@ -180,7 +180,7 @@ class XTBinarySensorEntity(XTEntity, TuyaBinarySensorEntity):
     @property
     def is_on(self) -> bool:
         is_on = super().is_on
-        if self.entity_description.device_online:
+        if hasattr(self.entity_description, "device_online") and self.entity_description.device_online:
             dpcode = self.entity_description.dpcode or self.entity_description.key
             self.device.online_states[dpcode] = is_on
             self.device_manager.update_device_online_status(self.device.id)
