@@ -2,22 +2,8 @@
 
 from __future__ import annotations
 
-from enum import StrEnum
-
-from tuya_sharing import CustomerDevice, Manager
-
-from homeassistant.components.alarm_control_panel import (
-    AlarmControlPanelEntity,
-    AlarmControlPanelEntityDescription,
-    AlarmControlPanelEntityFeature,
-    #AlarmControlPanelState,    #Activate somewhere around 2025.8
-)
 from homeassistant.const import (
     Platform,
-    STATE_ALARM_ARMED_AWAY,     #Disable somewhere around 2025.8
-    STATE_ALARM_ARMED_HOME,     #Disable somewhere around 2025.8
-    STATE_ALARM_DISARMED,       #Disable somewhere around 2025.8
-    STATE_ALARM_TRIGGERED,      #Disable somewhere around 2025.8
 )
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
@@ -26,36 +12,25 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from .util import (
     merge_device_descriptors
 )
+from .ha_tuya_integration.tuya_integration_imports import (
+    TuyaAlarmControlPanelEntityDescription,
+    TuyaAlarmEntity,
+)
 
-from .multi_manager.multi_manager import XTConfigEntry
-from .base import TuyaEntity
-from .const import TUYA_DISCOVERY_NEW, DPType
+from .multi_manager.multi_manager import (
+    XTConfigEntry,
+    MultiManager,
+    XTDevice,
+)
+from .const import TUYA_DISCOVERY_NEW
 
-
-class Mode(StrEnum):
-    """Alarm modes."""
-
-    ARM = "arm"
-    DISARMED = "disarmed"
-    HOME = "home"
-    SOS = "sos"
-
-
-STATE_MAPPING: dict[str, str] = {
-    #Mode.DISARMED: AlarmControlPanelState.DISARMED,    #Activate somewhere around 2025.8
-    #Mode.ARM: AlarmControlPanelState.ARMED_AWAY,       #Activate somewhere around 2025.8
-    #Mode.HOME: AlarmControlPanelState.ARMED_HOME,      #Activate somewhere around 2025.8
-    #Mode.SOS: AlarmControlPanelState.TRIGGERED,        #Activate somewhere around 2025.8
-    Mode.DISARMED: STATE_ALARM_DISARMED,                #Disable somewhere around 2025.8
-    Mode.ARM: STATE_ALARM_ARMED_AWAY,                   #Disable somewhere around 2025.8
-    Mode.HOME: STATE_ALARM_ARMED_HOME,                  #Disable somewhere around 2025.8
-    Mode.SOS: STATE_ALARM_TRIGGERED,                    #Disable somewhere around 2025.8
-}
-
+class XTAlarmEntityDescription(TuyaAlarmControlPanelEntityDescription):
+    def __init__(self, *args, **kwargs):
+        super(XTAlarmEntityDescription, self).__init__(*args, **kwargs)
 
 # All descriptions can be found here:
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
-ALARM: dict[str, tuple[AlarmControlPanelEntityDescription, ...]] = {
+ALARM: dict[str, tuple[XTAlarmEntityDescription, ...]] = {
 }
 
 
@@ -72,13 +47,13 @@ async def async_setup_entry(
     @callback
     def async_discover_device(device_map) -> None:
         """Discover and add a discovered Tuya siren."""
-        entities: list[TuyaAlarmEntity] = []
+        entities: list[XTAlarmEntity] = []
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id, None):
                 if descriptions := merged_descriptors.get(device.category):
                     entities.extend(
-                        TuyaAlarmEntity(device, hass_data.manager, description)
+                        XTAlarmEntity(device, hass_data.manager, description)
                         for description in descriptions
                         if description.key in device.status
                     )
@@ -92,57 +67,11 @@ async def async_setup_entry(
     )
 
 
-class TuyaAlarmEntity(TuyaEntity, AlarmControlPanelEntity):
-    """Tuya Alarm Entity."""
-
-    _attr_name = None
-    _attr_code_arm_required = False
-
+class XTAlarmEntity(TuyaAlarmEntity):
     def __init__(
         self,
-        device: CustomerDevice,
-        device_manager: Manager,
-        description: AlarmControlPanelEntityDescription,
+        device: XTDevice,
+        device_manager: MultiManager,
+        description: XTAlarmEntityDescription,
     ) -> None:
-        """Init Tuya Alarm."""
-        super().__init__(device, device_manager)
-        self.entity_description = description
-        self._attr_unique_id = f"{super().unique_id}{description.key}"
-
-        # Determine supported  modes
-        if supported_modes := self.find_dpcode(
-            description.key, dptype=DPType.ENUM, prefer_function=True
-        ):
-            if Mode.HOME in supported_modes.range:
-                self._attr_supported_features |= AlarmControlPanelEntityFeature.ARM_HOME
-
-            if Mode.ARM in supported_modes.range:
-                self._attr_supported_features |= AlarmControlPanelEntityFeature.ARM_AWAY
-
-            if Mode.SOS in supported_modes.range:
-                self._attr_supported_features |= AlarmControlPanelEntityFeature.TRIGGER
-
-    @property
-    def state(self) -> str | None:
-        """Return the state of the device."""
-        if not (status := self.device.status.get(self.entity_description.key)):
-            return None
-        return STATE_MAPPING.get(status)
-
-    def alarm_disarm(self, code: str | None = None) -> None:
-        """Send Disarm command."""
-        self._send_command(
-            [{"code": self.entity_description.key, "value": Mode.DISARMED}]
-        )
-
-    def alarm_arm_home(self, code: str | None = None) -> None:
-        """Send Home command."""
-        self._send_command([{"code": self.entity_description.key, "value": Mode.HOME}])
-
-    def alarm_arm_away(self, code: str | None = None) -> None:
-        """Send Arm command."""
-        self._send_command([{"code": self.entity_description.key, "value": Mode.ARM}])
-
-    def alarm_trigger(self, code: str | None = None) -> None:
-        """Send SOS command."""
-        self._send_command([{"code": self.entity_description.key, "value": Mode.SOS}])
+        super(XTAlarmEntity, self).__init__(device, device_manager, description)
