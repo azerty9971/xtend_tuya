@@ -36,8 +36,8 @@ class XTBinarySensorEntityDescription(TuyaBinarySensorEntityDescription):
     # This DPCode represent the online status of a device
     device_online: bool = False
 
-    """ def __init__(self, *args, **kwargs):
-        super(XTBinarySensorEntityDescription, self).__init__(*args, **kwargs) """
+    def __init__(self, *args, **kwargs):
+        super(XTBinarySensorEntityDescription, self).__init__(*args, **kwargs)
 
 
 # Commonly used sensors
@@ -145,7 +145,7 @@ async def async_setup_entry(
                         if dpcode in device.status:
                             entities.append(
                                 XTBinarySensorEntity(
-                                    device, hass_data.manager, description
+                                    device, hass_data.manager, XTBinarySensorEntityDescription(description)
                                 )
                             )
 
@@ -180,7 +180,7 @@ class XTBinarySensorEntity(XTEntity, TuyaBinarySensorEntity):
     @property
     def is_on(self) -> bool:
         is_on = super().is_on
-        if hasattr(self.entity_description, "device_online") and self.entity_description.device_online:
+        if self.entity_description.device_online:
             dpcode = self.entity_description.dpcode or self.entity_description.key
             self.device.online_states[dpcode] = is_on
             self.device_manager.update_device_online_status(self.device.id)
