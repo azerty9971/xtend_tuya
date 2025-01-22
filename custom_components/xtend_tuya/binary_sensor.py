@@ -145,7 +145,7 @@ async def async_setup_entry(
                         if dpcode in device.status:
                             entities.append(
                                 XTBinarySensorEntity(
-                                    device, hass_data.manager, XTBinarySensorEntityDescription(description)
+                                    device, hass_data.manager, XTBinarySensorEntityDescription(**description.__dict__)
                                 )
                             )
 
