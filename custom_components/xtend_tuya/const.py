@@ -146,7 +146,7 @@ class DPType(StrEnum):
 
 
 class DPCode(StrEnum):
-    """Data Point Codes used by Tuya.
+    """Data Point Codes used by XT.
 
     https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
     """
