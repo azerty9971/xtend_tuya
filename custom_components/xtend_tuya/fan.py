@@ -20,6 +20,9 @@ from .const import TUYA_DISCOVERY_NEW
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaFanEntity,
 )
+from .entity import (
+    XTEntity,
+)
 
 XT_SUPPORT_TYPE = {
 }
@@ -53,7 +56,7 @@ async def async_setup_entry(
     )
 
 
-class XTFanEntity(TuyaFanEntity):
+class XTFanEntity(XTEntity, TuyaFanEntity):
     """XT Fan Device."""
 
     def __init__(

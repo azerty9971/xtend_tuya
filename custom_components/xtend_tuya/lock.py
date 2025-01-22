@@ -28,6 +28,9 @@ from .multi_manager.multi_manager import (
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaEntity,
 )
+from .entity import (
+    XTEntity,
+)
 
 @dataclass(frozen=True)
 class XTLockEntityDescription(LockEntityDescription):
@@ -78,7 +81,7 @@ async def async_setup_entry(
         async_dispatcher_connect(hass, TUYA_DISCOVERY_NEW, async_discover_device)
     )
 
-class XTLockEntity(TuyaEntity, LockEntity):
+class XTLockEntity(XTEntity, LockEntity):
     """Tuya Lock Sensor Entity."""
 
     entity_description: XTLockEntityDescription

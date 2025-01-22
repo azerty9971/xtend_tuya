@@ -31,6 +31,9 @@ from .ha_tuya_integration.tuya_integration_imports import (
     TuyaNumberEntity,
     TuyaNumberEntityDescription,
 )
+from .entity import (
+    XTEntity,
+)
 
 class XTNumberEntityDescription(TuyaNumberEntityDescription):
     """Describe an Tuya light entity."""
@@ -378,7 +381,7 @@ async def async_setup_entry(
     )
 
 
-class XTNumberEntity(TuyaNumberEntity):
+class XTNumberEntity(XTEntity, TuyaNumberEntity):
     """Tuya Number Entity."""
 
     _number: IntegerTypeData | None = None

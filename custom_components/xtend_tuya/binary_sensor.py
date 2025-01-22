@@ -25,6 +25,9 @@ from .ha_tuya_integration.tuya_integration_imports import (
     TuyaBinarySensorEntity,
     TuyaBinarySensorEntityDescription,
 )
+from .entity import (
+    XTEntity,
+)
 
 @dataclass(frozen=True)
 class XTBinarySensorEntityDescription(TuyaBinarySensorEntityDescription):
@@ -157,7 +160,7 @@ async def async_setup_entry(
     )
 
 
-class XTBinarySensorEntity(TuyaBinarySensorEntity):
+class XTBinarySensorEntity(XTEntity, TuyaBinarySensorEntity):
     """XT Binary Sensor Entity."""
 
     entity_description: XTBinarySensorEntityDescription

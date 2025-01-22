@@ -24,6 +24,9 @@ from .const import TUYA_DISCOVERY_NEW, DPCode, DPType
 from .util import (
     append_lists
 )
+from .entity import (
+    XTEntity,
+)
 
 TUYA_MODE_RETURN_HOME = "chargego"
 TUYA_STATUS_TO_HA = {

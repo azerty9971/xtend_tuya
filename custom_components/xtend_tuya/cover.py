@@ -26,6 +26,9 @@ from .ha_tuya_integration.tuya_integration_imports import (
     TuyaCoverEntity,
     TuyaCoverEntityDescription,
 )
+from .entity import (
+    XTEntity,
+)
 
 @dataclass(frozen=True)
 class XTCoverEntityDescription(TuyaCoverEntityDescription):
@@ -128,7 +131,7 @@ async def async_setup_entry(
     )
 
 
-class XTCoverEntity(TuyaCoverEntity):
+class XTCoverEntity(XTEntity, TuyaCoverEntity):
     """XT Cover Device."""
 
     def __init__(

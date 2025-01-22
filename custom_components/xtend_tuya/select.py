@@ -17,6 +17,9 @@ from .util import (
 from .multi_manager.multi_manager import XTConfigEntry
 from .base import TuyaEntity
 from .const import TUYA_DISCOVERY_NEW, DPCode, DPType, LOGGER
+from .entity import (
+    XTEntity,
+)
 
 # All descriptions can be found here. Mostly the Enum data types in the
 # default instructions set of each category end up being a select.
