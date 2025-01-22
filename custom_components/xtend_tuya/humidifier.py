@@ -23,6 +23,9 @@ from .ha_tuya_integration.tuya_integration_imports import (
     TuyaHumidifierEntity,
     TuyaHumidifierEntityDescription,
 )
+from .entity import (
+    XTEntity,
+)
 
 @dataclass(frozen=True)
 class XTHumidifierEntityDescription(TuyaHumidifierEntityDescription):
@@ -65,7 +68,7 @@ async def async_setup_entry(
     )
 
 
-class XTHumidifierEntity(TuyaHumidifierEntity):
+class XTHumidifierEntity(XTEntity, TuyaHumidifierEntity):
     """XT (de)humidifier Device."""
 
     def __init__(

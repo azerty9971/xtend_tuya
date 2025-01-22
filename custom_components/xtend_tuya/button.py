@@ -24,6 +24,9 @@ from .ha_tuya_integration.tuya_integration_imports import (
     TuyaButtonEntity,
     TuyaButtonEntityDescription,
 )
+from .entity import (
+    XTEntity,
+)
 
 @dataclass(frozen=True)
 class XTButtonEntityDescription(TuyaButtonEntityDescription):
@@ -119,7 +122,7 @@ async def async_setup_entry(
     )
 
 
-class XTButtonEntity(TuyaButtonEntity):
+class XTButtonEntity(XTEntity, TuyaButtonEntity):
     """XT Button Device."""
 
     def __init__(

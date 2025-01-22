@@ -23,6 +23,9 @@ from .ha_tuya_integration.tuya_integration_imports import (
     TuyaLightEntity,
     TuyaLightEntityDescription,
 )
+from .entity import (
+    XTEntity,
+)
 
 @dataclass(frozen=True)
 class XTLightEntityDescription(TuyaLightEntityDescription):
@@ -74,7 +77,7 @@ async def async_setup_entry(
     )
 
 
-class XTLightEntity(TuyaLightEntity):
+class XTLightEntity(XTEntity, TuyaLightEntity):
     """XT light device."""
 
     def __init__(

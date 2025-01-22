@@ -70,6 +70,9 @@ from homeassistant.components.tuya.switch import (
 import homeassistant.components.tuya as tuya_integration  # noqa: F401
 from homeassistant.components.tuya.entity import (
         TuyaEntity as TuyaEntity,
+        ElectricityTypeData as TuyaElectricityTypeData,
+        EnumTypeData as TuyaEnumTypeData,
+        IntegerTypeData as TuyaIntegerTypeData,
     )
 from homeassistant.components.tuya.scene import (
         TuyaSceneEntity as TuyaSceneEntity,

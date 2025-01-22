@@ -28,6 +28,9 @@ from .multi_manager.multi_manager import (
     MultiManager,
     XTConfigEntry,
 )
+from .entity import (
+    XTEntity,
+)
 
 @dataclass(frozen=True)
 class TuyaTimeEntityDescription(TimeEntityDescription):

@@ -23,6 +23,9 @@ from .multi_manager.multi_manager import (
     XTDevice,
 )
 from .const import TUYA_DISCOVERY_NEW
+from .entity import (
+    XTEntity,
+)
 
 class XTAlarmEntityDescription(TuyaAlarmControlPanelEntityDescription):
     def __init__(self, *args, **kwargs):
@@ -67,7 +70,7 @@ async def async_setup_entry(
     )
 
 
-class XTAlarmEntity(TuyaAlarmEntity):
+class XTAlarmEntity(XTEntity, TuyaAlarmEntity):
     def __init__(
         self,
         device: XTDevice,

@@ -44,7 +44,9 @@ from .const import (
     VirtualStates,
     LOGGER,  # noqa: F401
 )
-
+from .entity import (
+    XTEntity,
+)
 
 @dataclass
 class TuyaSensorEntityDescription(SensorEntityDescription):

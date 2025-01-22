@@ -172,10 +172,16 @@ except ImportError:
 try:
     from custom_components.tuya.entity import ( # type: ignore
         TuyaEntity as TuyaEntity,
+        ElectricityTypeData as TuyaElectricityTypeData,
+        EnumTypeData as TuyaEnumTypeData,
+        IntegerTypeData as TuyaIntegerTypeData,
     )
 except ImportError:
     from homeassistant.components.tuya.entity import (
         TuyaEntity as TuyaEntity,   # noqa: F401
+        ElectricityTypeData as TuyaElectricityTypeData,
+        EnumTypeData as TuyaEnumTypeData,
+        IntegerTypeData as TuyaIntegerTypeData,
     )
 try:
     from custom_components.tuya.scene import (

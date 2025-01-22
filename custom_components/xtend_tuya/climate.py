@@ -29,7 +29,9 @@ from .ha_tuya_integration.tuya_integration_imports import (
     TuyaClimateEntityDescription,
     TuyaClimateHVACToHA,
 )
-
+from .entity import (
+    XTEntity,
+)
 
 @dataclass(frozen=True, kw_only=True)
 class XTClimateEntityDescription(TuyaClimateEntityDescription):
@@ -78,7 +80,7 @@ async def async_setup_entry(
     )
 
 
-class XTClimateEntity(TuyaClimateEntity):
+class XTClimateEntity(XTEntity, TuyaClimateEntity):
     """XT Climate Device."""
 
     def __init__(

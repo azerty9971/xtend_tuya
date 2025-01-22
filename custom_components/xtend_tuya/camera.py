@@ -21,6 +21,9 @@ from .const import TUYA_DISCOVERY_NEW
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaCameraEntity,
 )
+from .entity import (
+    XTEntity,
+)
 
 # All descriptions can be found here:
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
@@ -57,7 +60,7 @@ async def async_setup_entry(
     )
 
 
-class XTCameraEntity(TuyaCameraEntity):
+class XTCameraEntity(XTEntity, TuyaCameraEntity):
     """XT Camera Entity."""
 
     def __init__(
