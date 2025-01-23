@@ -344,9 +344,9 @@ class CloudFixes:
             value = json.loads(device.status_range[code].values)
             if "unit" in value and "min" in value and "max" in value and "scale" in value:
                 unit = value["unit"]
-                min = value["min"]
-                max = value["max"]
                 try:
+                    min = int(value["min"])
+                    max = int(["max"])
                     if unit not in supported_units:
                         continue
                     if max % 100 != 0:
@@ -361,9 +361,9 @@ class CloudFixes:
             value = json.loads(device.function[code].values)
             if "unit" in value and "min" in value and "max" in value and "scale" in value:
                 unit = value["unit"]
-                min = value["min"]
-                max = value["max"]
                 try:
+                    min = int(value["min"])
+                    max = int(["max"])
                     if unit not in supported_units:
                         continue
                     if max % 100 != 0:
@@ -380,9 +380,9 @@ class CloudFixes:
                     value = json.loads(value_descr)
                     if "unit" in value and "min" in value and "max" in value and "scale" in value:
                         unit = value["unit"]
-                        min = value["min"]
-                        max = value["max"]
                         try:
+                            min = int(value["min"])
+                            max = int(["max"])
                             if unit not in supported_units:
                                 continue
                             if max % 100 != 0:
