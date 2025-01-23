@@ -346,28 +346,34 @@ class CloudFixes:
                 unit = value["unit"]
                 min = value["min"]
                 max = value["max"]
-                if unit not in supported_units:
+                try:
+                    if unit not in supported_units:
+                        continue
+                    if max % 100 != 0:
+                        continue
+                    if min not in (0, 1):
+                        continue
+                    value["scale"] = int(max / 100) - 1
+                    device.status_range[code].values = json.dumps(value)
+                except Exception:
                     continue
-                if max % 100 != 0:
-                    continue
-                if min not in (0, 1):
-                    continue
-                value["scale"] = int(max / 100) - 1
-                device.status_range[code].values = json.dumps(value)
         for code in device.function:
             value = json.loads(device.function[code].values)
             if "unit" in value and "min" in value and "max" in value and "scale" in value:
                 unit = value["unit"]
                 min = value["min"]
                 max = value["max"]
-                if unit not in supported_units:
+                try:
+                    if unit not in supported_units:
+                        continue
+                    if max % 100 != 0:
+                        continue
+                    if min not in (0, 1):
+                        continue
+                    value["scale"] = int(max / 100) - 1
+                    device.function[code].values = json.dumps(value)
+                except Exception:
                     continue
-                if max % 100 != 0:
-                    continue
-                if min not in (0, 1):
-                    continue
-                value["scale"] = int(max / 100) - 1
-                device.function[code].values = json.dumps(value)
         for dpId in device.local_strategy:
             if config_item := device.local_strategy[dpId].get("config_item"):
                 if value_descr := config_item.get("valueDesc"):
@@ -376,14 +382,17 @@ class CloudFixes:
                         unit = value["unit"]
                         min = value["min"]
                         max = value["max"]
-                        if unit not in supported_units:
+                        try:
+                            if unit not in supported_units:
+                                continue
+                            if max % 100 != 0:
+                                continue
+                            if min not in (0, 1):
+                                continue
+                            value["scale"] = int(max / 100) - 1
+                            config_item["valueDesc"] = json.dumps(value)
+                        except Exception:
                             continue
-                        if max % 100 != 0:
-                            continue
-                        if min not in (0, 1):
-                            continue
-                        value["scale"] = int(max / 100) - 1
-                        config_item["valueDesc"] = json.dumps(value)
 
     def determine_most_plausible(value1: dict, value2: dict, key: str, state_value: any = None) -> int | None:
         if key in value1 and key in value2:
