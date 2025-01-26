@@ -88,6 +88,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
             for item in response["result"]:
                 device = XTDevice(**item)               #CHANGED
                 self.multi_manager.device_watcher.report_message(device.id, f"Product name 1: {device.product_name}", device)
+                self.multi_manager.device_watcher.report_message(device.id, f"API response 1: {response}", device)
                 status = {}
                 for item_status in device.status:
                     if "code" in item_status and "value" in item_status:
