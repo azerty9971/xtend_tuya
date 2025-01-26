@@ -134,6 +134,10 @@ class XTDevice(SimpleNamespace):
         return f"Device {self.name}:\r\n{self.source}"
 
     def from_compatible_device(device: Any, source: str = "Compatible device"):
+        #If the device is already an XT device return it right away
+        if isinstance(device, XTDevice):
+            return device
+        
         new_device = XTDevice(source=source, **device.__dict__)
 
         #Reuse the references from the original device
