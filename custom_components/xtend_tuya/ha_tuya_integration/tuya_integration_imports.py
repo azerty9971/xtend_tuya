@@ -166,6 +166,14 @@ except ImportError:
         SwitchEntityDescription as TuyaSwitchEntityDescription,
     )
 try:
+    from custom_components.tuya.vacuum import ( # type: ignore
+        TuyaVacuumEntity as TuyaVacuumEntity,
+    )
+except ImportError:
+    from homeassistant.components.tuya.vacuum import (
+        TuyaVacuumEntity as TuyaVacuumEntity,
+    )
+try:
     import custom_components.tuya as tuya_integration # type: ignore
 except ImportError:
     import homeassistant.components.tuya as tuya_integration  # noqa: F401

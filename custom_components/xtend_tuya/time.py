@@ -9,35 +9,30 @@ from homeassistant.components.time import (
     TimeEntityDescription,
 )
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.const import EntityCategory, Platform
+from homeassistant.const import Platform
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 
 from .const import (
-    LOGGER,  # noqa: F401
     TUYA_DISCOVERY_NEW,
-    DPCode,
 )
 from .util import (
     merge_device_descriptors,
 )
-from .base import TuyaEntity
-from .multi_manager.shared.device import (
-    XTDevice,
-)
 from .multi_manager.multi_manager import (
     MultiManager,
     XTConfigEntry,
+    XTDevice,
 )
 from .entity import (
     XTEntity,
 )
 
 @dataclass(frozen=True)
-class TuyaTimeEntityDescription(TimeEntityDescription):
+class XTTimeEntityDescription(TimeEntityDescription):
     """Describes a Tuya time."""
     pass
 
-TIMES: dict[str, tuple[TuyaTimeEntityDescription, ...]] = {
+TIMES: dict[str, tuple[XTTimeEntityDescription, ...]] = {
     
 }
 
@@ -54,13 +49,13 @@ async def async_setup_entry(
     @callback
     def async_discover_device(device_map) -> None:
         """Discover and add a discovered Tuya binary sensor."""
-        entities: list[TuyaTimeEntity] = []
+        entities: list[XTTimeEntity] = []
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
                 if descriptions := merged_descriptors.get(device.category):
                     entities.extend(
-                        TuyaTimeEntity(device, hass_data.manager, description)
+                        XTTimeEntity(device, hass_data.manager, description)
                         for description in descriptions
                         if description.key in device.status
                     )
@@ -75,18 +70,18 @@ async def async_setup_entry(
         async_dispatcher_connect(hass, TUYA_DISCOVERY_NEW, async_discover_device)
     )
 
-class TuyaTimeEntity(TuyaEntity, TimeEntity):
-    """Tuya Binary Sensor Entity."""
+class XTTimeEntity(XTEntity, TimeEntity):
+    """XT Time entity."""
 
-    entity_description: TuyaTimeEntityDescription
+    entity_description: XTTimeEntityDescription
 
     def __init__(
         self,
         device: XTDevice,
         device_manager: MultiManager,
-        description: TuyaTimeEntityDescription,
+        description: XTTimeEntityDescription,
     ) -> None:
-        """Init Tuya binary sensor."""
+        """Init XT time."""
         super().__init__(device, device_manager)
         self.entity_description = description
         self.device = device
