@@ -3,6 +3,7 @@ from __future__ import annotations
 from .const import (
     DPCode,
     DPType,
+    LOGGER,
 )
 
 from .ha_tuya_integration.tuya_integration_imports import (
@@ -22,7 +23,8 @@ class XTEntity(TuyaEntity):
     ) -> DPCode | TuyaEnumTypeData | TuyaIntegerTypeData | None:
         try:
             return super(XTEntity, self).find_dpcode(dpcodes=dpcodes, prefer_function=prefer_function, dptype=dptype)
-        except Exception:
+        except Exception as e:
+            LOGGER.warning(f"Using fallback for DPCode {dpcodes}: {e}")
             """Find a matching DP code available on for this device."""
             if dpcodes is None:
                 return None
