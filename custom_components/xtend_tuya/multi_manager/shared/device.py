@@ -4,6 +4,9 @@ from typing import Any, Optional
 from types import SimpleNamespace
 from dataclasses import dataclass, field
 import copy
+from tuya_sharing import (
+    CustomerDevice as TuyaDevice,
+)
 
 @dataclass
 class XTDeviceStatusRange:
@@ -73,38 +76,15 @@ class XTDeviceFunction:
             dp_id = None
         return XTDeviceFunction(code=code, type=type, desc=desc, name=name, values=values, dp_id=dp_id)
 
-class XTDevice(SimpleNamespace):
+class XTDevice(TuyaDevice):
     source: str
-    id: str
-    name: str
-    local_key: str
-    category: str
-    product_id: str
-    product_name: str
-    sub: bool
-    uuid: str
-    online: bool
-    icon: str
-    ip: str
-    time_zone: str
-    active_time: int
-    create_time: int
-    update_time: int
-    asset_id: Optional[str] = ""
-    set_up: Optional[bool] = False
-    support_local: Optional[bool] = False
-    local_strategy: dict[int, dict[str, Any]]
-
-    status: dict[str, Any]
-    function: dict[str, XTDeviceFunction]
-    status_range: dict[str, XTDeviceStatusRange]
     online_states: dict[str, bool]
     data_model: dict[str, Any]
-
     force_open_api: Optional[bool] = False
 
     def __init__(self, **kwargs: Any) -> None:
         self.source = ""
+        self.asset_id = ""
         self.local_strategy = {}
         self.status = {}
         self.function = {}
@@ -112,10 +92,6 @@ class XTDevice(SimpleNamespace):
         self.online_states = {}
         self.data_model = {}
         super().__init__(**kwargs)
-
-    def __eq__(self, other):
-        """If devices are the same one."""
-        return self.id == other.id
     
     def __repr__(self) -> str:
         function_str = "Functions:\r\n"
