@@ -99,9 +99,9 @@ class XTDevice(SimpleNamespace):
     function: dict[str, XTDeviceFunction]
     status_range: dict[str, XTDeviceStatusRange]
     online_states: dict[str, bool]
+    data_model: dict[str, Any]
 
     force_open_api: Optional[bool] = False
-    data_model: Optional[str] = ""
 
     def __init__(self, **kwargs: Any) -> None:
         self.source = ""
@@ -110,6 +110,7 @@ class XTDevice(SimpleNamespace):
         self.function = {}
         self.status_range = {}
         self.online_states = {}
+        self.data_model = {}
         super().__init__(**kwargs)
 
     def __eq__(self, other):

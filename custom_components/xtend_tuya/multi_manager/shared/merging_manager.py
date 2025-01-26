@@ -68,7 +68,9 @@ class XTMergingManager:
         device1.active_time     = XTMergingManager.smart_merge(device1.active_time, device2.active_time)
         device1.create_time     = XTMergingManager.smart_merge(device1.create_time, device2.create_time)
         device1.update_time     = XTMergingManager.smart_merge(device1.update_time, device2.update_time)
-        device1.set_up          = XTMergingManager.smart_merge(device1.set_up, device2.set_up, msg_queue, "device.set_up")
+        if device1.set_up or device2.set_up:
+            device1.set_up = True
+            device2.set_up = True
         if device1.support_local or device2.support_local:
             device1.support_local = True
             device2.support_local = True
