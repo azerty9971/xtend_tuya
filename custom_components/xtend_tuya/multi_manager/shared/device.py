@@ -82,7 +82,6 @@ class XTDevice(SimpleNamespace):
     product_name: str
     sub: bool
     uuid: str
-    asset_id: str
     online: bool
     icon: str
     ip: str
@@ -90,6 +89,7 @@ class XTDevice(SimpleNamespace):
     active_time: int
     create_time: int
     update_time: int
+    asset_id: Optional[sr] = ""
     set_up: Optional[bool] = False
     support_local: Optional[bool] = False
     local_strategy: dict[int, dict[str, Any]]

@@ -59,21 +59,19 @@ class XTMergingManager:
         device1.product_name    = XTMergingManager.smart_merge(device1.product_name, device2.product_name, msg_queue, "device.product_name")
         device1.sub             = XTMergingManager.smart_merge(device1.sub, device2.sub, msg_queue, "device.sub")
         device1.uuid            = XTMergingManager.smart_merge(device1.uuid, device2.uuid, msg_queue, "device.uuid")
-        try:
-            device1.asset_id        = XTMergingManager.smart_merge(device1.asset_id, device2.asset_id, msg_queue, "device.asset_id")
-        except Exception:
-            LOGGER.error(f"ERROR in merging: {type(device1)} <=> {type(device2)}")
-            LOGGER.error(f"ERROR in merging: {device1} <=> {device2}")
-
+        device1.asset_id        = XTMergingManager.smart_merge(device1.asset_id, device2.asset_id, msg_queue, "device.asset_id")
         device1.online          = XTMergingManager.smart_merge(device1.online, device2.online, msg_queue, "device.online")
         device1.icon            = XTMergingManager.smart_merge(device1.icon, device2.icon, msg_queue, "device.icon")
         device1.ip              = XTMergingManager.smart_merge(device1.ip, device2.ip, msg_queue, "device.ip")
         device1.time_zone       = XTMergingManager.smart_merge(device1.time_zone, device2.time_zone, msg_queue, "device.time_zone")
         device1.active_time     = XTMergingManager.smart_merge(device1.active_time, device2.active_time, msg_queue, "device.active_time")
         device1.create_time     = XTMergingManager.smart_merge(device1.create_time, device2.create_time, msg_queue, "device.create_time")
-        device1.update_time     = XTMergingManager.smart_merge(device1.update_time, device2.update_time, msg_queue, "device.update_time")
+        #Differs between API calls (suppress warning)
+        device1.update_time     = XTMergingManager.smart_merge(device1.update_time, device2.update_time)
         device1.set_up          = XTMergingManager.smart_merge(device1.set_up, device2.set_up, msg_queue, "device.set_up")
-        device1.support_local   = XTMergingManager.smart_merge(device1.support_local, device2.support_local, msg_queue, "device.support_local")
+        if device1.support_local or device2.support_local:
+            device1.support_local = True
+            device2.support_local = True
         device1.data_model      = XTMergingManager.smart_merge(device1.data_model, device2.data_model, msg_queue, "device.data_model")
 
     def _fix_incorrect_valuedescr(device1: XTDevice, device2: XTDevice):
