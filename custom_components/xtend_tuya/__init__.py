@@ -113,6 +113,9 @@ async def cleanup_device_registry(hass: HomeAssistant, multi_manager: MultiManag
         if len(processed_devices[device_id]) > 1:
             device_entry_to_keep = processed_devices[device_id][0]
             for device_entry in processed_devices[device_id]:
+                if " (unsupported)" not in device_entry.model:
+                    device_entry_to_keep = device_entry
+            for device_entry in processed_devices[device_id]:
                 if (DOMAIN_ORIG, device_id) in device_entry.identifiers:
                     device_entry_to_keep = device_entry
             for device_entry in processed_devices[device_id]:
