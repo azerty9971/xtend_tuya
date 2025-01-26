@@ -155,15 +155,6 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                 code = item["code"]
                 value = item["value"]
                 device.status[code] = value
-            if (
-                "dpId" in item 
-                and "value" in item 
-                and item["dpId"] in device.local_strategy
-                and "status_code_alias" in device.local_strategy[item["dpId"]]
-            ):
-                for alias in device.local_strategy[item["dpId"]]["status_code_alias"]:
-                    value = item["value"]
-                    device.status[alias] = value
 
         super()._on_device_report(device_id, [])
         
