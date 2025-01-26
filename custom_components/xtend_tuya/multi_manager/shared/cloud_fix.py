@@ -486,11 +486,14 @@ class CloudFixes:
                     status_formats_dict: dict = json.loads(status_formats)
                     pop_list: list[str] = []
                     for status in status_formats_dict:
-                        if status != status_code and status not in local_strategy["status_code_alias"]:
+                        if status != status_code:
+                            if status not in local_strategy["status_code_alias"]:
+                                local_strategy["status_code_alias"].append(status)
                             pop_list.append(status)
-                            local_strategy["status_code_alias"].append(status)
                     for status in pop_list:
                         status_formats_dict.pop(status)
+                    if status_code not in status_formats_dict:
+                        status_formats_dict[status_code] = "$"
                     config_item["statusFormat"] = json.dumps(status_formats_dict)
     
     def _remove_status_that_are_local_strategy_aliases(device: XTDevice):
