@@ -37,6 +37,7 @@ from .multi_manager.multi_manager import (
 from .const import (
     TUYA_DISCOVERY_NEW,
     DPCode,
+    DPType,
     VirtualStates,  # noqa: F401
 )
 from .entity import (
@@ -45,6 +46,7 @@ from .entity import (
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaSensorEntity,
     TuyaSensorEntityDescription,
+    TuyaDPCode,
 )
 
 @dataclass(frozen=True)
@@ -921,10 +923,36 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):
         description: XTSensorEntityDescription,
     ) -> None:
         """Init XT sensor."""
-        super(XTSensorEntity, self).__init__(device, device_manager, description)
+        description_copy = description
+        need_adjust = False
+        try:
+            #Verify if the DPCode is in Tuya's DPCode table, otherwise the init of Tuya will fail
+            TuyaDPCode(description.key)
+        except Exception:
+            need_adjust = True
+            description_copy = XTSensorEntityDescription(key=None)
+        super(XTSensorEntity, self).__init__(device, device_manager, description_copy)
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description
+        if need_adjust:
+            #If DPCode was not in Tuya's DPCode table then fix the initialization
+            self._attr_unique_id = (
+                f"{super().unique_id}{description.key}{description.subkey or ''}"
+            )
+
+            if int_type := self.find_dpcode(description.key, dptype=DPType.INTEGER):
+                self._type_data = int_type
+                self._type = DPType.INTEGER
+                if description.native_unit_of_measurement is None:
+                    self._attr_native_unit_of_measurement = int_type.unit
+            elif enum_type := self.find_dpcode(
+                description.key, dptype=DPType.ENUM, prefer_function=True
+            ):
+                self._type_data = enum_type
+                self._type = DPType.ENUM
+            else:
+                self._type = self.get_dptype(DPCode(description.key))
 
     def reset_value(self, _: datetime, manual_call: bool = False) -> None:
         if manual_call and self.cancel_reset_after_x_seconds:

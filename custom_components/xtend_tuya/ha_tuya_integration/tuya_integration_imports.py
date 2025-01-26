@@ -178,6 +178,16 @@ try:
 except ImportError:
     import homeassistant.components.tuya as tuya_integration  # noqa: F401
 try:
+    from custom_components.tuya.const import (
+        DPCode as TuyaDPCode,
+        DPType as TuyaDPType,
+    )
+except ImportError:
+    from homeassistant.components.tuya.const import (
+        DPCode as TuyaDPCode,
+        DPType as TuyaDPType,
+    )
+try:
     from custom_components.tuya.entity import ( # type: ignore
         TuyaEntity as TuyaEntity,
         ElectricityTypeData as TuyaElectricityTypeData,
