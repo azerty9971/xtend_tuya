@@ -7,7 +7,7 @@ import asyncio
 
 from homeassistant.config_entries import ConfigEntry, ConfigEntryState
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from homeassistant.helpers import device_registry as dr, entity_registry as er
 
 from .const import (
     DOMAIN,
@@ -75,16 +75,50 @@ async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
             model=f"{device.product_name} (unsupported)",
         )
 
-    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
-
     for device in aggregated_device_map.values():
         multi_manager.virtual_state_handler.apply_init_virtual_states(device)
         
+    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+
     # If the device does not register any entities, the device does not need to subscribe
     # So the subscription is here
     await hass.async_add_executor_job(multi_manager.refresh_mq)
     service_manager.register_services()
+    await cleanup_duplicated_devices(hass, entry)
     return True
+
+
+async def cleanup_duplicated_devices(hass: HomeAssistant, current_entry: ConfigEntry) -> None:
+    if not is_config_entry_master(hass, DOMAIN, current_entry):
+        return
+    device_registry = dr.async_get(hass)
+    entity_registry = er.async_get(hass)
+    duplicate_check_table: dict[str, list] = {}
+    for hass_dev_id, device_entry in list(device_registry.devices.items()):
+        for item in device_entry.identifiers:
+            if len(item) > 1:
+                domain = item[0]
+                device_id = item[1]
+                if domain in [DOMAIN, DOMAIN_ORIG]:
+                    if device_id not in duplicate_check_table:
+                        duplicate_check_table[device_id] = []
+                    if hass_dev_id not in duplicate_check_table[device_id]:
+                        duplicate_check_table[device_id].append(hass_dev_id)
+    for device_id in duplicate_check_table:
+        remaining_devices = len(duplicate_check_table[device_id])
+        if remaining_devices > 1:
+            for hass_dev_id in duplicate_check_table[device_id]:
+                if remaining_devices > 1:
+                    hass_entities = er.async_entries_for_device(
+                        entity_registry,
+                        device_id=hass_dev_id,
+                        include_disabled_entities=True,
+                    )
+                    if len(hass_entities) == 0:
+                        remaining_devices = remaining_devices - 1
+                        device_registry.async_remove_device(hass_dev_id)
+                else:
+                    break
 
 
 async def cleanup_device_registry(hass: HomeAssistant, multi_manager: MultiManager, current_entry: ConfigEntry) -> None:
@@ -97,33 +131,11 @@ async def cleanup_device_registry(hass: HomeAssistant, multi_manager: MultiManag
         else:
             return
     device_registry = dr.async_get(hass)
-    processed_devices: dict[str, list[dr.DeviceEntry]] = {}
     for dev_id, device_entry in list(device_registry.devices.items()):
         for item in device_entry.identifiers:
-            device_found, device_id = is_device_in_domain_device_maps(hass, [DOMAIN_ORIG, DOMAIN],item, current_entry)
-            if not device_found:
+            if not is_device_in_domain_device_maps(hass, [DOMAIN_ORIG, DOMAIN],item):
                 device_registry.async_remove_device(dev_id)
                 break
-            if device_id is not None:
-                if device_id not in processed_devices:
-                    processed_devices[device_id] = []
-                if device_entry not in processed_devices[device_id]:
-                    processed_devices[device_id].append(device_entry)
-    for device_id in processed_devices:
-        if len(processed_devices[device_id]) > 1:
-            device_entry_to_keep = processed_devices[device_id][0]
-            for device_entry in processed_devices[device_id]:
-                if " (unsupported)" not in device_entry.model:
-                    device_entry_to_keep = device_entry
-            for device_entry in processed_devices[device_id]:
-                if (DOMAIN_ORIG, device_id) in device_entry.identifiers:
-                    device_entry_to_keep = device_entry
-            for device_entry in processed_devices[device_id]:
-                if device_entry is not device_entry_to_keep:
-                    try:
-                        device_registry.async_remove_device(device_entry.id)
-                    except Exception:
-                        pass
 
 def are_all_domain_config_loaded(hass: HomeAssistant, domain: str, current_entry: ConfigEntry | None) -> bool:
     config_entries = hass.config_entries.async_entries(domain, False, False)
@@ -153,17 +165,20 @@ def get_domain_device_map(hass: HomeAssistant, domain: str, except_of_entry: Con
     return device_map
 
 def is_device_in_domain_device_maps(hass: HomeAssistant, domains: list[str], device_entry_identifiers: tuple[str, str], except_of_entry: ConfigEntry | None = None):
-    device_domain = device_entry_identifiers[0]
+    if len(device_entry_identifiers) > 0:
+        device_domain = device_entry_identifiers[0]
+    else:
+        device_domain = None
     if device_domain in domains:
         for domain in domains:
             device_map = get_domain_device_map(hass, domain, except_of_entry)
             device_id = device_entry_identifiers[1]
             if device_id in device_map:
-                return True, device_id
+                return True
     else:
-        return True, None
+        return True
     
-    return False, None
+    return False
 
 async def async_unload_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
     """Unloading the Tuya platforms."""
