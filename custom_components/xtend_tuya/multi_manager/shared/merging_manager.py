@@ -18,6 +18,8 @@ from ...const import (
 
 class XTMergingManager:
     def merge_devices(device1: XTDevice, device2: XTDevice):
+        msg_queue: list[str] = []
+
         device1_bak = copy.deepcopy(device1)
         device2_bak = copy.deepcopy(device2)
         #Make both devices compliant
@@ -27,13 +29,13 @@ class XTMergingManager:
         CloudFixes.apply_fixes(device2)
 
         #Now decide between each device which on has "the truth" and set it in both
+        XTMergingManager._align_device_properties(device1, device2, msg_queue)
         XTMergingManager._align_DPTypes(device1, device2)
         XTMergingManager._align_api_usage(device1, device2)
         XTMergingManager._prefer_non_default_value_convert(device1, device2)
         XTMergingManager._align_valuedescr(device1, device2)
 
         #Finally, align and extend both devices
-        msg_queue: list[str] = []
         device1.status_range = XTMergingManager.smart_merge(device1.status_range, device2.status_range, msg_queue, "status_range")
         device1.function = XTMergingManager.smart_merge(device1.function, device2.function, msg_queue, "function")
         device1.status = XTMergingManager.smart_merge(device1.status, device2.status, None, "status")
@@ -48,14 +50,26 @@ class XTMergingManager:
         device2.function = device1.function
         device2.status = device1.status
         device2.local_strategy = device1.local_strategy
-        if device1.data_model:
-            device2.data_model = device1.data_model
-        elif device2.data_model:
-            device1.data_model = device2.data_model
-        if device1.set_up:
-            device2.set_up = device1.set_up
-        elif device2.set_up:
-            device1.set_up = device2.set_up
+
+    def _align_device_properties(device1: XTDevice, device2: XTDevice, msg_queue: list[str] | None = None):
+        device1.name            = XTMergingManager.smart_merge(device1.name, device2.name, msg_queue, "device.name")
+        device1.local_key       = XTMergingManager.smart_merge(device1.local_key, device2.local_key, msg_queue, "device.local_key")
+        device1.category        = XTMergingManager.smart_merge(device1.category, device2.category, msg_queue, "device.category")
+        device1.product_id      = XTMergingManager.smart_merge(device1.product_id, device2.product_id, msg_queue, "device.product_id")
+        device1.product_name    = XTMergingManager.smart_merge(device1.product_name, device2.product_name, msg_queue, "device.product_name")
+        device1.sub             = XTMergingManager.smart_merge(device1.sub, device2.sub, msg_queue, "device.sub")
+        device1.uuid            = XTMergingManager.smart_merge(device1.uuid, device2.uuid, msg_queue, "device.uuid")
+        device1.asset_id        = XTMergingManager.smart_merge(device1.asset_id, device2.asset_id, msg_queue, "device.asset_id")
+        device1.online          = XTMergingManager.smart_merge(device1.online, device2.online, msg_queue, "device.online")
+        device1.icon            = XTMergingManager.smart_merge(device1.icon, device2.icon, msg_queue, "device.icon")
+        device1.ip              = XTMergingManager.smart_merge(device1.ip, device2.ip, msg_queue, "device.ip")
+        device1.time_zone       = XTMergingManager.smart_merge(device1.time_zone, device2.time_zone, msg_queue, "device.time_zone")
+        device1.active_time     = XTMergingManager.smart_merge(device1.active_time, device2.active_time, msg_queue, "device.active_time")
+        device1.create_time     = XTMergingManager.smart_merge(device1.create_time, device2.create_time, msg_queue, "device.create_time")
+        device1.update_time     = XTMergingManager.smart_merge(device1.update_time, device2.update_time, msg_queue, "device.update_time")
+        device1.set_up          = XTMergingManager.smart_merge(device1.set_up, device2.set_up, msg_queue, "device.set_up")
+        device1.support_local   = XTMergingManager.smart_merge(device1.support_local, device2.support_local, msg_queue, "device.support_local")
+        device1.data_model      = XTMergingManager.smart_merge(device1.data_model, device2.data_model, msg_queue, "device.data_model")
 
     def _fix_incorrect_valuedescr(device1: XTDevice, device2: XTDevice):
         for code in device1.function:
@@ -309,6 +323,10 @@ class XTMergingManager:
                 return json.dumps(left_json)
             elif right_json is not None:
                 return json.dumps(right_json)
+            elif right == "":
+                return left
+            elif left == "":
+                return right
             else:
                 if left != right and msg_queue is not None:
                     msg_queue.append(f"Merging {type(left)} that are different: |{left}| <=> |{right}|, using left ({path})")
