@@ -26,9 +26,7 @@ class CloudFixes:
         CloudFixes._fix_missing_local_strategy_enum_mapping_map(device)
         CloudFixes._fix_missing_range_values_using_local_strategy(device)
         CloudFixes._fix_missing_aliases_using_status_format(device)
-
-        #This causes some entities to disappear, instead we know update all local alias statuses
-        #CloudFixes._remove_status_that_are_local_strategy_aliases(device)
+        CloudFixes._remove_status_that_are_local_strategy_aliases(device)
 
     def _unify_added_attributes(device: XTDevice):
         for dpId in device.local_strategy:
