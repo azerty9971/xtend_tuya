@@ -36,7 +36,7 @@ from .entity import (
 )
 
 class XTNumberEntityDescription(TuyaNumberEntityDescription):
-    """Describe an Tuya light entity."""
+    """Describe an Tuya number entity."""
     pass
 
 TIMER_SENSORS: tuple[XTNumberEntityDescription, ...] = (
@@ -382,9 +382,7 @@ async def async_setup_entry(
 
 
 class XTNumberEntity(XTEntity, TuyaNumberEntity):
-    """Tuya Number Entity."""
-
-    _number: IntegerTypeData | None = None
+    """XT Number Entity."""
 
     def __init__(
         self,

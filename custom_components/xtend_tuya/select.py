@@ -2,9 +2,7 @@
 
 from __future__ import annotations
 
-from tuya_sharing import CustomerDevice, Manager
 
-from homeassistant.components.select import SelectEntity, SelectEntityDescription
 from homeassistant.const import EntityCategory, Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
@@ -14,81 +12,92 @@ from .util import (
     merge_device_descriptors
 )
 
-from .multi_manager.multi_manager import XTConfigEntry
-from .base import TuyaEntity
-from .const import TUYA_DISCOVERY_NEW, DPCode, DPType, LOGGER
+from .multi_manager.multi_manager import (
+    XTConfigEntry,
+    MultiManager,
+    XTDevice,
+)
+from .const import TUYA_DISCOVERY_NEW, DPCode
 from .entity import (
     XTEntity,
 )
+from .ha_tuya_integration.tuya_integration_imports import (
+    TuyaSelectEntity,
+    TuyaSelectEntityDescription,
+)
+
+class XTSelectEntityDescription(TuyaSelectEntityDescription):
+    """Describe an Tuya select entity."""
+    pass
 
 # All descriptions can be found here. Mostly the Enum data types in the
 # default instructions set of each category end up being a select.
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
-SELECTS: dict[str, tuple[SelectEntityDescription, ...]] = {
+SELECTS: dict[str, tuple[XTSelectEntityDescription, ...]] = {
     "dbl": (
-        SelectEntityDescription(
+        XTSelectEntityDescription(
             key=DPCode.TEMP_UNIT_CONVERT,
             translation_key="change_temp_unit",
             entity_category=EntityCategory.CONFIG,
         ),
-        SelectEntityDescription(
+        XTSelectEntityDescription(
             key=DPCode.COUNTDOWN_SET,
             translation_key="countdown",
             entity_category=EntityCategory.CONFIG,
         ),
-        SelectEntityDescription(
+        XTSelectEntityDescription(
             key=DPCode.POWER_SET,
             translation_key="dbl_power_set",
             entity_category=EntityCategory.CONFIG,
         ),
-        SelectEntityDescription(
+        XTSelectEntityDescription(
             key=DPCode.SOUND_MODE,
             translation_key="sound_mode",
             entity_category=EntityCategory.CONFIG,
         ),
     ),
     "dj": (
-        SelectEntityDescription(
+        XTSelectEntityDescription(
             key=DPCode.COLOR,
             translation_key="dj_color",
             entity_category=EntityCategory.CONFIG,
         ),
-        SelectEntityDescription(
+        XTSelectEntityDescription(
             key=DPCode.MODE2,
             translation_key="dj_mode",
             entity_category=EntityCategory.CONFIG,
         ),
     ),
     "gyd": (
-        SelectEntityDescription(
+        XTSelectEntityDescription(
             key=DPCode.DEVICE_MODE,
             translation_key="device_mode",
             entity_category=EntityCategory.CONFIG,
         ),
-        SelectEntityDescription(
+        XTSelectEntityDescription(
             key=DPCode.CDS,
             translation_key="cds",
             entity_category=EntityCategory.CONFIG,
         ),
-        SelectEntityDescription(
+        XTSelectEntityDescription(
             key=DPCode.PIR_SENSITIVITY,
             translation_key="pir_sensitivity",
             entity_category=EntityCategory.CONFIG,
         ),
     ),
     "jtmspro": (
-        SelectEntityDescription(
+        XTSelectEntityDescription(
             key=DPCode.BEEP_VOLUME,
             translation_key="beep_volume",
             entity_category=EntityCategory.CONFIG,
         ),
-        SelectEntityDescription(
+        XTSelectEntityDescription(
             key=DPCode.ALARM_VOLUME,
             translation_key="alarm_volume",
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False
         ),
-        SelectEntityDescription(
+        XTSelectEntityDescription(
             key=DPCode.SOUND_MODE,
             translation_key="sound_mode",
             entity_category=EntityCategory.CONFIG,
@@ -96,69 +105,69 @@ SELECTS: dict[str, tuple[SelectEntityDescription, ...]] = {
         ),
     ),
     "mk": (
-        SelectEntityDescription(
+        XTSelectEntityDescription(
             key=DPCode.DOORBELL_VOLUME,
             translation_key="doorbell_volume",
             entity_category=EntityCategory.CONFIG,
         ),
     ),
     "msp": (
-        SelectEntityDescription(
+        XTSelectEntityDescription(
             key=DPCode.CLEAN,
             translation_key="cat_litter_box_clean",
             entity_category=EntityCategory.CONFIG,
         ),
-        SelectEntityDescription(
+        XTSelectEntityDescription(
             key=DPCode.EMPTY,
             translation_key="cat_litter_box_empty",
             entity_category=EntityCategory.CONFIG,
         ),
-        SelectEntityDescription(
+        XTSelectEntityDescription(
             key=DPCode.STATUS,
             translation_key="cat_litter_box_status",
             entity_category=EntityCategory.DIAGNOSTIC,
         ),
-        SelectEntityDescription(
+        XTSelectEntityDescription(
             key=DPCode.WORK_MODE,
             translation_key="cat_litter_box_work_mode",
             entity_category=EntityCategory.CONFIG,
         ),
     ),
     "ms_category": (
-        SelectEntityDescription(
+        XTSelectEntityDescription(
             key=DPCode.KEY_TONE,
             translation_key="key_tone",
             entity_category=EntityCategory.CONFIG,
         ),
     ),
     "mzj": (
-        SelectEntityDescription(
+        XTSelectEntityDescription(
             key=DPCode.TEMPCHANGER,
             translation_key="change_temp_unit",
             entity_category=EntityCategory.CONFIG,
         ),
     ),
     "qccdz": (
-        SelectEntityDescription(
+        XTSelectEntityDescription(
             key=DPCode.WORK_MODE,
             translation_key="qccdz_work_mode",
             entity_category=EntityCategory.CONFIG,
         ),
-        SelectEntityDescription(
+        XTSelectEntityDescription(
             key=DPCode.CHARGINGOPERATION,
             translation_key="qccdz_chargingoperation",
             entity_category=EntityCategory.CONFIG,
         ),
     ),
     "sfkzq": (
-        SelectEntityDescription(
+        XTSelectEntityDescription(
             key=DPCode.WORK_STATE,
             translation_key="sfkzq_work_state",
             entity_category=EntityCategory.CONFIG,
         ),
     ),
     "xfj": (
-        SelectEntityDescription(
+        XTSelectEntityDescription(
             key=DPCode.MODE,
             translation_key="xfj_mode",
             entity_category=EntityCategory.CONFIG,
@@ -180,13 +189,13 @@ async def async_setup_entry(
     @callback
     def async_discover_device(device_map) -> None:
         """Discover and add a discovered Tuya select."""
-        entities: list[TuyaSelectEntity] = []
+        entities: list[XTSelectEntity] = []
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
                 if descriptions := merged_descriptors.get(device.category):
                     entities.extend(
-                        TuyaSelectEntity(device, hass_data.manager, description)
+                        XTSelectEntity(device, hass_data.manager, XTSelectEntityDescription(**description.__dict__))
                         for description in descriptions
                         if description.key in device.status
                     )
@@ -201,55 +210,17 @@ async def async_setup_entry(
     )
 
 
-class TuyaSelectEntity(TuyaEntity, SelectEntity):
-    """Tuya Select Entity."""
-
-    _attr_options_original: dict[str, str]
+class XTSelectEntity(XTEntity, TuyaSelectEntity):
+    """XT Select Entity."""
 
     def __init__(
         self,
-        device: CustomerDevice,
-        device_manager: Manager,
-        description: SelectEntityDescription,
+        device: XTDevice,
+        device_manager: MultiManager,
+        description: XTSelectEntityDescription,
     ) -> None:
-        """Init Tuya sensor."""
-        super().__init__(device, device_manager)
-        self._attr_options_original = {}
+        """Init XT select."""
+        super(XTSelectEntity, self).__init__(device, device_manager, description)
+        self.device = device
+        self.device_manager = device_manager
         self.entity_description = description
-        self._attr_unique_id = f"{super().unique_id}{description.key}"
-
-        self._attr_options: list[str] = []
-        if enum_type := self.find_dpcode(
-            description.key, dptype=DPType.ENUM, prefer_function=True
-        ):
-            try:
-                for enum_key in enum_type.range:
-                    if enum_key.lower() != enum_key:
-                        self._attr_options_original[enum_key.lower()] = enum_key
-                    self._attr_options.append(enum_key.lower())
-            except Exception:
-                self._attr_options = enum_type.range
-            
-
-    @property
-    def current_option(self) -> str | None:
-        """Return the selected entity option to represent the entity state."""
-        # Raw value
-        value: str = self.device.status.get(self.entity_description.key)
-        if value is None or ( value not in self._attr_options and value.lower() not in self._attr_options ):
-            return None
-
-        return value.lower()
-
-    def select_option(self, option: str) -> None:
-        """Change the selected option."""
-        if option in self._attr_options_original:
-            option = self._attr_options_original[option]
-        self._send_command(
-            [
-                {
-                    "code": self.entity_description.key,
-                    "value": option,
-                }
-            ]
-        )
