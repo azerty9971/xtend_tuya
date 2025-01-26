@@ -76,7 +76,6 @@ from ...const import (
     TUYA_DISCOVERY_NEW,
     TUYA_DISCOVERY_NEW_ORIG,
     TUYA_HA_SIGNAL_UPDATE_ENTITY,
-    TUYA_HA_SIGNAL_UPDATE_ENTITY_ORIG,
 )
 
 def get_plugin_instance() -> XTTuyaSharingDeviceManagerInterface | None:
@@ -200,7 +199,6 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
         return_list: list[str] = []
         if device.id in self.sharing_account.device_ids:
             return_list.append(TUYA_HA_SIGNAL_UPDATE_ENTITY)
-            return_list.append(TUYA_HA_SIGNAL_UPDATE_ENTITY_ORIG)
         if self.sharing_account.device_manager.reuse_config:
             self.sharing_account.device_manager.copy_statuses_to_tuya(device)
         if return_list:

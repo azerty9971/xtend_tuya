@@ -2,31 +2,14 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable
 from dataclasses import dataclass, field
 from enum import StrEnum, IntFlag
 import logging
 
 from tuya_iot import TuyaCloudOpenAPIEndpoint
 
-from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.const import (
-    CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
-    CONCENTRATION_MILLIGRAMS_PER_CUBIC_METER,
-    CONCENTRATION_PARTS_PER_BILLION,
-    CONCENTRATION_PARTS_PER_MILLION,
-    LIGHT_LUX,
-    PERCENTAGE,
-    SIGNAL_STRENGTH_DECIBELS,
-    SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
     Platform,
-    UnitOfElectricCurrent,
-    UnitOfElectricPotential,
-    UnitOfEnergy,
-    UnitOfPower,
-    UnitOfPressure,
-    UnitOfTemperature,
-    UnitOfVolume,
 )
 
 DOMAIN = "xtend_tuya"
@@ -54,9 +37,8 @@ TUYA_CLIENT_ID = "HA_3y9q4ak7g4ephrvke"
 TUYA_SCHEMA = "haauthorize"
 
 TUYA_DISCOVERY_NEW_ORIG = "tuya_discovery_new"
-TUYA_HA_SIGNAL_UPDATE_ENTITY_ORIG = "tuya_entry_update"
+TUYA_HA_SIGNAL_UPDATE_ENTITY = "tuya_entry_update"
 TUYA_DISCOVERY_NEW = "xt_tuya_discovery_new"
-TUYA_HA_SIGNAL_UPDATE_ENTITY = "xt_tuya_entry_update"
 
 TUYA_RESPONSE_CODE = "code"
 TUYA_RESPONSE_MSG = "msg"
@@ -614,207 +596,6 @@ class DPCode(StrEnum):
     WORK_STAT = "work_stat"
     WORK_STATE = "work_state"
     WORK_STATUS = "WorkStatus"
-
-
-@dataclass
-class UnitOfMeasurement:
-    """Describes a unit of measurement."""
-
-    unit: str
-    device_classes: set[str]
-
-    aliases: set[str] = field(default_factory=set)
-    conversion_unit: str | None = None
-    conversion_fn: Callable[[float], float] | None = None
-
-
-# A tuple of available units of measurements we can work with.
-# Tuya's devices aren't consistent in UOM use, thus this provides
-# a list of aliases for units and possible conversions we can do
-# to make them compatible with our model.
-UNITS = (
-    UnitOfMeasurement(
-        unit="",
-        aliases={" "},
-        device_classes={
-            SensorDeviceClass.AQI,
-            SensorDeviceClass.DATE,
-            SensorDeviceClass.MONETARY,
-            SensorDeviceClass.TIMESTAMP,
-        },
-    ),
-    UnitOfMeasurement(
-        unit=PERCENTAGE,
-        aliases={"pct", "percent", "% RH"},
-        device_classes={
-            SensorDeviceClass.BATTERY,
-            SensorDeviceClass.HUMIDITY,
-            SensorDeviceClass.POWER_FACTOR,
-        },
-    ),
-    UnitOfMeasurement(
-        unit=CONCENTRATION_PARTS_PER_MILLION,
-        device_classes={
-            SensorDeviceClass.CO,
-            SensorDeviceClass.CO2,
-        },
-    ),
-    UnitOfMeasurement(
-        unit=CONCENTRATION_PARTS_PER_BILLION,
-        device_classes={
-            SensorDeviceClass.CO,
-            SensorDeviceClass.CO2,
-        },
-        conversion_unit=CONCENTRATION_PARTS_PER_MILLION,
-        conversion_fn=lambda x: x / 1000,
-    ),
-    UnitOfMeasurement(
-        unit=UnitOfElectricCurrent.AMPERE,
-        aliases={"a", "ampere"},
-        device_classes={SensorDeviceClass.CURRENT},
-    ),
-    UnitOfMeasurement(
-        unit=UnitOfElectricCurrent.MILLIAMPERE,
-        aliases={"ma", "milliampere"},
-        device_classes={SensorDeviceClass.CURRENT},
-        conversion_unit=UnitOfElectricCurrent.AMPERE,
-        conversion_fn=lambda x: x / 1000,
-    ),
-    UnitOfMeasurement(
-        unit=UnitOfEnergy.WATT_HOUR,
-        aliases={"wh", "watthour"},
-        device_classes={SensorDeviceClass.ENERGY},
-    ),
-    UnitOfMeasurement(
-        unit=UnitOfEnergy.KILO_WATT_HOUR,
-        aliases={"kwh", "kilowatt-hour", "kW·h"},
-        device_classes={SensorDeviceClass.ENERGY},
-    ),
-    UnitOfMeasurement(
-        unit=UnitOfVolume.CUBIC_FEET,
-        aliases={"ft3"},
-        device_classes={SensorDeviceClass.GAS},
-    ),
-    UnitOfMeasurement(
-        unit=UnitOfVolume.CUBIC_METERS,
-        aliases={"m3"},
-        device_classes={SensorDeviceClass.GAS},
-    ),
-    UnitOfMeasurement(
-        unit=LIGHT_LUX,
-        aliases={"lux"},
-        device_classes={SensorDeviceClass.ILLUMINANCE},
-    ),
-    UnitOfMeasurement(
-        unit=CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
-        aliases={"ug/m3", "µg/m3", "ug/m³"},
-        device_classes={
-            SensorDeviceClass.NITROGEN_DIOXIDE,
-            SensorDeviceClass.NITROGEN_MONOXIDE,
-            SensorDeviceClass.NITROUS_OXIDE,
-            SensorDeviceClass.OZONE,
-            SensorDeviceClass.PM1,
-            SensorDeviceClass.PM25,
-            SensorDeviceClass.PM10,
-            SensorDeviceClass.SULPHUR_DIOXIDE,
-            SensorDeviceClass.VOLATILE_ORGANIC_COMPOUNDS,
-        },
-    ),
-    UnitOfMeasurement(
-        unit=CONCENTRATION_MILLIGRAMS_PER_CUBIC_METER,
-        aliases={"mg/m3"},
-        device_classes={
-            SensorDeviceClass.NITROGEN_DIOXIDE,
-            SensorDeviceClass.NITROGEN_MONOXIDE,
-            SensorDeviceClass.NITROUS_OXIDE,
-            SensorDeviceClass.OZONE,
-            SensorDeviceClass.PM1,
-            SensorDeviceClass.PM25,
-            SensorDeviceClass.PM10,
-            SensorDeviceClass.SULPHUR_DIOXIDE,
-            SensorDeviceClass.VOLATILE_ORGANIC_COMPOUNDS,
-        },
-        conversion_unit=CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
-        conversion_fn=lambda x: x * 1000,
-    ),
-    UnitOfMeasurement(
-        unit=UnitOfPower.WATT,
-        aliases={"watt"},
-        device_classes={SensorDeviceClass.POWER},
-    ),
-    UnitOfMeasurement(
-        unit=UnitOfPower.KILO_WATT,
-        aliases={"kilowatt"},
-        device_classes={SensorDeviceClass.POWER},
-    ),
-    UnitOfMeasurement(
-        unit=UnitOfPressure.BAR,
-        device_classes={SensorDeviceClass.PRESSURE},
-    ),
-    UnitOfMeasurement(
-        unit=UnitOfPressure.MBAR,
-        aliases={"millibar"},
-        device_classes={SensorDeviceClass.PRESSURE},
-    ),
-    UnitOfMeasurement(
-        unit=UnitOfPressure.HPA,
-        aliases={"hpa", "hectopascal"},
-        device_classes={SensorDeviceClass.PRESSURE},
-    ),
-    UnitOfMeasurement(
-        unit=UnitOfPressure.INHG,
-        aliases={"inhg"},
-        device_classes={SensorDeviceClass.PRESSURE},
-    ),
-    UnitOfMeasurement(
-        unit=UnitOfPressure.PSI,
-        device_classes={SensorDeviceClass.PRESSURE},
-    ),
-    UnitOfMeasurement(
-        unit=UnitOfPressure.PA,
-        device_classes={SensorDeviceClass.PRESSURE},
-    ),
-    UnitOfMeasurement(
-        unit=SIGNAL_STRENGTH_DECIBELS,
-        aliases={"db"},
-        device_classes={SensorDeviceClass.SIGNAL_STRENGTH},
-    ),
-    UnitOfMeasurement(
-        unit=SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
-        aliases={"dbm"},
-        device_classes={SensorDeviceClass.SIGNAL_STRENGTH},
-    ),
-    UnitOfMeasurement(
-        unit=UnitOfTemperature.CELSIUS,
-        aliases={"°c", "c", "celsius", "℃"},
-        device_classes={SensorDeviceClass.TEMPERATURE},
-    ),
-    UnitOfMeasurement(
-        unit=UnitOfTemperature.FAHRENHEIT,
-        aliases={"°f", "f", "fahrenheit"},
-        device_classes={SensorDeviceClass.TEMPERATURE},
-    ),
-    UnitOfMeasurement(
-        unit=UnitOfElectricPotential.VOLT,
-        aliases={"volt"},
-        device_classes={SensorDeviceClass.VOLTAGE},
-    ),
-    UnitOfMeasurement(
-        unit=UnitOfElectricPotential.MILLIVOLT,
-        aliases={"mv", "millivolt"},
-        device_classes={SensorDeviceClass.VOLTAGE},
-        conversion_unit=UnitOfElectricPotential.VOLT,
-        conversion_fn=lambda x: x / 1000,
-    ),
-)
-
-
-DEVICE_CLASS_UNITS: dict[str, dict[str, UnitOfMeasurement]] = {}
-for uom in UNITS:
-    for device_class in uom.device_classes:
-        DEVICE_CLASS_UNITS.setdefault(device_class, {})[uom.unit] = uom
-        for unit_alias in uom.aliases:
-            DEVICE_CLASS_UNITS[device_class][unit_alias] = uom
 
 @dataclass
 class Country:
