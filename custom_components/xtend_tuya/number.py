@@ -2,12 +2,7 @@
 
 from __future__ import annotations
 
-from tuya_sharing import CustomerDevice, Manager
 
-from homeassistant.components.number import (
-    NumberEntity,
-    NumberEntityDescription,
-)
 from homeassistant.const import EntityCategory, Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
@@ -20,8 +15,7 @@ from .util import (
     merge_device_descriptors
 )
 
-from .base import IntegerTypeData, TuyaEntity
-from .const import DEVICE_CLASS_UNITS, DOMAIN, TUYA_DISCOVERY_NEW, DPCode, DPType
+from .const import TUYA_DISCOVERY_NEW, DPCode
 from .multi_manager.multi_manager import (
     XTConfigEntry,
     MultiManager,
