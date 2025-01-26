@@ -247,7 +247,7 @@ class XTMergingManager:
             if left is not None:
                 return left
             return right
-        if type(left) is not type(right):
+        if type(left) != type(right):
             if msg_queue is not None:
                 msg_queue.append(f"Merging tried to merge objects of different types: {type(left)} and {type(right)}, returning left ({path})")
             return left
