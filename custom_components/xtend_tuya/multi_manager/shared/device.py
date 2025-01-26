@@ -132,7 +132,7 @@ class XTDevice(SimpleNamespace):
         return f"Device {self.name}:\r\n{function_str}{status_range_str}{status_str}{local_strategy_str}"
 
     def from_compatible_device(device: Any):
-        new_device = XTDevice(**(device.__dict__))
+        new_device = XTDevice(**device.__dict__)
         
         #Reuse the references from the original device
         if hasattr(device, "local_strategy"):
