@@ -50,7 +50,6 @@ class XTSharingDeviceRepository(DeviceRepository):
         if response["success"]:
             for item in response["result"]:
                 device = CustomerDevice(**item)
-                self.multi_manager.device_watcher.report_message(device.id, f"SHARING Query device: {response}", device)
                 status = {}
                 for item_status in device.status:
                     if "code" in item_status and "value" in item_status:
