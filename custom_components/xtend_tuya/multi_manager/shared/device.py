@@ -84,13 +84,33 @@ class XTDevice(TuyaDevice):
 
     def __init__(self, **kwargs: Any) -> None:
         self.source = ""
+        self.online_states = {}
+        self.data_model = {}
+        self.force_open_api = False
+        
+        self.id = ""
+        self.name = ""
+        self.local_key = ""
+        self.category = ""
+        self.product_id = ""
+        self.product_name = ""
+        self.sub = False
+        self.uuid = ""
         self.asset_id = ""
+        self.online = False
+        self.icon = ""
+        self.ip = ""
+        self.time_zone = ""
+        self.active_time = 0
+        self.create_time = 0
+        self.update_time = 0
+        self.set_up = False
+        self.support_local = False
+
         self.local_strategy = {}
         self.status = {}
         self.function = {}
         self.status_range = {}
-        self.online_states = {}
-        self.data_model = {}
         super().__init__(**kwargs)
     
     def __repr__(self) -> str:
