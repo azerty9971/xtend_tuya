@@ -90,7 +90,6 @@ class XTDevice(SimpleNamespace):
     active_time: int
     create_time: int
     update_time: int
-    local_key: str
     set_up: Optional[bool] = False
     support_local: Optional[bool] = False
     local_strategy: dict[int, dict[str, Any]]
@@ -133,7 +132,7 @@ class XTDevice(SimpleNamespace):
 
     def from_compatible_device(device: Any):
         new_device = XTDevice(**device.__dict__)
-        
+
         #Reuse the references from the original device
         if hasattr(device, "local_strategy"):
             new_device.local_strategy = device.local_strategy
