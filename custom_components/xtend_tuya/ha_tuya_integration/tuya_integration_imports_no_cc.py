@@ -71,6 +71,10 @@ from homeassistant.components.tuya.vacuum import (
         TuyaVacuumEntity as TuyaVacuumEntity,
     )
 import homeassistant.components.tuya as tuya_integration  # noqa: F401
+from homeassistant.components.tuya.const import (
+        DPCode as TuyaDPCode,
+        DPType as TuyaDPType,
+    )
 from homeassistant.components.tuya.entity import (
         TuyaEntity as TuyaEntity,
         ElectricityTypeData as TuyaElectricityTypeData,
