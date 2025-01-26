@@ -124,8 +124,6 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
         device = self.device_map.get(device_id, None)
         if not device:
             return
-        if self.multi_manager.debug_helper.status_helper.is_status_in_status_list(device_id, "add_ele", status):
-            self.multi_manager.device_watcher.report_message(device_id, f"[{MESSAGE_SOURCE_TUYA_SHARING}]On device report: {status}", device)
         status_new = self.multi_manager.convert_device_report_status_list(device_id, status)
         status_new = self.multi_manager.multi_source_handler.filter_status_list(device_id, MESSAGE_SOURCE_TUYA_SHARING, status_new)
         status_new = self.multi_manager.virtual_state_handler.apply_virtual_states_to_status_list(device, status_new, MESSAGE_SOURCE_TUYA_SHARING)
@@ -142,9 +140,7 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
                 for alias in device.local_strategy[item["dpId"]]["status_code_alias"]:
                     device.status[alias] = device.status[device.local_strategy[item["dpId"]]["status_code"]]
         super()._on_device_report(device_id, [])
-        if self.multi_manager.debug_helper.status_helper.is_status_in_status_list(device_id, "add_ele", status):
-            self.multi_manager.device_watcher.report_message(device_id, f"[{MESSAGE_SOURCE_TUYA_SHARING}]Status after run: {device.status["add_ele"]}", device)
-    
+            
     def send_commands(
             self, device_id: str, commands: list[dict[str, Any]]
     ):
