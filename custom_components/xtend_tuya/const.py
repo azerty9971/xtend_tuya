@@ -142,6 +142,7 @@ class DPCode(StrEnum):
     ADD_ELE2_THIS_YEAR = "add_ele2_this_year"
     ADD_ELE2_TODAY = "add_ele2_today"
     AIR_QUALITY = "air_quality"
+    AIR_QUALITY_INDEX = "air_quality_index"
     ALARM_LOCK = "alarm_lock"
     ALARM_SWITCH = "alarm_switch"  # Alarm switch
     ALARM_TIME = "alarm_time"  # Alarm time
@@ -259,6 +260,7 @@ class DPCode(StrEnum):
     CUP_NUMBER = "cup_number"  # NUmber of cups
     CURRENT_YD = "current_yd"
     CUR_CURRENT = "cur_current"  # Actual current
+    CUR_NEUTRAL = "cur_neutral"  # Total reverse energy
     CUR_POWER = "cur_power"  # Actual power
     CUR_VOLTAGE = "cur_voltage"  # Actual voltage
     C_CURRENT = "C_Current"
@@ -424,6 +426,7 @@ class DPCode(StrEnum):
     PRESENCE_STATE = "presence_state"
     PRESSURE_STATE = "pressure_state"
     PRESSURE_VALUE = "pressure_value"
+    PUMP = "pump"
     PUMP_RESET = "pump_reset"  # Water pump reset
     QUIET_TIMING_ON = "quiet_timing_on"
     QUIET_TIME_END = "quiet_time_end"
@@ -523,6 +526,7 @@ class DPCode(StrEnum):
     SWITCH_VERTICAL = "switch_vertical"  # Vertical swing flap switch
     SWITCH_VOICE = "switch_voice"  # Voice switch
     SYSTEM_VERSION = "system_version"
+    TARGET_DIS_CLOSEST = "target_dis_closest"  # Closest target distance
     TEMP = "temp"  # Temperature setting
     TEMPCHANGER = "TempChanger"
     TEMPERATURE = "temperature"
@@ -556,6 +560,7 @@ class DPCode(StrEnum):
     TOTAL_FORWARD_ENERGY = "total_forward_energy"
     TOTAL_TIME = "total_time"
     TOTAL_PM = "total_pm"
+    TOTAL_POWER = "total_power"
     TRASH_STATUS = "trash_status"
     TVOC = "tvoc"
     UNIT = "unit"
