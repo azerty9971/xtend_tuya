@@ -86,7 +86,8 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         response = self.api.get(f"/v1.0/users/{self.api.token_info.uid}/devices")
         if response["success"]:
             for item in response["result"]:
-                device = XTDevice(source="IOT update_device_list_in_smart_home_mod",**item)               #CHANGED
+                device = XTDevice(**item)                                   #CHANGED
+                device.source = "IOT update_device_list_in_smart_home_mod"  #CHANGED
                 status = {}
                 for item_status in device.status:
                     if "code" in item_status and "value" in item_status:
@@ -94,7 +95,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                         value = item_status["value"]
                         status[code] = value
                 device.status = status
-                self.device_map[device.id] = device     #CHANGED
+                self.device_map[device.id] = device                         #CHANGED
                 if "id" not in item:
                     LOGGER.warning(f"Received invalid device info: {item}")
 
@@ -111,7 +112,8 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         response = self.api.get(f"/v1.0/users/{self.api.token_info.uid}/devices?from=sharing")
         if response["success"]:
             for item in response["result"]:
-                device = XTDevice(source="IOT get_devices_from_sharing", **item)
+                device = XTDevice(**item)
+                device.source = "IOT get_devices_from_sharing"
                 status = {}
                 for item_status in device.status:
                     if "code" in item_status and "value" in item_status:
@@ -170,7 +172,8 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         result = response.get("result", {})
         for item in result.get("list", []):
             device_id = item["id"]
-            self.device_map[device_id] = XTDevice(source="IOT _update_device_list_info_cache", **item)
+            self.device_map[device_id] = XTDevice(**item)
+            self.device_map[device_id].source = "IOT _update_device_list_info_cache"
     
     def get_open_api_device(self, device: XTDevice) -> XTDevice | None:
         device_properties = XTDevice.from_compatible_device(device, "IOT get_open_api_device")

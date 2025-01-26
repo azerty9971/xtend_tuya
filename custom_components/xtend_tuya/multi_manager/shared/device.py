@@ -103,8 +103,8 @@ class XTDevice(SimpleNamespace):
     force_open_api: Optional[bool] = False
     data_model: Optional[str] = ""
 
-    def __init__(self, source: str, **kwargs: Any) -> None:
-        self.source = source
+    def __init__(self, **kwargs: Any) -> None:
+        self.source = ""
         self.local_strategy = {}
         self.status = {}
         self.function = {}
@@ -138,7 +138,8 @@ class XTDevice(SimpleNamespace):
         if isinstance(device, XTDevice):
             return device
         
-        new_device = XTDevice(source=source, **device.__dict__)
+        new_device = XTDevice(**device.__dict__)
+        new_device.source = source
 
         #Reuse the references from the original device
         if hasattr(device, "local_strategy"):
