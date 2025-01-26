@@ -10,6 +10,8 @@ from tuya_sharing.manager import (
     SceneRepository,
     UserRepository,
     CustomerApi,
+    BIZCODE_OFFLINE,
+    BIZCODE_ONLINE,
 )
 
 from tuya_sharing.home import (
@@ -113,17 +115,18 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
                 self.device_map[device.id] = new_device
 
     def _on_device_other(self, device_id: str, biz_code: str, data: dict[str, Any]):
-        self.multi_manager.device_watcher.report_message(device_id, f"[SHARING]On device other: {biz_code} <=> {data}")
-        return super()._on_device_other(device_id, biz_code, data)
+        self.multi_manager.device_watcher.report_message(device_id, f"[{MESSAGE_SOURCE_TUYA_SHARING}]On device other: {biz_code} <=> {data}")
+        super()._on_device_other(device_id, biz_code, data)
+        if biz_code in [BIZCODE_ONLINE, BIZCODE_OFFLINE]:
+            self.multi_manager.update_device_online_status(device_id)
 
     def _on_device_report(self, device_id: str, status: list):
         device = self.device_map.get(device_id, None)
         if not device:
             return
-        self.multi_manager.device_watcher.report_message(device_id, f"[SHARING]On device report: {status}", device)
         status_new = self.multi_manager.convert_device_report_status_list(device_id, status)
         status_new = self.multi_manager.multi_source_handler.filter_status_list(device_id, MESSAGE_SOURCE_TUYA_SHARING, status_new)
-        status_new = self.multi_manager.virtual_state_handler.apply_virtual_states_to_status_list(device, status_new)
+        status_new = self.multi_manager.virtual_state_handler.apply_virtual_states_to_status_list(device, status_new, MESSAGE_SOURCE_TUYA_SHARING)
 
         super()._on_device_report(device_id, status_new)
         #Temporary fix until a better solution is found
@@ -137,7 +140,7 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
                 for alias in device.local_strategy[item["dpId"]]["status_code_alias"]:
                     device.status[alias] = device.status[device.local_strategy[item["dpId"]]["status_code"]]
         super()._on_device_report(device_id, [])
-    
+            
     def send_commands(
             self, device_id: str, commands: list[dict[str, Any]]
     ):

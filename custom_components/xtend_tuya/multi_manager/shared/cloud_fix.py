@@ -9,10 +9,10 @@ from .device import (
 )
 from ...const import (
     LOGGER,  # noqa: F401
-)
-from ...base import (
     DPType,
-    TuyaEntity,
+)
+from ...entity import (
+    XTEntity,
 )
 
 class CloudFixes:
@@ -43,15 +43,15 @@ class CloudFixes:
         for key in device.status_range:
             if not isinstance(device.status_range[key], XTDeviceStatusRange):
                 device.status_range[key] = XTDeviceStatusRange.from_compatible_status_range(device.status_range[key])
-            device.status_range[key].type = TuyaEntity.determine_dptype(device.status_range[key].type)
+            device.status_range[key].type = XTEntity.determine_dptype(device.status_range[key].type)
         for key in device.function:
             if not isinstance(device.function[key], XTDeviceFunction):
                 device.function[key] = XTDeviceFunction.from_compatible_function(device.function[key])
-            device.function[key].type = TuyaEntity.determine_dptype(device.function[key].type)
+            device.function[key].type = XTEntity.determine_dptype(device.function[key].type)
         for dpId in device.local_strategy:
             if config_item := device.local_strategy[dpId].get("config_item"):
                 if "valueType" in config_item and "valueDesc" in config_item:
-                    config_item["valueType"] = TuyaEntity.determine_dptype(config_item["valueType"])
+                    config_item["valueType"] = XTEntity.determine_dptype(config_item["valueType"])
                     if code := device.local_strategy[dpId].get("status_code"):
                         state_value = device.status.get(code)
                         second_pass = False
@@ -344,46 +344,55 @@ class CloudFixes:
             value = json.loads(device.status_range[code].values)
             if "unit" in value and "min" in value and "max" in value and "scale" in value:
                 unit = value["unit"]
-                min = value["min"]
-                max = value["max"]
-                if unit not in supported_units:
+                try:
+                    min = int(value["min"])
+                    max = int(["max"])
+                    if unit not in supported_units:
+                        continue
+                    if max % 100 != 0:
+                        continue
+                    if min not in (0, 1):
+                        continue
+                    value["scale"] = int(max / 100) - 1
+                    device.status_range[code].values = json.dumps(value)
+                except Exception:
                     continue
-                if max % 100 != 0:
-                    continue
-                if min not in (0, 1):
-                    continue
-                value["scale"] = int(max / 100) - 1
-                device.status_range[code].values = json.dumps(value)
         for code in device.function:
             value = json.loads(device.function[code].values)
             if "unit" in value and "min" in value and "max" in value and "scale" in value:
                 unit = value["unit"]
-                min = value["min"]
-                max = value["max"]
-                if unit not in supported_units:
+                try:
+                    min = int(value["min"])
+                    max = int(["max"])
+                    if unit not in supported_units:
+                        continue
+                    if max % 100 != 0:
+                        continue
+                    if min not in (0, 1):
+                        continue
+                    value["scale"] = int(max / 100) - 1
+                    device.function[code].values = json.dumps(value)
+                except Exception:
                     continue
-                if max % 100 != 0:
-                    continue
-                if min not in (0, 1):
-                    continue
-                value["scale"] = int(max / 100) - 1
-                device.function[code].values = json.dumps(value)
         for dpId in device.local_strategy:
             if config_item := device.local_strategy[dpId].get("config_item"):
                 if value_descr := config_item.get("valueDesc"):
                     value = json.loads(value_descr)
                     if "unit" in value and "min" in value and "max" in value and "scale" in value:
                         unit = value["unit"]
-                        min = value["min"]
-                        max = value["max"]
-                        if unit not in supported_units:
+                        try:
+                            min = int(value["min"])
+                            max = int(["max"])
+                            if unit not in supported_units:
+                                continue
+                            if max % 100 != 0:
+                                continue
+                            if min not in (0, 1):
+                                continue
+                            value["scale"] = int(max / 100) - 1
+                            config_item["valueDesc"] = json.dumps(value)
+                        except Exception:
                             continue
-                        if max % 100 != 0:
-                            continue
-                        if min not in (0, 1):
-                            continue
-                        value["scale"] = int(max / 100) - 1
-                        config_item["valueDesc"] = json.dumps(value)
 
     def determine_most_plausible(value1: dict, value2: dict, key: str, state_value: any = None) -> int | None:
         if key in value1 and key in value2:
@@ -393,9 +402,9 @@ class CloudFixes:
                 return 2
             if not value2[key]:
                 return 1
-            if value1[key] == DPType.RAW and TuyaEntity.determine_dptype(value2[key]) is not None and isinstance(value1[key], DPType):
+            if value1[key] == DPType.RAW and XTEntity.determine_dptype(value2[key]) is not None and isinstance(value1[key], DPType):
                 return 2
-            if value2[key] == DPType.RAW and TuyaEntity.determine_dptype(value1[key]) is not None and isinstance(value2[key], DPType):
+            if value2[key] == DPType.RAW and XTEntity.determine_dptype(value1[key]) is not None and isinstance(value2[key], DPType):
                 return 1
             if value1[key] == DPType.STRING and value2[key] == DPType.JSON and isinstance(value1[key], DPType) and isinstance(value2[key], DPType):
                 return 2

@@ -117,13 +117,20 @@ class XTVirtualStateHandler:
                                         device.local_strategy[new_dp_id] = new_local_strategy
                                         device.function[new_code].dp_id = new_dp_id
 
-    def apply_virtual_states_to_status_list(self, device: XTDevice, status_in: list) -> list:
+    def apply_virtual_states_to_status_list(self, device: XTDevice, status_in: list, source: str = None) -> list:
         status = copy.deepcopy(status_in)
         virtual_states = self.get_category_virtual_states(device.category)
+        debug: bool = False
         for virtual_state in virtual_states:
             if virtual_state.virtual_state_value == VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME:
                 for item in status:
                     code, dpId, new_key_value, result_ok = self.multi_manager._read_code_dpid_value_from_state(device.id, item)
+                    if result_ok and code == "add_ele":
+                        if not debug:
+                            self.multi_manager.device_watcher.report_message(device.id, f"[{source}]Status In: {status_in}", device)
+                        debug = True
+                        #self.multi_manager.device_watcher.report_message(device.id, f"VirtualStates: {virtual_states}", device)
+                        
                     if result_ok and code == virtual_state.key:
                         cur_key_value = 0
                         if code in device.status:
@@ -153,6 +160,8 @@ class XTVirtualStateHandler:
                         if result_ok and code == virtual_state.key:
                             item["value"] += device.status[virtual_state.key]
                             continue
+        if debug:
+            self.multi_manager.device_watcher.report_message(device.id, f"[{source}]Status Out: {status}", device)
         return status
     
     def _get_empty_local_strategy_dp_id(self, device: XTDevice) -> int | None:
