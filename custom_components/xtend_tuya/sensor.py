@@ -930,7 +930,7 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):
             TuyaDPCode(description.key)
         except Exception:
             need_adjust = True
-            
+
             #This DPCode can be any value of Tuya's DPCode table, it doesn't matter
             description_copy = XTSensorEntityDescription(key=TuyaDPCode.FAULT)
         super(XTSensorEntity, self).__init__(device, device_manager, description_copy)
@@ -1016,6 +1016,8 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):
                 self._attr_native_unit_of_measurement = (
                     self._restored_data.native_unit_of_measurement
                 )
+            if device := self.device_manager.device_map.get(self.device.id, None):
+                device.status[self.entity_description.key] = float(self._attr_native_value)
     
     @callback
     async def _on_state_change_event(self, event: Event[EventStateChangedData]):
