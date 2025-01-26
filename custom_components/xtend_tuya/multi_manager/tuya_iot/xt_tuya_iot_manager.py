@@ -30,7 +30,7 @@ from ..shared.merging_manager import (
 from ..multi_manager import (
     MultiManager,  # noqa: F811
 )
-from ...base import TuyaEntity
+from ...entity import XTEntity
 from .ipc.xt_tuya_iot_ipc_manager import (
     XTIOTIPCManager
 )
@@ -86,7 +86,8 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         response = self.api.get(f"/v1.0/users/{self.api.token_info.uid}/devices")
         if response["success"]:
             for item in response["result"]:
-                device = XTDevice(**item)               #CHANGED
+                device = XTDevice(**item)                                   #CHANGED
+                device.source = "IOT update_device_list_in_smart_home_mod"  #CHANGED
                 status = {}
                 for item_status in device.status:
                     if "code" in item_status and "value" in item_status:
@@ -94,7 +95,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                         value = item_status["value"]
                         status[code] = value
                 device.status = status
-                self.device_map[device.id] = device     #CHANGED
+                self.device_map[device.id] = device                         #CHANGED
                 if "id" not in item:
                     LOGGER.warning(f"Received invalid device info: {item}")
 
@@ -112,6 +113,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         if response["success"]:
             for item in response["result"]:
                 device = XTDevice(**item)
+                device.source = "IOT get_devices_from_sharing"
                 status = {}
                 for item_status in device.status:
                     if "code" in item_status and "value" in item_status:
@@ -130,7 +132,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         for device_id in self.device_map:
             device = self.device_map[device_id]
             device_open_api = self.get_open_api_device(device)
-            self.multi_manager.device_watcher.report_message(device_id, f"About to merge {device} and {device_open_api}", device)
+            #self.multi_manager.device_watcher.report_message(device_id, f"About to merge {device} and {device_open_api}", device)
             XTMergingManager.merge_devices(device, device_open_api)
             self.multi_manager.virtual_state_handler.apply_init_virtual_states(device)
 
@@ -145,11 +147,10 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         device = self.device_map.get(device_id, None)
         if not device:
             return
-        self.multi_manager.device_watcher.report_message(device_id, f"[IOT]On device report: {status}", device)
         status_new = self.multi_manager.convert_device_report_status_list(device_id, status)
         status_new = self.multi_manager.multi_source_handler.filter_status_list(device_id, MESSAGE_SOURCE_TUYA_IOT, status_new)
-        status_new = self.multi_manager.virtual_state_handler.apply_virtual_states_to_status_list(device, status_new)
-        for item in status:
+        status_new = self.multi_manager.virtual_state_handler.apply_virtual_states_to_status_list(device, status_new, MESSAGE_SOURCE_TUYA_IOT)
+        for item in status_new:
             if "code" in item and "value" in item:
                 code = item["code"]
                 value = item["value"]
@@ -165,16 +166,17 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                     device.status[alias] = value
 
         super()._on_device_report(device_id, [])
-
+        
     def _update_device_list_info_cache(self, devIds: list[str]):
         response = self.get_device_list_info(devIds)
         result = response.get("result", {})
         for item in result.get("list", []):
             device_id = item["id"]
             self.device_map[device_id] = XTDevice(**item)
+            self.device_map[device_id].source = "IOT _update_device_list_info_cache"
     
     def get_open_api_device(self, device: XTDevice) -> XTDevice | None:
-        device_properties = XTDevice.from_compatible_device(device)
+        device_properties = XTDevice.from_compatible_device(device, "IOT get_open_api_device")
         device_properties.function = {}
         device_properties.status_range = {}
         device_properties.status = {}
@@ -200,7 +202,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                         dp_id = int(property["abilityId"])
                         code  = property["code"]
                         typeSpec = property["typeSpec"]
-                        real_type = TuyaEntity.determine_dptype(typeSpec["type"])
+                        real_type = XTEntity.determine_dptype(typeSpec["type"])
                         access_mode = property["accessMode"]
                         typeSpec.pop("type")
                         typeSpec_json = json.dumps(typeSpec)
@@ -242,7 +244,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                             property_update = False
                         else:
                             property_update = True
-                        real_type = TuyaEntity.determine_dptype(dp_type)
+                        real_type = XTEntity.determine_dptype(dp_type)
                         device_properties.local_strategy[dp_id] = {
                             "value_convert": "default",
                             "status_code": code,

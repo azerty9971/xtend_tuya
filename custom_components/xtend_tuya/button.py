@@ -1,12 +1,9 @@
-"""Support for Tuya buttons."""
+"""Support for XT buttons."""
 
 from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from tuya_sharing import CustomerDevice, Manager
-
-from homeassistant.components.button import ButtonEntity, ButtonEntityDescription
 from homeassistant.const import EntityCategory, Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
@@ -16,17 +13,28 @@ from .util import (
     merge_device_descriptors
 )
 
-from .multi_manager.multi_manager import XTConfigEntry
-from .base import TuyaEntity
+from .multi_manager.multi_manager import (
+    XTConfigEntry,
+    MultiManager,
+    XTDevice,
+)
+
 from .const import TUYA_DISCOVERY_NEW, DPCode, VirtualFunctions
+from .ha_tuya_integration.tuya_integration_imports import (
+    TuyaButtonEntity,
+    TuyaButtonEntityDescription,
+)
+from .entity import (
+    XTEntity,
+)
 
 @dataclass(frozen=True)
-class TuyaButtonEntityDescription(ButtonEntityDescription):
+class XTButtonEntityDescription(TuyaButtonEntityDescription):
     virtual_function: VirtualFunctions | None = None
     vf_reset_state: list[DPCode]  | None = field(default_factory=list)
 
-CONSUMPTION_BUTTONS: tuple[TuyaButtonEntityDescription, ...] = (
-    TuyaButtonEntityDescription(
+CONSUMPTION_BUTTONS: tuple[XTButtonEntityDescription, ...] = (
+    XTButtonEntityDescription(
             key=DPCode.RESET_ADD_ELE,
             virtual_function = VirtualFunctions.FUNCTION_RESET_STATE,
             vf_reset_state=[DPCode.ADD_ELE],
@@ -37,9 +45,9 @@ CONSUMPTION_BUTTONS: tuple[TuyaButtonEntityDescription, ...] = (
 
 # All descriptions can be found here.
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
-BUTTONS: dict[str, tuple[TuyaButtonEntityDescription, ...]] = {
+BUTTONS: dict[str, tuple[XTButtonEntityDescription, ...]] = {
     "jtmspro": (
-        TuyaButtonEntityDescription(
+        XTButtonEntityDescription(
             key=DPCode.MANUAL_LOCK,
             translation_key="manual_lock",
             entity_category=EntityCategory.CONFIG,
@@ -49,14 +57,14 @@ BUTTONS: dict[str, tuple[TuyaButtonEntityDescription, ...]] = {
         *CONSUMPTION_BUTTONS,
     ),
     "qccdz": (
-        TuyaButtonEntityDescription(
+        XTButtonEntityDescription(
             key=DPCode.CLEAR_ENERGY,
             translation_key="clear_energy",
             entity_category=EntityCategory.CONFIG,
         ),
     ),
     "xfj": (
-        TuyaButtonEntityDescription(
+        XTButtonEntityDescription(
             key=DPCode.FILTER_RESET,
             translation_key="filter_reset",
             entity_category=EntityCategory.CONFIG,
@@ -84,13 +92,13 @@ async def async_setup_entry(
     @callback
     def async_discover_device(device_map) -> None:
         """Discover and add a discovered Tuya buttons."""
-        entities: list[TuyaButtonEntity] = []
+        entities: list[XTButtonEntity] = []
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
                 if descriptions := merged_descriptors.get(device.category):
                     entities.extend(
-                        TuyaButtonEntity(device, hass_data.manager, description)
+                        XTButtonEntity(device, hass_data.manager, description)
                         for description in descriptions
                         if description.key in device.status
                     )
@@ -99,7 +107,7 @@ async def async_setup_entry(
                             for reset_state in description.vf_reset_state:
                                 if reset_state in device.status:
                                     entities.extend(
-                                        [TuyaButtonEntity(device, hass_data.manager, description)]
+                                        [XTButtonEntity(device, hass_data.manager, XTButtonEntityDescription(**description.__dict__))]
                                     )
                                 break
 
@@ -114,20 +122,17 @@ async def async_setup_entry(
     )
 
 
-class TuyaButtonEntity(TuyaEntity, ButtonEntity):
-    """Tuya Button Device."""
+class XTButtonEntity(XTEntity, TuyaButtonEntity):
+    """XT Button Device."""
 
     def __init__(
         self,
-        device: CustomerDevice,
-        device_manager: Manager,
-        description: TuyaButtonEntityDescription,
+        device: XTDevice,
+        device_manager: MultiManager,
+        description: XTButtonEntityDescription,
     ) -> None:
-        """Init Tuya button."""
-        super().__init__(device, device_manager)
+        """Init XT button."""
+        super(XTButtonEntity, self).__init__(device, device_manager, description)
+        self.device = device
+        self.device_manager = device_manager
         self.entity_description = description
-        self._attr_unique_id = f"{super().unique_id}{description.key}"
-
-    def press(self) -> None:
-        """Press the button."""
-        self._send_command([{"code": self.entity_description.key, "value": True}])

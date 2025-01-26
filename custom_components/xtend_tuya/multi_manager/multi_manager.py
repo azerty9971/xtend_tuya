@@ -33,6 +33,10 @@ from .shared.shared_classes import (
     XTConfigEntry,  # noqa: F811
 )
 
+from .shared.debug.debug_helper import (
+    DebugHelper,
+)
+
 from .shared.merging_manager import (
     XTMergingManager,
 )
@@ -83,6 +87,7 @@ class MultiManager:  # noqa: F811
         self.is_ready_for_messages = False
         self.pending_messages: list[tuple[str, str]] = []
         self.devices_shared: dict[str, XTDevice] = {}
+        self.debug_helper = DebugHelper(self)
 
     @property
     def device_map(self):
@@ -397,3 +402,13 @@ class MultiManager:  # noqa: F811
         for account in self.accounts.values():
             if account.trigger_scene(home_id, scene_id):
                 return
+    
+    def update_device_online_status(self, device_id: str):
+        if device := self.device_map.get(device_id, None):
+            old_online_status = device.online
+            for online_status in device.online_states:
+                device.online = online_status
+                if online_status: #Prefer to be more On than Off if multiple state are not in accordance
+                    break
+            if device.online != old_online_status:
+                self.multi_device_listener.update_device(device, None)
