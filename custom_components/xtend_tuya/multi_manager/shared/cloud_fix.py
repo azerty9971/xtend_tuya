@@ -346,14 +346,18 @@ class CloudFixes:
                 unit = value["unit"]
                 try:
                     min = int(value["min"])
-                    max = int(["max"])
+                    max = int(value["max"])
                     if unit not in supported_units:
                         continue
                     if max % 100 != 0:
                         continue
                     if min not in (0, 1):
                         continue
-                    value["scale"] = int(max / 100) - 1
+                    scale = 0
+                    while max > 100:
+                        max = int(max / 10)
+                        scale = scale + 1
+                    value["scale"] = scale
                     device.status_range[code].values = json.dumps(value)
                 except Exception:
                     continue
@@ -363,14 +367,18 @@ class CloudFixes:
                 unit = value["unit"]
                 try:
                     min = int(value["min"])
-                    max = int(["max"])
+                    max = int(value["max"])
                     if unit not in supported_units:
                         continue
                     if max % 100 != 0:
                         continue
                     if min not in (0, 1):
                         continue
-                    value["scale"] = int(max / 100) - 1
+                    scale = 0
+                    while max > 100:
+                        max = int(max / 10)
+                        scale = scale + 1
+                    value["scale"] = scale
                     device.function[code].values = json.dumps(value)
                 except Exception:
                     continue
@@ -382,14 +390,18 @@ class CloudFixes:
                         unit = value["unit"]
                         try:
                             min = int(value["min"])
-                            max = int(["max"])
+                            max = int(value["max"])
                             if unit not in supported_units:
                                 continue
                             if max % 100 != 0:
                                 continue
                             if min not in (0, 1):
                                 continue
-                            value["scale"] = int(max / 100) - 1
+                            scale = 0
+                            while max > 100:
+                                max = int(max / 10)
+                                scale = scale + 1
+                            value["scale"] = scale
                             config_item["valueDesc"] = json.dumps(value)
                         except Exception:
                             continue
