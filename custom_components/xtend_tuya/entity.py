@@ -9,6 +9,7 @@ from .ha_tuya_integration.tuya_integration_imports import (
     TuyaEntity,
     TuyaEnumTypeData,
     TuyaIntegerTypeData,
+    TUYA_DPTYPE_MAPPING,
 )
 
 class XTEntity(TuyaEntity):
@@ -72,3 +73,14 @@ class XTEntity(TuyaEntity):
                         return dpcode
 
             return None
+    
+    def determine_dptype(type) -> DPType | None:
+        """Determine the DPType.
+
+        Sometimes, we get ill-formed DPTypes from the cloud,
+        this fixes them and maps them to the correct DPType.
+        """
+        try:
+            return DPType(type)
+        except ValueError:
+            return TUYA_DPTYPE_MAPPING.get(type)

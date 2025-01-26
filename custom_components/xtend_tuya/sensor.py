@@ -47,6 +47,7 @@ from .ha_tuya_integration.tuya_integration_imports import (
     TuyaSensorEntity,
     TuyaSensorEntityDescription,
     TuyaDPCode,
+    TuyaIntegerTypeData,
 )
 
 @dataclass(frozen=True)
@@ -1012,11 +1013,13 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):
         if self.entity_description.restoredata:
             self._restored_data = await self.async_get_last_sensor_data()
             if self._restored_data is not None and self._restored_data.native_value is not None:
-                scaled_value_back = self._type_data.scale_value_back(self._restored_data.native_value)
-                self._restored_data.native_value = scaled_value_back
+                # Scale integer/float value
+                if isinstance(self._type_data, TuyaIntegerTypeData):
+                    scaled_value_back = self._type_data.scale_value_back(self._restored_data.native_value)
+                    self._restored_data.native_value = scaled_value_back
 
-            if device := self.device_manager.device_map.get(self.device.id, None):
-                device.status[self.entity_description.key] = float(self._restored_data.native_value)
+                if device := self.device_manager.device_map.get(self.device.id, None):
+                    device.status[self.entity_description.key] = float(self._restored_data.native_value)
     
     @callback
     async def _on_state_change_event(self, event: Event[EventStateChangedData]):

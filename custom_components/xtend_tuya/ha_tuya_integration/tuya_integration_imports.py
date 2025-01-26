@@ -193,6 +193,7 @@ try:
         ElectricityTypeData as TuyaElectricityTypeData,
         EnumTypeData as TuyaEnumTypeData,
         IntegerTypeData as TuyaIntegerTypeData,
+        _DPTYPE_MAPPING as TUYA_DPTYPE_MAPPING,
     )
 except ImportError:
     from homeassistant.components.tuya.entity import (
@@ -200,6 +201,7 @@ except ImportError:
         ElectricityTypeData as TuyaElectricityTypeData,
         EnumTypeData as TuyaEnumTypeData,
         IntegerTypeData as TuyaIntegerTypeData,
+        _DPTYPE_MAPPING as TUYA_DPTYPE_MAPPING,
     )
 try:
     from custom_components.tuya.scene import (

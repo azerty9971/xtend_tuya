@@ -80,6 +80,7 @@ from homeassistant.components.tuya.entity import (
         ElectricityTypeData as TuyaElectricityTypeData,
         EnumTypeData as TuyaEnumTypeData,
         IntegerTypeData as TuyaIntegerTypeData,
+        _DPTYPE_MAPPING as TUYA_DPTYPE_MAPPING,
     )
 from homeassistant.components.tuya.scene import (
         TuyaSceneEntity as TuyaSceneEntity,
