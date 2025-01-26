@@ -87,6 +87,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         if response["success"]:
             for item in response["result"]:
                 device = XTDevice(**item)               #CHANGED
+                self.multi_manager.device_watcher.report_message(device.id, f"Product name: {device.product_name}", device)
                 status = {}
                 for item_status in device.status:
                     if "code" in item_status and "value" in item_status:
@@ -112,6 +113,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         if response["success"]:
             for item in response["result"]:
                 device = XTDevice(**item)
+                self.multi_manager.device_watcher.report_message(device.id, f"Product name: {device.product_name}", device)
                 status = {}
                 for item_status in device.status:
                     if "code" in item_status and "value" in item_status:
@@ -171,6 +173,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         for item in result.get("list", []):
             device_id = item["id"]
             self.device_map[device_id] = XTDevice(**item)
+            self.multi_manager.device_watcher.report_message(self.device_map[device_id].id, f"Product name: {self.device_map[device_id].product_name}", self.device_map[device_id])
     
     def get_open_api_device(self, device: XTDevice) -> XTDevice | None:
         device_properties = XTDevice.from_compatible_device(device)
