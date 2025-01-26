@@ -21,7 +21,7 @@ class XTEntity(TuyaEntity):
         dptype: DPType | None = None,
     ) -> DPCode | TuyaEnumTypeData | TuyaIntegerTypeData | None:
         try:
-            return super(XTEntity, self).find_dpcode(dpcodes, prefer_function, dptype)
+            return super(XTEntity, self).find_dpcode(dpcodes=dpcodes, prefer_function=prefer_function, dptype=dptype)
         except Exception:
             """Find a matching DP code available on for this device."""
             if dpcodes is None:
