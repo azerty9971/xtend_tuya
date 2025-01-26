@@ -930,7 +930,9 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):
             TuyaDPCode(description.key)
         except Exception:
             need_adjust = True
-            description_copy = XTSensorEntityDescription(key=None)
+            
+            #This DPCode can be any value of Tuya's DPCode table, it doesn't matter
+            description_copy = XTSensorEntityDescription(key=TuyaDPCode.FAULT)
         super(XTSensorEntity, self).__init__(device, device_manager, description_copy)
         self.device = device
         self.device_manager = device_manager
