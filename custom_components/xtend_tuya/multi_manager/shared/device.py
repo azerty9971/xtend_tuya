@@ -74,6 +74,7 @@ class XTDeviceFunction:
         return XTDeviceFunction(code=code, type=type, desc=desc, name=name, values=values, dp_id=dp_id)
 
 class XTDevice(SimpleNamespace):
+    source: str
     id: str
     name: str
     local_key: str
@@ -102,7 +103,8 @@ class XTDevice(SimpleNamespace):
     force_open_api: Optional[bool] = False
     data_model: Optional[str] = ""
 
-    def __init__(self, **kwargs: Any) -> None:
+    def __init__(self, source: str, **kwargs: Any) -> None:
+        self.source = source
         self.local_strategy = {}
         self.status = {}
         self.function = {}
@@ -128,10 +130,11 @@ class XTDevice(SimpleNamespace):
         for dpId in self.local_strategy:
             local_strategy_str += f"{dpId}\r\n{self.local_strategy[dpId]}\r\n"
         
-        return f"Device {self.name}:\r\n{function_str}{status_range_str}{status_str}{local_strategy_str}"
+        #return f"Device {self.name}:\r\n{function_str}{status_range_str}{status_str}{local_strategy_str}"
+        return f"Device {self.name}:\r\n{self.source}"
 
-    def from_compatible_device(device: Any):
-        new_device = XTDevice(**device.__dict__)
+    def from_compatible_device(device: Any, source: str = "Compatible device"):
+        new_device = XTDevice(source=source, **device.__dict__)
 
         #Reuse the references from the original device
         if hasattr(device, "local_strategy"):

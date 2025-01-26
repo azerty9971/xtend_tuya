@@ -86,7 +86,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         response = self.api.get(f"/v1.0/users/{self.api.token_info.uid}/devices")
         if response["success"]:
             for item in response["result"]:
-                device = XTDevice(**item)               #CHANGED
+                device = XTDevice(source="IOT update_device_list_in_smart_home_mod",**item)               #CHANGED
                 status = {}
                 for item_status in device.status:
                     if "code" in item_status and "value" in item_status:
@@ -111,7 +111,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         response = self.api.get(f"/v1.0/users/{self.api.token_info.uid}/devices?from=sharing")
         if response["success"]:
             for item in response["result"]:
-                device = XTDevice(**item)
+                device = XTDevice(source="IOT get_devices_from_sharing", **item)
                 status = {}
                 for item_status in device.status:
                     if "code" in item_status and "value" in item_status:
@@ -170,10 +170,10 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         result = response.get("result", {})
         for item in result.get("list", []):
             device_id = item["id"]
-            self.device_map[device_id] = XTDevice(**item)
+            self.device_map[device_id] = XTDevice(source="IOT _update_device_list_info_cache", **item)
     
     def get_open_api_device(self, device: XTDevice) -> XTDevice | None:
-        device_properties = XTDevice.from_compatible_device(device)
+        device_properties = XTDevice.from_compatible_device(device, "IOT get_open_api_device")
         device_properties.function = {}
         device_properties.status_range = {}
         device_properties.status = {}
