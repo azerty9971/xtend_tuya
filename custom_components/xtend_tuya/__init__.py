@@ -3,6 +3,8 @@
 from __future__ import annotations
 import logging
 
+import time
+
 from homeassistant.config_entries import ConfigEntry, ConfigEntryState
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import device_registry as dr
@@ -87,10 +89,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
 
 async def cleanup_device_registry(hass: HomeAssistant, multi_manager: MultiManager, current_entry: ConfigEntry) -> None:
     """Remove deleted device registry entry if there are no remaining entities."""
-    if not are_all_domain_config_loaded(hass, DOMAIN, current_entry):
-        return
-    if not are_all_domain_config_loaded(hass, DOMAIN_ORIG, current_entry):
-        return
+    while not are_all_domain_config_loaded(hass, DOMAIN_ORIG, None):
+        time.sleep(1)
+    while not are_all_domain_config_loaded(hass, DOMAIN, current_entry):
+        if is_config_entry_master(hass, DOMAIN, current_entry):
+            time.sleep(1)
+        else:
+            return
     device_registry = dr.async_get(hass)
     processed_devices: dict[str, list[dr.DeviceEntry]] = {}
     for dev_id, device_entry in list(device_registry.devices.items()):
@@ -117,14 +122,20 @@ async def cleanup_device_registry(hass: HomeAssistant, multi_manager: MultiManag
                     except Exception:
                         pass
 
-def are_all_domain_config_loaded(hass: HomeAssistant, domain: str, current_entry: ConfigEntry) -> bool:
+def are_all_domain_config_loaded(hass: HomeAssistant, domain: str, current_entry: ConfigEntry | None) -> bool:
     config_entries = hass.config_entries.async_entries(domain, False, False)
     for config_entry in config_entries:
-        if config_entry.entry_id == current_entry.entry_id:
+        if current_entry is not None and config_entry.entry_id == current_entry.entry_id:
             continue
         if config_entry.state != ConfigEntryState.LOADED:
             return False
     return True
+
+def is_config_entry_master(hass: HomeAssistant, domain: str, current_entry: ConfigEntry) -> bool:
+    config_entries = hass.config_entries.async_entries(domain, False, False)
+    if len(config_entries) > 0:
+        return config_entries[0] == current_entry
+    return False
 
 def get_domain_device_map(hass: HomeAssistant, domain: str) -> dict[str, any]:
     device_map = {}
