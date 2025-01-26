@@ -65,9 +65,18 @@ class XTMergingManager:
         device1.ip              = XTMergingManager.smart_merge(device1.ip, device2.ip, msg_queue, "device.ip")
         device1.time_zone       = XTMergingManager.smart_merge(device1.time_zone, device2.time_zone, msg_queue, "device.time_zone")
         #Differs between API calls (suppress warning)
-        device1.active_time     = XTMergingManager.smart_merge(device1.active_time, device2.active_time)
-        device1.create_time     = XTMergingManager.smart_merge(device1.create_time, device2.create_time)
-        device1.update_time     = XTMergingManager.smart_merge(device1.update_time, device2.update_time)
+        if device2.active_time > 0:
+            device1.active_time = device2.active_time
+        else:
+            device2.active_time = device1.active_time
+        if device2.create_time > 0:
+            device1.create_time = device2.create_time
+        else:
+            device2.create_time = device1.create_time
+        if device2.update_time > 0:
+            device1.update_time = device2.update_time
+        else:
+            device2.update_time = device1.update_time
         if device1.set_up or device2.set_up:
             device1.set_up = True
             device2.set_up = True
