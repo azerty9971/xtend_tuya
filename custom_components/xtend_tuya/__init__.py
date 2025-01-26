@@ -1,6 +1,6 @@
 """Support for Tuya Smart devices."""
 
-from __future__ import annotations
+from __future__ import absolute_import
 import logging
 
 import time
