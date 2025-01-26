@@ -100,7 +100,7 @@ async def cleanup_device_registry(hass: HomeAssistant, multi_manager: MultiManag
     processed_devices: dict[str, list[dr.DeviceEntry]] = {}
     for dev_id, device_entry in list(device_registry.devices.items()):
         for item in device_entry.identifiers:
-            device_found, device_id = is_device_in_domain_device_maps(hass, [DOMAIN_ORIG, DOMAIN],item)
+            device_found, device_id = is_device_in_domain_device_maps(hass, [DOMAIN_ORIG, DOMAIN],item, current_entry)
             if not device_found:
                 device_registry.async_remove_device(dev_id)
                 break
@@ -137,21 +137,23 @@ def is_config_entry_master(hass: HomeAssistant, domain: str, current_entry: Conf
         return config_entries[0] == current_entry
     return False
 
-def get_domain_device_map(hass: HomeAssistant, domain: str) -> dict[str, any]:
+def get_domain_device_map(hass: HomeAssistant, domain: str, except_of_entry: ConfigEntry | None = None) -> dict[str, any]:
     device_map = {}
-    config_entries: XTConfigEntry = hass.config_entries.async_entries(domain, False, False)
+    config_entries = hass.config_entries.async_entries(domain, False, False)
     for config_entry in config_entries:
+        if config_entry == except_of_entry:
+            continue
         runtime_data = get_config_entry_runtime_data(hass, config_entry, domain)
         for device_id in runtime_data.device_manager.device_map:
             if device_id not in device_map:
                 device_map[device_id] = runtime_data.device_manager.device_map[device_id]
     return device_map
 
-def is_device_in_domain_device_maps(hass: HomeAssistant, domains: list[str], device_entry_identifiers: tuple[str, str]):
+def is_device_in_domain_device_maps(hass: HomeAssistant, domains: list[str], device_entry_identifiers: tuple[str, str], except_of_entry: ConfigEntry | None = None):
     device_domain = device_entry_identifiers[0]
     if device_domain in domains:
         for domain in domains:
-            device_map = get_domain_device_map(hass, domain)
+            device_map = get_domain_device_map(hass, domain, except_of_entry)
             device_id = device_entry_identifiers[1]
             if device_id in device_map:
                 return True, device_id
