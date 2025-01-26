@@ -64,9 +64,9 @@ class XTMergingManager:
         device1.icon            = XTMergingManager.smart_merge(device1.icon, device2.icon, msg_queue, "device.icon")
         device1.ip              = XTMergingManager.smart_merge(device1.ip, device2.ip, msg_queue, "device.ip")
         device1.time_zone       = XTMergingManager.smart_merge(device1.time_zone, device2.time_zone, msg_queue, "device.time_zone")
-        device1.active_time     = XTMergingManager.smart_merge(device1.active_time, device2.active_time, msg_queue, "device.active_time")
-        device1.create_time     = XTMergingManager.smart_merge(device1.create_time, device2.create_time, msg_queue, "device.create_time")
         #Differs between API calls (suppress warning)
+        device1.active_time     = XTMergingManager.smart_merge(device1.active_time, device2.active_time)
+        device1.create_time     = XTMergingManager.smart_merge(device1.create_time, device2.create_time)
         device1.update_time     = XTMergingManager.smart_merge(device1.update_time, device2.update_time)
         device1.set_up          = XTMergingManager.smart_merge(device1.set_up, device2.set_up, msg_queue, "device.set_up")
         if device1.support_local or device2.support_local:
