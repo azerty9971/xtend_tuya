@@ -3,7 +3,7 @@
 from __future__ import annotations
 import logging
 
-import time as py_time
+import asyncio
 
 from homeassistant.config_entries import ConfigEntry, ConfigEntryState
 from homeassistant.core import HomeAssistant
@@ -90,10 +90,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
 async def cleanup_device_registry(hass: HomeAssistant, multi_manager: MultiManager, current_entry: ConfigEntry) -> None:
     """Remove deleted device registry entry if there are no remaining entities."""
     while not are_all_domain_config_loaded(hass, DOMAIN_ORIG, None):
-        py_time.sleep(1)
+        await asyncio.sleep(1)
     while not are_all_domain_config_loaded(hass, DOMAIN, current_entry):
         if is_config_entry_master(hass, DOMAIN, current_entry):
-            py_time.sleep(1)
+            await asyncio.sleep(1)
         else:
             return
     device_registry = dr.async_get(hass)
