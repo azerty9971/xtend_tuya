@@ -247,7 +247,10 @@ class XTMergingManager:
             if left is not None:
                 return left
             return right
-        if type(left) != type(right):
+        if (
+            type(left) is not type(right) 
+            and not (isinstance(left, str) and isinstance(right, str)) #Used to prevent warning on classes that represent a string (DPType and TuyaDPType)
+            ):
             if msg_queue is not None:
                 msg_queue.append(f"Merging tried to merge objects of different types: {type(left)} and {type(right)}, returning left ({path})")
             return left
