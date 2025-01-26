@@ -258,10 +258,10 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
     
 
     @overload
-    def convert_to_xt_device(self, Any) -> XTDevice: ...
+    def convert_to_xt_device(self, Any, source: str = "SHARING convert_to_xt_device") -> XTDevice: ...
     
-    def convert_to_xt_device(self, device: CustomerDevice) -> XTDevice:
-        return XTDevice.from_compatible_device(device)
+    def convert_to_xt_device(self, device: CustomerDevice, source: str = "SHARING convert_to_xt_device") -> XTDevice:
+        return XTDevice.from_compatible_device(device, source)
     
     def send_lock_unlock_command(
             self, device_id: str, lock: bool
