@@ -129,17 +129,6 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
         status_new = self.multi_manager.virtual_state_handler.apply_virtual_states_to_status_list(device, status_new, MESSAGE_SOURCE_TUYA_SHARING)
 
         super()._on_device_report(device_id, status_new)
-        #Temporary fix until a better solution is found
-        #Loop through the reported dpId and resync the aliases with the status itself
-        for item in status_new:
-            if (
-                "dpId" in item
-                and item["dpId"] in device.local_strategy
-                and "status_code_alias" in device.local_strategy[item["dpId"]]
-                ):
-                for alias in device.local_strategy[item["dpId"]]["status_code_alias"]:
-                    device.status[alias] = device.status[device.local_strategy[item["dpId"]]["status_code"]]
-        super()._on_device_report(device_id, [])
             
     def send_commands(
             self, device_id: str, commands: list[dict[str, Any]]
