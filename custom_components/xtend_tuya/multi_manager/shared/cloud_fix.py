@@ -38,8 +38,9 @@ class CloudFixes:
             if dp_id in device.local_strategy:
                 if strat_code := device.local_strategy[dp_id].get("status_code"):
                     if strat_code != status:
-                        status_push[strat_code] = copy.deepcopy(device.status_range[status])
-                        status_push[strat_code].code = strat_code
+                        if strat_code not in device.status_range:
+                            status_push[strat_code] = copy.deepcopy(device.status_range[status])
+                            status_push[strat_code].code = strat_code
                         status_pop.append(status)
         for status in status_pop:
             device.status_range.pop(status)
@@ -53,8 +54,9 @@ class CloudFixes:
             if dp_id in device.local_strategy:
                 if strat_code := device.local_strategy[dp_id].get("status_code"):
                     if strat_code != function:
-                        function_push[strat_code] = copy.deepcopy(device.function[function])
-                        function_push[strat_code].code = strat_code
+                        if strat_code not in device.function:
+                            function_push[strat_code] = copy.deepcopy(device.function[function])
+                            function_push[strat_code].code = strat_code
                         function_pop.append(function)
         for function in function_pop:
             device.function.pop(function)
