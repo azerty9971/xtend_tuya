@@ -168,10 +168,10 @@ def get_domain_device_map(hass: HomeAssistant, domain: str, except_of_entry: Con
     return device_map
 
 def is_device_in_domain_device_maps(hass: HomeAssistant, domains: list[str], device_entry_identifiers: tuple[str, str], except_of_entry: ConfigEntry | None = None):
-    if len(device_entry_identifiers) > 0:
+    if len(device_entry_identifiers) > 1:
         device_domain = device_entry_identifiers[0]
     else:
-        device_domain = None
+        return True
     if device_domain in domains:
         for domain in domains:
             device_map = get_domain_device_map(hass, domain, except_of_entry)
