@@ -103,7 +103,8 @@ class XTLightEntity(XTEntity, TuyaLightEntity):
                 else:
                     values = self.device.status_range[dpcode].values
                 if function_data := json.loads(values):
-                    LOGGER.warning(f"Failed light: {device}")
+                    #LOGGER.warning(f"Failed light: {device}")
+                    pass
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description
