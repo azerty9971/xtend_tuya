@@ -182,7 +182,7 @@ class MultiManager:  # noqa: F811
             devices = self.__get_devices_from_device_id(device.id)
             for current_device in devices:
                 for prev_device in to_be_merged:
-                    XTMergingManager.merge_devices(prev_device, current_device)
+                    XTMergingManager.merge_devices(prev_device, current_device, self)
                 to_be_merged.append(current_device)
     
     def unload(self):
