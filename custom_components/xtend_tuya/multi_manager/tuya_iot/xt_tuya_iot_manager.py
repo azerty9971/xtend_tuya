@@ -256,7 +256,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                     code = dp_property["code"]
                     if code not in device_properties.status_range and code not in device_properties.function:
                         if ( "access_mode" in device_properties.local_strategy[dp_id] 
-                            and device_properties.local_strategy[dp_id]["access_mode"] in ("rw", "wr")):
+                            and device_properties.local_strategy[dp_id]["access_mode"] in ["rw", "wr"]):
                             device_properties.function[code] = XTDeviceFunction(code=code, 
                                                                                 type=device_properties.local_strategy[dp_id]["config_item"]["valueType"],
                                                                                 values=device_properties.local_strategy[dp_id]["config_item"]["valueDesc"],
