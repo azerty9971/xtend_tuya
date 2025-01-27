@@ -15,11 +15,16 @@ from .cloud_fix import (
 from ...const import (
     LOGGER,  # noqa: F401
 )
+from ..multi_manager import (
+    MultiManager,
+)
 
 class XTMergingManager:
-    def merge_devices(device1: XTDevice, device2: XTDevice):
+    def merge_devices(device1: XTDevice, device2: XTDevice, multi_manager: MultiManager = None):
         msg_queue: list[str] = []
 
+        if multi_manager:
+            multi_manager.device_watcher.report_message(device1.id, f"About to merge {device1.source}:{device1}\r\n\r\nand\r\n\r\n{device2.source}:{device2}", device1)
         device1_bak = copy.deepcopy(device1)
         device2_bak = copy.deepcopy(device2)
         #Make both devices compliant
@@ -50,6 +55,8 @@ class XTMergingManager:
         device2.function = device1.function
         device2.status = device1.status
         device2.local_strategy = device1.local_strategy
+        if multi_manager:
+            multi_manager.device_watcher.report_message(device1.id, f"Merged into {device1}", device1)
 
     def _align_device_properties(device1: XTDevice, device2: XTDevice, msg_queue: list[str] | None = None):
         device1.name            = XTMergingManager.smart_merge(device1.name, device2.name, msg_queue, "device.name")
