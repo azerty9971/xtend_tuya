@@ -31,6 +31,8 @@ class CloudFixes:
         
 
     def _fix_unaligned_function_or_status_range(device: XTDevice):
+
+        #Remove status_ranges that are refering to an alias
         status_push: dict[str, XTDeviceStatusRange] = {}
         status_pop: list[str] = []
         for status in device.status_range:
@@ -38,15 +40,26 @@ class CloudFixes:
             if dp_id in device.local_strategy:
                 if strat_code := device.local_strategy[dp_id].get("status_code"):
                     if strat_code != status:
-                        if strat_code not in device.status_range:
+                        if strat_code not in device.status_range and strat_code not in device.function:
                             status_push[strat_code] = copy.deepcopy(device.status_range[status])
                             status_push[strat_code].code = strat_code
+                        #Merge to be removed status_range in local strategy
+                        if config_item := device.local_strategy[dp_id].get("config_item"):
+                            if value_descr := config_item.get("valueDesc"):
+                                ls_value, _ = CloudFixes.get_value_descr_dict(value_descr)
+                                sr_value, _ = CloudFixes.get_value_descr_dict(device.status_range[status].values)
+                                fix_dict = CloudFixes.compute_aligned_valuedescr(ls_value, sr_value, {})
+                                for fix_code in fix_dict:
+                                    if ls_value:
+                                        ls_value[fix_code] = fix_dict[fix_code]
+                                config_item["valueDesc"] = json.dumps(ls_value)
                         status_pop.append(status)
         for status in status_pop:
             device.status_range.pop(status)
         for status in status_push:
             device.status_range[status] = status_push[status]
         
+        #Remove functions that are refering to an alias
         function_push: dict[str, XTDeviceFunction] = {}
         function_pop: list[str] = []
         for function in device.function:
@@ -54,9 +67,19 @@ class CloudFixes:
             if dp_id in device.local_strategy:
                 if strat_code := device.local_strategy[dp_id].get("status_code"):
                     if strat_code != function:
-                        if strat_code not in device.function:
+                        if strat_code not in device.status_range and strat_code not in device.function:
                             function_push[strat_code] = copy.deepcopy(device.function[function])
                             function_push[strat_code].code = strat_code
+                        #Merge to be removed function in local strategy
+                        if config_item := device.local_strategy[dp_id].get("config_item"):
+                            if value_descr := config_item.get("valueDesc"):
+                                ls_value, _ = CloudFixes.get_value_descr_dict(value_descr)
+                                fn_value, _ = CloudFixes.get_value_descr_dict(device.function[status].values)
+                                fix_dict = CloudFixes.compute_aligned_valuedescr(ls_value, fn_value, {})
+                                for fix_code in fix_dict:
+                                    if ls_value:
+                                        ls_value[fix_code] = fix_dict[fix_code]
+                                config_item["valueDesc"] = json.dumps(ls_value)
                         function_pop.append(function)
         for function in function_pop:
             device.function.pop(function)
