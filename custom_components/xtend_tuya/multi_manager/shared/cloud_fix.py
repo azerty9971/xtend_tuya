@@ -53,6 +53,10 @@ class CloudFixes:
                                     for fix_code in fix_dict:
                                         ls_value[fix_code] = fix_dict[fix_code]
                                     config_item["valueDesc"] = json.dumps(ls_value)
+                                    if strat_code in device.status_range:
+                                        device.status_range[strat_code].values = config_item["valueDesc"]
+                                    if strat_code in device.function:
+                                        device.function[strat_code].values = config_item["valueDesc"]
                         status_pop.append(status)
         for status in status_pop:
             device.status_range.pop(status)
@@ -80,6 +84,10 @@ class CloudFixes:
                                     for fix_code in fix_dict:
                                         ls_value[fix_code] = fix_dict[fix_code]
                                     config_item["valueDesc"] = json.dumps(ls_value)
+                                    if strat_code in device.status_range:
+                                        device.status_range[strat_code].values = config_item["valueDesc"]
+                                    if strat_code in device.function:
+                                        device.function[strat_code].values = config_item["valueDesc"]
                         function_pop.append(function)
         for function in function_pop:
             device.function.pop(function)
