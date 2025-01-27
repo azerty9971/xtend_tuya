@@ -76,7 +76,7 @@ class CloudFixes:
                             if value_descr := config_item.get("valueDesc"):
                                 ls_value, _ = CloudFixes.get_value_descr_dict(value_descr)
                                 if ls_value:
-                                    fn_value, _ = CloudFixes.get_value_descr_dict(device.function[status].values)
+                                    fn_value, _ = CloudFixes.get_value_descr_dict(device.function[function].values)
                                     fix_dict = CloudFixes.compute_aligned_valuedescr(ls_value, fn_value, {})
                                     for fix_code in fix_dict:
                                         if ls_value:
