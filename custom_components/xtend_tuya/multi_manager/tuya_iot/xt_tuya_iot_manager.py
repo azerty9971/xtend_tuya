@@ -132,10 +132,10 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         for device_id in self.device_map:
             device = self.device_map[device_id]
             device_open_api = self.get_open_api_device(device)
-            self.multi_manager.device_watcher.report_message(device_id, f"About to merge {device}\r\n\r\nand\r\n\r\n{device_open_api}", device)
+            #self.multi_manager.device_watcher.report_message(device_id, f"About to merge {device}\r\n\r\nand\r\n\r\n{device_open_api}", device)
             XTMergingManager.merge_devices(device, device_open_api)
             self.multi_manager.virtual_state_handler.apply_init_virtual_states(device)
-            self.multi_manager.device_watcher.report_message(device_id, f"Merged into \n\r{device}", device)
+            #self.multi_manager.device_watcher.report_message(device_id, f"Merged into \n\r{device}", device)
 
     def on_message(self, msg: str):
         super().on_message(msg)
@@ -269,7 +269,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                                                                                     dp_id=dp_id)
                     if code not in device_properties.status:
                         device_properties.status[code] = dp_property.get("value",None)
-        self.multi_manager.device_watcher.report_message(device_properties.id, f"get_open_api_device: {device}", device_properties)
+        #self.multi_manager.device_watcher.report_message(device_properties.id, f"get_open_api_device: {device}", device_properties)
         return device_properties
 
     def send_property_update(
