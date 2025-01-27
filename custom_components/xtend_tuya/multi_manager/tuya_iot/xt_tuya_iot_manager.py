@@ -268,6 +268,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                                                                                     dp_id=dp_id)
                     if code not in device_properties.status:
                         device_properties.status[code] = dp_property.get("value",None)
+        self.multi_manager.device_watcher.report_message(device_properties.id, f"get_open_api_device: {device}", device_properties)
         return device_properties
 
     def send_property_update(
