@@ -81,13 +81,15 @@ class XTDevice(TuyaDevice):
     online_states: dict[str, bool]
     data_model: dict[str, Any]
     force_open_api: Optional[bool] = False
+    function: dict[str, XTDeviceFunction]
+    status_range: dict[str, XTDeviceStatusRange]
 
     def __init__(self, **kwargs: Any) -> None:
         self.source = ""
         self.online_states = {}
         self.data_model = {}
         self.force_open_api = False
-        
+
         self.id = ""
         self.name = ""
         self.local_key = ""

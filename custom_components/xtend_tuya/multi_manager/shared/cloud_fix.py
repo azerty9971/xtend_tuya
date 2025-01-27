@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import json
+import json, copy
 
 from .device import (
     XTDevice,
@@ -27,6 +27,39 @@ class CloudFixes:
         CloudFixes._fix_missing_range_values_using_local_strategy(device)
         CloudFixes._fix_missing_aliases_using_status_format(device)
         CloudFixes._remove_status_that_are_local_strategy_aliases(device)
+        CloudFixes._fix_unaligned_function_or_status_range(device)
+        
+
+    def _fix_unaligned_function_or_status_range(device: XTDevice):
+        status_push: dict[str, XTDeviceStatusRange] = {}
+        status_pop: list[str] = []
+        for status in device.status_range:
+            dp_id: int = device.status_range[status].dp_id
+            if dp_id in device.local_strategy:
+                if strat_code := device.local_strategy[dp_id].get("status_code"):
+                    if strat_code != status:
+                        status_push[strat_code] = copy.deepcopy(device.status_range[status])
+                        status_push[strat_code].code = strat_code
+                        status_pop.append(status)
+        for status in status_pop:
+            device.status_range.pop(status)
+        for status in status_push:
+            device.status_range[status] = status_push[status]
+        
+        function_push: dict[str, XTDeviceFunction] = {}
+        function_pop: list[str] = []
+        for function in device.function:
+            dp_id: int = device.function[function].dp_id
+            if dp_id in device.local_strategy:
+                if strat_code := device.local_strategy[dp_id].get("status_code"):
+                    if strat_code != function:
+                        function_push[strat_code] = copy.deepcopy(device.function[function])
+                        function_push[strat_code].code = strat_code
+                        function_pop.append(function)
+        for function in function_pop:
+            device.function.pop(function)
+        for function in function_push:
+            device.function[function] = function_push[function]
 
     def _unify_added_attributes(device: XTDevice):
         for dpId in device.local_strategy:
