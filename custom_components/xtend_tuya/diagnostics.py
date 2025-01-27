@@ -13,7 +13,7 @@ from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.util import dt as dt_util
 
 from .multi_manager.multi_manager import XTConfigEntry
-from .const import DOMAIN, DPCode
+from .const import DOMAIN, DOMAIN_ORIG, DPCode
 from .multi_manager.shared.device import (
     XTDevice,
 )
@@ -172,7 +172,7 @@ def _async_device_as_dict(
     # Gather information how this Tuya device is represented in Home Assistant
     device_registry = dr.async_get(hass)
     entity_registry = er.async_get(hass)
-    hass_device = device_registry.async_get_device(identifiers={(DOMAIN, device.id)})
+    hass_device = device_registry.async_get_device(identifiers={(DOMAIN, device.id), (DOMAIN_ORIG, device.id)})
     if hass_device:
         data["home_assistant"] = {
             "name": hass_device.name,
