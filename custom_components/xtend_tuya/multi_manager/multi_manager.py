@@ -88,6 +88,7 @@ class MultiManager:  # noqa: F811
         self.pending_messages: list[tuple[str, str]] = []
         self.devices_shared: dict[str, XTDevice] = {}
         self.debug_helper = DebugHelper(self)
+        self.scene_id: list[str] = []
 
     @property
     def device_map(self):

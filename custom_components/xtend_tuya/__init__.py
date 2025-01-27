@@ -135,7 +135,7 @@ async def cleanup_device_registry(hass: HomeAssistant, multi_manager: MultiManag
     device_registry = dr.async_get(hass)
     for dev_id, device_entry in list(device_registry.devices.items()):
         for item in device_entry.identifiers:
-            if not is_device_in_domain_device_maps(hass, [DOMAIN_ORIG, DOMAIN],item):
+            if not is_device_in_domain_device_maps(hass, [DOMAIN_ORIG, DOMAIN],item, None, True):
                 device_registry.async_remove_device(dev_id)
                 break
 
@@ -154,7 +154,7 @@ def is_config_entry_master(hass: HomeAssistant, domain: str, current_entry: Conf
         return config_entries[0] == current_entry
     return False
 
-def get_domain_device_map(hass: HomeAssistant, domain: str, except_of_entry: ConfigEntry | None = None) -> dict[str, any]:
+def get_domain_device_map(hass: HomeAssistant, domain: str, except_of_entry: ConfigEntry | None = None, with_scene: bool = False) -> dict[str, any]:
     device_map = {}
     config_entries = hass.config_entries.async_entries(domain, False, False)
     for config_entry in config_entries:
@@ -164,19 +164,23 @@ def get_domain_device_map(hass: HomeAssistant, domain: str, except_of_entry: Con
         for device_id in runtime_data.device_manager.device_map:
             if device_id not in device_map:
                 device_map[device_id] = runtime_data.device_manager.device_map[device_id]
+        if with_scene and hasattr(runtime_data.device_manager, "scene_id"):
+            for scene_id in runtime_data.device_manager.scene_id:
+                device_map[scene_id] = None
     return device_map
 
-def is_device_in_domain_device_maps(hass: HomeAssistant, domains: list[str], device_entry_identifiers: tuple[str, str], except_of_entry: ConfigEntry | None = None):
+def is_device_in_domain_device_maps(hass: HomeAssistant, domains: list[str], device_entry_identifiers: tuple[str, str], except_of_entry: ConfigEntry | None = None, with_scene: bool = False):
     if len(device_entry_identifiers) > 1:
         device_domain = device_entry_identifiers[0]
     else:
         return True
     if device_domain in domains:
         for domain in domains:
-            device_map = get_domain_device_map(hass, domain, except_of_entry)
+            device_map = get_domain_device_map(hass, domain, except_of_entry, with_scene)
             device_id = device_entry_identifiers[1]
             if device_id in device_map:
                 return True
+            
     else:
         return True
     

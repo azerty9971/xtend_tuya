@@ -34,3 +34,5 @@ class XTSceneEntity(TuyaSceneEntity):
         super(XTSceneEntity, self).__init__(multi_manager, scene)
         self.home_manager = multi_manager
         self.scene = scene
+        if self._attr_unique_id not in multi_manager.scene_id:
+            multi_manager.scene_id.append(self._attr_unique_id)
