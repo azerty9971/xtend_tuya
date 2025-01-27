@@ -129,8 +129,8 @@ class XTDevice(TuyaDevice):
         for dpId in self.local_strategy:
             local_strategy_str += f"{dpId}\r\n{self.local_strategy[dpId]}\r\n"
         
-        #return f"Device {self.name}:\r\n{function_str}{status_range_str}{status_str}{local_strategy_str}"
-        return f"Device {self.name}:\r\n{self.source}"
+        return f"Device {self.name}:\r\n{function_str}{status_range_str}{status_str}{local_strategy_str}"
+        #return f"Device {self.name}:\r\n{self.source}"
 
     def from_compatible_device(device: Any, source: str = "Compatible device"):
         #If the device is already an XT device return it right away
