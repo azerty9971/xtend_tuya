@@ -13,6 +13,7 @@ from .const import (
     DOMAIN,
     DOMAIN_ORIG,
     PLATFORMS,
+    LOGGER,
 )
 
 from .multi_manager.multi_manager import (
@@ -135,6 +136,7 @@ async def cleanup_device_registry(hass: HomeAssistant, multi_manager: MultiManag
     for dev_id, device_entry in list(device_registry.devices.items()):
         for item in device_entry.identifiers:
             if not is_device_in_domain_device_maps(hass, [DOMAIN_ORIG, DOMAIN],item):
+                LOGGER.warning(f"Removing device {item[1]}")
                 device_registry.async_remove_device(dev_id)
                 break
 
