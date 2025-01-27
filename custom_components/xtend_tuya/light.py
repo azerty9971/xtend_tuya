@@ -1,6 +1,7 @@
 """Support for the XT lights."""
-
 from __future__ import annotations
+
+import json
 
 from dataclasses import dataclass
 
@@ -18,7 +19,12 @@ from .multi_manager.multi_manager import (
     MultiManager,
     XTDevice,
 )
-from .const import TUYA_DISCOVERY_NEW, DPCode
+from .const import (
+    TUYA_DISCOVERY_NEW, 
+    DPCode,
+    DPType,
+    LOGGER,
+)
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaLightEntity,
     TuyaLightEntityDescription,
@@ -86,7 +92,18 @@ class XTLightEntity(XTEntity, TuyaLightEntity):
         device_manager: MultiManager,
         description: XTLightEntityDescription,
     ) -> None:
-        super(XTLightEntity, self).__init__(device, device_manager, description)
+        try:
+            super(XTLightEntity, self).__init__(device, device_manager, description)
+        except Exception as e:
+            if (
+                dpcode := self.find_dpcode(description.color_data, prefer_function=True)
+            ) and self.get_dptype(dpcode) == DPType.JSON:
+                if dpcode in self.device.function:
+                    values = self.device.function[dpcode].values
+                else:
+                    values = self.device.status_range[dpcode].values
+                if function_data := json.loads(values):
+                    LOGGER.warning(f"Failed light: {e}:\r\n{function_data}")
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description
