@@ -299,11 +299,11 @@ class CloudFixes:
                             ls_value = json.loads(value_descr)
             fix_dict = CloudFixes.compute_aligned_valuedescr(ls_value, sr_value, fn_value)
             for fix_code in fix_dict:
-                if sr_value:
+                if sr_value is not None:
                     sr_value[fix_code] = fix_dict[fix_code]
-                if fn_value:
+                if fn_value is not None:
                     fn_value[fix_code] = fix_dict[fix_code]
-                if ls_value:
+                if ls_value is not None:
                     ls_value[fix_code] = fix_dict[fix_code]
             if sr_value:
                 device.status_range[code].values = json.dumps(sr_value)
