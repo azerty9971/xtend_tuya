@@ -47,12 +47,13 @@ class CloudFixes:
                         if config_item := device.local_strategy[dp_id].get("config_item"):
                             if value_descr := config_item.get("valueDesc"):
                                 ls_value, _ = CloudFixes.get_value_descr_dict(value_descr)
-                                sr_value, _ = CloudFixes.get_value_descr_dict(device.status_range[status].values)
-                                fix_dict = CloudFixes.compute_aligned_valuedescr(ls_value, sr_value, {})
-                                for fix_code in fix_dict:
-                                    if ls_value:
-                                        ls_value[fix_code] = fix_dict[fix_code]
-                                config_item["valueDesc"] = json.dumps(ls_value)
+                                if ls_value:
+                                    sr_value, _ = CloudFixes.get_value_descr_dict(device.status_range[status].values)
+                                    fix_dict = CloudFixes.compute_aligned_valuedescr(ls_value, sr_value, {})
+                                    for fix_code in fix_dict:
+                                        if ls_value:
+                                            ls_value[fix_code] = fix_dict[fix_code]
+                                    config_item["valueDesc"] = json.dumps(ls_value)
                         status_pop.append(status)
         for status in status_pop:
             device.status_range.pop(status)
@@ -74,12 +75,13 @@ class CloudFixes:
                         if config_item := device.local_strategy[dp_id].get("config_item"):
                             if value_descr := config_item.get("valueDesc"):
                                 ls_value, _ = CloudFixes.get_value_descr_dict(value_descr)
-                                fn_value, _ = CloudFixes.get_value_descr_dict(device.function[status].values)
-                                fix_dict = CloudFixes.compute_aligned_valuedescr(ls_value, fn_value, {})
-                                for fix_code in fix_dict:
-                                    if ls_value:
-                                        ls_value[fix_code] = fix_dict[fix_code]
-                                config_item["valueDesc"] = json.dumps(ls_value)
+                                if ls_value:
+                                    fn_value, _ = CloudFixes.get_value_descr_dict(device.function[status].values)
+                                    fix_dict = CloudFixes.compute_aligned_valuedescr(ls_value, fn_value, {})
+                                    for fix_code in fix_dict:
+                                        if ls_value:
+                                            ls_value[fix_code] = fix_dict[fix_code]
+                                    config_item["valueDesc"] = json.dumps(ls_value)
                         function_pop.append(function)
         for function in function_pop:
             device.function.pop(function)
