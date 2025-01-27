@@ -60,6 +60,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
     device_registry = dr.async_get(hass)
     aggregated_device_map = multi_manager.device_map
     for device in aggregated_device_map.values():
+        multi_manager.virtual_state_handler.apply_init_virtual_states(device)
+
+    for device in aggregated_device_map.values():
         domain_identifiers:list = multi_manager.get_domain_identifiers_of_device(device.id)
         identifiers: set[tuple[str, str]] = set()
         if device_registry.async_get_device({(DOMAIN_ORIG, device.id)}) is not None:
@@ -74,9 +77,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
             name=device.name,
             model=f"{device.product_name} (unsupported)",
         )
-
-    for device in aggregated_device_map.values():
-        multi_manager.virtual_state_handler.apply_init_virtual_states(device)
         
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
@@ -104,6 +104,7 @@ async def cleanup_duplicated_devices(hass: HomeAssistant, current_entry: ConfigE
                         duplicate_check_table[device_id] = []
                     if hass_dev_id not in duplicate_check_table[device_id]:
                         duplicate_check_table[device_id].append(hass_dev_id)
+                    break
     for device_id in duplicate_check_table:
         remaining_devices = len(duplicate_check_table[device_id])
         if remaining_devices > 1:
