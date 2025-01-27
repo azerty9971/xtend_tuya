@@ -19,7 +19,7 @@ from .services.services import (
 
 class DeviceWatcher:
     def __init__(self, multi_manager: MultiManager) -> None:
-        self.watched_dev_id = ["bfd2bc6b252907fc0dnlao"]
+        self.watched_dev_id = []
         self.multi_manager = multi_manager
 
     def is_watched(self, dev_id: str) -> bool:
