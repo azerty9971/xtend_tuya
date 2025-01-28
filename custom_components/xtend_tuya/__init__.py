@@ -86,6 +86,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
     await hass.async_add_executor_job(multi_manager.refresh_mq)
     service_manager.register_services()
     await cleanup_duplicated_devices(hass, entry)
+    LOGGER.debug(f"Xtended Tuya {entry.title} loaded")
     return True
 
 
