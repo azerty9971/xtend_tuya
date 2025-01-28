@@ -144,7 +144,7 @@ def are_all_domain_config_loaded(hass: HomeAssistant, domain: str, current_entry
     for config_entry in config_entries:
         if current_entry is not None and config_entry.entry_id == current_entry.entry_id:
             continue
-        if config_entry.state != ConfigEntryState.LOADED:
+        if config_entry.state == ConfigEntryState.SETUP_IN_PROGRESS:
             return False
     return True
 
