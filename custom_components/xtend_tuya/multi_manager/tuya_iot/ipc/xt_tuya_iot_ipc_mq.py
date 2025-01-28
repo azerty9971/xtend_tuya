@@ -18,34 +18,22 @@ from tuya_iot import (
 )
 
 from ..xt_tuya_iot_mq import (
-    XTIOTOpenMQ
+    XTIOTOpenMQ,
+    XTIOTTuyaMQConfig,
 )
 
-from ....util import (
-    log_stack,
-)
 from ....const import (
     LOGGER  # noqa: F401
 )
 
-class XTIOTIPCTuyaMQConfig(TuyaMQConfig):
-    def __init__(self, mqConfigResponse: dict[str, Any] = {}) -> None:
-        """Init TuyaMQConfig."""
-        self.url: str = None
-        self.client_id: str = None
-        self.username: str = None
-        self.password: str = None
-        self.source_topic: dict = None
-        self.sink_topic: dict = None
-        self.expire_time: int = 0
-        super().__init__(mqConfigResponse)
+
 
 class XTIOTOpenMQIPC(XTIOTOpenMQ):
     def __init__(self, api: TuyaOpenAPI) -> None:
-        self.mq_config: XTIOTIPCTuyaMQConfig = None
+        self.mq_config: XTIOTTuyaMQConfig = None
         super().__init__(api)
     
-    def _get_mqtt_config(self) -> Optional[XTIOTIPCTuyaMQConfig]:
+    def _get_mqtt_config(self) -> Optional[XTIOTTuyaMQConfig]:
         if not self.api.is_connect():
             return None
         response = self.api.post(
@@ -64,10 +52,10 @@ class XTIOTOpenMQIPC(XTIOTOpenMQ):
         )
 
         if response.get("success", False) is False:
-            log_stack(f"_get_mqtt_config failed: {response}")
+            LOGGER.warning(f"_get_mqtt_config failed: {response}", stack_info=True)
             return None
 
-        return XTIOTIPCTuyaMQConfig(response)
+        return XTIOTTuyaMQConfig(response)
     
     def _on_connect(self, mqttc: mqtt.Client, user_data: Any, flags, rc):
         if rc == 0:
