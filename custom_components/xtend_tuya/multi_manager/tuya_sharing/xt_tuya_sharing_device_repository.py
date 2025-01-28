@@ -97,25 +97,25 @@ class XTSharingDeviceRepository(DeviceRepository):
         self._update_device_strategy_info_mod(device)
         #Sometimes the Type provided by Tuya is ill formed,
         #replace it with the one from the local strategy
-        for loc_strat in device.local_strategy.values():
-            if "statusCode" not in loc_strat or "valueType" not in loc_strat:
-                continue
-            code = loc_strat["statusCode"]
-            value_type = loc_strat["valueType"]
+        # for loc_strat in device.local_strategy.values():
+        #     if "statusCode" not in loc_strat or "valueType" not in loc_strat:
+        #         continue
+        #     code = loc_strat["statusCode"]
+        #     value_type = loc_strat["valueType"]
 
-            if code in device.status_range:
-                device.status_range[code].type = value_type
-            if code in device.function:
-                device.function[code].type     = value_type
+        #     if code in device.status_range:
+        #         device.status_range[code].type = value_type
+        #     if code in device.function:
+        #         device.function[code].type     = value_type
 
-            if (
-                "valueDesc"  in loc_strat and
-                code not in device.status_range and
-                code not in device.function
-                ):
-                device.status_range[code] = DeviceStatusRange()   #CHANGED
-                device.status_range[code].code   = code
-                device.status_range[code].type   = value_type
-                device.status_range[code].values = loc_strat["valueDesc"]
+        #     if (
+        #         "valueDesc"  in loc_strat and
+        #         code not in device.status_range and
+        #         code not in device.function
+        #         ):
+        #         device.status_range[code] = DeviceStatusRange()   #CHANGED
+        #         device.status_range[code].code   = code
+        #         device.status_range[code].type   = value_type
+        #         device.status_range[code].values = loc_strat["valueDesc"]
 
         self.multi_manager.virtual_state_handler.apply_init_virtual_states(device)

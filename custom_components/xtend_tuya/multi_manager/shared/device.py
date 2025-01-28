@@ -81,13 +81,15 @@ class XTDevice(TuyaDevice):
     online_states: dict[str, bool]
     data_model: dict[str, Any]
     force_open_api: Optional[bool] = False
+    function: dict[str, XTDeviceFunction]
+    status_range: dict[str, XTDeviceStatusRange]
 
     def __init__(self, **kwargs: Any) -> None:
         self.source = ""
         self.online_states = {}
         self.data_model = {}
         self.force_open_api = False
-        
+
         self.id = ""
         self.name = ""
         self.local_key = ""
@@ -127,8 +129,8 @@ class XTDevice(TuyaDevice):
         for dpId in self.local_strategy:
             local_strategy_str += f"{dpId}\r\n{self.local_strategy[dpId]}\r\n"
         
-        #return f"Device {self.name}:\r\n{function_str}{status_range_str}{status_str}{local_strategy_str}"
-        return f"Device {self.name}:\r\n{self.source}"
+        return f"Device {self.name}:\r\n{function_str}{status_range_str}{status_str}{local_strategy_str}"
+        #return f"Device {self.name}:\r\n{self.source}"
 
     def from_compatible_device(device: Any, source: str = "Compatible device"):
         #If the device is already an XT device return it right away

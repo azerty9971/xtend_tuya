@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import json
+import json, copy
 
 from .device import (
     XTDevice,
@@ -26,9 +26,73 @@ class CloudFixes:
         CloudFixes._fix_missing_local_strategy_enum_mapping_map(device)
         CloudFixes._fix_missing_range_values_using_local_strategy(device)
         CloudFixes._fix_missing_aliases_using_status_format(device)
+        CloudFixes._remove_status_that_are_local_strategy_aliases(device)
+        CloudFixes._fix_unaligned_function_or_status_range(device)
+        
 
-        #This causes some entities to disappear, instead we know update all local alias statuses
-        #CloudFixes._remove_status_that_are_local_strategy_aliases(device)
+    def _fix_unaligned_function_or_status_range(device: XTDevice):
+
+        #Remove status_ranges that are refering to an alias
+        status_push: dict[str, XTDeviceStatusRange] = {}
+        status_pop: list[str] = []
+        for status in device.status_range:
+            dp_id: int = device.status_range[status].dp_id
+            if dp_id in device.local_strategy:
+                if strat_code := device.local_strategy[dp_id].get("status_code"):
+                    if strat_code != status:
+                        if strat_code not in device.status_range and strat_code not in device.function:
+                            status_push[strat_code] = copy.deepcopy(device.status_range[status])
+                            status_push[strat_code].code = strat_code
+                        #Merge to be removed status_range in local strategy
+                        if config_item := device.local_strategy[dp_id].get("config_item"):
+                            if value_descr := config_item.get("valueDesc"):
+                                ls_value, _ = CloudFixes.get_value_descr_dict(value_descr)
+                                if ls_value is not None:
+                                    sr_value, _ = CloudFixes.get_value_descr_dict(device.status_range[status].values)
+                                    fix_dict = CloudFixes.compute_aligned_valuedescr(ls_value, sr_value, {})
+                                    for fix_code in fix_dict:
+                                        ls_value[fix_code] = fix_dict[fix_code]
+                                    config_item["valueDesc"] = json.dumps(ls_value)
+                                    if strat_code in device.status_range:
+                                        device.status_range[strat_code].values = config_item["valueDesc"]
+                                    if strat_code in device.function:
+                                        device.function[strat_code].values = config_item["valueDesc"]
+                        status_pop.append(status)
+        for status in status_pop:
+            device.status_range.pop(status)
+        for status in status_push:
+            device.status_range[status] = status_push[status]
+        
+        #Remove functions that are refering to an alias
+        function_push: dict[str, XTDeviceFunction] = {}
+        function_pop: list[str] = []
+        for function in device.function:
+            dp_id: int = device.function[function].dp_id
+            if dp_id in device.local_strategy:
+                if strat_code := device.local_strategy[dp_id].get("status_code"):
+                    if strat_code != function:
+                        if strat_code not in device.status_range and strat_code not in device.function:
+                            function_push[strat_code] = copy.deepcopy(device.function[function])
+                            function_push[strat_code].code = strat_code
+                        #Merge to be removed function in local strategy
+                        if config_item := device.local_strategy[dp_id].get("config_item"):
+                            if value_descr := config_item.get("valueDesc"):
+                                ls_value, _ = CloudFixes.get_value_descr_dict(value_descr)
+                                if ls_value is not None:
+                                    fn_value, _ = CloudFixes.get_value_descr_dict(device.function[function].values)
+                                    fix_dict = CloudFixes.compute_aligned_valuedescr(ls_value, fn_value, {})
+                                    for fix_code in fix_dict:
+                                        ls_value[fix_code] = fix_dict[fix_code]
+                                    config_item["valueDesc"] = json.dumps(ls_value)
+                                    if strat_code in device.status_range:
+                                        device.status_range[strat_code].values = config_item["valueDesc"]
+                                    if strat_code in device.function:
+                                        device.function[strat_code].values = config_item["valueDesc"]
+                        function_pop.append(function)
+        for function in function_pop:
+            device.function.pop(function)
+        for function in function_push:
+            device.function[function] = function_push[function]
 
     def _unify_added_attributes(device: XTDevice):
         for dpId in device.local_strategy:
@@ -243,11 +307,11 @@ class CloudFixes:
                             ls_value = json.loads(value_descr)
             fix_dict = CloudFixes.compute_aligned_valuedescr(ls_value, sr_value, fn_value)
             for fix_code in fix_dict:
-                if sr_value:
+                if sr_value is not None:
                     sr_value[fix_code] = fix_dict[fix_code]
-                if fn_value:
+                if fn_value is not None:
                     fn_value[fix_code] = fix_dict[fix_code]
-                if ls_value:
+                if ls_value is not None:
                     ls_value[fix_code] = fix_dict[fix_code]
             if sr_value:
                 device.status_range[code].values = json.dumps(sr_value)
@@ -260,7 +324,7 @@ class CloudFixes:
     def compute_aligned_valuedescr(value1: dict, value2: dict, value3: dict) -> dict:
         return_dict: dict = {}
         maxlen_list: list = CloudFixes._get_field_of_valuedescr(value1, value2, value3, "maxlen")
-        if len(maxlen_list) > 1:
+        if len(maxlen_list) > 0:
             maxlen_cur = int(maxlen_list[0])
             for maxlen in maxlen_list:
                 maxlen = int(maxlen)
@@ -268,7 +332,7 @@ class CloudFixes:
                     maxlen_cur = maxlen
             return_dict["maxlen"] = maxlen_cur
         min_list: list = CloudFixes._get_field_of_valuedescr(value1, value2, value3, "min")
-        if len(min_list) > 1:
+        if len(min_list) > 0:
             min_cur = int(min_list[0])
             for min in min_list:
                 min = int(min)
@@ -276,7 +340,7 @@ class CloudFixes:
                     min_cur = min
             return_dict["min"] = min_cur
         max_list: list = CloudFixes._get_field_of_valuedescr(value1, value2, value3, "max")
-        if len(max_list) > 1:
+        if len(max_list) > 0:
             max_cur = int(max_list[0])
             for max in max_list:
                 max = int(max)
@@ -284,7 +348,7 @@ class CloudFixes:
                     max_cur = max
             return_dict["max"] = max_cur
         scale_list: list = CloudFixes._get_field_of_valuedescr(value1, value2, value3, "scale")
-        if len(scale_list) > 1:
+        if len(scale_list) > 0:
             scale_cur = int(scale_list[0])
             for scale in scale_list:
                 scale = int(scale)
@@ -292,7 +356,7 @@ class CloudFixes:
                     scale_cur = scale
             return_dict["scale"] = scale_cur
         step_list: list = CloudFixes._get_field_of_valuedescr(value1, value2, value3, "step")
-        if len(step_list) > 1:
+        if len(step_list) > 0:
             step_cur = int(step_list[0])
             for step in step_list:
                 step = int(step)
@@ -486,11 +550,14 @@ class CloudFixes:
                     status_formats_dict: dict = json.loads(status_formats)
                     pop_list: list[str] = []
                     for status in status_formats_dict:
-                        if status != status_code and status not in local_strategy["status_code_alias"]:
+                        if status != status_code:
+                            if status not in local_strategy["status_code_alias"]:
+                                local_strategy["status_code_alias"].append(status)
                             pop_list.append(status)
-                            local_strategy["status_code_alias"].append(status)
                     for status in pop_list:
                         status_formats_dict.pop(status)
+                    if status_code not in status_formats_dict:
+                        status_formats_dict[status_code] = "$"
                     config_item["statusFormat"] = json.dumps(status_formats_dict)
     
     def _remove_status_that_are_local_strategy_aliases(device: XTDevice):

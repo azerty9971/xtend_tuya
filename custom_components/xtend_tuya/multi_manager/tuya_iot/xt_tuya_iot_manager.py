@@ -132,9 +132,10 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         for device_id in self.device_map:
             device = self.device_map[device_id]
             device_open_api = self.get_open_api_device(device)
-            #self.multi_manager.device_watcher.report_message(device_id, f"About to merge {device} and {device_open_api}", device)
+            #self.multi_manager.device_watcher.report_message(device_id, f"About to merge {device}\r\n\r\nand\r\n\r\n{device_open_api}", device)
             XTMergingManager.merge_devices(device, device_open_api)
             self.multi_manager.virtual_state_handler.apply_init_virtual_states(device)
+            #self.multi_manager.device_watcher.report_message(device_id, f"Merged into \n\r{device}", device)
 
     def on_message(self, msg: str):
         super().on_message(msg)
@@ -155,15 +156,6 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                 code = item["code"]
                 value = item["value"]
                 device.status[code] = value
-            if (
-                "dpId" in item 
-                and "value" in item 
-                and item["dpId"] in device.local_strategy
-                and "status_code_alias" in device.local_strategy[item["dpId"]]
-            ):
-                for alias in device.local_strategy[item["dpId"]]["status_code_alias"]:
-                    value = item["value"]
-                    device.status[alias] = value
 
         super()._on_device_report(device_id, [])
         
@@ -265,7 +257,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                     code = dp_property["code"]
                     if code not in device_properties.status_range and code not in device_properties.function:
                         if ( "access_mode" in device_properties.local_strategy[dp_id] 
-                            and device_properties.local_strategy[dp_id]["access_mode"] in ("rw", "wr")):
+                            and device_properties.local_strategy[dp_id]["access_mode"] in ["rw", "wr"]):
                             device_properties.function[code] = XTDeviceFunction(code=code, 
                                                                                 type=device_properties.local_strategy[dp_id]["config_item"]["valueType"],
                                                                                 values=device_properties.local_strategy[dp_id]["config_item"]["valueDesc"],
@@ -277,6 +269,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                                                                                     dp_id=dp_id)
                     if code not in device_properties.status:
                         device_properties.status[code] = dp_property.get("value",None)
+        #self.multi_manager.device_watcher.report_message(device_properties.id, f"get_open_api_device: {device}", device_properties)
         return device_properties
 
     def send_property_update(

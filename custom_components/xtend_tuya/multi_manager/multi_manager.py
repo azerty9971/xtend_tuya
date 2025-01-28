@@ -88,6 +88,7 @@ class MultiManager:  # noqa: F811
         self.pending_messages: list[tuple[str, str]] = []
         self.devices_shared: dict[str, XTDevice] = {}
         self.debug_helper = DebugHelper(self)
+        self.scene_id: list[str] = []
 
     @property
     def device_map(self):
@@ -182,7 +183,7 @@ class MultiManager:  # noqa: F811
             devices = self.__get_devices_from_device_id(device.id)
             for current_device in devices:
                 for prev_device in to_be_merged:
-                    XTMergingManager.merge_devices(prev_device, current_device)
+                    XTMergingManager.merge_devices(prev_device, current_device, self)
                 to_be_merged.append(current_device)
     
     def unload(self):
