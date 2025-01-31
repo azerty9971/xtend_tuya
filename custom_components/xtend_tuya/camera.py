@@ -17,7 +17,7 @@ from .multi_manager.multi_manager import (
     XTDevice,
 )
 
-from .const import TUYA_DISCOVERY_NEW
+from .const import TUYA_DISCOVERY_NEW, LOGGER
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaCameraEntity,
 )
@@ -28,6 +28,7 @@ from .entity import (
 # All descriptions can be found here:
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
 CAMERAS: tuple[str, ...] = (
+    "jtmspro",
 )
 
 
@@ -49,7 +50,8 @@ async def async_setup_entry(
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
                 if device.category in merged_categories:
-                    entities.append(XTCameraEntity(device, hass_data.manager))
+                    if XTCameraEntity.should_entity_be_added(device, hass_data.manager):
+                        entities.append(XTCameraEntity(device, hass_data.manager))
 
         async_add_entities(entities)
 
@@ -72,3 +74,11 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         super(XTCameraEntity, self).__init__(device, device_manager)
         self.device = device
         self.device_manager = device_manager
+    
+    @staticmethod
+    def should_entity_be_added(device: XTDevice, multi_manager: MultiManager) -> bool:
+        if multi_manager.get_device_stream_allocate(device.id, 'rtsp'):
+            LOGGER.warning(f"Device {device.name} added as camera")
+            return True
+        LOGGER.warning(f"Device {device.name} NOT added as camera")
+        return False
