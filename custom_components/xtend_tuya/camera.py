@@ -51,8 +51,8 @@ async def async_setup_entry(
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
                 if device.category in merged_categories:
-                    if XTCameraEntity.should_entity_be_added(device, hass_data.manager):
-                        entities.append(XTCameraEntity(hass, device, hass_data.manager))
+                    if XTCameraEntity.should_entity_be_added(hass, device, hass_data.manager):
+                        entities.append(XTCameraEntity(device, hass_data.manager))
 
         async_add_entities(entities)
 
