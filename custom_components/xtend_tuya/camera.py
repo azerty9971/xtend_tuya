@@ -78,7 +78,7 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
     
     @staticmethod
     async def should_entity_be_added(hass: HomeAssistant, device: XTDevice, multi_manager: MultiManager) -> bool:
-        if await multi_manager.get_device_stream_allocate(device.id, "rtsp"):
+        if await hass.async_add_executor_job(multi_manager.get_device_stream_allocate, device.id, "rtsp"):
             LOGGER.warning(f"Device {device.name} added as camera")
             return True
         LOGGER.warning(f"Device {device.name} NOT added as camera")
