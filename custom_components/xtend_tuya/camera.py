@@ -44,25 +44,22 @@ async def async_setup_entry(
         merged_categories = tuple(append_lists(merged_categories, new_descriptor))
 
     @callback
-    def async_discover_device(device_map) -> None:
+    async def async_discover_device(device_map) -> None:
         """Discover and add a discovered Tuya camera."""
         entities: list[XTCameraEntity] = []
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
                 if device.category in merged_categories:
-                    if asyncio.run_coroutine_threadsafe(
-                        XTCameraEntity.should_entity_be_added(hass, device, hass_data.manager), 
-                        hass.loop
-                    ).result():
+                    if await XTCameraEntity.should_entity_be_added(hass, device, hass_data.manager):
                         entities.append(XTCameraEntity(device, hass_data.manager))
 
         async_add_entities(entities)
 
-    async_discover_device([*hass_data.manager.device_map])
+    await async_discover_device([*hass_data.manager.device_map])
 
     entry.async_on_unload(
-        async_dispatcher_connect(hass, TUYA_DISCOVERY_NEW, async_discover_device)
+        async_dispatcher_connect(hass, TUYA_DISCOVERY_NEW, await async_discover_device)
     )
 
 
