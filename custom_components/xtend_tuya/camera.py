@@ -51,7 +51,10 @@ async def async_setup_entry(
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
                 if device.category in merged_categories:
-                    if XTCameraEntity.should_entity_be_added(hass, device, hass_data.manager):
+                    if asyncio.run_coroutine_threadsafe(
+                        XTCameraEntity.should_entity_be_added(hass, device, hass_data.manager), 
+                        hass.loop
+                    ).result():
                         entities.append(XTCameraEntity(device, hass_data.manager))
 
         async_add_entities(entities)
@@ -77,11 +80,8 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         self.device_manager = device_manager
     
     @staticmethod
-    def should_entity_be_added(hass: HomeAssistant, device: XTDevice, multi_manager: MultiManager) -> bool:
-        stream_url = asyncio.run_coroutine_threadsafe(
-            multi_manager.get_device_stream_allocate(device.id, "rtsp"), hass.loop
-        ).result()
-        if stream_url:
+    async def should_entity_be_added(hass: HomeAssistant, device: XTDevice, multi_manager: MultiManager) -> bool:
+        if await multi_manager.get_device_stream_allocate(device.id, "rtsp"):
             LOGGER.warning(f"Device {device.name} added as camera")
             return True
         LOGGER.warning(f"Device {device.name} NOT added as camera")
