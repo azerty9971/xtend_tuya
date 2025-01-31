@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
@@ -76,8 +77,11 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         self.device_manager = device_manager
     
     @staticmethod
-    def should_entity_be_added(device: XTDevice, multi_manager: MultiManager) -> bool:
-        if multi_manager.get_device_stream_allocate(device.id, 'rtsp'):
+    def should_entity_be_added(hass: HomeAssistant, device: XTDevice, multi_manager: MultiManager) -> bool:
+        stream_url = asyncio.run_coroutine_threadsafe(
+            multi_manager.get_device_stream_allocate(device.id, "rtsp"), hass.loop
+        ).result()
+        if stream_url:
             LOGGER.warning(f"Device {device.name} added as camera")
             return True
         LOGGER.warning(f"Device {device.name} NOT added as camera")
