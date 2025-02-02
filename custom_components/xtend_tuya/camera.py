@@ -18,7 +18,7 @@ from .multi_manager.multi_manager import (
     XTDevice,
 )
 
-from .const import TUYA_DISCOVERY_NEW, LOGGER
+from .const import TUYA_DISCOVERY_NEW, LOGGER, DPCode
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaCameraEntity,
 )
@@ -44,14 +44,14 @@ async def async_setup_entry(
         merged_categories = tuple(append_lists(merged_categories, new_descriptor))
 
     @callback
-    async def async_discover_device(device_map) -> None:
+    def async_discover_device(device_map) -> None:
         """Discover and add a discovered Tuya camera."""
         entities: list[XTCameraEntity] = []
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
                 if device.category in merged_categories:
-                    if await XTCameraEntity.should_entity_be_added(hass, device, hass_data.manager):
+                    if XTCameraEntity.should_entity_be_added(hass, device, hass_data.manager):
                         entities.append(XTCameraEntity(device, hass_data.manager))
 
         async_add_entities(entities)
@@ -77,9 +77,9 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         self.device_manager = device_manager
     
     @staticmethod
-    async def should_entity_be_added(hass: HomeAssistant, device: XTDevice, multi_manager: MultiManager) -> bool:
-        if await hass.async_add_executor_job(multi_manager.get_device_stream_allocate, device.id, "rtsp"):
-            LOGGER.warning(f"Device {device.name} added as camera")
-            return True
-        LOGGER.warning(f"Device {device.name} NOT added as camera")
+    def should_entity_be_added(hass: HomeAssistant, device: XTDevice, multi_manager: MultiManager) -> bool:
+        camera_status: list[DPCode] = [DPCode.RECORD_MODE, DPCode.IPC_WORK_MODE, DPCode.PHOTO_AGAIN]
+        for test_status in camera_status:
+            if test_status in device.status:
+                return True
         return False
