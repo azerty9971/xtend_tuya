@@ -5,6 +5,7 @@ from __future__ import annotations
 from tuya_sharing import CustomerDevice, Manager
 
 from homeassistant.components.number import (
+    NumberDeviceClass,
     NumberEntity,
     NumberEntityDescription,
 )
@@ -71,6 +72,14 @@ COUNTDOWNS: tuple[NumberEntityDescription, ...] = (
 # default instructions set of each category end up being a number.
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
 NUMBERS: dict[str, tuple[NumberEntityDescription, ...]] = {
+    "bh": (
+        NumberEntityDescription(
+            key=DPCode.TEMP_SET_1,
+            translation_key="warm_temperature",
+            device_class=NumberDeviceClass.TEMPERATURE,
+            entity_category=EntityCategory.CONFIG,
+        ),
+    ),
     "dbl": (
         NumberEntityDescription(
             key=DPCode.VOLUME_SET,

@@ -408,6 +408,9 @@
       "time": {
         "name": "Time"
       },
+      "warm_temperature": {
+        "name": "Warm temperature"
+      },
       "temperature_after_boiling": {
         "name": "Temperature after boiling"
       },
