@@ -5,8 +5,6 @@ from __future__ import annotations
 
 from homeassistant.components.number import (
     NumberDeviceClass,
-    NumberEntity,
-    NumberEntityDescription,
 )
 from homeassistant.const import EntityCategory, Platform
 from homeassistant.core import HomeAssistant, callback
