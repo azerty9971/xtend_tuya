@@ -3,6 +3,11 @@
 from __future__ import annotations
 
 
+from homeassistant.components.number import (
+    NumberDeviceClass,
+    NumberEntity,
+    NumberEntityDescription,
+)
 from homeassistant.const import EntityCategory, Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
@@ -90,6 +95,14 @@ TIMER_SENSORS: tuple[XTNumberEntityDescription, ...] = (
 # default instructions set of each category end up being a number.
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
 NUMBERS: dict[str, tuple[XTNumberEntityDescription, ...]] = {
+    "bh": (
+        XTNumberEntityDescription(
+            key=DPCode.TEMP_SET_1,
+            translation_key="warm_temperature",
+            device_class=NumberDeviceClass.TEMPERATURE,
+            entity_category=EntityCategory.CONFIG,
+        ),
+    ),
     "dbl": (
         XTNumberEntityDescription(
             key=DPCode.VOLUME_SET,
