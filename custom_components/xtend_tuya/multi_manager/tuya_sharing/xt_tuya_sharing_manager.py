@@ -38,6 +38,9 @@ from ..shared.device import (
 from .xt_tuya_sharing_device_repository import (
     XTSharingDeviceRepository
 )
+from .xt_tuya_sharing_mq import (
+    XTSharingMQ,
+)
 
 class XTSharingDeviceManager(Manager):  # noqa: F811
     def __init__(
@@ -77,15 +80,19 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
         if self.other_device_manager:
             if self.mq and self.mq != self.other_device_manager.mq:
                 self.mq.stop()
-            for device in self.other_device_manager.device_map.values():
-                device.set_up = True
             self.other_device_manager.refresh_mq()
             return
-        for device in self.device_map.values():
-            device.set_up = True
-        super().refresh_mq()
+        if self.mq is not None:
+            self.mq.stop()
+            self.mq = None
+
+        home_ids = [home.id for home in self.user_homes]
+        device = [device for device in self.device_map.values() if
+                  hasattr(device, "id") and getattr(device, "set_up", False)]
+
+        self.mq = XTSharingMQ(self.customer_api, home_ids, device)
+        self.mq.start()
         self.mq.add_message_listener(self.forward_message_to_multi_manager)
-        self.mq.remove_message_listener(self.on_message)
 
     def set_overriden_device_manager(self, other_device_manager: Manager) -> None:
         self.other_device_manager = other_device_manager
