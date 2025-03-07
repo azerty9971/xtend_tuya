@@ -1,15 +1,11 @@
-"""Support for Tuya binary sensors."""
+"""Support for XT binary sensors."""
 
 from __future__ import annotations
 
 from dataclasses import dataclass
 
-from tuya_sharing import CustomerDevice, Manager
-
 from homeassistant.components.binary_sensor import (
     BinarySensorDeviceClass,
-    BinarySensorEntity,
-    BinarySensorEntityDescription,
 )
 from homeassistant.const import EntityCategory, Platform
 from homeassistant.core import HomeAssistant, callback
@@ -19,27 +15,33 @@ from .util import (
     merge_device_descriptors
 )
 
-from .multi_manager.multi_manager import XTConfigEntry
-from .base import TuyaEntity
-from .const import TUYA_DISCOVERY_NEW, DPCode
-
+from .multi_manager.multi_manager import (
+    XTConfigEntry,
+    MultiManager,
+    XTDevice,
+)
+from .const import TUYA_DISCOVERY_NEW, DPCode, LOGGER
+from .ha_tuya_integration.tuya_integration_imports import (
+    TuyaBinarySensorEntity,
+    TuyaBinarySensorEntityDescription,
+)
+from .entity import (
+    XTEntity,
+)
 
 @dataclass(frozen=True)
-class TuyaBinarySensorEntityDescription(BinarySensorEntityDescription):
-    """Describes a Tuya binary sensor."""
-
-    # DPCode, to use. If None, the key will be used as DPCode
-    dpcode: DPCode | None = None
-
-    # Value or values to consider binary sensor to be "on"
-    on_value: bool | float | int | str | set[bool | float | int | str] = True
+class XTBinarySensorEntityDescription(TuyaBinarySensorEntityDescription):
+    """Describes an XT binary sensor."""
 
     # This DPCode represent the online status of a device
     device_online: bool = False
 
+    """ def __init__(self, *args, **kwargs):
+        super(XTBinarySensorEntityDescription, self).__init__(*args, **kwargs) """
+
 
 # Commonly used sensors
-TAMPER_BINARY_SENSOR = TuyaBinarySensorEntityDescription(
+TAMPER_BINARY_SENSOR = XTBinarySensorEntityDescription(
     key=DPCode.TEMPER_ALARM,
     name="Tamper",
     device_class=BinarySensorDeviceClass.TAMPER,
@@ -51,9 +53,9 @@ TAMPER_BINARY_SENSOR = TuyaBinarySensorEntityDescription(
 # default status set of each category (that don't have a set instruction)
 # end up being a binary sensor.
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
-BINARY_SENSORS: dict[str, tuple[TuyaBinarySensorEntityDescription, ...]] = {
+BINARY_SENSORS: dict[str, tuple[XTBinarySensorEntityDescription, ...]] = {
     "jtmspro": (
-        TuyaBinarySensorEntityDescription(
+        XTBinarySensorEntityDescription(
             key=DPCode.LOCK_MOTOR_STATE,
             translation_key="lock_motor_state",
             device_class=BinarySensorDeviceClass.LOCK,
@@ -61,7 +63,7 @@ BINARY_SENSORS: dict[str, tuple[TuyaBinarySensorEntityDescription, ...]] = {
         ),
     ),
     "kg": (
-        TuyaBinarySensorEntityDescription(
+        XTBinarySensorEntityDescription(
             key=DPCode.PRESENCE_STATE,
             device_class=BinarySensorDeviceClass.MOTION,
             on_value="presence",
@@ -71,38 +73,48 @@ BINARY_SENSORS: dict[str, tuple[TuyaBinarySensorEntityDescription, ...]] = {
         #If 1 is reported, it will be counted once. 
         #If 0 is reported, it will not be counted
         #(today and the average number of toilet visits will be counted on the APP)
-        TuyaBinarySensorEntityDescription(
+        XTBinarySensorEntityDescription(
             key=DPCode.CLEANING_NUM,
             translation_key="cleaning_num",
         ),
-        TuyaBinarySensorEntityDescription(
+        XTBinarySensorEntityDescription(
             key=DPCode.TRASH_STATUS,
             translation_key="trash_status",
             entity_registry_enabled_default=True,
             on_value="1",
         ),
-        TuyaBinarySensorEntityDescription(
+        XTBinarySensorEntityDescription(
             key=DPCode.POWER,
             translation_key="power",
             entity_registry_enabled_default=False,
         ),
     ),
     "pir": (
-        TuyaBinarySensorEntityDescription(
+        XTBinarySensorEntityDescription(
             key=DPCode.PIR2,
             device_class=BinarySensorDeviceClass.MOTION,
         ),
     ),
+    #"qccdz": (
+    #    XTBinarySensorEntityDescription(
+    #        key=DPCode.ONLINE_STATE,
+    #        translation_key="online",
+    #        device_class=BinarySensorDeviceClass.CONNECTIVITY,
+    #        entity_registry_visible_default=False,
+    #        device_online=True,
+    #        on_value="online",
+    #    ),
+    #),
     "smd": (
-        TuyaBinarySensorEntityDescription(
+        XTBinarySensorEntityDescription(
             key=DPCode.OFF_BED,
             translation_key="off_bed",
         ),
-        TuyaBinarySensorEntityDescription(
+        XTBinarySensorEntityDescription(
             key=DPCode.WAKEUP,
             translation_key="wakeup",
         ),
-        TuyaBinarySensorEntityDescription(
+        XTBinarySensorEntityDescription(
             key=DPCode.OFF,
             translation_key="off",
         ),
@@ -123,7 +135,7 @@ async def async_setup_entry(
     @callback
     def async_discover_device(device_map) -> None:
         """Discover and add a discovered Tuya binary sensor."""
-        entities: list[TuyaBinarySensorEntity] = []
+        entities: list[XTBinarySensorEntity] = []
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id, None):
@@ -132,8 +144,8 @@ async def async_setup_entry(
                         dpcode = description.dpcode or description.key
                         if dpcode in device.status:
                             entities.append(
-                                TuyaBinarySensorEntity(
-                                    device, hass_data.manager, description
+                                XTBinarySensorEntity(
+                                    device, hass_data.manager, XTBinarySensorEntityDescription(**description.__dict__)
                                 )
                             )
 
@@ -148,36 +160,33 @@ async def async_setup_entry(
     )
 
 
-class TuyaBinarySensorEntity(TuyaEntity, BinarySensorEntity):
-    """Tuya Binary Sensor Entity."""
+class XTBinarySensorEntity(XTEntity, TuyaBinarySensorEntity):
+    """XT Binary Sensor Entity."""
 
-    entity_description: TuyaBinarySensorEntityDescription
+    entity_description: XTBinarySensorEntityDescription
 
     def __init__(
         self,
-        device: CustomerDevice,
-        device_manager: Manager,
-        description: TuyaBinarySensorEntityDescription,
+        device: XTDevice,
+        device_manager: MultiManager,
+        description: XTBinarySensorEntityDescription,
     ) -> None:
         """Init Tuya binary sensor."""
-        super().__init__(device, device_manager)
+        super(XTBinarySensorEntity, self).__init__(device, device_manager, description)
+        self.device = device
+        self.device_manager = device_manager
         self.entity_description = description
-        self._attr_unique_id = f"{super().unique_id}{description.key}"
 
     @property
     def is_on(self) -> bool:
-        is_on = self._is_on()
-        if hasattr(self.entity_description, "device_online") and self.entity_description.device_online:
-            self.device.online = is_on
+        is_on = super().is_on
+        if self.entity_description.device_online:
+            dpcode = self.entity_description.dpcode or self.entity_description.key
+            self.device.online_states[dpcode] = is_on
+            self.device_manager.update_device_online_status(self.device.id)
         return is_on
     
-    def _is_on(self) -> bool:
-        """Return true if sensor is on."""
-        dpcode = self.entity_description.dpcode or self.entity_description.key
-        if dpcode not in self.device.status:
-            return False
-
-        if isinstance(self.entity_description.on_value, set):
-            return self.device.status[dpcode] in self.entity_description.on_value
-
-        return self.device.status[dpcode] == self.entity_description.on_value
+    async def async_added_to_hass(self) -> None:
+        """Call when entity about to be added to hass."""
+        await super().async_added_to_hass()
+        self.is_on #Update the online status if needed

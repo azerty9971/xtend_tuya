@@ -2,31 +2,14 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable
 from dataclasses import dataclass, field
 from enum import StrEnum, IntFlag
 import logging
 
 from tuya_iot import TuyaCloudOpenAPIEndpoint
 
-from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.const import (
-    CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
-    CONCENTRATION_MILLIGRAMS_PER_CUBIC_METER,
-    CONCENTRATION_PARTS_PER_BILLION,
-    CONCENTRATION_PARTS_PER_MILLION,
-    LIGHT_LUX,
-    PERCENTAGE,
-    SIGNAL_STRENGTH_DECIBELS,
-    SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
     Platform,
-    UnitOfElectricCurrent,
-    UnitOfElectricPotential,
-    UnitOfEnergy,
-    UnitOfPower,
-    UnitOfPressure,
-    UnitOfTemperature,
-    UnitOfVolume,
 )
 
 DOMAIN = "xtend_tuya"
@@ -54,9 +37,8 @@ TUYA_CLIENT_ID = "HA_3y9q4ak7g4ephrvke"
 TUYA_SCHEMA = "haauthorize"
 
 TUYA_DISCOVERY_NEW_ORIG = "tuya_discovery_new"
-TUYA_HA_SIGNAL_UPDATE_ENTITY_ORIG = "tuya_entry_update"
+TUYA_HA_SIGNAL_UPDATE_ENTITY = "tuya_entry_update"
 TUYA_DISCOVERY_NEW = "xt_tuya_discovery_new"
-TUYA_HA_SIGNAL_UPDATE_ENTITY = "xt_tuya_entry_update"
 
 TUYA_RESPONSE_CODE = "code"
 TUYA_RESPONSE_MSG = "msg"
@@ -146,7 +128,7 @@ class DPType(StrEnum):
 
 
 class DPCode(StrEnum):
-    """Data Point Codes used by Tuya.
+    """Data Point Codes used by XT.
 
     https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
     """
@@ -160,6 +142,7 @@ class DPCode(StrEnum):
     ADD_ELE2_THIS_YEAR = "add_ele2_this_year"
     ADD_ELE2_TODAY = "add_ele2_today"
     AIR_QUALITY = "air_quality"
+    AIR_QUALITY_INDEX = "air_quality_index"
     ALARM_LOCK = "alarm_lock"
     ALARM_SWITCH = "alarm_switch"  # Alarm switch
     ALARM_TIME = "alarm_time"  # Alarm time
@@ -174,6 +157,8 @@ class DPCode(StrEnum):
     AUTO_DEORDRIZER = "auto_deordrizer"
     AUTO_LOCK_TIME = "auto_lock_time"
     AUTOMATIC_LOCK = "automatic_lock"
+    A_CURRENT = "A_Current"
+    A_VOLTAGE = "A_Voltage"
     BALANCE_ENERGY = "balance_energy"
     BASIC_ANTI_FLICKER = "basic_anti_flicker"
     BASIC_DEVICE_VOLUME = "basic_device_volume"
@@ -206,6 +191,8 @@ class DPCode(StrEnum):
     BRIGHTNESS_MIN_1 = "brightness_min_1"
     BRIGHTNESS_MIN_2 = "brightness_min_2"
     BRIGHTNESS_MIN_3 = "brightness_min_3"
+    B_CURRENT = "B_Current"
+    B_VOLTAGE = "B_Voltage"
     C_F = "c_f"  # Temperature unit switching
     CALIBRATION = "calibration"
     CAPACITY_CALIBRATION = "capacity_calibration"
@@ -218,6 +205,7 @@ class DPCode(StrEnum):
     CHARGE_CUR_SET = "charge_cur_set"
     CHARGE_ENERGY = "charge_energy"
     CHARGE_ENERGY_ONCE = "charge_energy_once"
+    CHARGINGOPERATION = "ChargingOperation"
     CHILD_LOCK = "child_lock"  # Child lock
     CISTERN = "cistern"
     CLEAN = "clean"
@@ -241,6 +229,7 @@ class DPCode(StrEnum):
     CO2_STATE = "co2_state"
     CO2_VALUE = "co2_value"  # CO2 concentration
     COLLECTION_MODE = "collection_mode"
+    COLOR = "Color"
     COLOR_DATA_V2 = "color_data_v2"
     COLOUR_DATA = "colour_data"  # Colored light mode
     COLOUR_DATA_HSV = "colour_data_hsv"  # Colored light mode
@@ -266,11 +255,16 @@ class DPCode(StrEnum):
     COUNTDOWN_LEFT = "countdown_left"
     COUNTDOWN_SET = "countdown_set"  # Countdown setting
     CRY_DETECTION_SWITCH = "cry_detection_switch"
+    CTIME = "Ctime"
+    CTIME2 = "CTime2"
     CUP_NUMBER = "cup_number"  # NUmber of cups
     CURRENT_YD = "current_yd"
     CUR_CURRENT = "cur_current"  # Actual current
+    CUR_NEUTRAL = "cur_neutral"  # Total reverse energy
     CUR_POWER = "cur_power"  # Actual power
     CUR_VOLTAGE = "cur_voltage"  # Actual voltage
+    C_CURRENT = "C_Current"
+    C_VOLTAGE = "C_Voltage"
     DECIBEL_SENSITIVITY = "decibel_sensitivity"
     DECIBEL_SWITCH = "decibel_switch"
     DEHUMIDITY_SET_ENUM = "dehumidify_set_enum"
@@ -281,6 +275,12 @@ class DPCode(StrEnum):
     DEO_START_TIME = "deo_start_time"
     DEO_END_TIME = "deo_end_time"
     DETECTION_SENSITIVITY = "detection_sensitivity"
+    DEVICEKW = "DeviceKw"
+    DEVICEKWH = "DeviceKwh"
+    DEVICEMAXSETA = "DeviceMaxSetA"
+    DEVICESTATE = "DeviceState"
+    DEVICETEMP = "DeviceTemp"
+    DEVICETEMP2 = "DeviceTemp2"
     DEVICE_MODE = "device_mode"
     DISINFECTION = "disinfection"
     DO_NOT_DISTURB = "do_not_disturb"
@@ -329,6 +329,7 @@ class DPCode(StrEnum):
     HUMIDITY_INDOOR = "humidity_indoor"  # Indoor humidity
     HUMIDITY_SET = "humidity_set"  # Humidity setting
     HUMIDITY_VALUE = "humidity_value"  # Humidity
+    IDVERIFICATIONSET = "IDVerificationSet"
     ILLUMINANCE_VALUE = "illuminance_value"
     INDICATOR_LIGHT = "indicator_light"
     INDUCTION_CLEAN = "Induction_Clean"
@@ -363,6 +364,7 @@ class DPCode(StrEnum):
     MINI_SET = "mini_set"
     MONITORING = "monitoring"
     MODE = "mode"  # Working mode / Mode
+    MODE2 = "Mode"
     MOODLIGHTING = "moodlighting"  # Mood light
     MOTION_RECORD = "motion_record"
     MOTION_SENSITIVITY = "motion_sensitivity"
@@ -395,6 +397,7 @@ class DPCode(StrEnum):
     PERCENT_STATE = "percent_state"
     PERCENT_STATE_2 = "percent_state_2"
     PERCENT_STATE_3 = "percent_state_3"
+    PHASEFLAG = "PhaseFlag"
     PHASE_A = "phase_a"
     PHASE_B = "phase_b"
     PHASE_C = "phase_c"
@@ -423,6 +426,7 @@ class DPCode(StrEnum):
     PRESENCE_STATE = "presence_state"
     PRESSURE_STATE = "pressure_state"
     PRESSURE_VALUE = "pressure_value"
+    PUMP = "pump"
     PUMP_RESET = "pump_reset"  # Water pump reset
     QUIET_TIMING_ON = "quiet_timing_on"
     QUIET_TIME_END = "quiet_time_end"
@@ -444,6 +448,7 @@ class DPCode(StrEnum):
     RESIDUAL_ELECTRICITY = "residual_electricity"
     RESPIRATORY_RATE = "respiratory_rate"
     REVERSE_ENERGY_TOTAL = "reverse_energy_total"
+    RFID = "RFID"
     ROLL_BRUSH = "roll_brush"
     RTC_TIME = "rtc_time"
     SAND_SURFACE_CALIBRATION = "sand_surface_calibration"
@@ -451,7 +456,13 @@ class DPCode(StrEnum):
     SENSITIVITY = "sensitivity"  # Sensitivity
     SENSOR_HUMIDITY = "sensor_humidity"
     SENSOR_TEMPERATURE = "sensor_temperature"
+    SETDELAYTIME = "SetDelayTime"
+    SETDEFINETIME = "SetDefineTime"
     SETTIME = "SetTime"
+    SET16A = "Set16A"
+    SET32A = "Set32A"
+    SET40A = "Set40A"
+    SET50A = "Set50A"
     SHAKE = "shake"  # Oscillating
     SHOCK_STATE = "shock_state"  # Vibration status
     SIGLE_PHASE_POWER = "sigle_phase_power"
@@ -515,6 +526,7 @@ class DPCode(StrEnum):
     SWITCH_VERTICAL = "switch_vertical"  # Vertical swing flap switch
     SWITCH_VOICE = "switch_voice"  # Voice switch
     SYSTEM_VERSION = "system_version"
+    TARGET_DIS_CLOSEST = "target_dis_closest"  # Closest target distance
     TEMP = "temp"  # Temperature setting
     TEMPCHANGER = "TempChanger"
     TEMPERATURE = "temperature"
@@ -549,6 +561,7 @@ class DPCode(StrEnum):
     TOTAL_FORWARD_ENERGY = "total_forward_energy"
     TOTAL_TIME = "total_time"
     TOTAL_PM = "total_pm"
+    TOTAL_POWER = "total_power"
     TRASH_STATUS = "trash_status"
     TVOC = "tvoc"
     UNIT = "unit"
@@ -589,207 +602,6 @@ class DPCode(StrEnum):
     WORK_STAT = "work_stat"
     WORK_STATE = "work_state"
     WORK_STATUS = "WorkStatus"
-
-
-@dataclass
-class UnitOfMeasurement:
-    """Describes a unit of measurement."""
-
-    unit: str
-    device_classes: set[str]
-
-    aliases: set[str] = field(default_factory=set)
-    conversion_unit: str | None = None
-    conversion_fn: Callable[[float], float] | None = None
-
-
-# A tuple of available units of measurements we can work with.
-# Tuya's devices aren't consistent in UOM use, thus this provides
-# a list of aliases for units and possible conversions we can do
-# to make them compatible with our model.
-UNITS = (
-    UnitOfMeasurement(
-        unit="",
-        aliases={" "},
-        device_classes={
-            SensorDeviceClass.AQI,
-            SensorDeviceClass.DATE,
-            SensorDeviceClass.MONETARY,
-            SensorDeviceClass.TIMESTAMP,
-        },
-    ),
-    UnitOfMeasurement(
-        unit=PERCENTAGE,
-        aliases={"pct", "percent", "% RH"},
-        device_classes={
-            SensorDeviceClass.BATTERY,
-            SensorDeviceClass.HUMIDITY,
-            SensorDeviceClass.POWER_FACTOR,
-        },
-    ),
-    UnitOfMeasurement(
-        unit=CONCENTRATION_PARTS_PER_MILLION,
-        device_classes={
-            SensorDeviceClass.CO,
-            SensorDeviceClass.CO2,
-        },
-    ),
-    UnitOfMeasurement(
-        unit=CONCENTRATION_PARTS_PER_BILLION,
-        device_classes={
-            SensorDeviceClass.CO,
-            SensorDeviceClass.CO2,
-        },
-        conversion_unit=CONCENTRATION_PARTS_PER_MILLION,
-        conversion_fn=lambda x: x / 1000,
-    ),
-    UnitOfMeasurement(
-        unit=UnitOfElectricCurrent.AMPERE,
-        aliases={"a", "ampere"},
-        device_classes={SensorDeviceClass.CURRENT},
-    ),
-    UnitOfMeasurement(
-        unit=UnitOfElectricCurrent.MILLIAMPERE,
-        aliases={"ma", "milliampere"},
-        device_classes={SensorDeviceClass.CURRENT},
-        conversion_unit=UnitOfElectricCurrent.AMPERE,
-        conversion_fn=lambda x: x / 1000,
-    ),
-    UnitOfMeasurement(
-        unit=UnitOfEnergy.WATT_HOUR,
-        aliases={"wh", "watthour"},
-        device_classes={SensorDeviceClass.ENERGY},
-    ),
-    UnitOfMeasurement(
-        unit=UnitOfEnergy.KILO_WATT_HOUR,
-        aliases={"kwh", "kilowatt-hour", "kW·h"},
-        device_classes={SensorDeviceClass.ENERGY},
-    ),
-    UnitOfMeasurement(
-        unit=UnitOfVolume.CUBIC_FEET,
-        aliases={"ft3"},
-        device_classes={SensorDeviceClass.GAS},
-    ),
-    UnitOfMeasurement(
-        unit=UnitOfVolume.CUBIC_METERS,
-        aliases={"m3"},
-        device_classes={SensorDeviceClass.GAS},
-    ),
-    UnitOfMeasurement(
-        unit=LIGHT_LUX,
-        aliases={"lux"},
-        device_classes={SensorDeviceClass.ILLUMINANCE},
-    ),
-    UnitOfMeasurement(
-        unit=CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
-        aliases={"ug/m3", "µg/m3", "ug/m³"},
-        device_classes={
-            SensorDeviceClass.NITROGEN_DIOXIDE,
-            SensorDeviceClass.NITROGEN_MONOXIDE,
-            SensorDeviceClass.NITROUS_OXIDE,
-            SensorDeviceClass.OZONE,
-            SensorDeviceClass.PM1,
-            SensorDeviceClass.PM25,
-            SensorDeviceClass.PM10,
-            SensorDeviceClass.SULPHUR_DIOXIDE,
-            SensorDeviceClass.VOLATILE_ORGANIC_COMPOUNDS,
-        },
-    ),
-    UnitOfMeasurement(
-        unit=CONCENTRATION_MILLIGRAMS_PER_CUBIC_METER,
-        aliases={"mg/m3"},
-        device_classes={
-            SensorDeviceClass.NITROGEN_DIOXIDE,
-            SensorDeviceClass.NITROGEN_MONOXIDE,
-            SensorDeviceClass.NITROUS_OXIDE,
-            SensorDeviceClass.OZONE,
-            SensorDeviceClass.PM1,
-            SensorDeviceClass.PM25,
-            SensorDeviceClass.PM10,
-            SensorDeviceClass.SULPHUR_DIOXIDE,
-            SensorDeviceClass.VOLATILE_ORGANIC_COMPOUNDS,
-        },
-        conversion_unit=CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
-        conversion_fn=lambda x: x * 1000,
-    ),
-    UnitOfMeasurement(
-        unit=UnitOfPower.WATT,
-        aliases={"watt"},
-        device_classes={SensorDeviceClass.POWER},
-    ),
-    UnitOfMeasurement(
-        unit=UnitOfPower.KILO_WATT,
-        aliases={"kilowatt"},
-        device_classes={SensorDeviceClass.POWER},
-    ),
-    UnitOfMeasurement(
-        unit=UnitOfPressure.BAR,
-        device_classes={SensorDeviceClass.PRESSURE},
-    ),
-    UnitOfMeasurement(
-        unit=UnitOfPressure.MBAR,
-        aliases={"millibar"},
-        device_classes={SensorDeviceClass.PRESSURE},
-    ),
-    UnitOfMeasurement(
-        unit=UnitOfPressure.HPA,
-        aliases={"hpa", "hectopascal"},
-        device_classes={SensorDeviceClass.PRESSURE},
-    ),
-    UnitOfMeasurement(
-        unit=UnitOfPressure.INHG,
-        aliases={"inhg"},
-        device_classes={SensorDeviceClass.PRESSURE},
-    ),
-    UnitOfMeasurement(
-        unit=UnitOfPressure.PSI,
-        device_classes={SensorDeviceClass.PRESSURE},
-    ),
-    UnitOfMeasurement(
-        unit=UnitOfPressure.PA,
-        device_classes={SensorDeviceClass.PRESSURE},
-    ),
-    UnitOfMeasurement(
-        unit=SIGNAL_STRENGTH_DECIBELS,
-        aliases={"db"},
-        device_classes={SensorDeviceClass.SIGNAL_STRENGTH},
-    ),
-    UnitOfMeasurement(
-        unit=SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
-        aliases={"dbm"},
-        device_classes={SensorDeviceClass.SIGNAL_STRENGTH},
-    ),
-    UnitOfMeasurement(
-        unit=UnitOfTemperature.CELSIUS,
-        aliases={"°c", "c", "celsius", "℃"},
-        device_classes={SensorDeviceClass.TEMPERATURE},
-    ),
-    UnitOfMeasurement(
-        unit=UnitOfTemperature.FAHRENHEIT,
-        aliases={"°f", "f", "fahrenheit"},
-        device_classes={SensorDeviceClass.TEMPERATURE},
-    ),
-    UnitOfMeasurement(
-        unit=UnitOfElectricPotential.VOLT,
-        aliases={"volt"},
-        device_classes={SensorDeviceClass.VOLTAGE},
-    ),
-    UnitOfMeasurement(
-        unit=UnitOfElectricPotential.MILLIVOLT,
-        aliases={"mv", "millivolt"},
-        device_classes={SensorDeviceClass.VOLTAGE},
-        conversion_unit=UnitOfElectricPotential.VOLT,
-        conversion_fn=lambda x: x / 1000,
-    ),
-)
-
-
-DEVICE_CLASS_UNITS: dict[str, dict[str, UnitOfMeasurement]] = {}
-for uom in UNITS:
-    for device_class in uom.device_classes:
-        DEVICE_CLASS_UNITS.setdefault(device_class, {})[uom.unit] = uom
-        for unit_alias in uom.aliases:
-            DEVICE_CLASS_UNITS[device_class][unit_alias] = uom
 
 @dataclass
 class Country:

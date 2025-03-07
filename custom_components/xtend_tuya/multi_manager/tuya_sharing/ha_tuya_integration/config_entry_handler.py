@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from homeassistant.core import HomeAssistant
-from ...ha_tuya_integration.tuya_integration_imports import (
+from ....ha_tuya_integration.tuya_integration_imports import (
     tuya_integration,
 )
 
@@ -40,13 +40,11 @@ class XTHATuyaIntegrationConfigEntryManager:
             runtime_data.device_manager.add_device_listener(runtime_data.device_listener)
         else:
             if self.config_entry.title == entry.title:
-                self.manager.reuse_config = False
                 self.manager.set_overriden_device_manager(None)
                 self.manager.mq = None
 
     async def on_tuya_remove_entry(self, before_call: bool, hass: HomeAssistant, entry: tuya_integration.TuyaConfigEntry):
-        if not before_call and self.manager.sharing_account and self.config_entry.title == entry.title:
-            self.manager.reuse_config = False
+        if not before_call and self.config_entry.title == entry.title:
             self.manager.set_overriden_device_manager(None)
             self.manager.mq = None
             self.manager.refresh_mq()

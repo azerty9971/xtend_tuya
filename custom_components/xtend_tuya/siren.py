@@ -2,15 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Any
-
-from tuya_sharing import CustomerDevice, Manager
-
-from homeassistant.components.siren import (
-    SirenEntity,
-    SirenEntityDescription,
-    SirenEntityFeature,
-)
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
@@ -20,13 +11,26 @@ from .util import (
     merge_device_descriptors
 )
 
-from .multi_manager.multi_manager import XTConfigEntry
-from .base import TuyaEntity
+from .multi_manager.multi_manager import (
+    XTConfigEntry,
+    MultiManager,
+    XTDevice,
+)
 from .const import TUYA_DISCOVERY_NEW
+from .entity import (
+    XTEntity,
+)
+from .ha_tuya_integration.tuya_integration_imports import (
+    TuyaSirenEntity,
+    TuyaSirenEntityDescription,
+)
+
+class XTSirenEntityDescription(TuyaSirenEntityDescription, frozen_or_thawed=True):
+    pass
 
 # All descriptions can be found here:
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
-SIRENS: dict[str, tuple[SirenEntityDescription, ...]] = {
+SIRENS: dict[str, tuple[XTSirenEntityDescription, ...]] = {
 }
 
 
@@ -49,7 +53,7 @@ async def async_setup_entry(
             if device := hass_data.manager.device_map.get(device_id):
                 if descriptions := merged_descriptors.get(device.category):
                     entities.extend(
-                        TuyaSirenEntity(device, hass_data.manager, description)
+                        TuyaSirenEntity(device, hass_data.manager, XTSirenEntityDescription(**description.__dict__))
                         for description in descriptions
                         if description.key in device.status
                     )
@@ -63,32 +67,17 @@ async def async_setup_entry(
     )
 
 
-class TuyaSirenEntity(TuyaEntity, SirenEntity):
-    """Tuya Siren Entity."""
-
-    _attr_supported_features = SirenEntityFeature.TURN_ON | SirenEntityFeature.TURN_OFF
-    _attr_name = None
+class XTSirenEntity(XTEntity, TuyaSirenEntity):
+    """XT Siren Entity."""
 
     def __init__(
         self,
-        device: CustomerDevice,
-        device_manager: Manager,
-        description: SirenEntityDescription,
+        device: XTDevice,
+        device_manager: MultiManager,
+        description: XTSirenEntityDescription,
     ) -> None:
-        """Init Tuya Siren."""
-        super().__init__(device, device_manager)
+        """Init XT Siren."""
+        super(XTSirenEntity, self).__init__(device, device_manager, description)
+        self.device = device
+        self.device_manager = device_manager
         self.entity_description = description
-        self._attr_unique_id = f"{super().unique_id}{description.key}"
-
-    @property
-    def is_on(self) -> bool:
-        """Return true if siren is on."""
-        return self.device.status.get(self.entity_description.key, False)
-
-    def turn_on(self, **kwargs: Any) -> None:
-        """Turn the siren on."""
-        self._send_command([{"code": self.entity_description.key, "value": True}])
-
-    def turn_off(self, **kwargs: Any) -> None:
-        """Turn the siren off."""
-        self._send_command([{"code": self.entity_description.key, "value": False}])

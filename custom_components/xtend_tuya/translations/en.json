@@ -251,6 +251,23 @@
         "name": "Snooze"
       }
     },
+    "climate": {
+      "mode": {
+        "name": "Mode",
+        "state": {
+          "auto": "Automatic",
+          "cold": "Cold",
+          "freeze": "Freeze",
+          "heat": "Heat",
+          "hot": "Hot",
+          "manual": "Manual",
+          "wet": "Wet",
+          "wind": "Wind",
+          "on": "On",
+          "off": "Off"
+        }
+      }
+    },
     "cover": {
       "blind": {
         "name": "Blind"
@@ -297,6 +314,24 @@
       }
     },
     "number": {
+      "set_delay_time": {
+        "name": "Set delay time"
+      },
+      "set_define_time": {
+        "name": "Set define time"
+      },
+      "set_16a": {
+        "name": "Set 16A"
+      },
+      "set_32a": {
+        "name": "Set 32A"
+      },
+      "set_40a": {
+        "name": "Set 40A"
+      },
+      "set_50a": {
+        "name": "Set 50A"
+      },
       "standby_time": {
         "name": "Standby time"
       },
@@ -500,6 +535,40 @@
       }
     },
     "select": {
+      "dj_color": {
+        "name": "Color",
+        "state": {
+          "r": "Red",
+          "rg": "Yellow",
+          "g": "Green",
+          "gb": "Light blue",
+          "b": "Blue",
+          "rb": "Pink",
+          "rgb": "White",
+          "color": "Random color"
+        }
+      },
+      "dj_mode": {
+        "name": "Mode",
+        "state": {
+          "bright": "Bright",
+          "gradually": "Gradually",
+          "star": "Star",
+          "flower": "Flower",
+          "marquee": "Marquee",
+          "fireworks": "Fireworks",
+          "meteor": "Meteor",
+          "stream": "Stream"
+        }
+      },
+      "qccdz_chargingoperation": {
+        "name": "Charging operation",
+        "state": {
+          "opencharging": "Open charging",
+          "closecharging": "Close charging",
+          "waitoperation": "Wait charging"
+        }
+      },
       "xfj_mode": {
         "name": "Mode",
         "state": {
@@ -953,6 +1022,72 @@
       }
     },
     "sensor": {
+      "ctime": {
+        "name": "Timer"
+      },
+      "ctime2": {
+        "name": "Timer 2"
+      },
+      "device_max_set_a": {
+        "name": "Device Max A",
+        "state": {
+          "max16a": "Max 16A",
+          "max32a": "Max 32A",
+          "max40a": "Max 40A",
+          "max50a": "Max 50A"
+        }
+      },
+      "a_current": {
+        "name": "Current A"
+      },
+      "a_voltage": {
+        "name": "Voltage A"
+      },
+      "b_current": {
+        "name": "Current B"
+      },
+      "b_voltage": {
+        "name": "Voltage B"
+      },
+      "c_current": {
+        "name": "Current C"
+      },
+      "c_voltage": {
+        "name": "Voltage C"
+      },
+      "phaseflag": {
+        "name": "Phase",
+        "state": {
+          "single_phase": "Single phase",
+          "three_phase": "Three phases",
+          "no_phase": "No phase",
+          "phase_err": "Phase error"
+        }
+      },
+      "device_power": {
+        "name": "Device power"
+      },
+      "device_consumption": {
+        "name": "Device consumption"
+      },
+      "device_temperature": {
+        "name": "Device temperature"
+      },
+      "device_temperature2": {
+        "name": "Device temperature 2"
+      },
+      "qccdz_devicestate": {
+        "name": "Device state",
+        "state": {
+          "no_connet": "Not connected",
+          "connect": "Connected",
+          "charing": "Charging",
+          "wait_rfid": "Waiting for RFID",
+          "finish": "Finished",
+          "wait_charing": "Charge waiting",
+          "error": "Error"
+        }
+      },
       "temp_top": {
         "name": "Max temperature"
       },
@@ -1530,6 +1665,12 @@
       }
     },
     "switch": {
+      "id_verification_set":{
+        "name": "Set ID verification"
+      },
+      "rfid":{
+        "name": "RFID"
+      },
       "uv_light":{
         "name": "UV light"
       },
