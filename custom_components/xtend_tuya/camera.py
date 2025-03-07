@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
@@ -17,7 +18,7 @@ from .multi_manager.multi_manager import (
     XTDevice,
 )
 
-from .const import TUYA_DISCOVERY_NEW
+from .const import TUYA_DISCOVERY_NEW, LOGGER, DPCode
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaCameraEntity,
 )
@@ -28,6 +29,7 @@ from .entity import (
 # All descriptions can be found here:
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
 CAMERAS: tuple[str, ...] = (
+    "jtmspro",
 )
 
 
@@ -49,7 +51,8 @@ async def async_setup_entry(
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
                 if device.category in merged_categories:
-                    entities.append(XTCameraEntity(device, hass_data.manager))
+                    if XTCameraEntity.should_entity_be_added(hass, device, hass_data.manager):
+                        entities.append(XTCameraEntity(device, hass_data.manager))
 
         async_add_entities(entities)
 
@@ -72,3 +75,11 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         super(XTCameraEntity, self).__init__(device, device_manager)
         self.device = device
         self.device_manager = device_manager
+    
+    @staticmethod
+    def should_entity_be_added(hass: HomeAssistant, device: XTDevice, multi_manager: MultiManager) -> bool:
+        camera_status: list[DPCode] = [DPCode.RECORD_MODE, DPCode.IPC_WORK_MODE, DPCode.PHOTO_AGAIN]
+        for test_status in camera_status:
+            if test_status in device.status:
+                return True
+        return False
