@@ -58,7 +58,16 @@
             },
             "time": {
                 "name": "Czas"
-            }
+            },
+            "warm_temperature": {
+                "name": "Utrzymywana temperatura"
+              },
+              "temperature_after_boiling": {
+                "name": "Temperatura po zagotowaniu"
+              },
+              "heat_preservation_time": {
+                "name": "Czas podtrzymania ciep\u0142a"
+              }
         },
         "select": {
             "basic_anti_flicker": {
