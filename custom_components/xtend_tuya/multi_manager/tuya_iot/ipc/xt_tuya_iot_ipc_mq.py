@@ -3,7 +3,18 @@ from __future__ import annotations
 from typing import Optional, Any
 import uuid
 import json
-from paho.mqtt import client as mqtt
+from paho.mqtt import (
+    client as mqtt,
+)
+from paho.mqtt.enums import (
+    CallbackAPIVersion as mqtt_CallbackAPIVersion,
+)
+from paho.mqtt.reasoncodes import (
+    ReasonCode as mqtt_ReasonCode,
+)
+from paho.mqtt.properties import (
+    Properties as mqtt_Properties,
+)
 from urllib.parse import urlsplit
 
 from tuya_iot.openmq import (
@@ -18,34 +29,22 @@ from tuya_iot import (
 )
 
 from ..xt_tuya_iot_mq import (
-    XTIOTOpenMQ
+    XTIOTOpenMQ,
+    XTIOTTuyaMQConfig,
 )
 
-from ....util import (
-    log_stack,
-)
 from ....const import (
     LOGGER  # noqa: F401
 )
 
-class XTIOTIPCTuyaMQConfig(TuyaMQConfig):
-    def __init__(self, mqConfigResponse: dict[str, Any] = {}) -> None:
-        """Init TuyaMQConfig."""
-        self.url: str = None
-        self.client_id: str = None
-        self.username: str = None
-        self.password: str = None
-        self.source_topic: dict = None
-        self.sink_topic: dict = None
-        self.expire_time: int = 0
-        super().__init__(mqConfigResponse)
+
 
 class XTIOTOpenMQIPC(XTIOTOpenMQ):
     def __init__(self, api: TuyaOpenAPI) -> None:
-        self.mq_config: XTIOTIPCTuyaMQConfig = None
+        self.mq_config: XTIOTTuyaMQConfig = None
         super().__init__(api)
     
-    def _get_mqtt_config(self) -> Optional[XTIOTIPCTuyaMQConfig]:
+    def _get_mqtt_config(self) -> Optional[XTIOTTuyaMQConfig]:
         if not self.api.is_connect():
             return None
         response = self.api.post(
@@ -64,12 +63,12 @@ class XTIOTOpenMQIPC(XTIOTOpenMQ):
         )
 
         if response.get("success", False) is False:
-            log_stack(f"_get_mqtt_config failed: {response}")
+            LOGGER.warning(f"_get_mqtt_config failed: {response}", stack_info=True)
             return None
 
-        return XTIOTIPCTuyaMQConfig(response)
+        return XTIOTTuyaMQConfig(response)
     
-    def _on_connect(self, mqttc: mqtt.Client, user_data: Any, flags, rc):
+    def _on_connect(self, mqttc: mqtt.Client, user_data: Any, flags, rc: mqtt_ReasonCode, properties: mqtt_Properties | None = None):
         if rc == 0:
             for (key, value) in self.mq_config.source_topic.items():
                 mqttc.subscribe(value)
@@ -82,16 +81,16 @@ class XTIOTOpenMQIPC(XTIOTOpenMQ):
         for listener in self.message_listeners:
             listener(msg_dict)
     
-    def _on_subscribe(self, mqttc: mqtt.Client, user_data: Any, mid, granted_qos):
+    def _on_subscribe(self, mqttc: mqtt.Client, user_data: Any, mid: int, reason_codes: list[mqtt_ReasonCode] = [], properties: mqtt_Properties | None = None):
         #LOGGER.debug(f"_on_subscribe: {mid}")
         pass
     
-    def _on_publish(self, mqttc: mqtt.Client, user_data: Any, mid):
+    def _on_publish(self, mqttc: mqtt.Client, user_data: Any, mid: int, reason_code: mqtt_ReasonCode = None, properties: mqtt_Properties = None):
         #LOGGER.debug(f"_on_publish: {mid} <=> {user_data}")
         pass
 
     def _start(self, mq_config: TuyaMQConfig) -> mqtt.Client:
-        mqttc = mqtt.Client(mq_config.client_id)
+        mqttc = mqtt.Client(callback_api_version=mqtt_CallbackAPIVersion.VERSION2, client_id=mq_config.client_id)
         mqttc.username_pw_set(mq_config.username, mq_config.password)
         mqttc.user_data_set({"mqConfig": mq_config})
         mqttc.on_connect = self._on_connect

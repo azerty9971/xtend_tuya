@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any
 from homeassistant.const import Platform
 
-from ...ha_tuya_integration.tuya_integration_imports import (
+from ....ha_tuya_integration.tuya_integration_imports import (
     ALARM_TUYA,
     BINARY_SENSORS_TUYA,
     BUTTONS_TUYA,
@@ -29,7 +29,7 @@ def get_tuya_platform_descriptors(platform: Platform) -> Any:
         case Platform.BUTTON:
             return BUTTONS_TUYA
         case Platform.CAMERA:
-            return CAMERAS_TUYA
+            return list(CAMERAS_TUYA)
         case Platform.CLIMATE:
             return CLIMATE_DESCRIPTIONS_TUYA
         case Platform.COVER:

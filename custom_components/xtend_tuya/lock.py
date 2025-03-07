@@ -20,28 +20,31 @@ from .const import (
 from .util import (
     append_dictionnaries,
 )
-from .base import TuyaEntity
-from .multi_manager.shared.device import (
+from .multi_manager.multi_manager import (
+    XTConfigEntry,
+    MultiManager,
     XTDevice,
 )
-from .multi_manager.multi_manager import (
-    MultiManager,
-    XTConfigEntry,
+from .ha_tuya_integration.tuya_integration_imports import (
+    TuyaEntity,
+)
+from .entity import (
+    XTEntity,
 )
 
 @dataclass(frozen=True)
-class TuyaLockEntityDescription(LockEntityDescription):
+class XTLockEntityDescription(LockEntityDescription):
     """Describes a Tuya lock."""
     unlock_status_list: list[DPCode] = field(default_factory=list)
     temporary_unlock: bool = False
 
-LOCKS: dict[str, TuyaLockEntityDescription] = {
-    "mk": TuyaLockEntityDescription(
+LOCKS: dict[str, XTLockEntityDescription] = {
+    "mk": XTLockEntityDescription(
             key=None,
             translation_key="operate_lock",
             temporary_unlock = True,
         ),
-    "jtmspro": TuyaLockEntityDescription(
+    "jtmspro": XTLockEntityDescription(
             key=None,
             translation_key="operate_lock",
             unlock_status_list=[DPCode.LOCK_MOTOR_STATE]
@@ -61,12 +64,12 @@ async def async_setup_entry(
     @callback
     def async_discover_device(device_map) -> None:
         """Discover and add a discovered Tuya binary sensor."""
-        entities: list[TuyaLockEntity] = []
+        entities: list[XTLockEntity] = []
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
                 if device.category in merged_descriptors:
-                    entities.append(TuyaLockEntity(
+                    entities.append(XTLockEntity(
                                     device, hass_data.manager, merged_descriptors[device.category]
                                 ))
         async_add_entities(entities)
@@ -78,16 +81,16 @@ async def async_setup_entry(
         async_dispatcher_connect(hass, TUYA_DISCOVERY_NEW, async_discover_device)
     )
 
-class TuyaLockEntity(TuyaEntity, LockEntity):
+class XTLockEntity(XTEntity, LockEntity):
     """Tuya Lock Sensor Entity."""
 
-    entity_description: TuyaLockEntityDescription
+    entity_description: XTLockEntityDescription
 
     def __init__(
         self,
         device: XTDevice,
         device_manager: MultiManager,
-        description: TuyaLockEntityDescription,
+        description: XTLockEntityDescription,
     ) -> None:
         """Init Tuya Lock sensor."""
         super().__init__(device, device_manager)

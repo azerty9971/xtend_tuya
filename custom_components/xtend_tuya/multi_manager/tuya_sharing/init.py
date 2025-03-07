@@ -76,7 +76,6 @@ from ...const import (
     TUYA_DISCOVERY_NEW,
     TUYA_DISCOVERY_NEW_ORIG,
     TUYA_HA_SIGNAL_UPDATE_ENTITY,
-    TUYA_HA_SIGNAL_UPDATE_ENTITY_ORIG,
 )
 
 def get_plugin_instance() -> XTTuyaSharingDeviceManagerInterface | None:
@@ -144,9 +143,9 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
             self.sharing_account.device_ids.clear()
             self.sharing_account.device_ids.extend(new_device_ids)
 
-            if other_manager := self.sharing_account.device_manager.get_overriden_device_manager():
-                for device in other_manager.device_map.values():
-                    self.multi_manager.device_watcher.report_message(device.id, f"Update device cache TUYA: {device}", device)
+            #if other_manager := self.sharing_account.device_manager.get_overriden_device_manager():
+            #    for device in other_manager.device_map.values():
+            #        self.multi_manager.device_watcher.report_message(device.id, f"Update device cache TUYA: {device}", device)
         except Exception as exc:
             # While in general, we should avoid catching broad exceptions,
             # we have no other way of detecting this case.
@@ -194,13 +193,7 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
         return [DOMAIN]
     
     def get_domain_identifiers_of_device(self, device_id: str) -> list:
-        if (
-            self.sharing_account.device_manager.reuse_config
-            and device_id in self.sharing_account.device_manager.get_overriden_device_manager().device_map
-        ):
-            return [DOMAIN_ORIG, DOMAIN]
-        else:
-            return [DOMAIN]
+        return [DOMAIN]
 
     def on_update_device(self, device: XTDevice) -> list[str] | None:
         return_list: list[str] = []
@@ -208,7 +201,6 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
             return_list.append(TUYA_HA_SIGNAL_UPDATE_ENTITY)
         if self.sharing_account.device_manager.reuse_config:
             self.sharing_account.device_manager.copy_statuses_to_tuya(device)
-            return_list.append(TUYA_HA_SIGNAL_UPDATE_ENTITY_ORIG)
         if return_list:
             return return_list
         return None
@@ -266,10 +258,10 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
     
 
     @overload
-    def convert_to_xt_device(self, Any) -> XTDevice: ...
+    def convert_to_xt_device(self, Any, source: str = "SHARING convert_to_xt_device") -> XTDevice: ...
     
-    def convert_to_xt_device(self, device: CustomerDevice) -> XTDevice:
-        return XTDevice.from_compatible_device(device)
+    def convert_to_xt_device(self, device: CustomerDevice, source: str = "SHARING convert_to_xt_device") -> XTDevice:
+        return XTDevice.from_compatible_device(device, source)
     
     def send_lock_unlock_command(
             self, device_id: str, lock: bool

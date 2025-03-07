@@ -1,22 +1,21 @@
-"""Support for Tuya scenes."""
+"""Support for XT scenes."""
 
 from __future__ import annotations
 
-from typing import Any
-
-from tuya_sharing import SharingScene
-
-from homeassistant.components.scene import Scene
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .multi_manager.multi_manager import (
-    MultiManager,
     XTConfigEntry,
+    MultiManager,
 )
-from .const import DOMAIN
+from .ha_tuya_integration.tuya_integration_imports import (
+    TuyaSceneEntity,
+    TuyaScene,
+)
 
+class XTScene(TuyaScene):
+    pass
 
 async def async_setup_entry(
     hass: HomeAssistant, entry: XTConfigEntry, async_add_entities: AddEntitiesCallback
@@ -24,38 +23,16 @@ async def async_setup_entry(
     """Set up Tuya scenes."""
     hass_data = entry.runtime_data
     scenes = await hass.async_add_executor_job(hass_data.manager.query_scenes)
-    async_add_entities(TuyaSceneEntity(hass_data.manager, scene) for scene in scenes)
+    async_add_entities(XTSceneEntity(hass_data.manager, XTScene(**scene.__dict__)) for scene in scenes)
 
 
-class TuyaSceneEntity(Scene):
-    """Tuya Scene Remote."""
+class XTSceneEntity(TuyaSceneEntity):
+    """XT Scene Entity."""
 
-    _should_poll = False
-    _attr_has_entity_name = True
-    _attr_name = None
-
-    def __init__(self, multi_manager: MultiManager, scene: SharingScene) -> None:
+    def __init__(self, multi_manager: MultiManager, scene: XTScene) -> None:
         """Init Tuya Scene."""
-        super().__init__()
-        self._attr_unique_id = f"tys{scene.scene_id}"
-        self.multi_manager = multi_manager
+        super(XTSceneEntity, self).__init__(multi_manager, scene)
+        self.home_manager = multi_manager
         self.scene = scene
-
-    @property
-    def device_info(self) -> DeviceInfo:
-        """Return a device description for device registry."""
-        return DeviceInfo(
-            identifiers={(DOMAIN, f"{self.unique_id}")},
-            manufacturer="tuya",
-            name=self.scene.name,
-            model="Tuya Scene",
-        )
-
-    @property
-    def available(self) -> bool:
-        """Return if the scene is enabled."""
-        return self.scene.enabled
-
-    def activate(self, **kwargs: Any) -> None:
-        """Activate the scene."""
-        self.multi_manager.trigger_scene(self.scene.home_id, self.scene.scene_id)
+        if self._attr_unique_id not in multi_manager.scene_id:
+            multi_manager.scene_id.append(self._attr_unique_id)
