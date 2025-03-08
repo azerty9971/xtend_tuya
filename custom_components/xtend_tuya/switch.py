@@ -57,6 +57,13 @@ SWITCHES: dict[str, tuple[XTSwitchEntityDescription, ...]] = {
             entity_category=EntityCategory.CONFIG,
         ),
     ),
+    "hps": (
+        XTSwitchEntityDescription(
+            key=DPCode.INDICATOR_LED,
+            translation_key="indicator_light",
+            entity_category=EntityCategory.CONFIG,
+        ),
+    ),
     "jtmspro": (
         XTSwitchEntityDescription(
             key=DPCode.AUTOMATIC_LOCK,
