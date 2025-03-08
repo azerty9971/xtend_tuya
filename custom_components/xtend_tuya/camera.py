@@ -30,6 +30,7 @@ from .entity import (
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
 CAMERAS: tuple[str, ...] = (
     "jtmspro",
+    "videolock",
 )
 
 
@@ -82,4 +83,6 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         for test_status in camera_status:
             if test_status in device.status:
                 return True
+        if device.category in ["videolock"]:
+            return True
         return False
