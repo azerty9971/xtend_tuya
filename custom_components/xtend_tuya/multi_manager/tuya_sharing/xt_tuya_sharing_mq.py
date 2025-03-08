@@ -11,6 +11,9 @@ from paho.mqtt import client as mqtt
 from paho.mqtt.enums import (
     CallbackAPIVersion as mqtt_CallbackAPIVersion,
 )
+from paho.mqtt.client import (
+    DisconnectFlags as mqtt_DisconnectFlags,
+)
 from paho.mqtt.reasoncodes import (
     ReasonCode as mqtt_ReasonCode,
 )
@@ -20,6 +23,9 @@ from paho.mqtt.properties import (
 from urllib.parse import urlsplit
 
 class XTSharingMQ(SharingMQ):
+
+    def _on_disconnect(self, client: mqtt.Client, userdata: Any, flags: mqtt_DisconnectFlags, rc: mqtt_ReasonCode, properties: mqtt_Properties | None = None):
+        super()._on_disconnect(client=client, userdata=userdata, rc=rc.getId())
 
     def _on_connect(self, mqttc: mqtt.Client, user_data: Any, flags, rc: mqtt_ReasonCode, properties: mqtt_Properties | None = None):
         super()._on_connect(mqttc=mqttc, user_data=user_data,flags=flags, rc=rc)

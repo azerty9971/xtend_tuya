@@ -274,6 +274,8 @@ class DPCode(StrEnum):
     DEODORIZATION_NUM = "deodorization_num"
     DEO_START_TIME = "deo_start_time"
     DEO_END_TIME = "deo_end_time"
+    DETECTION_DISTANCE_MIN = "detection_distance_min"
+    DETECTION_DISTANCE_MAX = "detection_distance_max"
     DETECTION_SENSITIVITY = "detection_sensitivity"
     DEVICEKW = "DeviceKw"
     DEVICEKWH = "DeviceKwh"
@@ -322,6 +324,7 @@ class DPCode(StrEnum):
     GAS_SENSOR_VALUE = "gas_sensor_value"
     HEART_RATE = "heart_rate"
     HISTORY = "History"
+    HOLD_SENSITIVITY = "hold_sensitivity"
     HUMIDIFIER = "humidifier"  # Humidification
     HUMIDITY = "humidity"  # Humidity
     HUMIDITY_CALIBRATION = "humidity_calibration"
@@ -331,6 +334,7 @@ class DPCode(StrEnum):
     HUMIDITY_VALUE = "humidity_value"  # Humidity
     IDVERIFICATIONSET = "IDVerificationSet"
     ILLUMINANCE_VALUE = "illuminance_value"
+    INDICATOR_LED = "indicator_led"
     INDICATOR_LIGHT = "indicator_light"
     INDUCTION_CLEAN = "Induction_Clean"
     INDUCTION_DELAY = "induction_delay"
@@ -340,6 +344,7 @@ class DPCode(StrEnum):
     IR_CONTROL = "ir_control"
     KEY_TONE = "key_tone"
     KILL = "kill"
+    LDR = "ldr"
     LED_TYPE_1 = "led_type_1"
     LED_TYPE_2 = "led_type_2"
     LED_TYPE_3 = "led_type_3"
@@ -378,6 +383,9 @@ class DPCode(StrEnum):
     M_ADC_NUM = "M_ADC_NUM"
     NEAR_DETECTION = "near_detection"
     NET_NOTICE = "Net_notice"
+    NONE_DELAY_TIME = "none_delay_time"
+    NONE_DELAY_TIME_MIN = "none_delay_time_min"
+    NONE_DELAY_TIME_SEC = "none_delay_time_sec"
     NOTIFICATION_STATUS = "notification_status"
     NOT_DISTURB = "not_disturb"
     NOT_DISTURB_SWITCH = "not_disturb_Switch"
@@ -526,6 +534,7 @@ class DPCode(StrEnum):
     SWITCH_VERTICAL = "switch_vertical"  # Vertical swing flap switch
     SWITCH_VOICE = "switch_voice"  # Voice switch
     SYSTEM_VERSION = "system_version"
+    TARGET_DISTANCE = "target_distance"
     TARGET_DIS_CLOSEST = "target_dis_closest"  # Closest target distance
     TEMP = "temp"  # Temperature setting
     TEMPCHANGER = "TempChanger"
@@ -563,6 +572,7 @@ class DPCode(StrEnum):
     TOTAL_PM = "total_pm"
     TOTAL_POWER = "total_power"
     TRASH_STATUS = "trash_status"
+    TRIGGER_SENSITIVITY = "trigger_sensitivity"
     TVOC = "tvoc"
     UNIT = "unit"
     UPPER_TEMP = "upper_temp"

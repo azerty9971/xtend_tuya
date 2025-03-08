@@ -723,6 +723,23 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
         ),
         *TEMPERATURE_SENSORS,
     ),
+    "hps": (
+        XTSensorEntityDescription(
+            key=DPCode.PRESENCE_STATE,
+            translation_key="hps_presence_state",
+            state_class=SensorStateClass.MEASUREMENT,
+        ),
+        XTSensorEntityDescription(
+            key=DPCode.TARGET_DISTANCE,
+            translation_key="target_distance",
+            state_class=SensorStateClass.MEASUREMENT,
+        ),
+        XTSensorEntityDescription(
+            key=DPCode.LDR,
+            translation_key="ldr",
+            state_class=SensorStateClass.MEASUREMENT,
+        ),
+    ),
     "qccdz": (
         XTSensorEntityDescription(
             key=DPCode.WORK_STATE,
@@ -876,6 +893,9 @@ SENSORS["tdq"]  = SENSORS["kg"]
 SENSORS["pc"]   = SENSORS["kg"]
 SENSORS["aqcz"] = SENSORS["kg"]
 SENSORS["zndb"] = SENSORS["kg"]
+
+#Lock duplicates
+SENSORS["videolock"] = SENSORS["jtmspro"]
 
 async def async_setup_entry(
     hass: HomeAssistant, entry: XTConfigEntry, async_add_entities: AddEntitiesCallback
