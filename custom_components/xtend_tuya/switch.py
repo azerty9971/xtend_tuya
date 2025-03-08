@@ -57,6 +57,13 @@ SWITCHES: dict[str, tuple[XTSwitchEntityDescription, ...]] = {
             entity_category=EntityCategory.CONFIG,
         ),
     ),
+    "hps": (
+        XTSwitchEntityDescription(
+            key=DPCode.INDICATOR_LED,
+            translation_key="indicator_light",
+            entity_category=EntityCategory.CONFIG,
+        ),
+    ),
     "jtmspro": (
         XTSwitchEntityDescription(
             key=DPCode.AUTOMATIC_LOCK,
@@ -293,6 +300,8 @@ SWITCHES: dict[str, tuple[XTSwitchEntityDescription, ...]] = {
     ),
 }
 
+#Lock duplicates
+SWITCHES["videolock"] = SWITCHES["jtmspro"]
 
 async def async_setup_entry(
     hass: HomeAssistant, entry: XTConfigEntry, async_add_entities: AddEntitiesCallback
