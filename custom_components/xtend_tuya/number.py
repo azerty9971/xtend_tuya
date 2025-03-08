@@ -130,6 +130,43 @@ NUMBERS: dict[str, tuple[XTNumberEntityDescription, ...]] = {
             entity_category=EntityCategory.CONFIG,
         ),
     ),
+    "hps": (
+        XTNumberEntityDescription(
+            key=DPCode.NONE_DELAY_TIME,
+            translation_key="none_delay_time",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        XTNumberEntityDescription(
+            key=DPCode.NONE_DELAY_TIME_MIN,
+            translation_key="none_delay_time_min",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        XTNumberEntityDescription(
+            key=DPCode.NONE_DELAY_TIME_SEC,
+            translation_key="none_delay_time_sec",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        XTNumberEntityDescription(
+            key=DPCode.DETECTION_DISTANCE_MAX,
+            translation_key="detection_distance_max",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        XTNumberEntityDescription(
+            key=DPCode.DETECTION_DISTANCE_MIN,
+            translation_key="detection_distance_min",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        XTNumberEntityDescription(
+            key=DPCode.TRIGGER_SENSITIVITY,
+            translation_key="trigger_sensitivity",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        XTNumberEntityDescription(
+            key=DPCode.HOLD_SENSITIVITY,
+            translation_key="hold_sensitivity",
+            entity_category=EntityCategory.CONFIG,
+        ),
+    ),
     "jtmspro": (
         XTNumberEntityDescription(
             key=DPCode.AUTO_LOCK_TIME,
