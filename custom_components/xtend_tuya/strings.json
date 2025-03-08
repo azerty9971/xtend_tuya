@@ -220,6 +220,9 @@
       }
     },
     "button": {
+      "filter_reset": {
+        "name": "Filter reset"
+      },
       "clear_energy": {
         "name": "Clear energy"
       },
@@ -246,6 +249,23 @@
       },
       "snooze": {
         "name": "Snooze"
+      }
+    },
+    "climate": {
+      "mode": {
+        "name": "Mode",
+        "state": {
+          "auto": "Automatic",
+          "cold": "Cold",
+          "freeze": "Freeze",
+          "heat": "Heat",
+          "hot": "Hot",
+          "manual": "Manual",
+          "wet": "Wet",
+          "wind": "Wind",
+          "on": "On",
+          "off": "Off"
+        }
       }
     },
     "cover": {
@@ -294,6 +314,45 @@
       }
     },
     "number": {
+      "none_delay_time": {
+        "name": "Presence reset time"
+      },
+      "none_delay_time_min": {
+        "name": "Presence reset time (minutes)"
+      },
+      "none_delay_time_sec": {
+        "name": "Presence reset time (seconds)"
+      },
+      "detection_distance_max": {
+        "name": "Max detection distance"
+      },
+      "detection_distance_min": {
+        "name": "Min detection distance"
+      },
+      "trigger_sensitivity": {
+        "name": "Trigger sensitivity"
+      },
+      "hold_sensitivity": {
+        "name": "Hold sensitivity"
+      },
+      "set_delay_time": {
+        "name": "Set delay time"
+      },
+      "set_define_time": {
+        "name": "Set define time"
+      },
+      "set_16a": {
+        "name": "Set 16A"
+      },
+      "set_32a": {
+        "name": "Set 32A"
+      },
+      "set_40a": {
+        "name": "Set 40A"
+      },
+      "set_50a": {
+        "name": "Set 50A"
+      },
       "standby_time": {
         "name": "Standby time"
       },
@@ -497,6 +556,66 @@
       }
     },
     "select": {
+      "dj_color": {
+        "name": "Color",
+        "state": {
+          "r": "Red",
+          "rg": "Yellow",
+          "g": "Green",
+          "gb": "Light blue",
+          "b": "Blue",
+          "rb": "Pink",
+          "rgb": "White",
+          "color": "Random color"
+        }
+      },
+      "dj_mode": {
+        "name": "Mode",
+        "state": {
+          "bright": "Bright",
+          "gradually": "Gradually",
+          "star": "Star",
+          "flower": "Flower",
+          "marquee": "Marquee",
+          "fireworks": "Fireworks",
+          "meteor": "Meteor",
+          "stream": "Stream"
+        }
+      },
+      "qccdz_chargingoperation": {
+        "name": "Charging operation",
+        "state": {
+          "opencharging": "Open charging",
+          "closecharging": "Close charging",
+          "waitoperation": "Wait charging"
+        }
+      },
+      "xfj_mode": {
+        "name": "Mode",
+        "state": {
+          "auto": "Automatic",
+          "sleep": "Sleep",
+          "manual": "Manual"
+        }
+      },
+      "dbl_power_set": {
+        "name": "Set power",
+        "state": {
+          "level_1": "Level 1",
+          "level_2": "Level 2",
+          "level_3": "Level 3",
+          "level_4": "Level 4",
+          "level_5": "Level 5"
+        }
+      },
+      "sfkzq_work_state": {
+        "name": "Work state",
+        "state": {
+          "auto": "Auto",
+          "manual": "Manual",
+          "idle": "Idle"
+        }
+      },
       "pir_sensitivity": {
         "name": "PIR sensitivity",
         "state": {
@@ -567,7 +686,9 @@
           "0": "C°",
           "1": "F",
           "false": "C°",
-          "true": "F"
+          "true": "F",
+          "c": "C°",
+          "f": "F"
         }
       },
       "cat_litter_box_clean":
@@ -664,7 +785,13 @@
           "ringtone_2": "Ringtone 2",
           "ringtone_3": "Ringtone 3",
           "ringtone_4": "Ringtone 4",
-          "ringtone_5": "Ringtone 5"
+          "ringtone_5": "Ringtone 5",
+          "sound_0": "Sound 0",
+          "sound_1": "Sound 1",
+          "sound_2": "Sound 2",
+          "sound_3": "Sound 3",
+          "sound_4": "Sound 4",
+          "sound_5": "Sound 5"
         }
       },
       "cups": {
@@ -916,6 +1043,106 @@
       }
     },
     "sensor": {
+      "hps_presence_state": {
+        "name": "Presence",
+        "state": {
+          "none": "none",
+          "presence": "Presence",
+          "peaceful": "Peaceful",
+          "small_move": "Small movement",
+          "large_move": "Large movement"
+        }
+      },
+      "target_distance": {
+        "name": "Target distance"
+      },
+      "ldr": {
+        "name": "Light intensity"
+      },
+      "ctime": {
+        "name": "Timer"
+      },
+      "ctime2": {
+        "name": "Timer 2"
+      },
+      "device_max_set_a": {
+        "name": "Device Max A",
+        "state": {
+          "max16a": "Max 16A",
+          "max32a": "Max 32A",
+          "max40a": "Max 40A",
+          "max50a": "Max 50A"
+        }
+      },
+      "a_current": {
+        "name": "Current A"
+      },
+      "a_voltage": {
+        "name": "Voltage A"
+      },
+      "b_current": {
+        "name": "Current B"
+      },
+      "b_voltage": {
+        "name": "Voltage B"
+      },
+      "c_current": {
+        "name": "Current C"
+      },
+      "c_voltage": {
+        "name": "Voltage C"
+      },
+      "phaseflag": {
+        "name": "Phase",
+        "state": {
+          "single_phase": "Single phase",
+          "three_phase": "Three phases",
+          "no_phase": "No phase",
+          "phase_err": "Phase error"
+        }
+      },
+      "device_power": {
+        "name": "Device power"
+      },
+      "device_consumption": {
+        "name": "Device consumption"
+      },
+      "device_temperature": {
+        "name": "Device temperature"
+      },
+      "device_temperature2": {
+        "name": "Device temperature 2"
+      },
+      "qccdz_devicestate": {
+        "name": "Device state",
+        "state": {
+          "no_connet": "Not connected",
+          "connect": "Connected",
+          "charing": "Charging",
+          "wait_rfid": "Waiting for RFID",
+          "finish": "Finished",
+          "wait_charing": "Charge waiting",
+          "error": "Error"
+        }
+      },
+      "temp_top": {
+        "name": "Max temperature"
+      },
+      "temp_bottom": {
+        "name": "Min temperature"
+      },
+      "tvoc": {
+        "name": "TVOC"
+      },
+      "countdown_left": {
+        "name": "Countdown left"
+      },
+      "water_once": {
+        "name": "Instant flow rate"
+      },
+      "water_total": {
+        "name": "Total flow"
+      },
       "system_version": {
         "name": "System version"
       },
@@ -1468,21 +1695,29 @@
           "great": "Great",
           "mild": "Mild",
           "good": "Good",
-          "severe": "Severe"
+          "severe": "Severe",
+          "medium": "Medium",
+          "bad": "Bad"
         }
       }
     },
     "switch": {
-      "switch_pir":
-      {
+      "id_verification_set":{
+        "name": "Set ID verification"
+      },
+      "rfid":{
+        "name": "RFID"
+      },
+      "uv_light":{
+        "name": "UV light"
+      },
+      "switch_pir":{
         "name": "Switch PIR"
       },
-      "photo_again":
-      {
+      "photo_again":{
         "name": "Take another photo"
       },
-      "one_click_cleanup":
-      {
+      "one_click_cleanup":{
         "name": "One click cleanup"
       },
       "sleeping": {

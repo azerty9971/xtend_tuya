@@ -9,6 +9,9 @@ from paho.mqtt import (
 from paho.mqtt.enums import (
     CallbackAPIVersion as mqtt_CallbackAPIVersion,
 )
+from paho.mqtt.client import (
+    DisconnectFlags as mqtt_DisconnectFlags,
+)
 from paho.mqtt.reasoncodes import (
     ReasonCode as mqtt_ReasonCode,
 )
@@ -53,7 +56,7 @@ class XTIOTOpenMQIPC(XTIOTOpenMQ):
             else TO_C_SMART_HOME_MQTT_CONFIG_API,
             {
                 "uid": self.api.token_info.uid,
-                "link_id": f"tuya-iot-app-sdk-python.ipc.{uuid.uuid1()}",
+                "link_id": f"tuya.ipc.{uuid.uuid1()}",
                 "link_type": "mqtt",
                 "topics": "ipc",
                 "msg_encrypted_version": "2.0"
@@ -74,6 +77,9 @@ class XTIOTOpenMQIPC(XTIOTOpenMQ):
                 mqttc.subscribe(value)
         elif rc == 5:
             self.__run_mqtt()
+
+    def _on_disconnect(self, client: mqtt.Client, userdata: Any, flags: mqtt_DisconnectFlags, rc: mqtt_ReasonCode, properties: mqtt_Properties | None = None):
+        super()._on_disconnect(client=client, userdata=userdata, flags=flags, rc=rc, properties=properties)
 
     def _on_message(self, mqttc: mqtt.Client, user_data: Any, msg: mqtt.MQTTMessage):
         msg_dict = json.loads(msg.payload.decode("utf8"))

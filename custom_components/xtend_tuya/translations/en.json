@@ -314,6 +314,27 @@
       }
     },
     "number": {
+      "none_delay_time": {
+        "name": "Presence reset time"
+      },
+      "none_delay_time_min": {
+        "name": "Presence reset time (minutes)"
+      },
+      "none_delay_time_sec": {
+        "name": "Presence reset time (seconds)"
+      },
+      "detection_distance_max": {
+        "name": "Max detection distance"
+      },
+      "detection_distance_min": {
+        "name": "Min detection distance"
+      },
+      "trigger_sensitivity": {
+        "name": "Trigger sensitivity"
+      },
+      "hold_sensitivity": {
+        "name": "Hold sensitivity"
+      },
       "set_delay_time": {
         "name": "Set delay time"
       },
@@ -1022,6 +1043,22 @@
       }
     },
     "sensor": {
+      "hps_presence_state": {
+        "name": "Presence",
+        "state": {
+          "none": "none",
+          "presence": "Presence",
+          "peaceful": "Peaceful",
+          "small_move": "Small movement",
+          "large_move": "Large movement"
+        }
+      },
+      "target_distance": {
+        "name": "Target distance"
+      },
+      "ldr": {
+        "name": "Light intensity"
+      },
       "ctime": {
         "name": "Timer"
       },
