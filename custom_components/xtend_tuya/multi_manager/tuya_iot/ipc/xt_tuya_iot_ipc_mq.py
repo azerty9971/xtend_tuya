@@ -3,18 +3,7 @@ from __future__ import annotations
 from typing import Optional, Any
 import uuid
 import json
-from paho.mqtt import (
-    client as mqtt,
-)
-from paho.mqtt.enums import (
-    CallbackAPIVersion as mqtt_CallbackAPIVersion,
-)
-from paho.mqtt.reasoncodes import (
-    ReasonCode as mqtt_ReasonCode,
-)
-from paho.mqtt.properties import (
-    Properties as mqtt_Properties,
-)
+from paho.mqtt import client as mqtt
 from urllib.parse import urlsplit
 
 from tuya_iot.openmq import (
@@ -68,7 +57,7 @@ class XTIOTOpenMQIPC(XTIOTOpenMQ):
 
         return XTIOTTuyaMQConfig(response)
     
-    def _on_connect(self, mqttc: mqtt.Client, user_data: Any, flags, rc: mqtt_ReasonCode, properties: mqtt_Properties | None = None):
+    def _on_connect(self, mqttc: mqtt.Client, user_data: Any, flags, rc):
         if rc == 0:
             for (key, value) in self.mq_config.source_topic.items():
                 mqttc.subscribe(value)
@@ -81,16 +70,16 @@ class XTIOTOpenMQIPC(XTIOTOpenMQ):
         for listener in self.message_listeners:
             listener(msg_dict)
     
-    def _on_subscribe(self, mqttc: mqtt.Client, user_data: Any, mid: int, reason_codes: list[mqtt_ReasonCode] = [], properties: mqtt_Properties | None = None):
+    def _on_subscribe(self, mqttc: mqtt.Client, user_data: Any, mid, granted_qos):
         #LOGGER.debug(f"_on_subscribe: {mid}")
         pass
     
-    def _on_publish(self, mqttc: mqtt.Client, user_data: Any, mid: int, reason_code: mqtt_ReasonCode = None, properties: mqtt_Properties = None):
+    def _on_publish(self, mqttc: mqtt.Client, user_data: Any, mid):
         #LOGGER.debug(f"_on_publish: {mid} <=> {user_data}")
         pass
 
     def _start(self, mq_config: TuyaMQConfig) -> mqtt.Client:
-        mqttc = mqtt.Client(callback_api_version=mqtt_CallbackAPIVersion.VERSION2, client_id=mq_config.client_id)
+        mqttc = mqtt.Client(mq_config.client_id)
         mqttc.username_pw_set(mq_config.username, mq_config.password)
         mqttc.user_data_set({"mqConfig": mq_config})
         mqttc.on_connect = self._on_connect
