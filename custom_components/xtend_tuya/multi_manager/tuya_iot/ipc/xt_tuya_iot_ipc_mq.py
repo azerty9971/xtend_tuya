@@ -6,22 +6,9 @@ import json
 from paho.mqtt import (
     client as mqtt,
 )
-from paho.mqtt.enums import (
-    CallbackAPIVersion as mqtt_CallbackAPIVersion,
-)
-from paho.mqtt.client import (
-    DisconnectFlags as mqtt_DisconnectFlags,
-)
-from paho.mqtt.reasoncodes import (
-    ReasonCode as mqtt_ReasonCode,
-)
-from paho.mqtt.properties import (
-    Properties as mqtt_Properties,
-)
 from urllib.parse import urlsplit
 
 from tuya_iot.openmq import (
-    TuyaMQConfig,
     TO_C_CUSTOM_MQTT_CONFIG_API,
     AuthType,
     TO_C_SMART_HOME_MQTT_CONFIG_API,
@@ -71,46 +58,15 @@ class XTIOTOpenMQIPC(XTIOTOpenMQ):
 
         return XTIOTTuyaMQConfig(response)
     
-    def _on_connect(self, mqttc: mqtt.Client, user_data: Any, flags, rc: mqtt_ReasonCode, properties: mqtt_Properties | None = None):
-        if rc == 0:
-            for (key, value) in self.mq_config.source_topic.items():
-                mqttc.subscribe(value)
-        elif rc == 5:
-            self.__run_mqtt()
-
-    def _on_disconnect(self, client: mqtt.Client, userdata: Any, flags: mqtt_DisconnectFlags, rc: mqtt_ReasonCode, properties: mqtt_Properties | None = None):
-        super()._on_disconnect(client=client, userdata=userdata, flags=flags, rc=rc, properties=properties)
+    # def _on_connect(self, mqttc: mqtt.Client, user_data: Any, flags, rc: mqtt_ReasonCode, properties: mqtt_Properties | None = None):
+    #     if rc == 0:
+    #         for (key, value) in self.mq_config.source_topic.items():
+    #             mqttc.subscribe(value)
+    #     elif rc == 5:
+    #         self.__run_mqtt()
 
     def _on_message(self, mqttc: mqtt.Client, user_data: Any, msg: mqtt.MQTTMessage):
         msg_dict = json.loads(msg.payload.decode("utf8"))
         #LOGGER.warning(f"IPC Message: {msg_dict}")
         for listener in self.message_listeners:
             listener(msg_dict)
-    
-    def _on_subscribe(self, mqttc: mqtt.Client, user_data: Any, mid: int, reason_codes: list[mqtt_ReasonCode] = [], properties: mqtt_Properties | None = None):
-        #LOGGER.debug(f"_on_subscribe: {mid}")
-        pass
-    
-    def _on_publish(self, mqttc: mqtt.Client, user_data: Any, mid: int, reason_code: mqtt_ReasonCode = None, properties: mqtt_Properties = None):
-        #LOGGER.debug(f"_on_publish: {mid} <=> {user_data}")
-        pass
-
-    def _start(self, mq_config: TuyaMQConfig) -> mqtt.Client:
-        mqttc = mqtt.Client(callback_api_version=mqtt_CallbackAPIVersion.VERSION2, client_id=mq_config.client_id)
-        mqttc.username_pw_set(mq_config.username, mq_config.password)
-        mqttc.user_data_set({"mqConfig": mq_config})
-        mqttc.on_connect = self._on_connect
-        mqttc.on_message = self._on_message
-        mqttc.on_subscribe = self._on_subscribe
-        mqttc.on_log = self._on_log
-        mqttc.on_disconnect = self._on_disconnect
-        mqttc.on_publish = self._on_publish
-
-        url = urlsplit(mq_config.url)
-        if url.scheme == "ssl":
-            mqttc.tls_set()
-
-        mqttc.connect(url.hostname, url.port)
-
-        mqttc.loop_start()
-        return mqttc
