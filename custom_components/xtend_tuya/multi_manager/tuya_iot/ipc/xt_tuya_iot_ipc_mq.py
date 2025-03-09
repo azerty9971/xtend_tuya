@@ -6,22 +6,9 @@ import json
 from paho.mqtt import (
     client as mqtt,
 )
-from paho.mqtt.enums import (
-    CallbackAPIVersion as mqtt_CallbackAPIVersion,
-)
-from paho.mqtt.client import (
-    DisconnectFlags as mqtt_DisconnectFlags,
-)
-from paho.mqtt.reasoncodes import (
-    ReasonCode as mqtt_ReasonCode,
-)
-from paho.mqtt.properties import (
-    Properties as mqtt_Properties,
-)
 from urllib.parse import urlsplit
 
 from tuya_iot.openmq import (
-    TuyaMQConfig,
     TO_C_CUSTOM_MQTT_CONFIG_API,
     AuthType,
     TO_C_SMART_HOME_MQTT_CONFIG_API,
