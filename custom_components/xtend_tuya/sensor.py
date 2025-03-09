@@ -511,6 +511,9 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
         *CONSUMPTION_SENSORS,
         *ELECTRICITY_SENSORS,
     ),
+    "ms": (
+        *BATTERY_SENSORS,
+    ),
     # Automatic cat litter box
     # Note: Undocumented
     "msp": (
