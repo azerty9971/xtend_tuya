@@ -26,7 +26,7 @@ class XTSharingMQ(SharingMQ):
 
     #This block will be useful when we'll use Paho MQTT 3.x or above
     # def _on_disconnect(self, client: mqtt.Client, userdata: Any, flags: mqtt_DisconnectFlags, rc: mqtt_ReasonCode, properties: mqtt_Properties | None = None):
-    #     super()._on_disconnect(client=client, userdata=userdata, rc=rc.getId())
+    #     super()._on_disconnect(client=client, userdata=userdata, rc=rc)
     #
     # def _on_connect(self, mqttc: mqtt.Client, user_data: Any, flags, rc: mqtt_ReasonCode, properties: mqtt_Properties | None = None):
     #     super()._on_connect(mqttc=mqttc, user_data=user_data,flags=flags, rc=rc)
