@@ -113,13 +113,17 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
         return added_new_statuses
 
     def update_device_cache(self):
-        super().update_device_cache()
-        
-        for device in self.multi_manager.devices_shared.values():
-            if device.id not in self.device_map:
-                new_device = device.get_copy()
-                self.device_repository.update_device_strategy_info(new_device)
-                self.device_map[device.id] = new_device
+        try:
+            super().update_device_cache()
+            
+            for device in self.multi_manager.devices_shared.values():
+                if device.id not in self.device_map:
+                    new_device = device.get_copy()
+                    self.device_repository.update_device_strategy_info(new_device)
+                    self.device_map[device.id] = new_device
+        except Exception:
+            #This could happen if the token is expired
+            pass
 
     def _on_device_other(self, device_id: str, biz_code: str, data: dict[str, Any]):
         self.multi_manager.device_watcher.report_message(device_id, f"[{MESSAGE_SOURCE_TUYA_SHARING}]On device other: {biz_code} <=> {data}")
