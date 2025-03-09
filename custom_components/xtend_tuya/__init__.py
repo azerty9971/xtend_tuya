@@ -161,13 +161,13 @@ def get_domain_device_map(hass: HomeAssistant, domain: str, except_of_entry: Con
     for config_entry in config_entries:
         if config_entry == except_of_entry:
             continue
-        runtime_data = get_config_entry_runtime_data(hass, config_entry, domain)
-        for device_id in runtime_data.device_manager.device_map:
-            if device_id not in device_map:
-                device_map[device_id] = runtime_data.device_manager.device_map[device_id]
-        if with_scene and hasattr(runtime_data.device_manager, "scene_id"):
-            for scene_id in runtime_data.device_manager.scene_id:
-                device_map[scene_id] = None
+        if runtime_data := get_config_entry_runtime_data(hass, config_entry, domain):
+            for device_id in runtime_data.device_manager.device_map:
+                if device_id not in device_map:
+                    device_map[device_id] = runtime_data.device_manager.device_map[device_id]
+            if with_scene and hasattr(runtime_data.device_manager, "scene_id"):
+                for scene_id in runtime_data.device_manager.scene_id:
+                    device_map[scene_id] = None
     return device_map
 
 def is_device_in_domain_device_maps(hass: HomeAssistant, domains: list[str], device_entry_identifiers: tuple[str, str], except_of_entry: ConfigEntry | None = None, with_scene: bool = False):
