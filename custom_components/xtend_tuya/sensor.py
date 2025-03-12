@@ -833,6 +833,9 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
         *TEMPERATURE_SENSORS,
         *HUMIDITY_SENSORS,
     ),
+    "wsdcg": (
+        *TEMPERATURE_SENSORS,
+    ),
     "xfj": (
         XTSensorEntityDescription(
             key=DPCode.PM25,
