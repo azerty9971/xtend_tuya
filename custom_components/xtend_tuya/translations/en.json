@@ -1081,6 +1081,12 @@
       }
     },
     "sensor": {
+      "flow_velocity": {
+        "name": "Flow speed"
+      },
+      "water_use_data": {
+        "name": "Water used"
+      },
       "hps_presence_state": {
         "name": "Presence",
         "state": {

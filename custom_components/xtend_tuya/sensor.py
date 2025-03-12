@@ -452,6 +452,13 @@ ELECTRICITY_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.VOLTAGE,
         entity_registry_enabled_default=False,
     ),
+    XTSensorEntityDescription(
+        key=DPCode.VOLTAGE_CURRENT,
+        translation_key="voltage",
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.VOLTAGE,
+        entity_registry_enabled_default=False,
+    ),
 )
 
 TIMER_SENSORS: tuple[XTSensorEntityDescription, ...] = (
@@ -783,6 +790,27 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
             state_class=SensorStateClass.TOTAL_INCREASING,
             entity_registry_enabled_default=True,
         ),
+    ),
+    "slj": (
+        XTSensorEntityDescription(
+            key=DPCode.WATER_USE_DATA,
+            translation_key="water_use_data",
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_registry_enabled_default=True,
+        ),
+        XTSensorEntityDescription(
+            key=DPCode.WATER_ONCE,
+            translation_key="water_once",
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_registry_enabled_default=True,
+        ),
+        XTSensorEntityDescription(
+            key=DPCode.FLOW_VELOCITY,
+            translation_key="flow_velocity",
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_registry_enabled_default=True,
+        ),
+        *ELECTRICITY_SENSORS,
     ),
     "smd": (
         XTSensorEntityDescription(

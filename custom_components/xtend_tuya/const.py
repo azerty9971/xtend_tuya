@@ -319,6 +319,7 @@ class DPCode(StrEnum):
     FILTER_RESET = "filter_reset"  # Filter (cartridge) reset
     FLOODLIGHT_LIGHTNESS = "floodlight_lightness"
     FLOODLIGHT_SWITCH = "floodlight_switch"
+    FLOW_VELOCITY = "flow_velocity"
     FORWARD_ENERGY_TOTAL = "forward_energy_total"
     GAS_SENSOR_STATE = "gas_sensor_state"
     GAS_SENSOR_STATUS = "gas_sensor_status"
@@ -601,6 +602,7 @@ class DPCode(StrEnum):
     VOICE_TIMES = "voice_times"
     VOLUME_SET = "volume_set"
     VOL_YD = "vol_yd"
+    VOLTAGE_CURRENT = "voltage_current"
     WAKEUP = "wakeup"
     WARM = "warm"  # Heat preservation
     WARM_TIME = "warm_time"  # Heat preservation time
@@ -610,6 +612,7 @@ class DPCode(StrEnum):
     WATER_RESET = "water_reset"  # Resetting of water usage days
     WATER_SET = "water_set"  # Water level
     WATER_TOTAL = "water_total"
+    WATER_USE_DATA = "water_use_data"
     WATERSENSOR_STATE = "watersensor_state"
     WEATHER_DELAY = "weather_delay"
     WEATHER_SWITCH = "weather_switch"
