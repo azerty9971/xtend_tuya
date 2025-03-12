@@ -68,6 +68,23 @@ SELECTS: dict[str, tuple[XTSelectEntityDescription, ...]] = {
             entity_category=EntityCategory.CONFIG,
         ),
     ),
+    "ggq": (
+        XTSelectEntityDescription(
+            key=DPCode.WEATHER_DELAY,
+            translation_key="weather_delay",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        XTSelectEntityDescription(
+            key=DPCode.WATER_CONTROL,
+            translation_key="water_control",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        XTSelectEntityDescription(
+            key=DPCode.TEMP_UNIT_CONVERT,
+            translation_key="temp_unit_convert",
+            entity_category=EntityCategory.CONFIG,
+        ),
+    ),
     "gyd": (
         XTSelectEntityDescription(
             key=DPCode.DEVICE_MODE,

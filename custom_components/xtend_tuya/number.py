@@ -108,6 +108,72 @@ NUMBERS: dict[str, tuple[XTNumberEntityDescription, ...]] = {
             entity_category=EntityCategory.CONFIG,
         ),
     ),
+    "ggq": (
+        XTNumberEntityDescription(
+            key=DPCode.COUNTDOWN_1,
+            translation_key="countdown_1",
+        ),
+        XTNumberEntityDescription(
+            key=DPCode.COUNTDOWN_2,
+            translation_key="countdown_2",
+        ),
+        XTNumberEntityDescription(
+            key=DPCode.COUNTDOWN_3,
+            translation_key="countdown_3",
+        ),
+        XTNumberEntityDescription(
+            key=DPCode.COUNTDOWN_4,
+            translation_key="countdown_4",
+        ),
+        XTNumberEntityDescription(
+            key=DPCode.COUNTDOWN_5,
+            translation_key="countdown_5",
+        ),
+        XTNumberEntityDescription(
+            key=DPCode.COUNTDOWN_6,
+            translation_key="countdown_6",
+        ),
+        XTNumberEntityDescription(
+            key=DPCode.COUNTDOWN_7,
+            translation_key="countdown_7",
+        ),
+        XTNumberEntityDescription(
+            key=DPCode.COUNTDOWN_8,
+            translation_key="countdown_8",
+        ),
+        XTNumberEntityDescription(
+            key=DPCode.USE_TIME_1,
+            translation_key="use_time_1",
+        ),
+        XTNumberEntityDescription(
+            key=DPCode.USE_TIME_2,
+            translation_key="use_time_2",
+        ),
+        XTNumberEntityDescription(
+            key=DPCode.USE_TIME_3,
+            translation_key="use_time_3",
+        ),
+        XTNumberEntityDescription(
+            key=DPCode.USE_TIME_4,
+            translation_key="use_time_4",
+        ),
+        XTNumberEntityDescription(
+            key=DPCode.USE_TIME_5,
+            translation_key="use_time_5",
+        ),
+        XTNumberEntityDescription(
+            key=DPCode.USE_TIME_6,
+            translation_key="use_time_6",
+        ),
+        XTNumberEntityDescription(
+            key=DPCode.USE_TIME_7,
+            translation_key="use_time_7",
+        ),
+        XTNumberEntityDescription(
+            key=DPCode.USE_TIME_8,
+            translation_key="use_time_8",
+        ),
+    ),
     "gyd": (
         XTNumberEntityDescription(
             key=DPCode.COUNTDOWN,
