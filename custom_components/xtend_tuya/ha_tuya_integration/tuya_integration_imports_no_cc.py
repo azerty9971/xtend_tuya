@@ -74,6 +74,7 @@ import homeassistant.components.tuya as tuya_integration  # noqa: F401
 from homeassistant.components.tuya.const import (
         DPCode as TuyaDPCode,
         DPType as TuyaDPType,
+        DOMAIN as TuyaDOMAIN,
     )
 from homeassistant.components.tuya.entity import (
         TuyaEntity as TuyaEntity,
