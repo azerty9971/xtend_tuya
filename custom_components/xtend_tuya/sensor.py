@@ -48,6 +48,8 @@ from .ha_tuya_integration.tuya_integration_imports import (
     TuyaSensorEntityDescription,
     TuyaDPCode,
     TuyaIntegerTypeData,
+    TuyaDOMAIN,
+    TuyaDEVICE_CLASS_UNITS,
 )
 
 @dataclass(frozen=True)
@@ -987,8 +989,61 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):
             need_adjust = True
 
             #This DPCode can be any value of Tuya's DPCode table, it doesn't matter
-            description_copy = XTSensorEntityDescription(key=TuyaDPCode.FAULT)
-        super(XTSensorEntity, self).__init__(device, device_manager, description_copy)
+            description_dict = description.__dict__
+            description_dict["key"] = TuyaDPCode.FAULT
+            description_copy = XTSensorEntityDescription(**description_dict)
+        try:
+            super(XTSensorEntity, self).__init__(device, device_manager, description_copy)
+        except Exception:
+            self.entity_description = description
+            self._attr_unique_id = (
+                f"{super().unique_id}{description.key}{description.subkey or ''}"
+            )
+
+            if int_type := self.find_dpcode(description.key, dptype=DPType.INTEGER):
+                self._type_data = int_type
+                self._type = DPType.INTEGER
+                if description.native_unit_of_measurement is None:
+                    self._attr_native_unit_of_measurement = int_type.unit
+            elif enum_type := self.find_dpcode(
+                description.key, dptype=DPType.ENUM, prefer_function=True
+            ):
+                self._type_data = enum_type
+                self._type = DPType.ENUM
+            else:
+                self._type = self.get_dptype(description.key)   #This is modified from TuyaSensorEntity's constructor
+
+            # Logic to ensure the set device class and API received Unit Of Measurement
+            # match Home Assistants requirements.
+            if (
+                self.device_class is not None
+                and not self.device_class.startswith(TuyaDOMAIN)
+                and description.native_unit_of_measurement is None
+            ):
+                # We cannot have a device class, if the UOM isn't set or the
+                # device class cannot be found in the validation mapping.
+                if (
+                    self.native_unit_of_measurement is None
+                    or self.device_class not in TuyaDEVICE_CLASS_UNITS
+                ):
+                    self._attr_device_class = None
+                    return
+
+                uoms = TuyaDEVICE_CLASS_UNITS[self.device_class]
+                self._uom = uoms.get(self.native_unit_of_measurement) or uoms.get(
+                    self.native_unit_of_measurement.lower()
+                )
+
+                # Unknown unit of measurement, device class should not be used.
+                if self._uom is None:
+                    self._attr_device_class = None
+                    return
+
+                # Found unit of measurement, use the standardized Unit
+                # Use the target conversion unit (if set)
+                self._attr_native_unit_of_measurement = (
+                    self._uom.conversion_unit or self._uom.unit
+                )
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description
