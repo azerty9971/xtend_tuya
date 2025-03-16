@@ -75,6 +75,7 @@ from homeassistant.components.tuya.const import (
         DPCode as TuyaDPCode,
         DPType as TuyaDPType,
         DOMAIN as TuyaDOMAIN,
+        DEVICE_CLASS_UNITS as TuyaDEVICE_CLASS_UNITS,
     )
 from homeassistant.components.tuya.entity import (
         TuyaEntity as TuyaEntity,
