@@ -51,6 +51,7 @@ class XTIOTOpenMQ(TuyaOpenMQ):
 
     def _get_mqtt_config(self) -> Optional[XTIOTTuyaMQConfig]:
         if not self.api.is_connect():
+            LOGGER.debug(f"_get_mqtt_config failed: not connected", stack_info=True)
             return None
         response = self.api.post(
             TO_C_CUSTOM_MQTT_CONFIG_API
