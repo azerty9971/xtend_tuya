@@ -277,9 +277,14 @@ class XTIOTOpenAPI:
                 t = {int(time.time()*1000)}"
         ) """
 
-        response = self.session.request(
-            method, self.endpoint + path, params=params, json=body, headers=headers
-        )
+        for _ in range(10):
+            try:
+                response = self.session.request(
+                    method, self.endpoint + path, params=params, json=body, headers=headers
+                )
+                break
+            except Exception:
+                time.sleep(2)
 
         if response.ok is False:
             LOGGER.error(
