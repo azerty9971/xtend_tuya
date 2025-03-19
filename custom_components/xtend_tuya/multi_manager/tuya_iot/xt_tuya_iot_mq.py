@@ -72,6 +72,8 @@ class XTIOTOpenMQ(TuyaOpenMQ):
             LOGGER.debug(f"_get_mqtt_config failed: {response}", stack_info=True)
             return None
 
+        LOGGER.debug(f"_get_mqtt_config succeeded", stack_info=True)
+
         return XTIOTTuyaMQConfig(response)
 
     #This block will be useful when we'll use Paho MQTT 3.x or above
