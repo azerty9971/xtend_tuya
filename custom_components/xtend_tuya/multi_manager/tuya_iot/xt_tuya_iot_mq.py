@@ -32,6 +32,9 @@ from tuya_iot.openmq import (
 from ...const import (
     LOGGER,  # noqa: F401
 )
+from .xt_tuya_iot_openapi import (
+    XTIOTOpenAPI,
+)
 
 class XTIOTTuyaMQConfig(TuyaMQConfig):
     def __init__(self, mqConfigResponse: dict[str, Any] = {}) -> None:
@@ -48,6 +51,7 @@ class XTIOTTuyaMQConfig(TuyaMQConfig):
 class XTIOTOpenMQ(TuyaOpenMQ):
     def __init__(self, api: TuyaOpenAPI) -> None:
         super().__init__(api)
+        self.api: XTIOTOpenAPI = api
 
     def _get_mqtt_config(self) -> Optional[XTIOTTuyaMQConfig]:
         if not self.api.is_connect():
