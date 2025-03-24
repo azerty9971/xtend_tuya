@@ -235,9 +235,10 @@ class XTIOTOpenAPI:
             and self.__password
             and self.__country_code
         ):
-            self.connect(
+            connect_result = self.connect(
                 self.__username, self.__password, self.__country_code, self.__schema
             )
+            LOGGER.debug(f"Trying to connect: {connect_result}")
         return self.token_info is not None and len(self.token_info.access_token) > 0
 
     def __request(
