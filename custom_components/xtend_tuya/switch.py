@@ -50,6 +50,52 @@ SWITCHES: dict[str, tuple[XTSwitchEntityDescription, ...]] = {
             entity_category=EntityCategory.CONFIG,
         ),
     ),
+    "ggq": (
+        XTSwitchEntityDescription(
+            key=DPCode.SWITCH_1,
+            translation_key="switch_1",
+        ),
+        XTSwitchEntityDescription(
+            key=DPCode.SWITCH_2,
+            translation_key="switch_2",
+        ),
+        XTSwitchEntityDescription(
+            key=DPCode.SWITCH_3,
+            translation_key="switch_3",
+        ),
+        XTSwitchEntityDescription(
+            key=DPCode.SWITCH_4,
+            translation_key="switch_4",
+        ),
+        XTSwitchEntityDescription(
+            key=DPCode.SWITCH_5,
+            translation_key="switch_5",
+        ),
+        XTSwitchEntityDescription(
+            key=DPCode.SWITCH_6,
+            translation_key="switch_6",
+        ),
+        XTSwitchEntityDescription(
+            key=DPCode.SWITCH_7,
+            translation_key="switch_7",
+        ),
+        XTSwitchEntityDescription(
+            key=DPCode.SWITCH_8,
+            translation_key="switch_8",
+        ),
+        XTSwitchEntityDescription(
+            key=DPCode.WEATHER_SWITCH,
+            translation_key="weather_switch",
+        ),
+        XTSwitchEntityDescription(
+            key=DPCode.CONTROL_SKIP,
+            translation_key="control_skip",
+        ),
+        XTSwitchEntityDescription(
+            key=DPCode.SWITCH_ENABLED,
+            translation_key="switch_enabled",
+        ),
+    ),
     "gyd": (
         XTSwitchEntityDescription(
             key=DPCode.SWITCH_PIR,

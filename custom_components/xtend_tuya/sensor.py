@@ -48,6 +48,8 @@ from .ha_tuya_integration.tuya_integration_imports import (
     TuyaSensorEntityDescription,
     TuyaDPCode,
     TuyaIntegerTypeData,
+    TuyaDOMAIN,
+    TuyaDEVICE_CLASS_UNITS,
 )
 
 @dataclass(frozen=True)
@@ -452,6 +454,13 @@ ELECTRICITY_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.VOLTAGE,
         entity_registry_enabled_default=False,
     ),
+    XTSensorEntityDescription(
+        key=DPCode.VOLTAGE_CURRENT,
+        translation_key="voltage",
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.VOLTAGE,
+        entity_registry_enabled_default=False,
+    ),
 )
 
 TIMER_SENSORS: tuple[XTSensorEntityDescription, ...] = (
@@ -510,6 +519,9 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
         *TEMPERATURE_SENSORS,
         *CONSUMPTION_SENSORS,
         *ELECTRICITY_SENSORS,
+    ),
+    "ms": (
+        *BATTERY_SENSORS,
     ),
     # Automatic cat litter box
     # Note: Undocumented
@@ -781,6 +793,27 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
             entity_registry_enabled_default=True,
         ),
     ),
+    "slj": (
+        XTSensorEntityDescription(
+            key=DPCode.WATER_USE_DATA,
+            translation_key="water_use_data",
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_registry_enabled_default=True,
+        ),
+        XTSensorEntityDescription(
+            key=DPCode.WATER_ONCE,
+            translation_key="water_once",
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_registry_enabled_default=True,
+        ),
+        XTSensorEntityDescription(
+            key=DPCode.FLOW_VELOCITY,
+            translation_key="flow_velocity",
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_registry_enabled_default=True,
+        ),
+        *ELECTRICITY_SENSORS,
+    ),
     "smd": (
         XTSensorEntityDescription(
             key=DPCode.HEART_RATE,
@@ -829,6 +862,9 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
         ),
         *TEMPERATURE_SENSORS,
         *HUMIDITY_SENSORS,
+    ),
+    "wsdcg": (
+        *TEMPERATURE_SENSORS,
     ),
     "xfj": (
         XTSensorEntityDescription(
@@ -937,6 +973,62 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):
     entity_description: XTSensorEntityDescription
     _restored_data: SensorExtraStoredData | None = None
 
+    def _replaced_constructor(
+        self,
+        device: XTDevice,
+        device_manager: MultiManager,
+        description: XTSensorEntityDescription,
+    ) -> None:
+        self.entity_description = description
+        self._attr_unique_id = (
+            f"{super().unique_id}{description.key}{description.subkey or ''}"
+        )
+
+        if int_type := self.find_dpcode(description.key, dptype=DPType.INTEGER):
+            self._type_data = int_type
+            self._type = DPType.INTEGER
+            if description.native_unit_of_measurement is None:
+                self._attr_native_unit_of_measurement = int_type.unit
+        elif enum_type := self.find_dpcode(
+            description.key, dptype=DPType.ENUM, prefer_function=True
+        ):
+            self._type_data = enum_type
+            self._type = DPType.ENUM
+        else:
+            self._type = self.get_dptype(description.key)   #This is modified from TuyaSensorEntity's constructor
+
+        # Logic to ensure the set device class and API received Unit Of Measurement
+        # match Home Assistants requirements.
+        if (
+            self.device_class is not None
+            and not self.device_class.startswith(TuyaDOMAIN)
+            and description.native_unit_of_measurement is None
+        ):
+            # We cannot have a device class, if the UOM isn't set or the
+            # device class cannot be found in the validation mapping.
+            if (
+                self.native_unit_of_measurement is None
+                or self.device_class not in TuyaDEVICE_CLASS_UNITS
+            ):
+                self._attr_device_class = None
+                return
+
+            uoms = TuyaDEVICE_CLASS_UNITS[self.device_class]
+            self._uom = uoms.get(self.native_unit_of_measurement) or uoms.get(
+                self.native_unit_of_measurement.lower()
+            )
+
+            # Unknown unit of measurement, device class should not be used.
+            if self._uom is None:
+                self._attr_device_class = None
+                return
+
+            # Found unit of measurement, use the standardized Unit
+            # Use the target conversion unit (if set)
+            self._attr_native_unit_of_measurement = (
+                self._uom.conversion_unit or self._uom.unit
+            )
+
     def __init__(
         self,
         device: XTDevice,
@@ -944,38 +1036,14 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):
         description: XTSensorEntityDescription,
     ) -> None:
         """Init XT sensor."""
-        description_copy = description
-        need_adjust = False
         try:
-            #Verify if the DPCode is in Tuya's DPCode table, otherwise the init of Tuya will fail
-            TuyaDPCode(description.key)
+            super(XTSensorEntity, self).__init__(device, device_manager, description)
         except Exception:
-            need_adjust = True
-
-            #This DPCode can be any value of Tuya's DPCode table, it doesn't matter
-            description_copy = XTSensorEntityDescription(key=TuyaDPCode.FAULT)
-        super(XTSensorEntity, self).__init__(device, device_manager, description_copy)
+            self._replaced_constructor(device=device, device_manager=device_manager, description=description)
+        
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description
-        if need_adjust:
-            #If DPCode was not in Tuya's DPCode table then fix the initialization
-            self._attr_unique_id = (
-                f"{super().unique_id}{description.key}{description.subkey or ''}"
-            )
-
-            if int_type := self.find_dpcode(description.key, dptype=DPType.INTEGER):
-                self._type_data = int_type
-                self._type = DPType.INTEGER
-                if description.native_unit_of_measurement is None:
-                    self._attr_native_unit_of_measurement = int_type.unit
-            elif enum_type := self.find_dpcode(
-                description.key, dptype=DPType.ENUM, prefer_function=True
-            ):
-                self._type_data = enum_type
-                self._type = DPType.ENUM
-            else:
-                self._type = self.get_dptype(DPCode(description.key))
 
     def reset_value(self, _: datetime, manual_call: bool = False) -> None:
         if manual_call and self.cancel_reset_after_x_seconds:

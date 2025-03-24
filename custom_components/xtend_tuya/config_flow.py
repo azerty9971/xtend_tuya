@@ -52,7 +52,7 @@ from .const import (
 class TuyaOptionFlow(OptionsFlow):
     def __init__(self, config_entry: ConfigEntry) -> None:
         """Initialize options flow."""
-        self.config_entry = config_entry
+        self.handler = config_entry.entry_id
         if config_entry.options is not None:
             self.options = config_entry.options
         else:

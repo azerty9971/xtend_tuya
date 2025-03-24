@@ -314,6 +314,30 @@
       }
     },
     "number": {
+      "use_time_1": {
+        "name": "Usage time 1"
+      },
+      "use_time_2": {
+        "name": "Usage time 2"
+      },
+      "use_time_3": {
+        "name": "Usage time 3"
+      },
+      "use_time_4": {
+        "name": "Usage time 4"
+      },
+      "use_time_5": {
+        "name": "Usage time 5"
+      },
+      "use_time_6": {
+        "name": "Usage time 6"
+      },
+      "use_time_7": {
+        "name": "Usage time 7"
+      },
+      "use_time_8": {
+        "name": "Usage time 8"
+      },
       "none_delay_time": {
         "name": "Presence reset time"
       },
@@ -556,6 +580,20 @@
       }
     },
     "select": {
+      "temp_unit_convert": {
+        "name": "Temperature unit",
+        "state": {
+          "c": "Celsius",
+          "f": "Fahrenheit"
+        }
+      },
+      "water_control": {
+        "name": "Water control",
+        "state": {
+          "on": "On",
+          "off": "Off"
+        }
+      },
       "dj_color": {
         "name": "Color",
         "state": {
@@ -1043,6 +1081,12 @@
       }
     },
     "sensor": {
+      "flow_velocity": {
+        "name": "Flow speed"
+      },
+      "water_use_data": {
+        "name": "Water used"
+      },
       "hps_presence_state": {
         "name": "Presence",
         "state": {
@@ -1702,6 +1746,12 @@
       }
     },
     "switch": {
+      "switch_enabled": {
+        "name": "Switch enabled"
+      },
+      "control_skip": {
+        "name": "Skip control"
+      },
       "id_verification_set":{
         "name": "Set ID verification"
       },
