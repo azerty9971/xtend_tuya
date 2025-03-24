@@ -73,10 +73,7 @@ class XTIOTOpenMQ(TuyaOpenMQ):
         )
 
         if response.get("success", False) is False:
-            LOGGER.debug(f"_get_mqtt_config failed: {response}", stack_info=True)
             return None
-
-        LOGGER.debug(f"_get_mqtt_config succeeded", stack_info=True)
 
         return XTIOTTuyaMQConfig(response)
 
