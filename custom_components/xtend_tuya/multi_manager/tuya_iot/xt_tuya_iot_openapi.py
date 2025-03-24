@@ -235,9 +235,10 @@ class XTIOTOpenAPI:
             and self.__password
             and self.__country_code
         ):
-            self.connect(
+            connect_result = self.connect(
                 self.__username, self.__password, self.__country_code, self.__schema
             )
+            LOGGER.debug(f"Trying to connect: {connect_result}")
         return self.token_info is not None and len(self.token_info.access_token) > 0
 
     def __request(
@@ -277,9 +278,14 @@ class XTIOTOpenAPI:
                 t = {int(time.time()*1000)}"
         ) """
 
-        response = self.session.request(
-            method, self.endpoint + path, params=params, json=body, headers=headers
-        )
+        for _ in range(10):
+            try:
+                response = self.session.request(
+                    method, self.endpoint + path, params=params, json=body, headers=headers
+                )
+                break
+            except Exception:
+                time.sleep(2)
 
         if response.ok is False:
             LOGGER.error(

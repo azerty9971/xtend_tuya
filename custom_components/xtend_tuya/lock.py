@@ -42,7 +42,7 @@ LOCKS: dict[str, XTLockEntityDescription] = {
     "jtmspro": XTLockEntityDescription(
             key=None,
             translation_key="operate_lock",
-            unlock_status_list=[DPCode.LOCK_MOTOR_STATE]
+            unlock_status_list=[DPCode.LOCK_MOTOR_STATE],
         ),
     "mk": XTLockEntityDescription(
             key=None,
@@ -52,12 +52,12 @@ LOCKS: dict[str, XTLockEntityDescription] = {
     "ms": XTLockEntityDescription(
             key=None,
             translation_key="operate_lock",
-            temporary_unlock = True,
+            unlock_status_list=[DPCode.LOCK_MOTOR_STATE],
         ),
     "videolock": XTLockEntityDescription(
             key=None,
             translation_key="operate_lock",
-            unlock_status_list=[DPCode.LOCK_MOTOR_STATE]
+            unlock_status_list=[DPCode.LOCK_MOTOR_STATE],
         ),
 }
 
