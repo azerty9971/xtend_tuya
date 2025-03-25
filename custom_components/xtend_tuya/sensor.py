@@ -517,6 +517,7 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
             entity_registry_enabled_default=True,
         ),
         *TEMPERATURE_SENSORS,
+        *HUMIDITY_SENSORS,
         *CONSUMPTION_SENSORS,
         *ELECTRICITY_SENSORS,
     ),
