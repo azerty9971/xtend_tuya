@@ -227,9 +227,11 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
             decorate_tuya_integration(self.sharing_account.ha_tuya_integration_config_manager)
 
         for device in self.sharing_account.device_manager.device_map.values():
-            if self.sharing_account.device_manager.copy_statuses_to_tuya(device):
-                #New statuses were copied, let's rediscover the device
-                self.multi_manager.multi_device_listener.trigger_device_discovery(device, [TUYA_DISCOVERY_NEW_ORIG])
+            #This should in theory already be done, I kept it here just to be safe...
+            self.sharing_account.device_manager.copy_statuses_to_tuya(device)
+
+            #Trigger Tuya's rediscovery
+            self.multi_manager.multi_device_listener.trigger_device_discovery(device, [TUYA_DISCOVERY_NEW_ORIG])
     
     def get_platform_descriptors_to_merge(self, platform: Platform) -> Any:
         if self.sharing_account.device_manager.reuse_config:
