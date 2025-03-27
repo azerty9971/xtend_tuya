@@ -4,11 +4,15 @@ from typing import Any, Optional
 from types import SimpleNamespace
 from dataclasses import dataclass, field
 import copy
+from homeassistant.core import HomeAssistant
 from tuya_sharing import (
     CustomerDevice as TuyaDevice,
 )
 from ..multi_manager import (
     MultiManager,
+)
+from ...util import (
+    get_device_multi_manager,
 )
 
 @dataclass
@@ -86,7 +90,6 @@ class XTDevice(TuyaDevice):
     force_open_api: Optional[bool] = False
     function: dict[str, XTDeviceFunction]
     status_range: dict[str, XTDeviceStatusRange]
-    multi_manager: MultiManager = None
 
     def __init__(self, **kwargs: Any) -> None:
         self.source = ""
@@ -117,7 +120,6 @@ class XTDevice(TuyaDevice):
         self.status = {}
         self.function = {}
         self.status_range = {}
-        self.multi_manager = None
         super().__init__(**kwargs)
     
     def __repr__(self) -> str:
@@ -169,5 +171,5 @@ class XTDevice(TuyaDevice):
     def get_copy(self) -> XTDevice:
         return copy.deepcopy(self)
     
-    def set_multi_manager(self, multi_manager: MultiManager) -> None:
-        self.multi_manager = multi_manager
+    def get_multi_manager(self, hass: HomeAssistant) -> MultiManager | None:
+        return get_device_multi_manager(hass=hass, device=self)
