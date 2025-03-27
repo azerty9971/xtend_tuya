@@ -94,7 +94,7 @@ def _async_device_as_dict(
     if hasattr(device, "local_key"):
         local_key = device.local_key
     mm_data = {}
-    if multi_manager := device.multi_manager:
+    if multi_manager := device.get_multi_manager(hass=hass):
         mm_data["mode"] = multi_manager.get_active_types()
     data = {
         "id": device.id,
