@@ -86,6 +86,7 @@ class XTDevice(TuyaDevice):
     force_open_api: Optional[bool] = False
     function: dict[str, XTDeviceFunction]
     status_range: dict[str, XTDeviceStatusRange]
+    multi_manager: MultiManager = None
 
     def __init__(self, **kwargs: Any) -> None:
         self.source = ""
