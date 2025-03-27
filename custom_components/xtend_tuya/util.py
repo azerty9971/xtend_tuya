@@ -13,10 +13,6 @@ from .const import (
     DOMAIN,
 )
 
-from .multi_manager.shared.device import (
-    XTDevice,
-)
-
 from tuya_sharing.manager import (
     Manager,
     SharingDeviceListener,
@@ -25,6 +21,7 @@ from tuya_sharing.manager import (
 from .multi_manager.multi_manager import (
     MultiManager,
     XTConfigEntry,
+    XTDevice,
 )
 
 def log_stack(message: str):
@@ -166,3 +163,10 @@ def get_all_multi_managers(hass: HomeAssistant) -> list[MultiManager]:
         if runtime_data := get_config_entry_runtime_data(hass, config_entry, DOMAIN):
             return_list.append(runtime_data.device_manager)
     return return_list
+
+def get_device_multi_manager(hass: HomeAssistant, device: XTDevice) -> MultiManager | None:
+    all_mm = get_all_multi_managers(hass=hass)
+    for mm in all_mm:
+        if device.id in mm.device_map:
+            return mm
+    return None
