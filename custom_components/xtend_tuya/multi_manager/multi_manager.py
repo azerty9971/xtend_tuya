@@ -145,6 +145,7 @@ class MultiManager:  # noqa: F811
             for device_map in manager.get_available_device_maps():
                 for device_id in device_map:
                     device_map[device_id] = manager.convert_to_xt_device(device_map[device_id])
+                    device_map[device_id].set_multi_manager(self)
         
         #Register all devices in the master device map
         self._update_master_device_map()
@@ -413,3 +414,10 @@ class MultiManager:  # noqa: F811
                     break
             if device.online != old_online_status:
                 self.multi_device_listener.update_device(device, None)
+    
+    def get_active_types(self) -> list[str]:
+        return_list: list[str] = []
+        for account in self.accounts.values():
+            if account.is_type_initialized():
+                return_list.append(account.get_type_name())
+        return return_list
