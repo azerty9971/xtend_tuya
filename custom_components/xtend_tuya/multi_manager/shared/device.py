@@ -7,6 +7,9 @@ import copy
 from tuya_sharing import (
     CustomerDevice as TuyaDevice,
 )
+from ..multi_manager import (
+    MultiManager,
+)
 
 @dataclass
 class XTDeviceStatusRange:
@@ -113,6 +116,7 @@ class XTDevice(TuyaDevice):
         self.status = {}
         self.function = {}
         self.status_range = {}
+        self.multi_manager = None
         super().__init__(**kwargs)
     
     def __repr__(self) -> str:
@@ -163,3 +167,6 @@ class XTDevice(TuyaDevice):
 
     def get_copy(self) -> XTDevice:
         return copy.deepcopy(self)
+    
+    def set_multi_manager(self, multi_manager: MultiManager) -> None:
+        self.multi_manager = multi_manager

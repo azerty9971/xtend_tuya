@@ -21,6 +21,10 @@ class XTDeviceManagerInterface(ABC):
     @abstractmethod
     def get_type_name(self) -> str:
         return None
+    
+    @abstractmethod
+    def is_type_initialized(self) -> bool:
+        return False
 
     @abstractmethod
     async def setup_from_entry(self, hass: HomeAssistant, config_entry: XTConfigEntry, multi_manager: MultiManager) -> XTDeviceManagerInterface:

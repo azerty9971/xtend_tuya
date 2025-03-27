@@ -89,6 +89,9 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
 
     def get_type_name(self) -> str:
         return MESSAGE_SOURCE_TUYA_SHARING
+    
+    def is_type_initialized(self) -> bool:
+        return self.sharing_account is not None
 
     async def setup_from_entry(self, hass: HomeAssistant, config_entry: XTConfigEntry, multi_manager: MultiManager) -> bool:
         self.multi_manager: MultiManager = multi_manager
