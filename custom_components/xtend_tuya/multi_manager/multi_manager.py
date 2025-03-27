@@ -145,7 +145,6 @@ class MultiManager:  # noqa: F811
             for device_map in manager.get_available_device_maps():
                 for device_id in device_map:
                     device_map[device_id] = manager.convert_to_xt_device(device_map[device_id])
-                    device_map[device_id].set_multi_manager(self)
         
         #Register all devices in the master device map
         self._update_master_device_map()
