@@ -415,8 +415,6 @@ class CloudFixes:
                         continue
                     if max % 100 != 0:
                         continue
-                    if min not in (0, 1):
-                        continue
                     scale = 0
                     while max > 100:
                         max = int(max / 10)
@@ -435,8 +433,6 @@ class CloudFixes:
                     if unit not in supported_units:
                         continue
                     if max % 100 != 0:
-                        continue
-                    if min not in (0, 1):
                         continue
                     scale = 0
                     while max > 100:
@@ -458,8 +454,6 @@ class CloudFixes:
                             if unit not in supported_units:
                                 continue
                             if max % 100 != 0:
-                                continue
-                            if min not in (0, 1):
                                 continue
                             scale = 0
                             while max > 100:
