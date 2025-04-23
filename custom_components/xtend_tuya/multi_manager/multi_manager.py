@@ -16,6 +16,7 @@ from tuya_iot.device import (
 from ..const import (
     LOGGER,
     AllowedPlugins,
+    XTDeviceEntityFunctions,
 )
 
 from .shared.import_stub import (
@@ -422,3 +423,8 @@ class MultiManager:  # noqa: F811
             if account.is_type_initialized():
                 return_list.append(account.get_type_name())
         return return_list
+    
+    def execute_device_entity_function(self, function: XTDeviceEntityFunctions, device: XTDevice, param1: any | None = None):
+        match function:
+            case XTDeviceEntityFunctions.RECALCULATE_PERCENT_SCALE:
+                CloudFixes.fix_incorrect_percent_scale_forced(device, param1)
