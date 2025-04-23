@@ -21,7 +21,7 @@ from .multi_manager.multi_manager import (
 )
 from .const import (
     TUYA_DISCOVERY_NEW, 
-    DPCode,
+    XTDPCode,
     DPType,
     LOGGER,
 )
@@ -41,9 +41,9 @@ class XTLightEntityDescription(TuyaLightEntityDescription):
 LIGHTS: dict[str, tuple[XTLightEntityDescription, ...]] = {
     "dbl": (
         XTLightEntityDescription(
-            key=DPCode.LIGHT,
+            key=XTDPCode.LIGHT,
             translation_key="light",
-            brightness=DPCode.BRIGHT_VALUE,
+            brightness=XTDPCode.BRIGHT_VALUE,
         ),
     ),
 }

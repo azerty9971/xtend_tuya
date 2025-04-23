@@ -15,7 +15,7 @@ from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from .const import (
     LOGGER,  # noqa: F401
     TUYA_DISCOVERY_NEW,
-    DPCode,
+    XTDPCode,
 )
 from .util import (
     append_dictionnaries,
@@ -35,14 +35,14 @@ from .entity import (
 @dataclass(frozen=True)
 class XTLockEntityDescription(LockEntityDescription):
     """Describes a Tuya lock."""
-    unlock_status_list: list[DPCode] = field(default_factory=list)
+    unlock_status_list: list[XTDPCode] = field(default_factory=list)
     temporary_unlock: bool = False
 
 LOCKS: dict[str, XTLockEntityDescription] = {
     "jtmspro": XTLockEntityDescription(
             key=None,
             translation_key="operate_lock",
-            unlock_status_list=[DPCode.LOCK_MOTOR_STATE],
+            unlock_status_list=[XTDPCode.LOCK_MOTOR_STATE],
         ),
     "mk": XTLockEntityDescription(
             key=None,
@@ -52,12 +52,12 @@ LOCKS: dict[str, XTLockEntityDescription] = {
     "ms": XTLockEntityDescription(
             key=None,
             translation_key="operate_lock",
-            unlock_status_list=[DPCode.LOCK_MOTOR_STATE],
+            unlock_status_list=[XTDPCode.LOCK_MOTOR_STATE],
         ),
     "videolock": XTLockEntityDescription(
             key=None,
             translation_key="operate_lock",
-            unlock_status_list=[DPCode.LOCK_MOTOR_STATE],
+            unlock_status_list=[XTDPCode.LOCK_MOTOR_STATE],
         ),
 }
 
@@ -144,7 +144,7 @@ class XTLockEntity(XTEntity, LockEntity):
             self._attr_is_unlocking = False
         return self._attr_is_unlocking
 
-    def _get_state_value(self, codes: list[DPCode]) -> Any | None:
+    def _get_state_value(self, codes: list[XTDPCode]) -> Any | None:
         for code in codes:
             if str(code) in self.device.status:
                 return self.device.status[str(code)]
