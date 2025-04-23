@@ -561,8 +561,7 @@ class CloudFixes:
                 for alias in aliases:
                     poped_value = None
                     if alias in device.status:
-                        poped_value = device.status[alias]
-                        device.status.pop(alias)
+                        poped_value = device.status.pop(alias)
                     if code is not None:
                         remapped_alias = False
                         if alias in device.status_range and code not in device.status_range:
