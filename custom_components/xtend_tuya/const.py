@@ -88,6 +88,10 @@ class VirtualFunctions(IntFlag):
     """Virtual functions"""
     FUNCTION_RESET_STATE                        = 0X0001,   #Reset the specified states
 
+class XTDeviceEntityFunctions(StrEnum):
+    """ Functions that can be called from the device entity to alter the state of the device """
+    RECALCULATE_PERCENT_SCALE                   = "recalculate_percent_scale",
+
 @dataclass
 class DescriptionVirtualState:
     """Describes the VirtualStates linked to a specific Description Key."""

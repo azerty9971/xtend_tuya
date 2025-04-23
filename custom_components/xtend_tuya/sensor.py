@@ -39,6 +39,7 @@ from .const import (
     XTDPCode,
     DPType,
     VirtualStates,  # noqa: F401
+    XTDeviceEntityFunctions,
 )
 from .entity import (
     XTEntity,
@@ -65,6 +66,7 @@ class XTSensorEntityDescription(TuyaSensorEntityDescription):
     reset_yearly: bool = False
     reset_after_x_seconds: int = 0
     restoredata: bool = False
+    recalculate_scale_for_percentage: bool = False
 
 # Commonly used battery sensors, that are re-used in the sensors down below.
 BATTERY_SENSORS: tuple[XTSensorEntityDescription, ...] = (
@@ -75,6 +77,7 @@ BATTERY_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.BATTERY,
         state_class=SensorStateClass.MEASUREMENT,
         entity_category=EntityCategory.DIAGNOSTIC,
+        recalculate_scale_for_percentage=True,
     ),
     XTSensorEntityDescription(
         key=XTDPCode.BATTERY,  # Used by non-standard contact sensor implementations
@@ -83,6 +86,7 @@ BATTERY_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.BATTERY,
         state_class=SensorStateClass.MEASUREMENT,
         entity_category=EntityCategory.DIAGNOSTIC,
+        recalculate_scale_for_percentage=True,
     ),
     XTSensorEntityDescription(
         key=XTDPCode.BATTERY_STATE,
@@ -110,6 +114,7 @@ BATTERY_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.BATTERY,
         state_class=SensorStateClass.MEASUREMENT,
         entity_category=EntityCategory.DIAGNOSTIC,
+        recalculate_scale_for_percentage=True,
     ),
     XTSensorEntityDescription(
         key=XTDPCode.BATTERY_POWER,
@@ -1045,6 +1050,8 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description
+        if description.recalculate_scale_for_percentage:
+            device_manager.execute_device_entity_function(XTDeviceEntityFunctions.RECALCULATE_PERCENT_SCALE, device, description.key)
 
     def reset_value(self, _: datetime, manual_call: bool = False) -> None:
         if manual_call and self.cancel_reset_after_x_seconds:
