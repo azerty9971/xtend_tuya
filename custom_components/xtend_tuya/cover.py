@@ -21,7 +21,7 @@ from .multi_manager.multi_manager import (
     MultiManager,
     XTDevice,
 )
-from .const import TUYA_DISCOVERY_NEW, DPCode
+from .const import TUYA_DISCOVERY_NEW, XTDPCode
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaCoverEntity,
     TuyaCoverEntityDescription,
@@ -49,33 +49,33 @@ COVERS: dict[str, tuple[XTCoverEntityDescription, ...]] = {
         #    device_class=CoverDeviceClass.CURTAIN,
         #),
         XTCoverEntityDescription(
-            key=DPCode.CONTROL,
+            key=XTDPCode.CONTROL,
             translation_key="curtain",
-            current_state=DPCode.SITUATION_SET,
-            current_position=(DPCode.PERCENT_CONTROL, DPCode.PERCENT_STATE),
-            set_position=DPCode.PERCENT_CONTROL,
+            current_state=XTDPCode.SITUATION_SET,
+            current_position=(XTDPCode.PERCENT_CONTROL, XTDPCode.PERCENT_STATE),
+            set_position=XTDPCode.PERCENT_CONTROL,
             device_class=CoverDeviceClass.CURTAIN,
             ##override_tuya=True,
         ),
         XTCoverEntityDescription(
-            key=DPCode.CONTROL_2,
+            key=XTDPCode.CONTROL_2,
             translation_key="curtain_2",
-            current_position=DPCode.PERCENT_STATE_2,
-            set_position=DPCode.PERCENT_CONTROL_2,
+            current_position=XTDPCode.PERCENT_STATE_2,
+            set_position=XTDPCode.PERCENT_CONTROL_2,
             device_class=CoverDeviceClass.CURTAIN,
         ),
         XTCoverEntityDescription(
-            key=DPCode.CONTROL_3,
+            key=XTDPCode.CONTROL_3,
             translation_key="curtain_3",
-            current_position=DPCode.PERCENT_STATE_3,
-            set_position=DPCode.PERCENT_CONTROL_3,
+            current_position=XTDPCode.PERCENT_STATE_3,
+            set_position=XTDPCode.PERCENT_CONTROL_3,
             device_class=CoverDeviceClass.CURTAIN,
         ),
         XTCoverEntityDescription(
-            key=DPCode.MACH_OPERATE,
+            key=XTDPCode.MACH_OPERATE,
             translation_key="curtain",
-            current_position=DPCode.POSITION,
-            set_position=DPCode.POSITION,
+            current_position=XTDPCode.POSITION,
+            set_position=XTDPCode.POSITION,
             device_class=CoverDeviceClass.CURTAIN,
             open_instruction_value="FZ",
             close_instruction_value="ZZ",
@@ -84,10 +84,10 @@ COVERS: dict[str, tuple[XTCoverEntityDescription, ...]] = {
         # switch_1 is an undocumented code that behaves identically to control
         # It is used by the Kogan Smart Blinds Driver
         XTCoverEntityDescription(
-            key=DPCode.SWITCH_1,
+            key=XTDPCode.SWITCH_1,
             translation_key="blind",
-            current_position=DPCode.PERCENT_CONTROL,
-            set_position=DPCode.PERCENT_CONTROL,
+            current_position=XTDPCode.PERCENT_CONTROL,
+            set_position=XTDPCode.PERCENT_CONTROL,
             device_class=CoverDeviceClass.BLIND,
         ),
     ),

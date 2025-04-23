@@ -415,8 +415,6 @@ class CloudFixes:
                         continue
                     if max % 100 != 0:
                         continue
-                    if min not in (0, 1):
-                        continue
                     scale = 0
                     while max > 100:
                         max = int(max / 10)
@@ -435,8 +433,6 @@ class CloudFixes:
                     if unit not in supported_units:
                         continue
                     if max % 100 != 0:
-                        continue
-                    if min not in (0, 1):
                         continue
                     scale = 0
                     while max > 100:
@@ -458,8 +454,6 @@ class CloudFixes:
                             if unit not in supported_units:
                                 continue
                             if max % 100 != 0:
-                                continue
-                            if min not in (0, 1):
                                 continue
                             scale = 0
                             while max > 100:
@@ -562,7 +556,21 @@ class CloudFixes:
     
     def _remove_status_that_are_local_strategy_aliases(device: XTDevice):
         for local_strategy in device.local_strategy.values():
+            code = local_strategy.get("status_code")
             if aliases := local_strategy.get("status_code_alias", None):
                 for alias in aliases:
+                    poped_value = None
                     if alias in device.status:
-                        device.status.pop(alias)
+                        poped_value = device.status.pop(alias)
+                    if code is not None:
+                        remapped_alias = False
+                        if alias in device.status_range and code not in device.status_range:
+                            device.status_range[code] = device.status_range[alias]
+                            device.status_range[code].code = code
+                            remapped_alias = True
+                        if alias in device.function and code not in device.function:
+                            device.function[code] = device.function[alias]
+                            device.function[code].code = code
+                            remapped_alias = True
+                        if remapped_alias:
+                            device.status[code] = poped_value
