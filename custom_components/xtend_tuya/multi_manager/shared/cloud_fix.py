@@ -559,12 +559,18 @@ class CloudFixes:
             code = local_strategy.get("status_code")
             if aliases := local_strategy.get("status_code_alias", None):
                 for alias in aliases:
+                    poped_value = None
                     if alias in device.status:
-                        device.status.pop(alias)
+                        poped_value = device.status.pop(alias)
                     if code is not None:
+                        remapped_alias = False
                         if alias in device.status_range and code not in device.status_range:
                             device.status_range[code] = device.status_range[alias]
                             device.status_range[code].code = code
+                            remapped_alias = True
                         if alias in device.function and code not in device.function:
                             device.function[code] = device.function[alias]
                             device.function[code].code = code
+                            remapped_alias = True
+                        if remapped_alias:
+                            device.status[code] = poped_value
