@@ -95,8 +95,8 @@ class DescriptionVirtualState:
     key: str
     virtual_state_name: str
     virtual_state_value: VirtualStates = None
-    vs_copy_to_state: list[DPCode] = field(default_factory=list)
-    vs_copy_delta_to_state: list[DPCode] = field(default_factory=list)
+    vs_copy_to_state: list[XTDPCode] = field(default_factory=list)
+    vs_copy_delta_to_state: list[XTDPCode] = field(default_factory=list)
 
 @dataclass
 class DescriptionVirtualFunction:
@@ -105,7 +105,7 @@ class DescriptionVirtualFunction:
     key: str
     virtual_function_name: str
     virtual_function_value: VirtualStates = None
-    vf_reset_state: list[DPCode] = field(default_factory=list)
+    vf_reset_state: list[XTDPCode] = field(default_factory=list)
 
 class WorkMode(StrEnum):
     """Work modes."""
@@ -127,7 +127,7 @@ class DPType(StrEnum):
     STRING = "String"
 
 
-class DPCode(StrEnum):
+class XTDPCode(StrEnum):
     """Data Point Codes used by XT.
 
     https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq

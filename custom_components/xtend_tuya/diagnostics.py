@@ -12,8 +12,8 @@ from homeassistant.helpers import device_registry as dr, entity_registry as er
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.util import dt as dt_util
 
-from .multi_manager.multi_manager import XTConfigEntry
-from .const import DOMAIN, DOMAIN_ORIG, DPCode
+from .multi_manager.multi_manager import XTConfigEntry, MultiManager
+from .const import DOMAIN, DOMAIN_ORIG, XTDPCode
 from .multi_manager.shared.device import (
     XTDevice,
 )
@@ -93,6 +93,9 @@ def _async_device_as_dict(
     local_key = ""
     if hasattr(device, "local_key"):
         local_key = device.local_key
+    mm_data = {}
+    if multi_manager := device.get_multi_manager(hass=hass):
+        mm_data["mode"] = multi_manager.get_active_types()
     data = {
         "id": device.id,
         "name": device.name,
@@ -113,13 +116,14 @@ def _async_device_as_dict(
         "home_assistant": {},
         "set_up": set_up,
         "support_local": support_local,
+        "multi_manager": mm_data,
         "data_model": data_model,
     }
 
     # Gather Tuya states
     for dpcode, value in device.status.items():
         # These statuses may contain sensitive information, redact these..
-        if dpcode in {DPCode.ALARM_MESSAGE, DPCode.MOVEMENT_DETECT_PIC}:
+        if dpcode in {XTDPCode.ALARM_MESSAGE, XTDPCode.MOVEMENT_DETECT_PIC}:
             data["status"][dpcode] = REDACTED
             continue
 

@@ -19,7 +19,7 @@ from .multi_manager.multi_manager import (
     XTDevice,
 )
 
-from .const import TUYA_DISCOVERY_NEW, DPCode, VirtualFunctions
+from .const import TUYA_DISCOVERY_NEW, XTDPCode, VirtualFunctions
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaButtonEntity,
     TuyaButtonEntityDescription,
@@ -31,13 +31,13 @@ from .entity import (
 @dataclass(frozen=True)
 class XTButtonEntityDescription(TuyaButtonEntityDescription):
     virtual_function: VirtualFunctions | None = None
-    vf_reset_state: list[DPCode]  | None = field(default_factory=list)
+    vf_reset_state: list[XTDPCode]  | None = field(default_factory=list)
 
 CONSUMPTION_BUTTONS: tuple[XTButtonEntityDescription, ...] = (
     XTButtonEntityDescription(
-            key=DPCode.RESET_ADD_ELE,
+            key=XTDPCode.RESET_ADD_ELE,
             virtual_function = VirtualFunctions.FUNCTION_RESET_STATE,
-            vf_reset_state=[DPCode.ADD_ELE],
+            vf_reset_state=[XTDPCode.ADD_ELE],
             translation_key="reset_add_ele",
             entity_category=EntityCategory.CONFIG,
     ),
@@ -48,7 +48,7 @@ CONSUMPTION_BUTTONS: tuple[XTButtonEntityDescription, ...] = (
 BUTTONS: dict[str, tuple[XTButtonEntityDescription, ...]] = {
     "jtmspro": (
         XTButtonEntityDescription(
-            key=DPCode.MANUAL_LOCK,
+            key=XTDPCode.MANUAL_LOCK,
             translation_key="manual_lock",
             entity_category=EntityCategory.CONFIG,
         ),
@@ -58,14 +58,14 @@ BUTTONS: dict[str, tuple[XTButtonEntityDescription, ...]] = {
     ),
     "qccdz": (
         XTButtonEntityDescription(
-            key=DPCode.CLEAR_ENERGY,
+            key=XTDPCode.CLEAR_ENERGY,
             translation_key="clear_energy",
             entity_category=EntityCategory.CONFIG,
         ),
     ),
     "xfj": (
         XTButtonEntityDescription(
-            key=DPCode.FILTER_RESET,
+            key=XTDPCode.FILTER_RESET,
             translation_key="filter_reset",
             entity_category=EntityCategory.CONFIG,
         ),

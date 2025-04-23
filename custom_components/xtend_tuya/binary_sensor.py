@@ -20,7 +20,7 @@ from .multi_manager.multi_manager import (
     MultiManager,
     XTDevice,
 )
-from .const import TUYA_DISCOVERY_NEW, DPCode, LOGGER
+from .const import TUYA_DISCOVERY_NEW, XTDPCode, LOGGER
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaBinarySensorEntity,
     TuyaBinarySensorEntityDescription,
@@ -42,7 +42,7 @@ class XTBinarySensorEntityDescription(TuyaBinarySensorEntityDescription):
 
 # Commonly used sensors
 TAMPER_BINARY_SENSOR = XTBinarySensorEntityDescription(
-    key=DPCode.TEMPER_ALARM,
+    key=XTDPCode.TEMPER_ALARM,
     name="Tamper",
     device_class=BinarySensorDeviceClass.TAMPER,
     entity_category=EntityCategory.DIAGNOSTIC,
@@ -56,7 +56,7 @@ TAMPER_BINARY_SENSOR = XTBinarySensorEntityDescription(
 BINARY_SENSORS: dict[str, tuple[XTBinarySensorEntityDescription, ...]] = {
     "jtmspro": (
         XTBinarySensorEntityDescription(
-            key=DPCode.LOCK_MOTOR_STATE,
+            key=XTDPCode.LOCK_MOTOR_STATE,
             translation_key="lock_motor_state",
             device_class=BinarySensorDeviceClass.LOCK,
             on_value=True
@@ -64,7 +64,7 @@ BINARY_SENSORS: dict[str, tuple[XTBinarySensorEntityDescription, ...]] = {
     ),
     "kg": (
         XTBinarySensorEntityDescription(
-            key=DPCode.PRESENCE_STATE,
+            key=XTDPCode.PRESENCE_STATE,
             device_class=BinarySensorDeviceClass.MOTION,
             on_value="presence",
         ),
@@ -74,24 +74,24 @@ BINARY_SENSORS: dict[str, tuple[XTBinarySensorEntityDescription, ...]] = {
         #If 0 is reported, it will not be counted
         #(today and the average number of toilet visits will be counted on the APP)
         XTBinarySensorEntityDescription(
-            key=DPCode.CLEANING_NUM,
+            key=XTDPCode.CLEANING_NUM,
             translation_key="cleaning_num",
         ),
         XTBinarySensorEntityDescription(
-            key=DPCode.TRASH_STATUS,
+            key=XTDPCode.TRASH_STATUS,
             translation_key="trash_status",
             entity_registry_enabled_default=True,
             on_value="1",
         ),
         XTBinarySensorEntityDescription(
-            key=DPCode.POWER,
+            key=XTDPCode.POWER,
             translation_key="power",
             entity_registry_enabled_default=False,
         ),
     ),
     "pir": (
         XTBinarySensorEntityDescription(
-            key=DPCode.PIR2,
+            key=XTDPCode.PIR2,
             device_class=BinarySensorDeviceClass.MOTION,
         ),
     ),
@@ -107,15 +107,15 @@ BINARY_SENSORS: dict[str, tuple[XTBinarySensorEntityDescription, ...]] = {
     #),
     "smd": (
         XTBinarySensorEntityDescription(
-            key=DPCode.OFF_BED,
+            key=XTDPCode.OFF_BED,
             translation_key="off_bed",
         ),
         XTBinarySensorEntityDescription(
-            key=DPCode.WAKEUP,
+            key=XTDPCode.WAKEUP,
             translation_key="wakeup",
         ),
         XTBinarySensorEntityDescription(
-            key=DPCode.OFF,
+            key=XTDPCode.OFF,
             translation_key="off",
         ),
     ),
