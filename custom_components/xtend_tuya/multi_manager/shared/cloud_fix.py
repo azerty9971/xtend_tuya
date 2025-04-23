@@ -56,8 +56,8 @@ class CloudFixes:
                             config_item["valueDesc"] = json.dumps(value)
                         except Exception:
                             continue
-        if code := device.status_range.get(recomputed_function_code):
-            value = json.loads(device.status_range[code].values)
+        if recomputed_function_code in device.status_range:
+            value = json.loads(device.status_range[recomputed_function_code].values)
             if "unit" in value and "min" in value and "max" in value and "scale" in value:
                 try:
                     max = int(value["max"])
@@ -67,11 +67,11 @@ class CloudFixes:
                             max = int(max / 10)
                             scale = scale + 1
                         value["scale"] = scale
-                        device.status_range[code].values = json.dumps(value)
+                        device.status_range[recomputed_function_code].values = json.dumps(value)
                 except Exception:
                     pass
-        if code := device.function.get(recomputed_function_code):
-            value = json.loads(device.function[code].values)
+        if recomputed_function_code in device.function:
+            value = json.loads(device.function[recomputed_function_code].values)
             if "unit" in value and "min" in value and "max" in value and "scale" in value:
                 try:
                     max = int(value["max"])
@@ -81,7 +81,7 @@ class CloudFixes:
                             max = int(max / 10)
                             scale = scale + 1
                         value["scale"] = scale
-                        device.function[code].values = json.dumps(value)
+                        device.function[recomputed_function_code].values = json.dumps(value)
                 except Exception:
                     pass
 
