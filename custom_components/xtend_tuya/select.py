@@ -17,7 +17,7 @@ from .multi_manager.multi_manager import (
     MultiManager,
     XTDevice,
 )
-from .const import TUYA_DISCOVERY_NEW, DPCode
+from .const import TUYA_DISCOVERY_NEW, XTDPCode
 from .entity import (
     XTEntity,
 )
@@ -36,86 +36,86 @@ class XTSelectEntityDescription(TuyaSelectEntityDescription):
 SELECTS: dict[str, tuple[XTSelectEntityDescription, ...]] = {
     "dbl": (
         XTSelectEntityDescription(
-            key=DPCode.TEMP_UNIT_CONVERT,
+            key=XTDPCode.TEMP_UNIT_CONVERT,
             translation_key="change_temp_unit",
             entity_category=EntityCategory.CONFIG,
         ),
         XTSelectEntityDescription(
-            key=DPCode.COUNTDOWN_SET,
+            key=XTDPCode.COUNTDOWN_SET,
             translation_key="countdown",
             entity_category=EntityCategory.CONFIG,
         ),
         XTSelectEntityDescription(
-            key=DPCode.POWER_SET,
+            key=XTDPCode.POWER_SET,
             translation_key="dbl_power_set",
             entity_category=EntityCategory.CONFIG,
         ),
         XTSelectEntityDescription(
-            key=DPCode.SOUND_MODE,
+            key=XTDPCode.SOUND_MODE,
             translation_key="sound_mode",
             entity_category=EntityCategory.CONFIG,
         ),
     ),
     "dj": (
         XTSelectEntityDescription(
-            key=DPCode.COLOR,
+            key=XTDPCode.COLOR,
             translation_key="dj_color",
             entity_category=EntityCategory.CONFIG,
         ),
         XTSelectEntityDescription(
-            key=DPCode.MODE2,
+            key=XTDPCode.MODE2,
             translation_key="dj_mode",
             entity_category=EntityCategory.CONFIG,
         ),
     ),
     "ggq": (
         XTSelectEntityDescription(
-            key=DPCode.WEATHER_DELAY,
+            key=XTDPCode.WEATHER_DELAY,
             translation_key="weather_delay",
             entity_category=EntityCategory.CONFIG,
         ),
         XTSelectEntityDescription(
-            key=DPCode.WATER_CONTROL,
+            key=XTDPCode.WATER_CONTROL,
             translation_key="water_control",
             entity_category=EntityCategory.CONFIG,
         ),
         XTSelectEntityDescription(
-            key=DPCode.TEMP_UNIT_CONVERT,
+            key=XTDPCode.TEMP_UNIT_CONVERT,
             translation_key="temp_unit_convert",
             entity_category=EntityCategory.CONFIG,
         ),
     ),
     "gyd": (
         XTSelectEntityDescription(
-            key=DPCode.DEVICE_MODE,
+            key=XTDPCode.DEVICE_MODE,
             translation_key="device_mode",
             entity_category=EntityCategory.CONFIG,
         ),
         XTSelectEntityDescription(
-            key=DPCode.CDS,
+            key=XTDPCode.CDS,
             translation_key="cds",
             entity_category=EntityCategory.CONFIG,
         ),
         XTSelectEntityDescription(
-            key=DPCode.PIR_SENSITIVITY,
+            key=XTDPCode.PIR_SENSITIVITY,
             translation_key="pir_sensitivity",
             entity_category=EntityCategory.CONFIG,
         ),
     ),
     "jtmspro": (
         XTSelectEntityDescription(
-            key=DPCode.BEEP_VOLUME,
+            key=XTDPCode.BEEP_VOLUME,
             translation_key="beep_volume",
             entity_category=EntityCategory.CONFIG,
         ),
         XTSelectEntityDescription(
-            key=DPCode.ALARM_VOLUME,
+            key=XTDPCode.ALARM_VOLUME,
             translation_key="alarm_volume",
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False
         ),
         XTSelectEntityDescription(
-            key=DPCode.SOUND_MODE,
+            key=XTDPCode.SOUND_MODE,
             translation_key="sound_mode",
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False
@@ -123,69 +123,69 @@ SELECTS: dict[str, tuple[XTSelectEntityDescription, ...]] = {
     ),
     "mk": (
         XTSelectEntityDescription(
-            key=DPCode.DOORBELL_VOLUME,
+            key=XTDPCode.DOORBELL_VOLUME,
             translation_key="doorbell_volume",
             entity_category=EntityCategory.CONFIG,
         ),
     ),
     "msp": (
         XTSelectEntityDescription(
-            key=DPCode.CLEAN,
+            key=XTDPCode.CLEAN,
             translation_key="cat_litter_box_clean",
             entity_category=EntityCategory.CONFIG,
         ),
         XTSelectEntityDescription(
-            key=DPCode.EMPTY,
+            key=XTDPCode.EMPTY,
             translation_key="cat_litter_box_empty",
             entity_category=EntityCategory.CONFIG,
         ),
         XTSelectEntityDescription(
-            key=DPCode.STATUS,
+            key=XTDPCode.STATUS,
             translation_key="cat_litter_box_status",
             entity_category=EntityCategory.DIAGNOSTIC,
         ),
         XTSelectEntityDescription(
-            key=DPCode.WORK_MODE,
+            key=XTDPCode.WORK_MODE,
             translation_key="cat_litter_box_work_mode",
             entity_category=EntityCategory.CONFIG,
         ),
     ),
     "ms_category": (
         XTSelectEntityDescription(
-            key=DPCode.KEY_TONE,
+            key=XTDPCode.KEY_TONE,
             translation_key="key_tone",
             entity_category=EntityCategory.CONFIG,
         ),
     ),
     "mzj": (
         XTSelectEntityDescription(
-            key=DPCode.TEMPCHANGER,
+            key=XTDPCode.TEMPCHANGER,
             translation_key="change_temp_unit",
             entity_category=EntityCategory.CONFIG,
         ),
     ),
     "qccdz": (
         XTSelectEntityDescription(
-            key=DPCode.WORK_MODE,
+            key=XTDPCode.WORK_MODE,
             translation_key="qccdz_work_mode",
             entity_category=EntityCategory.CONFIG,
         ),
         XTSelectEntityDescription(
-            key=DPCode.CHARGINGOPERATION,
+            key=XTDPCode.CHARGINGOPERATION,
             translation_key="qccdz_chargingoperation",
             entity_category=EntityCategory.CONFIG,
         ),
     ),
     "sfkzq": (
         XTSelectEntityDescription(
-            key=DPCode.WORK_STATE,
+            key=XTDPCode.WORK_STATE,
             translation_key="sfkzq_work_state",
             entity_category=EntityCategory.CONFIG,
         ),
     ),
     "xfj": (
         XTSelectEntityDescription(
-            key=DPCode.MODE,
+            key=XTDPCode.MODE,
             translation_key="xfj_mode",
             entity_category=EntityCategory.CONFIG,
         ),

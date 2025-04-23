@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from .const import (
-    DPCode,
+    XTDPCode,
     DPType,
 )
 
@@ -15,11 +15,11 @@ from .ha_tuya_integration.tuya_integration_imports import (
 class XTEntity(TuyaEntity):
     def find_dpcode(
         self,
-        dpcodes: str | DPCode | tuple[DPCode, ...] | None,
+        dpcodes: str | XTDPCode | tuple[XTDPCode, ...] | None,
         *,
         prefer_function: bool = False,
         dptype: DPType | None = None,
-    ) -> DPCode | TuyaEnumTypeData | TuyaIntegerTypeData | None:
+    ) -> XTDPCode | TuyaEnumTypeData | TuyaIntegerTypeData | None:
         try:
             return super(XTEntity, self).find_dpcode(dpcodes=dpcodes, prefer_function=prefer_function, dptype=dptype)
         except Exception:
@@ -28,7 +28,7 @@ class XTEntity(TuyaEntity):
                 return None
 
             if isinstance(dpcodes, str):
-                dpcodes = (DPCode(dpcodes),)
+                dpcodes = (XTDPCode(dpcodes),)
             elif not isinstance(dpcodes, tuple):
                 dpcodes = (dpcodes,)
 

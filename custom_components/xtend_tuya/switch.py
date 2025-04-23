@@ -16,7 +16,7 @@ from .multi_manager.multi_manager import (
     MultiManager,
     XTDevice,
 )
-from .const import TUYA_DISCOVERY_NEW, DPCode
+from .const import TUYA_DISCOVERY_NEW, XTDPCode
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaSwitchEntity,
     TuyaSwitchEntityDescription,
@@ -34,90 +34,90 @@ class XTSwitchEntityDescription(TuyaSwitchEntityDescription, frozen_or_thawed=Tr
 SWITCHES: dict[str, tuple[XTSwitchEntityDescription, ...]] = {
     "dbl": (
         XTSwitchEntityDescription(
-            key=DPCode.SWITCH,
+            key=XTDPCode.SWITCH,
             translation_key="switch",
             entity_category=EntityCategory.CONFIG,
         ),
         XTSwitchEntityDescription(
-            key=DPCode.CHILD_LOCK,
+            key=XTDPCode.CHILD_LOCK,
             translation_key="child_lock",
             entity_category=EntityCategory.CONFIG,
             icon="mdi:human-child"
         ),
         XTSwitchEntityDescription(
-            key=DPCode.SOUND,
+            key=XTDPCode.SOUND,
             translation_key="sound",
             entity_category=EntityCategory.CONFIG,
         ),
     ),
     "ggq": (
         XTSwitchEntityDescription(
-            key=DPCode.SWITCH_1,
+            key=XTDPCode.SWITCH_1,
             translation_key="switch_1",
         ),
         XTSwitchEntityDescription(
-            key=DPCode.SWITCH_2,
+            key=XTDPCode.SWITCH_2,
             translation_key="switch_2",
         ),
         XTSwitchEntityDescription(
-            key=DPCode.SWITCH_3,
+            key=XTDPCode.SWITCH_3,
             translation_key="switch_3",
         ),
         XTSwitchEntityDescription(
-            key=DPCode.SWITCH_4,
+            key=XTDPCode.SWITCH_4,
             translation_key="switch_4",
         ),
         XTSwitchEntityDescription(
-            key=DPCode.SWITCH_5,
+            key=XTDPCode.SWITCH_5,
             translation_key="switch_5",
         ),
         XTSwitchEntityDescription(
-            key=DPCode.SWITCH_6,
+            key=XTDPCode.SWITCH_6,
             translation_key="switch_6",
         ),
         XTSwitchEntityDescription(
-            key=DPCode.SWITCH_7,
+            key=XTDPCode.SWITCH_7,
             translation_key="switch_7",
         ),
         XTSwitchEntityDescription(
-            key=DPCode.SWITCH_8,
+            key=XTDPCode.SWITCH_8,
             translation_key="switch_8",
         ),
         XTSwitchEntityDescription(
-            key=DPCode.WEATHER_SWITCH,
+            key=XTDPCode.WEATHER_SWITCH,
             translation_key="weather_switch",
         ),
         XTSwitchEntityDescription(
-            key=DPCode.CONTROL_SKIP,
+            key=XTDPCode.CONTROL_SKIP,
             translation_key="control_skip",
         ),
         XTSwitchEntityDescription(
-            key=DPCode.SWITCH_ENABLED,
+            key=XTDPCode.SWITCH_ENABLED,
             translation_key="switch_enabled",
         ),
     ),
     "gyd": (
         XTSwitchEntityDescription(
-            key=DPCode.SWITCH_PIR,
+            key=XTDPCode.SWITCH_PIR,
             translation_key="switch_pir",
             entity_category=EntityCategory.CONFIG,
         ),
     ),
     "hps": (
         XTSwitchEntityDescription(
-            key=DPCode.INDICATOR_LED,
+            key=XTDPCode.INDICATOR_LED,
             translation_key="indicator_light",
             entity_category=EntityCategory.CONFIG,
         ),
     ),
     "jtmspro": (
         XTSwitchEntityDescription(
-            key=DPCode.AUTOMATIC_LOCK,
+            key=XTDPCode.AUTOMATIC_LOCK,
             translation_key="automatic_lock",
             entity_category=EntityCategory.CONFIG,
         ),
         XTSwitchEntityDescription(
-            key=DPCode.ALARM_SWITCH,
+            key=XTDPCode.ALARM_SWITCH,
             translation_key="alarm_switch",
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False
@@ -125,13 +125,13 @@ SWITCHES: dict[str, tuple[XTSwitchEntityDescription, ...]] = {
     ),
     "mk": (
         XTSwitchEntityDescription(
-            key=DPCode.AUTOMATIC_LOCK,
+            key=XTDPCode.AUTOMATIC_LOCK,
             translation_key="automatic_lock",
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False
         ),
         XTSwitchEntityDescription(
-            key=DPCode.PHOTO_AGAIN,
+            key=XTDPCode.PHOTO_AGAIN,
             translation_key="photo_again",
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False
@@ -141,205 +141,205 @@ SWITCHES: dict[str, tuple[XTSwitchEntityDescription, ...]] = {
     # Note: Undocumented
     "msp": (
         XTSwitchEntityDescription(
-            key=DPCode.AUTO_CLEAN,
+            key=XTDPCode.AUTO_CLEAN,
             translation_key="auto_clean",
             entity_category=EntityCategory.CONFIG,
             icon="mdi:bacteria",
         ),
         XTSwitchEntityDescription(
-            key=DPCode.AUTO_DEORDRIZER,
+            key=XTDPCode.AUTO_DEORDRIZER,
             translation_key="auto_deordrizer",
             entity_category=EntityCategory.CONFIG,
         ),
         XTSwitchEntityDescription(
-            key=DPCode.BEEP,
+            key=XTDPCode.BEEP,
             translation_key="beep",
             entity_category=EntityCategory.CONFIG,
         ),
         XTSwitchEntityDescription(
-            key=DPCode.CALIBRATION,
+            key=XTDPCode.CALIBRATION,
             translation_key="calibration",
             entity_category=EntityCategory.CONFIG,
         ),
         XTSwitchEntityDescription(
-            key=DPCode.CHILD_LOCK,
+            key=XTDPCode.CHILD_LOCK,
             translation_key="child_lock",
             entity_category=EntityCategory.CONFIG,
             icon="mdi:human-child"
         ),
         XTSwitchEntityDescription(
-            key=DPCode.CLEAN_NOTICE,
+            key=XTDPCode.CLEAN_NOTICE,
             translation_key="clean_notice",
             entity_category=EntityCategory.CONFIG,
         ),
         XTSwitchEntityDescription(
-            key=DPCode.CLEAN_TASTE_SWITCH,
+            key=XTDPCode.CLEAN_TASTE_SWITCH,
             translation_key="clean_tasteswitch",
             entity_category=EntityCategory.CONFIG,
         ),
         XTSwitchEntityDescription(
-            key=DPCode.CLEAN_TIME_SWITCH,
+            key=XTDPCode.CLEAN_TIME_SWITCH,
             translation_key="clean_time_switch",
             entity_category=EntityCategory.CONFIG,
         ),
         XTSwitchEntityDescription(
-            key=DPCode.DEODORIZATION,
+            key=XTDPCode.DEODORIZATION,
             translation_key="deodorization",
             entity_category=EntityCategory.CONFIG,
             icon="mdi:bacteria",
         ),
         XTSwitchEntityDescription(
-            key=DPCode.FACTORY_RESET,
+            key=XTDPCode.FACTORY_RESET,
             translation_key="factory_reset",
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False,
         ),
         XTSwitchEntityDescription(
-            key=DPCode.INDICATOR_LIGHT,
+            key=XTDPCode.INDICATOR_LIGHT,
             translation_key="indicator_light",
             entity_category=EntityCategory.CONFIG,
         ),
         XTSwitchEntityDescription(
-            key=DPCode.INDUCTION_CLEAN,
+            key=XTDPCode.INDUCTION_CLEAN,
             translation_key="induction_clean",
             entity_category=EntityCategory.CONFIG,
         ),
         XTSwitchEntityDescription(
-            key=DPCode.LIGHT,
+            key=XTDPCode.LIGHT,
             translation_key="light",
             entity_category=EntityCategory.CONFIG,
         ),
         XTSwitchEntityDescription(
-            key=DPCode.MANUAL_CLEAN,
+            key=XTDPCode.MANUAL_CLEAN,
             translation_key="manual_clean",
             entity_category=EntityCategory.CONFIG,
         ),
         XTSwitchEntityDescription(
-            key=DPCode.NET_NOTICE,
+            key=XTDPCode.NET_NOTICE,
             translation_key="net_notice",
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False,
         ),
         XTSwitchEntityDescription(
-            key=DPCode.NOT_DISTURB_SWITCH,
+            key=XTDPCode.NOT_DISTURB_SWITCH,
             translation_key="not_disturb_switch",
             entity_category=EntityCategory.CONFIG,
         ),
         XTSwitchEntityDescription(
-            key=DPCode.ODOURLESS,
+            key=XTDPCode.ODOURLESS,
             translation_key="odourless",
             entity_category=EntityCategory.CONFIG,
         ),
         XTSwitchEntityDescription(
-            key=DPCode.CLEANING,
+            key=XTDPCode.CLEANING,
             translation_key="one_click_cleanup",
             entity_category=EntityCategory.CONFIG,
         ),
         XTSwitchEntityDescription(
-            key=DPCode.QUIET_TIMING_ON,
+            key=XTDPCode.QUIET_TIMING_ON,
             translation_key="quiet_timing_on",
             entity_category=EntityCategory.CONFIG,
         ),
         XTSwitchEntityDescription(
-            key=DPCode.REBOOT,
+            key=XTDPCode.REBOOT,
             translation_key="child_lock",
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False,
         ),
         XTSwitchEntityDescription(
-            key=DPCode.SLEEP,
+            key=XTDPCode.SLEEP,
             translation_key="sleep",
             entity_category=EntityCategory.CONFIG,
         ),
         XTSwitchEntityDescription(
-            key=DPCode.SLEEPING,
+            key=XTDPCode.SLEEPING,
             translation_key="sleeping",
             entity_category=EntityCategory.CONFIG,
         ),
         XTSwitchEntityDescription(
-            key=DPCode.SMART_CLEAN,
+            key=XTDPCode.SMART_CLEAN,
             translation_key="smart_clean",
             entity_category=EntityCategory.CONFIG,
         ),
         XTSwitchEntityDescription(
-            key=DPCode.START,
+            key=XTDPCode.START,
             translation_key="start",
             entity_category=EntityCategory.CONFIG,
             icon="mdi:bacteria",
         ),
         XTSwitchEntityDescription(
-            key=DPCode.STORE_FULL_NOTIFY,
+            key=XTDPCode.STORE_FULL_NOTIFY,
             translation_key="store_full_notify",
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False,
         ),
         XTSwitchEntityDescription(
-            key=DPCode.SWITCH,
+            key=XTDPCode.SWITCH,
             translation_key="switch",
             entity_category=EntityCategory.CONFIG,
         ),
         XTSwitchEntityDescription(
-            key=DPCode.TOILET_NOTICE,
+            key=XTDPCode.TOILET_NOTICE,
             translation_key="toilet_notice",
             entity_category=EntityCategory.CONFIG,
             icon="mdi:toilet"
         ),
         XTSwitchEntityDescription(
-            key=DPCode.UNIT,
+            key=XTDPCode.UNIT,
             translation_key="unit",
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False,
         ),
         XTSwitchEntityDescription(
-            key=DPCode.UV,
+            key=XTDPCode.UV,
             translation_key="uv",
             entity_category=EntityCategory.CONFIG,
         ),
     ),
     "mzj": (
         XTSwitchEntityDescription(
-            key=DPCode.POWERONOFF,
+            key=XTDPCode.POWERONOFF,
             translation_key="power",
             entity_category=EntityCategory.CONFIG,
         ),
     ),
     "qccdz": (
         XTSwitchEntityDescription(
-            key=DPCode.SWITCH,
+            key=XTDPCode.SWITCH,
             translation_key="switch",
             entity_category=EntityCategory.CONFIG,
         ),
         XTSwitchEntityDescription(
-            key=DPCode.RFID,
+            key=XTDPCode.RFID,
             translation_key="rfid",
             entity_category=EntityCategory.CONFIG,
         ),
         XTSwitchEntityDescription(
-            key=DPCode.IDVERIFICATIONSET,
+            key=XTDPCode.IDVERIFICATIONSET,
             translation_key="id_verification_set",
             entity_category=EntityCategory.CONFIG,
         ),
     ),
     "wnykq": (
         XTSwitchEntityDescription(
-            key=DPCode.POWERON,
+            key=XTDPCode.POWERON,
             translation_key="power",
             entity_category=EntityCategory.CONFIG,
         ),
     ),
     "xfj": (
         XTSwitchEntityDescription(
-            key=DPCode.SWITCH,
+            key=XTDPCode.SWITCH,
             translation_key="switch",
             entity_category=EntityCategory.CONFIG,
         ),
         XTSwitchEntityDescription(
-            key=DPCode.UV_LIGHT,
+            key=XTDPCode.UV_LIGHT,
             translation_key="uv_light",
             entity_category=EntityCategory.CONFIG,
         ),
         XTSwitchEntityDescription(
-            key=DPCode.ANION,
+            key=XTDPCode.ANION,
             translation_key="anion",
             entity_category=EntityCategory.CONFIG,
         ),
