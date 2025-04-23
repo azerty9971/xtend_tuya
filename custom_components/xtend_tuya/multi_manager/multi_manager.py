@@ -153,6 +153,8 @@ class MultiManager:  # noqa: F811
         #"All functionnality" device
         self._merge_devices_from_multiple_sources()
         for device in self.device_map.values():
+            #Applied twice because some parts at the end of apply_fix would change values of previous calls
+            CloudFixes.apply_fixes(device)
             CloudFixes.apply_fixes(device)
         self._process_pending_messages()
 
@@ -413,3 +415,10 @@ class MultiManager:  # noqa: F811
                     break
             if device.online != old_online_status:
                 self.multi_device_listener.update_device(device, None)
+    
+    def get_active_types(self) -> list[str]:
+        return_list: list[str] = []
+        for account in self.accounts.values():
+            if account.is_type_initialized():
+                return_list.append(account.get_type_name())
+        return return_list
