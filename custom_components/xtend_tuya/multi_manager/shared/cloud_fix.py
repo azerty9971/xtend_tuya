@@ -29,6 +29,61 @@ class CloudFixes:
         CloudFixes._remove_status_that_are_local_strategy_aliases(device)
         CloudFixes._fix_unaligned_function_or_status_range(device)
         
+    def fix_incorrect_percent_scale_forced(device: XTDevice, function_code: str):
+        recomputed_function_code = function_code
+        for dpId in device.local_strategy:
+            status_code = device.local_strategy[dpId].get("status_code")
+            status_code_aliases = device.local_strategy[dpId].get("status_code_alias", [])
+            if status_code != function_code and function_code not in status_code_aliases:
+                continue
+
+            #We found the correct status, let's store it
+            recomputed_function_code = status_code
+
+            if config_item := device.local_strategy[dpId].get("config_item"):
+                if value_descr := config_item.get("valueDesc"):
+                    value = json.loads(value_descr)
+                    if "unit" in value and "min" in value and "max" in value and "scale" in value:
+                        try:
+                            max = int(value["max"])
+                            if max % 100 != 0:
+                                continue
+                            scale = 0
+                            while max > 100:
+                                max = int(max / 10)
+                                scale = scale + 1
+                            value["scale"] = scale
+                            config_item["valueDesc"] = json.dumps(value)
+                        except Exception:
+                            continue
+        if recomputed_function_code in device.status_range:
+            value = json.loads(device.status_range[recomputed_function_code].values)
+            if "unit" in value and "min" in value and "max" in value and "scale" in value:
+                try:
+                    max = int(value["max"])
+                    if max % 100 == 0:
+                        scale = 0
+                        while max > 100:
+                            max = int(max / 10)
+                            scale = scale + 1
+                        value["scale"] = scale
+                        device.status_range[recomputed_function_code].values = json.dumps(value)
+                except Exception:
+                    pass
+        if recomputed_function_code in device.function:
+            value = json.loads(device.function[recomputed_function_code].values)
+            if "unit" in value and "min" in value and "max" in value and "scale" in value:
+                try:
+                    max = int(value["max"])
+                    if max % 100 == 0:
+                        scale = 0
+                        while max > 100:
+                            max = int(max / 10)
+                            scale = scale + 1
+                        value["scale"] = scale
+                        device.function[recomputed_function_code].values = json.dumps(value)
+                except Exception:
+                    pass
 
     def _fix_unaligned_function_or_status_range(device: XTDevice):
 
