@@ -18,7 +18,7 @@ from .multi_manager.multi_manager import (
     XTDevice,
 )
 
-from .const import TUYA_DISCOVERY_NEW, LOGGER, DPCode
+from .const import TUYA_DISCOVERY_NEW, LOGGER, XTDPCode
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaCameraEntity,
 )
@@ -79,7 +79,7 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
     
     @staticmethod
     def should_entity_be_added(hass: HomeAssistant, device: XTDevice, multi_manager: MultiManager) -> bool:
-        camera_status: list[DPCode] = [DPCode.RECORD_MODE, DPCode.IPC_WORK_MODE, DPCode.PHOTO_AGAIN]
+        camera_status: list[XTDPCode] = [XTDPCode.RECORD_MODE, XTDPCode.IPC_WORK_MODE, XTDPCode.PHOTO_AGAIN]
         for test_status in camera_status:
             if test_status in device.status:
                 return True

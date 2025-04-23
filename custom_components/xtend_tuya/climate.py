@@ -23,7 +23,7 @@ from .multi_manager.multi_manager import (
     MultiManager,
     XTDevice,
 )
-from .const import TUYA_DISCOVERY_NEW, DPCode, DPType
+from .const import TUYA_DISCOVERY_NEW, XTDPCode, DPType
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaClimateEntity,
     TuyaClimateEntityDescription,
@@ -100,7 +100,7 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
         self._attr_hvac_modes: list[HVACMode] = []
         self._hvac_to_tuya = {}
         if enum_type := self.find_dpcode(
-            DPCode.MODE, dptype=DPType.ENUM, prefer_function=True
+            XTDPCode.MODE, dptype=DPType.ENUM, prefer_function=True
         ):
             self._attr_hvac_modes = [HVACMode.OFF]
             unknown_hvac_modes: list[str] = []
@@ -132,7 +132,7 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
                     self._attr_hvac_modes.append(description.switch_only_hvac_mode)
                 self._attr_preset_modes = unknown_hvac_modes
                 self._attr_supported_features |= ClimateEntityFeature.PRESET_MODE
-        elif self.find_dpcode(DPCode.SWITCH, prefer_function=True):
+        elif self.find_dpcode(XTDPCode.SWITCH, prefer_function=True):
             self._attr_hvac_modes = [
                 HVACMode.OFF,
                 description.switch_only_hvac_mode,

@@ -18,7 +18,7 @@ from .util import (
     merge_device_descriptors
 )
 
-from .const import TUYA_DISCOVERY_NEW, DPCode
+from .const import TUYA_DISCOVERY_NEW, XTDPCode
 from .multi_manager.multi_manager import (
     XTConfigEntry,
     MultiManager,
@@ -38,52 +38,52 @@ class XTNumberEntityDescription(TuyaNumberEntityDescription):
 
 TIMER_SENSORS: tuple[XTNumberEntityDescription, ...] = (
     XTNumberEntityDescription(
-        key=DPCode.COUNTDOWN_1,
+        key=XTDPCode.COUNTDOWN_1,
         translation_key="countdown_1",
         entity_category=EntityCategory.CONFIG,
     ),
     XTNumberEntityDescription(
-        key=DPCode.COUNTDOWN_2,
+        key=XTDPCode.COUNTDOWN_2,
         translation_key="countdown_2",
         entity_category=EntityCategory.CONFIG,
     ),
     XTNumberEntityDescription(
-        key=DPCode.COUNTDOWN_3,
+        key=XTDPCode.COUNTDOWN_3,
         translation_key="countdown_3",
         entity_category=EntityCategory.CONFIG,
     ),
     XTNumberEntityDescription(
-        key=DPCode.COUNTDOWN_4,
+        key=XTDPCode.COUNTDOWN_4,
         translation_key="countdown_4",
         entity_category=EntityCategory.CONFIG,
     ),
     XTNumberEntityDescription(
-        key=DPCode.COUNTDOWN_5,
+        key=XTDPCode.COUNTDOWN_5,
         translation_key="countdown_5",
         entity_category=EntityCategory.CONFIG,
     ),
     XTNumberEntityDescription(
-        key=DPCode.COUNTDOWN_6,
+        key=XTDPCode.COUNTDOWN_6,
         translation_key="countdown_6",
         entity_category=EntityCategory.CONFIG,
     ),
     XTNumberEntityDescription(
-        key=DPCode.COUNTDOWN_7,
+        key=XTDPCode.COUNTDOWN_7,
         translation_key="countdown_7",
         entity_category=EntityCategory.CONFIG,
     ),
     XTNumberEntityDescription(
-        key=DPCode.COUNTDOWN_8,
+        key=XTDPCode.COUNTDOWN_8,
         translation_key="countdown_8",
         entity_category=EntityCategory.CONFIG,
     ),
     XTNumberEntityDescription(
-        key=DPCode.SETDELAYTIME,
+        key=XTDPCode.SETDELAYTIME,
         translation_key="set_delay_time",
         entity_category=EntityCategory.CONFIG,
     ),
     XTNumberEntityDescription(
-        key=DPCode.SETDEFINETIME,
+        key=XTDPCode.SETDEFINETIME,
         translation_key="set_define_time",
         entity_category=EntityCategory.CONFIG,
     ),
@@ -95,7 +95,7 @@ TIMER_SENSORS: tuple[XTNumberEntityDescription, ...] = (
 NUMBERS: dict[str, tuple[XTNumberEntityDescription, ...]] = {
     "bh": (
         XTNumberEntityDescription(
-            key=DPCode.TEMP_SET_1,
+            key=XTDPCode.TEMP_SET_1,
             translation_key="warm_temperature",
             device_class=NumberDeviceClass.TEMPERATURE,
             entity_category=EntityCategory.CONFIG,
@@ -103,180 +103,180 @@ NUMBERS: dict[str, tuple[XTNumberEntityDescription, ...]] = {
     ),
     "dbl": (
         XTNumberEntityDescription(
-            key=DPCode.VOLUME_SET,
+            key=XTDPCode.VOLUME_SET,
             translation_key="volume",
             entity_category=EntityCategory.CONFIG,
         ),
     ),
     "ggq": (
         XTNumberEntityDescription(
-            key=DPCode.COUNTDOWN_1,
+            key=XTDPCode.COUNTDOWN_1,
             translation_key="countdown_1",
         ),
         XTNumberEntityDescription(
-            key=DPCode.COUNTDOWN_2,
+            key=XTDPCode.COUNTDOWN_2,
             translation_key="countdown_2",
         ),
         XTNumberEntityDescription(
-            key=DPCode.COUNTDOWN_3,
+            key=XTDPCode.COUNTDOWN_3,
             translation_key="countdown_3",
         ),
         XTNumberEntityDescription(
-            key=DPCode.COUNTDOWN_4,
+            key=XTDPCode.COUNTDOWN_4,
             translation_key="countdown_4",
         ),
         XTNumberEntityDescription(
-            key=DPCode.COUNTDOWN_5,
+            key=XTDPCode.COUNTDOWN_5,
             translation_key="countdown_5",
         ),
         XTNumberEntityDescription(
-            key=DPCode.COUNTDOWN_6,
+            key=XTDPCode.COUNTDOWN_6,
             translation_key="countdown_6",
         ),
         XTNumberEntityDescription(
-            key=DPCode.COUNTDOWN_7,
+            key=XTDPCode.COUNTDOWN_7,
             translation_key="countdown_7",
         ),
         XTNumberEntityDescription(
-            key=DPCode.COUNTDOWN_8,
+            key=XTDPCode.COUNTDOWN_8,
             translation_key="countdown_8",
         ),
         XTNumberEntityDescription(
-            key=DPCode.USE_TIME_1,
+            key=XTDPCode.USE_TIME_1,
             translation_key="use_time_1",
         ),
         XTNumberEntityDescription(
-            key=DPCode.USE_TIME_2,
+            key=XTDPCode.USE_TIME_2,
             translation_key="use_time_2",
         ),
         XTNumberEntityDescription(
-            key=DPCode.USE_TIME_3,
+            key=XTDPCode.USE_TIME_3,
             translation_key="use_time_3",
         ),
         XTNumberEntityDescription(
-            key=DPCode.USE_TIME_4,
+            key=XTDPCode.USE_TIME_4,
             translation_key="use_time_4",
         ),
         XTNumberEntityDescription(
-            key=DPCode.USE_TIME_5,
+            key=XTDPCode.USE_TIME_5,
             translation_key="use_time_5",
         ),
         XTNumberEntityDescription(
-            key=DPCode.USE_TIME_6,
+            key=XTDPCode.USE_TIME_6,
             translation_key="use_time_6",
         ),
         XTNumberEntityDescription(
-            key=DPCode.USE_TIME_7,
+            key=XTDPCode.USE_TIME_7,
             translation_key="use_time_7",
         ),
         XTNumberEntityDescription(
-            key=DPCode.USE_TIME_8,
+            key=XTDPCode.USE_TIME_8,
             translation_key="use_time_8",
         ),
     ),
     "gyd": (
         XTNumberEntityDescription(
-            key=DPCode.COUNTDOWN,
+            key=XTDPCode.COUNTDOWN,
             translation_key="countdown",
             entity_category=EntityCategory.CONFIG,
         ),
         XTNumberEntityDescription(
-            key=DPCode.PIR_DELAY,
+            key=XTDPCode.PIR_DELAY,
             translation_key="pir_delay",
             entity_category=EntityCategory.CONFIG,
         ),
         XTNumberEntityDescription(
-            key=DPCode.STANDBY_TIME,
+            key=XTDPCode.STANDBY_TIME,
             translation_key="standby_time",
             entity_category=EntityCategory.CONFIG,
         ),
         XTNumberEntityDescription(
-            key=DPCode.STANDBY_BRIGHT,
+            key=XTDPCode.STANDBY_BRIGHT,
             translation_key="standby_bright",
             entity_category=EntityCategory.CONFIG,
         ),
     ),
     "hps": (
         XTNumberEntityDescription(
-            key=DPCode.NONE_DELAY_TIME,
+            key=XTDPCode.NONE_DELAY_TIME,
             translation_key="none_delay_time",
             entity_category=EntityCategory.CONFIG,
         ),
         XTNumberEntityDescription(
-            key=DPCode.NONE_DELAY_TIME_MIN,
+            key=XTDPCode.NONE_DELAY_TIME_MIN,
             translation_key="none_delay_time_min",
             entity_category=EntityCategory.CONFIG,
         ),
         XTNumberEntityDescription(
-            key=DPCode.NONE_DELAY_TIME_SEC,
+            key=XTDPCode.NONE_DELAY_TIME_SEC,
             translation_key="none_delay_time_sec",
             entity_category=EntityCategory.CONFIG,
         ),
         XTNumberEntityDescription(
-            key=DPCode.DETECTION_DISTANCE_MAX,
+            key=XTDPCode.DETECTION_DISTANCE_MAX,
             translation_key="detection_distance_max",
             entity_category=EntityCategory.CONFIG,
         ),
         XTNumberEntityDescription(
-            key=DPCode.DETECTION_DISTANCE_MIN,
+            key=XTDPCode.DETECTION_DISTANCE_MIN,
             translation_key="detection_distance_min",
             entity_category=EntityCategory.CONFIG,
         ),
         XTNumberEntityDescription(
-            key=DPCode.TRIGGER_SENSITIVITY,
+            key=XTDPCode.TRIGGER_SENSITIVITY,
             translation_key="trigger_sensitivity",
             entity_category=EntityCategory.CONFIG,
         ),
         XTNumberEntityDescription(
-            key=DPCode.HOLD_SENSITIVITY,
+            key=XTDPCode.HOLD_SENSITIVITY,
             translation_key="hold_sensitivity",
             entity_category=EntityCategory.CONFIG,
         ),
     ),
     "jtmspro": (
         XTNumberEntityDescription(
-            key=DPCode.AUTO_LOCK_TIME,
+            key=XTDPCode.AUTO_LOCK_TIME,
             translation_key="auto_lock_time",
             entity_category=EntityCategory.CONFIG,
         ),
     ),
     "kg": (
         XTNumberEntityDescription(
-            key=DPCode.PRESENCE_DELAY,
+            key=XTDPCode.PRESENCE_DELAY,
             translation_key="presence_delay",
             mode = NumberMode.BOX,
             entity_category=EntityCategory.CONFIG,
         ),
         XTNumberEntityDescription(
-            key=DPCode.MOVESENSITIVITY,
+            key=XTDPCode.MOVESENSITIVITY,
             translation_key="movesensitivity",
             entity_category=EntityCategory.CONFIG,
         ),
         XTNumberEntityDescription(
-            key=DPCode.MOVEDISTANCE_MAX,
+            key=XTDPCode.MOVEDISTANCE_MAX,
             translation_key="movedistance_max",
             mode = NumberMode.BOX,
             entity_category=EntityCategory.CONFIG,
         ),
         XTNumberEntityDescription(
-            key=DPCode.MOVEDISTANCE_MIN,
+            key=XTDPCode.MOVEDISTANCE_MIN,
             translation_key="movedistance_min",
             mode = NumberMode.BOX,
             entity_category=EntityCategory.CONFIG,
         ),
         XTNumberEntityDescription(
-            key=DPCode.BREATHSENSITIVITY,
+            key=XTDPCode.BREATHSENSITIVITY,
             translation_key="breathsensitivity",
             entity_category=EntityCategory.CONFIG,
         ),
         XTNumberEntityDescription(
-            key=DPCode.BREATHDISTANCE_MAX,
+            key=XTDPCode.BREATHDISTANCE_MAX,
             translation_key="breathdistance_max",
             mode = NumberMode.BOX,
             entity_category=EntityCategory.CONFIG,
         ),
         XTNumberEntityDescription(
-            key=DPCode.BREATHDISTANCE_MIN,
+            key=XTDPCode.BREATHDISTANCE_MIN,
             translation_key="breathdistance_min",
             mode = NumberMode.BOX,
             entity_category=EntityCategory.CONFIG,
@@ -285,82 +285,82 @@ NUMBERS: dict[str, tuple[XTNumberEntityDescription, ...]] = {
     ),
     "mk": (
         XTNumberEntityDescription(
-            key=DPCode.AUTO_LOCK_TIME,
+            key=XTDPCode.AUTO_LOCK_TIME,
             translation_key="auto_lock_time",
             entity_category=EntityCategory.CONFIG,
         ),
         XTNumberEntityDescription(
-            key=DPCode.ALARM_TIME,
+            key=XTDPCode.ALARM_TIME,
             translation_key="alarm_time",
             entity_category=EntityCategory.CONFIG,
         ),
     ),
     "msp": (
         XTNumberEntityDescription(
-            key=DPCode.DELAY_CLEAN_TIME,
+            key=XTDPCode.DELAY_CLEAN_TIME,
             translation_key="delay_clean_time",
             entity_category=EntityCategory.CONFIG,
         ),
         XTNumberEntityDescription(
-            key=DPCode.QUIET_TIME_END,
+            key=XTDPCode.QUIET_TIME_END,
             translation_key="quiet_time_end",
             entity_category=EntityCategory.CONFIG,
         ),
         XTNumberEntityDescription(
-            key=DPCode.QUIET_TIME_START,
+            key=XTDPCode.QUIET_TIME_START,
             translation_key="quiet_time_start",
             entity_category=EntityCategory.CONFIG,
         ),
         XTNumberEntityDescription(
-            key=DPCode.SLEEP_START_TIME,
+            key=XTDPCode.SLEEP_START_TIME,
             translation_key="sleep_start_time",
             entity_category=EntityCategory.CONFIG,
         ),
         XTNumberEntityDescription(
-            key=DPCode.SLEEP_END_TIME,
+            key=XTDPCode.SLEEP_END_TIME,
             translation_key="sleep_end_time",
             entity_category=EntityCategory.CONFIG,
         ),
         XTNumberEntityDescription(
-            key=DPCode.UV_START_TIME,
+            key=XTDPCode.UV_START_TIME,
             translation_key="uv_start_time",
             entity_category=EntityCategory.CONFIG,
         ),
         XTNumberEntityDescription(
-            key=DPCode.UV_END_TIME,
+            key=XTDPCode.UV_END_TIME,
             translation_key="uv_end_time",
             entity_category=EntityCategory.CONFIG,
         ),
         XTNumberEntityDescription(
-            key=DPCode.DEO_START_TIME,
+            key=XTDPCode.DEO_START_TIME,
             translation_key="deo_start_time",
             entity_category=EntityCategory.CONFIG,
         ),
         XTNumberEntityDescription(
-            key=DPCode.DEO_END_TIME,
+            key=XTDPCode.DEO_END_TIME,
             translation_key="deo_end_time",
             entity_category=EntityCategory.CONFIG,
         ),
     ),
     "mzj": (
         XTNumberEntityDescription(
-            key=DPCode.TEMPSET,
+            key=XTDPCode.TEMPSET,
             translation_key="temp_set",
             mode = NumberMode.SLIDER,
             entity_category=EntityCategory.CONFIG,
         ),
         XTNumberEntityDescription(
-            key=DPCode.RECIPE,
+            key=XTDPCode.RECIPE,
             translation_key="recipe",
             entity_category=EntityCategory.CONFIG,
         ),
         XTNumberEntityDescription(
-            key=DPCode.SETTIME,
+            key=XTDPCode.SETTIME,
             translation_key="set_time",
             entity_category=EntityCategory.CONFIG,
         ),
         XTNumberEntityDescription(
-            key=DPCode.TEMPSC,
+            key=XTDPCode.TEMPSC,
             translation_key="tempsc",
             mode = NumberMode.SLIDER,
             entity_category=EntityCategory.CONFIG,
@@ -368,38 +368,38 @@ NUMBERS: dict[str, tuple[XTNumberEntityDescription, ...]] = {
     ),
     "qccdz": (
         XTNumberEntityDescription(
-            key=DPCode.CHARGE_CUR_SET,
+            key=XTDPCode.CHARGE_CUR_SET,
             translation_key="charge_cur_set",
             entity_category=EntityCategory.CONFIG,
         ),
         XTNumberEntityDescription(
-            key=DPCode.TIMER_ON,
+            key=XTDPCode.TIMER_ON,
             translation_key="timer_on",
             entity_category=EntityCategory.CONFIG,
         ),
         XTNumberEntityDescription(
-            key=DPCode.SET16A,
+            key=XTDPCode.SET16A,
             translation_key="set_16a",
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=True,
             entity_registry_visible_default=False,
         ),
         XTNumberEntityDescription(
-            key=DPCode.SET32A,
+            key=XTDPCode.SET32A,
             translation_key="set_32a",
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=True,
             entity_registry_visible_default=False,
         ),
         XTNumberEntityDescription(
-            key=DPCode.SET40A,
+            key=XTDPCode.SET40A,
             translation_key="set_40a",
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=True,
             entity_registry_visible_default=False,
         ),
         XTNumberEntityDescription(
-            key=DPCode.SET50A,
+            key=XTDPCode.SET50A,
             translation_key="set_50a",
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=True,
@@ -409,18 +409,18 @@ NUMBERS: dict[str, tuple[XTNumberEntityDescription, ...]] = {
     ),
     "wnykq": (
         XTNumberEntityDescription(
-            key=DPCode.BRIGHT_VALUE,
+            key=XTDPCode.BRIGHT_VALUE,
             translation_key="bright_value",
             entity_category=EntityCategory.CONFIG,
         ),
         XTNumberEntityDescription(
-            key=DPCode.HUMIDITY_CALIBRATION,
+            key=XTDPCode.HUMIDITY_CALIBRATION,
             translation_key="humidity_calibration",
             mode = NumberMode.SLIDER,
             entity_category=EntityCategory.CONFIG,
         ),
         XTNumberEntityDescription(
-            key=DPCode.TEMP_CALIBRATION,
+            key=XTDPCode.TEMP_CALIBRATION,
             translation_key="temp_calibration",
             mode = NumberMode.SLIDER,
             entity_category=EntityCategory.CONFIG,
@@ -428,25 +428,25 @@ NUMBERS: dict[str, tuple[XTNumberEntityDescription, ...]] = {
     ),
     "ywcgq": (
         XTNumberEntityDescription(
-            key=DPCode.MAX_SET,
+            key=XTDPCode.MAX_SET,
             translation_key="max_set",
             mode = NumberMode.SLIDER,
             entity_category=EntityCategory.CONFIG,
         ),
         XTNumberEntityDescription(
-            key=DPCode.MINI_SET,
+            key=XTDPCode.MINI_SET,
             translation_key="mini_set",
             mode = NumberMode.SLIDER,
             entity_category=EntityCategory.CONFIG,
         ),
         XTNumberEntityDescription(
-            key=DPCode.INSTALLATION_HEIGHT,
+            key=XTDPCode.INSTALLATION_HEIGHT,
             translation_key="installation_height",
             mode = NumberMode.SLIDER,
             entity_category=EntityCategory.CONFIG,
         ),
         XTNumberEntityDescription(
-            key=DPCode.LIQUID_DEPTH_MAX,
+            key=XTDPCode.LIQUID_DEPTH_MAX,
             translation_key="liquid_depth_max",
             mode = NumberMode.SLIDER,
             entity_category=EntityCategory.CONFIG,
