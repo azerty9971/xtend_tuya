@@ -12,6 +12,7 @@ from .multi_device_listener import (
 )
 from ...const import (
     LOGGER,
+    XTDeviceSourcePriority,
 )
 from .services.services import (
     ServiceManager,
@@ -47,3 +48,11 @@ class HomeAssistantXTData(NamedTuple):
         return self.multi_manager
 
 type XTConfigEntry = ConfigEntry[HomeAssistantXTData]
+
+class XTDeviceMap(dict[str, XTDevice]):
+
+    device_source_priority: XTDeviceSourcePriority | None = None
+
+    def __init__(self, iterable, device_source_priority: XTDeviceSourcePriority | None = None):
+        super().__init__(iterable=iterable)
+        self.device_source_priority = device_source_priority
