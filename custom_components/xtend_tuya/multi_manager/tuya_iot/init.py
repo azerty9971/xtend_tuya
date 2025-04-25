@@ -24,6 +24,7 @@ from ..shared.interface.device_manager import (
 )
 from ..shared.shared_classes import (
     XTConfigEntry,
+    XTDeviceMap,
 )
 from ..shared.device import (
     XTDevice,
@@ -144,8 +145,8 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
         self.iot_account.device_ids.clear()
         self.iot_account.device_ids.extend(new_device_ids)
     
-    def get_available_device_maps(self) -> list[tuple[XTDeviceSourcePriority, dict[str, XTDevice]]]:
-        return [(XTDeviceSourcePriority.TUYA_IOT, self.iot_account.device_manager.device_map)]
+    def get_available_device_maps(self) -> list[XTDeviceMap]:
+        return [XTDeviceMap(self.iot_account.device_manager.device_map, XTDeviceSourcePriority.TUYA_IOT)]
     
     def refresh_mq(self):
         pass

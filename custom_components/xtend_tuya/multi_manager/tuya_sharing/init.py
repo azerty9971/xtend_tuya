@@ -32,6 +32,7 @@ from ..shared.interface.device_manager import (
 )
 from ..shared.shared_classes import (
     XTConfigEntry,
+    XTDeviceMap,
 )
 from ..shared.device import (
     XTDevice,
@@ -161,11 +162,11 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
                     raise ConfigEntryAuthFailed("Authentication failed. Please re-authenticate.")
             raise
     
-    def get_available_device_maps(self) -> list[tuple[XTDeviceSourcePriority, dict[str, XTDevice]]]:
+    def get_available_device_maps(self) -> list[XTDeviceMap]:
         return_list: list[dict[str, XTDevice]] = []
         if other_manager := self.sharing_account.device_manager.get_overriden_device_manager():
-            return_list.append((XTDeviceSourcePriority.REGULAR_TUYA, other_manager.device_map))
-        return_list.append((XTDeviceSourcePriority.TUYA_SHARED, self.sharing_account.device_manager.device_map))
+            return_list.append(XTDeviceMap(other_manager.device_map, XTDeviceSourcePriority.REGULAR_TUYA))
+        return_list.append(XTDeviceMap(self.sharing_account.device_manager.device_map, XTDeviceSourcePriority.TUYA_SHARED))
         return return_list
     
     def refresh_mq(self):
