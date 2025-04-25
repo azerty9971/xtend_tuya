@@ -146,7 +146,7 @@ class MultiManager:  # noqa: F811
             #let's convert them to XTDevice
             for device_map in manager.get_available_device_maps():
                 for device_id in device_map[1]:
-                    device_map[device_id] = manager.convert_to_xt_device(device_map[device_id], device_map[0])
+                    device_map[1][device_id] = manager.convert_to_xt_device(device_map[1][device_id], device_map[0])
         
         #Register all devices in the master device map
         self._update_master_device_map()
@@ -171,7 +171,7 @@ class MultiManager:  # noqa: F811
             for device_map in manager.get_available_device_maps():
                 for device_id in device_map[1]:
                     if device_id not in self.master_device_map:
-                        self.master_device_map[device_id] = device_map[device_id]
+                        self.master_device_map[device_id] = device_map[1][device_id]
 
     def __get_available_device_maps(self) -> list[dict[str, XTDevice]]:
         return_list: list[dict[str, XTDevice]] = []
