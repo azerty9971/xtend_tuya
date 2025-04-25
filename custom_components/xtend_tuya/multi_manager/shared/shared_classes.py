@@ -54,5 +54,5 @@ class XTDeviceMap(dict[str, XTDevice]):
     device_source_priority: XTDeviceSourcePriority | None = None
 
     def __init__(self, iterable, device_source_priority: XTDeviceSourcePriority | None = None):
-        super().__init__(iterable=iterable)
+        super().__init__(**iterable)
         self.device_source_priority = device_source_priority

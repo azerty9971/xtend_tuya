@@ -89,7 +89,6 @@ class XTIOTDeviceManager(TuyaDeviceManager):
             for item in response["result"]:
                 device = XTDevice(**item)                                           #CHANGED
                 device.source = "IOT update_device_list_in_smart_home_mod"          #CHANGED
-                device.device_source_priority = XTDeviceSourcePriority.TUYA_IOT     #CHANGED
                 status = {}
                 for item_status in device.status:
                     if "code" in item_status and "value" in item_status:
