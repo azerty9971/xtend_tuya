@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from enum import StrEnum, IntFlag
+from enum import StrEnum, IntFlag, IntEnum
 import logging
 
 from tuya_iot import TuyaCloudOpenAPIEndpoint
@@ -91,6 +91,13 @@ class VirtualFunctions(IntFlag):
 class XTDeviceEntityFunctions(StrEnum):
     """ Functions that can be called from the device entity to alter the state of the device """
     RECALCULATE_PERCENT_SCALE                   = "recalculate_percent_scale",
+
+#Defines the priority of the sources for the merging process
+#In case of conflict take the data from the lowest priority
+class XTDeviceSourcePriority(IntEnum):
+    REGULAR_TUYA    = 10,
+    TUYA_SHARED     = 20,
+    TUYA_IOT        = 30,
 
 @dataclass
 class DescriptionVirtualState:
