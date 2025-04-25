@@ -8,12 +8,14 @@ from homeassistant.core import HomeAssistant
 
 from ..shared_classes import (
     XTConfigEntry,
+    XTDeviceMap,
 )
 from ..device import (
     XTDevice,
 )
 from ...multi_manager import (
     MultiManager,
+    XTDeviceSourcePriority,
 )
 
 class XTDeviceManagerInterface(ABC):
@@ -35,7 +37,7 @@ class XTDeviceManagerInterface(ABC):
         pass
 
     @abstractmethod
-    def get_available_device_maps(self) -> list[dict[str, XTDevice]]:
+    def get_available_device_maps(self) -> list[XTDeviceMap]:
         pass
 
     def remove_device_listeners(self):
@@ -99,7 +101,7 @@ class XTDeviceManagerInterface(ABC):
         return return_list
     
     @abstractmethod
-    def convert_to_xt_device(self, Any) -> XTDevice:
+    def convert_to_xt_device(self, device: Any, device_source_priority: XTDeviceSourcePriority | None = None) -> XTDevice:
         pass
 
     def inform_device_has_an_entity(self, device_id: str):

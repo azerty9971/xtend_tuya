@@ -482,6 +482,34 @@ TIMER_SENSORS: tuple[XTSensorEntityDescription, ...] = (
     ),
 )
 
+LOCK_SENSORS: tuple[XTSensorEntityDescription, ...] = (
+    XTSensorEntityDescription(
+        key=XTDPCode.UNLOCK_FINGERPRINT,
+        translation_key="unlock_fingerprint	",
+        entity_registry_enabled_default=True,
+    ),
+    XTSensorEntityDescription(
+        key=XTDPCode.UNLOCK_PASSWORD,
+        translation_key="unlock_password",
+        entity_registry_enabled_default=True,
+    ),
+    XTSensorEntityDescription(
+        key=XTDPCode.UNLOCK_CARD,
+        translation_key="unlock_card",
+        entity_registry_enabled_default=True,
+    ),
+    XTSensorEntityDescription(
+        key=XTDPCode.UNLOCK_FACE,
+        translation_key="unlock_face",
+        entity_registry_enabled_default=True,
+    ),
+    XTSensorEntityDescription(
+        key=XTDPCode.CLOSED_OPENED,
+        translation_key="jtmspro_closed_opened",
+        entity_registry_enabled_default=True,
+    ),
+)
+
 # All descriptions can be found here. Mostly the Integer data types in the
 # default status set of each category (that don't have a set instruction)
 # end up being a sensor.
@@ -503,11 +531,7 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
             translation_key="jtmspro_alarm_lock",
             entity_registry_enabled_default=False,
         ),
-        XTSensorEntityDescription(
-            key=XTDPCode.CLOSED_OPENED,
-            translation_key="jtmspro_closed_opened",
-            entity_registry_enabled_default=True,
-        ),
+        *LOCK_SENSORS,
         *ELECTRICITY_SENSORS,
         *BATTERY_SENSORS,
     ),
@@ -528,6 +552,7 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
     ),
     "ms": (
         *BATTERY_SENSORS,
+        *LOCK_SENSORS,
     ),
     # Automatic cat litter box
     # Note: Undocumented
@@ -726,6 +751,7 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
             entity_registry_enabled_default=False,
             reset_after_x_seconds=1
         ),
+        *LOCK_SENSORS,
         *BATTERY_SENSORS,
     ),
     "mzj": (
@@ -917,6 +943,7 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
             key=XTDPCode.LIQUID_LEVEL_PERCENT,
             translation_key="liquid_level_percent",
             entity_registry_enabled_default=True,
+            recalculate_scale_for_percentage=True,
         ),
     ),
     #ZNRB devices don't send correct cloud data, for these devices use https://github.com/make-all/tuya-local instead
