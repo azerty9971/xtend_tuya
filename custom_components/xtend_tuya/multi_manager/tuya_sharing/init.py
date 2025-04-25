@@ -76,6 +76,7 @@ from ...const import (
     TUYA_DISCOVERY_NEW,
     TUYA_DISCOVERY_NEW_ORIG,
     TUYA_HA_SIGNAL_UPDATE_ENTITY,
+    XTDeviceSourcePriority,
 )
 
 def get_plugin_instance() -> XTTuyaSharingDeviceManagerInterface | None:
@@ -160,11 +161,11 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
                     raise ConfigEntryAuthFailed("Authentication failed. Please re-authenticate.")
             raise
     
-    def get_available_device_maps(self) -> list[dict[str, XTDevice]]:
+    def get_available_device_maps(self) -> list[tuple[XTDeviceSourcePriority, dict[str, XTDevice]]]:
         return_list: list[dict[str, XTDevice]] = []
         if other_manager := self.sharing_account.device_manager.get_overriden_device_manager():
-            return_list.append(other_manager.device_map)
-        return_list.append(self.sharing_account.device_manager.device_map)
+            return_list.append((XTDeviceSourcePriority.REGULAR_TUYA, other_manager.device_map))
+        return_list.append((XTDeviceSourcePriority.TUYA_SHARED, self.sharing_account.device_manager.device_map))
         return return_list
     
     def refresh_mq(self):
@@ -263,10 +264,10 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
     
 
     @overload
-    def convert_to_xt_device(self, Any, source: str = "SHARING convert_to_xt_device") -> XTDevice: ...
+    def convert_to_xt_device(self, device: Any, device_source_priority: XTDeviceSourcePriority | None = None) -> XTDevice: ...
     
-    def convert_to_xt_device(self, device: CustomerDevice, source: str = "SHARING convert_to_xt_device") -> XTDevice:
-        return XTDevice.from_compatible_device(device, source)
+    def convert_to_xt_device(self, device: CustomerDevice, device_source_priority: XTDeviceSourcePriority | None = None) -> XTDevice:
+        return XTDevice.from_compatible_device(device, device_source_priority=device_source_priority)
     
     def send_lock_unlock_command(
             self, device_id: str, lock: bool

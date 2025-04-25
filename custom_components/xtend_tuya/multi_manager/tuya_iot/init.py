@@ -61,6 +61,7 @@ from ...const import (
     LOGGER,
     TUYA_DISCOVERY_NEW,
     TUYA_HA_SIGNAL_UPDATE_ENTITY,
+    XTDeviceSourcePriority,
 )
 
 def get_plugin_instance() -> XTTuyaIOTDeviceManagerInterface | None:
@@ -143,8 +144,8 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
         self.iot_account.device_ids.clear()
         self.iot_account.device_ids.extend(new_device_ids)
     
-    def get_available_device_maps(self) -> list[dict[str, XTDevice]]:
-        return [self.iot_account.device_manager.device_map]
+    def get_available_device_maps(self) -> list[tuple[XTDeviceSourcePriority, dict[str, XTDevice]]]:
+        return [(XTDeviceSourcePriority.TUYA_IOT, self.iot_account.device_manager.device_map)]
     
     def refresh_mq(self):
         pass
@@ -239,10 +240,11 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
             self.iot_account.device_manager.send_property_update(device_id, property_commands)
 
     @overload
-    def convert_to_xt_device(self, Any) -> XTDevice: ...
+    def convert_to_xt_device(self, device: Any, device_source_priority: XTDeviceSourcePriority | None = None) -> XTDevice: ...
     
-    def convert_to_xt_device(self, device: XTDevice) -> XTDevice:
+    def convert_to_xt_device(self, device: XTDevice, device_source_priority: XTDeviceSourcePriority | None = None) -> XTDevice:
         #Nothing to do, tuya_iot initializes XTDevice by default...
+        device.device_source_priority = device_source_priority
         return device
     
     def send_lock_unlock_command(
