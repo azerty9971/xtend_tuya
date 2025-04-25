@@ -106,7 +106,7 @@ class XTDeviceManagerInterface(ABC):
     def inform_device_has_an_entity(self, device_id: str):
         for device_map in self.get_available_device_maps():
             if device_id in device_map[1]:
-                device_map[device_id].set_up = True
+                device_map[1][device_id].set_up = True
     
     def call_api(self, method: str, url: str, payload: str) -> str | None:
         pass
