@@ -62,4 +62,5 @@ class XTDeviceMap(UserDict[str, XTDevice]):
     
     def __setitem__(self, key, item):
         super().__setitem__(key, item)
-        self._original_ref[key] = item
+        if self._original_ref is not None:
+            self._original_ref[key] = item
