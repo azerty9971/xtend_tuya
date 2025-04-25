@@ -20,6 +20,11 @@ from ..multi_manager import (
 )
 
 class XTMergingManager:
+
+    #All the methods of this class (except merge device) take the LEFT device as a priority in case of conflict
+
+
+
     def merge_devices(device1: XTDevice, device2: XTDevice, multi_manager: MultiManager = None):
         msg_queue: list[str] = []
 
