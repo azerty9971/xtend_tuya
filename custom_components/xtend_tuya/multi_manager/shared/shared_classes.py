@@ -1,5 +1,6 @@
 from __future__ import annotations
 from typing import NamedTuple
+from collections import UserDict
 from homeassistant.config_entries import ConfigEntry
 from .device import (
     XTDevice,
@@ -12,6 +13,7 @@ from .multi_device_listener import (
 )
 from ...const import (
     LOGGER,
+    XTDeviceSourcePriority,
 )
 from .services.services import (
     ServiceManager,
@@ -47,3 +49,18 @@ class HomeAssistantXTData(NamedTuple):
         return self.multi_manager
 
 type XTConfigEntry = ConfigEntry[HomeAssistantXTData]
+
+class XTDeviceMap(UserDict[str, XTDevice]):
+
+    device_source_priority: XTDeviceSourcePriority | None = None
+    _original_ref: any = None
+
+    def __init__(self, iterable, device_source_priority: XTDeviceSourcePriority | None = None):
+        super().__init__(**iterable)
+        self._original_ref = iterable
+        self.device_source_priority = device_source_priority
+    
+    def __setitem__(self, key, item):
+        super().__setitem__(key, item)
+        if self._original_ref is not None:
+            self._original_ref[key] = item

@@ -17,6 +17,7 @@ from ..const import (
     LOGGER,
     AllowedPlugins,
     XTDeviceEntityFunctions,
+    XTDeviceSourcePriority,
 )
 
 from .shared.import_stub import (
@@ -32,6 +33,7 @@ from .shared.device import (
 from .shared.shared_classes import (
     DeviceWatcher,
     XTConfigEntry,  # noqa: F811
+    XTDeviceMap,
 )
 
 from .shared.debug.debug_helper import (
@@ -145,7 +147,7 @@ class MultiManager:  # noqa: F811
             #let's convert them to XTDevice
             for device_map in manager.get_available_device_maps():
                 for device_id in device_map:
-                    device_map[device_id] = manager.convert_to_xt_device(device_map[device_id])
+                    device_map[device_id] = manager.convert_to_xt_device(device_map[device_id], device_map.device_source_priority)
         
         #Register all devices in the master device map
         self._update_master_device_map()
@@ -172,8 +174,8 @@ class MultiManager:  # noqa: F811
                     if device_id not in self.master_device_map:
                         self.master_device_map[device_id] = device_map[device_id]
 
-    def __get_available_device_maps(self) -> list[dict[str, XTDevice]]:
-        return_list: list[dict[str, XTDevice]] = []
+    def __get_available_device_maps(self) -> list[XTDeviceMap]:
+        return_list: list[XTDeviceMap] = []
         for manager in self.accounts.values():
             for device_map in manager.get_available_device_maps():
                 return_list.append(device_map)

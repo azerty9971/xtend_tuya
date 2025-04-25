@@ -1081,6 +1081,18 @@
       }
     },
     "sensor": {
+      "unlock_card": {
+        "name": "Card unlock user"
+      },
+      "unlock_face": {
+        "name": "Face unlock user"
+      },
+      "unlock_fingerprint": {
+        "name": "Fingerprint unlock user"
+      },
+      "unlock_password": {
+        "name": "Password unlock user"
+      },
       "flow_velocity": {
         "name": "Flow speed"
       },
