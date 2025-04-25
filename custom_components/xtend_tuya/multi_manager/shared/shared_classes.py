@@ -1,5 +1,6 @@
 from __future__ import annotations
 from typing import NamedTuple
+from collections import UserDict
 from homeassistant.config_entries import ConfigEntry
 from .device import (
     XTDevice,
@@ -49,10 +50,10 @@ class HomeAssistantXTData(NamedTuple):
 
 type XTConfigEntry = ConfigEntry[HomeAssistantXTData]
 
-class XTDeviceMap(dict[str, XTDevice]):
+class XTDeviceMap(UserDict[str, XTDevice]):
 
     device_source_priority: XTDeviceSourcePriority | None = None
-
-    def __init__(self, iterable, device_source_priority: XTDeviceSourcePriority | None = None):
-        super().__init__(iterable=iterable)
+    
+    def __init__(self, dict=None, device_source_priority: XTDeviceSourcePriority | None = None, /, **kwargs):
+        super().__init__(dict, kwargs=kwargs)
         self.device_source_priority = device_source_priority
