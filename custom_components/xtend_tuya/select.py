@@ -34,6 +34,13 @@ class XTSelectEntityDescription(TuyaSelectEntityDescription):
 # default instructions set of each category end up being a select.
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
 SELECTS: dict[str, tuple[XTSelectEntityDescription, ...]] = {
+    "cz": (
+        XTSelectEntityDescription(
+            key=XTDPCode.SOLAR_EN_TOTAL,
+            translation_key="solar_en_total",
+            entity_category=EntityCategory.CONFIG,
+        ),
+    ),
     "dbl": (
         XTSelectEntityDescription(
             key=XTDPCode.TEMP_UNIT_CONVERT,

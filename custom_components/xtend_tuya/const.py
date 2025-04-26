@@ -203,7 +203,10 @@ class XTDPCode(StrEnum):
     BRIGHTNESS_MIN_2 = "brightness_min_2"
     BRIGHTNESS_MIN_3 = "brightness_min_3"
     B_CURRENT = "B_Current"
+    B_DETECTION_DISTANCE_MAX = "b_detection_distance_max"
+    B_DETECTION_DISTANCE_MIN = "b_detection_distance_min"
     B_VOLTAGE = "B_Voltage"
+    B_SENSITIVITY = "b_sensitivity"
     C_F = "c_f"  # Temperature unit switching
     CALIBRATION = "calibration"
     CAPACITY_CALIBRATION = "capacity_calibration"
@@ -379,6 +382,7 @@ class XTDPCode(StrEnum):
     MANUAL_LOCK = "manual_lock"
     MATERIAL = "material"  # Material
     MAX_SET = "max_set"
+    METER_TYPE = "meter_type"
     MINI_SET = "mini_set"
     MONITORING = "monitoring"
     MODE = "mode"  # Working mode / Mode
@@ -394,6 +398,9 @@ class XTDPCode(StrEnum):
     MOVESENSITIVITY = "movesensitivity"
     MUFFLING = "muffling"  # Muffling
     M_ADC_NUM = "M_ADC_NUM"
+    M_DETECTION_DISTANCE_MAX = "m_detection_distance_max"
+    M_DETECTION_DISTANCE_MIN = "m_detection_distance_min"
+    M_SENSITIVITY = "m_sensitivity"
     NEAR_DETECTION = "near_detection"
     NET_NOTICE = "Net_notice"
     NONE_DELAY_TIME = "none_delay_time"
@@ -468,6 +475,7 @@ class XTDPCode(StrEnum):
     RESET_ROLL_BRUSH = "reset_roll_brush"
     RESIDUAL_ELECTRICITY = "residual_electricity"
     RESPIRATORY_RATE = "respiratory_rate"
+    RESTORE_FACTORY_SETTINGS = "restore_factory_settings"
     REVERSE_ENERGY_TOTAL = "reverse_energy_total"
     RFID = "RFID"
     ROLL_BRUSH = "roll_brush"
@@ -499,6 +507,10 @@ class XTDPCode(StrEnum):
     SMOKE_SENSOR_STATE = "smoke_sensor_state"
     SMOKE_SENSOR_STATUS = "smoke_sensor_status"
     SMOKE_SENSOR_VALUE = "smoke_sensor_value"
+    SM_DETECTION_DISTANCE_MAX = "sm_detection_distance_max"
+    SM_DETECTION_DISTANCE_MIN = "sm_detection_distance_min"
+    SM_SENSITIVITY = "sm_sensitivity"
+    SOLAR_EN_TOTAL = "solar_en_total"
     SOS = "sos"  # Emergency State
     SOS_STATE = "sos_state"  # Emergency mode
     SOUND = "sound"

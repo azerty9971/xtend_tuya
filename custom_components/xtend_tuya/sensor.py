@@ -525,6 +525,23 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
             entity_registry_enabled_default=False,
         ),
     ),
+    "hps": (
+        XTSensorEntityDescription(
+            key=XTDPCode.PRESENCE_STATE,
+            translation_key="hps_presence_state",
+            state_class=SensorStateClass.MEASUREMENT,
+        ),
+        XTSensorEntityDescription(
+            key=XTDPCode.TARGET_DISTANCE,
+            translation_key="target_distance",
+            state_class=SensorStateClass.MEASUREMENT,
+        ),
+        XTSensorEntityDescription(
+            key=XTDPCode.LDR,
+            translation_key="ldr",
+            state_class=SensorStateClass.MEASUREMENT,
+        ),
+    ),
     "jtmspro": (
         XTSensorEntityDescription(
             key=XTDPCode.ALARM_LOCK,
@@ -544,6 +561,11 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
             device_class=SensorDeviceClass.ILLUMINANCE,
             state_class=SensorStateClass.MEASUREMENT,
             entity_registry_enabled_default=True,
+        ),
+        XTSensorEntityDescription(
+            key=XTDPCode.METER_TYPE,
+            translation_key="meter_type",
+            entity_category=EntityCategory.CONFIG,
         ),
         *TEMPERATURE_SENSORS,
         *HUMIDITY_SENSORS,
@@ -766,23 +788,6 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
             entity_registry_enabled_default=True,
         ),
         *TEMPERATURE_SENSORS,
-    ),
-    "hps": (
-        XTSensorEntityDescription(
-            key=XTDPCode.PRESENCE_STATE,
-            translation_key="hps_presence_state",
-            state_class=SensorStateClass.MEASUREMENT,
-        ),
-        XTSensorEntityDescription(
-            key=XTDPCode.TARGET_DISTANCE,
-            translation_key="target_distance",
-            state_class=SensorStateClass.MEASUREMENT,
-        ),
-        XTSensorEntityDescription(
-            key=XTDPCode.LDR,
-            translation_key="ldr",
-            state_class=SensorStateClass.MEASUREMENT,
-        ),
     ),
     "qccdz": (
         XTSensorEntityDescription(

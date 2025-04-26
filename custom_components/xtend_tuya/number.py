@@ -232,6 +232,51 @@ NUMBERS: dict[str, tuple[XTNumberEntityDescription, ...]] = {
             translation_key="hold_sensitivity",
             entity_category=EntityCategory.CONFIG,
         ),
+        XTNumberEntityDescription(
+            key=XTDPCode.M_DETECTION_DISTANCE_MAX,
+            translation_key="m_detection_distance_max",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        XTNumberEntityDescription(
+            key=XTDPCode.M_DETECTION_DISTANCE_MIN,
+            translation_key="m_detection_distance_min",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        XTNumberEntityDescription(
+            key=XTDPCode.M_SENSITIVITY,
+            translation_key="m_sensitivity",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        XTNumberEntityDescription(
+            key=XTDPCode.B_DETECTION_DISTANCE_MAX,
+            translation_key="b_detection_distance_max",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        XTNumberEntityDescription(
+            key=XTDPCode.B_DETECTION_DISTANCE_MIN,
+            translation_key="b_detection_distance_min",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        XTNumberEntityDescription(
+            key=XTDPCode.B_SENSITIVITY,
+            translation_key="b_sensitivity",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        XTNumberEntityDescription(
+            key=XTDPCode.SM_DETECTION_DISTANCE_MAX,
+            translation_key="b_detection_distance_max",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        XTNumberEntityDescription(
+            key=XTDPCode.SM_DETECTION_DISTANCE_MIN,
+            translation_key="b_detection_distance_min",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        XTNumberEntityDescription(
+            key=XTDPCode.SM_SENSITIVITY,
+            translation_key="sm_sensitivity",
+            entity_category=EntityCategory.CONFIG,
+        ),
     ),
     "jtmspro": (
         XTNumberEntityDescription(

@@ -314,6 +314,33 @@
       }
     },
     "number": {
+      "b_detection_distance_max": {
+        "name": "Max breath detection distance"
+      },
+      "b_detection_distance_min": {
+        "name": "Min breath detection distance"
+      },
+      "b_sensitivity": {
+        "name": "Breath detection sensitivity"
+      },
+      "m_detection_distance_max": {
+        "name": "Max motion detection distance"
+      },
+      "m_detection_distance_min": {
+        "name": "Min motion detection distance"
+      },
+      "m_sensitivity": {
+        "name": "Motion detection sensitivity"
+      },
+      "sm_detection_distance_max": {
+        "name": "Max micro-motion detection distance"
+      },
+      "sm_detection_distance_min": {
+        "name": "Min micro-motion detection distance"
+      },
+      "sm_sensitivity": {
+        "name": "Micro-motion detection sensitivity"
+      },
       "use_time_1": {
         "name": "Usage time 1"
       },
@@ -580,6 +607,14 @@
       }
     },
     "select": {
+      "solar_en_total": {
+        "name": "Solar energy total",
+        "state": {
+          "unknown": "Unknown",
+          "disable": "Disable",
+          "enable": "Enable"
+        }
+      },
       "temp_unit_convert": {
         "name": "Temperature unit",
         "state": {
@@ -1081,6 +1116,16 @@
       }
     },
     "sensor": {
+      "meter_type": {
+        "name": "Meter type",
+        "state": {
+          "unknown": "Unknown",
+          "3_phase": "3 Phases",
+          "1_phase": "1 Phase",
+          "1_phase_3_wire": "1 Phase 3 wires",
+          "other": "Other"
+        }
+      },
       "unlock_card": {
         "name": "Card unlock user"
       },
