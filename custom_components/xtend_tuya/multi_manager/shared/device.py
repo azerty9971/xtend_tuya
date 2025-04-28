@@ -91,6 +91,7 @@ class XTDevice(TuyaDevice):
     status_range: dict[str, XTDeviceStatusRange]
     force_open_api: Optional[bool] = False
     device_source_priority: int | None = None
+    force_compatibility: bool = False   #Force the device functions/status_range/state to remain untouched after merging
 
     def __init__(self, **kwargs: Any) -> None:
         self.source = ""
