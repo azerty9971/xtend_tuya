@@ -174,6 +174,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         device_properties.status_range = {}
         device_properties.status = {}
         device_properties.local_strategy = {}
+        device_properties.device_source_priority = XTDeviceSourcePriority.TUYA_IOT
         response = self.api.get(f"/v2.0/cloud/thing/{device.id}/shadow/properties")
         response2 = self.api.get(f"/v2.0/cloud/thing/{device.id}/model")
         if not response.get("success") or not response2.get("success"):
