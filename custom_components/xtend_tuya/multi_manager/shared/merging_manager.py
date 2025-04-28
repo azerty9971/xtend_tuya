@@ -97,6 +97,9 @@ class XTMergingManager:
             device.function[new_status] = device.function.pop(orig_status)
             device.function[new_status].code = new_status
         
+        if orig_status in device.status:
+            device.status[new_status] = device.status.pop(orig_status)
+        
         for dpId in device.local_strategy:
             status_code = device.local_strategy[dpId].get("status_code")
             status_alias: list = device.local_strategy[dpId].get("status_code_alias", [])
