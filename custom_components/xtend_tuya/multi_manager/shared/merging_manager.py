@@ -72,6 +72,11 @@ class XTMergingManager:
         lower_priority.local_strategy = higher_priority.local_strategy
         #if multi_manager:
         #    multi_manager.device_watcher.report_message(device1.id, f"Merged into {device1}", device1)
+
+        #DEBUG
+        if higher_priority.id == "bf615b97b0d088e11ee38v":
+            XTMergingManager._replace_status_with_another(higher_priority, "temp_value_v2", "temp_value")
+
         if lower_bak.force_compatibility:
             XTMergingManager._enforce_compatibility(higher_priority, lower_bak)
         if higher_bak.force_compatibility:
@@ -89,7 +94,7 @@ class XTMergingManager:
                         XTMergingManager._replace_status_with_another(device, status_code, status)
     
     def _replace_status_with_another(device: XTDevice, orig_status: str, new_status:str):
-        LOGGER.warning(f"Replaceing {orig_status} with {new_status} in {device.name}")
+        LOGGER.warning(f"Replacing {orig_status} with {new_status} in {device.name}")
         if orig_status in device.status_range:
             device.status_range[new_status] = device.status_range.pop(orig_status)
             device.status_range[new_status].code = new_status
