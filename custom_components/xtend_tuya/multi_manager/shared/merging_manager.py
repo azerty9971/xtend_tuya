@@ -89,6 +89,7 @@ class XTMergingManager:
                         XTMergingManager._replace_status_with_another(device, status_code, status)
     
     def _replace_status_with_another(device: XTDevice, orig_status: str, new_status:str):
+        LOGGER.warning(f"Replaceing {orig_status} with {new_status} in {device.name}")
         if orig_status in device.status_range:
             device.status_range[new_status] = device.status_range.pop(orig_status)
             device.status_range[new_status].code = new_status
