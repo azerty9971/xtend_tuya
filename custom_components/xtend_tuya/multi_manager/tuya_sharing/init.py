@@ -269,7 +269,8 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
     
     def convert_to_xt_device(self, device: CustomerDevice, device_source_priority: XTDeviceSourcePriority | None = None) -> XTDevice:
         device: XTDevice = XTDevice.from_compatible_device(device, device_source_priority=device_source_priority)
-        device.force_compatibility = True
+        if device_source_priority == XTDeviceSourcePriority.REGULAR_TUYA:
+            device.force_compatibility = True
         return device
     
     def send_lock_unlock_command(
