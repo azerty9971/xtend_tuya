@@ -19,6 +19,7 @@ from ...multi_manager import (
 )
 from ....const import (
     DOMAIN,
+    LOGGER,
 )
 
 from homeassistant.helpers.issue_registry import (
@@ -140,14 +141,18 @@ class XTDeviceManagerInterface(ABC):
         return None
     
     async def raise_issue(self, hass: HomeAssistant, config_entry: XTConfigEntry, is_fixable: bool, severity: IssueSeverity, translation_key: str, translation_placeholders: dict[str, any], learn_more_url: str | None = None):
-        async_create_issue(
-            hass=hass,
-            domain=DOMAIN,
-            issue_domain=DOMAIN,
-            issue_id=f"{config_entry.entry_id}_{translation_key}",
-            is_fixable=is_fixable,
-            severity=severity,
-            translation_key=translation_key,
-            translation_placeholders=translation_placeholders,
-            learn_more_url=learn_more_url
-        )
+        try:
+            async_create_issue(
+                hass=hass,
+                domain=DOMAIN,
+                issue_domain=DOMAIN,
+                issue_id=f"{config_entry.entry_id}_{translation_key}",
+                is_fixable=is_fixable,
+                severity=severity,
+                translation_key=translation_key,
+                translation_placeholders=translation_placeholders,
+                learn_more_url=learn_more_url
+            )
+        except Exception as e:
+            #Prevent failure for any reason on this method
+            LOGGER.error(f"Exception raised during raise_issue: {e}")

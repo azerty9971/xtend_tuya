@@ -103,7 +103,7 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
             ):
             await self.raise_issue(
                 hass=hass, 
-                config_entry=None, 
+                config_entry=config_entry, 
                 is_fixable=True, 
                 severity=IssueSeverity.WARNING, 
                 translation_key="tuya_iot_not_configured", 
@@ -153,7 +153,7 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
             await self.raise_issue(
                 hass=hass, 
                 config_entry=config_entry, 
-                is_fixable=True,
+                is_fixable=True, 
                 severity=IssueSeverity.ERROR, 
                 translation_key="tuya_iot_failed_login", 
                 translation_placeholders={
