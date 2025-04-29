@@ -141,9 +141,10 @@ class XTDeviceManagerInterface(ABC):
     
     async def raise_issue(self, hass: HomeAssistant, config_entry: XTConfigEntry, is_fixable: bool, severity: IssueSeverity, translation_key: str, translation_placeholders: dict[str, any]):
         async_create_issue(
-            hass,
-            DOMAIN,
-            f"{config_entry.entry_id}_{translation_key}",
+            hass=hass,
+            domain=DOMAIN,
+            issue_domain=DOMAIN,
+            issue_id=f"{config_entry.entry_id}_{translation_key}",
             is_fixable=is_fixable,
             severity=severity,
             translation_key=translation_key,
