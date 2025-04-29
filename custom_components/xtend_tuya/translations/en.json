@@ -2179,15 +2179,15 @@
       }
     },
     "tuya_iot_failed_request": {
-        "description": "The integration {name} (`{config_entry_id}`) could not connect to the Tuya OpenAPI service (request failed). To fix this error, check that your HA can access the internet and that there is no firewall in between HA and Tuya OpenAPI endpoints.",
+        "description": "The integration \"{name}\" (`{config_entry_id}`) could not connect to the Tuya OpenAPI service (request failed)\n\nTo fix this error, check that your HA can access the internet and that there is no firewall in between HA and Tuya OpenAPI endpoints.",
         "title": "Tuya OpenAPI request failed"
     },
     "tuya_iot_failed_login": {
-        "description": "The integration {name} (`{config_entry_id}`) could not connect to the Tuya OpenAPI service (failed login). To fix this error please follow the guide, then restart Home Assistant.",
+        "description": "The integration \"{name}\" (`{config_entry_id}`) could not connect to the Tuya OpenAPI service (failed login)\n\nTo fix this error please follow the guide at [this URL](https://github.com/azerty9971/xtend_tuya/blob/main/docs/renew_cloud_credentials.md), then restart Home Assistant.",
         "title": "Tuya OpenAPI login failed"
     },
     "tuya_iot_not_configured": {
-        "description": "The integration {name} (`{config_entry_id}`) Does not have Tuya OpenAPI credentials. To fix this warning please follow the guide, then restart Home Assistant.",
+        "description": "The integration \"{name}\" (`{config_entry_id}`) Does not have Tuya OpenAPI credentials\n\nTo fix this warning please follow the guide at [this URL](https://github.com/azerty9971/xtend_tuya/blob/main/docs/cloud_credentials.md), then restart Home Assistant.",
         "title": "Tuya OpenAPI account not configured"
     }
   }
