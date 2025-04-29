@@ -604,6 +604,8 @@ class XTDPCode(StrEnum):
     UNLOCK_CARD = "unlock_card"
     UNLOCK_FACE = "unlock_face"
     UNLOCK_FINGERPRINT = "unlock_fingerprint"
+    UNLOCK_FINGER_VEIN = "unlock_finger_vein"
+    UNLOCK_HAND = "unlock_hand"
     UNLOCK_PASSWORD = "unlock_password"
     UPPER_TEMP = "upper_temp"
     UPPER_TEMP_F = "upper_temp_f"
