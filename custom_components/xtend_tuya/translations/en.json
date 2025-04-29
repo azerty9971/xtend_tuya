@@ -2179,6 +2179,7 @@
       }
     },
     "tuya_iot_failed_request": {
+      "title": "Tuya OpenAPI request failed",
       "fix_flow": {
         "step": {
           "confirm": {
@@ -2189,6 +2190,7 @@
       }
     },
     "tuya_iot_failed_login": {
+      "title": "Tuya OpenAPI login failed",
       "fix_flow": {
         "step": {
           "confirm": {
@@ -2199,6 +2201,7 @@
       }
     },
     "tuya_iot_not_configured": {
+      "title": "Tuya OpenAPI account not configured",
       "fix_flow": {
         "step": {
           "confirm": {
