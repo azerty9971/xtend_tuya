@@ -485,23 +485,39 @@ TIMER_SENSORS: tuple[XTSensorEntityDescription, ...] = (
 LOCK_SENSORS: tuple[XTSensorEntityDescription, ...] = (
     XTSensorEntityDescription(
         key=XTDPCode.UNLOCK_FINGERPRINT,
-        translation_key="unlock_fingerprint	",
+        translation_key="unlock_fingerprint",
         entity_registry_enabled_default=True,
+        reset_after_x_seconds=2,
     ),
     XTSensorEntityDescription(
         key=XTDPCode.UNLOCK_PASSWORD,
         translation_key="unlock_password",
         entity_registry_enabled_default=True,
+        reset_after_x_seconds=2,
     ),
     XTSensorEntityDescription(
         key=XTDPCode.UNLOCK_CARD,
         translation_key="unlock_card",
         entity_registry_enabled_default=True,
+        reset_after_x_seconds=2,
     ),
     XTSensorEntityDescription(
         key=XTDPCode.UNLOCK_FACE,
         translation_key="unlock_face",
         entity_registry_enabled_default=True,
+        reset_after_x_seconds=2,
+    ),
+    XTSensorEntityDescription(
+        key=XTDPCode.UNLOCK_HAND,
+        translation_key="unlock_hand",
+        entity_registry_enabled_default=True,
+        reset_after_x_seconds=2,
+    ),
+    XTSensorEntityDescription(
+        key=XTDPCode.UNLOCK_FINGER_VEIN,
+        translation_key="unlock_finger_vein",
+        entity_registry_enabled_default=True,
+        reset_after_x_seconds=2,
     ),
     XTSensorEntityDescription(
         key=XTDPCode.CLOSED_OPENED,
