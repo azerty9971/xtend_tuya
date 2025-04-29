@@ -146,6 +146,6 @@ class XTDeviceManagerInterface(ABC):
             f"{config_entry.entry_id}_{translation_key}",
             is_fixable=is_fixable,
             severity=severity,
-            translation_key=f"{translation_key}",
+            translation_key=translation_key,
             translation_placeholders=translation_placeholders,
         )

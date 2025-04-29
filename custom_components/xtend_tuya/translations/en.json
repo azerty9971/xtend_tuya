@@ -2188,7 +2188,7 @@
     },
     "tuya_iot_not_configured": {
         "description": "The automation \"{name}\" (`{config_entry_id}`) Does not have Tuya OpenAPI credentials\n\nTo fix this warning please follow the guide at [this URL](https://github.com/azerty9971/xtend_tuya/blob/main/docs/cloud_credentials.md), then restart Home Assistant.",
-        "title": "Automation {name}: request failed"
+        "title": "Automation {name}: OpenAPI account not configured"
     }
   }
 }
