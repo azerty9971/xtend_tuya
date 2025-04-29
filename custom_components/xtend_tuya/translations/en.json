@@ -2177,6 +2177,18 @@
           }
         }
       }
+    },
+    "tuya_iot_failed_request": {
+        "description": "The automation \"{name}\" (`{config_entry_id}`) could not connect to the Tuya OpenAPI service (request failed)\n\nTo fix this error, check that your HA can access the internet and that there is no firewall in between HA and Tuya OpenAPI endpoints.",
+        "title": "Automation {name}: request failed"
+    },
+    "tuya_iot_failed_login": {
+        "description": "The automation \"{name}\" (`{config_entry_id}`) could not connect to the Tuya OpenAPI service (failed login)\n\nTo fix this error please follow the guide at [this URL](https://github.com/azerty9971/xtend_tuya/blob/main/docs/renew_cloud_credentials.md), then restart Home Assistant.",
+        "title": "Automation {name}: login failed"
+    },
+    "tuya_iot_not_configured": {
+        "description": "The automation \"{name}\" (`{config_entry_id}`) Does not have Tuya OpenAPI credentials\n\nTo fix this warning please follow the guide at [this URL](https://github.com/azerty9971/xtend_tuya/blob/main/docs/cloud_credentials.md), then restart Home Assistant.",
+        "title": "Automation {name}: request failed"
     }
   }
 }

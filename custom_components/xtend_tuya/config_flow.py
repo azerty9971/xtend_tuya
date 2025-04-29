@@ -17,6 +17,11 @@ except ImportError:
     from homeassistant.data_entry_flow import FlowResult
     type ConfigFlowResult = FlowResult
 from homeassistant.helpers import selector
+from homeassistant.helpers.issue_registry import (
+    IssueSeverity,
+    async_create_issue,
+    async_delete_issue,
+)
 
 from .const import (
     CONF_ENDPOINT,
