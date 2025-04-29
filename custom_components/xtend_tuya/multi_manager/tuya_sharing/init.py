@@ -155,9 +155,8 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
             # While in general, we should avoid catching broad exceptions,
             # we have no other way of detecting this case.
             if "sign invalid" in str(exc):
-                msg = "Authentication failed. Please re-authenticate the Tuya integration"
                 if self.sharing_account.device_manager.reuse_config:
-                    raise ConfigEntryNotReady(msg) from exc
+                    raise ConfigEntryNotReady("Authentication failed. Please re-authenticate the Tuya integration") from exc
                 else:
                     raise ConfigEntryAuthFailed("Authentication failed. Please re-authenticate.")
             raise
