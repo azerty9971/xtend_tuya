@@ -32,6 +32,7 @@ from ..shared.device import (
 )
 
 from .const import (
+    CONF_NO_OPENAPI,
     CONF_ACCESS_ID,
     CONF_AUTH_TYPE,
     CONF_ENDPOINT_OT,
@@ -101,6 +102,8 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
             or CONF_COUNTRY_CODE  not in config_entry.options
             or CONF_APP_TYPE      not in config_entry.options
             ):
+            if CONF_NO_OPENAPI in config_entry.options and config_entry.options[CONF_NO_OPENAPI] is True:
+                return None
             await self.raise_issue(
                 hass=hass, 
                 config_entry=config_entry, 

@@ -43,6 +43,7 @@ from .const import (
     CONF_ENDPOINT_OT,
     CONF_AUTH_TYPE,
     CONF_COUNTRY_CODE,
+    CONF_NO_OPENAPI,
     CONF_PASSWORD,
     CONF_USERNAME,
     SMARTLIFE_APP,
@@ -77,6 +78,7 @@ class TuyaOptionFlow(OptionsFlow):
         ][0]
 
         data = {
+            CONF_NO_OPENAPI: user_input[CONF_NO_OPENAPI],
             CONF_ENDPOINT_OT: country.endpoint,
             CONF_AUTH_TYPE: AuthType.CUSTOM,
             CONF_ACCESS_ID: user_input[CONF_ACCESS_ID],
@@ -170,6 +172,10 @@ class TuyaOptionFlow(OptionsFlow):
             step_id="init",
             data_schema=vol.Schema(
                 {
+                    vol.Optional(
+                        CONF_NO_OPENAPI, 
+                        default=bool(user_input.get(CONF_NO_OPENAPI, self.options.get(CONF_NO_OPENAPI, "")))
+                    ): bool,
                     vol.Optional(
                         CONF_COUNTRY_CODE, 
                         default=user_input.get(CONF_COUNTRY_CODE, default_country)
