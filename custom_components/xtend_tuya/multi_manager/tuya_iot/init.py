@@ -21,6 +21,7 @@ from .xt_tuya_iot_manager import (
 )
 from ..shared.interface.device_manager import (
     XTDeviceManagerInterface,
+    IssueSeverity,
 )
 from ..shared.shared_classes import (
     XTConfigEntry,
@@ -31,6 +32,7 @@ from ..shared.device import (
 )
 
 from .const import (
+    CONF_NO_OPENAPI,
     CONF_ACCESS_ID,
     CONF_AUTH_TYPE,
     CONF_ENDPOINT_OT,
@@ -100,6 +102,19 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
             or CONF_COUNTRY_CODE  not in config_entry.options
             or CONF_APP_TYPE      not in config_entry.options
             ):
+            if CONF_NO_OPENAPI in config_entry.options and config_entry.options[CONF_NO_OPENAPI] is True:
+                return None
+            await self.raise_issue(
+                hass=hass, 
+                config_entry=config_entry, 
+                is_fixable=True, 
+                severity=IssueSeverity.WARNING, 
+                translation_key="tuya_iot_not_configured", 
+                translation_placeholders={
+                    "name": DOMAIN,
+                    "config_entry_id": config_entry.title or "Config entry not found"
+                },
+                learn_more_url="https://github.com/azerty9971/xtend_tuya/blob/main/docs/cloud_credentials.md")
             return None
         auth_type = AuthType(config_entry.options[CONF_AUTH_TYPE])
         api = XTIOTOpenAPI(
@@ -123,10 +138,33 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
                     config_entry.options[CONF_APP_TYPE],
                 )
         except requests.exceptions.RequestException as err:
-            raise ConfigEntryNotReady(err) from err
+            #raise ConfigEntryNotReady(err) from err
+            await self.raise_issue(
+                hass=hass, 
+                config_entry=config_entry, 
+                is_fixable=True, 
+                severity=IssueSeverity.ERROR, 
+                translation_key="tuya_iot_failed_request", 
+                translation_placeholders={
+                    "name": DOMAIN,
+                    "config_entry_id": config_entry.title or "Config entry not found"
+                })
+            return None
 
         if response.get("success", False) is False:
-            raise ConfigEntryNotReady(response)
+            #raise ConfigEntryNotReady(response)
+            await self.raise_issue(
+                hass=hass, 
+                config_entry=config_entry, 
+                is_fixable=True, 
+                severity=IssueSeverity.ERROR, 
+                translation_key="tuya_iot_failed_login", 
+                translation_placeholders={
+                    "name": DOMAIN,
+                    "config_entry_id": config_entry.title or "Config entry not found"
+                },
+                learn_more_url="https://github.com/azerty9971/xtend_tuya/blob/main/docs/renew_cloud_credentials.md")
+            return None
         mq = XTIOTOpenMQ(api)
         mq.start()
         device_manager = XTIOTDeviceManager(self.multi_manager, api, mq)
