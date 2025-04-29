@@ -1146,6 +1146,7 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):
                 )
             )
         if self.entity_description.reset_after_x_seconds:
+            self.reset_value(None, True)
             self.async_on_remove(
                 async_track_state_change_event(
                     self.hass,
