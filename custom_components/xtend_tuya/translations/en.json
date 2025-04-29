@@ -2205,7 +2205,7 @@
       "fix_flow": {
         "step": {
           "confirm": {
-            "description": "The integration \"{name}\" (`{config_entry_id}`) Does not have Tuya OpenAPI credentials\n\nTo fix this warning please follow the guide at [this URL](https://github.com/azerty9971/xtend_tuya/blob/main/docs/cloud_credentials.md), then restart Home Assistant.",
+            "description": "The integration \"{name}\" (`{config_entry_id}`) Does not have Tuya OpenAPI credentials\n\nWithout this, a lot of entities might be missing in your devices.\n\nTo fix this warning please follow the guide at [this URL](https://github.com/azerty9971/xtend_tuya/blob/main/docs/cloud_credentials.md), then restart Home Assistant.",
             "title": "Tuya OpenAPI account not configured"
           }
         }
