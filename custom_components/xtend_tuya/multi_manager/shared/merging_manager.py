@@ -20,43 +20,108 @@ from ..multi_manager import (
 )
 
 class XTMergingManager:
+
+    #All the methods of this class (except merge device) take the LEFT device as a priority in case of conflict
+
+
+
     def merge_devices(device1: XTDevice, device2: XTDevice, multi_manager: MultiManager = None):
         msg_queue: list[str] = []
 
+        if (device1.device_source_priority is not None
+            and device2.device_source_priority is not None
+            and device2.device_source_priority < device1.device_source_priority):
+            higher_priority = device2
+            lower_priority = device1
+        else:
+            higher_priority = device1
+            lower_priority = device2
+
         #if multi_manager:
         #    multi_manager.device_watcher.report_message(device1.id, f"About to merge {device1.source}:{device1}\r\n\r\nand\r\n\r\n{device2.source}:{device2}", device1)
-        device1_bak = copy.deepcopy(device1)
-        device2_bak = copy.deepcopy(device2)
+        higher_bak = copy.deepcopy(higher_priority)
+        lower_bak = copy.deepcopy(lower_priority)
+
         #Make both devices compliant
-        XTMergingManager._fix_incorrect_valuedescr(device1, device2)
-        XTMergingManager._fix_incorrect_valuedescr(device2, device1)
-        CloudFixes.apply_fixes(device1)
-        CloudFixes.apply_fixes(device2)
+        XTMergingManager._fix_incorrect_valuedescr(higher_priority, lower_priority)
+        XTMergingManager._fix_incorrect_valuedescr(lower_priority, higher_priority)
+        CloudFixes.apply_fixes(higher_priority)
+        CloudFixes.apply_fixes(lower_priority)
 
         #Now decide between each device which on has "the truth" and set it in both
-        XTMergingManager._align_device_properties(device1, device2, msg_queue)
-        XTMergingManager._align_DPTypes(device1, device2)
-        XTMergingManager._align_api_usage(device1, device2)
-        XTMergingManager._prefer_non_default_value_convert(device1, device2)
-        XTMergingManager._align_valuedescr(device1, device2)
+        XTMergingManager._align_device_properties(higher_priority, lower_priority, msg_queue)
+        XTMergingManager._align_DPTypes(higher_priority, lower_priority)
+        XTMergingManager._align_api_usage(higher_priority, lower_priority)
+        XTMergingManager._prefer_non_default_value_convert(higher_priority, lower_priority)
+        XTMergingManager._align_valuedescr(higher_priority, lower_priority)
 
         #Finally, align and extend both devices
-        device1.status_range = XTMergingManager.smart_merge(device1.status_range, device2.status_range, msg_queue, "status_range")
-        device1.function = XTMergingManager.smart_merge(device1.function, device2.function, msg_queue, "function")
-        device1.status = XTMergingManager.smart_merge(device1.status, device2.status, None, "status")
-        device1.local_strategy = XTMergingManager.smart_merge(device1.local_strategy, device2.local_strategy, msg_queue, "local_strategy")
+        higher_priority.status_range = XTMergingManager.smart_merge(higher_priority.status_range, lower_priority.status_range, msg_queue, "status_range")
+        higher_priority.function = XTMergingManager.smart_merge(higher_priority.function, lower_priority.function, msg_queue, "function")
+        higher_priority.status = XTMergingManager.smart_merge(higher_priority.status, lower_priority.status, None, "status")
+        higher_priority.local_strategy = XTMergingManager.smart_merge(higher_priority.local_strategy, lower_priority.local_strategy, msg_queue, "local_strategy")
         if msg_queue:
-            LOGGER.warning(f"Messages for merging of {device1_bak} and {device2_bak}:")
+            LOGGER.warning(f"Messages for merging of {higher_bak} and {lower_bak}:")
             for msg in msg_queue:
                 LOGGER.warning(msg)
 
         #Now link the references so that they point to the same structure in memory
-        device2.status_range = device1.status_range
-        device2.function = device1.function
-        device2.status = device1.status
-        device2.local_strategy = device1.local_strategy
+        lower_priority.status_range = higher_priority.status_range
+        lower_priority.function = higher_priority.function
+        lower_priority.status = higher_priority.status
+        lower_priority.local_strategy = higher_priority.local_strategy
         #if multi_manager:
         #    multi_manager.device_watcher.report_message(device1.id, f"Merged into {device1}", device1)
+
+        if lower_bak.force_compatibility:
+            XTMergingManager._enforce_compatibility(higher_priority, lower_bak)
+            higher_priority.force_compatibility = True
+        if higher_bak.force_compatibility:
+            XTMergingManager._enforce_compatibility(higher_priority, higher_bak)
+            higher_priority.force_compatibility = True
+
+    def _enforce_compatibility(device: XTDevice, enforcing_reference: XTDevice):
+        for status in enforcing_reference.status:
+            if status not in device.status:
+                #Find the original status that has been masked as a status_alias and make it the reference
+                for dpId in device.local_strategy:
+                    status_code = device.local_strategy[dpId].get("status_code")
+                    status_alias = device.local_strategy[dpId].get("status_code_alias", [])
+                    if status in status_alias:
+                        #Replace status_code with status in the device
+                        XTMergingManager._replace_status_with_another(device, status_code, status)
+    
+    def _replace_status_with_another(device: XTDevice, orig_status: str, new_status:str):
+        #LOGGER.debug(f"Replacing {orig_status} with {new_status} in {device.name}")
+        if orig_status in device.status_range:
+            device.status_range[new_status] = device.status_range.pop(orig_status)
+            device.status_range[new_status].code = new_status
+        
+        if orig_status in device.function:
+            device.function[new_status] = device.function.pop(orig_status)
+            device.function[new_status].code = new_status
+        
+        if orig_status in device.status:
+            device.status[new_status] = device.status.pop(orig_status)
+        
+        for dpId in device.local_strategy:
+            status_code = device.local_strategy[dpId].get("status_code")
+            status_alias: list = device.local_strategy[dpId].get("status_code_alias", [])
+            if status_code == orig_status:
+                device.local_strategy[dpId]["status_code"] = new_status
+                if new_status in status_alias:
+                    status_alias.remove(new_status)
+                if orig_status not in status_alias:
+                    status_alias.append(orig_status)
+                device.local_strategy[dpId]["status_code_alias"] = status_alias
+                if config_item := device.local_strategy[dpId].get("config_item", None):
+                    if status_formats := config_item.get("statusFormat", None):
+                        status_formats_dict: dict = json.loads(status_formats)
+                        for first_key in status_formats_dict:
+                            status_formats_dict[new_status] = status_formats_dict.pop(first_key)
+                            break
+                        config_item["statusFormat"] = json.dumps(status_formats_dict)
+                break
 
     def _align_device_properties(device1: XTDevice, device2: XTDevice, msg_queue: list[str] | None = None):
         device1.name            = XTMergingManager.smart_merge(device1.name, device2.name, msg_queue, "device.name")

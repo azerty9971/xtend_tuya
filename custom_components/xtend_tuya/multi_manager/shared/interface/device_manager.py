@@ -8,12 +8,24 @@ from homeassistant.core import HomeAssistant
 
 from ..shared_classes import (
     XTConfigEntry,
+    XTDeviceMap,
 )
 from ..device import (
     XTDevice,
 )
 from ...multi_manager import (
     MultiManager,
+    XTDeviceSourcePriority,
+)
+from ....const import (
+    DOMAIN,
+    LOGGER,
+)
+
+from homeassistant.helpers.issue_registry import (
+    IssueSeverity,
+    async_create_issue,
+    async_delete_issue,
 )
 
 class XTDeviceManagerInterface(ABC):
@@ -35,7 +47,7 @@ class XTDeviceManagerInterface(ABC):
         pass
 
     @abstractmethod
-    def get_available_device_maps(self) -> list[dict[str, XTDevice]]:
+    def get_available_device_maps(self) -> list[XTDeviceMap]:
         pass
 
     def remove_device_listeners(self):
@@ -99,7 +111,7 @@ class XTDeviceManagerInterface(ABC):
         return return_list
     
     @abstractmethod
-    def convert_to_xt_device(self, Any) -> XTDevice:
+    def convert_to_xt_device(self, device: Any, device_source_priority: XTDeviceSourcePriority | None = None) -> XTDevice:
         pass
 
     def inform_device_has_an_entity(self, device_id: str):
@@ -127,3 +139,20 @@ class XTDeviceManagerInterface(ABC):
     
     def send_webrtc_trickle_ice(self, device_id: str, session_id: str, candidate: str) -> str | None:
         return None
+    
+    async def raise_issue(self, hass: HomeAssistant, config_entry: XTConfigEntry, is_fixable: bool, severity: IssueSeverity, translation_key: str, translation_placeholders: dict[str, any], learn_more_url: str | None = None):
+        try:
+            async_create_issue(
+                hass=hass,
+                domain=DOMAIN,
+                issue_domain=DOMAIN,
+                issue_id=f"{config_entry.entry_id}_{translation_key}",
+                is_fixable=is_fixable,
+                severity=severity,
+                translation_key=translation_key,
+                translation_placeholders=translation_placeholders,
+                learn_more_url=learn_more_url
+            )
+        except Exception as e:
+            #Prevent failure for any reason on this method
+            LOGGER.error(f"Exception raised during raise_issue: {e}")
