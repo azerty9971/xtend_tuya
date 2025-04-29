@@ -87,10 +87,14 @@ class TuyaOptionFlow(OptionsFlow):
         }
         if (
                 is_variable_empty(data[CONF_ACCESS_ID]) and
-                is_variable_empty(data[CONF_ACCESS_ID]) and
-                is_variable_empty(data[CONF_ACCESS_ID]) and
-                is_variable_empty(data[CONF_ACCESS_ID])
+                is_variable_empty(data[CONF_ACCESS_SECRET]) and
+                is_variable_empty(data[CONF_USERNAME]) and
+                is_variable_empty(data[CONF_PASSWORD])
         ):
+            data[CONF_ACCESS_ID] = ""
+            data[CONF_ACCESS_SECRET] = ""
+            data[CONF_USERNAME] = ""
+            data[CONF_PASSWORD] = ""
             return {TUYA_RESPONSE_SUCCESS: True}, data
 
         for app_type in ("", TUYA_SMART_APP, SMARTLIFE_APP):
