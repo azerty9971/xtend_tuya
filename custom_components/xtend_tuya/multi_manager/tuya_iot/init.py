@@ -109,7 +109,7 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
                 translation_key="tuya_iot_not_configured", 
                 translation_placeholders={
                     "name": DOMAIN,
-                    "config_entry_id": config_entry.entry_id
+                    "config_entry_id": config_entry.entry_id or "Config entry not found"
                 },
                 learn_more_url="https://github.com/azerty9971/xtend_tuya/blob/main/docs/cloud_credentials.md")
             return None
@@ -144,7 +144,7 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
                 translation_key="tuya_iot_failed_request", 
                 translation_placeholders={
                     "name": DOMAIN,
-                    "config_entry_id": config_entry.entry_id
+                    "config_entry_id": config_entry.entry_id or "Config entry not found"
                 })
             return None
 
@@ -158,7 +158,7 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
                 translation_key="tuya_iot_failed_login", 
                 translation_placeholders={
                     "name": DOMAIN,
-                    "config_entry_id": config_entry.entry_id
+                    "config_entry_id": config_entry.entry_id or "Config entry not found"
                 },
                 learn_more_url="https://github.com/azerty9971/xtend_tuya/blob/main/docs/renew_cloud_credentials.md")
             return None
