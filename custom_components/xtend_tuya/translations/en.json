@@ -1126,6 +1126,12 @@
           "other": "Other"
         }
       },
+      "unlock_hand": {
+        "name": "Hand unlock user"
+      },
+      "unlock_finger_vein": {
+        "name": "Finger vein unlock user"
+      },
       "unlock_card": {
         "name": "Card unlock user"
       },
