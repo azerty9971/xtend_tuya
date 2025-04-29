@@ -17,11 +17,6 @@ except ImportError:
     from homeassistant.data_entry_flow import FlowResult
     type ConfigFlowResult = FlowResult
 from homeassistant.helpers import selector
-from homeassistant.helpers.issue_registry import (
-    IssueSeverity,
-    async_create_issue,
-    async_delete_issue,
-)
 
 from .const import (
     CONF_ENDPOINT,
@@ -51,9 +46,6 @@ from .const import (
     TUYA_SMART_APP,
     TUYA_RESPONSE_PLATFORM_URL,
     LOGGER,  # noqa: F401
-)
-from .util import (
-    is_variable_empty,
 )
 
 
@@ -87,16 +79,11 @@ class TuyaOptionFlow(OptionsFlow):
             CONF_PASSWORD: user_input[CONF_PASSWORD],
             CONF_COUNTRY_CODE: country.country_code,
         }
-        if (
-                is_variable_empty(data[CONF_ACCESS_ID]) and
-                is_variable_empty(data[CONF_ACCESS_SECRET]) and
-                is_variable_empty(data[CONF_USERNAME]) and
-                is_variable_empty(data[CONF_PASSWORD])
-        ):
-            data[CONF_ACCESS_ID] = ""
-            data[CONF_ACCESS_SECRET] = ""
-            data[CONF_USERNAME] = ""
-            data[CONF_PASSWORD] = ""
+        if data[CONF_NO_OPENAPI] is True:
+            data[CONF_ACCESS_ID] = None
+            data[CONF_ACCESS_SECRET] = None
+            data[CONF_USERNAME] = None
+            data[CONF_PASSWORD] = None
             return {TUYA_RESPONSE_SUCCESS: True}, data
 
         for app_type in ("", TUYA_SMART_APP, SMARTLIFE_APP):
