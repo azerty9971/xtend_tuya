@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from enum import StrEnum, IntFlag
+from enum import StrEnum, IntFlag, IntEnum
 import logging
 
 from tuya_iot import TuyaCloudOpenAPIEndpoint
@@ -23,7 +23,7 @@ CONF_TOKEN_INFO = "token_info"
 CONF_USER_CODE = "user_code"
 CONF_USERNAME = "username"
 #OpenTuya specific conf
-CONF_USE_OPEN_API = "use_open_api"
+CONF_NO_OPENAPI = "no_openapi"
 CONF_ENDPOINT_OT = "endpoint"
 CONF_AUTH_TYPE = "auth_type"
 CONF_ACCESS_ID = "access_id"
@@ -87,6 +87,17 @@ class VirtualStates(IntFlag):
 class VirtualFunctions(IntFlag):
     """Virtual functions"""
     FUNCTION_RESET_STATE                        = 0X0001,   #Reset the specified states
+
+class XTDeviceEntityFunctions(StrEnum):
+    """ Functions that can be called from the device entity to alter the state of the device """
+    RECALCULATE_PERCENT_SCALE                   = "recalculate_percent_scale",
+
+#Defines the priority of the sources for the merging process
+#In case of conflict take the data from the lowest priority
+class XTDeviceSourcePriority(IntEnum):
+    REGULAR_TUYA    = 10,
+    TUYA_SHARED     = 20,
+    TUYA_IOT        = 30,
 
 @dataclass
 class DescriptionVirtualState:
@@ -192,7 +203,10 @@ class XTDPCode(StrEnum):
     BRIGHTNESS_MIN_2 = "brightness_min_2"
     BRIGHTNESS_MIN_3 = "brightness_min_3"
     B_CURRENT = "B_Current"
+    B_DETECTION_DISTANCE_MAX = "b_detection_distance_max"
+    B_DETECTION_DISTANCE_MIN = "b_detection_distance_min"
     B_VOLTAGE = "B_Voltage"
+    B_SENSITIVITY = "b_sensitivity"
     C_F = "c_f"  # Temperature unit switching
     CALIBRATION = "calibration"
     CAPACITY_CALIBRATION = "capacity_calibration"
@@ -368,6 +382,7 @@ class XTDPCode(StrEnum):
     MANUAL_LOCK = "manual_lock"
     MATERIAL = "material"  # Material
     MAX_SET = "max_set"
+    METER_TYPE = "meter_type"
     MINI_SET = "mini_set"
     MONITORING = "monitoring"
     MODE = "mode"  # Working mode / Mode
@@ -383,6 +398,9 @@ class XTDPCode(StrEnum):
     MOVESENSITIVITY = "movesensitivity"
     MUFFLING = "muffling"  # Muffling
     M_ADC_NUM = "M_ADC_NUM"
+    M_DETECTION_DISTANCE_MAX = "m_detection_distance_max"
+    M_DETECTION_DISTANCE_MIN = "m_detection_distance_min"
+    M_SENSITIVITY = "m_sensitivity"
     NEAR_DETECTION = "near_detection"
     NET_NOTICE = "Net_notice"
     NONE_DELAY_TIME = "none_delay_time"
@@ -457,6 +475,7 @@ class XTDPCode(StrEnum):
     RESET_ROLL_BRUSH = "reset_roll_brush"
     RESIDUAL_ELECTRICITY = "residual_electricity"
     RESPIRATORY_RATE = "respiratory_rate"
+    RESTORE_FACTORY_SETTINGS = "restore_factory_settings"
     REVERSE_ENERGY_TOTAL = "reverse_energy_total"
     RFID = "RFID"
     ROLL_BRUSH = "roll_brush"
@@ -488,6 +507,10 @@ class XTDPCode(StrEnum):
     SMOKE_SENSOR_STATE = "smoke_sensor_state"
     SMOKE_SENSOR_STATUS = "smoke_sensor_status"
     SMOKE_SENSOR_VALUE = "smoke_sensor_value"
+    SM_DETECTION_DISTANCE_MAX = "sm_detection_distance_max"
+    SM_DETECTION_DISTANCE_MIN = "sm_detection_distance_min"
+    SM_SENSITIVITY = "sm_sensitivity"
+    SOLAR_EN_TOTAL = "solar_en_total"
     SOS = "sos"  # Emergency State
     SOS_STATE = "sos_state"  # Emergency mode
     SOUND = "sound"
@@ -578,6 +601,10 @@ class XTDPCode(StrEnum):
     TRIGGER_SENSITIVITY = "trigger_sensitivity"
     TVOC = "tvoc"
     UNIT = "unit"
+    UNLOCK_CARD = "unlock_card"
+    UNLOCK_FACE = "unlock_face"
+    UNLOCK_FINGERPRINT = "unlock_fingerprint"
+    UNLOCK_PASSWORD = "unlock_password"
     UPPER_TEMP = "upper_temp"
     UPPER_TEMP_F = "upper_temp_f"
     USAGE_TIMES = "usage_times"

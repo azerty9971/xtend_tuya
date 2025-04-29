@@ -21,15 +21,18 @@ from .xt_tuya_iot_manager import (
 )
 from ..shared.interface.device_manager import (
     XTDeviceManagerInterface,
+    IssueSeverity,
 )
 from ..shared.shared_classes import (
     XTConfigEntry,
+    XTDeviceMap,
 )
 from ..shared.device import (
     XTDevice,
 )
 
 from .const import (
+    CONF_NO_OPENAPI,
     CONF_ACCESS_ID,
     CONF_AUTH_TYPE,
     CONF_ENDPOINT_OT,
@@ -61,6 +64,7 @@ from ...const import (
     LOGGER,
     TUYA_DISCOVERY_NEW,
     TUYA_HA_SIGNAL_UPDATE_ENTITY,
+    XTDeviceSourcePriority,
 )
 
 def get_plugin_instance() -> XTTuyaIOTDeviceManagerInterface | None:
@@ -98,6 +102,19 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
             or CONF_COUNTRY_CODE  not in config_entry.options
             or CONF_APP_TYPE      not in config_entry.options
             ):
+            if CONF_NO_OPENAPI in config_entry.options and config_entry.options[CONF_NO_OPENAPI] is True:
+                return None
+            await self.raise_issue(
+                hass=hass, 
+                config_entry=config_entry, 
+                is_fixable=True, 
+                severity=IssueSeverity.WARNING, 
+                translation_key="tuya_iot_not_configured", 
+                translation_placeholders={
+                    "name": DOMAIN,
+                    "config_entry_id": config_entry.title or "Config entry not found"
+                },
+                learn_more_url="https://github.com/azerty9971/xtend_tuya/blob/main/docs/cloud_credentials.md")
             return None
         auth_type = AuthType(config_entry.options[CONF_AUTH_TYPE])
         api = XTIOTOpenAPI(
@@ -121,10 +138,33 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
                     config_entry.options[CONF_APP_TYPE],
                 )
         except requests.exceptions.RequestException as err:
-            raise ConfigEntryNotReady(err) from err
+            #raise ConfigEntryNotReady(err) from err
+            await self.raise_issue(
+                hass=hass, 
+                config_entry=config_entry, 
+                is_fixable=True, 
+                severity=IssueSeverity.ERROR, 
+                translation_key="tuya_iot_failed_request", 
+                translation_placeholders={
+                    "name": DOMAIN,
+                    "config_entry_id": config_entry.title or "Config entry not found"
+                })
+            return None
 
         if response.get("success", False) is False:
-            raise ConfigEntryNotReady(response)
+            #raise ConfigEntryNotReady(response)
+            await self.raise_issue(
+                hass=hass, 
+                config_entry=config_entry, 
+                is_fixable=True, 
+                severity=IssueSeverity.ERROR, 
+                translation_key="tuya_iot_failed_login", 
+                translation_placeholders={
+                    "name": DOMAIN,
+                    "config_entry_id": config_entry.title or "Config entry not found"
+                },
+                learn_more_url="https://github.com/azerty9971/xtend_tuya/blob/main/docs/renew_cloud_credentials.md")
+            return None
         mq = XTIOTOpenMQ(api)
         mq.start()
         device_manager = XTIOTDeviceManager(self.multi_manager, api, mq)
@@ -143,8 +183,8 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
         self.iot_account.device_ids.clear()
         self.iot_account.device_ids.extend(new_device_ids)
     
-    def get_available_device_maps(self) -> list[dict[str, XTDevice]]:
-        return [self.iot_account.device_manager.device_map]
+    def get_available_device_maps(self) -> list[XTDeviceMap]:
+        return [XTDeviceMap(self.iot_account.device_manager.device_map, XTDeviceSourcePriority.TUYA_IOT)]
     
     def refresh_mq(self):
         pass
@@ -239,10 +279,11 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
             self.iot_account.device_manager.send_property_update(device_id, property_commands)
 
     @overload
-    def convert_to_xt_device(self, Any) -> XTDevice: ...
+    def convert_to_xt_device(self, device: Any, device_source_priority: XTDeviceSourcePriority | None = None) -> XTDevice: ...
     
-    def convert_to_xt_device(self, device: XTDevice) -> XTDevice:
+    def convert_to_xt_device(self, device: XTDevice, device_source_priority: XTDeviceSourcePriority | None = None) -> XTDevice:
         #Nothing to do, tuya_iot initializes XTDevice by default...
+        device.device_source_priority = device_source_priority
         return device
     
     def send_lock_unlock_command(
