@@ -170,3 +170,11 @@ def get_device_multi_manager(hass: HomeAssistant, device: XTDevice) -> MultiMana
         if device.id in mm.device_map:
             return mm
     return None
+
+def is_variable_empty(var):
+    if var is None:
+        return True
+    if var == "":
+        return True
+    
+    return False
