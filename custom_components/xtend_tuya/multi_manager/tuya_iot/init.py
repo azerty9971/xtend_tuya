@@ -110,7 +110,8 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
                 translation_placeholders={
                     "name": DOMAIN,
                     "config_entry_id": config_entry.entry_id
-                })
+                },
+                learn_more_url="https://github.com/azerty9971/xtend_tuya/blob/main/docs/cloud_credentials.md")
             return None
         auth_type = AuthType(config_entry.options[CONF_AUTH_TYPE])
         api = XTIOTOpenAPI(
@@ -158,7 +159,8 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
                 translation_placeholders={
                     "name": DOMAIN,
                     "config_entry_id": config_entry.entry_id
-                })
+                },
+                learn_more_url="https://github.com/azerty9971/xtend_tuya/blob/main/docs/renew_cloud_credentials.md")
             return None
         mq = XTIOTOpenMQ(api)
         mq.start()

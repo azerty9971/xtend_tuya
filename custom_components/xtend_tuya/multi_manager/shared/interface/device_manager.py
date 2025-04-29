@@ -139,7 +139,7 @@ class XTDeviceManagerInterface(ABC):
     def send_webrtc_trickle_ice(self, device_id: str, session_id: str, candidate: str) -> str | None:
         return None
     
-    async def raise_issue(self, hass: HomeAssistant, config_entry: XTConfigEntry, is_fixable: bool, severity: IssueSeverity, translation_key: str, translation_placeholders: dict[str, any]):
+    async def raise_issue(self, hass: HomeAssistant, config_entry: XTConfigEntry, is_fixable: bool, severity: IssueSeverity, translation_key: str, translation_placeholders: dict[str, any], learn_more_url: str | None = None):
         async_create_issue(
             hass=hass,
             domain=DOMAIN,
@@ -149,4 +149,5 @@ class XTDeviceManagerInterface(ABC):
             severity=severity,
             translation_key=translation_key,
             translation_placeholders=translation_placeholders,
+            learn_more_url=learn_more_url
         )
