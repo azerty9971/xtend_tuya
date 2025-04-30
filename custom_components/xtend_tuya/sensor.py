@@ -684,17 +684,14 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
         XTSensorEntityDescription(
             key=XTDPCode.PRODUCT_SPECIFICATIONS,
             translation_key="product_specifications",
-            state_class=SensorStateClass.MEASUREMENT,
         ),
         XTSensorEntityDescription(
             key=XTDPCode.DEVICEID,
             translation_key="deviceid",
-            state_class=SensorStateClass.MEASUREMENT,
         ),
         XTSensorEntityDescription(
             key=XTDPCode.RELEASES,
             translation_key="releases",
-            state_class=SensorStateClass.MEASUREMENT,
         ),
         *TEMPERATURE_SENSORS,
         *ELECTRICITY_SENSORS,
