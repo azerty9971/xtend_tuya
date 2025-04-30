@@ -301,6 +301,12 @@ TEMPERATURE_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         entity_registry_enabled_default=True,
     ),
     XTSensorEntityDescription(
+        key=XTDPCode.TEMP2,
+        translation_key="temperature",
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_registry_enabled_default=True,
+    ),
+    XTSensorEntityDescription(
         key=XTDPCode.TEMP_CURRENT,
         translation_key="temperature",
         state_class=SensorStateClass.MEASUREMENT,
@@ -364,6 +370,30 @@ HUMIDITY_SENSORS: tuple[XTSensorEntityDescription, ...] = (
 )
 
 ELECTRICITY_SENSORS: tuple[XTSensorEntityDescription, ...] = (
+    XTSensorEntityDescription(
+        key=XTDPCode.ACHZ,
+        translation_key="achz",
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.FREQUENCY,
+        entity_registry_enabled_default=True,
+        entity_registry_visible_default=False,
+    ),
+    XTSensorEntityDescription(
+        key=XTDPCode.ACV,
+        translation_key="acv",
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.VOLTAGE,
+        entity_registry_enabled_default=True,
+        entity_registry_visible_default=False,
+    ),
+    XTSensorEntityDescription(
+        key=XTDPCode.ACI,
+        translation_key="aci",
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.CURRENT,
+        entity_registry_enabled_default=True,
+        entity_registry_visible_default=False,
+    ),
     XTSensorEntityDescription(
         key=XTDPCode.A_CURRENT,
         translation_key="a_current",
@@ -433,6 +463,20 @@ ELECTRICITY_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         entity_registry_visible_default=False,
     ),
     XTSensorEntityDescription(
+        key=XTDPCode.ELECTRIC,
+        translation_key="electric",
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.POWER,
+        entity_registry_enabled_default=True,
+    ),
+    XTSensorEntityDescription(
+        key=XTDPCode.ELECTRIC_TOTAL,
+        translation_key="electric_total",
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.POWER,
+        entity_registry_enabled_default=True,
+    ),
+    XTSensorEntityDescription(
         key=XTDPCode.PHASEFLAG,
         translation_key="phaseflag",
         entity_registry_enabled_default=True,
@@ -444,6 +488,54 @@ ELECTRICITY_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.POWER,
         entity_registry_enabled_default=True,
+    ),
+    XTSensorEntityDescription(
+        key=XTDPCode.PV1_VOLT,
+        translation_key="pv1_volt",
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.VOLTAGE,
+        entity_registry_enabled_default=True,
+        entity_registry_visible_default=False,
+    ),
+    XTSensorEntityDescription(
+        key=XTDPCode.PV2_VOLT,
+        translation_key="pv2_volt",
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.VOLTAGE,
+        entity_registry_enabled_default=True,
+        entity_registry_visible_default=False,
+    ),
+    XTSensorEntityDescription(
+        key=XTDPCode.PVV,
+        translation_key="pvv",
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.VOLTAGE,
+        entity_registry_enabled_default=True,
+        entity_registry_visible_default=False,
+    ),
+    XTSensorEntityDescription(
+        key=XTDPCode.PV1_CURR,
+        translation_key="pv1_curr",
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.CURRENT,
+        entity_registry_enabled_default=True,
+        entity_registry_visible_default=False,
+    ),
+    XTSensorEntityDescription(
+        key=XTDPCode.PV2_CURR,
+        translation_key="pv2_curr",
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.CURRENT,
+        entity_registry_enabled_default=True,
+        entity_registry_visible_default=False,
+    ),
+    XTSensorEntityDescription(
+        key=XTDPCode.PVI,
+        translation_key="pvi",
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.CURRENT,
+        entity_registry_enabled_default=True,
+        entity_registry_visible_default=False,
     ),
     XTSensorEntityDescription(
         key=XTDPCode.SIGLE_PHASE_POWER,
@@ -587,6 +679,26 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
         *HUMIDITY_SENSORS,
         *CONSUMPTION_SENSORS,
         *ELECTRICITY_SENSORS,
+    ),
+    "MPPT": (
+        XTSensorEntityDescription(
+            key=XTDPCode.PRODUCT_SPECIFICATIONS,
+            translation_key="product_specifications",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        XTSensorEntityDescription(
+            key=XTDPCode.DEVICEID,
+            translation_key="deviceid",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        XTSensorEntityDescription(
+            key=XTDPCode.RELEASES,
+            translation_key="releases",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        *TEMPERATURE_SENSORS,
+        *ELECTRICITY_SENSORS,
+        *CONSUMPTION_SENSORS,
     ),
     "ms": (
         *BATTERY_SENSORS,
