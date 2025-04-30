@@ -673,7 +673,7 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
         XTSensorEntityDescription(
             key=XTDPCode.METER_TYPE,
             translation_key="meter_type",
-            entity_category=EntityCategory.CONFIG,
+            state_class=SensorStateClass.MEASUREMENT,
         ),
         *TEMPERATURE_SENSORS,
         *HUMIDITY_SENSORS,
@@ -684,17 +684,17 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
         XTSensorEntityDescription(
             key=XTDPCode.PRODUCT_SPECIFICATIONS,
             translation_key="product_specifications",
-            entity_category=EntityCategory.CONFIG,
+            state_class=SensorStateClass.MEASUREMENT,
         ),
         XTSensorEntityDescription(
             key=XTDPCode.DEVICEID,
             translation_key="deviceid",
-            entity_category=EntityCategory.CONFIG,
+            state_class=SensorStateClass.MEASUREMENT,
         ),
         XTSensorEntityDescription(
             key=XTDPCode.RELEASES,
             translation_key="releases",
-            entity_category=EntityCategory.CONFIG,
+            state_class=SensorStateClass.MEASUREMENT,
         ),
         *TEMPERATURE_SENSORS,
         *ELECTRICITY_SENSORS,
