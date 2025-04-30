@@ -610,9 +610,9 @@
       "currency": {
         "name": "Currency",
         "state": {
-          "Euro": "Euro",
-          "USD": "USD",
-          "RMB": "RMB"
+          "euro": "Euro",
+          "usd": "USD",
+          "rmb": "RMB"
         }
       },
       "tempunit": {
@@ -1134,8 +1134,8 @@
       "product_specifications": {
         "name": "Product specification",
         "state": {
-          "Europe": "Europe",
-          "America": "America"
+          "europe": "Europe",
+          "america": "America"
         }
       },
       "deviceid": {
