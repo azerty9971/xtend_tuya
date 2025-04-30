@@ -1153,6 +1153,15 @@
       "electric": {
         "name": "Power production"
       },
+      "electric_this_month": {
+        "name": "Monthly production"
+      },
+      "electric_this_year": {
+        "name": "Yearly production"
+      },
+      "electric_today": {
+        "name": "Daily production"
+      },
       "electric_total": {
         "name": "Total power production"
       },
