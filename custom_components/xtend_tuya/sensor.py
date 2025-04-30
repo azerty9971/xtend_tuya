@@ -221,7 +221,6 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.ENERGY,
         state_class=SensorStateClass.TOTAL,
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
-        entity_registry_enabled_default=True,
         restoredata=False,
     ),
     XTSensorEntityDescription(
@@ -230,7 +229,6 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.ENERGY,
         state_class=SensorStateClass.TOTAL_INCREASING,
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
-        entity_registry_enabled_default=True,
         restoredata=False,
     ),
     XTSensorEntityDescription(
@@ -238,7 +236,6 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         translation_key="charge_energy_once",
         device_class=SensorDeviceClass.ENERGY,
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
-        entity_registry_enabled_default=True,
         restoredata=False,
     ),
     XTSensorEntityDescription(
@@ -246,22 +243,22 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         translation_key="power",
         device_class=SensorDeviceClass.POWER,
         state_class=SensorStateClass.MEASUREMENT,
-        entity_registry_enabled_default=True,
     ),
     XTSensorEntityDescription(
         key=XTDPCode.DEVICEKWH,
         translation_key="device_consumption",
-        device_class=SensorDeviceClass.POWER,
+        device_class=SensorDeviceClass.ENERGY,
         state_class=SensorStateClass.MEASUREMENT,
-        entity_registry_enabled_default=True,
     ),
     XTSensorEntityDescription(
         key=XTDPCode.ELECTRIC,
         virtual_state=VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME | VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD,
         vs_copy_to_state=[XTDPCode.ELECTRIC_TODAY, XTDPCode.ELECTRIC_THIS_MONTH, XTDPCode.ELECTRIC_THIS_YEAR],
         translation_key="electric",
-        state_class=SensorStateClass.MEASUREMENT,
-        device_class=SensorDeviceClass.POWER,
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        native_unit_of_measurement=UnitOfEnergy.WATT_HOUR,
+        restoredata=True,
     ),
     XTSensorEntityDescription(
         key=XTDPCode.ELECTRIC_TODAY,
@@ -270,7 +267,6 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.ENERGY,
         state_class=SensorStateClass.TOTAL_INCREASING,
         native_unit_of_measurement=UnitOfEnergy.WATT_HOUR,
-        entity_registry_enabled_default=True,
         restoredata=True,
         reset_daily=True
     ),
@@ -281,7 +277,6 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.ENERGY,
         state_class=SensorStateClass.TOTAL_INCREASING,
         native_unit_of_measurement=UnitOfEnergy.WATT_HOUR,
-        entity_registry_enabled_default=True,
         restoredata=True,
         reset_monthly=True
     ),
