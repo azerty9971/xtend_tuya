@@ -143,7 +143,9 @@ class XTDPCode(StrEnum):
 
     https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
     """
-
+    ACHZ = "ACHZ"
+    ACI = "ACI"
+    ACV = "ACV"
     ADD_ELE = "add_ele" #Added watt since last heartbeat
     ADD_ELE_THIS_MONTH = "add_ele_this_month"
     ADD_ELE_THIS_YEAR = "add_ele_this_year"
@@ -292,6 +294,7 @@ class XTDPCode(StrEnum):
     DETECTION_DISTANCE_MIN = "detection_distance_min"
     DETECTION_DISTANCE_MAX = "detection_distance_max"
     DETECTION_SENSITIVITY = "detection_sensitivity"
+    DEVICEID = "DeviceID"
     DEVICEKW = "DeviceKw"
     DEVICEKWH = "DeviceKwh"
     DEVICEMAXSETA = "DeviceMaxSetA"
@@ -308,6 +311,8 @@ class XTDPCode(StrEnum):
     DUSTER_CLOTH = "duster_cloth"
     ECO2 = "eco2"
     EDGE_BRUSH = "edge_brush"
+    ELECTRIC = "electric"
+    ELECTRIC_TOTAL = "electric_total"
     ELECTRICITY_LEFT = "electricity_left"
     EMPTY = "empty"
     EXCRETION_TIME_DAY = "excretion_time_day"
@@ -450,10 +455,17 @@ class XTDPCode(StrEnum):
     POWER_GO = "power_go"
     POWER_SET = "power_set"
     POWER_TOTAL = "power_total"
+    PV1_CURR = "pv1_curr"
+    PV1_VOLT = "pv1_volt"
+    PV2_CURR = "pv2_curr"
+    PV2_VOLT = "pv2_volt"
+    PVV = "PVV"
+    PVI = "PVI"
     PRESENCE_DELAY = "presence_delay"
     PRESENCE_STATE = "presence_state"
     PRESSURE_STATE = "pressure_state"
     PRESSURE_VALUE = "pressure_value"
+    PRODUCT_SPECIFICATIONS = "product_specifications"
     PUMP = "pump"
     PUMP_RESET = "pump_reset"  # Water pump reset
     QUIET_TIMING_ON = "quiet_timing_on"
@@ -464,6 +476,7 @@ class XTDPCode(StrEnum):
     RECORD_MODE = "record_mode"
     RECORD_SWITCH = "record_switch"  # Recording switch
     RELAY_STATUS = "relay_status"
+    RELEASES = "releases"
     REMAININGTIME = "RemainingTime"
     REMAIN_TIME = "remain_time"
     REMOTE_NO_DP_KEY = "remote_no_dp_key"
@@ -563,12 +576,14 @@ class XTDPCode(StrEnum):
     TARGET_DISTANCE = "target_distance"
     TARGET_DIS_CLOSEST = "target_dis_closest"  # Closest target distance
     TEMP = "temp"  # Temperature setting
+    TEMP2 = "Temp"  # Temperature setting
     TEMPCHANGER = "TempChanger"
     TEMPERATURE = "temperature"
     TEMPER_ALARM = "temper_alarm"  # Tamper alarm
     TEMPSC = "TempSc"
     TEMPSET = "TempSet"
     TEMPSHOW = "TempShow"
+    TEMPUNIT = "TempUnit"
     TEMP_ADC = "temp_adc"
     TEMP_BOILING_C = "temp_boiling_c"
     TEMP_BOILING_F = "temp_boiling_f"
@@ -601,6 +616,7 @@ class XTDPCode(StrEnum):
     TRIGGER_SENSITIVITY = "trigger_sensitivity"
     TVOC = "tvoc"
     UNIT = "unit"
+    UNIT2 = "Unit"
     UNLOCK_CARD = "unlock_card"
     UNLOCK_FACE = "unlock_face"
     UNLOCK_FINGERPRINT = "unlock_fingerprint"

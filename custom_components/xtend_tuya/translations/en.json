@@ -607,6 +607,21 @@
       }
     },
     "select": {
+      "currency": {
+        "name": "Currency",
+        "state": {
+          "Euro": "Euro",
+          "USD": "USD",
+          "RMB": "RMB"
+        }
+      },
+      "tempunit": {
+        "name": "Temperature unit",
+        "state": {
+          "centigrade": "Celsius",
+          "fahrenheit_degree": "Fahrenheit"
+        }
+      },
       "solar_en_total": {
         "name": "Solar energy total",
         "state": {
@@ -1116,6 +1131,52 @@
       }
     },
     "sensor": {
+      "product_specifications": {
+        "name": "Product specification",
+        "state": {
+          "Europe": "Europe",
+          "America": "America"
+        }
+      },
+      "deviceid": {
+        "name": "Device ID"
+      },
+      "achz": {
+        "name": "Grid Frequency"
+      },
+      "acv": {
+        "name": "Grid voltage"
+      },
+      "aci": {
+        "name": "Grid current"
+      },
+      "electric": {
+        "name": "Power production"
+      },
+      "electric_total": {
+        "name": "Total power production"
+      },
+      "pv1_volt": {
+        "name": "Panel 1 voltage"
+      },
+      "pv1_curr": {
+        "name": "Panel 1 current"
+      },
+      "pv2_volt": {
+        "name": "Panel 2 voltage"
+      },
+      "pv2_curr": {
+        "name": "Panel 2 current"
+      },
+      "pvv": {
+        "name": "Total panel voltage"
+      },
+      "pvi": {
+        "name": "Total panel 1 current"
+      },
+      "releases": {
+        "name": "Release"
+      },
       "meter_type": {
         "name": "Meter type",
         "state": {

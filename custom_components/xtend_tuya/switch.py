@@ -137,6 +137,13 @@ SWITCHES: dict[str, tuple[XTSwitchEntityDescription, ...]] = {
             entity_registry_enabled_default=False
         ),
     ),
+    "MPPT": (
+        XTSwitchEntityDescription(
+            key=XTDPCode.SWITCH,
+            translation_key="switch",
+            entity_category=EntityCategory.CONFIG,
+        ),
+    ),
     # Automatic cat litter box
     # Note: Undocumented
     "msp": (
