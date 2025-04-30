@@ -256,6 +256,47 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         entity_registry_enabled_default=True,
     ),
     XTSensorEntityDescription(
+        key=XTDPCode.ELECTRIC,
+        virtual_state=VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME | VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD,
+        vs_copy_to_state=[XTDPCode.ELECTRIC_TODAY, XTDPCode.ELECTRIC_THIS_MONTH, XTDPCode.ELECTRIC_THIS_YEAR],
+        translation_key="electric",
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.POWER,
+    ),
+    XTSensorEntityDescription(
+        key=XTDPCode.ELECTRIC_TODAY,
+        virtual_state=VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD,
+        translation_key="electric_today",
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        native_unit_of_measurement=UnitOfEnergy.WATT_HOUR,
+        entity_registry_enabled_default=True,
+        restoredata=True,
+        reset_daily=True
+    ),
+    XTSensorEntityDescription(
+        key=XTDPCode.ELECTRIC_THIS_MONTH,
+        virtual_state=VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD,
+        translation_key="electric_this_month",
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        native_unit_of_measurement=UnitOfEnergy.WATT_HOUR,
+        entity_registry_enabled_default=True,
+        restoredata=True,
+        reset_monthly=True
+    ),
+    XTSensorEntityDescription(
+        key=XTDPCode.ELECTRIC_THIS_YEAR,
+        virtual_state=VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD,
+        translation_key="electric_this_year",
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        native_unit_of_measurement=UnitOfEnergy.WATT_HOUR,
+        entity_registry_enabled_default=True,
+        restoredata=True,
+        reset_yearly=True
+    ),
+    XTSensorEntityDescription(
         key=XTDPCode.FORWARD_ENERGY_TOTAL,
         virtual_state=VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME,
         vs_copy_delta_to_state=[XTDPCode.ADD_ELE2_TODAY, XTDPCode.ADD_ELE2_THIS_MONTH, XTDPCode.ADD_ELE2_THIS_YEAR],
@@ -430,12 +471,6 @@ ELECTRICITY_SENSORS: tuple[XTSensorEntityDescription, ...] = (
     XTSensorEntityDescription(
         key=XTDPCode.DEVICEMAXSETA,
         translation_key="device_max_set_a",
-    ),
-    XTSensorEntityDescription(
-        key=XTDPCode.ELECTRIC,
-        translation_key="electric",
-        state_class=SensorStateClass.MEASUREMENT,
-        device_class=SensorDeviceClass.POWER,
     ),
     XTSensorEntityDescription(
         key=XTDPCode.ELECTRIC_TOTAL,
