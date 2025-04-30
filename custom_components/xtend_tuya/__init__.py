@@ -111,6 +111,8 @@ async def cleanup_duplicated_devices(hass: HomeAssistant, current_entry: ConfigE
         remaining_devices = len(duplicate_check_table[device_id])
         if remaining_devices > 1:
             for hass_dev_id in duplicate_check_table[device_id]:
+                if hass_dev_id not in device_registry.devices:
+                    continue
                 if remaining_devices > 1:
                     hass_entities = er.async_entries_for_device(
                         entity_registry,
