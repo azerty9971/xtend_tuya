@@ -5,14 +5,32 @@ from .const import (
     DPType,
 )
 
+from .multi_manager.shared.device import (
+    XTDevice,
+)
+from .multi_manager.multi_manager import (
+    MultiManager,
+)
+
 from .ha_tuya_integration.tuya_integration_imports import (
-    TuyaEntity,
     TuyaEnumTypeData,
     TuyaIntegerTypeData,
     TUYA_DPTYPE_MAPPING,
 )
 
-class XTEntity(TuyaEntity):
+class XTEntity(object):
+    def __init__(
+        self,
+        device: XTDevice,
+        device_manager: MultiManager,
+        description: any | None = None,
+    ) -> None:
+        """Init XT number."""
+        if description is not None:
+            super(XTEntity, self).__init__(device, device_manager, description)
+        else:
+            super(XTEntity, self).__init__(device, device_manager)
+
     def find_dpcode(
         self,
         dpcodes: str | XTDPCode | tuple[XTDPCode, ...] | None,
