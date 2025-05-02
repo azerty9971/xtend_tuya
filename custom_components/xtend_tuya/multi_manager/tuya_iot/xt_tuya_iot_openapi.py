@@ -251,7 +251,7 @@ class XTIOTOpenAPI:
     ) -> dict[str, Any]:
 
         self.__refresh_access_token_if_need(path)
-
+        LOGGER.debug(f"[TUYA_IOT]Requesting: {method} {path} (first_pass={first_pass})")
         access_token = self.token_info.access_token if self.token_info else ""
         sign, t = self._calculate_sign(method, path, params, body)
         headers = {
@@ -285,19 +285,20 @@ class XTIOTOpenAPI:
                 )
                 break
             except Exception:
+                LOGGER.debug(f"[TUYA_IOT]Exception in request, waiting for 2 seconds and retrying")
                 time.sleep(2)
 
         if response.ok is False:
             LOGGER.error(
-                f"Response error: code={response.status_code}, body={response.body}"
+                f"[TUYA_IOT]Response error: code={response.status_code}, body={response.body}"
             )
             return None
 
         result = response.json()
 
-        """ LOGGER.debug(
-            f"Response: {json.dumps(result, ensure_ascii=False, indent=2)}"
-        ) """
+        LOGGER.debug(
+            f"[TUYA_IOT]Response: {json.dumps(result, ensure_ascii=False, indent=2)}"
+        )
 
         if result.get("code", -1) == TUYA_ERROR_CODE_TOKEN_INVALID:
             self.token_info = None
