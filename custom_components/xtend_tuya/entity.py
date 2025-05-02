@@ -29,10 +29,14 @@ class XTEntity:
         description: any | None = PARAMETER_NOT_ASSIGNED,
     ) -> None:
         #This is to catch the super call in case the next class in parent's MRO doesn't have an init method
-        if description is PARAMETER_NOT_ASSIGNED:
-            super().__init__(device, device_manager)
-        else:
-            super().__init__(device, device_manager, description)
+        try:
+            if description is PARAMETER_NOT_ASSIGNED:
+                super().__init__(device, device_manager)
+            else:
+                super().__init__(device, device_manager, description)
+        except Exception:
+            #In case we have an error, do nothing
+            pass
 
     def find_dpcode(
         self,
