@@ -48,7 +48,6 @@ class XTEntity:
         try:
             return super(XTEntity, self).find_dpcode(dpcodes=dpcodes, prefer_function=prefer_function, dptype=dptype)
         except Exception:
-            LOGGER.warning(f"XTEntity exception")
             """Find a matching DP code available on for this device."""
             if dpcodes is None:
                 return None
