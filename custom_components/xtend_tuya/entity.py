@@ -3,6 +3,7 @@ from __future__ import annotations
 from .const import (
     XTDPCode,
     DPType,
+    LOGGER,
 )
 
 from .multi_manager.shared.device import (
@@ -20,28 +21,18 @@ from .ha_tuya_integration.tuya_integration_imports import (
 
 PARAMETER_NOT_ASSIGNED = "!!!PARAMETER IS NOT ASSIGNED!!!"
 
-class XTEntityNotConstructed:
+class XTEntity:
     def __init__(
         self,
         device: XTDevice,
         device_manager: MultiManager,
-        description: any | None = None,
+        description: any | None = PARAMETER_NOT_ASSIGNED,
     ) -> None:
         #This is to catch the super call in case the next class in parent's MRO doesn't have an init method
-        pass
-
-class XTEntity(XTEntityNotConstructed):
-    def __init__(
-        self,
-        device: XTDevice,
-        device_manager: MultiManager,
-        description: any = PARAMETER_NOT_ASSIGNED,
-    ) -> None:
-        """Init XT number."""
-        if description is not PARAMETER_NOT_ASSIGNED:
-            super(XTEntity, self).__init__(device, device_manager, description)
+        if description is PARAMETER_NOT_ASSIGNED:
+            super().__init__(device, device_manager)
         else:
-            super(XTEntity, self).__init__(device, device_manager)
+            super().__init__(device, device_manager, description)
 
     def find_dpcode(
         self,
@@ -53,6 +44,7 @@ class XTEntity(XTEntityNotConstructed):
         try:
             return super(XTEntity, self).find_dpcode(dpcodes=dpcodes, prefer_function=prefer_function, dptype=dptype)
         except Exception:
+            LOGGER.warning(f"XTEntity exception")
             """Find a matching DP code available on for this device."""
             if dpcodes is None:
                 return None
