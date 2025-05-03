@@ -144,7 +144,7 @@ class XTIOTOpenAPI:
         return sign, t
 
     def __refresh_access_token_if_need(self, path: str):
-        if self.is_connect() is False:
+        if self.is_connect() is False and self.reconnect() is False:
             return
 
         if path.startswith(self.__login_path):
@@ -226,11 +226,10 @@ class XTIOTOpenAPI:
 
         return response
 
-    def is_connect(self) -> bool:
-        """Is connect to tuya cloud."""
+    def reconnect(self) -> bool:
+        self.token_info = None
         if (
-            self.token_info is None
-            and not self.connecting
+            not self.connecting
             and self.__username 
             and self.__password
             and self.__country_code
@@ -238,7 +237,11 @@ class XTIOTOpenAPI:
             connect_result = self.connect(
                 self.__username, self.__password, self.__country_code, self.__schema
             )
-            LOGGER.debug(f"Trying to connect: {connect_result}")
+            LOGGER.debug(f"Trying to reconnect: {connect_result}")
+        return self.is_connect()
+
+    def is_connect(self) -> bool:
+        """Is connect to tuya cloud."""
         return self.token_info is not None and len(self.token_info.access_token) > 0
 
     def __request(
