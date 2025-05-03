@@ -68,7 +68,7 @@ class XTIOTOpenMQ(TuyaOpenMQ):
             time.sleep(self.mq_config.expire_time - 60)
 
     def _get_mqtt_config(self, first_pass = True) -> Optional[XTIOTTuyaMQConfig]:
-        if not self.api.is_connect():
+        if self.api.is_connect() is False and self.api.reconnect() is False:
             LOGGER.debug(f"_get_mqtt_config failed: not connected", stack_info=True)
             return None
         response = self.api.post(
