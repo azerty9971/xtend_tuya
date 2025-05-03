@@ -138,7 +138,7 @@ class XTIOTOpenMQ(TuyaOpenMQ):
     def __run_mqtt(self):
         mq_config = self._get_mqtt_config()
         if mq_config is None:
-            LOGGER.error("error while get mqtt config")
+            LOGGER.error("error while get mqtt config", stack_info=True)
             return
 
         self.mq_config = mq_config
