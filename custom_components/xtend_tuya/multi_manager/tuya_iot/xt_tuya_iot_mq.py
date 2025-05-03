@@ -51,7 +51,11 @@ class XTIOTTuyaMQConfig(TuyaMQConfig):
         super().__init__(mqConfigResponse)
 
 class XTIOTOpenMQ(TuyaOpenMQ):
+
+    link_id: str = None
+
     def __init__(self, api: TuyaOpenAPI) -> None:
+        self.link_id = f"tuya.{uuid.uuid1()}"
         super().__init__(api)
         self.api: XTIOTOpenAPI = api
 
@@ -63,7 +67,7 @@ class XTIOTOpenMQ(TuyaOpenMQ):
             # reconnect every 2 hours required.
             time.sleep(self.mq_config.expire_time - 60)
 
-    def _get_mqtt_config(self) -> Optional[XTIOTTuyaMQConfig]:
+    def _get_mqtt_config(self, first_pass = True) -> Optional[XTIOTTuyaMQConfig]:
         if not self.api.is_connect():
             LOGGER.debug(f"_get_mqtt_config failed: not connected", stack_info=True)
             return None
@@ -73,7 +77,7 @@ class XTIOTOpenMQ(TuyaOpenMQ):
             else TO_C_SMART_HOME_MQTT_CONFIG_API,
             {
                 "uid": self.api.token_info.uid,
-                "link_id": f"tuya.{uuid.uuid1()}",
+                "link_id": self.link_id,
                 "link_type": "mqtt",
                 "topics": "device",
                 "msg_encrypted_version": "2.0"
@@ -83,6 +87,9 @@ class XTIOTOpenMQ(TuyaOpenMQ):
         )
 
         if response.get("success", False) is False:
+            if first_pass:
+                self.api.reconnect()
+                return self._get_mqtt_config(first_pass=False)
             return None
 
         return XTIOTTuyaMQConfig(response)
