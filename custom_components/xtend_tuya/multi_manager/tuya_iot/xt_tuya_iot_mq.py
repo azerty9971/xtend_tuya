@@ -55,12 +55,12 @@ class XTIOTOpenMQ(TuyaOpenMQ):
     link_id: str = None
     class_id: str = None
 
-    def __init__(self, api: TuyaOpenAPI) -> None:
+    def __init__(self, api: XTIOTOpenAPI) -> None:
         if self.link_id is None:
             self.link_id = f"tuya.{uuid.uuid1()}"
         if self.class_id is None:
             self.class_id = "IOT"
-        self.api.class_id = self.class_id
+        api.class_id = self.class_id
         super().__init__(api)
         self.api: XTIOTOpenAPI = api
 
