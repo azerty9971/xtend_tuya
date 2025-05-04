@@ -32,7 +32,7 @@ from ....const import (
 
 class XTIOTOpenMQIPC(XTIOTOpenMQ):
     def __init__(self, api: TuyaOpenAPI) -> None:
-        time.sleep(5)   #Debug value to have a time between IPC and IOT queries for log reading
+        self.sleep_time: float = 5   #Debug value to have a time between IPC and IOT queries for log reading
         self.mq_config: XTIOTTuyaMQConfig = None
         self.link_id: str = f"tuya.ipc.{uuid.uuid1()}"
         self.class_id: str = "IPC"

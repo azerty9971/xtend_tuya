@@ -54,17 +54,22 @@ class XTIOTOpenMQ(TuyaOpenMQ):
 
     link_id: str = None
     class_id: str = None
+    sleep_time: float = None
 
     def __init__(self, api: XTIOTOpenAPI) -> None:
         if self.link_id is None:
             self.link_id = f"tuya.{uuid.uuid1()}"
         if self.class_id is None:
             self.class_id = "IOT"
+        if self.sleep_time is None:
+            self.sleep_time = 0
         super().__init__(api)
         self.api: XTIOTOpenAPI = api
 
     def run(self):
         """Method representing the thread's activity which should not be used directly."""
+        if self.sleep_time:
+            time.sleep(self.sleep_time)
         while not self._stop_event.is_set():
             self.__run_mqtt()
 
