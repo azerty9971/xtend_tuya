@@ -33,6 +33,7 @@ class XTIOTOpenMQIPC(XTIOTOpenMQ):
     def __init__(self, api: TuyaOpenAPI) -> None:
         self.mq_config: XTIOTTuyaMQConfig = None
         self.link_id: str = f"tuya.ipc.{uuid.uuid1()}"
+        self.class_id: str = "IPC"
         super().__init__(api)
 
     def _on_message(self, mqttc: mqtt.Client, user_data: Any, msg: mqtt.MQTTMessage):
