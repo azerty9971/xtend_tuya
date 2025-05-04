@@ -53,9 +53,14 @@ class XTIOTTuyaMQConfig(TuyaMQConfig):
 class XTIOTOpenMQ(TuyaOpenMQ):
 
     link_id: str = None
+    class_id: str = None
 
     def __init__(self, api: TuyaOpenAPI) -> None:
-        self.link_id = f"tuya.{uuid.uuid1()}"
+        if self.link_id is None:
+            self.link_id = f"tuya.{uuid.uuid1()}"
+        if self.class_id is None:
+            self.class_id = "IOT"
+        self.api.class_id = self.class_id
         super().__init__(api)
         self.api: XTIOTOpenAPI = api
 
@@ -68,7 +73,7 @@ class XTIOTOpenMQ(TuyaOpenMQ):
             time.sleep(self.mq_config.expire_time - 60)
 
     def _get_mqtt_config(self, first_pass = True) -> Optional[XTIOTTuyaMQConfig]:
-        LOGGER.debug(f"[TUYA_IOT]Calling _get_mqtt_config")
+        LOGGER.debug(f"[{self.class_id}]Calling _get_mqtt_config")
         if self.api.is_connect() is False and self.api.reconnect() is False:
             LOGGER.debug(f"_get_mqtt_config failed: not connected", stack_info=True)
             return None
