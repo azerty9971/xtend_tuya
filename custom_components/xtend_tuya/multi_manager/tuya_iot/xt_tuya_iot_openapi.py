@@ -77,8 +77,10 @@ class XTIOTOpenAPI:
         self.auth_type = auth_type
         if self.auth_type == AuthType.CUSTOM:
             self.__login_path = TO_C_CUSTOM_TOKEN_API
+            self.__refresh_path = TO_C_CUSTOM_REFRESH_TOKEN_API
         else:
             self.__login_path = TO_C_SMART_HOME_TOKEN_API
+            self.__refresh_path = TO_C_SMART_HOME_REFRESH_TOKEN_API
 
         self.token_info: TuyaTokenInfo = None
 
@@ -144,10 +146,12 @@ class XTIOTOpenAPI:
         return sign, t
 
     def __refresh_access_token_if_need(self, path: str):
-        if self.is_connect() is False and self.reconnect() is False:
-            return
+        LOGGER.debug(f"[TUYA_IOT]Calling __refresh_access_token_if_need")
+        #if self.is_connect() is False and self.reconnect() is False:
+        #    return
 
-        if path.startswith(self.__login_path):
+        if path.startswith(self.__refresh_path):
+            LOGGER.debug(f"[TUYA_IOT]Calling __refresh_access_token_if_need")
             return
 
         # should use refresh token?
@@ -155,6 +159,7 @@ class XTIOTOpenAPI:
         expired_time = self.token_info.expire_time
 
         if expired_time - 60 * 1000 > now:  # 1min
+            LOGGER.debug(f"[TUYA_IOT]__refresh_access_token_if_need token is not old enough ({expired_time - 60 * 1000} > {now})")
             return
 
         self.token_info.access_token = ""
@@ -167,7 +172,7 @@ class XTIOTOpenAPI:
             response = self.get(
                 TO_C_SMART_HOME_REFRESH_TOKEN_API + self.token_info.refresh_token
             )
-
+        LOGGER.debug(f"[TUYA_IOT]__refresh_access_token_if_need response: {response}")
         self.token_info = TuyaTokenInfo(response)
 
     def set_dev_channel(self, dev_channel: str):
@@ -197,6 +202,7 @@ class XTIOTOpenAPI:
         self.__country_code = country_code
         self.__schema = schema
         self.connecting = True
+        LOGGER.debug(f"[TUYA_IOT]Calling connect")
         if self.auth_type == AuthType.CUSTOM:
             response = self.post(
                 TO_C_CUSTOM_TOKEN_API,
@@ -227,13 +233,14 @@ class XTIOTOpenAPI:
         return response
 
     def reconnect(self) -> bool:
-        self.token_info = None
+        LOGGER.debug(f"[TUYA_IOT]Calling reconnect (connecting: {self.connecting})")
         if (
             not self.connecting
             and self.__username 
             and self.__password
             and self.__country_code
         ):
+            self.token_info = None
             connect_result = self.connect(
                 self.__username, self.__password, self.__country_code, self.__schema
             )
@@ -242,7 +249,9 @@ class XTIOTOpenAPI:
 
     def is_connect(self) -> bool:
         """Is connect to tuya cloud."""
-        return self.token_info is not None and len(self.token_info.access_token) > 0
+        ret_val = self.token_info is not None and len(self.token_info.access_token) > 0
+        LOGGER.debug(f"[TUYA_IOT]is_connect = {ret_val}")
+        return ret_val
 
     def __request(
         self,
@@ -304,10 +313,7 @@ class XTIOTOpenAPI:
         )
 
         if result.get("code", -1) == TUYA_ERROR_CODE_TOKEN_INVALID:
-            self.token_info = None
-            self.connect(
-                self.__username, self.__password, self.__country_code, self.__schema
-            )
+            self.reconnect()
             if first_pass:
                 return self.__request(method, path, params, body, False)
 
