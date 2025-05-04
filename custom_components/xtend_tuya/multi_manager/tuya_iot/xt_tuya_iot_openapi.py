@@ -147,8 +147,8 @@ class XTIOTOpenAPI:
 
     def __refresh_access_token_if_need(self, path: str):
         LOGGER.debug(f"[TUYA_IOT]Calling __refresh_access_token_if_need")
-        #if self.is_connect() is False and self.reconnect() is False:
-        #    return
+        if self.is_connect() is False: # and self.reconnect() is False:
+            return
 
         if path.startswith(self.__refresh_path):
             LOGGER.debug(f"[TUYA_IOT]Calling __refresh_access_token_if_need")
