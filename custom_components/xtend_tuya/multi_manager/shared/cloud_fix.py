@@ -29,7 +29,7 @@ class CloudFixes:
         CloudFixes._remove_status_that_are_local_strategy_aliases(device)
         CloudFixes._fix_unaligned_function_or_status_range(device)
         
-    def fix_incorrect_percent_scale_forced(device: XTDevice, function_code: str):
+    def fix_incorrect_percent_scale_forced(device: XTDevice, function_code: str, scale_threshold: int = 1000):
         recomputed_function_code = function_code
         for dpId in device.local_strategy:
             status_code = device.local_strategy[dpId].get("status_code")
@@ -49,7 +49,7 @@ class CloudFixes:
                             if max % 100 != 0:
                                 continue
                             scale = 0
-                            while max > 100:
+                            while max >= scale_threshold:
                                 max = int(max / 10)
                                 scale = scale + 1
                             value["scale"] = scale
@@ -63,7 +63,7 @@ class CloudFixes:
                     max = int(value["max"])
                     if max % 100 == 0:
                         scale = 0
-                        while max > 100:
+                        while max >= scale_threshold:
                             max = int(max / 10)
                             scale = scale + 1
                         value["scale"] = scale
@@ -77,7 +77,7 @@ class CloudFixes:
                     max = int(value["max"])
                     if max % 100 == 0:
                         scale = 0
-                        while max > 100:
+                        while max >= scale_threshold:
                             max = int(max / 10)
                             scale = scale + 1
                         value["scale"] = scale
