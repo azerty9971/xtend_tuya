@@ -135,6 +135,18 @@ SELECTS: dict[str, tuple[XTSelectEntityDescription, ...]] = {
             entity_category=EntityCategory.CONFIG,
         ),
     ),
+    "MPPT": (
+        XTSelectEntityDescription(
+            key=XTDPCode.TEMPUNIT,
+            translation_key="tempunit",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        XTSelectEntityDescription(
+            key=XTDPCode.UNIT2,
+            translation_key="currency",
+            entity_category=EntityCategory.CONFIG,
+        ),
+    ),
     "msp": (
         XTSelectEntityDescription(
             key=XTDPCode.CLEAN,
