@@ -146,12 +146,12 @@ class XTIOTOpenAPI:
         return sign, t
 
     def __refresh_access_token_if_need(self, path: str):
-        LOGGER.debug(f"[API]Calling __refresh_access_token_if_need")
+        #LOGGER.debug(f"[API]Calling __refresh_access_token_if_need")
         if self.is_connect() is False: # and self.reconnect() is False:
             return
 
         if path.startswith(self.__refresh_path):
-            LOGGER.debug(f"[API]Calling __refresh_access_token_if_need")
+            #LOGGER.debug(f"[API]__refresh_access_token_if_need path is refresh path")
             return
 
         # should use refresh token?
@@ -159,7 +159,7 @@ class XTIOTOpenAPI:
         expired_time = self.token_info.expire_time
 
         if expired_time - 60 * 1000 > now:  # 1min
-            LOGGER.debug(f"[API]__refresh_access_token_if_need token is not old enough ({expired_time - 60 * 1000} > {now})")
+            #LOGGER.debug(f"[API]__refresh_access_token_if_need token is not old enough ({expired_time - 60 * 1000} > {now})")
             return
 
         self.token_info.access_token = ""
@@ -172,7 +172,7 @@ class XTIOTOpenAPI:
             response = self.get(
                 TO_C_SMART_HOME_REFRESH_TOKEN_API + self.token_info.refresh_token
             )
-        LOGGER.debug(f"[API]__refresh_access_token_if_need response: {response}")
+        #LOGGER.debug(f"[API]__refresh_access_token_if_need response: {response}")
         self.token_info = TuyaTokenInfo(response)
 
     def set_dev_channel(self, dev_channel: str):
@@ -202,7 +202,7 @@ class XTIOTOpenAPI:
         self.__country_code = country_code
         self.__schema = schema
         self.connecting = True
-        LOGGER.debug(f"[API]Calling connect")
+        #LOGGER.debug(f"[API]Calling connect")
         if self.auth_type == AuthType.CUSTOM:
             response = self.post(
                 TO_C_CUSTOM_TOKEN_API,
@@ -233,7 +233,7 @@ class XTIOTOpenAPI:
         return response
 
     def reconnect(self) -> bool:
-        LOGGER.debug(f"[API]Calling reconnect (connecting: {self.connecting})")
+        #LOGGER.debug(f"[API]Calling reconnect (connecting: {self.connecting})")
         if (
             not self.connecting
             and self.__username 
@@ -244,13 +244,13 @@ class XTIOTOpenAPI:
             connect_result = self.connect(
                 self.__username, self.__password, self.__country_code, self.__schema
             )
-            LOGGER.debug(f"Trying to reconnect: {connect_result}")
+            #LOGGER.debug(f"Trying to reconnect: {connect_result}")
         return self.is_connect()
 
     def is_connect(self) -> bool:
         """Is connect to tuya cloud."""
         ret_val = self.token_info is not None and len(self.token_info.access_token) > 0
-        LOGGER.debug(f"[API]is_connect = {ret_val}")
+        #LOGGER.debug(f"[API]is_connect = {ret_val}")
         return ret_val
 
     def __request(
@@ -263,7 +263,7 @@ class XTIOTOpenAPI:
     ) -> dict[str, Any]:
 
         self.__refresh_access_token_if_need(path)
-        LOGGER.debug(f"[API]Requesting: {method} {path} (first_pass={first_pass})")
+        #LOGGER.debug(f"[API]Requesting: {method} {path} (first_pass={first_pass})")
         access_token = self.token_info.access_token if self.token_info else ""
         sign, t = self._calculate_sign(method, path, params, body)
         headers = {
@@ -297,7 +297,7 @@ class XTIOTOpenAPI:
                 )
                 break
             except Exception:
-                LOGGER.debug(f"[API]Exception in request, waiting for 2 seconds and retrying")
+                LOGGER.warning(f"[API]Exception in request, waiting for 2 seconds and retrying")
                 time.sleep(2)
 
         if response.ok is False:
@@ -308,9 +308,9 @@ class XTIOTOpenAPI:
 
         result = response.json()
 
-        LOGGER.debug(
-            f"[API]Response: {json.dumps(result, ensure_ascii=False, indent=2)}"
-        )
+        #LOGGER.debug(
+        #    f"[API]Response: {json.dumps(result, ensure_ascii=False, indent=2)}"
+        #)
 
         if result.get("code", -1) == TUYA_ERROR_CODE_TOKEN_INVALID:
             self.reconnect()
