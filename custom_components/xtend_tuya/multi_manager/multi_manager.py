@@ -426,7 +426,7 @@ class MultiManager:  # noqa: F811
                 return_list.append(account.get_type_name())
         return return_list
     
-    def execute_device_entity_function(self, function: XTDeviceEntityFunctions, device: XTDevice, param1: any | None = None):
+    def execute_device_entity_function(self, function: XTDeviceEntityFunctions, device: XTDevice, param1: any | None = None, param2: any | None = None):
         match function:
             case XTDeviceEntityFunctions.RECALCULATE_PERCENT_SCALE:
-                CloudFixes.fix_incorrect_percent_scale_forced(device, param1)
+                CloudFixes.fix_incorrect_percent_scale_forced(device, param1, param2)

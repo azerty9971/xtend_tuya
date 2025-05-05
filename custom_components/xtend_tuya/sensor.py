@@ -67,6 +67,7 @@ class XTSensorEntityDescription(TuyaSensorEntityDescription):
     reset_after_x_seconds: int = 0
     restoredata: bool = False
     recalculate_scale_for_percentage: bool = False
+    recalculate_scale_for_percentage_threshold: int = 1000
 
 # Commonly used battery sensors, that are re-used in the sensors down below.
 BATTERY_SENSORS: tuple[XTSensorEntityDescription, ...] = (
@@ -1185,7 +1186,7 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):
         self.device_manager = device_manager
         self.entity_description = description
         if description.recalculate_scale_for_percentage:
-            device_manager.execute_device_entity_function(XTDeviceEntityFunctions.RECALCULATE_PERCENT_SCALE, device, description.key)
+            device_manager.execute_device_entity_function(XTDeviceEntityFunctions.RECALCULATE_PERCENT_SCALE, device, description.key, description.recalculate_scale_for_percentage_threshold)
 
     def reset_value(self, _: datetime, manual_call: bool = False) -> None:
         if manual_call and self.cancel_reset_after_x_seconds:
