@@ -67,7 +67,7 @@ class XTSensorEntityDescription(TuyaSensorEntityDescription):
     reset_after_x_seconds: int = 0
     restoredata: bool = False
     recalculate_scale_for_percentage: bool = False
-    recalculate_scale_for_percentage_threshold: int = 1000
+    recalculate_scale_for_percentage_threshold: int = 100 #Maximum percentage that the sensor can display (default = 100%)
 
 # Commonly used battery sensors, that are re-used in the sensors down below.
 BATTERY_SENSORS: tuple[XTSensorEntityDescription, ...] = (
@@ -1052,6 +1052,7 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
             translation_key="liquid_level_percent",
             entity_registry_enabled_default=True,
             recalculate_scale_for_percentage=True,
+            recalculate_scale_for_percentage_threshold=1000,
         ),
     ),
     #ZNRB devices don't send correct cloud data, for these devices use https://github.com/make-all/tuya-local instead
