@@ -77,9 +77,9 @@ class XTIOTOpenMQ(TuyaOpenMQ):
             time.sleep(self.mq_config.expire_time - 60)
 
     def _get_mqtt_config(self, first_pass = True) -> Optional[XTIOTTuyaMQConfig]:
-        LOGGER.debug(f"[{self.class_id}]Calling _get_mqtt_config")
+        #LOGGER.debug(f"[{self.class_id}]Calling _get_mqtt_config")
         if self.api.is_connect() is False and self.api.reconnect() is False:
-            LOGGER.debug(f"_get_mqtt_config failed: not connected", stack_info=True)
+            #LOGGER.debug(f"_get_mqtt_config failed: not connected", stack_info=True)
             return None
         response = self.api.post(
             TO_C_CUSTOM_MQTT_CONFIG_API
@@ -121,7 +121,8 @@ class XTIOTOpenMQ(TuyaOpenMQ):
         if rc != 0:
             LOGGER.error(f"Unexpected disconnection.{rc}")
         else:
-            LOGGER.debug("disconnect")
+            pass
+            #LOGGER.debug("disconnect")
 
     def _start(self, mq_config: TuyaMQConfig) -> mqtt.Client:
         #mqttc = mqtt.Client(callback_api_version=mqtt_CallbackAPIVersion.VERSION2 ,client_id=mq_config.client_id)
@@ -145,7 +146,7 @@ class XTIOTOpenMQ(TuyaOpenMQ):
         return mqttc
     
     def _on_connect(self, mqttc: mqtt.Client, user_data: Any, flags, rc):
-        LOGGER.debug(f"connect flags->{flags}, rc->{rc}")
+        #LOGGER.debug(f"connect flags->{flags}, rc->{rc}")
         if rc == 0:
             for (key, value) in self.mq_config.source_topic.items():
                 mqttc.subscribe(value)
@@ -160,7 +161,7 @@ class XTIOTOpenMQ(TuyaOpenMQ):
 
         self.mq_config = mq_config
 
-        LOGGER.debug(f"connecting {mq_config.url}")
+        #LOGGER.debug(f"connecting {mq_config.url}")
         mqttc = self._start(mq_config)
 
         if self.client:
