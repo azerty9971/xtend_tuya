@@ -3,16 +3,41 @@ from __future__ import annotations
 from .const import (
     XTDPCode,
     DPType,
+    LOGGER,
+)
+
+from .multi_manager.shared.device import (
+    XTDevice,
+)
+from .multi_manager.multi_manager import (
+    MultiManager,
 )
 
 from .ha_tuya_integration.tuya_integration_imports import (
-    TuyaEntity,
     TuyaEnumTypeData,
     TuyaIntegerTypeData,
     TUYA_DPTYPE_MAPPING,
 )
 
-class XTEntity(TuyaEntity):
+PARAMETER_NOT_ASSIGNED = "!!!PARAMETER IS NOT ASSIGNED!!!"
+
+class XTEntity:
+    def __init__(
+        self,
+        device: XTDevice,
+        device_manager: MultiManager,
+        description: any | None = PARAMETER_NOT_ASSIGNED,
+    ) -> None:
+        #This is to catch the super call in case the next class in parent's MRO doesn't have an init method
+        try:
+            if description is PARAMETER_NOT_ASSIGNED:
+                super().__init__(device, device_manager)
+            else:
+                super().__init__(device, device_manager, description)
+        except Exception:
+            #In case we have an error, do nothing
+            pass
+
     def find_dpcode(
         self,
         dpcodes: str | XTDPCode | tuple[XTDPCode, ...] | None,

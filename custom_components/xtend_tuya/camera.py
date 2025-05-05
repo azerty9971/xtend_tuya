@@ -31,6 +31,7 @@ from .entity import (
 CAMERAS: tuple[str, ...] = (
     "jtmspro",
     "videolock",
+    "sp",
 )
 
 
