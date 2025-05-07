@@ -48,6 +48,25 @@ TAMPER_BINARY_SENSOR = XTBinarySensorEntityDescription(
     entity_category=EntityCategory.DIAGNOSTIC,
 )
 
+PROXIMITY_BINARY_SENSOR = tuple[XTBinarySensorEntityDescription, ...] = (
+    XTBinarySensorEntityDescription(
+        key=XTDPCode.PRESENCE_STATE,
+        translation_key="pir_state",
+        device_class=BinarySensorDeviceClass.MOTION,
+        on_value="presence",
+    ),
+    XTBinarySensorEntityDescription(
+        key=XTDPCode.PIR_STATE,
+        translation_key="pir_state",
+        device_class=BinarySensorDeviceClass.MOTION,
+        on_value="pir",
+    ),
+    XTBinarySensorEntityDescription(
+        key=XTDPCode.PIR2,
+        translation_key="pir_state",
+        device_class=BinarySensorDeviceClass.MOTION,
+    ),
+)
 
 # All descriptions can be found here. Mostly the Boolean data types in the
 # default status set of each category (that don't have a set instruction)
@@ -63,11 +82,7 @@ BINARY_SENSORS: dict[str, tuple[XTBinarySensorEntityDescription, ...]] = {
         ),
     ),
     "kg": (
-        XTBinarySensorEntityDescription(
-            key=XTDPCode.PRESENCE_STATE,
-            device_class=BinarySensorDeviceClass.MOTION,
-            on_value="presence",
-        ),
+        *PROXIMITY_BINARY_SENSOR,
     ),
     "msp": (
         #If 1 is reported, it will be counted once. 
@@ -90,10 +105,7 @@ BINARY_SENSORS: dict[str, tuple[XTBinarySensorEntityDescription, ...]] = {
         ),
     ),
     "pir": (
-        XTBinarySensorEntityDescription(
-            key=XTDPCode.PIR2,
-            device_class=BinarySensorDeviceClass.MOTION,
-        ),
+        *PROXIMITY_BINARY_SENSOR,
     ),
     #"qccdz": (
     #    XTBinarySensorEntityDescription(
@@ -120,6 +132,8 @@ BINARY_SENSORS: dict[str, tuple[XTBinarySensorEntityDescription, ...]] = {
         ),
     ),
 }
+
+BINARY_SENSORS["tdq"] = BINARY_SENSORS["kg"]
 
 #Lock duplicates
 BINARY_SENSORS["videolock"] = BINARY_SENSORS["jtmspro"]
