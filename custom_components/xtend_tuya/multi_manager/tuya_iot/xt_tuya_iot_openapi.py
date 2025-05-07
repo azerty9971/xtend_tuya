@@ -151,7 +151,7 @@ class XTIOTOpenAPI:
             return
 
         if path.startswith(self.__refresh_path):
-            LOGGER.debug(f"[API]Calling __refresh_access_token_if_need")
+            LOGGER.debug(f"[API]__refresh_access_token_if_need path starts with refresh path")
             return
 
         # should use refresh token?
