@@ -443,6 +443,7 @@ class XTDPCode(StrEnum):
     PIR_DELAY = "pir_delay"
     PIR_RADAR = "PIR_RADAR"
     PIR_SENSITIVITY = "pir_sensitivity"
+    PIR_STATE = "pir_state"
     PM1 = "pm1"
     PM10 = "pm10"
     PM25 = "pm25"

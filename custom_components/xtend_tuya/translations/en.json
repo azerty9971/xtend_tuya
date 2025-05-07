@@ -161,6 +161,9 @@
   },
   "entity": {
     "binary_sensor": {
+      "pir_state": {
+        "name": "Proximity sensor"
+      },
       "online": {
         "name": "Device online"
       },
