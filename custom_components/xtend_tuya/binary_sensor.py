@@ -48,7 +48,7 @@ TAMPER_BINARY_SENSOR = XTBinarySensorEntityDescription(
     entity_category=EntityCategory.DIAGNOSTIC,
 )
 
-PROXIMITY_BINARY_SENSOR = tuple[XTBinarySensorEntityDescription, ...] = (
+PROXIMITY_BINARY_SENSOR: tuple[XTBinarySensorEntityDescription, ...] = (
     XTBinarySensorEntityDescription(
         key=XTDPCode.PRESENCE_STATE,
         translation_key="pir_state",
