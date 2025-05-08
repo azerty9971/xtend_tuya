@@ -32,13 +32,13 @@ from .const import (
     TUYA_RESPONSE_RESULT,
     TUYA_RESPONSE_SUCCESS,
     TUYA_SCHEMA,
-    CONF_USE_OPEN_API,
     CONF_ACCESS_ID,
     CONF_ACCESS_SECRET,
     CONF_APP_TYPE,
     CONF_ENDPOINT_OT,
     CONF_AUTH_TYPE,
     CONF_COUNTRY_CODE,
+    CONF_NO_OPENAPI,
     CONF_PASSWORD,
     CONF_USERNAME,
     SMARTLIFE_APP,
@@ -70,6 +70,7 @@ class TuyaOptionFlow(OptionsFlow):
         ][0]
 
         data = {
+            CONF_NO_OPENAPI: user_input[CONF_NO_OPENAPI],
             CONF_ENDPOINT_OT: country.endpoint,
             CONF_AUTH_TYPE: AuthType.CUSTOM,
             CONF_ACCESS_ID: user_input[CONF_ACCESS_ID],
@@ -77,11 +78,8 @@ class TuyaOptionFlow(OptionsFlow):
             CONF_USERNAME: user_input[CONF_USERNAME],
             CONF_PASSWORD: user_input[CONF_PASSWORD],
             CONF_COUNTRY_CODE: country.country_code,
-            CONF_USE_OPEN_API: user_input[CONF_USE_OPEN_API],
         }
-        if (
-               not data[CONF_USE_OPEN_API]
-        ):
+        if data[CONF_NO_OPENAPI] is True:
             data[CONF_ACCESS_ID] = None
             data[CONF_ACCESS_SECRET] = None
             data[CONF_USERNAME] = None
@@ -162,8 +160,8 @@ class TuyaOptionFlow(OptionsFlow):
             data_schema=vol.Schema(
                 {
                     vol.Optional(
-                        CONF_USE_OPEN_API, 
-                        default=bool(user_input.get(CONF_ACCESS_ID, self.options.get(CONF_ACCESS_ID, "")))
+                        CONF_NO_OPENAPI, 
+                        default=bool(user_input.get(CONF_NO_OPENAPI, self.options.get(CONF_NO_OPENAPI, "")))
                     ): bool,
                     vol.Optional(
                         CONF_COUNTRY_CODE, 

@@ -30,7 +30,7 @@
       "init": {
         "description": "Add a Tuya OpenAPI credential to improve the compatibility with some Tuya devices",
         "data": {
-          "use_open_api": "Use OpenAPI credentials",
+          "no_openapi": "Don't ask for OpenAPI credentials",
           "country_code": "Country",
           "access_id": "Tuya IoT Access ID",
           "access_secret": "Tuya IoT Access Secret",
@@ -314,6 +314,33 @@
       }
     },
     "number": {
+      "b_detection_distance_max": {
+        "name": "Max breath detection distance"
+      },
+      "b_detection_distance_min": {
+        "name": "Min breath detection distance"
+      },
+      "b_sensitivity": {
+        "name": "Breath detection sensitivity"
+      },
+      "m_detection_distance_max": {
+        "name": "Max motion detection distance"
+      },
+      "m_detection_distance_min": {
+        "name": "Min motion detection distance"
+      },
+      "m_sensitivity": {
+        "name": "Motion detection sensitivity"
+      },
+      "sm_detection_distance_max": {
+        "name": "Max micro-motion detection distance"
+      },
+      "sm_detection_distance_min": {
+        "name": "Min micro-motion detection distance"
+      },
+      "sm_sensitivity": {
+        "name": "Micro-motion detection sensitivity"
+      },
       "use_time_1": {
         "name": "Usage time 1"
       },
@@ -580,6 +607,14 @@
       }
     },
     "select": {
+      "solar_en_total": {
+        "name": "Solar energy total",
+        "state": {
+          "unknown": "Unknown",
+          "disable": "Disable",
+          "enable": "Enable"
+        }
+      },
       "temp_unit_convert": {
         "name": "Temperature unit",
         "state": {
@@ -1081,6 +1116,28 @@
       }
     },
     "sensor": {
+      "meter_type": {
+        "name": "Meter type",
+        "state": {
+          "unknown": "Unknown",
+          "3_phase": "3 Phases",
+          "1_phase": "1 Phase",
+          "1_phase_3_wire": "1 Phase 3 wires",
+          "other": "Other"
+        }
+      },
+      "unlock_card": {
+        "name": "Card unlock user"
+      },
+      "unlock_face": {
+        "name": "Face unlock user"
+      },
+      "unlock_fingerprint": {
+        "name": "Fingerprint unlock user"
+      },
+      "unlock_password": {
+        "name": "Password unlock user"
+      },
       "flow_velocity": {
         "name": "Flow speed"
       },
@@ -2117,6 +2174,39 @@
           "confirm": {
             "title": "Tuya vacuum support for vacuum.turn_on is being removed",
             "description": "Tuya vacuum support for the vacuum.turn_on service is deprecated and will be removed in Home Assistant 2024.2; Please adjust any automation or script that uses the service to instead call vacuum.start and select submit below to mark this issue as resolved."
+          }
+        }
+      }
+    },
+    "tuya_iot_failed_request": {
+      "title": "Tuya OpenAPI request failed",
+      "fix_flow": {
+        "step": {
+          "confirm": {
+            "description": "The integration \"{name}\" (`{config_entry_id}`) could not connect to the Tuya OpenAPI service (request failed)\n\nTo fix this error, check that your HA can access the internet and that there is no firewall in between HA and Tuya OpenAPI endpoints.",
+            "title": "Tuya OpenAPI request failed"
+          }
+        }
+      }
+    },
+    "tuya_iot_failed_login": {
+      "title": "Tuya OpenAPI login failed",
+      "fix_flow": {
+        "step": {
+          "confirm": {
+            "description": "The integration \"{name}\" (`{config_entry_id}`) could not connect to the Tuya OpenAPI service (failed login)\n\nTo fix this error please follow the guide at [this URL](https://github.com/azerty9971/xtend_tuya/blob/main/docs/renew_cloud_credentials.md), then restart Home Assistant.",
+            "title": "Tuya OpenAPI login failed"
+          }
+        }
+      }
+    },
+    "tuya_iot_not_configured": {
+      "title": "Tuya OpenAPI account not configured",
+      "fix_flow": {
+        "step": {
+          "confirm": {
+            "description": "The integration \"{name}\" (`{config_entry_id}`) Does not have Tuya OpenAPI credentials\n\nWithout this, a lot of entities might be missing in your devices.\n\nTo fix this warning please follow the guide at [this URL](https://github.com/azerty9971/xtend_tuya/blob/main/docs/cloud_credentials.md), then restart Home Assistant.",
+            "title": "Tuya OpenAPI account not configured"
           }
         }
       }
