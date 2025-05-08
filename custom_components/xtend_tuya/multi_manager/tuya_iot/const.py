@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-CONF_USE_OPEN_API = "use_open_api"
+CONF_NO_OPENAPI = "no_openapi"
 CONF_ENDPOINT_OT = "endpoint"
 CONF_AUTH_TYPE = "auth_type"
 CONF_ACCESS_ID = "access_id"

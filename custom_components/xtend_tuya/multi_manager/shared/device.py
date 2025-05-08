@@ -4,8 +4,15 @@ from typing import Any, Optional
 from types import SimpleNamespace
 from dataclasses import dataclass, field
 import copy
+from homeassistant.core import HomeAssistant
 from tuya_sharing import (
     CustomerDevice as TuyaDevice,
+)
+from ..multi_manager import (
+    MultiManager,
+)
+from ...util import (
+    get_device_multi_manager,
 )
 
 @dataclass
@@ -80,9 +87,11 @@ class XTDevice(TuyaDevice):
     source: str
     online_states: dict[str, bool]
     data_model: dict[str, Any]
-    force_open_api: Optional[bool] = False
     function: dict[str, XTDeviceFunction]
     status_range: dict[str, XTDeviceStatusRange]
+    force_open_api: Optional[bool] = False
+    device_source_priority: int | None = None
+    force_compatibility: bool = False   #Force the device functions/status_range/state to remain untouched after merging
 
     def __init__(self, **kwargs: Any) -> None:
         self.source = ""
@@ -132,13 +141,14 @@ class XTDevice(TuyaDevice):
         return f"Device {self.name}:\r\n{function_str}{status_range_str}{status_str}{local_strategy_str}"
         #return f"Device {self.name}:\r\n{self.source}"
 
-    def from_compatible_device(device: Any, source: str = "Compatible device"):
+    def from_compatible_device(device: Any, source: str = "Compatible device", device_source_priority: int | None = None):
         #If the device is already an XT device return it right away
         if isinstance(device, XTDevice):
             return device
         
         new_device = XTDevice(**device.__dict__)
         new_device.source = source
+        new_device.device_source_priority = device_source_priority
 
         #Reuse the references from the original device
         if hasattr(device, "local_strategy"):
@@ -163,3 +173,6 @@ class XTDevice(TuyaDevice):
 
     def get_copy(self) -> XTDevice:
         return copy.deepcopy(self)
+    
+    def get_multi_manager(self, hass: HomeAssistant) -> MultiManager | None:
+        return get_device_multi_manager(hass=hass, device=self)

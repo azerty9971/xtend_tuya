@@ -32,6 +32,7 @@ from ..shared.interface.device_manager import (
 )
 from ..shared.shared_classes import (
     XTConfigEntry,
+    XTDeviceMap,
 )
 from ..shared.device import (
     XTDevice,
@@ -76,6 +77,7 @@ from ...const import (
     TUYA_DISCOVERY_NEW,
     TUYA_DISCOVERY_NEW_ORIG,
     TUYA_HA_SIGNAL_UPDATE_ENTITY,
+    XTDeviceSourcePriority,
 )
 
 def get_plugin_instance() -> XTTuyaSharingDeviceManagerInterface | None:
@@ -89,6 +91,9 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
 
     def get_type_name(self) -> str:
         return MESSAGE_SOURCE_TUYA_SHARING
+    
+    def is_type_initialized(self) -> bool:
+        return self.sharing_account is not None
 
     async def setup_from_entry(self, hass: HomeAssistant, config_entry: XTConfigEntry, multi_manager: MultiManager) -> bool:
         self.multi_manager: MultiManager = multi_manager
@@ -150,18 +155,17 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
             # While in general, we should avoid catching broad exceptions,
             # we have no other way of detecting this case.
             if "sign invalid" in str(exc):
-                msg = "Authentication failed. Please re-authenticate the Tuya integration"
                 if self.sharing_account.device_manager.reuse_config:
-                    raise ConfigEntryNotReady(msg) from exc
+                    raise ConfigEntryNotReady("Authentication failed. Please re-authenticate the Tuya integration") from exc
                 else:
                     raise ConfigEntryAuthFailed("Authentication failed. Please re-authenticate.")
             raise
     
-    def get_available_device_maps(self) -> list[dict[str, XTDevice]]:
+    def get_available_device_maps(self) -> list[XTDeviceMap]:
         return_list: list[dict[str, XTDevice]] = []
         if other_manager := self.sharing_account.device_manager.get_overriden_device_manager():
-            return_list.append(other_manager.device_map)
-        return_list.append(self.sharing_account.device_manager.device_map)
+            return_list.append(XTDeviceMap(other_manager.device_map, XTDeviceSourcePriority.REGULAR_TUYA))
+        return_list.append(XTDeviceMap(self.sharing_account.device_manager.device_map, XTDeviceSourcePriority.TUYA_SHARED))
         return return_list
     
     def refresh_mq(self):
@@ -227,9 +231,11 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
             decorate_tuya_integration(self.sharing_account.ha_tuya_integration_config_manager)
 
         for device in self.sharing_account.device_manager.device_map.values():
-            if self.sharing_account.device_manager.copy_statuses_to_tuya(device):
-                #New statuses were copied, let's rediscover the device
-                self.multi_manager.multi_device_listener.trigger_device_discovery(device, [TUYA_DISCOVERY_NEW_ORIG])
+            #This should in theory already be done, I kept it here just to be safe...
+            self.sharing_account.device_manager.copy_statuses_to_tuya(device)
+
+            #Trigger Tuya's rediscovery
+            self.multi_manager.multi_device_listener.trigger_device_discovery(device, [TUYA_DISCOVERY_NEW_ORIG])
     
     def get_platform_descriptors_to_merge(self, platform: Platform) -> Any:
         if self.sharing_account.device_manager.reuse_config:
@@ -258,10 +264,13 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
     
 
     @overload
-    def convert_to_xt_device(self, Any, source: str = "SHARING convert_to_xt_device") -> XTDevice: ...
+    def convert_to_xt_device(self, device: Any, device_source_priority: XTDeviceSourcePriority | None = None) -> XTDevice: ...
     
-    def convert_to_xt_device(self, device: CustomerDevice, source: str = "SHARING convert_to_xt_device") -> XTDevice:
-        return XTDevice.from_compatible_device(device, source)
+    def convert_to_xt_device(self, device: CustomerDevice, device_source_priority: XTDeviceSourcePriority | None = None) -> XTDevice:
+        device: XTDevice = XTDevice.from_compatible_device(device, device_source_priority=device_source_priority)
+        if device_source_priority == XTDeviceSourcePriority.REGULAR_TUYA:
+            device.force_compatibility = True
+        return device
     
     def send_lock_unlock_command(
             self, device_id: str, lock: bool

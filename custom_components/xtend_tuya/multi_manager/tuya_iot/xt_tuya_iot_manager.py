@@ -15,6 +15,7 @@ from typing import Any
 from ...const import (
     LOGGER,
     MESSAGE_SOURCE_TUYA_IOT,
+    XTDeviceSourcePriority,
 )
 
 from ..shared.device import (
@@ -86,8 +87,8 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         response = self.api.get(f"/v1.0/users/{self.api.token_info.uid}/devices")
         if response["success"]:
             for item in response["result"]:
-                device = XTDevice(**item)                                   #CHANGED
-                device.source = "IOT update_device_list_in_smart_home_mod"  #CHANGED
+                device = XTDevice(**item)                                           #CHANGED
+                device.source = "IOT update_device_list_in_smart_home_mod"          #CHANGED
                 status = {}
                 for item_status in device.status:
                     if "code" in item_status and "value" in item_status:
@@ -95,7 +96,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                         value = item_status["value"]
                         status[code] = value
                 device.status = status
-                self.device_map[device.id] = device                         #CHANGED
+                self.device_map[device.id] = device                                 #CHANGED
                 if "id" not in item:
                     LOGGER.warning(f"Received invalid device info: {item}")
 
@@ -173,6 +174,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         device_properties.status_range = {}
         device_properties.status = {}
         device_properties.local_strategy = {}
+        device_properties.device_source_priority = XTDeviceSourcePriority.TUYA_IOT
         response = self.api.get(f"/v2.0/cloud/thing/{device.id}/shadow/properties")
         response2 = self.api.get(f"/v2.0/cloud/thing/{device.id}/model")
         if not response.get("success") or not response2.get("success"):
