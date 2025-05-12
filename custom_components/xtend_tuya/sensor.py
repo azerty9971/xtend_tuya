@@ -541,6 +541,14 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
             translation_key="ldr",
             state_class=SensorStateClass.MEASUREMENT,
         ),
+        (
+        XTSensorEntityDescription(
+            key=XTDPCode.ILLUMINANCE_VALUE,
+            translation_key="illuminance_value",
+            device_class=SensorDeviceClass.ILLUMINANCE,
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_registry_enabled_default=True,
+        ),
     ),
     "jtmspro": (
         XTSensorEntityDescription(
