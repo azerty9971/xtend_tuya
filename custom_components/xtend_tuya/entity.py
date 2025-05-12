@@ -19,21 +19,15 @@ from .ha_tuya_integration.tuya_integration_imports import (
     TUYA_DPTYPE_MAPPING,
 )
 
-PARAMETER_NOT_ASSIGNED = "!!!PARAMETER IS NOT ASSIGNED!!!"
-
 class XTEntity:
     def __init__(
         self,
-        device: XTDevice,
-        device_manager: MultiManager,
-        description: any | None = PARAMETER_NOT_ASSIGNED,
+        *args,
+        **kwargs
     ) -> None:
         #This is to catch the super call in case the next class in parent's MRO doesn't have an init method
         try:
-            if description is PARAMETER_NOT_ASSIGNED:
-                super().__init__(device, device_manager)
-            else:
-                super().__init__(device, device_manager, description)
+            super().__init__(*args, **kwargs)
         except Exception:
             #In case we have an error, do nothing
             pass
