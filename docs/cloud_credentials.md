@@ -68,7 +68,7 @@ DO NOT USE THE WESTERN EUROPE OR EASTERN AMERICA DATA CENTERS, THEY ARE RESERVED
 - Tuya IoT Access Secret is the Client Secret you retrieved in step 4.2<br/>
 - SmartLife/Tuya account is the App Account you retrieved in step 4.1<br/>
 - SmartLife/Tuya account password is the password you use when logging in the SmartLife/Tuya app on your smartphone<br/>
-![image](https://github.com/user-attachments/assets/83f7ea9b-a96e-4569-b295-88cacc77dded)<br/>
+![image](https://github.com/user-attachments/assets/da4fb3d8-8fb5-4cf1-8ab2-d8a54c0bced0)<br/>
 5.6- Click Submit, if everything went correctly you should have a success message<br/>
 ![image](https://github.com/user-attachments/assets/21c042a9-025b-4a52-9f31-bc3e30d2ba26)<br/>
 5.7- Restart your Home Assistant and enjoy!
