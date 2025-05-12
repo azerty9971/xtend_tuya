@@ -125,7 +125,7 @@ BATTERY_SENSORS: tuple[XTSensorEntityDescription, ...] = (
     ),
 )
 
-#Commonlu sed energy sensors, that are re-used in the sensors down below.
+#Commonly used energy sensors, that are re-used in the sensors down below.
 CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
     XTSensorEntityDescription(
         key=XTDPCode.ADD_ELE,
