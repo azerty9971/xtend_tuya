@@ -125,7 +125,7 @@ BATTERY_SENSORS: tuple[XTSensorEntityDescription, ...] = (
     ),
 )
 
-#Commonlu sed energy sensors, that are re-used in the sensors down below.
+#Commonly used energy sensors, that are re-used in the sensors down below.
 CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
     XTSensorEntityDescription(
         key=XTDPCode.ADD_ELE,
@@ -540,6 +540,22 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
             key=XTDPCode.LDR,
             translation_key="ldr",
             state_class=SensorStateClass.MEASUREMENT,
+        ),
+        XTSensorEntityDescription(
+            key=XTDPCode.ILLUMINANCE_VALUE,
+            translation_key="illuminance_value",
+            device_class=SensorDeviceClass.ILLUMINANCE,
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_registry_enabled_default=True,
+        ),
+    ),
+    "pir": (
+        XTSensorEntityDescription(
+            key=XTDPCode.ILLUMINANCE_VALUE,
+            translation_key="illuminance_value",
+            device_class=SensorDeviceClass.ILLUMINANCE,
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_registry_enabled_default=True,
         ),
     ),
     "jtmspro": (
