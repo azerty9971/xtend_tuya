@@ -549,7 +549,7 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
             entity_registry_enabled_default=True,
         ),
     ),
-        "pir": (
+    "pir": (
         XTSensorEntityDescription(
             key=XTDPCode.ILLUMINANCE_VALUE,
             translation_key="illuminance_value",
