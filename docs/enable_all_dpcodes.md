@@ -2,7 +2,7 @@
 The purpose of this documentation is to expose all the functionnalities of your devices to Xtend Tuya.
 
 # Prerequisite
-For this, you will need a functionning Tuya IOT Cloud Platform account. If you don't have one already please follow the following guide:
+For this, you will need a functioning Tuya IOT Cloud Platform account. If you don't have one already please follow the following guide:
 https://github.com/azerty9971/xtend_tuya/blob/main/docs/cloud_credentials.md
 
 # Steps
