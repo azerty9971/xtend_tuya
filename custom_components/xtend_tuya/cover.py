@@ -150,6 +150,7 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         """Initialize the cover entity."""
         # Initialize the entity
         super(XTCoverEntity, self).__init__(device, device_manager, description)
+        super(XTEntity, self).__init__(device, device_manager, description) # type: ignore
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description
