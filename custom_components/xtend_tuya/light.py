@@ -105,6 +105,7 @@ class XTLightEntity(XTEntity, TuyaLightEntity):
                 if function_data := json.loads(values):
                     #LOGGER.warning(f"Failed light: {device}")
                     pass
+        super(XTEntity, self).__init__(device, device_manager, description) # type: ignore
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description

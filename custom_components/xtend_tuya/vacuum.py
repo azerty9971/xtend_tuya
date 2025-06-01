@@ -57,5 +57,6 @@ class XTVacuumEntity(XTEntity, TuyaVacuumEntity):
     def __init__(self, device: XTDevice, device_manager: MultiManager) -> None:
         """Init Tuya vacuum."""
         super(XTVacuumEntity, self).__init__(device, device_manager)
+        super(XTEntity, self).__init__(device, device_manager) # type: ignore
         self.device = device
         self.device_manager = device_manager

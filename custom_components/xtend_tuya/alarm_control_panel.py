@@ -78,3 +78,4 @@ class XTAlarmEntity(XTEntity, TuyaAlarmEntity):
         description: XTAlarmEntityDescription,
     ) -> None:
         super(XTAlarmEntity, self).__init__(device, device_manager, description)
+        super(XTEntity, self).__init__(device, device_manager, description) # type: ignore

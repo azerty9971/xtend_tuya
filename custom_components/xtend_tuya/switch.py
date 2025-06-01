@@ -401,6 +401,7 @@ class XTSwitchEntity(XTEntity, TuyaSwitchEntity):
     ) -> None:
         """Init TuyaHaSwitch."""
         super(XTSwitchEntity, self).__init__(device, device_manager, description)
+        super(XTEntity, self).__init__(device, device_manager, description) # type: ignore
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description

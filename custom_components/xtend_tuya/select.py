@@ -257,6 +257,7 @@ class XTSelectEntity(XTEntity, TuyaSelectEntity):
     ) -> None:
         """Init XT select."""
         super(XTSelectEntity, self).__init__(device, device_manager, description)
+        super(XTEntity, self).__init__(device, device_manager, description) # type: ignore
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description

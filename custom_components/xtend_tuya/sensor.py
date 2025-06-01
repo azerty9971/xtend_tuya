@@ -1194,8 +1194,9 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):
         description: XTSensorEntityDescription,
     ) -> None:
         """Init XT sensor."""
+        super(XTSensorEntity, self).__init__(device, device_manager, description)
         try:
-            super(XTSensorEntity, self).__init__(device, device_manager, description)
+            super(XTEntity, self).__init__(device, device_manager, description) # type: ignore
         except Exception:
             self._replaced_constructor(device=device, device_manager=device_manager, description=description)
         

@@ -75,6 +75,7 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
     ) -> None:
         """Init XT Camera."""
         super(XTCameraEntity, self).__init__(device, device_manager)
+        super(XTEntity, self).__init__(device, device_manager) # type: ignore
         self.device = device
         self.device_manager = device_manager
     
