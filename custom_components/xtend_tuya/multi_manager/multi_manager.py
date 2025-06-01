@@ -20,10 +20,10 @@ from ..const import (
     XTDeviceSourcePriority,
 )
 
-#from .shared.import_stub import (
-#    MultiManager,
-#    XTConfigEntry,
-#)
+from .shared.import_stub import (
+    MultiManager, # type: ignore
+    XTConfigEntry,
+)
 
 from .shared.device import (
     XTDevice  # noqa: F811
