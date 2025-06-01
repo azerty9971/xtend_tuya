@@ -8,9 +8,8 @@ from homeassistant.core import HomeAssistant
 from tuya_sharing import (
     CustomerDevice as TuyaDevice,
 )
-from ..multi_manager import (
-    MultiManager,
-)
+import multi_manager.multi_manager as MultiManager
+
 from ...util import (
     get_device_multi_manager,
 )
@@ -86,6 +85,25 @@ class XTDeviceFunction:
         return XTDeviceFunction(code=code, type=type, desc=desc, name=name, values=values, dp_id=dp_id)
 
 class XTDevice(TuyaDevice):
+    id: str
+    name: str
+    local_key: str
+    category: str
+    product_id: str
+    product_name: str
+    sub: bool
+    uuid: str
+    asset_id: str
+    online: bool
+    icon: str
+    ip: str
+    time_zone: str
+    active_time: int
+    create_time: int
+    update_time: int
+    set_up: Optional[bool] = False
+    support_local: Optional[bool] = False
+    local_strategy: dict[int, dict[str, Any]] = {}
     source: str
     online_states: dict[str, bool]
     data_model: dict[str, Any]
@@ -177,5 +195,5 @@ class XTDevice(TuyaDevice):
     def get_copy(self) -> XTDevice:
         return copy.deepcopy(self)
     
-    def get_multi_manager(self, hass: HomeAssistant) -> MultiManager | None:
+    def get_multi_manager(self, hass: HomeAssistant) -> MultiManager.MultiManager | None:
         return get_device_multi_manager(hass=hass, device=self)
