@@ -8,14 +8,12 @@ from homeassistant.core import HomeAssistant
 from tuya_sharing import (
     CustomerDevice as TuyaDevice,
 )
-import multi_manager.multi_manager as MultiManager
-#from ..multi_manager import (
-#    MultiManager,
-#)
-import util as Util
-#from ...util import (
-#    get_device_multi_manager,
-#)
+from ..multi_manager import (
+    MultiManager,
+)
+from ...util import (
+    get_device_multi_manager,
+)
 
 @dataclass
 class XTDeviceStatusRange:
@@ -198,5 +196,5 @@ class XTDevice(TuyaDevice):
     def get_copy(self) -> XTDevice:
         return copy.deepcopy(self)
     
-    def get_multi_manager(self, hass: HomeAssistant) -> MultiManager.MultiManager | None:
-        return Util.get_device_multi_manager(hass=hass, device=self)
+    def get_multi_manager(self, hass: HomeAssistant) -> MultiManager | None:
+        return get_device_multi_manager(hass=hass, device=self)
