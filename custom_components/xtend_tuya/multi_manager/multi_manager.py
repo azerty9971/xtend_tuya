@@ -23,6 +23,7 @@ from ..const import (
 from .shared.import_stub import (
     MultiManager, # type: ignore
     XTConfigEntry,
+    XTDevice,
 )
 
 from .shared.device import (
