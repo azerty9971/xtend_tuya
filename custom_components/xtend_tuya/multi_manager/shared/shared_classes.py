@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import NamedTuple
+from typing import NamedTuple, Any
 from collections import UserDict
 from homeassistant.config_entries import ConfigEntry
 from .device import (
@@ -40,12 +40,12 @@ class DeviceWatcher:
 class HomeAssistantXTData(NamedTuple):
     """Tuya data stored in the Home Assistant data object."""
 
-    multi_manager: MultiManager = None
-    listener: MultiDeviceListener = None
-    service_manager: ServiceManager = None
+    multi_manager: MultiManager | None = None
+    listener: MultiDeviceListener | None = None
+    service_manager: ServiceManager | None = None
 
     @property
-    def manager(self) -> MultiManager:
+    def manager(self) -> MultiManager | None:
         return self.multi_manager
 
 type XTConfigEntry = ConfigEntry[HomeAssistantXTData]
@@ -53,7 +53,7 @@ type XTConfigEntry = ConfigEntry[HomeAssistantXTData]
 class XTDeviceMap(UserDict[str, XTDevice]):
 
     device_source_priority: XTDeviceSourcePriority | None = None
-    _original_ref: any = None
+    _original_ref: Any | None = None
 
     def __init__(self, iterable, device_source_priority: XTDeviceSourcePriority | None = None):
         super().__init__(**iterable)

@@ -20,11 +20,10 @@ from ..const import (
     XTDeviceSourcePriority,
 )
 
-from .shared.import_stub import (
-    MultiManager,
-    XTConfigEntry,
-    XTDevice,
-)
+#from .shared.import_stub import (
+#    MultiManager,
+#    XTConfigEntry,
+#)
 
 from .shared.device import (
     XTDevice  # noqa: F811
@@ -212,7 +211,7 @@ class MultiManager:  # noqa: F811
             return None
         if ( code in device.status_range 
             and hasattr(device.status_range[code], "dp_id") 
-            and device.status_range[code].dp_id is not None
+            and device.status_range[code].dp_id != 0
             ):
             return device.status_range[code].dp_id
         for dpId in device.local_strategy:

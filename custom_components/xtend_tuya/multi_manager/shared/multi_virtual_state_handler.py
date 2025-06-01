@@ -71,7 +71,7 @@ class XTVirtualStateHandler:
                                 device.status[new_code] = copy.deepcopy(device.status[virtual_state.key])
                             device.status_range[new_code] = copy.deepcopy(device.status_range[virtual_state.key])
                             device.status_range[new_code].code = new_code
-                            device.status_range[new_code].dp_id = None
+                            device.status_range[new_code].dp_id = 0
                             if not self.multi_manager._read_dpId_from_code(new_code, device):
                                 if dp_id := self.multi_manager._read_dpId_from_code(virtual_state.key, device):
                                     if new_dp_id := self._get_empty_local_strategy_dp_id(device):
@@ -89,7 +89,7 @@ class XTVirtualStateHandler:
                                 device.status[new_code] = 0
                             device.status_range[new_code] = copy.deepcopy(device.status_range[virtual_state.key])
                             device.status_range[new_code].code = new_code
-                            device.status_range[new_code].dp_id = None
+                            device.status_range[new_code].dp_id = 0
                             if not self.multi_manager._read_dpId_from_code(new_code, device):
                                 if dp_id := self.multi_manager._read_dpId_from_code(virtual_state.key, device):
                                     if new_dp_id := self._get_empty_local_strategy_dp_id(device):

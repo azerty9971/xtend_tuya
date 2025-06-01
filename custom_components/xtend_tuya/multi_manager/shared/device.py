@@ -17,70 +17,72 @@ from ...util import (
 
 @dataclass
 class XTDeviceStatusRange:
-    code: str
-    type: str
-    values: str
-    dp_id: int = None
+    code: str = ""
+    type: str | None = None
+    values: str = "{}"
+    dp_id: int = 0
 
     def __repr__(self) -> str:
         return f"StatusRange(code={self.code}, type={self.type}, values={self.values}, dp_id={self.dp_id})"
 
+    @staticmethod
     def from_compatible_status_range(status_range: Any):
         if hasattr(status_range, "code"):
             code = status_range.code
         else:
-            code = None
+            code = ""
         if hasattr(status_range, "type"):
             type = status_range.type
         else:
-            type = None
+            type = ""
         if hasattr(status_range, "values"):
             values = status_range.values
         else:
-            values = None
+            values = "{}"
         if hasattr(status_range, "dp_id"):
             dp_id = status_range.dp_id
         else:
-            dp_id = None
+            dp_id = 0
         return XTDeviceStatusRange(code=code, type=type, values=values, dp_id=dp_id)
 
 @dataclass
 class XTDeviceFunction:
-    code: str
-    type: str
-    desc: str = None
-    name: str = None
-    values: dict[str, Any] = field(default_factory=dict)
-    dp_id: int = None
+    code: str = ""
+    type: str | None = None
+    desc: str = ""
+    name: str = ""
+    values: str = "{}"
+    dp_id: int = 0
     
     def __repr__(self) -> str:
         return f"Function(code={self.code}, type={self.type}, desc={self.desc}, name={self.name}, values={self.values}, dp_id={self.dp_id})"
 
+    @staticmethod
     def from_compatible_function(function: Any):
         if hasattr(function, "code"):
             code = function.code
         else:
-            code = None
+            code = ""
         if hasattr(function, "type"):
             type = function.type
         else:
-            type = None
+            type = ""
         if hasattr(function, "values"):
             values = function.values
         else:
-            values = None
+            values = "{}"
         if hasattr(function, "desc"):
             desc = function.desc
         else:
-            desc = None
+            desc = ""
         if hasattr(function, "name"):
             name = function.name
         else:
-            name = None
+            name = ""
         if hasattr(function, "dp_id"):
             dp_id = function.dp_id
         else:
-            dp_id = None
+            dp_id = 0
         return XTDeviceFunction(code=code, type=type, desc=desc, name=name, values=values, dp_id=dp_id)
 
 class XTDevice(TuyaDevice):
@@ -99,29 +101,29 @@ class XTDevice(TuyaDevice):
         self.data_model = {}
         self.force_open_api = False
 
-        self.id = ""
-        self.name = ""
-        self.local_key = ""
-        self.category = ""
-        self.product_id = ""
-        self.product_name = ""
-        self.sub = False
-        self.uuid = ""
-        self.asset_id = ""
-        self.online = False
-        self.icon = ""
-        self.ip = ""
-        self.time_zone = ""
+        self.id: str = ""
+        self.name: str = ""
+        self.local_key: str = ""
+        self.category: str = ""
+        self.product_id: str = ""
+        self.product_name: str = ""
+        self.sub: bool = False
+        self.uuid: str = ""
+        self.asset_id: str = ""
+        self.online: bool = False
+        self.icon: str = ""
+        self.ip: str = ""
+        self.time_zone: str = ""
         self.active_time = 0
         self.create_time = 0
         self.update_time = 0
-        self.set_up = False
-        self.support_local = False
+        self.set_up: bool | None = False
+        self.support_local: bool | None = False
 
         self.local_strategy = {}
         self.status = {}
-        self.function = {}
-        self.status_range = {}
+        self.function = {} # type: ignore
+        self.status_range = {} # type: ignore
         super().__init__(**kwargs)
     
     def __repr__(self) -> str:
@@ -141,6 +143,7 @@ class XTDevice(TuyaDevice):
         return f"Device {self.name}:\r\n{function_str}{status_range_str}{status_str}{local_strategy_str}"
         #return f"Device {self.name}:\r\n{self.source}"
 
+    @staticmethod
     def from_compatible_device(device: Any, source: str = "Compatible device", device_source_priority: int | None = None):
         #If the device is already an XT device return it right away
         if isinstance(device, XTDevice):
