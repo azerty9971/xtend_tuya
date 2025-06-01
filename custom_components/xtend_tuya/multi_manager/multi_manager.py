@@ -25,56 +25,6 @@ from ..const import (
 #    XTConfigEntry,
 #    XTDevice
 #)
-
-from .shared.device import (
-    XTDevice  # noqa: F811
-)
-
-from .shared.shared_classes import (
-    DeviceWatcher,
-    XTConfigEntry,  # noqa: F811
-    XTDeviceMap,
-)
-
-from .shared.debug.debug_helper import (
-    DebugHelper,
-)
-
-from .shared.merging_manager import (
-    XTMergingManager,
-)
-
-from .shared.cloud_fix import (
-    CloudFixes,
-)
-
-from .shared.multi_source_handler import (
-    MultiSourceHandler,
-)
-
-from .shared.multi_mq import (
-    MultiMQTTQueue,
-)
-
-from .shared.multi_device_listener import (
-    MultiDeviceListener,
-)
-
-from .shared.multi_virtual_state_handler import (
-    XTVirtualStateHandler,
-)
-
-from .shared.multi_virtual_function_handler import (
-    XTVirtualFunctionHandler,
-)
-
-from ..util import (
-    append_lists,
-)
-
-from .shared.interface.device_manager import (
-    XTDeviceManagerInterface,
-)
     
 class MultiManager:  # noqa: F811
     def __init__(self, hass: HomeAssistant) -> None:
@@ -430,3 +380,64 @@ class MultiManager:  # noqa: F811
         match function:
             case XTDeviceEntityFunctions.RECALCULATE_PERCENT_SCALE:
                 CloudFixes.fix_incorrect_percent_scale_forced(device, param1, param2)
+
+
+
+
+
+
+
+
+
+
+
+
+from .shared.device import (
+    XTDevice  # noqa: F811
+)
+
+from .shared.shared_classes import (
+    DeviceWatcher,
+    XTConfigEntry,  # noqa: F811
+    XTDeviceMap,
+)
+
+from .shared.debug.debug_helper import (
+    DebugHelper,
+)
+
+from .shared.merging_manager import (
+    XTMergingManager,
+)
+
+from .shared.cloud_fix import (
+    CloudFixes,
+)
+
+from .shared.multi_source_handler import (
+    MultiSourceHandler,
+)
+
+from .shared.multi_mq import (
+    MultiMQTTQueue,
+)
+
+from .shared.multi_device_listener import (
+    MultiDeviceListener,
+)
+
+from .shared.multi_virtual_state_handler import (
+    XTVirtualStateHandler,
+)
+
+from .shared.multi_virtual_function_handler import (
+    XTVirtualFunctionHandler,
+)
+
+from ..util import (
+    append_lists,
+)
+
+from .shared.interface.device_manager import (
+    XTDeviceManagerInterface,
+)
