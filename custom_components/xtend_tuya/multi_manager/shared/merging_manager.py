@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import copy
 
-from .device import (
+from .shared_classes import (
     XTDevice,
     XTDeviceStatusRange,
     XTDeviceFunction,

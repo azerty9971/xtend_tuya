@@ -40,22 +40,22 @@ class XTLockEntityDescription(LockEntityDescription):
 
 LOCKS: dict[str, XTLockEntityDescription] = {
     "jtmspro": XTLockEntityDescription(
-            key=None,
+            key="",
             translation_key="operate_lock",
             unlock_status_list=[XTDPCode.LOCK_MOTOR_STATE],
         ),
     "mk": XTLockEntityDescription(
-            key=None,
+            key="",
             translation_key="operate_lock",
             temporary_unlock = True,
         ),
     "ms": XTLockEntityDescription(
-            key=None,
+            key="",
             translation_key="operate_lock",
             unlock_status_list=[XTDPCode.LOCK_MOTOR_STATE],
         ),
     "videolock": XTLockEntityDescription(
-            key=None,
+            key="",
             translation_key="operate_lock",
             unlock_status_list=[XTDPCode.LOCK_MOTOR_STATE],
         ),
@@ -106,7 +106,7 @@ class XTLockEntity(XTEntity, LockEntity):
         super().__init__(device, device_manager)
         self.device = device
         self.device_manager = device_manager
-        self.last_action: str = None
+        self.last_action: str | None = None
         self.entity_description = description
 
     @property

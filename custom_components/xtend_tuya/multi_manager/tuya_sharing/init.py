@@ -33,8 +33,6 @@ from ..shared.interface.device_manager import (
 from ..shared.shared_classes import (
     XTConfigEntry,
     XTDeviceMap,
-)
-from ..shared.device import (
     XTDevice,
 )
 from .xt_tuya_sharing_data import (

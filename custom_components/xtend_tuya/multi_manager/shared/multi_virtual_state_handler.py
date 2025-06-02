@@ -4,10 +4,6 @@ import copy
 
 from homeassistant.helpers.entity import EntityDescription
 
-from .device import (
-    XTDevice,
-)
-
 from ...const import (
     VirtualStates,
     DescriptionVirtualState,
@@ -16,6 +12,7 @@ from ...const import (
 
 from ..multi_manager import (
     MultiManager,
+    XTDevice,
 )
 
 class XTVirtualStateHandler:

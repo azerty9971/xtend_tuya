@@ -12,11 +12,12 @@ from homeassistant.helpers import device_registry as dr, entity_registry as er
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.util import dt as dt_util
 
-from .multi_manager.multi_manager import XTConfigEntry, MultiManager
-from .const import DOMAIN, DOMAIN_ORIG, XTDPCode
-from .multi_manager.shared.device import (
+from .multi_manager.multi_manager import (
+    XTConfigEntry, 
+    MultiManager,
     XTDevice,
 )
+from .const import DOMAIN, DOMAIN_ORIG, XTDPCode
 
 
 async def async_get_config_entry_diagnostics(
