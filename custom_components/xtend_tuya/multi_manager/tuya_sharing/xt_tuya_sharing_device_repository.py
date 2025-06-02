@@ -21,7 +21,7 @@ from .xt_tuya_sharing_manager import (
 from ..multi_manager import (
     MultiManager,
 )
-from ..shared.device import (
+from ..shared.shared_classes import (
     XTDeviceFunction,
     XTDeviceStatusRange,
 )
