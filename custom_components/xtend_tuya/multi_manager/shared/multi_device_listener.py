@@ -57,7 +57,7 @@ class MultiDeviceListener:
         for account in self.multi_manager.accounts.values():
             for account_identifier in account.get_device_registry_identifiers():
                 if account_identifier not in account_identifiers:
-                    identifiers.add(tuple(account_identifier, device_id))
+                    identifiers.add((account_identifier, device_id))
                     account_identifiers.add(account_identifier)
         device_entry = device_registry.async_get_device(
             identifiers=identifiers

@@ -193,7 +193,7 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
     def unload(self):
         pass
     
-    def on_message(self, msg: str):
+    def on_message(self, msg: dict):
         self.iot_account.device_manager.on_message(msg)
     
     def query_scenes(self) -> list:
@@ -289,7 +289,7 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
     ) -> bool:
         return self.iot_account.device_manager.send_lock_unlock_command(device_id, lock)
     
-    def call_api(self, method: str, url: str, payload: str) -> str | None:
+    def call_api(self, method: str, url: str, payload: str | None) -> str | None:
         params: dict[str, any] = None
         if payload:
             params = json.loads(payload)

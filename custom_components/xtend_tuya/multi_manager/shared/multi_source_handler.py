@@ -25,7 +25,7 @@ class MultiSourceCodeCounter:
         if not source_counter_found:
             self.source_counter_list.append(SourceCodeCounter(source))
     
-    def get_allowed_source(self) -> str:
+    def get_allowed_source(self) -> str | None:
         last_allowed_source_count = 0
         highest_source_count = 0
         highest_source = None
@@ -62,8 +62,8 @@ class MultiSourceHandler:
             return
         
         for item in status_in:
-            code, dpId, value, result_ok = self.multi_manager._read_code_dpid_value_from_state(dev_id, item, False, True)
-            if not result_ok:
+            code, _, _, result_ok = self.multi_manager._read_code_dpid_value_from_state(dev_id, item, False, True)
+            if not result_ok or code is None:
                 continue
 
             for virtual_state in virtual_states:
@@ -84,8 +84,8 @@ class MultiSourceHandler:
         
         i = 0
         for item in status_list:
-            code, dpId, value, result_ok = self.multi_manager._read_code_dpid_value_from_state(dev_id, item, False, True)
-            if not result_ok:
+            code, _, _, result_ok = self.multi_manager._read_code_dpid_value_from_state(dev_id, item, False, True)
+            if not result_ok or code is None:
                 continue
 
             for virtual_state in virtual_states:

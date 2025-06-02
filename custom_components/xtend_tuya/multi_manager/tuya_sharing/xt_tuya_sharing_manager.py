@@ -81,7 +81,7 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
         self.mq.start()
         self.mq.add_message_listener(self.forward_message_to_multi_manager)
 
-    def set_overriden_device_manager(self, other_device_manager: Manager) -> None:
+    def set_overriden_device_manager(self, other_device_manager: Manager | None) -> None:
         self.other_device_manager = other_device_manager
     
     def get_overriden_device_manager(self) -> Manager | None:

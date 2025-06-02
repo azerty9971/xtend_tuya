@@ -29,7 +29,9 @@ from .multi_manager.shared.shared_classes import (
 def log_stack(message: str):
     LOGGER.debug(message, stack_info=True)
 
-def get_default_value(dp_type: DPType) -> Any:
+def get_default_value(dp_type: DPType | None) -> Any:
+    if dp_type is None:
+        return None
     match dp_type:
         case DPType.BOOLEAN:
             return False
@@ -144,7 +146,7 @@ def append_dictionnaries(dict1: dict, dict2: dict) -> dict:
             return_dict[category] = copy.deepcopy(dict2[category])
     return return_dict
 
-def append_lists(list1: list, list2: list) -> list:
+def append_lists(list1: list, list2: list | None) -> list:
     return_list = copy.deepcopy(list(list1))
     if list2:
         for item in list2:

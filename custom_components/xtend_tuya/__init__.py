@@ -4,6 +4,7 @@ from __future__ import annotations
 import logging
 
 import asyncio
+from typing import Any
 
 from homeassistant.config_entries import ConfigEntry, ConfigEntryState
 from homeassistant.core import HomeAssistant
@@ -155,7 +156,7 @@ def is_config_entry_master(hass: HomeAssistant, domain: str, current_entry: Conf
         return config_entries[0] == current_entry
     return False
 
-def get_domain_device_map(hass: HomeAssistant, domain: str, except_of_entry: ConfigEntry | None = None, with_scene: bool = False) -> dict[str, any]:
+def get_domain_device_map(hass: HomeAssistant, domain: str, except_of_entry: ConfigEntry | None = None, with_scene: bool = False) -> dict[str, Any]:
     device_map = {}
     config_entries = hass.config_entries.async_entries(domain, False, False)
     for config_entry in config_entries:
@@ -166,7 +167,7 @@ def get_domain_device_map(hass: HomeAssistant, domain: str, except_of_entry: Con
                 if device_id not in device_map:
                     device_map[device_id] = runtime_data.device_manager.device_map[device_id]
             if with_scene and hasattr(runtime_data.device_manager, "scene_id"):
-                for scene_id in runtime_data.device_manager.scene_id:
+                for scene_id in runtime_data.device_manager.scene_id: # type: ignore
                     device_map[scene_id] = None
     return device_map
 
@@ -191,9 +192,10 @@ async def async_unload_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
     """Unloading the Tuya platforms."""
     if unload_ok := await hass.config_entries.async_unload_platforms(entry, PLATFORMS):
         tuya = entry.runtime_data
-        if tuya.manager.mq is not None:
-            tuya.manager.mq.stop()
-        tuya.manager.remove_device_listeners()
+        if tuya.manager is not None:
+            if tuya.manager.mq is not None:
+                tuya.manager.mq.stop()
+            tuya.manager.remove_device_listeners()
     return unload_ok
 
 

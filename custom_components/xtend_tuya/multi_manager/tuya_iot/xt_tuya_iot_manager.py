@@ -46,7 +46,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         self.multi_manager = multi_manager
         self.ipc_manager = XTIOTIPCManager(api, multi_manager)
 
-    def forward_message_to_multi_manager(self, msg:str):
+    def forward_message_to_multi_manager(self, msg:str | dict):
         self.multi_manager.on_message(MESSAGE_SOURCE_TUYA_IOT, msg)
 
     def get_device_info(self, device_id: str) -> dict[str, Any]:

@@ -55,19 +55,20 @@ def _async_get_diagnostics(
         "disabled_polling": entry.pref_disable_polling,
     }
 
-    if device:
-        tuya_device_id = next(iter(device.identifiers))[1]
-        if tuya_device_id in hass_data.manager.device_map:
-            data |= _async_device_as_dict(
-                hass, hass_data.manager.device_map[tuya_device_id]
+    if hass_data.manager is not None:
+        if device:
+            tuya_device_id = next(iter(device.identifiers))[1]
+            if tuya_device_id in hass_data.manager.device_map:
+                data |= _async_device_as_dict(
+                    hass, hass_data.manager.device_map[tuya_device_id]
+                )
+        else:
+            data.update(
+                devices=[
+                    _async_device_as_dict(hass, device)
+                    for device in hass_data.manager.device_map.values()
+                ]
             )
-    else:
-        data.update(
-            devices=[
-                _async_device_as_dict(hass, device)
-                for device in hass_data.manager.device_map.values()
-            ]
-        )
 
     return data
 

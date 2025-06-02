@@ -11,11 +11,7 @@ import voluptuous as vol
 
 from homeassistant.core import callback
 from homeassistant.config_entries import ConfigEntry, ConfigFlow, OptionsFlow
-try:
-    from homeassistant.config_entries import ConfigFlowResult
-except ImportError:
-    from homeassistant.data_entry_flow import FlowResult
-    type ConfigFlowResult = FlowResult
+from homeassistant.config_entries import ConfigFlowResult
 from homeassistant.helpers import selector
 
 from .const import (
@@ -115,7 +111,7 @@ class TuyaOptionFlow(OptionsFlow):
 
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None
-    ) -> FlowResult:
+    ) -> ConfigFlowResult:
         """Manage the options."""
         errors = {}
         placeholders = {}
@@ -139,8 +135,8 @@ class TuyaOptionFlow(OptionsFlow):
                 )
             errors["base"] = "login_error"
             placeholders = {
-                TUYA_RESPONSE_CODE: response.get(TUYA_RESPONSE_CODE),
-                TUYA_RESPONSE_MSG: response.get(TUYA_RESPONSE_MSG),
+                TUYA_RESPONSE_CODE: response.get(TUYA_RESPONSE_CODE, "0"),
+                TUYA_RESPONSE_MSG: response.get(TUYA_RESPONSE_MSG, "Unknown error"),
             }
 
         if user_input is None:
@@ -328,15 +324,16 @@ class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
             )
 
         return self.async_create_entry(
-            title=info.get("username"),
+            title=info.get("username", ""),
             data=entry_data,
         )
 
     async def async_step_reauth(self, _: Mapping[str, Any]) -> ConfigFlowResult:
         """Handle initiation of re-authentication with Tuya."""
-        self.__reauth_entry = self.hass.config_entries.async_get_entry(
-            self.context["entry_id"]
-        )
+        if entry_id := self.context.get("entry_id"):
+            self.__reauth_entry = self.hass.config_entries.async_get_entry(
+                entry_id
+            )
 
         if self.__reauth_entry and CONF_USER_CODE in self.__reauth_entry.data:
             success, _ = await self.__async_get_qr_code(
