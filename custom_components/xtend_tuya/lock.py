@@ -99,7 +99,7 @@ async def async_setup_entry(
 class XTLockEntity(XTEntity, LockEntity): # type: ignore
     """Tuya Lock Sensor Entity."""
 
-    entity_description: XTLockEntityDescription # type: ignore
+    entity_description: XTLockEntityDescription
 
     def __init__(
         self,
@@ -112,6 +112,7 @@ class XTLockEntity(XTEntity, LockEntity): # type: ignore
         self.device = device
         self.device_manager = device_manager
         self.last_action: str | None = None
+        self.entity_description = description # type: ignore
 
     @property
     def is_locked(self) -> bool | None: # type: ignore
