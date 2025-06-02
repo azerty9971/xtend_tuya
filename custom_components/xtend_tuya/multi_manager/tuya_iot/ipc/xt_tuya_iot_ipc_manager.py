@@ -4,21 +4,11 @@ from tuya_iot import (
     TuyaOpenAPI,
 )
 
-from .xt_tuya_iot_ipc_listener import (
-    XTIOTIPCListener,
-)
-from .xt_tuya_iot_ipc_mq import (
-    XTIOTOpenMQIPC,
-)
-
 from ...multi_manager import (
     MultiManager,
 )
 from ....const import (
     LOGGER,  # noqa: F401
-)
-from .webrtc.xt_tuya_iot_webrtc_manager import (
-    XTIOTWebRTCManager,
 )
 
 class XTIOTIPCManager:  # noqa: F811
@@ -38,3 +28,14 @@ class XTIOTIPCManager:  # noqa: F811
         LOGGER.warning(f"Publishing to IPC: {msg}")
         publish_result = self.ipc_mq.client.publish(topic=topic, payload=msg)
         publish_result.wait_for_publish(10)
+
+
+from .xt_tuya_iot_ipc_listener import (
+    XTIOTIPCListener,
+)
+from .xt_tuya_iot_ipc_mq import (
+    XTIOTOpenMQIPC,
+)
+from .webrtc.xt_tuya_iot_webrtc_manager import (
+    XTIOTWebRTCManager,
+)
