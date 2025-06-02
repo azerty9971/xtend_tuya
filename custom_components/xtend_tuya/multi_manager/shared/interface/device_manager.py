@@ -10,12 +10,10 @@ from ..shared_classes import (
     XTConfigEntry,
     XTDeviceMap,
 )
-from ..device import (
-    XTDevice,
-)
 from ...multi_manager import (
     MultiManager,
     XTDeviceSourcePriority,
+    XTDevice,
 )
 from ....const import (
     DOMAIN,

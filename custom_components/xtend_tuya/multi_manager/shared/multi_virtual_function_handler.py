@@ -9,12 +9,9 @@ from ...const import (
     DescriptionVirtualFunction,
 )
 
-from .device import (
-    XTDevice,
-)
-
 from ..multi_manager import (
     MultiManager,
+    XTDevice,
 )
 
 class XTVirtualFunctionHandler:

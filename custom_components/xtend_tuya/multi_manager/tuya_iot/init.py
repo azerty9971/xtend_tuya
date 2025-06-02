@@ -27,9 +27,6 @@ from ..shared.shared_classes import (
     XTConfigEntry,
     XTDeviceMap,
 )
-from ..shared.device import (
-    XTDevice,
-)
 
 from .const import (
     CONF_NO_OPENAPI,
@@ -57,6 +54,7 @@ from .xt_tuya_iot_home_manager import (
 )
 from ..multi_manager import (
     MultiManager,
+    XTDevice,
 )
 from ...const import (
     DOMAIN,

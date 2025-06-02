@@ -18,7 +18,7 @@ from ...const import (
     XTDeviceSourcePriority,
 )
 
-from ..shared.device import (
+from ..shared.shared_classes import (
     XTDevice,
     XTDeviceFunction,
     XTDeviceStatusRange,

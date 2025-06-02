@@ -9,11 +9,9 @@ from .const import (
     LOGGER,
 )
 
-from .multi_manager.shared.device import (
-    XTDevice,
-)
 from .multi_manager.multi_manager import (
     MultiManager,
+    XTDevice,
 )
 
 from .ha_tuya_integration.tuya_integration_imports import (

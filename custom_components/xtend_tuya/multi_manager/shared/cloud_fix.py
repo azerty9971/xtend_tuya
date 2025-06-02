@@ -4,7 +4,7 @@ import json, copy
 
 from typing import Any
 
-from .device import (
+from .shared_classes import (
     XTDevice,
     XTDeviceFunction,
     XTDeviceStatusRange,

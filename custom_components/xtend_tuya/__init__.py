@@ -23,6 +23,7 @@ from .multi_manager.multi_manager import (
 
 from .multi_manager.shared.shared_classes import (
     HomeAssistantXTData,
+    XTDevice,
 )
 
 from .util import (
@@ -30,9 +31,6 @@ from .util import (
 )
 from .multi_manager.shared.services.services import (
     ServiceManager,
-)
-from .multi_manager.shared.device import (
-    XTDevice,
 )
 
 # Suppress logs from the library, it logs unneeded on error

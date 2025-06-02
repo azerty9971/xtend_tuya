@@ -392,14 +392,11 @@ class MultiManager:  # noqa: F811
 
 
 
-from .shared.device import (
-    XTDevice  # noqa: F811
-)
-
 from .shared.shared_classes import (
     DeviceWatcher,
     XTConfigEntry,  # noqa: F811
     XTDeviceMap,
+    XTDevice,
 )
 
 from .shared.debug.debug_helper import (
