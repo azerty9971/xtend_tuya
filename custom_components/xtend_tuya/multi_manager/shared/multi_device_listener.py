@@ -12,6 +12,8 @@ from ...const import (
 
 from ..multi_manager import (
     MultiManager,
+)
+from .shared_classes import (
     XTDevice,
 )
 
