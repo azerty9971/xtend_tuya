@@ -1,5 +1,4 @@
 from __future__ import annotations
-
 from typing import NamedTuple, Any, Optional
 from collections import UserDict
 from dataclasses import dataclass
@@ -8,22 +7,6 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from tuya_sharing import (
     CustomerDevice as TuyaDevice,
-)
-from ..multi_manager import (
-    MultiManager,
-)
-from .multi_device_listener import (
-    MultiDeviceListener,
-)
-from ...const import (
-    LOGGER,
-    XTDeviceSourcePriority,
-)
-from .services.services import (
-    ServiceManager,
-)
-from ...util import (
-    get_device_multi_manager,
 )
 
 class DeviceWatcher:
@@ -255,3 +238,24 @@ class XTDeviceMap(UserDict[str, XTDevice]):
         super().__setitem__(key, item)
         if self._original_ref is not None:
             self._original_ref[key] = item
+
+
+
+
+
+from ..multi_manager import (
+    MultiManager,
+)
+from .multi_device_listener import (
+    MultiDeviceListener,
+)
+from ...const import (
+    LOGGER,
+    XTDeviceSourcePriority,
+)
+from .services.services import (
+    ServiceManager,
+)
+from ...util import (
+    get_device_multi_manager,
+)
