@@ -29,13 +29,6 @@ from ..multi_manager import (
     XTDevice,
 )
 
-from .xt_tuya_sharing_device_repository import (
-    XTSharingDeviceRepository
-)
-from .xt_tuya_sharing_mq import (
-    XTSharingMQ,
-)
-
 class XTSharingDeviceManager(Manager):  # noqa: F811
     def __init__(
         self,
@@ -145,3 +138,15 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
     ) -> bool:
         #I didn't find a way to implement this using the Sharing SDK...
         return False
+
+
+
+
+
+
+from .xt_tuya_sharing_device_repository import (
+    XTSharingDeviceRepository
+)
+from .xt_tuya_sharing_mq import (
+    XTSharingMQ,
+)
