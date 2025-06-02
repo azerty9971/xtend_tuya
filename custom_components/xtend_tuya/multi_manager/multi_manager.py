@@ -19,12 +19,6 @@ from ..const import (
     XTDeviceEntityFunctions,
     XTDeviceSourcePriority,
 )
-
-#from .shared.import_stub import (
-#    MultiManager, # type: ignore
-#    XTConfigEntry,
-#    XTDevice
-#)
     
 class MultiManager:  # noqa: F811
     def __init__(self, hass: HomeAssistant) -> None:

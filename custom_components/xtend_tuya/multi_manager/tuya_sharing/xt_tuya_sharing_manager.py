@@ -19,10 +19,6 @@ from tuya_sharing.home import (
     HomeRepository,
 )
 
-from .import_stub import (
-    XTSharingDeviceManager,
-)
-
 from ...const import (
     LOGGER,  # noqa: F401
     MESSAGE_SOURCE_TUYA_SHARING,
