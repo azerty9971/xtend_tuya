@@ -320,7 +320,7 @@ class CloudFixes:
             return None, value_str
     
     @staticmethod
-    def get_fixed_value_descr(value1_str: str, value2_str: str | None = None) -> str:
+    def get_fixed_value_descr(value1_str: str | None, value2_str: str | None = None) -> str:
         if value1_str is not None and value2_str is not None:
             return json.dumps({
                 "ErrorValue1": value1_str,

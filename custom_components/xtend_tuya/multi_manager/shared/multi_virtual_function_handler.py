@@ -29,7 +29,7 @@ class XTVirtualFunctionHandler:
                     if hasattr(description, "virtual_function") and description.virtual_function is not None:
                         description_list_vf.append(description)
                     
-            elif isinstance(category_item, EntityDescription):
+            else:
                 #category is directly a descriptor
                 if hasattr(category_item, "virtual_function") and category_item.virtual_function is not None:
                     description_list_vf.append(category_item)
@@ -43,17 +43,22 @@ class XTVirtualFunctionHandler:
     def get_category_virtual_functions(self,category: str) -> list[DescriptionVirtualFunction]:
         to_return = []
         for virtual_function in VirtualFunctions:
+            if virtual_function.name is None or virtual_function.value is None:
+                continue
             for descriptor in self.descriptors_with_virtual_function.values():
                 if (descriptions := descriptor.get(category)):
                     for description in descriptions:
-                        if description.virtual_function is not None and description.virtual_function & virtual_function.value:
+                        if (
+                            description.virtual_function is not None and
+                            description.virtual_function & virtual_function.value
+                        ):
                             # This virtual_state is applied to this key, let's return it
-                            found_virtual_function = DescriptionVirtualFunction(description.key, virtual_function.name, virtual_function.value, description.vf_reset_state)
+                            found_virtual_function = DescriptionVirtualFunction(description.key, virtual_function.name, VirtualFunctions(virtual_function.value), description.vf_reset_state)
                             to_return.append(found_virtual_function)
         return to_return
     
     def process_virtual_function(self, device_id: str, commands: list[dict[str, Any]]):
-        device: XTDevice = self.multi_manager.device_map.get(device_id, None)
+        device: XTDevice | None = self.multi_manager.device_map.get(device_id, None)
         if not device:
             return
         for command in commands:

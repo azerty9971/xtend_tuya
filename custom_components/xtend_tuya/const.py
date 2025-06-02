@@ -119,7 +119,7 @@ class DescriptionVirtualFunction:
     
     key: str
     virtual_function_name: str
-    virtual_function_value: VirtualStates | None = None
+    virtual_function_value: VirtualFunctions | None = None
     vf_reset_state: list[XTDPCode] = field(default_factory=list)
 
 class WorkMode(StrEnum):

@@ -176,7 +176,7 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
         if not self.multi_manager.get_account_by_name(MESSAGE_SOURCE_TUYA_IOT):
             self.sharing_account.device_manager.user_repository.unload(self.sharing_account.device_manager.terminal_id)
     
-    def on_message(self, msg: str):
+    def on_message(self, msg: dict):
         self.sharing_account.device_manager.on_message(msg)
     
     def query_scenes(self) -> list:
@@ -275,7 +275,7 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
     ) -> bool:
         return self.sharing_account.device_manager.send_lock_unlock_command(device_id, lock)
     
-    def call_api(self, method: str, url: str, payload: str) -> str | None:
+    def call_api(self, method: str, url: str, payload: str | None) -> str | None:
         params: dict[str, any] = None
         if payload:
             params = json.loads(payload)

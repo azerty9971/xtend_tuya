@@ -13,8 +13,8 @@ from .util import (
     merge_device_descriptors
 )
 from .ha_tuya_integration.tuya_integration_imports import (
-    TuyaAlarmControlPanelEntityDescription,
     TuyaAlarmEntity,
+    TuyaAlarmControlPanelEntityDescription,
 )
 
 from .multi_manager.multi_manager import (
@@ -44,6 +44,8 @@ async def async_setup_entry(
     hass_data = entry.runtime_data
 
     merged_descriptors = ALARM
+    if entry.runtime_data.multi_manager is None or hass_data.manager is None:
+        return
     for new_descriptor in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(Platform.ALARM_CONTROL_PANEL):
         merged_descriptors = merge_device_descriptors(merged_descriptors, new_descriptor)
 
@@ -52,6 +54,8 @@ async def async_setup_entry(
         """Discover and add a discovered Tuya siren."""
         entities: list[XTAlarmEntity] = []
         device_ids = [*device_map]
+        if hass_data.manager is None:
+            return
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id, None):
                 if descriptions := merged_descriptors.get(device.category):

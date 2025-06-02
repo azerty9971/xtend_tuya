@@ -38,7 +38,7 @@ class XTEntity(TuyaEntity):
     @overload
     def find_dpcode(
         self,
-        dpcodes: str | TuyaDPCode | tuple[TuyaDPCode, ...] | None,
+        dpcodes: str | XTDPCode | tuple[XTDPCode, ...] | TuyaDPCode | tuple[TuyaDPCode, ...] | None,
         *,
         prefer_function: bool = False,
         dptype: Literal[DPType.ENUM],
@@ -47,7 +47,7 @@ class XTEntity(TuyaEntity):
     @overload
     def find_dpcode(
         self,
-        dpcodes: str | TuyaDPCode | tuple[TuyaDPCode, ...] | None,
+        dpcodes: str | XTDPCode | tuple[XTDPCode, ...] | TuyaDPCode | tuple[TuyaDPCode, ...] | None,
         *,
         prefer_function: bool = False,
         dptype: Literal[DPType.INTEGER],
@@ -56,7 +56,7 @@ class XTEntity(TuyaEntity):
     @overload
     def find_dpcode(
         self,
-        dpcodes: str | TuyaDPCode | tuple[TuyaDPCode, ...] | None,
+        dpcodes: str | XTDPCode | tuple[XTDPCode, ...] | TuyaDPCode | tuple[TuyaDPCode, ...] | None,
         *,
         prefer_function: bool = False,
     ) -> TuyaDPCode | None: ...
@@ -64,7 +64,7 @@ class XTEntity(TuyaEntity):
     @overload
     def find_dpcode(
         self,
-        dpcodes: str | TuyaDPCode | tuple[TuyaDPCode, ...] | None,
+        dpcodes: str | XTDPCode | tuple[XTDPCode, ...] | TuyaDPCode | tuple[TuyaDPCode, ...] | None,
         *,
         prefer_function: bool = False,
         dptype: DPType | None = None,

@@ -165,14 +165,15 @@ class ServiceManager:
         source  = event.data.get(CONF_SOURCE, None)
         method  = event.data.get(CONF_METHOD, None)
         url     = event.data.get(CONF_URL, None)
-        payload = event.data.get(CONF_PAYLOAD, None)
-        if account := self.multi_manager.get_account_by_name(source):
-            try:
-                if response := await self.hass.async_add_executor_job(account.call_api, method, url, payload):
-                    LOGGER.warning(f"API call response: {response}")
-                    return response
-            except Exception as e:
-                LOGGER.warning(f"API Call failed: {e}")
+        payload = event.data.get(CONF_PAYLOAD, "")
+        if source is not None and method is not None and url is not None:
+            if account := self.multi_manager.get_account_by_name(source):
+                try:
+                    if response := await self.hass.async_add_executor_job(account.call_api, method, url, payload):
+                        LOGGER.warning(f"API call response: {response}")
+                        return response
+                except Exception as e:
+                    LOGGER.warning(f"API Call failed: {e}")
     
     async def _handle_get_ice_servers(self, event: XTEventData) -> web.Response | str | None:
         source      = event.data.get(CONF_SOURCE, MESSAGE_SOURCE_TUYA_IOT)
@@ -211,20 +212,21 @@ class ServiceManager:
         if device_id is None or session_id is None:
             return None
         multi_manager = self._get_correct_multi_manager(source, device_id)
-        if multi_manager is None:
+        if multi_manager is None or device_id is None or session_id is None:
             return None
         match event.method:
             case "POST":
                 match event.content_type:
                     case "application/sdp":
-                        if account := multi_manager.get_account_by_name(source):
-                            sdp_answer = await self.hass.async_add_executor_job(account.get_webrtc_sdp_answer, device_id, session_id, event.payload, channel)
-                            if sdp_answer is not None:
-                                response = web.Response(status=201, text=sdp_answer, content_type="application/sdp", charset="utf-8")
-                                response.headers["ETag"] = session_id
-                                response.headers["Location"] = event.location
-                                response.headers["Accept-Patch"] = "application/trickle-ice-sdpfrag"
-                                return response
+                        if channel is not None:
+                            if account := multi_manager.get_account_by_name(source):
+                                sdp_answer = await self.hass.async_add_executor_job(account.get_webrtc_sdp_answer, device_id, session_id, event.payload, channel)
+                                if sdp_answer is not None:
+                                    response = web.Response(status=201, text=sdp_answer, content_type="application/sdp", charset="utf-8")
+                                    response.headers["ETag"] = session_id
+                                    response.headers["Location"] = event.location
+                                    response.headers["Accept-Patch"] = "application/trickle-ice-sdpfrag"
+                                    return response
                         return None
             case "PATCH":
                 match event.content_type:
