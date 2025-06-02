@@ -4,10 +4,6 @@ from tuya_iot import (
     TuyaOpenAPI,
 )
 
-from .import_stub import (
-    XTIOTIPCManager,
-)
-
 from .xt_tuya_iot_ipc_listener import (
     XTIOTIPCListener,
 )
