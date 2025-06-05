@@ -37,7 +37,8 @@ class XTHATuyaIntegrationConfigEntryManager:
         if before_call:
             #If before the call, we need to add the regular device listener back
             runtime_data = get_config_entry_runtime_data(hass, entry, DOMAIN_ORIG)
-            runtime_data.device_manager.add_device_listener(runtime_data.device_listener)
+            if runtime_data is not None:
+                runtime_data.device_manager.add_device_listener(runtime_data.device_listener)
         else:
             if self.config_entry.title == entry.title:
                 self.manager.set_overriden_device_manager(None)

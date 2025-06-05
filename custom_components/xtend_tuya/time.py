@@ -42,6 +42,9 @@ async def async_setup_entry(
     """Set up Tuya binary sensor dynamically through Tuya discovery."""
     hass_data = entry.runtime_data
 
+    if entry.runtime_data.multi_manager is None or hass_data.manager is None:
+        return
+
     merged_descriptors = TIMES
     for new_descriptor in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(Platform.TIME):
         merged_descriptors = merge_device_descriptors(merged_descriptors, new_descriptor)
@@ -49,6 +52,8 @@ async def async_setup_entry(
     @callback
     def async_discover_device(device_map) -> None:
         """Discover and add a discovered Tuya binary sensor."""
+        if hass_data.manager is None:
+            return
         entities: list[XTTimeEntity] = []
         device_ids = [*device_map]
         for device_id in device_ids:
@@ -70,7 +75,7 @@ async def async_setup_entry(
         async_dispatcher_connect(hass, TUYA_DISCOVERY_NEW, async_discover_device)
     )
 
-class XTTimeEntity(XTEntity, TimeEntity):
+class XTTimeEntity(XTEntity, TimeEntity): # type: ignore
     """XT Time entity."""
 
     entity_description: XTTimeEntityDescription
@@ -83,12 +88,12 @@ class XTTimeEntity(XTEntity, TimeEntity):
     ) -> None:
         """Init XT time."""
         super().__init__(device, device_manager)
-        self.entity_description = description
+        self.entity_description = description # type: ignore
         self.device = device
         self.device_manager = device_manager
 
     @property
-    def native_value(self) -> time | None:
+    def native_value(self) -> time | None: # type: ignore
         """Return the latest value."""
         return datetime.now().time()
 

@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import json, copy
 
-from .device import (
+from typing import Any
+
+from .shared_classes import (
     XTDevice,
     XTDeviceFunction,
     XTDeviceStatusRange,
@@ -16,6 +18,8 @@ from ...entity import (
 )
 
 class CloudFixes:
+
+    @staticmethod
     def apply_fixes(device: XTDevice):
         CloudFixes._unify_data_types(device)
         CloudFixes._unify_added_attributes(device)
@@ -28,7 +32,8 @@ class CloudFixes:
         CloudFixes._fix_missing_aliases_using_status_format(device)
         CloudFixes._remove_status_that_are_local_strategy_aliases(device)
         CloudFixes._fix_unaligned_function_or_status_range(device)
-        
+    
+    @staticmethod
     def fix_incorrect_percent_scale_forced(device: XTDevice, function_code: str, scale_threshold: int = 100):
         recomputed_function_code = function_code
         for dpId in device.local_strategy:
@@ -81,6 +86,7 @@ class CloudFixes:
                 except Exception:
                     pass
 
+    @staticmethod
     def _fix_unaligned_function_or_status_range(device: XTDevice):
 
         #Remove status_ranges that are refering to an alias
@@ -145,6 +151,7 @@ class CloudFixes:
         for function in function_push:
             device.function[function] = function_push[function]
 
+    @staticmethod
     def _unify_added_attributes(device: XTDevice):
         for dpId in device.local_strategy:
             if device.local_strategy[dpId].get("property_update") is None:
@@ -154,6 +161,7 @@ class CloudFixes:
             if device.local_strategy[dpId].get("status_code_alias") is None:
                 device.local_strategy[dpId]["status_code_alias"] = []
     
+    @staticmethod
     def _unify_data_types(device: XTDevice):
         for key in device.status_range:
             if not isinstance(device.status_range[key], XTDeviceStatusRange):
@@ -196,6 +204,8 @@ class CloudFixes:
                                     case 2:
                                         config_item["valueType"] = device.status_range[code].type
                                         config_item["valueDesc"] = device.status_range[code].values
+    
+    @staticmethod
     def _map_dpid_to_codes(device: XTDevice):
         for dpId in device.local_strategy:
             if code := device.local_strategy[dpId].get("status_code"):
@@ -210,6 +220,7 @@ class CloudFixes:
                     if code in device.status_range:
                         device.status_range[code].dp_id = dpId
 
+    @staticmethod
     def _fix_incorrect_valuedescr(device: XTDevice):
         all_codes: list[str] = []
         for code in device.status_range:
@@ -233,9 +244,13 @@ class CloudFixes:
             sr_need_fixing = False
             fn_need_fixing = False
             ls_need_fixing = False
+            ls_value_raw = ""
+            sr_value_raw = ""
+            fn_value_raw = ""
+            config_item = None
             if code in device.status_range:
                 sr_value_dict, sr_value_raw = CloudFixes.get_value_descr_dict(device.status_range[code].values)
-                if device.status_range[code].dp_id is not None:
+                if device.status_range[code].dp_id != 0:
                     dp_id = device.status_range[code].dp_id
                 if sr_value_dict is None:
                     sr_need_fixing = True
@@ -290,10 +305,11 @@ class CloudFixes:
                     device.status_range[code].values = correct_value
                 if fn_need_fixing:
                     device.function[code].values = correct_value
-                if ls_need_fixing:
+                if ls_need_fixing and config_item is not None:
                     config_item["valueDesc"] = correct_value
 
-    def get_value_descr_dict(value_str: str):
+    @staticmethod
+    def get_value_descr_dict(value_str: str) -> tuple[dict[str, Any] | None, str]:
         try:
             value_dict: dict = json.loads(value_str)
             if value_dict.get("ErrorValue1"):
@@ -303,7 +319,8 @@ class CloudFixes:
         except Exception:
             return None, value_str
     
-    def get_fixed_value_descr(value1_str: str, value2_str: str | None = None) -> str:
+    @staticmethod
+    def get_fixed_value_descr(value1_str: str | None, value2_str: str | None = None) -> str:
         if value1_str is not None and value2_str is not None:
             return json.dumps({
                 "ErrorValue1": value1_str,
@@ -320,6 +337,7 @@ class CloudFixes:
         else:
             return json.dumps({})
 
+    @staticmethod
     def _align_valuedescr(device: XTDevice):
         all_codes: dict[str, int] = {}
         for code in device.status_range:
@@ -345,6 +363,7 @@ class CloudFixes:
             fn_value = None
             ls_value = None
             dp_id = None
+            config_item = None
             if code in device.status_range:
                 sr_value = json.loads(device.status_range[code].values)
                 dp_id = device.status_range[code].dp_id
@@ -368,12 +387,12 @@ class CloudFixes:
                 device.status_range[code].values = json.dumps(sr_value)
             if fn_value:
                 device.function[code].values = json.dumps(fn_value)
-            if ls_value:
+            if ls_value and config_item is not None:
                 config_item["valueDesc"] = json.dumps(ls_value)
 
-    
-    def compute_aligned_valuedescr(value1: dict, value2: dict, value3: dict) -> dict:
-        return_dict: dict = {}
+    @staticmethod
+    def compute_aligned_valuedescr(value1: dict[str, Any] | None, value2: dict[str, Any] | None, value3: dict[str, Any] | None) -> dict[str, Any]:
+        return_dict: dict[str, Any] = {}
         maxlen_list: list = CloudFixes._get_field_of_valuedescr(value1, value2, value3, "maxlen")
         if len(maxlen_list) > 0:
             maxlen_cur = int(maxlen_list[0])
@@ -435,8 +454,8 @@ class CloudFixes:
             return_dict["range"] = range_ref
         return return_dict
             
-
-    def _get_field_of_valuedescr(value1: dict, value2: dict, value3: dict, field: str) -> list:
+    @staticmethod
+    def _get_field_of_valuedescr(value1: dict[str, Any] | None, value2: dict[str, Any] | None, value3: dict[str, Any] | None, field: str) -> list:
         return_list: list = []
         if value1:
             value = value1.get(field)
@@ -452,7 +471,7 @@ class CloudFixes:
                 return_list.append(value)
         return return_list
         
-
+    @staticmethod
     def _fix_incorrect_percentage_scale(device: XTDevice):
         supported_units: list = ["%"]
         for code in device.status_range:
@@ -515,7 +534,8 @@ class CloudFixes:
                         except Exception:
                             continue
 
-    def determine_most_plausible(value1: dict, value2: dict, key: str, state_value: any = None) -> int | None:
+    @staticmethod
+    def determine_most_plausible(value1: dict, value2: dict, key: str, state_value: Any = None) -> int | None:
         if key in value1 and key in value2:
             if value1[key] == value2[key]:
                 return None
@@ -543,6 +563,7 @@ class CloudFixes:
             return 2
         return None
 
+    @staticmethod
     def _fix_missing_local_strategy_enum_mapping_map(device: XTDevice):
         for local_strategy in device.local_strategy.values():
             if config_item := local_strategy.get("config_item", None):
@@ -552,6 +573,7 @@ class CloudFixes:
                     if 'true' in mappings and str(True) not in mappings:
                         mappings[str(True)] = mappings['true']
     
+    @staticmethod
     def _fix_missing_range_values_using_local_strategy(device: XTDevice):
         for local_strategy in device.local_strategy.values():
             status_code = local_strategy.get("status_code", None)
@@ -586,7 +608,7 @@ class CloudFixes:
                                 function_values["range"] = new_range_list
                                 function.values = json.dumps(function_values)
 
-
+    @staticmethod
     def _fix_missing_aliases_using_status_format(device: XTDevice):
         for local_strategy in device.local_strategy.values():
             status_code = local_strategy.get("status_code", None)
@@ -605,6 +627,7 @@ class CloudFixes:
                         status_formats_dict[status_code] = "$"
                     config_item["statusFormat"] = json.dumps(status_formats_dict)
     
+    @staticmethod
     def _remove_status_that_are_local_strategy_aliases(device: XTDevice):
         for local_strategy in device.local_strategy.values():
             code = local_strategy.get("status_code")

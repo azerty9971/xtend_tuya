@@ -40,6 +40,9 @@ async def async_setup_entry(
     """Set up Tuya siren dynamically through Tuya discovery."""
     hass_data = entry.runtime_data
 
+    if entry.runtime_data.multi_manager is None or hass_data.manager is None:
+        return
+
     merged_descriptors = SIRENS
     for new_descriptor in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(Platform.SIREN):
         merged_descriptors = merge_device_descriptors(merged_descriptors, new_descriptor)
@@ -47,13 +50,15 @@ async def async_setup_entry(
     @callback
     def async_discover_device(device_map) -> None:
         """Discover and add a discovered Tuya siren."""
+        if hass_data.manager is None:
+            return
         entities: list[TuyaSirenEntity] = []
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
                 if descriptions := merged_descriptors.get(device.category):
                     entities.extend(
-                        TuyaSirenEntity(device, hass_data.manager, XTSirenEntityDescription(**description.__dict__))
+                        XTSirenEntity(device, hass_data.manager, XTSirenEntityDescription(**description.__dict__))
                         for description in descriptions
                         if description.key in device.status
                     )
@@ -78,6 +83,7 @@ class XTSirenEntity(XTEntity, TuyaSirenEntity):
     ) -> None:
         """Init XT Siren."""
         super(XTSirenEntity, self).__init__(device, device_manager, description)
+        super(XTEntity, self).__init__(device, device_manager, description) # type: ignore
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description

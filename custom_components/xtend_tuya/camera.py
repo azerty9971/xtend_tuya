@@ -41,13 +41,18 @@ async def async_setup_entry(
     """Set up Tuya cameras dynamically through Tuya discovery."""
     hass_data = entry.runtime_data
 
+    if entry.runtime_data.multi_manager is None or hass_data.manager is None:
+        return
+
     merged_categories = CAMERAS
     for new_descriptor in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(Platform.CAMERA):
-        merged_categories = tuple(append_lists(merged_categories, new_descriptor))
+        merged_categories = tuple(append_lists(list(merged_categories), new_descriptor))
 
     @callback
     def async_discover_device(device_map) -> None:
         """Discover and add a discovered Tuya camera."""
+        if hass_data.manager is None:
+            return
         entities: list[XTCameraEntity] = []
         device_ids = [*device_map]
         for device_id in device_ids:
@@ -75,6 +80,7 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
     ) -> None:
         """Init XT Camera."""
         super(XTCameraEntity, self).__init__(device, device_manager)
+        super(XTEntity, self).__init__(device, device_manager) # type: ignore
         self.device = device
         self.device_manager = device_manager
     

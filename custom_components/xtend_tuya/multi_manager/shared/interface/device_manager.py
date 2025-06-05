@@ -10,12 +10,10 @@ from ..shared_classes import (
     XTConfigEntry,
     XTDeviceMap,
 )
-from ..device import (
-    XTDevice,
-)
 from ...multi_manager import (
     MultiManager,
     XTDeviceSourcePriority,
+    XTDevice,
 )
 from ....const import (
     DOMAIN,
@@ -32,15 +30,15 @@ class XTDeviceManagerInterface(ABC):
 
     @abstractmethod
     def get_type_name(self) -> str:
-        return None
+        pass
     
     @abstractmethod
     def is_type_initialized(self) -> bool:
         return False
 
     @abstractmethod
-    async def setup_from_entry(self, hass: HomeAssistant, config_entry: XTConfigEntry, multi_manager: MultiManager) -> XTDeviceManagerInterface:
-        return None
+    async def setup_from_entry(self, hass: HomeAssistant, config_entry: XTConfigEntry, multi_manager: MultiManager) -> bool:
+        pass
 
     @abstractmethod
     def update_device_cache(self):
@@ -60,12 +58,14 @@ class XTDeviceManagerInterface(ABC):
         pass
     
     @abstractmethod
-    def on_message(self, msg: str):
+    def on_message(self, msg: dict):
         pass
 
+    @abstractmethod
     def query_scenes(self) -> list:
         pass
 
+    @abstractmethod
     def get_device_stream_allocate(
             self, device_id: str, stream_type: Literal["flv", "hls", "rtmp", "rtsp"]
     ) -> Optional[str]:
@@ -119,10 +119,10 @@ class XTDeviceManagerInterface(ABC):
             if device_id in device_map:
                 device_map[device_id].set_up = True
     
-    def call_api(self, method: str, url: str, payload: str) -> str | None:
+    def call_api(self, method: str, url: str, payload: str | None) -> dict[str, Any] | None:
         pass
 
-    def trigger_scene(self, home_id: str, scene_id: str) -> False:
+    def trigger_scene(self, home_id: str, scene_id: str) -> bool:
         return False
     
     def get_webrtc_sdp_answer(self, device_id: str, session_id: str, sdp_offer: str, channel: str) -> str | None:
@@ -140,7 +140,7 @@ class XTDeviceManagerInterface(ABC):
     def send_webrtc_trickle_ice(self, device_id: str, session_id: str, candidate: str) -> str | None:
         return None
     
-    async def raise_issue(self, hass: HomeAssistant, config_entry: XTConfigEntry, is_fixable: bool, severity: IssueSeverity, translation_key: str, translation_placeholders: dict[str, any], learn_more_url: str | None = None):
+    async def raise_issue(self, hass: HomeAssistant, config_entry: XTConfigEntry, is_fixable: bool, severity: IssueSeverity, translation_key: str, translation_placeholders: dict[str, Any], learn_more_url: str | None = None):
         try:
             async_create_issue(
                 hass=hass,

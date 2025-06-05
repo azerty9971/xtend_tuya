@@ -22,6 +22,10 @@ async def async_setup_entry(
 ) -> None:
     """Set up Tuya scenes."""
     hass_data = entry.runtime_data
+
+    if hass_data.manager is None:
+        return
+
     scenes = await hass.async_add_executor_job(hass_data.manager.query_scenes)
     async_add_entities(XTSceneEntity(hass_data.manager, XTScene(**scene.__dict__)) for scene in scenes)
 
@@ -31,8 +35,8 @@ class XTSceneEntity(TuyaSceneEntity):
 
     def __init__(self, multi_manager: MultiManager, scene: XTScene) -> None:
         """Init Tuya Scene."""
-        super(XTSceneEntity, self).__init__(multi_manager, scene)
+        super(XTSceneEntity, self).__init__(multi_manager, scene) # type: ignore
         self.home_manager = multi_manager
         self.scene = scene
-        if self._attr_unique_id not in multi_manager.scene_id:
+        if self._attr_unique_id is not None and self._attr_unique_id not in multi_manager.scene_id:
             multi_manager.scene_id.append(self._attr_unique_id)

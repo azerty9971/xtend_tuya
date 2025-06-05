@@ -19,10 +19,6 @@ from tuya_sharing.home import (
     HomeRepository,
 )
 
-from .import_stub import (
-    XTSharingDeviceManager,
-)
-
 from ...const import (
     LOGGER,  # noqa: F401
     MESSAGE_SOURCE_TUYA_SHARING,
@@ -30,33 +26,24 @@ from ...const import (
 
 from ..multi_manager import (
     MultiManager,
-)
-from ..shared.device import (
     XTDevice,
-)
-
-from .xt_tuya_sharing_device_repository import (
-    XTSharingDeviceRepository
-)
-from .xt_tuya_sharing_mq import (
-    XTSharingMQ,
 )
 
 class XTSharingDeviceManager(Manager):  # noqa: F811
     def __init__(
         self,
         multi_manager: MultiManager,
-        other_device_manager: Manager = None
+        other_device_manager: Manager | None = None
     ) -> None:
         self.multi_manager = multi_manager
-        self.terminal_id = None
+        self.terminal_id: str | None = None
         self.mq = None
-        self.customer_api: CustomerApi = None
-        self.home_repository: HomeRepository = None
-        self.device_repository: XTSharingDeviceRepository = None
-        self.scene_repository: SceneRepository = None
-        self.user_repository: UserRepository = None
-        self.device_map: dict[str, XTDevice] = {}
+        self.customer_api: CustomerApi | None = None
+        self.home_repository: HomeRepository | None = None
+        self.device_repository: XTSharingDeviceRepository | None = None
+        self.scene_repository: SceneRepository | None = None
+        self.user_repository: UserRepository | None = None
+        self.device_map: dict[str, XTDevice] = {} # type: ignore
         self.user_homes: list[SmartLifeHome] = []
         self.device_listeners = set()
         self.other_device_manager = other_device_manager
@@ -67,14 +54,15 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
             return True
         return False
 
-    def forward_message_to_multi_manager(self, msg:str):
+    def forward_message_to_multi_manager(self, msg:dict):
         self.multi_manager.on_message(MESSAGE_SOURCE_TUYA_SHARING, msg)
 
     def on_external_refresh_mq(self):
         if self.other_device_manager is not None:
             self.mq = self.other_device_manager.mq
-            self.mq.add_message_listener(self.forward_message_to_multi_manager)
-            self.mq.remove_message_listener(self.other_device_manager.on_message)
+            if self.mq is not None:
+                self.mq.add_message_listener(self.forward_message_to_multi_manager)
+                self.mq.remove_message_listener(self.other_device_manager.on_message)
 
     def refresh_mq(self):
         if self.other_device_manager:
@@ -90,11 +78,12 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
         device = [device for device in self.device_map.values() if
                   hasattr(device, "id") and getattr(device, "set_up", False)]
 
-        self.mq = XTSharingMQ(self.customer_api, home_ids, device)
-        self.mq.start()
-        self.mq.add_message_listener(self.forward_message_to_multi_manager)
+        if self.customer_api is not None:
+            self.mq = XTSharingMQ(self.customer_api, home_ids, device) # type: ignore
+            self.mq.start()
+            self.mq.add_message_listener(self.forward_message_to_multi_manager)
 
-    def set_overriden_device_manager(self, other_device_manager: Manager) -> None:
+    def set_overriden_device_manager(self, other_device_manager: Manager | None) -> None:
         self.other_device_manager = other_device_manager
     
     def get_overriden_device_manager(self) -> Manager | None:
@@ -115,6 +104,9 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
     def update_device_cache(self):
         super().update_device_cache()
         
+        if self.device_repository is None:
+            return None
+
         for device in self.multi_manager.devices_shared.values():
             if device.id not in self.device_map:
                 new_device = device.get_copy()
@@ -151,3 +143,15 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
     ) -> bool:
         #I didn't find a way to implement this using the Sharing SDK...
         return False
+
+
+
+
+
+
+from .xt_tuya_sharing_device_repository import (
+    XTSharingDeviceRepository
+)
+from .xt_tuya_sharing_mq import (
+    XTSharingMQ,
+)

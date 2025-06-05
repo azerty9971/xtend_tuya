@@ -19,62 +19,6 @@ from ..const import (
     XTDeviceEntityFunctions,
     XTDeviceSourcePriority,
 )
-
-from .shared.import_stub import (
-    MultiManager,
-    XTConfigEntry,
-    XTDevice,
-)
-
-from .shared.device import (
-    XTDevice  # noqa: F811
-)
-
-from .shared.shared_classes import (
-    DeviceWatcher,
-    XTConfigEntry,  # noqa: F811
-    XTDeviceMap,
-)
-
-from .shared.debug.debug_helper import (
-    DebugHelper,
-)
-
-from .shared.merging_manager import (
-    XTMergingManager,
-)
-
-from .shared.cloud_fix import (
-    CloudFixes,
-)
-
-from .shared.multi_source_handler import (
-    MultiSourceHandler,
-)
-
-from .shared.multi_mq import (
-    MultiMQTTQueue,
-)
-
-from .shared.multi_device_listener import (
-    MultiDeviceListener,
-)
-
-from .shared.multi_virtual_state_handler import (
-    XTVirtualStateHandler,
-)
-
-from .shared.multi_virtual_function_handler import (
-    XTVirtualFunctionHandler,
-)
-
-from ..util import (
-    append_lists,
-)
-
-from .shared.interface.device_manager import (
-    XTDeviceManagerInterface,
-)
     
 class MultiManager:  # noqa: F811
     def __init__(self, hass: HomeAssistant) -> None:
@@ -88,7 +32,7 @@ class MultiManager:  # noqa: F811
         self.accounts: dict[str, XTDeviceManagerInterface] = {}
         self.master_device_map: dict[str, XTDevice] = {}
         self.is_ready_for_messages = False
-        self.pending_messages: list[tuple[str, str]] = []
+        self.pending_messages: list[tuple[str, dict]] = []
         self.devices_shared: dict[str, XTDevice] = {}
         self.debug_helper = DebugHelper(self)
         self.scene_id: list[str] = []
@@ -101,7 +45,7 @@ class MultiManager:  # noqa: F811
     def mq(self):
         return self.multi_mqtt_queue
 
-    def get_account_by_name(self, account_name:str) -> XTDeviceManagerInterface | None:
+    def get_account_by_name(self, account_name: str | None) -> XTDeviceManagerInterface | None:
         if account_name in self.accounts:
             return self.accounts[account_name]
         return None
@@ -212,7 +156,7 @@ class MultiManager:  # noqa: F811
             return None
         if ( code in device.status_range 
             and hasattr(device.status_range[code], "dp_id") 
-            and device.status_range[code].dp_id is not None
+            and device.status_range[code].dp_id != 0
             ):
             return device.status_range[code].dp_id
         for dpId in device.local_strategy:
@@ -229,7 +173,7 @@ class MultiManager:  # noqa: F811
             return dp_id_item["status_code"]
         return None
     
-    def __get_devices_from_device_id(self, device_id: str) -> list[XTDevice] | None:
+    def __get_devices_from_device_id(self, device_id: str) -> list[XTDevice]:
         return_list = []
         device_maps = self.__get_available_device_maps()
         for device_map in device_maps:
@@ -283,7 +227,7 @@ class MultiManager:  # noqa: F811
             return None, None, None, False
         return code, dpId, value, True
 
-    def convert_device_report_status_list(self, device_id: str, status_in: list) -> list:
+    def convert_device_report_status_list(self, device_id: str, status_in: list) -> list[dict[str, Any]]:
         status = copy.deepcopy(status_in)
         for item in status:
             code, dpId, value, result_ok = self._read_code_dpid_value_from_state(device_id, item)
@@ -296,7 +240,7 @@ class MultiManager:  # noqa: F811
                 pass
         return status
 
-    def on_message(self, source: str, msg: str):
+    def on_message(self, source: str, msg: dict):
         if not self.is_ready_for_messages:
             self.pending_messages.append((source, msg))
             return
@@ -316,7 +260,7 @@ class MultiManager:  # noqa: F811
         if source in self.accounts:
             self.accounts[source].on_message(new_message)
 
-    def _get_device_id_from_message(self, msg: str) -> str | None:
+    def _get_device_id_from_message(self, msg: dict) -> str | None:
         protocol = msg.get("protocol", 0)
         data = msg.get("data", {})
         if (dev_id := data.get("devId", None)):
@@ -327,14 +271,14 @@ class MultiManager:  # noqa: F811
                     return dev_id
         return None
     
-    def _get_status_list_from_message(self, msg: str) -> str | None:
+    def _get_status_list_from_message(self, msg: dict) -> str | None:
         protocol = msg.get("protocol", 0)
         data = msg.get("data", {})
         if protocol == PROTOCOL_DEVICE_REPORT and "status" in data:
             return data["status"]
         return None
 
-    def _convert_message_for_all_accounts(self, msg: str) -> str:
+    def _convert_message_for_all_accounts(self, msg: dict) -> dict:
         protocol = msg.get("protocol", 0)
         data = msg.get("data", {})
         if protocol == PROTOCOL_DEVICE_REPORT:
@@ -413,8 +357,8 @@ class MultiManager:  # noqa: F811
         if device := self.device_map.get(device_id, None):
             old_online_status = device.online
             for online_status in device.online_states:
-                device.online = online_status
-                if online_status: #Prefer to be more On than Off if multiple state are not in accordance
+                device.online = device.online_states[online_status]
+                if device.online: #Prefer to be more On than Off if multiple state are not in accordance
                     break
             if device.online != old_online_status:
                 self.multi_device_listener.update_device(device, None)
@@ -426,7 +370,66 @@ class MultiManager:  # noqa: F811
                 return_list.append(account.get_type_name())
         return return_list
     
-    def execute_device_entity_function(self, function: XTDeviceEntityFunctions, device: XTDevice, param1: any | None = None, param2: any | None = None):
+    def execute_device_entity_function(self, function: XTDeviceEntityFunctions, device: XTDevice, param1: Any | None = None, param2: Any | None = None):
         match function:
             case XTDeviceEntityFunctions.RECALCULATE_PERCENT_SCALE:
-                CloudFixes.fix_incorrect_percent_scale_forced(device, param1, param2)
+                if isinstance(param1, str) and isinstance(param2, int):
+                    CloudFixes.fix_incorrect_percent_scale_forced(device, param1, param2)
+
+
+
+
+
+
+
+
+
+
+
+
+from .shared.shared_classes import (
+    DeviceWatcher,
+    XTConfigEntry,  # noqa: F811
+    XTDeviceMap,
+    XTDevice,
+)
+
+from .shared.debug.debug_helper import (
+    DebugHelper,
+)
+
+from .shared.merging_manager import (
+    XTMergingManager,
+)
+
+from .shared.cloud_fix import (
+    CloudFixes,
+)
+
+from .shared.multi_source_handler import (
+    MultiSourceHandler,
+)
+
+from .shared.multi_mq import (
+    MultiMQTTQueue,
+)
+
+from .shared.multi_device_listener import (
+    MultiDeviceListener,
+)
+
+from .shared.multi_virtual_state_handler import (
+    XTVirtualStateHandler,
+)
+
+from .shared.multi_virtual_function_handler import (
+    XTVirtualFunctionHandler,
+)
+
+from ..util import (
+    append_lists,
+)
+
+from .shared.interface.device_manager import (
+    XTDeviceManagerInterface,
+)

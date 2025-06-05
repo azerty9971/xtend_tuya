@@ -10,7 +10,7 @@ from tuya_iot import (
     TuyaOpenAPI,
     TuyaOpenMQ,
 )
-from typing import Any
+from typing import Any, overload
 
 from ...const import (
     LOGGER,
@@ -18,7 +18,7 @@ from ...const import (
     XTDeviceSourcePriority,
 )
 
-from ..shared.device import (
+from ..shared.shared_classes import (
     XTDevice,
     XTDeviceFunction,
     XTDeviceStatusRange,
@@ -35,18 +35,24 @@ from ...entity import XTEntity
 from .ipc.xt_tuya_iot_ipc_manager import (
     XTIOTIPCManager
 )
+from .xt_tuya_iot_openapi import (
+    XTIOTOpenAPI,
+)
 
 
 class XTIOTDeviceManager(TuyaDeviceManager):
-    def __init__(self, multi_manager: MultiManager, api: TuyaOpenAPI, mq: TuyaOpenMQ) -> None:
-        self.device_map: dict[str, XTDevice] = {}
+
+    device_map: dict[str, XTDevice] = {}
+
+    def __init__(self, multi_manager: MultiManager, api: XTIOTOpenAPI, mq: TuyaOpenMQ) -> None:
+        self.device_map = {} # type: ignore
         super().__init__(api, mq)
         mq.remove_message_listener(self.on_message)
-        mq.add_message_listener(self.forward_message_to_multi_manager)
+        mq.add_message_listener(self.forward_message_to_multi_manager) # type: ignore
         self.multi_manager = multi_manager
         self.ipc_manager = XTIOTIPCManager(api, multi_manager)
 
-    def forward_message_to_multi_manager(self, msg:str):
+    def forward_message_to_multi_manager(self, msg:dict):
         self.multi_manager.on_message(MESSAGE_SOURCE_TUYA_IOT, msg)
 
     def get_device_info(self, device_id: str) -> dict[str, Any]:
@@ -64,6 +70,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                 result = response["result"]
                 result["online"] = result["is_online"]
                 return response
+        return {}
     
     def get_device_status(self, device_id: str) -> dict[str, Any]:
         """Get device status.
@@ -81,6 +88,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
             response = self.api.get(f"/v1.0/iot-03/devices/{device_id}/status")
             if response["success"]:
                 return response
+        return {}
 
     #Copy of the Tuya original method with some minor modifications
     def update_device_list_in_smart_home_mod(self):
@@ -92,8 +100,8 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                 status = {}
                 for item_status in device.status:
                     if "code" in item_status and "value" in item_status:
-                        code = item_status["code"]
-                        value = item_status["value"]
+                        code = item_status["code"] # type: ignore
+                        value = item_status["value"] # type: ignore
                         status[code] = value
                 device.status = status
                 self.device_map[device.id] = device                                 #CHANGED
@@ -118,8 +126,8 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                 status = {}
                 for item_status in device.status:
                     if "code" in item_status and "value" in item_status:
-                        code = item_status["code"]
-                        value = item_status["value"]
+                        code = item_status["code"] # type: ignore
+                        value = item_status["value"] # type: ignore
                         status[code] = value
                 device.status = status
                 return_dict[item["id"]] = device

@@ -24,8 +24,7 @@ from .entity import (
     XTEntity,
 )
 
-XT_SUPPORT_TYPE = {
-}
+XT_SUPPORT_TYPE = set()
 
 
 async def async_setup_entry(
@@ -34,6 +33,9 @@ async def async_setup_entry(
     """Set up tuya fan dynamically through tuya discovery."""
     hass_data = entry.runtime_data
 
+    if entry.runtime_data.multi_manager is None or hass_data.manager is None:
+        return
+
     merged_categories = XT_SUPPORT_TYPE
     for new_descriptor in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(Platform.FAN):
         merged_categories = append_sets(merged_categories, new_descriptor)
@@ -41,6 +43,8 @@ async def async_setup_entry(
     @callback
     def async_discover_device(device_map) -> None:
         """Discover and add a discovered tuya fan."""
+        if hass_data.manager is None:
+            return
         entities: list[XTFanEntity] = []
         device_ids = [*device_map]
         for device_id in device_ids:
@@ -66,5 +70,6 @@ class XTFanEntity(XTEntity, TuyaFanEntity):
     ) -> None:
         """Init XT Fan Device."""
         super(XTFanEntity, self).__init__(device, device_manager)
+        super(XTEntity, self).__init__(device, device_manager) # type: ignore
         self.device = device
         self.device_manager = device_manager

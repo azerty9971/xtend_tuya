@@ -12,6 +12,9 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
+from .const import (
+    LOGGER,
+)
 from .util import (
     merge_device_descriptors
 )
@@ -25,6 +28,7 @@ from .const import TUYA_DISCOVERY_NEW, XTDPCode
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaCoverEntity,
     TuyaCoverEntityDescription,
+    TuyaDPCode,
 )
 from .entity import (
     XTEntity,
@@ -33,7 +37,10 @@ from .entity import (
 @dataclass(frozen=True)
 class XTCoverEntityDescription(TuyaCoverEntityDescription):
     """Describes XT cover entity."""
-    
+    current_state: TuyaDPCode | XTDPCode | None = None # type: ignore
+    current_position: TuyaDPCode | tuple[TuyaDPCode, ...] | XTDPCode | tuple[XTDPCode, ...] | None = None # type: ignore
+    set_position: TuyaDPCode | XTDPCode | None = None # type: ignore
+
     # Additional attributes for XT specific functionality
     control_back_mode: str | None = None
 
@@ -107,6 +114,9 @@ async def async_setup_entry(
     """Set up Tuya cover dynamically through Tuya discovery."""
     hass_data = entry.runtime_data
 
+    if entry.runtime_data.multi_manager is None or hass_data.manager is None:
+        return
+
     merged_descriptors = COVERS
     for new_descriptor in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(Platform.COVER):
         merged_descriptors = merge_device_descriptors(merged_descriptors, new_descriptor)
@@ -114,6 +124,8 @@ async def async_setup_entry(
     @callback
     def async_discover_device(device_map) -> None:
         """Discover and add a discovered tuya cover."""
+        if hass_data.manager is None:
+            return
         entities: list[XTCoverEntity] = []
         device_ids = [*device_map]
         for device_id in device_ids:
@@ -141,6 +153,8 @@ async def async_setup_entry(
 class XTCoverEntity(XTEntity, TuyaCoverEntity):
     """XT Cover Device."""
 
+    entity_description: XTCoverEntityDescription # type: ignore
+
     def __init__(
         self,
         device: XTDevice,
@@ -150,9 +164,7 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         """Initialize the cover entity."""
         # Initialize the entity
         super(XTCoverEntity, self).__init__(device, device_manager, description)
-        self.device = device
-        self.device_manager = device_manager
-        self.entity_description = description
+        super(XTEntity, self).__init__(device, device_manager, description) # type: ignore
 
 
     @property

@@ -15,13 +15,12 @@ from tuya_iot.openmq import (
     TO_C_SMART_HOME_MQTT_CONFIG_API,
 )
 
-from tuya_iot import (
-    TuyaOpenAPI,
-)
-
 from ..xt_tuya_iot_mq import (
     XTIOTOpenMQ,
     XTIOTTuyaMQConfig,
+)
+from ..xt_tuya_iot_openapi import (
+    XTIOTOpenAPI,
 )
 
 from ....const import (
@@ -31,11 +30,11 @@ from ....const import (
 
 
 class XTIOTOpenMQIPC(XTIOTOpenMQ):
-    def __init__(self, api: TuyaOpenAPI) -> None:
-        self.sleep_time: float = 5   #Debug value to have a time between IPC and IOT queries for log reading
-        self.mq_config: XTIOTTuyaMQConfig = None
-        self.link_id: str = f"tuya.ipc.{uuid.uuid1()}"
-        self.class_id: str = "IPC"
+    def __init__(self, api: XTIOTOpenAPI) -> None:
+        self.sleep_time: float | None = 5   #Debug value to have a time between IPC and IOT queries for log reading
+        self.mq_config: XTIOTTuyaMQConfig | None = None
+        self.link_id: str | None = f"tuya.ipc.{uuid.uuid1()}"
+        self.class_id: str | None = "IPC"
         super().__init__(api)
 
     def _on_message(self, mqttc: mqtt.Client, user_data: Any, msg: mqtt.MQTTMessage):
