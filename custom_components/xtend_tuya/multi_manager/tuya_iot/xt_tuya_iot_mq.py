@@ -41,30 +41,30 @@ from .xt_tuya_iot_openapi import (
 class XTIOTTuyaMQConfig(TuyaMQConfig):
     def __init__(self, mqConfigResponse: dict[str, Any] = {}) -> None:
         """Init TuyaMQConfig."""
-        self.url: str = None
-        self.client_id: str = None
-        self.username: str = None
-        self.password: str = None
-        self.source_topic: dict = None
-        self.sink_topic: dict = None
+        self.url: str| None = None
+        self.client_id: str | None = None
+        self.username: str | None = None
+        self.password: str | None = None
+        self.source_topic: dict[str, str] | None = None
+        self.sink_topic: dict[str, str] | None = None
         self.expire_time: int = 0
         super().__init__(mqConfigResponse)
 
 class XTIOTOpenMQ(TuyaOpenMQ):
 
-    link_id: str = None
-    class_id: str = None
-    sleep_time: float = None
+    link_id: str | None = None
+    class_id: str | None = None
+    sleep_time: float | None = None
 
     def __init__(self, api: XTIOTOpenAPI) -> None:
         if self.link_id is None:
-            self.link_id = f"tuya.{uuid.uuid1()}"
+            self.link_id: str | None = f"tuya.{uuid.uuid1()}"
         if self.class_id is None:
-            self.class_id = "IOT"
+            self.class_id: str | None = "IOT"
         if self.sleep_time is None:
-            self.sleep_time = 0
+            self.sleep_time: float | None = 0
         super().__init__(api)
-        self.api: XTIOTOpenAPI = api
+        self.api: XTIOTOpenAPI = api # type: ignore
 
     def run(self):
         """Method representing the thread's activity which should not be used directly."""
@@ -80,6 +80,8 @@ class XTIOTOpenMQ(TuyaOpenMQ):
         LOGGER.debug(f"[{self.class_id}]Calling _get_mqtt_config")
         if self.api.is_connect() is False and self.api.reconnect() is False:
             LOGGER.debug(f"_get_mqtt_config failed: not connected", stack_info=True)
+            return None
+        if self.api.token_info is None:
             return None
         response = self.api.post(
             TO_C_CUSTOM_MQTT_CONFIG_API
@@ -147,8 +149,9 @@ class XTIOTOpenMQ(TuyaOpenMQ):
     def _on_connect(self, mqttc: mqtt.Client, user_data: Any, flags, rc):
         LOGGER.debug(f"connect flags->{flags}, rc->{rc}")
         if rc == 0:
-            for (key, value) in self.mq_config.source_topic.items():
-                mqttc.subscribe(value)
+            if self.mq_config.source_topic is not None:
+                for (key, value) in self.mq_config.source_topic.items():
+                    mqttc.subscribe(value)
         elif rc == CONNECT_FAILED_NOT_AUTHORISED:
             self.__run_mqtt()
 

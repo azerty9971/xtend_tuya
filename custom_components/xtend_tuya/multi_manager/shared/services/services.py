@@ -3,6 +3,7 @@ from __future__ import annotations
 import voluptuous as vol
 import homeassistant.helpers.config_validation as cv
 from aiohttp import web
+from typing import Any
 from ...multi_manager import (
     MultiManager,
 )
@@ -161,7 +162,7 @@ class ServiceManager:
                 return response
         return None
     
-    async def _handle_call_api(self, event: XTEventData) -> web.Response | str | None:
+    async def _handle_call_api(self, event: XTEventData) -> web.Response | dict[str, Any] | None:
         source  = event.data.get(CONF_SOURCE, None)
         method  = event.data.get(CONF_METHOD, None)
         url     = event.data.get(CONF_URL, None)

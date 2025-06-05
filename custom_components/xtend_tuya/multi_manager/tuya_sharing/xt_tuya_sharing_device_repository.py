@@ -37,9 +37,9 @@ class XTSharingDeviceRepository(DeviceRepository):
 
         #Now convert the status_range and function to XT format
         for code in device.status_range:
-            device.status_range[code] = XTDeviceStatusRange.from_compatible_status_range(device.status_range[code])
+            device.status_range[code] = XTDeviceStatusRange.from_compatible_status_range(device.status_range[code]) # type: ignore
         for code in device.function:
-            device.function[code] = XTDeviceFunction.from_compatible_function(device.function[code])
+            device.function[code] = XTDeviceFunction.from_compatible_function(device.function[code]) # type: ignore
 
     def query_devices_by_home(self, home_id: str) -> list[CustomerDevice]:
         response = self.api.get("/v1.0/m/life/ha/home/devices", {"homeId": home_id})
@@ -53,8 +53,8 @@ class XTSharingDeviceRepository(DeviceRepository):
                 status = {}
                 for item_status in device.status:
                     if "code" in item_status and "value" in item_status:
-                        code = item_status["code"]
-                        value = item_status["value"]
+                        code = item_status["code"] # type: ignore
+                        value = item_status["value"] # type: ignore
                         status[code] = value
                 device.status = status
                 self.update_device_specification(device)
@@ -118,4 +118,4 @@ class XTSharingDeviceRepository(DeviceRepository):
         #         device.status_range[code].type   = value_type
         #         device.status_range[code].values = loc_strat["valueDesc"]
 
-        self.multi_manager.virtual_state_handler.apply_init_virtual_states(device)
+        self.multi_manager.virtual_state_handler.apply_init_virtual_states(device) # type: ignore

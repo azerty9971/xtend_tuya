@@ -1,5 +1,6 @@
 from __future__ import annotations
 import copy
+from typing import Any
 
 from ..multi_manager import MultiManager
 from ...const import LOGGER  # noqa: F401
@@ -71,7 +72,7 @@ class MultiSourceHandler:
                     self._prepare_structure_for_code(dev_id, code)
                     self.device_map[dev_id][code].register_source_message(source)
 
-    def filter_status_list(self, dev_id: str, original_source: str, status_in) -> str:
+    def filter_status_list(self, dev_id: str, original_source: str, status_in: list[dict[str, Any]]) -> list[dict[str, Any]]:
         status_list = copy.deepcopy(status_in)
         device = self.multi_manager.device_map.get(dev_id, None)
         if not device:
