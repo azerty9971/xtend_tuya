@@ -100,6 +100,7 @@ class XTLockEntity(XTEntity, LockEntity): # type: ignore
     """Tuya Lock Sensor Entity."""
 
     entity_description: XTLockEntityDescription
+    temporary_unlock: bool = False
 
     def __init__(
         self,
@@ -113,11 +114,15 @@ class XTLockEntity(XTEntity, LockEntity): # type: ignore
         self.device_manager = device_manager
         self.last_action: str | None = None
         self.entity_description = description # type: ignore
+        self.temporary_unlock = description.temporary_unlock
+        if self._get_state_value(self.entity_description.unlock_status_list) is None:
+            #If we can't find the status of the lock then assume a temporary lock
+            self.temporary_unlock = True
 
     @property
     def is_locked(self) -> bool | None: # type: ignore
         """Return true if the lock is locked."""
-        if self.entity_description.temporary_unlock:
+        if self.temporary_unlock:
             return True
         is_unlocked = self._get_state_value(self.entity_description.unlock_status_list)
         if is_unlocked is not None:
@@ -131,7 +136,7 @@ class XTLockEntity(XTEntity, LockEntity): # type: ignore
     
     @property
     def is_locking(self) -> bool | None: # type: ignore
-        if self.entity_description.temporary_unlock:
+        if self.temporary_unlock:
             return False
         """Return true if the lock is locking."""
         is_locked = self.is_locked
@@ -141,7 +146,7 @@ class XTLockEntity(XTEntity, LockEntity): # type: ignore
 
     @property
     def is_unlocking(self) -> bool | None: # type: ignore
-        if self.entity_description.temporary_unlock:
+        if self.temporary_unlock:
             return False
         """Return true if the lock is unlocking."""
         is_locked = self.is_locked
@@ -158,13 +163,13 @@ class XTLockEntity(XTEntity, LockEntity): # type: ignore
     def lock(self, **kwargs: Any) -> None:
         """Lock the lock."""
         if self.device_manager.send_lock_unlock_command(self.device.id, True):
-            if not self.entity_description.temporary_unlock:
+            if not self.temporary_unlock:
                 self._attr_is_locking = True
     
     def unlock(self, **kwargs: Any) -> None:
         """Unlock the lock."""
         if self.device_manager.send_lock_unlock_command(self.device.id, False):
-            if not self.entity_description.temporary_unlock:
+            if not self.temporary_unlock:
                 self._attr_is_unlocking = True
     
     def open(self, **kwargs: Any) -> None:
