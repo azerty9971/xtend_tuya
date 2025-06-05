@@ -85,6 +85,10 @@ class XTIOTOpenAPI(TuyaOpenAPI):
             self.__refresh_path = TO_C_SMART_HOME_REFRESH_TOKEN_API
 
         self.token_info = None
+        self.__username = ""
+        self.__password = ""
+        self.__country_code = ""
+        self.__schema = ""
 
     def __refresh_access_token_if_need(self, path: str):
         LOGGER.debug(f"[API]Calling __refresh_access_token_if_need")
@@ -127,6 +131,10 @@ class XTIOTOpenAPI(TuyaOpenAPI):
         schema: str = "",
     ) -> dict[str, Any]:
         self.connecting = True
+        self.__username = username
+        self.__password = password
+        self.__country_code = country_code
+        self.__schema = schema
         LOGGER.debug(f"[API]Calling connect")
         return_value = super().connect(username=username, password=password, country_code=country_code, schema=schema)
         self.connecting = False
