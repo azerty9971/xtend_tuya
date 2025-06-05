@@ -159,7 +159,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         entity_registry_enabled_default=True,
         restoredata=True,
-        reset_daily=True
+        reset_daily=True,
     ),
     XTSensorEntityDescription(
         key=XTDPCode.ADD_ELE_THIS_MONTH,
@@ -170,7 +170,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         entity_registry_enabled_default=True,
         restoredata=True,
-        reset_monthly=True
+        reset_monthly=True,
     ),
     XTSensorEntityDescription(
         key=XTDPCode.ADD_ELE_THIS_YEAR,
@@ -181,7 +181,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         entity_registry_enabled_default=True,
         restoredata=True,
-        reset_yearly=True
+        reset_yearly=True,
     ),
     XTSensorEntityDescription(
         key=XTDPCode.ADD_ELE2_TODAY,
@@ -192,7 +192,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         entity_registry_enabled_default=False,
         restoredata=True,
-        reset_daily=True
+        reset_daily=True,
     ),
     XTSensorEntityDescription(
         key=XTDPCode.ADD_ELE2_THIS_MONTH,
@@ -203,7 +203,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         entity_registry_enabled_default=False,
         restoredata=True,
-        reset_monthly=True
+        reset_monthly=True,
     ),
     XTSensorEntityDescription(
         key=XTDPCode.ADD_ELE2_THIS_YEAR,
@@ -214,7 +214,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         entity_registry_enabled_default=False,
         restoredata=True,
-        reset_yearly=True
+        reset_yearly=True,
     ),
     XTSensorEntityDescription(
         key=XTDPCode.BALANCE_ENERGY,
@@ -222,7 +222,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.ENERGY,
         state_class=SensorStateClass.TOTAL,
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
-        restoredata=False,
+        restoredata=True,
     ),
     XTSensorEntityDescription(
         key=XTDPCode.CHARGE_ENERGY,
@@ -230,7 +230,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.ENERGY,
         state_class=SensorStateClass.TOTAL_INCREASING,
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
-        restoredata=False,
+        restoredata=True,
     ),
     XTSensorEntityDescription(
         key=XTDPCode.CHARGE_ENERGY_ONCE,
@@ -240,16 +240,11 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         restoredata=False,
     ),
     XTSensorEntityDescription(
-        key=XTDPCode.CUR_POWER,
-        translation_key="power",
-        device_class=SensorDeviceClass.POWER,
-        state_class=SensorStateClass.MEASUREMENT,
-    ),
-    XTSensorEntityDescription(
         key=XTDPCode.DEVICEKWH,
         translation_key="device_consumption",
         device_class=SensorDeviceClass.ENERGY,
-        state_class=SensorStateClass.MEASUREMENT,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        restoredata=True,
     ),
     XTSensorEntityDescription(
         key=XTDPCode.ELECTRIC,
@@ -269,7 +264,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         state_class=SensorStateClass.TOTAL_INCREASING,
         native_unit_of_measurement=UnitOfEnergy.WATT_HOUR,
         restoredata=True,
-        reset_daily=True
+        reset_daily=True,
     ),
     XTSensorEntityDescription(
         key=XTDPCode.ELECTRIC_THIS_MONTH,
@@ -279,7 +274,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         state_class=SensorStateClass.TOTAL_INCREASING,
         native_unit_of_measurement=UnitOfEnergy.WATT_HOUR,
         restoredata=True,
-        reset_monthly=True
+        reset_monthly=True,
     ),
     XTSensorEntityDescription(
         key=XTDPCode.ELECTRIC_THIS_YEAR,
@@ -290,7 +285,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         native_unit_of_measurement=UnitOfEnergy.WATT_HOUR,
         entity_registry_enabled_default=True,
         restoredata=True,
-        reset_yearly=True
+        reset_yearly=True,
     ),
     XTSensorEntityDescription(
         key=XTDPCode.FORWARD_ENERGY_TOTAL,
@@ -299,6 +294,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         translation_key="total_energy",
         device_class=SensorDeviceClass.ENERGY,
         state_class=SensorStateClass.TOTAL_INCREASING,
+        restoredata=True,
     ),
     XTSensorEntityDescription(
         key=XTDPCode.POWER_CONSUMPTION,
@@ -316,6 +312,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         translation_key="gross_generation",
         device_class=SensorDeviceClass.ENERGY,
         state_class=SensorStateClass.TOTAL_INCREASING,
+        restoredata=True,
     ),
     XTSensorEntityDescription(
         key=XTDPCode.TOTAL_FORWARD_ENERGY,
@@ -326,7 +323,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         state_class=SensorStateClass.TOTAL_INCREASING,
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         entity_registry_enabled_default=True,
-        restoredata=False,
+        restoredata=True,
     ),
 )
 
@@ -438,6 +435,12 @@ ELECTRICITY_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         translation_key="b_voltage",
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.VOLTAGE,
+    ),
+    XTSensorEntityDescription(
+        key=XTDPCode.CUR_POWER,
+        translation_key="power",
+        device_class=SensorDeviceClass.POWER,
+        state_class=SensorStateClass.MEASUREMENT,
     ),
     XTSensorEntityDescription(
         key=XTDPCode.CURRENT_YD,
