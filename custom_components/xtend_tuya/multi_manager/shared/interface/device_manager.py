@@ -37,8 +37,8 @@ class XTDeviceManagerInterface(ABC):
         return False
 
     @abstractmethod
-    async def setup_from_entry(self, hass: HomeAssistant, config_entry: XTConfigEntry, multi_manager: MultiManager) -> XTDeviceManagerInterface | None:
-        return None
+    async def setup_from_entry(self, hass: HomeAssistant, config_entry: XTConfigEntry, multi_manager: MultiManager) -> bool:
+        pass
 
     @abstractmethod
     def update_device_cache(self):
@@ -119,7 +119,7 @@ class XTDeviceManagerInterface(ABC):
             if device_id in device_map:
                 device_map[device_id].set_up = True
     
-    def call_api(self, method: str, url: str, payload: str | None) -> str | None:
+    def call_api(self, method: str, url: str, payload: str | None) -> dict[str, Any] | None:
         pass
 
     def trigger_scene(self, home_id: str, scene_id: str) -> bool:

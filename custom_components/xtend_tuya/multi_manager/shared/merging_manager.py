@@ -27,9 +27,10 @@ class XTMergingManager:
 
 
     @staticmethod
-    def merge_devices(device1: XTDevice, device2: XTDevice, multi_manager: MultiManager | None = None):
+    def merge_devices(device1: XTDevice, device2: XTDevice | None, multi_manager: MultiManager | None = None):
         msg_queue: list[str] = []
-
+        if device2 is None:
+            return None
         if (device1.device_source_priority is not None
             and device2.device_source_priority is not None
             and device2.device_source_priority < device1.device_source_priority):

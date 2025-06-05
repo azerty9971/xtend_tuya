@@ -227,7 +227,7 @@ class MultiManager:  # noqa: F811
             return None, None, None, False
         return code, dpId, value, True
 
-    def convert_device_report_status_list(self, device_id: str, status_in: list) -> list:
+    def convert_device_report_status_list(self, device_id: str, status_in: list) -> list[dict[str, Any]]:
         status = copy.deepcopy(status_in)
         for item in status:
             code, dpId, value, result_ok = self._read_code_dpid_value_from_state(device_id, item)

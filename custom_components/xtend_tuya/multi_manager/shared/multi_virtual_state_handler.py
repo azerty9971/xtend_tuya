@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+from typing import Any
 
 from homeassistant.helpers.entity import EntityDescription
 
@@ -116,7 +117,7 @@ class XTVirtualStateHandler:
                                         device.local_strategy[new_dp_id] = new_local_strategy
                                         device.function[new_code].dp_id = new_dp_id
 
-    def apply_virtual_states_to_status_list(self, device: XTDevice, status_in: list, source: str | None = None) -> list:
+    def apply_virtual_states_to_status_list(self, device: XTDevice, status_in: list[dict[str, Any]], source: str | None = None) -> list:
         status = copy.deepcopy(status_in)
         virtual_states = self.get_category_virtual_states(device.category)
         debug: bool = False
