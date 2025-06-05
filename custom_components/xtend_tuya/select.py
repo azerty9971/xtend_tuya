@@ -218,6 +218,9 @@ async def async_setup_entry(
     """Set up Tuya select dynamically through Tuya discovery."""
     hass_data = entry.runtime_data
 
+    if entry.runtime_data.multi_manager is None or hass_data.manager is None:
+        return
+
     merged_descriptors = SELECTS
     for new_descriptor in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(Platform.SELECT):
         merged_descriptors = merge_device_descriptors(merged_descriptors, new_descriptor)
@@ -225,6 +228,8 @@ async def async_setup_entry(
     @callback
     def async_discover_device(device_map) -> None:
         """Discover and add a discovered Tuya select."""
+        if hass_data.manager is None:
+            return
         entities: list[XTSelectEntity] = []
         device_ids = [*device_map]
         for device_id in device_ids:
@@ -257,6 +262,7 @@ class XTSelectEntity(XTEntity, TuyaSelectEntity):
     ) -> None:
         """Init XT select."""
         super(XTSelectEntity, self).__init__(device, device_manager, description)
+        super(XTEntity, self).__init__(device, device_manager, description) # type: ignore
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description

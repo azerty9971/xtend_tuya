@@ -4,8 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-
-from homeassistant.components.climate import (
+from homeassistant.components.climate.const import (
     ClimateEntityFeature,
     HVACMode,
 )
@@ -49,6 +48,9 @@ async def async_setup_entry(
 ) -> None:
     """Set up Tuya climate dynamically through Tuya discovery."""
     hass_data = entry.runtime_data
+
+    if entry.runtime_data.multi_manager is None or hass_data.manager is None:
+        return
     
     merged_descriptions = CLIMATE_DESCRIPTIONS
     for new_descriptor in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(Platform.CLIMATE):
@@ -57,6 +59,8 @@ async def async_setup_entry(
     @callback
     def async_discover_device(device_map) -> None:
         """Discover and add a discovered Tuya climate."""
+        if hass_data.manager is None:
+            return
         entities: list[XTClimateEntity] = []
         device_ids = [*device_map]
         for device_id in device_ids:
@@ -92,6 +96,7 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
     ) -> None:
         """Determine which values to use."""
         super(XTClimateEntity, self).__init__(device, device_manager, description, system_temperature_unit)
+        super(XTEntity, self).__init__(device, device_manager, description, system_temperature_unit) # type: ignore
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description
@@ -123,7 +128,7 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
             new_hvac_to_tuya = {}
             for ha_mode in self._hvac_to_tuya:
                 if self._hvac_to_tuya[ha_mode] in unknown_hvac_modes:
-                    self._attr_hvac_modes.remove(ha_mode)
+                    self._attr_hvac_modes.remove(HVACMode(ha_mode))
                 else:
                     new_hvac_to_tuya[ha_mode] = self._hvac_to_tuya[ha_mode]
             self._hvac_to_tuya = new_hvac_to_tuya

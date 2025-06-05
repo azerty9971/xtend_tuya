@@ -1,12 +1,9 @@
 from __future__ import annotations
 
 import copy
+from typing import Any
 
 from homeassistant.helpers.entity import EntityDescription
-
-from .device import (
-    XTDevice,
-)
 
 from ...const import (
     VirtualStates,
@@ -16,6 +13,7 @@ from ...const import (
 
 from ..multi_manager import (
     MultiManager,
+    XTDevice,
 )
 
 class XTVirtualStateHandler:
@@ -33,7 +31,7 @@ class XTVirtualStateHandler:
                     if hasattr(description, "virtual_state") and description.virtual_state is not None:
                         description_list_vs.append(description)
                     
-            elif isinstance(category_item, EntityDescription):
+            else:
                 #category is directly a descriptor
                 if hasattr(category_item, "virtual_state") and category_item.virtual_state is not None:
                     description_list_vs.append(category_item)
@@ -48,12 +46,14 @@ class XTVirtualStateHandler:
     def get_category_virtual_states(self,category: str) -> list[DescriptionVirtualState]:
         to_return = []
         for virtual_state in VirtualStates:
+            if virtual_state.name is None or virtual_state.value is None:
+                continue
             for descriptor in self.descriptors_with_virtual_state.values():
                 if (descriptions := descriptor.get(category)):
                     for description in descriptions:
                         if description.virtual_state is not None and description.virtual_state & virtual_state.value:
                             # This virtual_state is applied to this key, let's return it
-                            found_virtual_state = DescriptionVirtualState(description.key, virtual_state.name, virtual_state.value, description.vs_copy_to_state, description.vs_copy_delta_to_state)
+                            found_virtual_state = DescriptionVirtualState(description.key, virtual_state.name, VirtualStates(virtual_state.value), description.vs_copy_to_state, description.vs_copy_delta_to_state)
                             to_return.append(found_virtual_state)
         return to_return
 
@@ -71,7 +71,7 @@ class XTVirtualStateHandler:
                                 device.status[new_code] = copy.deepcopy(device.status[virtual_state.key])
                             device.status_range[new_code] = copy.deepcopy(device.status_range[virtual_state.key])
                             device.status_range[new_code].code = new_code
-                            device.status_range[new_code].dp_id = None
+                            device.status_range[new_code].dp_id = 0
                             if not self.multi_manager._read_dpId_from_code(new_code, device):
                                 if dp_id := self.multi_manager._read_dpId_from_code(virtual_state.key, device):
                                     if new_dp_id := self._get_empty_local_strategy_dp_id(device):
@@ -89,7 +89,7 @@ class XTVirtualStateHandler:
                                 device.status[new_code] = 0
                             device.status_range[new_code] = copy.deepcopy(device.status_range[virtual_state.key])
                             device.status_range[new_code].code = new_code
-                            device.status_range[new_code].dp_id = None
+                            device.status_range[new_code].dp_id = 0
                             if not self.multi_manager._read_dpId_from_code(new_code, device):
                                 if dp_id := self.multi_manager._read_dpId_from_code(virtual_state.key, device):
                                     if new_dp_id := self._get_empty_local_strategy_dp_id(device):
@@ -108,7 +108,7 @@ class XTVirtualStateHandler:
                                 device.status[new_code] = copy.deepcopy(device.status[virtual_state.key])
                             device.function[new_code] = copy.deepcopy(device.function[virtual_state.key])
                             device.function[new_code].code = new_code
-                            device.function[new_code].dp_id = None
+                            device.function[new_code].dp_id = 0
                             if not self.multi_manager._read_dpId_from_code(new_code, device):
                                 if dp_id := self.multi_manager._read_dpId_from_code(virtual_state.key, device):
                                     if new_dp_id := self._get_empty_local_strategy_dp_id(device):
@@ -117,7 +117,7 @@ class XTVirtualStateHandler:
                                         device.local_strategy[new_dp_id] = new_local_strategy
                                         device.function[new_code].dp_id = new_dp_id
 
-    def apply_virtual_states_to_status_list(self, device: XTDevice, status_in: list, source: str = None) -> list:
+    def apply_virtual_states_to_status_list(self, device: XTDevice, status_in: list[dict[str, Any]], source: str | None = None) -> list:
         status = copy.deepcopy(status_in)
         virtual_states = self.get_category_virtual_states(device.category)
         debug: bool = False
@@ -144,8 +144,8 @@ class XTVirtualStateHandler:
                             code, dpId, new_key_value, result_ok = self.multi_manager._read_code_dpid_value_from_state(device.id, {"code": str(state_name), "value": new_key_value})
                             current_value = None
                             if code in device.status:
-                                current_value = device.status[code]
-                            if result_ok and current_value is not None:
+                                current_value = device.status.get(code)
+                            if result_ok and current_value is not None and isinstance(new_key_value, (int, float)):
                                 new_status = {"code": code, "value": copy.copy(new_key_value - cur_key_value), "dpId": dpId}
                                 status.append(new_status)
             

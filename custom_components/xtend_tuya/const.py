@@ -12,6 +12,10 @@ from homeassistant.const import (
     Platform,
 )
 
+from .ha_tuya_integration.tuya_integration_imports import (
+    TuyaDPType as DPType
+)
+
 DOMAIN = "xtend_tuya"
 DOMAIN_ORIG = "tuya"
 LOGGER = logging.getLogger(__package__)
@@ -81,23 +85,23 @@ class AllowedPlugins:
 
 class VirtualStates(IntFlag):
     """Virtual states"""
-    STATE_COPY_TO_MULTIPLE_STATE_NAME           = 0X0001,   #Copy the state so that it can be used with other virtual states
-    STATE_SUMMED_IN_REPORTING_PAYLOAD           = 0X0002,   #Spoof the state value to make it a total instead of an incremental value
+    STATE_COPY_TO_MULTIPLE_STATE_NAME           = 0X0001   #Copy the state so that it can be used with other virtual states
+    STATE_SUMMED_IN_REPORTING_PAYLOAD           = 0X0002   #Spoof the state value to make it a total instead of an incremental value
 
 class VirtualFunctions(IntFlag):
     """Virtual functions"""
-    FUNCTION_RESET_STATE                        = 0X0001,   #Reset the specified states
+    FUNCTION_RESET_STATE                        = 0X0001   #Reset the specified states
 
 class XTDeviceEntityFunctions(StrEnum):
     """ Functions that can be called from the device entity to alter the state of the device """
-    RECALCULATE_PERCENT_SCALE                   = "recalculate_percent_scale",
+    RECALCULATE_PERCENT_SCALE                   = "recalculate_percent_scale"
 
 #Defines the priority of the sources for the merging process
 #In case of conflict take the data from the lowest priority
 class XTDeviceSourcePriority(IntEnum):
-    REGULAR_TUYA    = 10,
-    TUYA_SHARED     = 20,
-    TUYA_IOT        = 30,
+    REGULAR_TUYA    = 10
+    TUYA_SHARED     = 20
+    TUYA_IOT        = 30
 
 @dataclass
 class DescriptionVirtualState:
@@ -105,7 +109,7 @@ class DescriptionVirtualState:
     
     key: str
     virtual_state_name: str
-    virtual_state_value: VirtualStates = None
+    virtual_state_value: VirtualStates | None = None
     vs_copy_to_state: list[XTDPCode] = field(default_factory=list)
     vs_copy_delta_to_state: list[XTDPCode] = field(default_factory=list)
 
@@ -115,7 +119,7 @@ class DescriptionVirtualFunction:
     
     key: str
     virtual_function_name: str
-    virtual_function_value: VirtualStates = None
+    virtual_function_value: VirtualFunctions | None = None
     vf_reset_state: list[XTDPCode] = field(default_factory=list)
 
 class WorkMode(StrEnum):
@@ -125,17 +129,6 @@ class WorkMode(StrEnum):
     MUSIC = "music"
     SCENE = "scene"
     WHITE = "white"
-
-
-class DPType(StrEnum):
-    """Data point types."""
-
-    BOOLEAN = "Boolean"
-    ENUM = "Enum"
-    INTEGER = "Integer"
-    JSON = "Json"
-    RAW = "Raw"
-    STRING = "String"
 
 
 class XTDPCode(StrEnum):
