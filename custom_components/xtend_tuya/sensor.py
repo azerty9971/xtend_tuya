@@ -1203,6 +1203,10 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor): # type: ignore
         device_manager: MultiManager,
         description: XTSensorEntityDescription,
     ) -> None:
+        
+        if description.recalculate_scale_for_percentage:
+            device_manager.execute_device_entity_function(XTDeviceEntityFunctions.RECALCULATE_PERCENT_SCALE, device, description.key, description.recalculate_scale_for_percentage_threshold)
+
         """Init XT sensor."""
         super(XTSensorEntity, self).__init__(device, device_manager, description)
         try:
@@ -1214,8 +1218,6 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor): # type: ignore
         self.device_manager = device_manager
         self.entity_description = description # type: ignore
         self.cancel_reset_after_x_seconds = None
-        if description.recalculate_scale_for_percentage:
-            device_manager.execute_device_entity_function(XTDeviceEntityFunctions.RECALCULATE_PERCENT_SCALE, device, description.key, description.recalculate_scale_for_percentage_threshold)
 
     def reset_value(self, _: datetime.datetime | None, manual_call: bool = False) -> None:
         if manual_call and self.cancel_reset_after_x_seconds:
