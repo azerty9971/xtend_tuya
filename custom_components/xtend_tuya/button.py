@@ -81,6 +81,7 @@ BUTTONS["aqcz"] = BUTTONS["kg"]
 
 #Lock duplicates
 BUTTONS["videolock"] = BUTTONS["jtmspro"]
+BUTTONS["jtmsbh"] = BUTTONS["jtmspro"]
 
 async def async_setup_entry(
     hass: HomeAssistant, entry: XTConfigEntry, async_add_entities: AddEntitiesCallback
