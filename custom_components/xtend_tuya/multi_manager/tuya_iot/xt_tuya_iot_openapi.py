@@ -153,6 +153,7 @@ class XTIOTOpenAPI(TuyaOpenAPI):
         self.__schema = schema
         LOGGER.debug(f"[API]Calling connect")
         return_value = self.connect_new()
+        LOGGER.warning(f"Logging response: {return_value}")
         #return_value = super().connect(username=username, password=password, country_code=country_code, schema=schema)
         self.connecting = False
         return return_value
