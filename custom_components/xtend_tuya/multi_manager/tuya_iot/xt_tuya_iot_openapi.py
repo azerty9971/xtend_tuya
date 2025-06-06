@@ -71,6 +71,7 @@ class XTIOTOpenAPI(TuyaOpenAPI):
         access_secret: str,
         auth_type: AuthType = AuthType.SMART_HOME,
         lang: str = "en",
+        non_user_api: bool = False,
     ) -> None:
         """Init TuyaOpenAPI."""
         super().__init__(endpoint=endpoint,
@@ -80,6 +81,7 @@ class XTIOTOpenAPI(TuyaOpenAPI):
                          lang=lang)
         
         self.connecting = False
+        self.non_user_api = non_user_api
         if self.auth_type == AuthType.CUSTOM:
             self.__refresh_path = TO_C_CUSTOM_REFRESH_TOKEN_API
         else:
@@ -152,9 +154,11 @@ class XTIOTOpenAPI(TuyaOpenAPI):
         self.__country_code = country_code
         self.__schema = schema
         LOGGER.debug(f"[API]Calling connect")
-        return_value = self.connect_new()
+        if self.non_user_api:
+            return_value = self.connect_new()
+        else:
+            return_value = super().connect(username=username, password=password, country_code=country_code, schema=schema)
         LOGGER.warning(f"Logging response: {return_value}")
-        #return_value = super().connect(username=username, password=password, country_code=country_code, schema=schema)
         self.connecting = False
         return return_value
 

@@ -44,13 +44,14 @@ class XTIOTDeviceManager(TuyaDeviceManager):
 
     device_map: dict[str, XTDevice] = {}
 
-    def __init__(self, multi_manager: MultiManager, api: XTIOTOpenAPI, mq: TuyaOpenMQ) -> None:
+    def __init__(self, multi_manager: MultiManager, api: XTIOTOpenAPI, non_user_api: XTIOTOpenAPI, mq: TuyaOpenMQ) -> None:
         self.device_map = {} # type: ignore
         super().__init__(api, mq)
         mq.remove_message_listener(self.on_message)
         mq.add_message_listener(self.forward_message_to_multi_manager) # type: ignore
         self.multi_manager = multi_manager
         self.ipc_manager = XTIOTIPCManager(api, multi_manager)
+        self.non_user_api = non_user_api
 
     def forward_message_to_multi_manager(self, msg:dict):
         self.multi_manager.on_message(MESSAGE_SOURCE_TUYA_IOT, msg)
@@ -93,6 +94,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
     #Copy of the Tuya original method with some minor modifications
     def update_device_list_in_smart_home_mod(self):
         response = self.api.get(f"/v1.0/users/{self.api.token_info.uid}/devices")
+        LOGGER.warning(f"update_device_list_in_smart_home_mod: {response}")
         if response["success"]:
             for item in response["result"]:
                 device = XTDevice(**item)                                           #CHANGED
@@ -316,7 +318,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
     
     def get_supported_unlock_types(self, device_id: str) -> list[str]:
         supported_unlock_types: list[str] = []
-        remote_unlock_types = self.api.get(f"/v1.0/devices/{device_id}/door-lock/remote-unlocks")
+        remote_unlock_types = self.non_user_api.get(f"/v1.0/devices/{device_id}/door-lock/remote-unlocks")
         self.multi_manager.device_watcher.report_message(device_id, f"API remote unlock types: {remote_unlock_types}", self.device_map[device_id])
         if remote_unlock_types.get("success", False):
             results: list[dict] = remote_unlock_types.get("result", [])
@@ -327,7 +329,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         return supported_unlock_types
 
     def get_door_lock_password_ticket(self, device_id: str) -> str | None:
-        ticket = self.api.post(f"/v1.0/devices/{device_id}/door-lock/password-ticket")
+        ticket = self.non_user_api.post(f"/v1.0/devices/{device_id}/door-lock/password-ticket")
         self.multi_manager.device_watcher.report_message(device_id, f"API remote unlock ticket: {ticket}", self.device_map[device_id])
         if ticket.get("success", False):
             result: dict[str, Any] = ticket.get("result", {})
@@ -337,7 +339,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
     
     def call_door_operate(self, device_id: str, open: str) -> bool:
         if ticket_id := self.get_door_lock_password_ticket(device_id):
-            lock_operation = self.api.post(f"/v1.0/smart-lock/devices/{device_id}/password-free/door-operate", {"ticket_id": ticket_id, "open": open})
+            lock_operation = self.non_user_api.post(f"/v1.0/smart-lock/devices/{device_id}/password-free/door-operate", {"ticket_id": ticket_id, "open": open})
             self.multi_manager.device_watcher.report_message(device_id, f"API call_door_operate result: {lock_operation}", self.device_map[device_id])
             if lock_operation.get("success", False):
                 return True
@@ -345,7 +347,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
     
     def call_door_open(self, device_id: str) -> bool:
         if ticket_id := self.get_door_lock_password_ticket(device_id):
-            lock_operation = self.api.post(f"/v1.0/devices/{device_id}/door-lock/password-free/open-door", {"ticket_id": ticket_id})
+            lock_operation = self.non_user_api.post(f"/v1.0/devices/{device_id}/door-lock/password-free/open-door", {"ticket_id": ticket_id})
             self.multi_manager.device_watcher.report_message(device_id, f"API call_door_open result: {lock_operation}", self.device_map[device_id])
             if lock_operation.get("success", False):
                 return True
