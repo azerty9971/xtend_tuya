@@ -318,5 +318,17 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                 if ticket_id := result.get("ticket_id", None):
                     lock_operation = self.api.post(f"/v1.0/smart-lock/devices/{device_id}/password-free/door-operate", {"ticket_id": ticket_id, "open": open})
                     self.multi_manager.device_watcher.report_message(device_id, f"API remote unlock operation result: {lock_operation}", self.device_map[device_id])
-                    return lock_operation.get("success", False)
+                    if not lock_operation.get("success", False):
+                        #Sometimes this call will return an access denied
+                        if lock:
+                            #Locking of the door
+                            pass
+                        else:
+                            #Unlocking of the door
+                            lock_operation = self.api.post(f"/v1.0/smart-lock/devices/{device_id}/password-free/open-door", {"ticket_id": ticket_id})
+                            self.multi_manager.device_watcher.report_message(device_id, f"API remote unlock2 operation result: {lock_operation}", self.device_map[device_id])
+                            if lock_operation.get("success", False):
+                                return True
+                    else:
+                        return True
         return False
