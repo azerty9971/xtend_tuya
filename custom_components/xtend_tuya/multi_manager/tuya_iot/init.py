@@ -120,6 +120,14 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
             access_id=config_entry.options[CONF_ACCESS_ID],
             access_secret=config_entry.options[CONF_ACCESS_SECRET],
             auth_type=auth_type,
+            non_user_api=False
+        )
+        non_user_api = XTIOTOpenAPI(
+            endpoint=config_entry.options[CONF_ENDPOINT_OT],
+            access_id=config_entry.options[CONF_ACCESS_ID],
+            access_secret=config_entry.options[CONF_ACCESS_SECRET],
+            auth_type=auth_type,
+            non_user_api=True
         )
         api.set_dev_channel("hass")
         try:
@@ -130,6 +138,13 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
             else:
                 response = await hass.async_add_executor_job(
                     api.connect,
+                    config_entry.options[CONF_USERNAME],
+                    config_entry.options[CONF_PASSWORD],
+                    config_entry.options[CONF_COUNTRY_CODE],
+                    config_entry.options[CONF_APP_TYPE],
+                )
+            response2 = await hass.async_add_executor_job(
+                    non_user_api.connect,
                     config_entry.options[CONF_USERNAME],
                     config_entry.options[CONF_PASSWORD],
                     config_entry.options[CONF_COUNTRY_CODE],
@@ -149,7 +164,7 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
                 })
             return None
 
-        if response.get("success", False) is False:
+        if response.get("success", False) is False or response2.get("success", False) is False:
             #raise ConfigEntryNotReady(response)
             await self.raise_issue(
                 hass=hass, 
@@ -165,7 +180,7 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
             return None
         mq = XTIOTOpenMQ(api)
         mq.start()
-        device_manager = XTIOTDeviceManager(self.multi_manager, api, mq)
+        device_manager = XTIOTDeviceManager(self.multi_manager, api, non_user_api, mq)
         device_ids: list[str] = list()
         home_manager = XTIOTHomeManager(api, mq, device_manager, self.multi_manager)
         device_manager.add_device_listener(self.multi_manager.multi_device_listener) # type: ignore
