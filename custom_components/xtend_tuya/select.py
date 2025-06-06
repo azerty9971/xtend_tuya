@@ -211,6 +211,9 @@ SELECTS: dict[str, tuple[XTSelectEntityDescription, ...]] = {
     ),
 }
 
+#Lock duplicates
+SELECTS["videolock"] = SELECTS["jtmspro"]
+SELECTS["jtmsbh"] = SELECTS["jtmspro"]
 
 async def async_setup_entry(
     hass: HomeAssistant, entry: XTConfigEntry, async_add_entities: AddEntitiesCallback

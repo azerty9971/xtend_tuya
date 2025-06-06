@@ -1093,6 +1093,7 @@ SENSORS["zndb"] = SENSORS["kg"]
 
 #Lock duplicates
 SENSORS["videolock"] = SENSORS["jtmspro"]
+SENSORS["jtmsbh"] = SENSORS["jtmspro"]
 
 async def async_setup_entry(
     hass: HomeAssistant, entry: XTConfigEntry, async_add_entities: AddEntitiesCallback

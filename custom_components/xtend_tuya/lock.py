@@ -39,6 +39,11 @@ class XTLockEntityDescription(LockEntityDescription):
     temporary_unlock: bool = False
 
 LOCKS: dict[str, XTLockEntityDescription] = {
+    "jtmsbh": XTLockEntityDescription(
+            key="",
+            translation_key="operate_lock",
+            unlock_status_list=[XTDPCode.LOCK_MOTOR_STATE],
+        ),
     "jtmspro": XTLockEntityDescription(
             key="",
             translation_key="operate_lock",
