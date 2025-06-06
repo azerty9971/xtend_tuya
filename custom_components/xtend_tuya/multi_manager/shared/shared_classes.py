@@ -11,7 +11,7 @@ from tuya_sharing import (
 
 class DeviceWatcher:
     def __init__(self, multi_manager: MultiManager) -> None:
-        self.watched_dev_id = []
+        self.watched_dev_id: list[str] = ["eb22391101724bf560wf1c"]
         self.multi_manager = multi_manager
 
     def is_watched(self, dev_id: str) -> bool:
