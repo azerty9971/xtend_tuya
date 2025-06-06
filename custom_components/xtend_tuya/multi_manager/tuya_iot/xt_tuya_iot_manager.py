@@ -325,7 +325,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                             pass
                         else:
                             #Unlocking of the door
-                            lock_operation = self.api.post(f"/v1.0/smart-lock/devices/{device_id}/password-free/open-door", {"ticket_id": ticket_id})
+                            lock_operation = self.api.post(f"/v1.0/devices/{device_id}/door-lock/password-free/open-door", {"ticket_id": ticket_id})
                             self.multi_manager.device_watcher.report_message(device_id, f"API remote unlock2 operation result: {lock_operation}", self.device_map[device_id])
                             if lock_operation.get("success", False):
                                 return True
