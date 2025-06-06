@@ -346,7 +346,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
     def call_door_open(self, device_id: str) -> bool:
         if ticket_id := self.get_door_lock_password_ticket(device_id):
             lock_operation = self.api.post(f"/v1.0/devices/{device_id}/door-lock/password-free/open-door", {"ticket_id": ticket_id})
-            self.multi_manager.device_watcher.report_message(device_id, f"API call_door_operate result: {lock_operation}", self.device_map[device_id])
+            self.multi_manager.device_watcher.report_message(device_id, f"API call_door_open result: {lock_operation}", self.device_map[device_id])
             if lock_operation.get("success", False):
                 return True
         return False
