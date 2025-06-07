@@ -301,7 +301,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         else:
             open = "true"
 
-        self.multi_manager.device_watcher.report_message(device_id, f"Sending lock/unlock command open: {open}", self.device_map[device_id])
+        self.multi_manager.device_watcher.report_message(device_id, f"Sending lock/unlock command open: {open}")
 
         supported_unlock_types = self.get_supported_unlock_types(device_id)
         if "remoteUnlockWithoutPwd" in supported_unlock_types:
@@ -319,7 +319,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
     def get_supported_unlock_types(self, device_id: str) -> list[str]:
         supported_unlock_types: list[str] = []
         remote_unlock_types = self.non_user_api.get(f"/v1.0/devices/{device_id}/door-lock/remote-unlocks")
-        self.multi_manager.device_watcher.report_message(device_id, f"API remote unlock types: {remote_unlock_types}", self.device_map[device_id])
+        self.multi_manager.device_watcher.report_message(device_id, f"API remote unlock types: {remote_unlock_types}")
         if remote_unlock_types.get("success", False):
             results: list[dict] = remote_unlock_types.get("result", [])
             for result in results:
@@ -330,7 +330,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
 
     def get_door_lock_password_ticket(self, device_id: str) -> str | None:
         ticket = self.non_user_api.post(f"/v1.0/devices/{device_id}/door-lock/password-ticket")
-        self.multi_manager.device_watcher.report_message(device_id, f"API remote unlock ticket: {ticket}", self.device_map[device_id])
+        self.multi_manager.device_watcher.report_message(device_id, f"API remote unlock ticket: {ticket}")
         if ticket.get("success", False):
             result: dict[str, Any] = ticket.get("result", {})
             if ticket_id := result.get("ticket_id", None):
@@ -340,7 +340,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
     def call_door_operate(self, device_id: str, open: str) -> bool:
         if ticket_id := self.get_door_lock_password_ticket(device_id):
             lock_operation = self.non_user_api.post(f"/v1.0/smart-lock/devices/{device_id}/password-free/door-operate", {"ticket_id": ticket_id, "open": open})
-            self.multi_manager.device_watcher.report_message(device_id, f"API call_door_operate result: {lock_operation}", self.device_map[device_id])
+            self.multi_manager.device_watcher.report_message(device_id, f"API call_door_operate result: {lock_operation}")
             if lock_operation.get("success", False):
                 return True
         return False
@@ -348,7 +348,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
     def call_door_open(self, device_id: str) -> bool:
         if ticket_id := self.get_door_lock_password_ticket(device_id):
             lock_operation = self.non_user_api.post(f"/v1.0/devices/{device_id}/door-lock/password-free/open-door", {"ticket_id": ticket_id})
-            self.multi_manager.device_watcher.report_message(device_id, f"API call_door_open result: {lock_operation}", self.device_map[device_id])
+            self.multi_manager.device_watcher.report_message(device_id, f"API call_door_open result: {lock_operation}")
             if lock_operation.get("success", False):
                 return True
         return False
