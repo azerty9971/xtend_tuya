@@ -259,7 +259,7 @@ class CloudFixes:
                     correct_value = sr_value_raw
             if code in device.function:
                 fn_value_dict, fn_value_raw = CloudFixes.get_value_descr_dict(device.function[code].values)
-                if device.function[code].dp_id is not None:
+                if device.function[code].dp_id != 0:
                     dp_id = device.function[code].dp_id
                 if fn_value_dict is None:
                     fn_need_fixing = True
