@@ -18,6 +18,7 @@ from ..const import (
     AllowedPlugins,
     XTDeviceEntityFunctions,
     XTDeviceSourcePriority,
+    XTMultiManagerProperties,
 )
     
 class MultiManager:  # noqa: F811
@@ -36,6 +37,7 @@ class MultiManager:  # noqa: F811
         self.devices_shared: dict[str, XTDevice] = {}
         self.debug_helper = DebugHelper(self)
         self.scene_id: list[str] = []
+        self.general_properties: dict[str, Any] = {}
 
     @property
     def device_map(self):
@@ -375,7 +377,16 @@ class MultiManager:  # noqa: F811
             case XTDeviceEntityFunctions.RECALCULATE_PERCENT_SCALE:
                 if isinstance(param1, str) and isinstance(param2, int):
                     CloudFixes.fix_incorrect_percent_scale_forced(device, param1, param2)
+    
+    async def on_loading_finalized(self, hass: HomeAssistant, config_entry: XTConfigEntry):
+        for account in self.accounts.values():
+            await self.hass.async_add_executor_job(account.on_loading_finalized, hass, config_entry, self)
 
+    def set_general_property(self, property_id: XTMultiManagerProperties, property_value: Any):
+        self.general_properties[property_id] = property_value
+    
+    def get_general_property(self, property_id: XTMultiManagerProperties, default: Any | None = None) -> Any | None:
+        return self.general_properties.get(property_id, default)
 
 
 

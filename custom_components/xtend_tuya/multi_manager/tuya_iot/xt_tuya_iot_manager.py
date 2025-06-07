@@ -329,6 +329,18 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                     return True
         return False
     
+    def test_api_subscription(self, device: XTDevice, api: XTIOTOpenAPI | None = None) -> bool:
+        if api is None:
+            if self.test_api_subscription(device, self.api):
+                if self.test_api_subscription(device, self.non_user_api):
+                    return True
+            return False
+        ticket = api.post(f"/v1.0/devices/{device.id}/door-lock/password-ticket")
+        if code := ticket.get("code", None):
+            if code == 28841101:
+                return False
+        return True
+    
     def get_supported_unlock_types(self, device: XTDevice, api: XTIOTOpenAPI) -> list[str]:
         supported_unlock_types: list[str] = []
         api_to_use = cast(XTIOTOpenAPI, device.get_preference(f"{MESSAGE_SOURCE_TUYA_IOT}.XTIOTDeviceManager.get_supported_unlock_types", api))
