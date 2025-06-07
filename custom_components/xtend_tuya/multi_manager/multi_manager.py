@@ -380,7 +380,7 @@ class MultiManager:  # noqa: F811
     
     async def on_loading_finalized(self, hass: HomeAssistant, config_entry: XTConfigEntry):
         for account in self.accounts.values():
-            await config_entry.async_create_task(hass, account.on_loading_finalized(hass, config_entry, self))
+            await hass.async_add_executor_job(hass.async_create_task(account.on_loading_finalized(hass, config_entry, self)))
 
     def set_general_property(self, property_id: XTMultiManagerProperties, property_value: Any):
         self.general_properties[property_id] = property_value
