@@ -283,7 +283,8 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
         if lock_device_id := multi_manager.get_general_property(XTMultiManagerProperties.LOCK_DEVICE_ID, None):
             #Verify if we are subscribed to the lock service
             if device := multi_manager.device_map.get(lock_device_id, None):
-                if not self.iot_account.device_manager.test_api_subscription(device):
+                test_api = await hass.async_add_executor_job(self.iot_account.device_manager.test_api_subscription, device)
+                if not test_api:
                     await self.raise_issue(
                         hass=hass, 
                         config_entry=config_entry, 
