@@ -63,6 +63,7 @@ from ...const import (
     TUYA_DISCOVERY_NEW,
     TUYA_HA_SIGNAL_UPDATE_ENTITY,
     XTDeviceSourcePriority,
+    XTMultiManagerProperties,
 )
 
 def get_plugin_instance() -> XTTuyaIOTDeviceManagerInterface | None:
@@ -275,6 +276,26 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
         for device in shared_devices.values():
             if device.id not in self.multi_manager.devices_shared:
                 self.multi_manager.devices_shared[device.id] = device
+
+    async def on_loading_finalized(self, hass: HomeAssistant, config_entry: XTConfigEntry, multi_manager: MultiManager):
+        if self.iot_account is None:
+            return None
+        if lock_device_id := multi_manager.get_general_property(XTMultiManagerProperties.LOCK_DEVICE_ID, None):
+            #Verify if we are subscribed to the lock service
+            if device := multi_manager.device_map.get(lock_device_id, None):
+                if not self.iot_account.device_manager.test_api_subscription(device):
+                    await self.raise_issue(
+                        hass=hass, 
+                        config_entry=config_entry, 
+                        is_fixable=True, 
+                        severity=IssueSeverity.WARNING, 
+                        translation_key="tuya_iot_lock_not_subscribed", 
+                        translation_placeholders={
+                            "name": DOMAIN,
+                            "config_entry_id": config_entry.title or "Config entry not found"
+                        },
+                        learn_more_url="https://github.com/azerty9971/xtend_tuya/blob/main/docs/configure_locks.md")
+
     
     def get_platform_descriptors_to_merge(self, platform: Platform) -> Any:
         pass

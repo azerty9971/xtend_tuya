@@ -86,6 +86,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
     service_manager.register_services()
     await cleanup_duplicated_devices(hass, entry)
     LOGGER.debug(f"Xtended Tuya {entry.title} loaded")
+    await multi_manager.on_loading_finalized(hass, entry)
     return True
 
 
