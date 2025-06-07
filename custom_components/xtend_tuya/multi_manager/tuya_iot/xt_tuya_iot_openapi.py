@@ -71,7 +71,7 @@ class XTIOTOpenAPI(TuyaOpenAPI):
         access_secret: str,
         auth_type: AuthType = AuthType.SMART_HOME,
         lang: str = "en",
-        non_user_api: bool = False,
+        non_user_specific_api: bool = False,
     ) -> None:
         """Init TuyaOpenAPI."""
         super().__init__(endpoint=endpoint,
@@ -81,7 +81,7 @@ class XTIOTOpenAPI(TuyaOpenAPI):
                          lang=lang)
         
         self.connecting = False
-        self.non_user_api = non_user_api
+        self.non_user_specific_api = non_user_specific_api
         if self.auth_type == AuthType.CUSTOM:
             self.__refresh_path = TO_C_CUSTOM_REFRESH_TOKEN_API
         else:
@@ -126,7 +126,7 @@ class XTIOTOpenAPI(TuyaOpenAPI):
         LOGGER.debug(f"[API]__refresh_access_token_if_need response: {response}")
         self.token_info = TuyaTokenInfo(response)
 
-    def connect_new(self) -> dict[str, Any]:
+    def connect_non_user_specific(self) -> dict[str, Any]:
         response = self.get(
             TO_C_SMART_HOME_TOKEN_API_NEW,
             {
@@ -154,8 +154,8 @@ class XTIOTOpenAPI(TuyaOpenAPI):
         self.__country_code = country_code
         self.__schema = schema
         LOGGER.debug(f"[API]Calling connect")
-        if self.non_user_api:
-            return_value = self.connect_new()
+        if self.non_user_specific_api:
+            return_value = self.connect_non_user_specific()
         else:
             return_value = super().connect(username=username, password=password, country_code=country_code, schema=schema)
         LOGGER.warning(f"Logging response: {return_value}")
@@ -182,6 +182,9 @@ class XTIOTOpenAPI(TuyaOpenAPI):
         ret_val = super().is_connect()
         LOGGER.debug(f"[API]is_connect = {ret_val}")
         return ret_val
+    
+    def test_validity(self) -> dict[str, Any]:
+        return self.get("/v2.0/cloud/space/child")
 
     def __request(
         self,
