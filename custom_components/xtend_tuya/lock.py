@@ -167,13 +167,13 @@ class XTLockEntity(XTEntity, LockEntity): # type: ignore
 
     def lock(self, **kwargs: Any) -> None:
         """Lock the lock."""
-        if self.device_manager.send_lock_unlock_command(self.device.id, True):
+        if self.device_manager.send_lock_unlock_command(self.device, True):
             if not self.temporary_unlock:
                 self._attr_is_locking = True
     
     def unlock(self, **kwargs: Any) -> None:
         """Unlock the lock."""
-        if self.device_manager.send_lock_unlock_command(self.device.id, False):
+        if self.device_manager.send_lock_unlock_command(self.device, False):
             if not self.temporary_unlock:
                 self._attr_is_unlocking = True
     

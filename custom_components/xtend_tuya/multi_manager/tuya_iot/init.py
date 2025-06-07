@@ -321,11 +321,11 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
         return device
     
     def send_lock_unlock_command(
-            self, device_id: str, lock: bool
+            self, device: XTDevice, lock: bool
     ) -> bool:
         if self.iot_account is None:
             return False
-        return self.iot_account.device_manager.send_lock_unlock_command(device_id, lock)
+        return self.iot_account.device_manager.send_lock_unlock_command(device, lock)
     
     def call_api(self, method: str, url: str, payload: str | None) -> dict[str, Any] | None:
         if self.iot_account is None:

@@ -302,11 +302,11 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
         return device_new
     
     def send_lock_unlock_command(
-            self, device_id: str, lock: bool
+            self, device: XTDevice, lock: bool
     ) -> bool:
         if self.sharing_account is None:
             return False
-        return self.sharing_account.device_manager.send_lock_unlock_command(device_id, lock)
+        return self.sharing_account.device_manager.send_lock_unlock_command(device, lock)
     
     def call_api(self, method: str, url: str, payload: str | None) -> dict[str, Any] | None:
         params: dict[str, Any] | None = None
