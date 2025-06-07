@@ -120,23 +120,23 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
             access_id=config_entry.options[CONF_ACCESS_ID],
             access_secret=config_entry.options[CONF_ACCESS_SECRET],
             auth_type=auth_type,
-            non_user_api=False
+            non_user_specific_api=False
         )
         non_user_api = XTIOTOpenAPI(
             endpoint=config_entry.options[CONF_ENDPOINT_OT],
             access_id=config_entry.options[CONF_ACCESS_ID],
             access_secret=config_entry.options[CONF_ACCESS_SECRET],
             auth_type=auth_type,
-            non_user_api=True
+            non_user_specific_api=True
         )
         api.set_dev_channel("hass")
         try:
             if auth_type == AuthType.CUSTOM:
-                response = await hass.async_add_executor_job(
+                response1 = await hass.async_add_executor_job(
                     api.connect, config_entry.options[CONF_USERNAME], config_entry.options[CONF_PASSWORD]
                 )
             else:
-                response = await hass.async_add_executor_job(
+                response1 = await hass.async_add_executor_job(
                     api.connect,
                     config_entry.options[CONF_USERNAME],
                     config_entry.options[CONF_PASSWORD],
@@ -150,6 +150,10 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
                     config_entry.options[CONF_COUNTRY_CODE],
                     config_entry.options[CONF_APP_TYPE],
                 )
+            response3 = await hass.async_add_executor_job(
+                    api.test_validity)
+            response4 = await hass.async_add_executor_job(
+                    non_user_api.test_validity)
         except requests.exceptions.RequestException as err:
             #raise ConfigEntryNotReady(err) from err
             await self.raise_issue(
@@ -164,7 +168,12 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
                 })
             return None
 
-        if response.get("success", False) is False or response2.get("success", False) is False:
+        if (
+            response1.get("success", False) is False or 
+            response2.get("success", False) is False or
+            response3.get("success", False) is False or
+            response4.get("success", False) is False
+        ):
             #raise ConfigEntryNotReady(response)
             await self.raise_issue(
                 hass=hass, 

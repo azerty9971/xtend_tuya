@@ -97,7 +97,6 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         if self.api.token_info is None:                                             #CHANGED
             return None                                                             #CHANGED
         response = self.api.get(f"/v1.0/users/{self.api.token_info.uid}/devices")
-        LOGGER.warning(f"update_device_list_in_smart_home_mod: {response}")
         if response["success"]:
             for item in response["result"]:
                 device = XTDevice(**item)                                           #CHANGED
