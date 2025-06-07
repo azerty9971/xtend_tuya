@@ -72,7 +72,7 @@ class XTDeviceManagerInterface(ABC):
         pass
 
     def send_lock_unlock_command(
-            self, device_id: str, lock: bool
+            self, device: XTDevice, lock: bool
     ) -> bool:
         return False
     

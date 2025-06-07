@@ -337,10 +337,10 @@ class MultiManager:  # noqa: F811
                 return stream_allocate
 
     def send_lock_unlock_command(
-            self, device_id: str, lock: bool
+            self, device: XTDevice, lock: bool
     ) -> bool:
         for account in self.accounts.values():
-            if account.send_lock_unlock_command(device_id, lock):
+            if account.send_lock_unlock_command(device, lock):
                 return True
         return False
     
