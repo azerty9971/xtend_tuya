@@ -158,7 +158,6 @@ class XTIOTOpenAPI(TuyaOpenAPI):
             return_value = self.connect_non_user_specific()
         else:
             return_value = super().connect(username=username, password=password, country_code=country_code, schema=schema)
-        LOGGER.warning(f"Logging response: {return_value}")
         self.connecting = False
         return return_value
 
