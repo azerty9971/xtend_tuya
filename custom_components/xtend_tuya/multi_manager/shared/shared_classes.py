@@ -11,7 +11,7 @@ from tuya_sharing import (
 
 class DeviceWatcher:
     def __init__(self, multi_manager: MultiManager) -> None:
-        self.watched_dev_id = []
+        self.watched_dev_id: list[str] = []
         self.multi_manager = multi_manager
 
     def is_watched(self, dev_id: str) -> bool:
@@ -138,6 +138,7 @@ class XTDevice(TuyaDevice):
     force_open_api: Optional[bool] = False
     device_source_priority: int | None = None
     force_compatibility: bool = False   #Force the device functions/status_range/state to remain untouched after merging
+    device_preference: dict[str, Any] = {}
 
     def __init__(self, **kwargs: Any) -> None:
         self.source = ""
@@ -168,6 +169,7 @@ class XTDevice(TuyaDevice):
         self.status = {}
         self.function = {} # type: ignore
         self.status_range = {} # type: ignore
+        self.device_preference = {}
         super().__init__(**kwargs)
     
     def __repr__(self) -> str:
@@ -223,6 +225,12 @@ class XTDevice(TuyaDevice):
     
     def get_multi_manager(self, hass: HomeAssistant) -> MultiManager | None:
         return get_device_multi_manager(hass=hass, device=self)
+    
+    def get_preference(self, pref_id: str, ret_val_if_missing: Any | None = None) -> Any | None:
+        return self.device_preference.get(pref_id, ret_val_if_missing)
+    
+    def set_preference(self, pref_id: str, pref_val: Any):
+        self.device_preference[pref_id] = pref_val
 
 class XTDeviceMap(UserDict[str, XTDevice]):
 

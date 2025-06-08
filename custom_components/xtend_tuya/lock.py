@@ -16,6 +16,7 @@ from .const import (
     LOGGER,  # noqa: F401
     TUYA_DISCOVERY_NEW,
     XTDPCode,
+    XTMultiManagerProperties,
 )
 from .util import (
     append_dictionnaries,
@@ -39,6 +40,11 @@ class XTLockEntityDescription(LockEntityDescription):
     temporary_unlock: bool = False
 
 LOCKS: dict[str, XTLockEntityDescription] = {
+    "jtmsbh": XTLockEntityDescription(
+            key="",
+            translation_key="operate_lock",
+            unlock_status_list=[XTDPCode.LOCK_MOTOR_STATE],
+        ),
     "jtmspro": XTLockEntityDescription(
             key="",
             translation_key="operate_lock",
@@ -118,6 +124,7 @@ class XTLockEntity(XTEntity, LockEntity): # type: ignore
         if self._get_state_value(self.entity_description.unlock_status_list) is None:
             #If we can't find the status of the lock then assume a temporary lock
             self.temporary_unlock = True
+        device_manager.set_general_property(XTMultiManagerProperties.LOCK_DEVICE_ID, device.id)
 
     @property
     def is_locked(self) -> bool | None: # type: ignore
@@ -162,13 +169,13 @@ class XTLockEntity(XTEntity, LockEntity): # type: ignore
 
     def lock(self, **kwargs: Any) -> None:
         """Lock the lock."""
-        if self.device_manager.send_lock_unlock_command(self.device.id, True):
+        if self.device_manager.send_lock_unlock_command(self.device, True):
             if not self.temporary_unlock:
                 self._attr_is_locking = True
     
     def unlock(self, **kwargs: Any) -> None:
         """Unlock the lock."""
-        if self.device_manager.send_lock_unlock_command(self.device.id, False):
+        if self.device_manager.send_lock_unlock_command(self.device, False):
             if not self.temporary_unlock:
                 self._attr_is_unlocking = True
     

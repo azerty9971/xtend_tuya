@@ -96,6 +96,9 @@ class XTDeviceEntityFunctions(StrEnum):
     """ Functions that can be called from the device entity to alter the state of the device """
     RECALCULATE_PERCENT_SCALE                   = "recalculate_percent_scale"
 
+class XTMultiManagerProperties(StrEnum):
+    LOCK_DEVICE_ID                              = "lock_device_id"
+
 #Defines the priority of the sources for the merging process
 #In case of conflict take the data from the lowest priority
 class XTDeviceSourcePriority(IntEnum):

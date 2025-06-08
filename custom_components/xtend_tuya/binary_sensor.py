@@ -137,6 +137,7 @@ BINARY_SENSORS["tdq"] = BINARY_SENSORS["kg"]
 
 #Lock duplicates
 BINARY_SENSORS["videolock"] = BINARY_SENSORS["jtmspro"]
+BINARY_SENSORS["jtmsbh"] = BINARY_SENSORS["jtmspro"]
 
 async def async_setup_entry(
     hass: HomeAssistant, entry: XTConfigEntry, async_add_entities: AddEntitiesCallback

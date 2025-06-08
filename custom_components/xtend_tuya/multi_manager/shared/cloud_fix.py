@@ -48,7 +48,7 @@ class CloudFixes:
             if config_item := device.local_strategy[dpId].get("config_item"):
                 if value_descr := config_item.get("valueDesc"):
                     value = json.loads(value_descr)
-                    if "unit" in value and "min" in value and "max" in value and "scale" in value:
+                    if "min" in value and "max" in value and "scale" in value:
                         try:
                             max = int(value["max"])
                             scale = 0
@@ -61,7 +61,7 @@ class CloudFixes:
                             continue
         if recomputed_function_code in device.status_range:
             value = json.loads(device.status_range[recomputed_function_code].values)
-            if "unit" in value and "min" in value and "max" in value and "scale" in value:
+            if "min" in value and "max" in value and "scale" in value:
                 try:
                     max = int(value["max"])
                     scale = 0
@@ -74,7 +74,7 @@ class CloudFixes:
                     pass
         if recomputed_function_code in device.function:
             value = json.loads(device.function[recomputed_function_code].values)
-            if "unit" in value and "min" in value and "max" in value and "scale" in value:
+            if "min" in value and "max" in value and "scale" in value:
                 try:
                     max = int(value["max"])
                     scale = 0
@@ -259,7 +259,7 @@ class CloudFixes:
                     correct_value = sr_value_raw
             if code in device.function:
                 fn_value_dict, fn_value_raw = CloudFixes.get_value_descr_dict(device.function[code].values)
-                if device.function[code].dp_id is not None:
+                if device.function[code].dp_id != 0:
                     dp_id = device.function[code].dp_id
                 if fn_value_dict is None:
                     fn_need_fixing = True

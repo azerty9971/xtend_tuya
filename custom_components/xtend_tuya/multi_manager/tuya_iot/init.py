@@ -63,6 +63,7 @@ from ...const import (
     TUYA_DISCOVERY_NEW,
     TUYA_HA_SIGNAL_UPDATE_ENTITY,
     XTDeviceSourcePriority,
+    XTMultiManagerProperties,
 )
 
 def get_plugin_instance() -> XTTuyaIOTDeviceManagerInterface | None:
@@ -120,21 +121,40 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
             access_id=config_entry.options[CONF_ACCESS_ID],
             access_secret=config_entry.options[CONF_ACCESS_SECRET],
             auth_type=auth_type,
+            non_user_specific_api=False
+        )
+        non_user_api = XTIOTOpenAPI(
+            endpoint=config_entry.options[CONF_ENDPOINT_OT],
+            access_id=config_entry.options[CONF_ACCESS_ID],
+            access_secret=config_entry.options[CONF_ACCESS_SECRET],
+            auth_type=auth_type,
+            non_user_specific_api=True
         )
         api.set_dev_channel("hass")
         try:
             if auth_type == AuthType.CUSTOM:
-                response = await hass.async_add_executor_job(
+                response1 = await hass.async_add_executor_job(
                     api.connect, config_entry.options[CONF_USERNAME], config_entry.options[CONF_PASSWORD]
                 )
             else:
-                response = await hass.async_add_executor_job(
+                response1 = await hass.async_add_executor_job(
                     api.connect,
                     config_entry.options[CONF_USERNAME],
                     config_entry.options[CONF_PASSWORD],
                     config_entry.options[CONF_COUNTRY_CODE],
                     config_entry.options[CONF_APP_TYPE],
                 )
+            response2 = await hass.async_add_executor_job(
+                    non_user_api.connect,
+                    config_entry.options[CONF_USERNAME],
+                    config_entry.options[CONF_PASSWORD],
+                    config_entry.options[CONF_COUNTRY_CODE],
+                    config_entry.options[CONF_APP_TYPE],
+                )
+            response3 = await hass.async_add_executor_job(
+                    api.test_validity)
+            response4 = await hass.async_add_executor_job(
+                    non_user_api.test_validity)
         except requests.exceptions.RequestException as err:
             #raise ConfigEntryNotReady(err) from err
             await self.raise_issue(
@@ -149,7 +169,12 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
                 })
             return None
 
-        if response.get("success", False) is False:
+        if (
+            response1.get("success", False) is False or 
+            response2.get("success", False) is False or
+            response3.get("success", False) is False or
+            response4.get("success", False) is False
+        ):
             #raise ConfigEntryNotReady(response)
             await self.raise_issue(
                 hass=hass, 
@@ -165,7 +190,7 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
             return None
         mq = XTIOTOpenMQ(api)
         mq.start()
-        device_manager = XTIOTDeviceManager(self.multi_manager, api, mq)
+        device_manager = XTIOTDeviceManager(self.multi_manager, api, non_user_api, mq)
         device_ids: list[str] = list()
         home_manager = XTIOTHomeManager(api, mq, device_manager, self.multi_manager)
         device_manager.add_device_listener(self.multi_manager.multi_device_listener) # type: ignore
@@ -251,6 +276,27 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
         for device in shared_devices.values():
             if device.id not in self.multi_manager.devices_shared:
                 self.multi_manager.devices_shared[device.id] = device
+
+    async def on_loading_finalized(self, hass: HomeAssistant, config_entry: XTConfigEntry, multi_manager: MultiManager):
+        if self.iot_account is None:
+            return None
+        if lock_device_id := multi_manager.get_general_property(XTMultiManagerProperties.LOCK_DEVICE_ID, None):
+            #Verify if we are subscribed to the lock service
+            if device := multi_manager.device_map.get(lock_device_id, None):
+                test_api = await hass.async_add_executor_job(self.iot_account.device_manager.test_api_subscription, device)
+                if not test_api:
+                    await self.raise_issue(
+                        hass=hass, 
+                        config_entry=config_entry, 
+                        is_fixable=True, 
+                        severity=IssueSeverity.WARNING, 
+                        translation_key="tuya_iot_lock_not_subscribed", 
+                        translation_placeholders={
+                            "name": DOMAIN,
+                            "config_entry_id": config_entry.title or "Config entry not found"
+                        },
+                        learn_more_url="https://github.com/azerty9971/xtend_tuya/blob/main/docs/configure_locks.md")
+
     
     def get_platform_descriptors_to_merge(self, platform: Platform) -> Any:
         pass
@@ -306,11 +352,11 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
         return device
     
     def send_lock_unlock_command(
-            self, device_id: str, lock: bool
+            self, device: XTDevice, lock: bool
     ) -> bool:
         if self.iot_account is None:
             return False
-        return self.iot_account.device_manager.send_lock_unlock_command(device_id, lock)
+        return self.iot_account.device_manager.send_lock_unlock_command(device, lock)
     
     def call_api(self, method: str, url: str, payload: str | None) -> dict[str, Any] | None:
         if self.iot_account is None:
