@@ -2292,14 +2292,7 @@
     },
     "tuya_iot_lock_not_subscribed": {
       "title": "Tuya OpenAPI account badly configured (lock)",
-      "fix_flow": {
-        "step": {
-          "confirm": {
-            "description": "The integration \"{name}\" (`{config_entry_id}`) Does not have a Tuya OpenAPI account that is subscribed to the Smart Lock Open Service\n\nWithout this, locks will not function properly.\n\nTo fix this warning please follow the guide at [this URL](https://github.com/azerty9971/xtend_tuya/blob/main/docs/configure_locks.md), then restart Home Assistant.",
-            "title": "Tuya OpenAPI account not configured"
-          }
-        }
-      }
+      "description": "The integration \"{name}\" (`{config_entry_id}`) Does not have a Tuya OpenAPI account that is subscribed to the Smart Lock Open Service\n\nWithout this, locks will not function properly.\n\nTo fix this warning please follow the guide at [this URL](https://github.com/azerty9971/xtend_tuya/blob/main/docs/configure_locks.md), then restart Home Assistant."
     }
   }
 }
