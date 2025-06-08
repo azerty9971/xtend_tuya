@@ -498,6 +498,9 @@ NUMBERS: dict[str, tuple[XTNumberEntityDescription, ...]] = {
     ),
 }
 
+#Lock duplicates
+NUMBERS["videolock"] = NUMBERS["jtmspro"]
+NUMBERS["jtmsbh"] = NUMBERS["jtmspro"]
 
 async def async_setup_entry(
     hass: HomeAssistant, entry: XTConfigEntry, async_add_entities: AddEntitiesCallback

@@ -139,7 +139,7 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
         super().send_commands(device_id, commands)
     
     def send_lock_unlock_command(
-            self, device_id: str, lock: bool
+            self, device: XTDevice, lock: bool
     ) -> bool:
         #I didn't find a way to implement this using the Sharing SDK...
         return False

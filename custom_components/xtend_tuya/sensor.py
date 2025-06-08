@@ -19,7 +19,7 @@ from homeassistant.const import (
     PERCENTAGE,
     EntityCategory,
 )
-from homeassistant.core import HomeAssistant, callback, Event, EventStateChangedData, State
+from homeassistant.core import HomeAssistant, callback, Event, EventStateChangedData, State, CALLBACK_TYPE
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.event import async_track_time_change, async_call_later, async_track_state_change_event
@@ -1093,6 +1093,7 @@ SENSORS["zndb"] = SENSORS["kg"]
 
 #Lock duplicates
 SENSORS["videolock"] = SENSORS["jtmspro"]
+SENSORS["jtmsbh"] = SENSORS["jtmspro"]
 
 async def async_setup_entry(
     hass: HomeAssistant, entry: XTConfigEntry, async_add_entities: AddEntitiesCallback
@@ -1138,6 +1139,7 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor): # type: ignore
 
     entity_description: XTSensorEntityDescription
     _restored_data: SensorExtraStoredData | None = None
+    cancel_reset_after_x_seconds: CALLBACK_TYPE | None = None
 
     def _replaced_constructor(
         self,
@@ -1201,6 +1203,10 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor): # type: ignore
         device_manager: MultiManager,
         description: XTSensorEntityDescription,
     ) -> None:
+        
+        if description.recalculate_scale_for_percentage:
+            device_manager.execute_device_entity_function(XTDeviceEntityFunctions.RECALCULATE_PERCENT_SCALE, device, description.key, description.recalculate_scale_for_percentage_threshold)
+
         """Init XT sensor."""
         super(XTSensorEntity, self).__init__(device, device_manager, description)
         try:
@@ -1211,8 +1217,7 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor): # type: ignore
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description # type: ignore
-        if description.recalculate_scale_for_percentage:
-            device_manager.execute_device_entity_function(XTDeviceEntityFunctions.RECALCULATE_PERCENT_SCALE, device, description.key, description.recalculate_scale_for_percentage_threshold)
+        self.cancel_reset_after_x_seconds = None
 
     def reset_value(self, _: datetime.datetime | None, manual_call: bool = False) -> None:
         if manual_call and self.cancel_reset_after_x_seconds:
