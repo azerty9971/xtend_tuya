@@ -121,7 +121,11 @@ async def cleanup_duplicated_devices(hass: HomeAssistant, current_entry: ConfigE
                     )
                     if len(hass_entities) == 0:
                         remaining_devices = remaining_devices - 1
-                        device_registry.async_remove_device(hass_dev_id)
+                        try:
+                            device_registry.async_remove_device(hass_dev_id)
+                        except Exception:
+                            #Discard any exception in device cleanup...
+                            pass
                 else:
                     break
 
