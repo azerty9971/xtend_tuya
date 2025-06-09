@@ -288,6 +288,24 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         reset_yearly=True,
     ),
     XTSensorEntityDescription(
+        key=XTDPCode.ENERGYCONSUMEDA,
+        translation_key="energyconsumeda",
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL_INCREASING
+    ),
+    XTSensorEntityDescription(
+        key=XTDPCode.ENERGYCONSUMEDB,
+        translation_key="energyconsumedb",
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL_INCREASING
+    ),
+    XTSensorEntityDescription(
+        key=XTDPCode.ENERGYCONSUMEDC,
+        translation_key="energyconsumedc",
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL_INCREASING
+    ),
+    XTSensorEntityDescription(
         key=XTDPCode.FORWARD_ENERGY_TOTAL,
         virtual_state=VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME,
         vs_copy_delta_to_state=[XTDPCode.ADD_ELE2_TODAY, XTDPCode.ADD_ELE2_THIS_MONTH, XTDPCode.ADD_ELE2_THIS_YEAR],
@@ -308,11 +326,44 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         restoredata=True,
     ),
     XTSensorEntityDescription(
+        key=XTDPCode.REVERSE_ENERGY_A,
+        translation_key="gross_generation_a",
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+    ),
+    XTSensorEntityDescription(
+        key=XTDPCode.REVERSE_ENERGY_B,
+        translation_key="gross_generation_b",
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+    ),
+    XTSensorEntityDescription(
+        key=XTDPCode.REVERSE_ENERGY_C,
+        translation_key="gross_generation_c",
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+    ),
+    XTSensorEntityDescription(
+        key=XTDPCode.REVERSE_ENERGY_T,
+        translation_key="gross_generation",
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+    ),
+    XTSensorEntityDescription(
         key=XTDPCode.REVERSE_ENERGY_TOTAL,
         translation_key="gross_generation",
         device_class=SensorDeviceClass.ENERGY,
         state_class=SensorStateClass.TOTAL_INCREASING,
         restoredata=True,
+    ),
+    XTSensorEntityDescription(
+        key=XTDPCode.TOTALENERGYCONSUMED,
+        virtual_state=VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME,
+        vs_copy_delta_to_state=[XTDPCode.ADD_ELE2_TODAY, XTDPCode.ADD_ELE2_THIS_MONTH, XTDPCode.ADD_ELE2_THIS_YEAR],
+        translation_key="total_energy",
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
     ),
     XTSensorEntityDescription(
         key=XTDPCode.TOTAL_FORWARD_ENERGY,
@@ -322,7 +373,6 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.ENERGY,
         state_class=SensorStateClass.TOTAL_INCREASING,
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
-        entity_registry_enabled_default=True,
         restoredata=True,
     ),
 )
@@ -330,6 +380,11 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
 TEMPERATURE_SENSORS: tuple[XTSensorEntityDescription, ...] = (
     XTSensorEntityDescription(
         key=XTDPCode.TEMPERATURE,
+        translation_key="temperature",
+        state_class=SensorStateClass.MEASUREMENT,
+    ),
+    XTSensorEntityDescription(
+        key=XTDPCode.TEMPERATURE2,
         translation_key="temperature",
         state_class=SensorStateClass.MEASUREMENT,
     ),
@@ -376,9 +431,25 @@ TEMPERATURE_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         key=XTDPCode.TEMPSHOW,
         translation_key="temp_show",
     ),
+    XTSensorEntityDescription(
+        key=XTDPCode.TEMP_ALARM,
+        translation_key="temp_alarm",
+    ),
 )
 
 HUMIDITY_SENSORS: tuple[XTSensorEntityDescription, ...] = (
+    XTSensorEntityDescription(
+        key=XTDPCode.HUMIDITY,
+        translation_key="humidity",
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_registry_enabled_default=True,
+    ),
+    XTSensorEntityDescription(
+        key=XTDPCode.HUMIDITY1,
+        translation_key="humidity",
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_registry_enabled_default=True,
+    ),
     XTSensorEntityDescription(
         key=XTDPCode.HUMIDITY_VALUE,
         translation_key="humidity",
@@ -391,6 +462,10 @@ HUMIDITY_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.HUMIDITY,
         state_class=SensorStateClass.MEASUREMENT,
     ),
+    XTSensorEntityDescription(
+        key=XTDPCode.HUM_ALARM,
+        translation_key="hum_alarm",
+    ),
 )
 
 ELECTRICITY_SENSORS: tuple[XTSensorEntityDescription, ...] = (
@@ -399,6 +474,30 @@ ELECTRICITY_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         translation_key="achz",
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.FREQUENCY,
+    ),
+    XTSensorEntityDescription(
+        key=XTDPCode.ACTIVEPOWER,
+        translation_key="activepower",
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.POWER,
+    ),
+    XTSensorEntityDescription(
+        key=XTDPCode.ACTIVEPOWERA,
+        translation_key="activepowera",
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.POWER,
+    ),
+    XTSensorEntityDescription(
+        key=XTDPCode.ACTIVEPOWERB,
+        translation_key="activepowerb",
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.POWER,
+    ),
+    XTSensorEntityDescription(
+        key=XTDPCode.ACTIVEPOWERC,
+        translation_key="activepowerc",
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.POWER,
     ),
     XTSensorEntityDescription(
         key=XTDPCode.ACV,
@@ -443,11 +542,34 @@ ELECTRICITY_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         state_class=SensorStateClass.MEASUREMENT,
     ),
     XTSensorEntityDescription(
+        key=XTDPCode.CURRENT,
+        translation_key="current",
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.CURRENT,
+    ),
+    XTSensorEntityDescription(
+        key=XTDPCode.CURRENTA,
+        translation_key="currenta",
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.CURRENT,
+    ),
+    XTSensorEntityDescription(
+        key=XTDPCode.CURRENTB,
+        translation_key="currentb",
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.CURRENT,
+    ),
+    XTSensorEntityDescription(
+        key=XTDPCode.CURRENTC,
+        translation_key="currentc",
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.CURRENT,
+    ),
+    XTSensorEntityDescription(
         key=XTDPCode.CURRENT_YD,
         translation_key="current",
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.CURRENT,
-        entity_registry_enabled_default=False,
     ),
     XTSensorEntityDescription(
         key=XTDPCode.C_CURRENT,
@@ -480,6 +602,18 @@ ELECTRICITY_SENSORS: tuple[XTSensorEntityDescription, ...] = (
     XTSensorEntityDescription(
         key=XTDPCode.PHASEFLAG,
         translation_key="phaseflag",
+    ),
+    XTSensorEntityDescription(
+        key=XTDPCode.POWERFACTORA,
+        translation_key="powerfactora",
+    ),
+    XTSensorEntityDescription(
+        key=XTDPCode.POWERFACTORB,
+        translation_key="powerfactorb",
+    ),
+    XTSensorEntityDescription(
+        key=XTDPCode.POWERFACTORC,
+        translation_key="powerfactorc",
     ),
     XTSensorEntityDescription(
         key=XTDPCode.POWER_TOTAL,
@@ -524,6 +658,30 @@ ELECTRICITY_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.CURRENT,
     ),
     XTSensorEntityDescription(
+        key=XTDPCode.REACTIVEPOWER,
+        translation_key="reactivepower",
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.REACTIVE_POWER,
+    ),
+    XTSensorEntityDescription(
+        key=XTDPCode.REACTIVEPOWERA,
+        translation_key="reactivepowera",
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.REACTIVE_POWER,
+    ),
+    XTSensorEntityDescription(
+        key=XTDPCode.REACTIVEPOWERB,
+        translation_key="reactivepowerb",
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.REACTIVE_POWER,
+    ),
+    XTSensorEntityDescription(
+        key=XTDPCode.REACTIVEPOWERC,
+        translation_key="reactivepowerc",
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.REACTIVE_POWER,
+    ),
+    XTSensorEntityDescription(
         key=XTDPCode.SIGLE_PHASE_POWER,
         translation_key="sigle_phase_power",
         state_class=SensorStateClass.MEASUREMENT,
@@ -532,6 +690,24 @@ ELECTRICITY_SENSORS: tuple[XTSensorEntityDescription, ...] = (
     XTSensorEntityDescription(
         key=XTDPCode.VOL_YD,
         translation_key="voltage",
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.VOLTAGE,
+    ),
+    XTSensorEntityDescription(
+        key=XTDPCode.VOLTAGEA,
+        translation_key="a_voltage",
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.VOLTAGE,
+    ),
+    XTSensorEntityDescription(
+        key=XTDPCode.VOLTAGEB,
+        translation_key="b_voltage",
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.VOLTAGE,
+    ),
+    XTSensorEntityDescription(
+        key=XTDPCode.VOLTAGEC,
+        translation_key="c_voltage",
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.VOLTAGE,
     ),
@@ -671,6 +847,11 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
         XTSensorEntityDescription(
             key=XTDPCode.METER_TYPE,
             translation_key="meter_type",
+        ),
+        XTSensorEntityDescription(
+            key=XTDPCode.FREQUENCY,
+            translation_key="frequency",
+            device_class=SensorDeviceClass.FREQUENCY,
         ),
         *TEMPERATURE_SENSORS,
         *HUMIDITY_SENSORS,
@@ -1012,6 +1193,7 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
     ),
     "wk": (
         *BATTERY_SENSORS,
+        *TEMPERATURE_SENSORS,
     ),
     "wnykq": (
         XTSensorEntityDescription(
@@ -1079,6 +1261,11 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
     #    *CONSUMPTION_SENSORS,
     #    *TEMPERATURE_SENSORS,
     #),
+    "zwjcy": (
+        *TEMPERATURE_SENSORS,
+        *HUMIDITY_SENSORS,
+        *BATTERY_SENSORS,
+    ),
 }
 
 # Socket (duplicate of `kg`)

@@ -35,6 +35,78 @@ class XTNumberEntityDescription(TuyaNumberEntityDescription):
     """Describe an Tuya number entity."""
     pass
 
+TEMPERATURE_SENSORS:  tuple[XTNumberEntityDescription, ...] = (
+    XTNumberEntityDescription(
+        key=XTDPCode.TEMPSET,
+        translation_key="temp_set",
+        mode = NumberMode.SLIDER,
+        entity_category=EntityCategory.CONFIG,
+    ),
+    XTNumberEntityDescription(
+        key=XTDPCode.TEMP_SET_1,
+        translation_key="temp_set",
+        device_class=NumberDeviceClass.TEMPERATURE,
+        entity_category=EntityCategory.CONFIG,
+    ),
+    XTNumberEntityDescription(
+        key=XTDPCode.TEMPSC,
+        translation_key="tempsc",
+        mode = NumberMode.SLIDER,
+        entity_category=EntityCategory.CONFIG,
+    ),
+    XTNumberEntityDescription(
+        key=XTDPCode.TEMP_CALIBRATION,
+        translation_key="temp_calibration",
+        mode = NumberMode.SLIDER,
+        entity_category=EntityCategory.CONFIG,
+    ),
+    XTNumberEntityDescription(
+        key=XTDPCode.MAXTEMP_SET,
+        translation_key="maxtemp_set",
+        mode = NumberMode.SLIDER,
+        entity_category=EntityCategory.CONFIG,
+    ),
+    XTNumberEntityDescription(
+        key=XTDPCode.MINITEMP_SET,
+        translation_key="minitemp_set",
+        mode = NumberMode.SLIDER,
+        entity_category=EntityCategory.CONFIG,
+    ),
+    XTNumberEntityDescription(
+        key=XTDPCode.TEMP_SENSITIVITY,
+        translation_key="temp_sensitivity",
+        mode = NumberMode.SLIDER,
+        entity_category=EntityCategory.CONFIG,
+    ),
+)
+
+HUMIDITY_SENSORS: tuple[XTNumberEntityDescription, ...] = (
+    XTNumberEntityDescription(
+        key=XTDPCode.MAXHUM_SET,
+        translation_key="maxhum_set",
+        mode = NumberMode.SLIDER,
+        entity_category=EntityCategory.CONFIG,
+    ),
+    XTNumberEntityDescription(
+        key=XTDPCode.MINIHUM_SET,
+        translation_key="minihum_set",
+        mode = NumberMode.SLIDER,
+        entity_category=EntityCategory.CONFIG,
+    ),
+    XTNumberEntityDescription(
+        key=XTDPCode.HUM_SENSITIVITY,
+        translation_key="hum_sensitivity",
+        mode = NumberMode.SLIDER,
+        entity_category=EntityCategory.CONFIG,
+    ),
+    XTNumberEntityDescription(
+        key=XTDPCode.HUMIDITY_CALIBRATION,
+        translation_key="humidity_calibration",
+        mode = NumberMode.SLIDER,
+        entity_category=EntityCategory.CONFIG,
+    ),
+)
+
 TIMER_SENSORS: tuple[XTNumberEntityDescription, ...] = (
     XTNumberEntityDescription(
         key=XTDPCode.COUNTDOWN_1,
@@ -388,12 +460,6 @@ NUMBERS: dict[str, tuple[XTNumberEntityDescription, ...]] = {
     ),
     "mzj": (
         XTNumberEntityDescription(
-            key=XTDPCode.TEMPSET,
-            translation_key="temp_set",
-            mode = NumberMode.SLIDER,
-            entity_category=EntityCategory.CONFIG,
-        ),
-        XTNumberEntityDescription(
             key=XTDPCode.RECIPE,
             translation_key="recipe",
             entity_category=EntityCategory.CONFIG,
@@ -403,12 +469,8 @@ NUMBERS: dict[str, tuple[XTNumberEntityDescription, ...]] = {
             translation_key="set_time",
             entity_category=EntityCategory.CONFIG,
         ),
-        XTNumberEntityDescription(
-            key=XTDPCode.TEMPSC,
-            translation_key="tempsc",
-            mode = NumberMode.SLIDER,
-            entity_category=EntityCategory.CONFIG,
-        ),
+        *TEMPERATURE_SENSORS,
+        *HUMIDITY_SENSORS,
     ),
     "qccdz": (
         XTNumberEntityDescription(
@@ -451,24 +513,18 @@ NUMBERS: dict[str, tuple[XTNumberEntityDescription, ...]] = {
         ),
         *TIMER_SENSORS,
     ),
+    "wk": (
+        *TEMPERATURE_SENSORS,
+        *HUMIDITY_SENSORS,
+    ),
     "wnykq": (
         XTNumberEntityDescription(
             key=XTDPCode.BRIGHT_VALUE,
             translation_key="bright_value",
             entity_category=EntityCategory.CONFIG,
         ),
-        XTNumberEntityDescription(
-            key=XTDPCode.HUMIDITY_CALIBRATION,
-            translation_key="humidity_calibration",
-            mode = NumberMode.SLIDER,
-            entity_category=EntityCategory.CONFIG,
-        ),
-        XTNumberEntityDescription(
-            key=XTDPCode.TEMP_CALIBRATION,
-            translation_key="temp_calibration",
-            mode = NumberMode.SLIDER,
-            entity_category=EntityCategory.CONFIG,
-        ),
+        *TEMPERATURE_SENSORS,
+        *HUMIDITY_SENSORS,
     ),
     "ywcgq": (
         XTNumberEntityDescription(
@@ -496,6 +552,16 @@ NUMBERS: dict[str, tuple[XTNumberEntityDescription, ...]] = {
             entity_category=EntityCategory.CONFIG,
         ),
     ),
+    "zwjcy": (
+        XTNumberEntityDescription(
+            key=XTDPCode.REPORT_SENSITIVITY,
+            translation_key="report_sensitivity",
+            mode = NumberMode.SLIDER,
+            entity_category=EntityCategory.CONFIG,
+        ),
+        *TEMPERATURE_SENSORS,
+        *HUMIDITY_SENSORS,
+    )
 }
 
 #Lock duplicates
