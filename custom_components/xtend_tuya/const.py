@@ -323,6 +323,7 @@ class XTDPCode(StrEnum):
     ELECTRIC_TOTAL = "electric_total"
     ELECTRICITY_LEFT = "electricity_left"
     EMPTY = "empty"
+    ENERGYCONSUMED = "EnergyConsumed"
     ENERGYCONSUMEDA = "EnergyConsumedA"
     ENERGYCONSUMEDB = "EnergyConsumedB"
     ENERGYCONSUMEDC = "EnergyConsumedC"
