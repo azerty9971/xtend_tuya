@@ -38,6 +38,7 @@ class XTLockEntityDescription(LockEntityDescription):
     """Describes a Tuya lock."""
     unlock_status_list: list[XTDPCode] = field(default_factory=list)
     temporary_unlock: bool = False
+    manual_unlock_command: list[XTDPCode] = field(default_factory=list)
 
 LOCKS: dict[str, XTLockEntityDescription] = {
     "jtmsbh": XTLockEntityDescription(
@@ -59,6 +60,7 @@ LOCKS: dict[str, XTLockEntityDescription] = {
             key="",
             translation_key="operate_lock",
             unlock_status_list=[XTDPCode.LOCK_MOTOR_STATE],
+            manual_unlock_command=[XTDPCode.BLUETOOTH_UNLOCK]
         ),
     "videolock": XTLockEntityDescription(
             key="",
@@ -125,6 +127,8 @@ class XTLockEntity(XTEntity, LockEntity): # type: ignore
             #If we can't find the status of the lock then assume a temporary lock
             self.temporary_unlock = True
         device_manager.set_general_property(XTMultiManagerProperties.LOCK_DEVICE_ID, device.id)
+        if len(description.manual_unlock_command) > 0:
+            device.set_preference(f"manual_unlock_command", description.manual_unlock_command)
 
     @property
     def is_locked(self) -> bool | None: # type: ignore
