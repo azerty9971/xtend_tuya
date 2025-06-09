@@ -28,15 +28,16 @@ from .const import (
     TUYA_RESPONSE_RESULT,
     TUYA_RESPONSE_SUCCESS,
     TUYA_SCHEMA,
-    CONF_ACCESS_ID,
-    CONF_ACCESS_SECRET,
+    CONF_ACCESS_ID_OT,
+    CONF_ACCESS_SECRET_OT,
     CONF_APP_TYPE,
     CONF_ENDPOINT_OT,
     CONF_AUTH_TYPE,
     CONF_COUNTRY_CODE,
     CONF_NO_OPENAPI,
-    CONF_PASSWORD,
+    CONF_PASSWORD_OT,
     CONF_USERNAME,
+    CONF_USERNAME_OT,
     SMARTLIFE_APP,
     TUYA_COUNTRIES,
     TUYA_SMART_APP,
@@ -69,17 +70,17 @@ class TuyaOptionFlow(OptionsFlow):
             CONF_NO_OPENAPI: user_input[CONF_NO_OPENAPI],
             CONF_ENDPOINT_OT: country.endpoint,
             CONF_AUTH_TYPE: AuthType.CUSTOM,
-            CONF_ACCESS_ID: user_input[CONF_ACCESS_ID],
-            CONF_ACCESS_SECRET: user_input[CONF_ACCESS_SECRET],
-            CONF_USERNAME: user_input[CONF_USERNAME],
-            CONF_PASSWORD: user_input[CONF_PASSWORD],
+            CONF_ACCESS_ID_OT: user_input[CONF_ACCESS_ID_OT],
+            CONF_ACCESS_SECRET_OT: user_input[CONF_ACCESS_SECRET_OT],
+            CONF_USERNAME_OT: user_input[CONF_USERNAME_OT],
+            CONF_PASSWORD_OT: user_input[CONF_PASSWORD_OT],
             CONF_COUNTRY_CODE: country.country_code,
         }
         if data[CONF_NO_OPENAPI] is True:
-            data[CONF_ACCESS_ID] = None
-            data[CONF_ACCESS_SECRET] = None
-            data[CONF_USERNAME] = None
-            data[CONF_PASSWORD] = None
+            data[CONF_ACCESS_ID_OT] = None
+            data[CONF_ACCESS_SECRET_OT] = None
+            data[CONF_USERNAME_OT] = None
+            data[CONF_PASSWORD_OT] = None
             return {TUYA_RESPONSE_SUCCESS: True}, data
 
         for app_type in ("", TUYA_SMART_APP, SMARTLIFE_APP):
@@ -91,15 +92,15 @@ class TuyaOptionFlow(OptionsFlow):
 
             api = TuyaOpenAPI(
                 endpoint=data[CONF_ENDPOINT_OT],
-                access_id=data[CONF_ACCESS_ID],
-                access_secret=data[CONF_ACCESS_SECRET],
+                access_id=data[CONF_ACCESS_ID_OT],
+                access_secret=data[CONF_ACCESS_SECRET_OT],
                 auth_type=data[CONF_AUTH_TYPE],
             )
             api.set_dev_channel("hass")
 
             response = api.connect(
-                username=data[CONF_USERNAME],
-                password=data[CONF_PASSWORD],
+                username=data[CONF_USERNAME_OT],
+                password=data[CONF_PASSWORD_OT],
                 country_code=data[CONF_COUNTRY_CODE],
                 schema=data[CONF_APP_TYPE],
             )
@@ -167,20 +168,20 @@ class TuyaOptionFlow(OptionsFlow):
                         [country.name for country in TUYA_COUNTRIES]
                     ),
                     vol.Optional(
-                        CONF_ACCESS_ID, 
-                        default=user_input.get(CONF_ACCESS_ID, self.options.get(CONF_ACCESS_ID, ""))
+                        CONF_ACCESS_ID_OT, 
+                        default=user_input.get(CONF_ACCESS_ID_OT, self.options.get(CONF_ACCESS_ID_OT, ""))
                     ): str,
                     vol.Optional(
-                        CONF_ACCESS_SECRET,
-                        default=user_input.get(CONF_ACCESS_SECRET, self.options.get(CONF_ACCESS_SECRET, "")),
+                        CONF_ACCESS_SECRET_OT,
+                        default=user_input.get(CONF_ACCESS_SECRET_OT, self.options.get(CONF_ACCESS_SECRET_OT, "")),
                     ): str,
                     vol.Optional(
-                        CONF_USERNAME, 
-                        default=user_input.get(CONF_USERNAME, self.options.get(CONF_USERNAME, ""))
+                        CONF_USERNAME_OT, 
+                        default=user_input.get(CONF_USERNAME_OT, self.options.get(CONF_USERNAME_OT, ""))
                     ): str,
                     vol.Optional(
-                        CONF_PASSWORD, 
-                        default=user_input.get(CONF_PASSWORD, self.options.get(CONF_PASSWORD, ""))
+                        CONF_PASSWORD_OT, 
+                        default=user_input.get(CONF_PASSWORD_OT, self.options.get(CONF_PASSWORD_OT, ""))
                     ): str,
                 }
             ),
@@ -315,6 +316,7 @@ class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
             },
             CONF_TERMINAL_ID: info[CONF_TERMINAL_ID],
             CONF_ENDPOINT: info[CONF_ENDPOINT],
+            CONF_USERNAME: info.get("username", "")
         }
 
         if self.__reauth_entry:

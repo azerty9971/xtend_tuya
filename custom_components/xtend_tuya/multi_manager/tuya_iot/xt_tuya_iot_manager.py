@@ -16,6 +16,7 @@ from ...const import (
     LOGGER,
     MESSAGE_SOURCE_TUYA_IOT,
     XTDeviceSourcePriority,
+    XTDPCode,
 )
 
 from ..shared.shared_classes import (
@@ -327,6 +328,12 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                 #Unlocking of the door
                 if self.call_door_open(device, api):
                     return True
+        if manual_unlock_code := cast(list[XTDPCode], device.get_preference(f"manual_unlock_command")):
+            commands: list[dict[str, Any]] = []
+            for dpcode in manual_unlock_code:
+                commands.append({"code": dpcode, "value": device.status.get(dpcode, True)})
+            self.multi_manager.send_commands(device_id=device.id, commands=commands)
+            return True #Assume that the command worked...
         return False
     
     def test_api_subscription(self, device: XTDevice, api: XTIOTOpenAPI | None = None) -> bool:
