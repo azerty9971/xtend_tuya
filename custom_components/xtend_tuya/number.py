@@ -277,11 +277,13 @@ NUMBERS: dict[str, tuple[XTNumberEntityDescription, ...]] = {
             key=XTDPCode.NONE_DELAY_TIME_MIN,
             translation_key="none_delay_time_min",
             entity_category=EntityCategory.CONFIG,
+            entity_registry_enabled_default=False,
         ),
         XTNumberEntityDescription(
             key=XTDPCode.NONE_DELAY_TIME_SEC,
             translation_key="none_delay_time_sec",
             entity_category=EntityCategory.CONFIG,
+            entity_registry_enabled_default=False,
         ),
         XTNumberEntityDescription(
             key=XTDPCode.DETECTION_DISTANCE_MAX,
