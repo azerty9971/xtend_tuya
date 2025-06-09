@@ -32,6 +32,13 @@ class XTSwitchEntityDescription(TuyaSwitchEntityDescription, frozen_or_thawed=Tr
 # default instruction set of each category end up being a Switch.
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
 SWITCHES: dict[str, tuple[XTSwitchEntityDescription, ...]] = {
+    "cwwsq": (
+        XTSwitchEntityDescription(
+            key=XTDPCode.KEY_REC,
+            translation_key="key_rec",
+            entity_category=EntityCategory.CONFIG,
+        ),
+    ),
     "dbl": (
         XTSwitchEntityDescription(
             key=XTDPCode.SWITCH,
@@ -324,6 +331,13 @@ SWITCHES: dict[str, tuple[XTSwitchEntityDescription, ...]] = {
         XTSwitchEntityDescription(
             key=XTDPCode.IDVERIFICATIONSET,
             translation_key="id_verification_set",
+            entity_category=EntityCategory.CONFIG,
+        ),
+    ),
+    "wk": (
+        XTSwitchEntityDescription(
+            key=XTDPCode.SWITCH,
+            translation_key="switch",
             entity_category=EntityCategory.CONFIG,
         ),
     ),

@@ -612,6 +612,7 @@ class XTDPCode(StrEnum):
     TEMP2 = "Temp"  # Temperature setting
     TEMPCHANGER = "TempChanger"
     TEMPERATURE = "temperature"
+    TEMPERATURE2 = "Temperature"
     TEMPER_ALARM = "temper_alarm"  # Tamper alarm
     TEMPSC = "TempSc"
     TEMPSET = "TempSet"
