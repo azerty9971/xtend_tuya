@@ -317,6 +317,27 @@
       }
     },
     "number": {
+      "maxhum_set": {
+        "name": "Maximum humidity"
+      },
+      "minihum_set": {
+        "name": "Minimum humidity"
+      },
+      "hum_sensitivity": {
+        "name": "Humidity sensitivity"
+      },
+      "maxtemp_set": {
+        "name": "Maximum temperature"
+      },
+      "minitemp_set": {
+        "name": "Minimum temperature"
+      },
+      "temp_sensitivity": {
+        "name": "Temperature sensitivity"
+      },
+      "report_sensitivity": {
+        "name": "Report sensitivity"
+      },
       "b_detection_distance_max": {
         "name": "Max breath detection distance"
       },
@@ -1134,6 +1155,88 @@
       }
     },
     "sensor": {
+      "frequency": {
+        "name": "Frequency"
+      },
+      "reactivepower": {
+        "name": "Reactive power"
+      },
+      "reactivepowera": {
+        "name": "Reactive power A"
+      },
+      "reactivepowerb": {
+        "name": "Reactive power B"
+      },
+      "reactivepowerc": {
+        "name": "Reactive power C"
+      },
+      "powerfactora": {
+        "name": "Power factor A"
+      },
+      "powerfactorb": {
+        "name": "Power factor B"
+      },
+      "powerfactorc": {
+        "name": "Power factor C"
+      },
+      "currenta": {
+        "name": "Current A"
+      },
+      "currentb": {
+        "name": "Current B"
+      },
+      "currentc": {
+        "name": "Current C"
+      },
+      "activepower": {
+        "name": "Active power"
+      },
+      "activepowera": {
+        "name": "Active power A"
+      },
+      "activepowerb": {
+        "name": "Active power B"
+      },
+      "activepowerc": {
+        "name": "Active power C"
+      },
+      "energyconsumeda": {
+        "name": "Energy consumed A"
+      },
+      "energyconsumedb": {
+        "name": "Energy consumed B"
+      },
+      "energyconsumedc": {
+        "name": "Energy consumed C"
+      },
+      "gross_generation_a":
+      {
+        "name": "Gross generation A"
+      },
+      "gross_generation_b":
+      {
+        "name": "Gross generation B"
+      },
+      "gross_generation_c":
+      {
+        "name": "Gross generation C"
+      },
+      "temp_alarm": {
+        "name": "Temperature alarm",
+        "state": {
+          "loweralarm": "Low temperature",
+          "upperalarm": "High temperature",
+          "cancel": "None"
+        }
+      },
+      "hum_alarm": {
+        "name": "Humidity alarm",
+        "state": {
+          "loweralarm": "Low humidity",
+          "upperalarm": "High humidity",
+          "cancel": "None"
+        }
+      },
       "product_specifications": {
         "name": "Product specification",
         "state": {
@@ -1745,7 +1848,12 @@
         "name": "Voltage"
       },
       "battery_state": {
-        "name": "Battery state"
+        "name": "Battery state",
+        "state": {
+          "low": "Low",
+          "middle": "Middle",
+          "high": "High"
+        }
       },
       "gas": {
         "name": "Gas"
@@ -1882,6 +1990,9 @@
       }
     },
     "switch": {
+      "key_rec": {
+        "name": "Key tone"
+      },
       "switch_enabled": {
         "name": "Switch enabled"
       },
