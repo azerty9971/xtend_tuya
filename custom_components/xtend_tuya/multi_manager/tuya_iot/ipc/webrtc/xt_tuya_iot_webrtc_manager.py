@@ -538,10 +538,13 @@ class XTIOTWebRTCManager:
                 break
             searched_offset = end_offset
             fingerprint_orig_str = answer_sdp[offset:end_offset]
+            LOGGER.warning(f"Full fingerprint: {fingerprint_orig_str}")
             offset = fingerprint_orig_str.find(" ")
             if offset != -1:
                 fingerprint_orig_str = fingerprint_orig_str[offset:]
+            LOGGER.warning(f"Restricted fingerprint: {fingerprint_orig_str}")
             fingerprint_new_str = fingerprint_orig_str.upper()
+            LOGGER.warning(f"New fingerprint: {fingerprint_new_str}")
             answer_sdp = answer_sdp.replace(fingerprint_orig_str, fingerprint_new_str)
         return answer_sdp
     
