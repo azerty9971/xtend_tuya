@@ -42,6 +42,7 @@ class XTIOTWebRTCSession:
     message_callback: WebRTCSendMessage | None = None
     offer_candidate: list[str]
     hass: HomeAssistant | None
+    offer_sent: bool = False
 
     def __init__(self, ttl: int = 600) -> None:
         self.webrtc_config = {}
@@ -54,6 +55,7 @@ class XTIOTWebRTCSession:
         self.has_all_candidates = False
         self.message_callback = None
         self.offer_candidate = []
+        self.offer_sent = False
     
     def __repr__(self) -> str:
         answer = ""
@@ -417,12 +419,22 @@ class XTIOTWebRTCManager:
         self.set_sdp_offer(session_id, offer_changed)
         sdp_offer_payload = self.format_offer_payload(session_id, offer_sdp, device)
         self.send_to_ipc_mqtt(session_id, device, json.dumps(sdp_offer_payload))
+        session_data.offer_sent = True
+        for candidate in session_data.offer_candidate:
+            if candidate_payload := self.format_offer_candidate(session_id, candidate, device):
+                self.send_to_ipc_mqtt(session_id, device, json.dumps(candidate_payload))
 
     async def async_on_webrtc_candidate(
         self, session_id: str, candidate: RTCIceCandidateInit, device: XTDevice
     ) -> None:
-        if payload := self.format_offer_candidate(session_id, candidate.candidate, device):
-            self.send_to_ipc_mqtt(session_id, device, json.dumps(payload))
+        session_data = self.get_webrtc_session(session_id)
+        if session_data is None:
+            return None
+        if session_data.offer_sent == False:
+            session_data.offer_candidate.append(candidate.candidate)
+        else:
+            if payload := self.format_offer_candidate(session_id, candidate.candidate, device):
+                self.send_to_ipc_mqtt(session_id, device, json.dumps(payload))
     
     def get_candidates_from_offer(self, session_id: str, offer_sdp: str) -> str:
         session_data = self.get_webrtc_session(session_id)
