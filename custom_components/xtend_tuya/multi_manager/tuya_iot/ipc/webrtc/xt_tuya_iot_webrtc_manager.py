@@ -518,7 +518,7 @@ class XTIOTWebRTCManager:
             offer_sdp = offer_sdp.replace(candidate_str, "")
         return offer_sdp
     
-    def format_offer_payload(self, session_id: str, offer_sdp: str, device: XTDevice, channel: str = "low") -> dict[str, Any] | None:
+    def format_offer_payload(self, session_id: str, offer_sdp: str, device: XTDevice, channel: str = "1") -> dict[str, Any] | None:
         if webrtc_config := self.get_config(device.id, session_id):
             return {
                 "protocol":302,
@@ -526,19 +526,19 @@ class XTIOTWebRTCManager:
                 "t":int(time.time()),
                 "data":{
                     "header":{
+                        "type":"offer",
                         "from":f"{self.ipc_manager.get_from()}",
                         "to":f"{device.id}",
-                        #"sub_dev_id":"",
+                        "sub_dev_id":"",
                         "sessionid":f"{session_id}",
                         "moto_id":f"{webrtc_config.get("moto_id", "!!!MOTO_ID_NOT_FOUND!!!")}",
-                        #"tid":"",
-                        "type":"offer",
+                        "tid":"",
                     },
                     "msg":{
-                        "sdp":f"{offer_sdp}",
-                        "auth":f"{webrtc_config.get("auth", "!!!AUTH_NOT_FOUND!!!")}",
                         "mode":"webrtc",
+                        "sdp":f"{offer_sdp}",
                         "stream_type":self._get_stream_type(device.id, session_id, channel),
+                        "auth":f"{webrtc_config.get("auth", "!!!AUTH_NOT_FOUND!!!")}",
                     }
                 },
             }
