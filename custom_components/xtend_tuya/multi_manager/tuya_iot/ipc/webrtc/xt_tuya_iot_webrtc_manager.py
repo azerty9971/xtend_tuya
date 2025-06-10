@@ -474,9 +474,9 @@ class XTIOTWebRTCManager:
         if session_data is None:
             return None
         if session_data.offer_sent == False:
-            session_data.offer_candidate.append(candidate.candidate)
+            session_data.offer_candidate.append(f"a={candidate.candidate}")
         else:
-            if payload := self.format_offer_candidate(session_id, candidate.candidate, device):
+            if payload := self.format_offer_candidate(session_id, f"a={candidate.candidate}", device):
                 self.send_to_ipc_mqtt(session_id, device, json.dumps(payload))
     
     def get_candidates_from_offer(self, session_id: str, offer_sdp: str) -> str:
