@@ -174,7 +174,7 @@ class XTIOTWebRTCManager:
                 self.set_config(session_id, result)
             else:
                 self.set_config(device_id, result)
-            #LOGGER.warning(f"WebRTC Config: {result}")
+            LOGGER.warning(f"WebRTC Config: {result}")
             return result
         return None
     
