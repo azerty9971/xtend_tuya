@@ -102,7 +102,9 @@ class XTIOTWebRTCManager:
         self._create_session_if_necessary(session_id)
         self.sdp_exchange[session_id].answer = answer
         if callback := self.sdp_exchange[session_id].message_callback:
-            callback(WebRTCAnswer(answer=f"{answer.get("sdp", "")}"))
+            sdp_answer = answer.get("sdp", "")
+            LOGGER.warning(f"SDP Answer {sdp_answer}")
+            callback(WebRTCAnswer(answer=sdp_answer))
     
     def add_sdp_answer_candidate(self, session_id: str | None, candidate: dict) -> None:
         if session_id is None:
