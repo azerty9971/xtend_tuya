@@ -74,7 +74,7 @@ async def async_setup_entry(
     async_discover_device([*hass_data.manager.device_map])
 
     for entity in entities:
-        await hass.async_add_executor_job(entity.get_webrtc_config)
+        await entity.get_webrtc_config()
 
     entry.async_on_unload(
         async_dispatcher_connect(hass, TUYA_DISCOVERY_NEW, async_discover_device)
@@ -103,8 +103,7 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         if self.iot_manager is None:
             self._supports_native_sync_webrtc = False
             self._supports_native_async_webrtc = False
-        else:
-            pass
+
     
     @staticmethod
     def should_entity_be_added(hass: HomeAssistant, device: XTDevice, multi_manager: MultiManager) -> bool:
