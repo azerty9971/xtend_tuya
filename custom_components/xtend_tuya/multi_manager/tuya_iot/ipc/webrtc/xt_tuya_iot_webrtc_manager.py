@@ -602,7 +602,7 @@ class XTIOTWebRTCManager:
                     break
         return answer_sdp
     
-    def format_offer_payload(self, session_id: str, offer_sdp: str, device: XTDevice, channel: str = "1") -> dict[str, Any] | None:
+    def format_offer_payload(self, session_id: str, offer_sdp: str, device: XTDevice, channel: str = "high") -> dict[str, Any] | None:
         if webrtc_config := self.get_config(device.id, session_id):
             return {
                 "protocol":302,

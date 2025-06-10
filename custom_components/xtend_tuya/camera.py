@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 import functools
-from typing import Any
+from typing import Any, cast
 
 from webrtc_models import (
     RTCIceCandidateInit,
@@ -106,8 +106,7 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         if iot_manager := device_manager.get_account_by_name(account_name=MESSAGE_SOURCE_TUYA_IOT):
             self.iot_manager = iot_manager
         if self.iot_manager is None:
-            self._supports_native_sync_webrtc = False
-            self._supports_native_async_webrtc = False
+            self.disable_webrtc()
 
     
     @staticmethod
@@ -120,6 +119,10 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
             return True
         return False
     
+    def disable_webrtc(self):
+        self._supports_native_sync_webrtc = False
+        self._supports_native_async_webrtc = False
+
     async def get_webrtc_config(self) -> None:
         if self.iot_manager is None:
             return None
@@ -140,6 +143,14 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
             self.webrtc_configuration.configuration.ice_servers = ice_list
             self.webrtc_configuration.get_candidates_upfront = True
         if webrtc_config:
+            if audio_attribute := cast(dict | None, webrtc_config.get("audio_attributes")):
+                if call_mode := cast(list | None, audio_attribute.get("call_mode")):
+                    if 2 in call_mode:
+                        #Device supports 2 way audio
+                        pass
+            if not webrtc_config.get("supports_webrtc", False):
+                #Disable WebRTC in case we don't support it
+                self.disable_webrtc()
             LOGGER.warning(f"Returned RTC Config: {webrtc_config}")
 
     async def async_handle_async_webrtc_offer(
