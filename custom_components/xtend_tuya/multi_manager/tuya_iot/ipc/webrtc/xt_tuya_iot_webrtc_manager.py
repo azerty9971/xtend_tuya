@@ -535,6 +535,7 @@ class XTIOTWebRTCManager:
         #Find the send/receive mode of audio/video
         searched_offset = 0
         has_more_m_sections = True
+        modes_to_search: list[str] = [f"a=sendrecv{ENDLINE}", f"a=recvonly{ENDLINE}", f"a=sendonly{ENDLINE}"]
         while has_more_m_sections:
             offset = offer_sdp.find("m=", searched_offset)
             if offset == -1:
@@ -544,14 +545,11 @@ class XTIOTWebRTCManager:
                 has_more_m_sections = False
                 end_of_section = len(offer_sdp)
             audio_video = offer_sdp[offset+2:offset+7]
-            if offer_sdp.find("a=sendrecv", offset, end_of_section) != -1:
-                mode = "sendrecv"
-            elif offer_sdp.find("a=recvonly", offset, end_of_section) != -1:
-                mode = "recvonly"
-            else:
-                mode = "sendonly"
+            for mode_to_search in modes_to_search:
+                if offer_sdp.find(mode_to_search, offset, end_of_section) != -1:
+                    webrtc_session.modes[audio_video] = mode_to_search
+                    break
             searched_offset = end_of_section
-            webrtc_session.modes[audio_video] = mode
         LOGGER.warning(f"Stored modes: {webrtc_session.modes}")
         return offer_sdp
     
@@ -595,7 +593,7 @@ class XTIOTWebRTCManager:
             for mode_to_search in modes_to_search:
                 mode_offset = answer_sdp.find(mode_to_search, offset, end_of_section)
                 if mode_offset != -1:
-                    answer_sdp = answer_sdp[0:offset] + webrtc_session.modes.get(audio_video, mode_to_search) + answer_sdp[offset+len(mode_to_search):]
+                    answer_sdp = answer_sdp[0:mode_offset] + webrtc_session.modes.get(audio_video, mode_to_search) + answer_sdp[mode_offset+len(mode_to_search):]
                     break
         return answer_sdp
     
