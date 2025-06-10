@@ -583,6 +583,5 @@ class XTIOTWebRTCManager:
         for topic in self.ipc_manager.ipc_mq.mq_config.sink_topic.values():
             topic = topic.replace("{device_id}", device.id)
             topic = topic.replace("moto_id", webrtc_config.get("moto_id", "!!!MOTO_ID_NOT_FOUND!!!"))
-            LOGGER.warning(f"Sending to IPC topic: {topic}")
             #LOGGER.warning(f"Sending to IPC: {payload}")
             self.ipc_manager.publish_to_ipc_mqtt(topic, payload)

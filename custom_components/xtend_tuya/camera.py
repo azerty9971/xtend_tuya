@@ -140,7 +140,7 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
     ) -> None:
         if self.iot_manager is None:
             return await super().async_handle_async_webrtc_offer(offer_sdp, session_id, send_message)
-        LOGGER.warning(f"async_handle_async_webrtc_offer: offer sdp:  {offer_sdp}")
+        #LOGGER.warning(f"async_handle_async_webrtc_offer: offer sdp:  {offer_sdp}")
         #LOGGER.warning(f"async_handle_async_webrtc_offer: session_id: {session_id}")
         if self.wait_for_candidates:
             self.wait_for_candidates()
@@ -157,7 +157,7 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
     def send_closing_candidate(self, session_id: str, device: XTDevice , *_: Any) -> None:
         if self.iot_manager is None:
             return None
-        LOGGER.warning(f"send_closing_candidate")
+        #LOGGER.warning(f"send_closing_candidate")
         self.iot_manager.on_webrtc_candidate(session_id, RTCIceCandidateInit(candidate=""), device)
 
     async def async_on_webrtc_candidate(
@@ -166,7 +166,7 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         """Handle a WebRTC candidate."""
         if self.iot_manager is None:
             return await super().async_on_webrtc_candidate(session_id, candidate)
-        LOGGER.warning(f"async_on_webrtc_candidate: candidate:  {candidate}")
+        #LOGGER.warning(f"async_on_webrtc_candidate: candidate:  {candidate}")
         #LOGGER.warning(f"async_on_webrtc_candidate: session_id: {session_id}")
         return await self.iot_manager.async_on_webrtc_candidate(session_id, candidate, self.device)
     

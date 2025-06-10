@@ -13,7 +13,7 @@ class XTIOTIPCListener:
         self.ipc_manager = ipc_manager
     
     def handle_message(self, msg: dict):
-        LOGGER.warning(f"IPC Handle message: {msg}")
+        LOGGER.warning(f"MQTT <= {msg}")
         protocol = msg.get("protocol")
         if not protocol:
             return
