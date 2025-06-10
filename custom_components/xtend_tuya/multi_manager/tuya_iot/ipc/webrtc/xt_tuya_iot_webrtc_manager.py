@@ -461,10 +461,13 @@ class XTIOTWebRTCManager:
         for candidate in session_data.offer_candidate:
             if candidate_payload := self.format_offer_candidate(session_id, candidate, device):
                 self.send_to_ipc_mqtt(session_id, device, json.dumps(candidate_payload))
-        #time.sleep(1)
-        self.send_to_ipc_mqtt(session_id, device, json.dumps(self.format_offer_candidate(session_id, "", device)))
 
     async def async_on_webrtc_candidate(
+        self, session_id: str, candidate: RTCIceCandidateInit, device: XTDevice
+    ) -> None:
+        self.on_webrtc_candidate(session_id, candidate, device)
+    
+    def on_webrtc_candidate(
         self, session_id: str, candidate: RTCIceCandidateInit, device: XTDevice
     ) -> None:
         session_data = self.get_webrtc_session(session_id)

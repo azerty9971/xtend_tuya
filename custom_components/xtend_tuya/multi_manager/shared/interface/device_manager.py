@@ -155,6 +155,11 @@ class XTDeviceManagerInterface(ABC):
         self, session_id: str, candidate: RTCIceCandidateInit, device: XTDevice
     ) -> None:
         return None
+    
+    def on_webrtc_candidate(
+        self, session_id: str, candidate: RTCIceCandidateInit, device: XTDevice
+    ) -> None:
+        return None
 
     async def async_get_webrtc_ice_servers(
         self, device: XTDevice, format: str, hass: HomeAssistant

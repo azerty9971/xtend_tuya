@@ -424,3 +424,10 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
         if self.iot_account is None:
             return None
         return await self.iot_account.device_manager.ipc_manager.webrtc_manager.async_on_webrtc_candidate(session_id, candidate, device)
+    
+    def on_webrtc_candidate(
+        self, session_id: str, candidate: RTCIceCandidateInit, device: XTDevice
+    ) -> None:
+        if self.iot_account is None:
+            return None
+        return self.iot_account.device_manager.ipc_manager.webrtc_manager.on_webrtc_candidate(session_id, candidate, device)

@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import json
+import functools
+from typing import Any
 
 from webrtc_models import (
     RTCIceCandidateInit,
@@ -10,7 +12,8 @@ from webrtc_models import (
 )
 
 from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant, callback
+from homeassistant.core import HomeAssistant, callback, HassJob, HassJobType
+from homeassistant.helpers.event import async_call_later
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.components.camera.webrtc import WebRTCSendMessage, WebRTCClientConfiguration
@@ -99,6 +102,7 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         self.iot_manager: XTDeviceManagerInterface | None = None
         self.hass = hass
         self.webrtc_configuration: WebRTCClientConfiguration | None = None
+        self.wait_for_candidates = None
         if iot_manager := device_manager.get_account_by_name(account_name=MESSAGE_SOURCE_TUYA_IOT):
             self.iot_manager = iot_manager
         if self.iot_manager is None:
@@ -138,8 +142,24 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
             return await super().async_handle_async_webrtc_offer(offer_sdp, session_id, send_message)
         LOGGER.warning(f"async_handle_async_webrtc_offer: offer sdp:  {offer_sdp}")
         #LOGGER.warning(f"async_handle_async_webrtc_offer: session_id: {session_id}")
+        if self.wait_for_candidates:
+            self.wait_for_candidates()
+        self.wait_for_candidates = async_call_later(
+            self.hass, 
+            1, 
+            HassJob(
+                functools.partial(self.send_closing_candidate, session_id, self.device),
+                job_type=HassJobType.Callback,
+                cancel_on_shutdown=True,
+            ))
         return await self.iot_manager.async_handle_async_webrtc_offer(offer_sdp, session_id, send_message, self.device, self.hass)
-    
+
+    def send_closing_candidate(self, session_id: str, device: XTDevice , *_: Any) -> None:
+        if self.iot_manager is None:
+            return None
+        LOGGER.warning(f"send_closing_candidate")
+        self.iot_manager.on_webrtc_candidate(session_id, RTCIceCandidateInit(candidate=""), device)
+
     async def async_on_webrtc_candidate(
         self, session_id: str, candidate: RTCIceCandidateInit
     ) -> None:
