@@ -605,6 +605,7 @@ class XTIOTWebRTCManager:
             
             #Change returned RTPMap from 103 to 126 to have a matching video stream
             answer_sdp = answer_sdp.replace(":103 ", ":126 ")
+            answer_sdp = answer_sdp.replace(f"a=rtcp-fb:126 nack pli{ENDLINE}", f"a=rtcp-fb:126 nack pli{ENDLINE}a=rtcp-fb:126 transport-cc{ENDLINE}")
         return answer_sdp
     
     def format_offer_payload(self, session_id: str, offer_sdp: str, device: XTDevice, channel: str = "high") -> dict[str, Any] | None:
