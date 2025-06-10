@@ -443,7 +443,7 @@ class XTIOTWebRTCManager:
             return None
         session_data.message_callback = send_message
         session_data.hass = hass
-        await self.async_get_config(device.id, session_id)
+        await self.async_get_config(device.id, session_id, hass)
         self.set_original_sdp_offer(session_id, offer_sdp)
         offer_changed = self.get_candidates_from_offer(session_id, offer_sdp)
         self.set_sdp_offer(session_id, offer_changed)
