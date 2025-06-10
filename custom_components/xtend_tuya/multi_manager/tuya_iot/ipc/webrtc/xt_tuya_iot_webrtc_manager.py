@@ -579,7 +579,7 @@ class XTIOTWebRTCManager:
         
         searched_offset = 0
         has_more_m_sections = True
-        modes_to_search: list[str] = [f"a=sendrecv{ENDLINE}", f"a=recvonly{ENDLINE}", f"a=sendonly{ENDLINE}"]
+        modes_to_search: dict[str, str] = {f"a=sendrecv{ENDLINE}": f"a=sendrecv{ENDLINE}", f"a=recvonly{ENDLINE}": f"a=sendonly{ENDLINE}", f"a=sendonly{ENDLINE}": f"a=recvonly{ENDLINE}"}
         while has_more_m_sections:
             offset = answer_sdp.find("m=", searched_offset)
             if offset == -1:
@@ -593,7 +593,12 @@ class XTIOTWebRTCManager:
             for mode_to_search in modes_to_search:
                 mode_offset = answer_sdp.find(mode_to_search, offset, end_of_section)
                 if mode_offset != -1:
-                    answer_sdp = answer_sdp[0:mode_offset] + webrtc_session.modes.get(audio_video, mode_to_search) + answer_sdp[mode_offset+len(mode_to_search):]
+                    new_mode = webrtc_session.modes.get(audio_video, None)
+                    if new_mode is not None:
+                        new_mode = modes_to_search.get(new_mode, new_mode)
+                    else:
+                        new_mode = mode_to_search
+                    answer_sdp = answer_sdp[0:mode_offset] + new_mode + answer_sdp[mode_offset+len(mode_to_search):]
                     break
         return answer_sdp
     
