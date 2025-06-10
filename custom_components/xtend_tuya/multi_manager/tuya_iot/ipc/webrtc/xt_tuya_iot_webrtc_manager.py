@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, cast
 from datetime import datetime, timedelta
 import time
 import json
@@ -107,11 +107,11 @@ class XTIOTWebRTCManager:
             return
         self._create_session_if_necessary(session_id)
         self.sdp_exchange[session_id].answer_candidates.append(candidate)
-        candidate_str = candidate.get("candidate", "")
+        candidate_str = cast(str, candidate.get("candidate", ""))
         if candidate_str == "":
             self.sdp_exchange[session_id].has_all_candidates = True
         if callback := self.sdp_exchange[session_id].message_callback:
-            callback(WebRTCCandidate(candidate=RTCIceCandidate(candidate=candidate_str)))
+            callback(WebRTCCandidate(candidate=RTCIceCandidate(candidate=candidate_str.removeprefix("a="))))
 
     def set_config(self, session_id: str, config: dict[str, Any]):
         self._create_session_if_necessary(session_id)
