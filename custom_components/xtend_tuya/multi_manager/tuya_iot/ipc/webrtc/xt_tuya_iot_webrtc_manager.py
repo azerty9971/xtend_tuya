@@ -605,6 +605,7 @@ class XTIOTWebRTCManager:
             
             #Change returned RTPMap from 103 to 126 to have a matching video stream
             answer_sdp = answer_sdp.replace(":103 ", ":126 ")
+            answer_sdp = answer_sdp.replace("a=fmtp:126 level-asymmetry-allowed=1;packetization-mode=1;profile-level-id=42001f", "a=fmtp:126 profile-level-id=42e01f;level-asymmetry-allowed=1;packetization-mode=1")
             answer_sdp = answer_sdp.replace(f"a=rtcp-fb:126 nack pli{ENDLINE}", f"a=rtcp-fb:126 nack pli{ENDLINE}a=rtcp-fb:126 transport-cc{ENDLINE}")
         return answer_sdp
     
