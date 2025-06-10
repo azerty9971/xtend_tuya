@@ -577,29 +577,34 @@ class XTIOTWebRTCManager:
             fingerprint_new_str = fingerprint_orig_str.upper()
             answer_sdp = answer_sdp.replace(fingerprint_orig_str, fingerprint_new_str)
         
-        searched_offset = 0
-        has_more_m_sections = True
-        modes_to_search: dict[str, str] = {f"a=sendrecv{ENDLINE}": f"a=sendrecv{ENDLINE}", f"a=recvonly{ENDLINE}": f"a=sendonly{ENDLINE}", f"a=sendonly{ENDLINE}": f"a=recvonly{ENDLINE}"}
-        while has_more_m_sections:
-            offset = answer_sdp.find("m=", searched_offset)
-            if offset == -1:
-                break
-            end_of_section = answer_sdp.find("m=", offset+1)
-            if end_of_section == -1:
-                has_more_m_sections = False
-                end_of_section = len(answer_sdp)
-            audio_video = answer_sdp[offset+2:offset+7]
-            searched_offset = end_of_section
-            for mode_to_search in modes_to_search:
-                mode_offset = answer_sdp.find(mode_to_search, offset, end_of_section)
-                if mode_offset != -1:
-                    new_mode = webrtc_session.modes.get(audio_video, None)
-                    if new_mode is not None:
-                        new_mode = modes_to_search.get(new_mode, new_mode)
-                    else:
-                        new_mode = mode_to_search
-                    answer_sdp = answer_sdp[0:mode_offset] + new_mode + answer_sdp[mode_offset+len(mode_to_search):]
+        if webrtc_session.offer is not None and webrtc_session.offer.find("mozilla") != -1:
+            #Fix send/receive mode for Firefox
+            searched_offset = 0
+            has_more_m_sections = True
+            modes_to_search: dict[str, str] = {f"a=sendrecv{ENDLINE}": f"a=sendrecv{ENDLINE}", f"a=recvonly{ENDLINE}": f"a=sendonly{ENDLINE}", f"a=sendonly{ENDLINE}": f"a=recvonly{ENDLINE}"}
+            while has_more_m_sections:
+                offset = answer_sdp.find("m=", searched_offset)
+                if offset == -1:
                     break
+                end_of_section = answer_sdp.find("m=", offset+1)
+                if end_of_section == -1:
+                    has_more_m_sections = False
+                    end_of_section = len(answer_sdp)
+                audio_video = answer_sdp[offset+2:offset+7]
+                searched_offset = end_of_section
+                for mode_to_search in modes_to_search:
+                    mode_offset = answer_sdp.find(mode_to_search, offset, end_of_section)
+                    if mode_offset != -1:
+                        new_mode = webrtc_session.modes.get(audio_video, None)
+                        if new_mode is not None:
+                            new_mode = modes_to_search.get(new_mode, new_mode)
+                        else:
+                            new_mode = mode_to_search
+                        answer_sdp = answer_sdp[0:mode_offset] + new_mode + answer_sdp[mode_offset+len(mode_to_search):]
+                        break
+            
+            #Change returned RTPMap from 103 to 126 to have a matching video stream
+            answer_sdp = answer_sdp.replace(":103 ", ":126 ")
         return answer_sdp
     
     def format_offer_payload(self, session_id: str, offer_sdp: str, device: XTDevice, channel: str = "high") -> dict[str, Any] | None:
