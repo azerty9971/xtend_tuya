@@ -527,14 +527,16 @@ class XTIOTWebRTCManager:
     
     def fix_anwser(self, answer_sdp: str) -> str:
         fingerprint_found = True
+        searched_offset: int = -1
         while fingerprint_found:
-            offset = answer_sdp.find("a=fingerprint:")
+            offset = answer_sdp.find("a=fingerprint:", searched_offset)
             if offset == -1:
                 fingerprint_found = False
                 break
             end_offset = answer_sdp.find(ENDLINE, offset) + len(ENDLINE)
             if end_offset <= offset:
                 break
+            searched_offset = end_offset
             fingerprint_orig_str = answer_sdp[offset:end_offset]
             offset = fingerprint_orig_str.find(" ")
             if offset != -1:
