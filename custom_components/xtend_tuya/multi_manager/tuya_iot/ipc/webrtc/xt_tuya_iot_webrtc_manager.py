@@ -31,6 +31,8 @@ from ....shared.shared_classes import (
     XTDevice,
 )
 
+ENDLINE = "\r\n"
+
 class XTIOTWebRTCSession:
     webrtc_config: dict[str, Any] | None
     original_offer: str | None
@@ -111,7 +113,7 @@ class XTIOTWebRTCManager:
         if candidate_str == "":
             self.sdp_exchange[session_id].has_all_candidates = True
         if callback := self.sdp_exchange[session_id].message_callback:
-            callback(WebRTCCandidate(candidate=RTCIceCandidate(candidate=candidate_str.removeprefix("a="))))
+            callback(WebRTCCandidate(candidate=RTCIceCandidate(candidate=candidate_str.removeprefix("a=").removesuffix(ENDLINE))))
 
     def set_config(self, session_id: str, config: dict[str, Any]):
         self._create_session_if_necessary(session_id)
@@ -262,7 +264,6 @@ class XTIOTWebRTCManager:
     def get_sdp_answer(self, device_id: str, session_id: str, sdp_offer: str, channel: str, wait_for_answers: int = 5) -> str | None:
         sleep_step = 0.01
         sleep_count: int = int(wait_for_answers / sleep_step)
-        ENDLINE = "\r\n"
         self.set_original_sdp_offer(session_id, sdp_offer)
         if webrtc_config := self.get_config(device_id, session_id):
             auth_token = webrtc_config.get("auth")
@@ -488,7 +489,6 @@ class XTIOTWebRTCManager:
         if session_data is None:
             return sdp_offer
         offer_candidates = []
-        ENDLINE = "\r\n"
         candidate_found = True
         while candidate_found:
             offset = sdp_offer.find("a=candidate:")
@@ -507,7 +507,6 @@ class XTIOTWebRTCManager:
         return sdp_offer
     
     def fix_offer(self, offer_sdp: str) -> str:
-        ENDLINE = "\r\n"
         extmap_found = True
         while extmap_found:
             offset = offer_sdp.find("a=extmap:")
