@@ -473,10 +473,13 @@ class XTIOTWebRTCManager:
         session_data = self.get_webrtc_session(session_id)
         if session_data is None:
             return None
+        candidate_str = candidate.candidate
+        if candidate_str != "":
+            candidate_str = f"a={candidate.candidate}"
         if session_data.offer_sent == False:
-            session_data.offer_candidate.append(f"a={candidate.candidate}")
+            session_data.offer_candidate.append(candidate_str)
         else:
-            if payload := self.format_offer_candidate(session_id, f"a={candidate.candidate}", device):
+            if payload := self.format_offer_candidate(session_id, candidate_str, device):
                 self.send_to_ipc_mqtt(session_id, device, json.dumps(payload))
     
     def get_candidates_from_offer(self, session_id: str, offer_sdp: str) -> str:
