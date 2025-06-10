@@ -32,7 +32,7 @@ from ....shared.shared_classes import (
 )
 
 class XTIOTWebRTCSession:
-    webrtc_config: dict[str, Any]
+    webrtc_config: dict[str, Any] | None
     original_offer: str | None
     offer: str | None
     answer: dict
@@ -45,7 +45,7 @@ class XTIOTWebRTCSession:
     offer_sent: bool = False
 
     def __init__(self, ttl: int = 600) -> None:
-        self.webrtc_config = {}
+        self.webrtc_config = None
         self.original_offer = None
         self.offer = None
         self.answer = {}
@@ -138,7 +138,7 @@ class XTIOTWebRTCManager:
     async def async_get_config(self, device_id: str, session_id: str | None, hass: HomeAssistant | None = None) -> dict | None:
         local_hass = hass
         if current_exchange := self.get_webrtc_session(session_id):
-            if current_exchange.webrtc_config:
+            if current_exchange.webrtc_config is not None:
                 return current_exchange.webrtc_config
             if current_exchange.hass is not None:
                 local_hass = hass
@@ -149,8 +149,12 @@ class XTIOTWebRTCManager:
 
     def get_config(self, device_id: str, session_id: str | None) -> dict | None:
         if current_exchange := self.get_webrtc_session(session_id):
-            if current_exchange.webrtc_config:
+            if current_exchange.webrtc_config is not None:
                 return current_exchange.webrtc_config
+        elif session_id is not None:
+            if current_exchange := self.get_webrtc_session(device_id):
+                if current_exchange.webrtc_config is not None:
+                    self.set_config(session_id, current_exchange.webrtc_config)
         return self._get_config_from_cloud(device_id, session_id)
     
     def _get_config_from_cloud(self, device_id: str, session_id: str | None) -> dict | None:
@@ -159,6 +163,8 @@ class XTIOTWebRTCManager:
             result = webrtc_config.get("result", {})
             if session_id is not None:
                 self.set_config(session_id, result)
+            else:
+                self.set_config(device_id, result)
             LOGGER.warning(f"WebRTC Config: {result}")
             return result
         return None

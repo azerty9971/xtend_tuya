@@ -55,12 +55,13 @@ async def async_setup_entry(
     for new_descriptor in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(Platform.CAMERA):
         merged_categories = tuple(append_lists(list(merged_categories), new_descriptor))
 
+    entities: list[XTCameraEntity] = []
+
     @callback
     def async_discover_device(device_map) -> None:
         """Discover and add a discovered Tuya camera."""
         if hass_data.manager is None:
             return
-        entities: list[XTCameraEntity] = []
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
@@ -71,6 +72,9 @@ async def async_setup_entry(
         async_add_entities(entities)
 
     async_discover_device([*hass_data.manager.device_map])
+
+    for entity in entities:
+        await hass.async_add_executor_job(entity.get_webrtc_config)
 
     entry.async_on_unload(
         async_dispatcher_connect(hass, TUYA_DISCOVERY_NEW, async_discover_device)
@@ -99,6 +103,8 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         if self.iot_manager is None:
             self._supports_native_sync_webrtc = False
             self._supports_native_async_webrtc = False
+        else:
+            pass
     
     @staticmethod
     def should_entity_be_added(hass: HomeAssistant, device: XTDevice, multi_manager: MultiManager) -> bool:
@@ -110,6 +116,13 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
             return True
         return False
     
+    async def get_webrtc_config(self) -> None:
+        if self.iot_manager is None:
+            return None
+        if ice_servers := await self.iot_manager.async_get_webrtc_ice_servers(self.device, "GO2RTC", self.hass):
+            self.webrtc_configuration = WebRTCClientConfiguration()
+            LOGGER.warning(f"Retrieved ICE servers: {ice_servers}")
+
     async def async_handle_async_webrtc_offer(
         self, offer_sdp: str, session_id: str, send_message: WebRTCSendMessage
     ) -> None:
@@ -132,12 +145,7 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
     @callback
     def _async_get_webrtc_client_configuration(self) -> WebRTCClientConfiguration:
         """Return the WebRTC client configuration adjustable per integration."""
-        if self.iot_manager is None:
+        if self.iot_manager is None or self.webrtc_configuration is None:
             return super()._async_get_webrtc_client_configuration()
         LOGGER.warning(f"_async_get_webrtc_client_configuration")
-        self.webrtc_configuration = WebRTCClientConfiguration()
         return self.webrtc_configuration
-    
-    async def async_create_stream(self) -> Stream | None:
-        LOGGER.warning(f"async_create_stream")
-        return await super().async_create_stream()

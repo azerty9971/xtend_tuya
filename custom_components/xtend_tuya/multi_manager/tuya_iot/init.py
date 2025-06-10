@@ -386,6 +386,13 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
             return None
         return hass.async_create_task(self.iot_account.device_manager.ipc_manager.webrtc_manager.async_get_ice_servers(device_id, session_id, format, hass)).result()
     
+    async def async_get_webrtc_ice_servers(
+        self, device: XTDevice, format: str, hass: HomeAssistant
+    ) -> str | None:
+        if self.iot_account is None:
+            return None
+        return await hass.async_add_executor_job(self.iot_account.device_manager.ipc_manager.webrtc_manager.get_ice_servers, device.id, None, format)
+
     def get_webrtc_exchange_debug(self, session_id: str) -> str | None:
         if self.iot_account is None:
             return None
