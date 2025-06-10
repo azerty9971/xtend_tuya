@@ -163,7 +163,7 @@ class XTDeviceManagerInterface(ABC):
 
     async def async_get_webrtc_ice_servers(
         self, device: XTDevice, format: str, hass: HomeAssistant
-    ) -> str | None:
+    ) -> tuple[str, dict] | None:
         return None
     
     async def on_loading_finalized(self, hass: HomeAssistant, config_entry: XTConfigEntry, multi_manager: MultiManager):

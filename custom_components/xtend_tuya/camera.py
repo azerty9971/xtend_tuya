@@ -123,7 +123,12 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
     async def get_webrtc_config(self) -> None:
         if self.iot_manager is None:
             return None
-        if ice_servers := await self.iot_manager.async_get_webrtc_ice_servers(self.device, "GO2RTC", self.hass):
+        return_tuple = await self.iot_manager.async_get_webrtc_ice_servers(self.device, "GO2RTC", self.hass)
+        if return_tuple is None:
+            return None
+        ice_servers = return_tuple[0]
+        webrtc_config = return_tuple[1]
+        if ice_servers:
             self.webrtc_configuration = WebRTCClientConfiguration()
             ice_servers_dict: list[dict[str, str]] = json.loads(ice_servers)
             ice_list: list[RTCIceServer] = []
@@ -134,6 +139,8 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
                     ice_list.append(RTCIceServer(urls=url, username=username, credential=credential))
             self.webrtc_configuration.configuration.ice_servers = ice_list
             self.webrtc_configuration.get_candidates_upfront = True
+        if webrtc_config:
+            LOGGER.warning(f"Returned RTC Config: {webrtc_config}")
 
     async def async_handle_async_webrtc_offer(
         self, offer_sdp: str, session_id: str, send_message: WebRTCSendMessage
