@@ -88,7 +88,7 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         self.iot_manager: XTDeviceManagerInterface | None = None
         if iot_manager := device_manager.get_account_by_name(account_name=MESSAGE_SOURCE_TUYA_IOT):
             self.iot_manager = iot_manager
-        if self.iot_manager is not None:
+        if self.iot_manager is None:
             self._supports_native_sync_webrtc = False
             self._supports_native_async_webrtc = False
     
