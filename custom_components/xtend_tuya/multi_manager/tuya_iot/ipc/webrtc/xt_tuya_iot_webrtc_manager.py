@@ -159,6 +159,7 @@ class XTIOTWebRTCManager:
             result = webrtc_config.get("result", {})
             if session_id is not None:
                 self.set_config(session_id, result)
+            LOGGER.warning(f"WebRTC Config: {result}")
             return result
         return None
     
