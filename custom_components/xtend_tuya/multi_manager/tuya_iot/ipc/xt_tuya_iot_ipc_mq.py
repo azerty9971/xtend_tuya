@@ -36,6 +36,7 @@ class XTIOTOpenMQIPC(XTIOTOpenMQ):
         self.mq_config: XTIOTTuyaMQConfig | None = None
         self.link_id: str | None = f"tuya.ipc.{uuid.uuid1()}"
         self.class_id: str | None = "IPC"
+        self.topics: str | None = "ipc"
         super().__init__(api)
 
     def _on_message(self, mqttc: mqtt.Client, user_data: Any, msg: mqtt.MQTTMessage):
@@ -45,7 +46,7 @@ class XTIOTOpenMQIPC(XTIOTOpenMQ):
             listener(msg_dict)
     
     def _start(self, mq_config: TuyaMQConfig) -> mqtt.Client:
-        LOGGER.warning(f"Starting IPC MQTT")
+        LOGGER.warning(f"Starting IPC MQTT: {mq_config}")
         #mqttc = mqtt.Client(callback_api_version=mqtt_CallbackAPIVersion.VERSION2 ,client_id=mq_config.client_id)
         mqttc = mqtt.Client(client_id=mq_config.client_id)
         mqttc.username_pw_set(mq_config.username, mq_config.password)
