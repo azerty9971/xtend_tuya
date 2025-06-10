@@ -103,7 +103,7 @@ class XTIOTWebRTCManager:
         self.sdp_exchange[session_id].answer = answer
         if callback := self.sdp_exchange[session_id].message_callback:
             sdp_answer = answer.get("sdp", "")
-            sdp_answer = self.fix_anwser(sdp_answer)
+            sdp_answer = self.fix_answer(sdp_answer)
             LOGGER.warning(f"SDP Answer {sdp_answer}")
             callback(WebRTCAnswer(answer=sdp_answer))
     
@@ -525,9 +525,9 @@ class XTIOTWebRTCManager:
             offer_sdp = offer_sdp.replace(extmap_str, "")
         return offer_sdp
     
-    def fix_anwser(self, answer_sdp: str) -> str:
+    def fix_answer(self, answer_sdp: str) -> str:
         fingerprint_found = True
-        searched_offset: int = -1
+        searched_offset: int = 0
         while fingerprint_found:
             offset = answer_sdp.find("a=fingerprint:", searched_offset)
             if offset == -1:
