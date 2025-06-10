@@ -103,6 +103,7 @@ class XTIOTWebRTCManager:
         self.sdp_exchange[session_id].answer = answer
         if callback := self.sdp_exchange[session_id].message_callback:
             sdp_answer = answer.get("sdp", "")
+            sdp_answer = self.fix_anwser(sdp_answer)
             LOGGER.warning(f"SDP Answer {sdp_answer}")
             callback(WebRTCAnswer(answer=sdp_answer))
     
@@ -520,9 +521,27 @@ class XTIOTWebRTCManager:
             end_offset = offer_sdp.find(ENDLINE, offset) + len(ENDLINE)
             if end_offset <= offset:
                 break
-            candidate_str = offer_sdp[offset:end_offset]
-            offer_sdp = offer_sdp.replace(candidate_str, "")
+            extmap_str = offer_sdp[offset:end_offset]
+            offer_sdp = offer_sdp.replace(extmap_str, "")
         return offer_sdp
+    
+    def fix_anwser(self, answer_sdp: str) -> str:
+        fingerprint_found = True
+        while fingerprint_found:
+            offset = answer_sdp.find("a=fingerprint:")
+            if offset == -1:
+                fingerprint_found = False
+                break
+            end_offset = answer_sdp.find(ENDLINE, offset) + len(ENDLINE)
+            if end_offset <= offset:
+                break
+            fingerprint_orig_str = answer_sdp[offset:end_offset]
+            offset = fingerprint_orig_str.find(" ")
+            if offset != -1:
+                fingerprint_orig_str = fingerprint_orig_str[offset:]
+            fingerprint_new_str = fingerprint_orig_str.upper()
+            answer_sdp = answer_sdp.replace(fingerprint_orig_str, fingerprint_new_str)
+        return answer_sdp
     
     def format_offer_payload(self, session_id: str, offer_sdp: str, device: XTDevice, channel: str = "1") -> dict[str, Any] | None:
         if webrtc_config := self.get_config(device.id, session_id):
