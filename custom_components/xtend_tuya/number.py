@@ -10,7 +10,6 @@ from homeassistant.const import EntityCategory, Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-
 from homeassistant.components.number.const import (
     NumberMode,
 )
@@ -35,6 +34,78 @@ from .entity import (
 class XTNumberEntityDescription(TuyaNumberEntityDescription):
     """Describe an Tuya number entity."""
     pass
+
+TEMPERATURE_SENSORS:  tuple[XTNumberEntityDescription, ...] = (
+    XTNumberEntityDescription(
+        key=XTDPCode.TEMPSET,
+        translation_key="temp_set",
+        mode = NumberMode.SLIDER,
+        entity_category=EntityCategory.CONFIG,
+    ),
+    XTNumberEntityDescription(
+        key=XTDPCode.TEMP_SET_1,
+        translation_key="temp_set",
+        device_class=NumberDeviceClass.TEMPERATURE,
+        entity_category=EntityCategory.CONFIG,
+    ),
+    XTNumberEntityDescription(
+        key=XTDPCode.TEMPSC,
+        translation_key="tempsc",
+        mode = NumberMode.SLIDER,
+        entity_category=EntityCategory.CONFIG,
+    ),
+    XTNumberEntityDescription(
+        key=XTDPCode.TEMP_CALIBRATION,
+        translation_key="temp_calibration",
+        mode = NumberMode.SLIDER,
+        entity_category=EntityCategory.CONFIG,
+    ),
+    XTNumberEntityDescription(
+        key=XTDPCode.MAXTEMP_SET,
+        translation_key="maxtemp_set",
+        mode = NumberMode.SLIDER,
+        entity_category=EntityCategory.CONFIG,
+    ),
+    XTNumberEntityDescription(
+        key=XTDPCode.MINITEMP_SET,
+        translation_key="minitemp_set",
+        mode = NumberMode.SLIDER,
+        entity_category=EntityCategory.CONFIG,
+    ),
+    XTNumberEntityDescription(
+        key=XTDPCode.TEMP_SENSITIVITY,
+        translation_key="temp_sensitivity",
+        mode = NumberMode.SLIDER,
+        entity_category=EntityCategory.CONFIG,
+    ),
+)
+
+HUMIDITY_SENSORS: tuple[XTNumberEntityDescription, ...] = (
+    XTNumberEntityDescription(
+        key=XTDPCode.MAXHUM_SET,
+        translation_key="maxhum_set",
+        mode = NumberMode.SLIDER,
+        entity_category=EntityCategory.CONFIG,
+    ),
+    XTNumberEntityDescription(
+        key=XTDPCode.MINIHUM_SET,
+        translation_key="minihum_set",
+        mode = NumberMode.SLIDER,
+        entity_category=EntityCategory.CONFIG,
+    ),
+    XTNumberEntityDescription(
+        key=XTDPCode.HUM_SENSITIVITY,
+        translation_key="hum_sensitivity",
+        mode = NumberMode.SLIDER,
+        entity_category=EntityCategory.CONFIG,
+    ),
+    XTNumberEntityDescription(
+        key=XTDPCode.HUMIDITY_CALIBRATION,
+        translation_key="humidity_calibration",
+        mode = NumberMode.SLIDER,
+        entity_category=EntityCategory.CONFIG,
+    ),
+)
 
 TIMER_SENSORS: tuple[XTNumberEntityDescription, ...] = (
     XTNumberEntityDescription(
@@ -206,11 +277,13 @@ NUMBERS: dict[str, tuple[XTNumberEntityDescription, ...]] = {
             key=XTDPCode.NONE_DELAY_TIME_MIN,
             translation_key="none_delay_time_min",
             entity_category=EntityCategory.CONFIG,
+            entity_registry_enabled_default=False,
         ),
         XTNumberEntityDescription(
             key=XTDPCode.NONE_DELAY_TIME_SEC,
             translation_key="none_delay_time_sec",
             entity_category=EntityCategory.CONFIG,
+            entity_registry_enabled_default=False,
         ),
         XTNumberEntityDescription(
             key=XTDPCode.DETECTION_DISTANCE_MAX,
@@ -389,12 +462,6 @@ NUMBERS: dict[str, tuple[XTNumberEntityDescription, ...]] = {
     ),
     "mzj": (
         XTNumberEntityDescription(
-            key=XTDPCode.TEMPSET,
-            translation_key="temp_set",
-            mode = NumberMode.SLIDER,
-            entity_category=EntityCategory.CONFIG,
-        ),
-        XTNumberEntityDescription(
             key=XTDPCode.RECIPE,
             translation_key="recipe",
             entity_category=EntityCategory.CONFIG,
@@ -404,12 +471,8 @@ NUMBERS: dict[str, tuple[XTNumberEntityDescription, ...]] = {
             translation_key="set_time",
             entity_category=EntityCategory.CONFIG,
         ),
-        XTNumberEntityDescription(
-            key=XTDPCode.TEMPSC,
-            translation_key="tempsc",
-            mode = NumberMode.SLIDER,
-            entity_category=EntityCategory.CONFIG,
-        ),
+        *TEMPERATURE_SENSORS,
+        *HUMIDITY_SENSORS,
     ),
     "qccdz": (
         XTNumberEntityDescription(
@@ -452,24 +515,18 @@ NUMBERS: dict[str, tuple[XTNumberEntityDescription, ...]] = {
         ),
         *TIMER_SENSORS,
     ),
+    "wk": (
+        *TEMPERATURE_SENSORS,
+        *HUMIDITY_SENSORS,
+    ),
     "wnykq": (
         XTNumberEntityDescription(
             key=XTDPCode.BRIGHT_VALUE,
             translation_key="bright_value",
             entity_category=EntityCategory.CONFIG,
         ),
-        XTNumberEntityDescription(
-            key=XTDPCode.HUMIDITY_CALIBRATION,
-            translation_key="humidity_calibration",
-            mode = NumberMode.SLIDER,
-            entity_category=EntityCategory.CONFIG,
-        ),
-        XTNumberEntityDescription(
-            key=XTDPCode.TEMP_CALIBRATION,
-            translation_key="temp_calibration",
-            mode = NumberMode.SLIDER,
-            entity_category=EntityCategory.CONFIG,
-        ),
+        *TEMPERATURE_SENSORS,
+        *HUMIDITY_SENSORS,
     ),
     "ywcgq": (
         XTNumberEntityDescription(
@@ -497,14 +554,30 @@ NUMBERS: dict[str, tuple[XTNumberEntityDescription, ...]] = {
             entity_category=EntityCategory.CONFIG,
         ),
     ),
+    "zwjcy": (
+        XTNumberEntityDescription(
+            key=XTDPCode.REPORT_SENSITIVITY,
+            translation_key="report_sensitivity",
+            mode = NumberMode.SLIDER,
+            entity_category=EntityCategory.CONFIG,
+        ),
+        *TEMPERATURE_SENSORS,
+        *HUMIDITY_SENSORS,
+    )
 }
 
+#Lock duplicates
+NUMBERS["videolock"] = NUMBERS["jtmspro"]
+NUMBERS["jtmsbh"] = NUMBERS["jtmspro"]
 
 async def async_setup_entry(
     hass: HomeAssistant, entry: XTConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
     """Set up Tuya number dynamically through Tuya discovery."""
     hass_data = entry.runtime_data
+
+    if entry.runtime_data.multi_manager is None or hass_data.manager is None:
+        return
 
     merged_descriptors = NUMBERS
     for new_descriptor in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(Platform.NUMBER):
@@ -513,6 +586,8 @@ async def async_setup_entry(
     @callback
     def async_discover_device(device_map) -> None:
         """Discover and add a discovered Tuya number."""
+        if hass_data.manager is None:
+            return
         entities: list[XTNumberEntity] = []
         device_ids = [*device_map]
         for device_id in device_ids:
@@ -545,6 +620,7 @@ class XTNumberEntity(XTEntity, TuyaNumberEntity):
     ) -> None:
         """Init XT number."""
         super(XTNumberEntity, self).__init__(device, device_manager, description)
+        super(XTEntity, self).__init__(device, device_manager, description) # type: ignore
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description

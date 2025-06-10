@@ -32,6 +32,13 @@ class XTSwitchEntityDescription(TuyaSwitchEntityDescription, frozen_or_thawed=Tr
 # default instruction set of each category end up being a Switch.
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
 SWITCHES: dict[str, tuple[XTSwitchEntityDescription, ...]] = {
+    "cwwsq": (
+        XTSwitchEntityDescription(
+            key=XTDPCode.KEY_REC,
+            translation_key="key_rec",
+            entity_category=EntityCategory.CONFIG,
+        ),
+    ),
     "dbl": (
         XTSwitchEntityDescription(
             key=XTDPCode.SWITCH,
@@ -135,6 +142,13 @@ SWITCHES: dict[str, tuple[XTSwitchEntityDescription, ...]] = {
             translation_key="photo_again",
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False
+        ),
+    ),
+    "MPPT": (
+        XTSwitchEntityDescription(
+            key=XTDPCode.SWITCH,
+            translation_key="switch",
+            entity_category=EntityCategory.CONFIG,
         ),
     ),
     # Automatic cat litter box
@@ -320,6 +334,13 @@ SWITCHES: dict[str, tuple[XTSwitchEntityDescription, ...]] = {
             entity_category=EntityCategory.CONFIG,
         ),
     ),
+    "wk": (
+        XTSwitchEntityDescription(
+            key=XTDPCode.SWITCH,
+            translation_key="switch",
+            entity_category=EntityCategory.CONFIG,
+        ),
+    ),
     "wnykq": (
         XTSwitchEntityDescription(
             key=XTDPCode.POWERON,
@@ -348,12 +369,16 @@ SWITCHES: dict[str, tuple[XTSwitchEntityDescription, ...]] = {
 
 #Lock duplicates
 SWITCHES["videolock"] = SWITCHES["jtmspro"]
+SWITCHES["jtmsbh"] = SWITCHES["jtmspro"]
 
 async def async_setup_entry(
     hass: HomeAssistant, entry: XTConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
     """Set up tuya sensors dynamically through tuya discovery."""
     hass_data = entry.runtime_data
+
+    if entry.runtime_data.multi_manager is None or hass_data.manager is None:
+        return
 
     merged_descriptors = SWITCHES
     for new_descriptor in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(Platform.SWITCH):
@@ -362,6 +387,8 @@ async def async_setup_entry(
     @callback
     def async_discover_device(device_map) -> None:
         """Discover and add a discovered tuya sensor."""
+        if hass_data.manager is None:
+            return
         entities: list[XTSwitchEntity] = []
         device_ids = [*device_map]
         for device_id in device_ids:
@@ -394,6 +421,7 @@ class XTSwitchEntity(XTEntity, TuyaSwitchEntity):
     ) -> None:
         """Init TuyaHaSwitch."""
         super(XTSwitchEntity, self).__init__(device, device_manager, description)
+        super(XTEntity, self).__init__(device, device_manager, description) # type: ignore
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description

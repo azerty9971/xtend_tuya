@@ -28,6 +28,7 @@ from .const import (
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaLightEntity,
     TuyaLightEntityDescription,
+    TuyaDPCode,
 )
 from .entity import (
     XTEntity,
@@ -36,7 +37,12 @@ from .entity import (
 @dataclass(frozen=True)
 class XTLightEntityDescription(TuyaLightEntityDescription):
     """Describe an Tuya light entity."""
-    pass
+    brightness_max: TuyaDPCode | XTDPCode | None = None # type: ignore
+    brightness_min: TuyaDPCode | XTDPCode | None = None # type: ignore
+    brightness: TuyaDPCode | tuple[TuyaDPCode, ...] | XTDPCode | tuple[XTDPCode, ...] | None = None # type: ignore
+    color_data: TuyaDPCode | tuple[TuyaDPCode, ...] | XTDPCode | tuple[XTDPCode, ...] | None = None # type: ignore
+    color_mode: TuyaDPCode | XTDPCode | None = None # type: ignore
+    color_temp: TuyaDPCode | tuple[TuyaDPCode, ...] | XTDPCode | tuple[XTDPCode, ...] | None = None # type: ignore
 
 LIGHTS: dict[str, tuple[XTLightEntityDescription, ...]] = {
     "dbl": (
@@ -55,6 +61,9 @@ async def async_setup_entry(
     """Set up tuya light dynamically through tuya discovery."""
     hass_data = entry.runtime_data
 
+    if entry.runtime_data.multi_manager is None or hass_data.manager is None:
+        return
+
     merged_descriptors = LIGHTS
     for new_descriptor in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(Platform.LIGHT):
         merged_descriptors = merge_device_descriptors(merged_descriptors, new_descriptor)
@@ -62,6 +71,8 @@ async def async_setup_entry(
     @callback
     def async_discover_device(device_map):
         """Discover and add a discovered tuya light."""
+        if hass_data.manager is None:
+            return
         entities: list[XTLightEntity] = []
         device_ids = [*device_map]
         for device_id in device_ids:
@@ -105,6 +116,7 @@ class XTLightEntity(XTEntity, TuyaLightEntity):
                 if function_data := json.loads(values):
                     #LOGGER.warning(f"Failed light: {device}")
                     pass
+        super(XTEntity, self).__init__(device, device_manager, description) # type: ignore
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description

@@ -28,6 +28,9 @@ async def async_setup_entry(
 ) -> None:
     """Set up Tuya vacuum dynamically through Tuya discovery."""
     hass_data = entry.runtime_data
+
+    if entry.runtime_data.multi_manager is None or hass_data.manager is None:
+        return
     
     category_list: list[str] = []
     for new_descriptor in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(Platform.VACUUM):
@@ -36,6 +39,8 @@ async def async_setup_entry(
     @callback
     def async_discover_device(device_map) -> None:
         """Discover and add a discovered Tuya vacuum."""
+        if hass_data.manager is None:
+            return
         entities: list[XTVacuumEntity] = []
         device_ids = [*device_map]
         for device_id in device_ids:
@@ -57,5 +62,6 @@ class XTVacuumEntity(XTEntity, TuyaVacuumEntity):
     def __init__(self, device: XTDevice, device_manager: MultiManager) -> None:
         """Init Tuya vacuum."""
         super(XTVacuumEntity, self).__init__(device, device_manager)
+        super(XTEntity, self).__init__(device, device_manager) # type: ignore
         self.device = device
         self.device_manager = device_manager

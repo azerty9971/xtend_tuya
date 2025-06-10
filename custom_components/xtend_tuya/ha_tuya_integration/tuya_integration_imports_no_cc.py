@@ -1,17 +1,21 @@
+from homeassistant.components.alarm_control_panel import (
+    AlarmControlPanelEntityDescription as TuyaAlarmControlPanelEntityDescription,
+)
 from homeassistant.components.tuya.alarm_control_panel import (
         ALARM as ALARM_TUYA,  # noqa: F401
         TuyaAlarmEntity as TuyaAlarmEntity,
-        AlarmControlPanelEntityDescription as TuyaAlarmControlPanelEntityDescription,
     )
 from homeassistant.components.tuya.binary_sensor import (
         BINARY_SENSORS as BINARY_SENSORS_TUYA,  # noqa: F401
         TuyaBinarySensorEntity as TuyaBinarySensorEntity,
         TuyaBinarySensorEntityDescription as TuyaBinarySensorEntityDescription,
     )
+from homeassistant.components.button import (
+    ButtonEntityDescription as TuyaButtonEntityDescription,
+)
 from homeassistant.components.tuya.button import (
         BUTTONS as BUTTONS_TUYA,  # noqa: F401
         TuyaButtonEntity as TuyaButtonEntity,
-        ButtonEntityDescription as TuyaButtonEntityDescription,
     )
 from homeassistant.components.tuya.camera import (
         CAMERAS as CAMERAS_TUYA,  # noqa: F401
@@ -42,30 +46,38 @@ from homeassistant.components.tuya.light import (
         TuyaLightEntity as TuyaLightEntity,
         TuyaLightEntityDescription as TuyaLightEntityDescription,
     )
+from homeassistant.components.number import (
+    NumberEntityDescription as TuyaNumberEntityDescription,
+)
 from homeassistant.components.tuya.number import (
         NUMBERS as NUMBERS_TUYA,  # noqa: F401
         TuyaNumberEntity as TuyaNumberEntity,
-        NumberEntityDescription as TuyaNumberEntityDescription,
     )
+from homeassistant.components.select import (
+    SelectEntityDescription as TuyaSelectEntityDescription,
+)
 from homeassistant.components.tuya.select import (
         SELECTS as SELECTS_TUYA,  # noqa: F401
         TuyaSelectEntity as TuyaSelectEntity,
-        SelectEntityDescription as TuyaSelectEntityDescription,
     )
 from homeassistant.components.tuya.sensor import (
         SENSORS as SENSORS_TUYA,  # noqa: F401
         TuyaSensorEntity as TuyaSensorEntity,
         TuyaSensorEntityDescription as TuyaSensorEntityDescription,
     )
+from homeassistant.components.siren import (
+    SirenEntityDescription as TuyaSirenEntityDescription,
+)
 from homeassistant.components.tuya.siren import (
         SIRENS as SIRENS_TUYA,  # noqa: F401
         TuyaSirenEntity as TuyaSirenEntity,
-        SirenEntityDescription as TuyaSirenEntityDescription,
     )
+from homeassistant.components.switch import (
+    SwitchEntityDescription as TuyaSwitchEntityDescription,
+)
 from homeassistant.components.tuya.switch import (
         SWITCHES as SWITCHES_TUYA,  # noqa: F401
         TuyaSwitchEntity as TuyaSwitchEntity,
-        SwitchEntityDescription as TuyaSwitchEntityDescription,
     )
 from homeassistant.components.tuya.vacuum import (
         TuyaVacuumEntity as TuyaVacuumEntity,
@@ -84,7 +96,9 @@ from homeassistant.components.tuya.entity import (
         IntegerTypeData as TuyaIntegerTypeData,
         _DPTYPE_MAPPING as TUYA_DPTYPE_MAPPING,
     )
+from tuya_sharing.scenes import (
+    SharingScene as TuyaScene,
+)
 from homeassistant.components.tuya.scene import (
         TuyaSceneEntity as TuyaSceneEntity,
-        SharingScene as TuyaScene,
     )

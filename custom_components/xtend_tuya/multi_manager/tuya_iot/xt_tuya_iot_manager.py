@@ -10,15 +10,16 @@ from tuya_iot import (
     TuyaOpenAPI,
     TuyaOpenMQ,
 )
-from typing import Any
+from typing import Any, overload, cast
 
 from ...const import (
     LOGGER,
     MESSAGE_SOURCE_TUYA_IOT,
     XTDeviceSourcePriority,
+    XTDPCode,
 )
 
-from ..shared.device import (
+from ..shared.shared_classes import (
     XTDevice,
     XTDeviceFunction,
     XTDeviceStatusRange,
@@ -35,18 +36,26 @@ from ...entity import XTEntity
 from .ipc.xt_tuya_iot_ipc_manager import (
     XTIOTIPCManager
 )
+from .xt_tuya_iot_openapi import (
+    XTIOTOpenAPI,
+)
 
 
 class XTIOTDeviceManager(TuyaDeviceManager):
-    def __init__(self, multi_manager: MultiManager, api: TuyaOpenAPI, mq: TuyaOpenMQ) -> None:
-        self.device_map: dict[str, XTDevice] = {}
+
+    device_map: dict[str, XTDevice] = {}
+
+    def __init__(self, multi_manager: MultiManager, api: XTIOTOpenAPI, non_user_api: XTIOTOpenAPI, mq: TuyaOpenMQ) -> None:
+        self.device_map = {} # type: ignore
         super().__init__(api, mq)
         mq.remove_message_listener(self.on_message)
-        mq.add_message_listener(self.forward_message_to_multi_manager)
+        mq.add_message_listener(self.forward_message_to_multi_manager) # type: ignore
         self.multi_manager = multi_manager
         self.ipc_manager = XTIOTIPCManager(api, multi_manager)
+        self.non_user_api = non_user_api
+        self.api = api
 
-    def forward_message_to_multi_manager(self, msg:str):
+    def forward_message_to_multi_manager(self, msg:dict):
         self.multi_manager.on_message(MESSAGE_SOURCE_TUYA_IOT, msg)
 
     def get_device_info(self, device_id: str) -> dict[str, Any]:
@@ -64,6 +73,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                 result = response["result"]
                 result["online"] = result["is_online"]
                 return response
+        return {}
     
     def get_device_status(self, device_id: str) -> dict[str, Any]:
         """Get device status.
@@ -81,9 +91,12 @@ class XTIOTDeviceManager(TuyaDeviceManager):
             response = self.api.get(f"/v1.0/iot-03/devices/{device_id}/status")
             if response["success"]:
                 return response
+        return {}
 
     #Copy of the Tuya original method with some minor modifications
     def update_device_list_in_smart_home_mod(self):
+        if self.api.token_info is None:                                             #CHANGED
+            return None                                                             #CHANGED
         response = self.api.get(f"/v1.0/users/{self.api.token_info.uid}/devices")
         if response["success"]:
             for item in response["result"]:
@@ -92,8 +105,8 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                 status = {}
                 for item_status in device.status:
                     if "code" in item_status and "value" in item_status:
-                        code = item_status["code"]
-                        value = item_status["value"]
+                        code = item_status["code"] # type: ignore
+                        value = item_status["value"] # type: ignore
                         status[code] = value
                 device.status = status
                 self.device_map[device.id] = device                                 #CHANGED
@@ -110,6 +123,8 @@ class XTIOTDeviceManager(TuyaDeviceManager):
 
     def get_devices_from_sharing(self) -> dict[str, XTDevice]:
         return_dict: dict[str, XTDevice] = {}
+        if self.api.token_info is None:
+            return {}
         response = self.api.get(f"/v1.0/users/{self.api.token_info.uid}/devices?from=sharing")
         if response["success"]:
             for item in response["result"]:
@@ -118,8 +133,8 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                 status = {}
                 for item_status in device.status:
                     if "code" in item_status and "value" in item_status:
-                        code = item_status["code"]
-                        value = item_status["value"]
+                        code = item_status["code"] # type: ignore
+                        value = item_status["value"] # type: ignore
                         status[code] = value
                 device.status = status
                 return_dict[item["id"]] = device
@@ -134,7 +149,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
             device = self.device_map[device_id]
             device_open_api = self.get_open_api_device(device)
             #self.multi_manager.device_watcher.report_message(device_id, f"About to merge {device}\r\n\r\nand\r\n\r\n{device_open_api}", device)
-            XTMergingManager.merge_devices(device, device_open_api)
+            XTMergingManager.merge_devices(device, device_open_api, self.multi_manager)
             self.multi_manager.virtual_state_handler.apply_init_virtual_states(device)
             #self.multi_manager.device_watcher.report_message(device_id, f"Merged into \n\r{device}", device)
 
@@ -284,31 +299,96 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         )
     
     def send_lock_unlock_command(
-            self, device_id: str, lock: bool
+            self, device: XTDevice, lock: bool
     ) -> bool:
-        supported_unlock_types: list[str] = []
+        self.multi_manager.device_watcher.report_message(device.id, f"Sending lock/unlock command open: {open}")
+        return self.send_lock_unlock_command_multi_api(device, lock)
+        
+    
+    def send_lock_unlock_command_multi_api(
+            self, device: XTDevice, lock: bool, api: XTIOTOpenAPI | None = None
+    ) -> bool:
+        if api is None:
+            if self.send_lock_unlock_command_multi_api(device, lock, self.non_user_api):
+                return True
+            else:
+                return self.send_lock_unlock_command_multi_api(device, lock, self.api)
         if lock:
             open = "false"
         else:
             open = "true"
-
-        self.multi_manager.device_watcher.report_message(device_id, f"Sending lock/unlock command open: {open}", self.device_map[device_id])
-
-        remote_unlock_types = self.api.get(f"/v1.0/devices/{device_id}/door-lock/remote-unlocks")
-        self.multi_manager.device_watcher.report_message(device_id, f"API remote unlock types: {remote_unlock_types}", self.device_map[device_id])
+        supported_unlock_types = self.get_supported_unlock_types(device, api)
+        if "remoteUnlockWithoutPwd" in supported_unlock_types:
+            if self.call_door_operate(device, open, api):
+                return True
+            if lock:
+                #Locking of the door
+                pass
+            else:
+                #Unlocking of the door
+                if self.call_door_open(device, api):
+                    return True
+        if manual_unlock_code := cast(list[XTDPCode], device.get_preference(f"manual_unlock_command")):
+            commands: list[dict[str, Any]] = []
+            for dpcode in manual_unlock_code:
+                commands.append({"code": dpcode, "value": device.status.get(dpcode, True)})
+            self.multi_manager.send_commands(device_id=device.id, commands=commands)
+            return True #Assume that the command worked...
+        return False
+    
+    def test_api_subscription(self, device: XTDevice, api: XTIOTOpenAPI | None = None) -> bool:
+        if api is None:
+            if self.test_api_subscription(device, self.api):
+                if self.test_api_subscription(device, self.non_user_api):
+                    return True
+            return False
+        ticket = api.post(f"/v1.0/devices/{device.id}/door-lock/password-ticket")
+        if code := ticket.get("code", None):
+            if code == 28841101:
+                return False
+        return True
+    
+    def get_supported_unlock_types(self, device: XTDevice, api: XTIOTOpenAPI) -> list[str]:
+        supported_unlock_types: list[str] = []
+        api_to_use = cast(XTIOTOpenAPI, device.get_preference(f"{MESSAGE_SOURCE_TUYA_IOT}.XTIOTDeviceManager.get_supported_unlock_types", api))
+        remote_unlock_types = api_to_use.get(f"/v1.0/devices/{device.id}/door-lock/remote-unlocks")
+        self.multi_manager.device_watcher.report_message(device.id, f"API remote unlock types: {remote_unlock_types}")
         if remote_unlock_types.get("success", False):
-            results = remote_unlock_types.get("result", [])
+            device.set_preference(f"{MESSAGE_SOURCE_TUYA_IOT}.XTIOTDeviceManager.get_supported_unlock_types", api_to_use)
+            results: list[dict] = remote_unlock_types.get("result", [])
             for result in results:
                 if result.get("open", False):
                     if supported_unlock_type := result.get("remote_unlock_type", None):
                         supported_unlock_types.append(supported_unlock_type)
-        if "remoteUnlockWithoutPwd" in supported_unlock_types:
-            ticket = self.api.post(f"/v1.0/devices/{device_id}/door-lock/password-ticket")
-            self.multi_manager.device_watcher.report_message(device_id, f"API remote unlock ticket: {ticket}", self.device_map[device_id])
-            if ticket.get("success", False):
-                result = ticket.get("result", {})
-                if ticket_id := result.get("ticket_id", None):
-                    lock_operation = self.api.post(f"/v1.0/smart-lock/devices/{device_id}/password-free/door-operate", {"ticket_id": ticket_id, "open": open})
-                    self.multi_manager.device_watcher.report_message(device_id, f"API remote unlock operation result: {lock_operation}", self.device_map[device_id])
-                    return lock_operation.get("success", False)
+        return supported_unlock_types
+
+    def get_door_lock_password_ticket(self, device: XTDevice, api: XTIOTOpenAPI) -> str | None:
+        api_to_use = cast(XTIOTOpenAPI, device.get_preference(f"{MESSAGE_SOURCE_TUYA_IOT}.XTIOTDeviceManager.get_door_lock_password_ticket", api))
+        ticket = api_to_use.post(f"/v1.0/devices/{device.id}/door-lock/password-ticket")
+        self.multi_manager.device_watcher.report_message(device.id, f"API remote unlock ticket: {ticket}")
+        if ticket.get("success", False):
+            device.set_preference(f"{MESSAGE_SOURCE_TUYA_IOT}.XTIOTDeviceManager.get_door_lock_password_ticket", api_to_use)
+            result: dict[str, Any] = ticket.get("result", {})
+            if ticket_id := result.get("ticket_id", None):
+                return ticket_id
+        return None
+    
+    def call_door_operate(self, device: XTDevice, open: str, api: XTIOTOpenAPI) -> bool:
+        if ticket_id := self.get_door_lock_password_ticket(device, api):
+            api_to_use = cast(XTIOTOpenAPI, device.get_preference(f"{MESSAGE_SOURCE_TUYA_IOT}.XTIOTDeviceManager.call_door_operate", api))
+            lock_operation = api_to_use.post(f"/v1.0/smart-lock/devices/{device.id}/password-free/door-operate", {"ticket_id": ticket_id, "open": open})
+            self.multi_manager.device_watcher.report_message(device.id, f"API call_door_operate result: {lock_operation}")
+            if lock_operation.get("success", False):
+                device.set_preference(f"{MESSAGE_SOURCE_TUYA_IOT}.XTIOTDeviceManager.call_door_operate", api_to_use)
+                return True
+        return False
+    
+    def call_door_open(self, device: XTDevice, api: XTIOTOpenAPI) -> bool:
+        if ticket_id := self.get_door_lock_password_ticket(device, api):
+            api_to_use = cast(XTIOTOpenAPI, device.get_preference(f"{MESSAGE_SOURCE_TUYA_IOT}.XTIOTDeviceManager.call_door_open", api))
+            lock_operation = api.post(f"/v1.0/devices/{device.id}/door-lock/password-free/open-door", {"ticket_id": ticket_id})
+            self.multi_manager.device_watcher.report_message(device.id, f"API call_door_open result: {lock_operation}")
+            if lock_operation.get("success", False):
+                device.set_preference(f"{MESSAGE_SOURCE_TUYA_IOT}.XTIOTDeviceManager.call_door_open", api_to_use)
+                return True
         return False
