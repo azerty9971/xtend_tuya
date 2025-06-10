@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import requests
 import json
+import asyncio
 from typing import Optional, Literal, Any, overload
 from webrtc_models import (
     RTCIceCandidateInit,
@@ -380,10 +381,10 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
             return None
         return self.iot_account.device_manager.ipc_manager.webrtc_manager.get_sdp_answer(device_id, session_id, sdp_offer, channel)
     
-    def get_webrtc_ice_servers(self, device_id: str, session_id: str | None, format: str) -> str | None:
+    def get_webrtc_ice_servers(self, device_id: str, session_id: str | None, format: str, hass: HomeAssistant) -> str | None:
         if self.iot_account is None:
             return None
-        return self.iot_account.device_manager.ipc_manager.webrtc_manager.get_ice_servers(device_id, session_id, format)
+        return asyncio.run_coroutine_threadsafe(self.iot_account.device_manager.ipc_manager.webrtc_manager.async_get_ice_servers(device_id, session_id, format), hass.loop).result()
     
     def get_webrtc_exchange_debug(self, session_id: str) -> str | None:
         if self.iot_account is None:

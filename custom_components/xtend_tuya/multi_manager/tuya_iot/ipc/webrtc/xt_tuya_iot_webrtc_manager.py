@@ -135,7 +135,7 @@ class XTIOTWebRTCManager:
         if session_id not in self.sdp_exchange:
             self.sdp_exchange[session_id] = XTIOTWebRTCSession()
     
-    async def async_get_config(self, device_id: str, session_id: str) -> dict | None:
+    async def async_get_config(self, device_id: str, session_id: str | None) -> dict | None:
         if current_exchange := self.get_webrtc_session(session_id):
             if current_exchange.webrtc_config:
                 return current_exchange.webrtc_config
@@ -158,6 +158,32 @@ class XTIOTWebRTCManager:
             return result
         return None
     
+    async def async_get_ice_servers(self, device_id: str, session_id: str | None, format: str) -> str | None:
+        if config := await self.async_get_config(device_id, session_id):
+            p2p_config: dict = config.get("p2p_config", {})
+            ice_str = p2p_config.get("ices", "{}")
+            match format:
+                case "GO2RTC":
+                    return ice_str
+                case "SimpleWHEP":
+                    temp_str: str = ""
+                    ice_list = json.loads(ice_str)
+                    for ice in ice_list:
+                        password: str = ice.get("credential", None)
+                        username: str = ice.get("username", None)
+                        url: str = ice.get("urls", None)
+                        if url is None:
+                            continue
+                        if username is not None and password is not None:
+                            #TURN server
+                            temp_str += " -T " + url.replace("turn:", "turn://").replace("turns:", "turns://").replace("://", f"://{username}:{password}@") + "?transport=tcp"
+                            pass
+                        else:
+                            #STUN server
+                            temp_str += " -S " + url.replace("stun:", "stun://")
+                            pass
+                    return temp_str.strip()
+
     def get_ice_servers(self, device_id: str, session_id: str | None, format: str) -> str | None:
         if config := self.get_config(device_id, session_id):
             p2p_config: dict = config.get("p2p_config", {})
