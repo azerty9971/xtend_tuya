@@ -45,6 +45,7 @@ class XTIOTWebRTCSession:
     offer_candidate: list[str]
     hass: HomeAssistant | None
     offer_sent: bool = False
+    modes: dict[str, str]
 
     def __init__(self, ttl: int = 600) -> None:
         self.webrtc_config = None
@@ -58,6 +59,7 @@ class XTIOTWebRTCSession:
         self.message_callback = None
         self.offer_candidate = []
         self.offer_sent = False
+        self.modes = {}
     
     def __repr__(self) -> str:
         answer = ""
@@ -103,7 +105,7 @@ class XTIOTWebRTCManager:
         self.sdp_exchange[session_id].answer = answer
         if callback := self.sdp_exchange[session_id].message_callback:
             sdp_answer = answer.get("sdp", "")
-            sdp_answer = self.fix_answer(sdp_answer)
+            sdp_answer = self.fix_answer(sdp_answer, session_id)
             LOGGER.warning(f"SDP Answer {sdp_answer}")
             callback(WebRTCAnswer(answer=sdp_answer))
     
@@ -117,7 +119,7 @@ class XTIOTWebRTCManager:
             self.sdp_exchange[session_id].has_all_candidates = True
         if callback := self.sdp_exchange[session_id].message_callback:
             ice_candidate = candidate_str.removeprefix("a=").removesuffix(ENDLINE)
-            LOGGER.warning(f"Returning ICE candidate {ice_candidate}")
+            #LOGGER.warning(f"Returning ICE candidate {ice_candidate}")
             callback(WebRTCCandidate(candidate=RTCIceCandidate(candidate=ice_candidate)))
 
     def set_config(self, session_id: str, config: dict[str, Any]):
@@ -459,7 +461,7 @@ class XTIOTWebRTCManager:
         await self.async_get_config(device.id, session_id, hass)
         self.set_original_sdp_offer(session_id, offer_sdp)
         offer_changed = self.get_candidates_from_offer(session_id, offer_sdp)
-        offer_changed = self.fix_offer(offer_changed)
+        offer_changed = self.fix_offer(offer_changed, session_id)
         self.set_sdp_offer(session_id, offer_changed)
         sdp_offer_payload = self.format_offer_payload(session_id, offer_changed, device)
         self.send_to_ipc_mqtt(session_id, device, json.dumps(sdp_offer_payload))
@@ -511,8 +513,14 @@ class XTIOTWebRTCManager:
             session_data.offer_candidate = offer_candidates
         return sdp_offer
     
-    def fix_offer(self, offer_sdp: str) -> str:
+    def fix_offer(self, offer_sdp: str, session_id: str) -> str:
+        webrtc_session = self.get_webrtc_session(session_id)
         extmap_found = True
+        searched_offset: int = 0
+
+        if webrtc_session is None:
+            return offer_sdp
+
         while extmap_found:
             offset = offer_sdp.find("a=extmap:")
             if offset == -1:
@@ -523,11 +531,38 @@ class XTIOTWebRTCManager:
                 break
             extmap_str = offer_sdp[offset:end_offset]
             offer_sdp = offer_sdp.replace(extmap_str, "")
+
+        #Find the send/receive mode of audio/video
+        searched_offset = 0
+        has_more_m_sections = True
+        while has_more_m_sections:
+            offset = offer_sdp.find("m=", searched_offset)
+            if offset == -1:
+                break
+            end_of_section = offer_sdp.find("m=", offset+1)
+            if end_of_section == -1:
+                has_more_m_sections = False
+                end_of_section = len(offer_sdp)
+            audio_video = offer_sdp[offset+2:offset+7]
+            if offer_sdp.find("a=sendrecv", offset, end_of_section) != -1:
+                mode = "sendrecv"
+            elif offer_sdp.find("a=recvonly", offset, end_of_section) != -1:
+                mode = "recvonly"
+            else:
+                mode = "sendonly"
+            searched_offset = end_of_section
+            webrtc_session.modes[audio_video] = mode
+        LOGGER.warning(f"Stored modes: {webrtc_session.modes}")
         return offer_sdp
     
-    def fix_answer(self, answer_sdp: str) -> str:
+    def fix_answer(self, answer_sdp: str, session_id: str) -> str:
+        webrtc_session = self.get_webrtc_session(session_id)
         fingerprint_found = True
         searched_offset: int = 0
+
+        if webrtc_session is None:
+            return answer_sdp
+
         while fingerprint_found:
             offset = answer_sdp.find("a=fingerprint:", searched_offset)
             if offset == -1:
@@ -538,14 +573,30 @@ class XTIOTWebRTCManager:
                 break
             searched_offset = end_offset
             fingerprint_orig_str = answer_sdp[offset:end_offset]
-            LOGGER.warning(f"Full fingerprint: {fingerprint_orig_str}")
             offset = fingerprint_orig_str.find(" ")
             if offset != -1:
                 fingerprint_orig_str = fingerprint_orig_str[offset:]
-            LOGGER.warning(f"Restricted fingerprint: {fingerprint_orig_str}")
             fingerprint_new_str = fingerprint_orig_str.upper()
-            LOGGER.warning(f"New fingerprint: {fingerprint_new_str}")
             answer_sdp = answer_sdp.replace(fingerprint_orig_str, fingerprint_new_str)
+        
+        searched_offset = 0
+        has_more_m_sections = True
+        modes_to_search: list[str] = [f"a=sendrecv{ENDLINE}", f"a=recvonly{ENDLINE}", f"a=sendonly{ENDLINE}"]
+        while has_more_m_sections:
+            offset = answer_sdp.find("m=", searched_offset)
+            if offset == -1:
+                break
+            end_of_section = answer_sdp.find("m=", offset+1)
+            if end_of_section == -1:
+                has_more_m_sections = False
+                end_of_section = len(answer_sdp)
+            audio_video = answer_sdp[offset+2:offset+7]
+            searched_offset = end_of_section
+            for mode_to_search in modes_to_search:
+                mode_offset = answer_sdp.find(mode_to_search, offset, end_of_section)
+                if mode_offset != -1:
+                    answer_sdp = answer_sdp[0:offset] + webrtc_session.modes.get(audio_video, mode_to_search) + answer_sdp[offset+len(mode_to_search):]
+                    break
         return answer_sdp
     
     def format_offer_payload(self, session_id: str, offer_sdp: str, device: XTDevice, channel: str = "1") -> dict[str, Any] | None:
