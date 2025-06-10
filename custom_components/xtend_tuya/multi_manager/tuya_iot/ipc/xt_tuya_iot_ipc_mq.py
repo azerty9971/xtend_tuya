@@ -45,6 +45,7 @@ class XTIOTOpenMQIPC(XTIOTOpenMQ):
             listener(msg_dict)
     
     def _start(self, mq_config: TuyaMQConfig) -> mqtt.Client:
+        LOGGER.warning(f"Starting IPC MQTT")
         #mqttc = mqtt.Client(callback_api_version=mqtt_CallbackAPIVersion.VERSION2 ,client_id=mq_config.client_id)
         mqttc = mqtt.Client(client_id=mq_config.client_id)
         mqttc.username_pw_set(mq_config.username, mq_config.password)
