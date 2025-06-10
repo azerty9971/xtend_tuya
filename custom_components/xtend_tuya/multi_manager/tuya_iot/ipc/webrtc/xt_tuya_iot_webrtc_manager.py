@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from typing import Any
 from datetime import datetime, timedelta
 import time
 import json
@@ -12,11 +13,11 @@ from ..xt_tuya_iot_ipc_manager import (
 )
 
 class XTIOTWebRTCSession:
-    webrtc_config: dict[str, any]
-    original_offer: str
-    offer: str
+    webrtc_config: dict[str, Any]
+    original_offer: str | None
+    offer: str | None
     answer: dict
-    final_answer: str
+    final_answer: str | None
     answer_candidates: list[dict]
     has_all_candidates: bool
 
@@ -65,18 +66,22 @@ class XTIOTWebRTCManager:
         for session_id in to_clean:
             self.sdp_exchange.pop(session_id)
     
-    def set_sdp_answer(self, session_id: str, answer: str) -> None:
+    def set_sdp_answer(self, session_id: str | None, answer: dict) -> None:
+        if session_id is None:
+            return
         self._create_session_if_necessary(session_id)
         self.sdp_exchange[session_id].answer = answer
     
-    def add_sdp_answer_candidate(self, session_id: str, candidate: dict) -> None:
+    def add_sdp_answer_candidate(self, session_id: str | None, candidate: dict) -> None:
+        if session_id is None:
+            return
         self._create_session_if_necessary(session_id)
         self.sdp_exchange[session_id].answer_candidates.append(candidate)
         candidate_str = candidate.get("candidate", None)
         if candidate_str == '':
             self.sdp_exchange[session_id].has_all_candidates = True
 
-    def set_config(self, session_id: str, config: dict[str, any]):
+    def set_config(self, session_id: str, config: dict[str, Any]):
         self._create_session_if_necessary(session_id)
 
         #Format ICE Servers so that they can be used by GO2RTC
@@ -105,15 +110,15 @@ class XTIOTWebRTCManager:
         
         webrtc_config = self.ipc_manager.api.get(f"/v1.0/devices/{device_id}/webrtc-configs")
         if webrtc_config.get("success"):
-            result = webrtc_config.get("result")
+            result = webrtc_config.get("result", {})
             self.set_config(session_id, result)
             return result
         return None
     
-    def get_ice_servers(self, device_id: str, session_id: str, format: str) -> None:
+    def get_ice_servers(self, device_id: str, session_id: str, format: str) -> str | None:
         if config := self.get_config(device_id, session_id):
             p2p_config: dict = config.get("p2p_config", {})
-            ice_str = p2p_config.get("ices", None)
+            ice_str = p2p_config.get("ices", "{}")
             match format:
                 case "GO2RTC":
                     return ice_str
@@ -137,16 +142,16 @@ class XTIOTWebRTCManager:
                     return temp_str.strip()
 
     def _get_stream_type(self, device_id: str, session_id: str, requested_channel: str) -> int:
-        any_stream_type = 1
-        highest_res_stream_type = any_stream_type
+        Any_stream_type = 1
+        highest_res_stream_type = Any_stream_type
         cur_highest = 0
-        lowest_res_stream_type = any_stream_type
+        lowest_res_stream_type = Any_stream_type
         cur_lowest = 0
         if webrtc_config := self.get_config(device_id, session_id):
             if skill := webrtc_config.get("skill"):
                 try:
                     skill_json: dict = json.loads(skill)
-                    video_list: list[dict[str, any]] = skill_json.get("videos")
+                    video_list: list[dict[str, Any]] | None = skill_json.get("videos")
                     if video_list:
                         for video_details in video_list:
                             if (
@@ -154,7 +159,7 @@ class XTIOTWebRTCManager:
                                 and "width" in video_details
                                 and "height" in video_details
                             ):
-                                any_stream_type = video_details["streamType"]
+                                Any_stream_type = video_details["streamType"]
                                 width = int(video_details["width"])
                                 height = int(video_details["height"])
                                 cur_value = width * height
@@ -171,8 +176,8 @@ class XTIOTWebRTCManager:
                     else:
                         return int(requested_channel)
                 except Exception:
-                    return any_stream_type
-        return any_stream_type
+                    return Any_stream_type
+        return Any_stream_type
 
     def get_sdp_answer(self, device_id: str, session_id: str, sdp_offer: str, channel: str, wait_for_answers: int = 5) -> str | None:
         sleep_step = 0.01
@@ -182,7 +187,6 @@ class XTIOTWebRTCManager:
         if webrtc_config := self.get_config(device_id, session_id):
             auth_token = webrtc_config.get("auth")
             moto_id =  webrtc_config.get("moto_id")
-            topic: str = None
             offer_candidates = []
             candidate_found = True
             while candidate_found:
@@ -199,34 +203,66 @@ class XTIOTWebRTCManager:
                 sdp_offer = sdp_offer.replace(candidate_str, "")
             sdp_offer = sdp_offer.replace("a=end-of-candidates" + ENDLINE, "")
             self.set_sdp_offer(session_id, sdp_offer)
-            for topic in self.ipc_manager.ipc_mq.mq_config.sink_topic.values():
-                topic = topic.replace("{device_id}", device_id)
-                topic = topic.replace("moto_id", moto_id)
-                payload = {
-                    "protocol":302,
-                    "pv":"2.2",
-                    "t":int(time.time()),
-                    "data":{
-                        "header":{
-                            "from":f"{self.ipc_manager.get_from()}",
-                            "to":f"{device_id}",
-                            #"sub_dev_id":"",
-                            "sessionid":f"{session_id}",
-                            "moto_id":f"{moto_id}",
-                            #"tid":"",
-                            "type":"offer",
+            if (
+                self.ipc_manager.ipc_mq.mq_config is not None and 
+                self.ipc_manager.ipc_mq.mq_config.sink_topic is not None and 
+                moto_id is not None
+            ):
+                for topic in self.ipc_manager.ipc_mq.mq_config.sink_topic.values():
+                    topic = topic.replace("{device_id}", device_id)
+                    topic = topic.replace("moto_id", moto_id)
+                    payload = {
+                        "protocol":302,
+                        "pv":"2.2",
+                        "t":int(time.time()),
+                        "data":{
+                            "header":{
+                                "from":f"{self.ipc_manager.get_from()}",
+                                "to":f"{device_id}",
+                                #"sub_dev_id":"",
+                                "sessionid":f"{session_id}",
+                                "moto_id":f"{moto_id}",
+                                #"tid":"",
+                                "type":"offer",
+                            },
+                            "msg":{
+                                "sdp":f"{sdp_offer}",
+                                "auth":f"{auth_token}",
+                                "mode":"webrtc",
+                                "stream_type":self._get_stream_type(device_id, session_id, channel),
+                            }
                         },
-                        "msg":{
-                            "sdp":f"{sdp_offer}",
-                            "auth":f"{auth_token}",
-                            "mode":"webrtc",
-                            "stream_type":self._get_stream_type(device_id, session_id, channel),
-                        }
-                    },
-                }
-                self.ipc_manager.publish_to_ipc_mqtt(topic, json.dumps(payload))
-                if offer_candidates:
-                    for candidate in offer_candidates:
+                    }
+                    self.ipc_manager.publish_to_ipc_mqtt(topic, json.dumps(payload))
+                    if offer_candidates:
+                        for candidate in offer_candidates:
+                            payload = {
+                                "protocol":302,
+                                "pv":"2.2",
+                                "t":int(time.time()),
+                                "data":{
+                                    "header":{
+                                        "type":"candidate",
+                                        "from":f"{self.ipc_manager.get_from()}",
+                                        "to":f"{device_id}",
+                                        "sub_dev_id":"",
+                                        "sessionid":f"{session_id}",
+                                        "moto_id":f"{moto_id}",
+                                        "tid":""
+                                    },
+                                    "msg":{
+                                        "mode":"webrtc",
+                                        "candidate": candidate
+                                    }
+                                },
+                            }
+                            self.ipc_manager.publish_to_ipc_mqtt(topic, json.dumps(payload))
+                    for _ in range(sleep_count):
+                        if session := self.get_webrtc_session(session_id):
+                            if session.has_all_candidates:
+                                break
+                        time.sleep(sleep_step) #Wait for MQTT responses
+                    if offer_candidates:
                         payload = {
                             "protocol":302,
                             "pv":"2.2",
@@ -243,48 +279,21 @@ class XTIOTWebRTCManager:
                                 },
                                 "msg":{
                                     "mode":"webrtc",
-                                    "candidate": candidate
+                                    "candidate": ""
                                 }
                             },
                         }
                         self.ipc_manager.publish_to_ipc_mqtt(topic, json.dumps(payload))
-                for _ in range(sleep_count):
                     if session := self.get_webrtc_session(session_id):
-                        if session.has_all_candidates:
-                            break
-                    time.sleep(sleep_step) #Wait for MQTT responses
-                if offer_candidates:
-                    payload = {
-                        "protocol":302,
-                        "pv":"2.2",
-                        "t":int(time.time()),
-                        "data":{
-                            "header":{
-                                "type":"candidate",
-                                "from":f"{self.ipc_manager.get_from()}",
-                                "to":f"{device_id}",
-                                "sub_dev_id":"",
-                                "sessionid":f"{session_id}",
-                                "moto_id":f"{moto_id}",
-                                "tid":""
-                            },
-                            "msg":{
-                                "mode":"webrtc",
-                                "candidate": ""
-                            }
-                        },
-                    }
-                    self.ipc_manager.publish_to_ipc_mqtt(topic, json.dumps(payload))
-                if session := self.get_webrtc_session(session_id):
-                    #Format SDP answer and send it back
-                    sdp_answer: str = session.answer.get("sdp", "")
-                    candidates: str = ""
-                    if session.answer_candidates:
-                        for candidate in session.answer_candidates:
-                            candidates += candidate.get("candidate", "")
-                        sdp_answer += candidates + "a=end-of-candidates" + ENDLINE
-                    session.final_answer = f"{sdp_answer}"
-                    return sdp_answer
+                        #Format SDP answer and send it back
+                        sdp_answer: str = session.answer.get("sdp", "")
+                        candidates: str = ""
+                        if session.answer_candidates:
+                            for candidate in session.answer_candidates:
+                                candidates += candidate.get("candidate", "")
+                            sdp_answer += candidates + "a=end-of-candidates" + ENDLINE
+                        session.final_answer = f"{sdp_answer}"
+                        return sdp_answer
             
             if not auth_token or not moto_id:
                 return None
@@ -313,9 +322,12 @@ class XTIOTWebRTCManager:
                     }
                 },
             }
-            for topic in self.ipc_manager.ipc_mq.mq_config.sink_topic.values():
-                self.ipc_manager.publish_to_ipc_mqtt(topic, json.dumps(payload))
-            return ""
+            if self.ipc_manager.ipc_mq.mq_config is None:
+                return None
+            if self.ipc_manager.ipc_mq.mq_config.sink_topic is not None:
+                for topic in self.ipc_manager.ipc_mq.mq_config.sink_topic.values():
+                    self.ipc_manager.publish_to_ipc_mqtt(topic, json.dumps(payload))
+                return ""
         return None
     
     def send_webrtc_trickle_ice(self, device_id: str, session_id: str, candidate: str) -> str | None:
@@ -341,7 +353,10 @@ class XTIOTWebRTCManager:
                     }
                 },
             }
-            for topic in self.ipc_manager.ipc_mq.mq_config.sink_topic.values():
-                self.ipc_manager.publish_to_ipc_mqtt(topic, json.dumps(payload))
-            return ""
+            if self.ipc_manager.ipc_mq.mq_config is None:
+                return None
+            if self.ipc_manager.ipc_mq.mq_config.sink_topic is not None:
+                for topic in self.ipc_manager.ipc_mq.mq_config.sink_topic.values():
+                    self.ipc_manager.publish_to_ipc_mqtt(topic, json.dumps(payload))
+                return ""
         return None

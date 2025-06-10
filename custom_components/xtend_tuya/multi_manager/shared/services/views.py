@@ -8,7 +8,9 @@ from multidict import (
 import string
 import random
 
-from homeassistant.components.http import KEY_AUTHENTICATED, HomeAssistantView
+from typing import Any
+
+from homeassistant.helpers.http import KEY_AUTHENTICATED, HomeAssistantView
 from homeassistant.helpers.entity_component import EntityComponent, entity
 
 from aiohttp import hdrs, web
@@ -35,7 +37,7 @@ class XTRequestCacheResult:
             if cache_entry.valid_until < current_time:
                 self.cached_result.remove(cache_entry)
 
-    def find_in_cache(self, event_data) -> any | None:
+    def find_in_cache(self, event_data) -> Any | None:
         self._clean_cache()
         for cache_entry in self.cached_result:
             if cache_entry.event_data == event_data:
@@ -47,24 +49,24 @@ class XTRequestCacheResult:
 
 class XTEventData:
     @property
-    def data(self) -> dict[str, any]:
+    def data(self) -> dict[str, Any]:
         return self.query_params
 
-    method: str = None
-    query_params: dict[str, any] = None
-    headers: dict[str, str] = None
-    payload: str = None
-    content_type: str = None
-    session_id: str = None
-    location: str = None
+    method: str | None = None
+    query_params: dict[str, Any] = {}
+    headers: dict[str, str] = {}
+    payload: str = ""
+    content_type: str = ""
+    session_id: str = ""
+    location: str = ""
 
     def __init__(self) -> None:
         self.query_params = {}
         self.headers = {}
         self.session_id = self._id_generator()
     
-    def __eq__(self, other: XTEventData) -> bool:
-        return self.query_params == other.query_params and self.method == other.method and self.payload == other.payload
+    def __eq__(self, other: object) -> bool:
+        return isinstance(other, XTEventData) and self.query_params == other.query_params and self.method == other.method and self.payload == other.payload
 
     def __repr__(self) -> str:
         return f"Method: {self.method} <=> Headers: {self.headers} <=> Content-Type: {self.content_type} <=> Query parameters: {self.query_params} <=> Payload: {self.payload}"
@@ -87,7 +89,7 @@ class XTEntityView(HomeAssistantView):
 
     async def get(self, request: web.Request, entity_id: str) -> web.StreamResponse:
         """Start a GET request."""
-        entity: entity.Entity = self.component.get_entity(entity_id)
+        entity: entity.Entity | None = self.component.get_entity(entity_id)
         if entity is None:
             raise web.HTTPNotFound
 

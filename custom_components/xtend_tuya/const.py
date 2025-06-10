@@ -12,6 +12,10 @@ from homeassistant.const import (
     Platform,
 )
 
+from .ha_tuya_integration.tuya_integration_imports import (
+    TuyaDPType as DPType
+)
+
 DOMAIN = "xtend_tuya"
 DOMAIN_ORIG = "tuya"
 LOGGER = logging.getLogger(__package__)
@@ -26,10 +30,10 @@ CONF_USERNAME = "username"
 CONF_NO_OPENAPI = "no_openapi"
 CONF_ENDPOINT_OT = "endpoint"
 CONF_AUTH_TYPE = "auth_type"
-CONF_ACCESS_ID = "access_id"
-CONF_ACCESS_SECRET = "access_secret"
-CONF_USERNAME = "username"
-CONF_PASSWORD = "password"
+CONF_ACCESS_ID_OT = "access_id"
+CONF_ACCESS_SECRET_OT = "access_secret"
+CONF_USERNAME_OT = "username"
+CONF_PASSWORD_OT = "password"
 CONF_COUNTRY_CODE = "country_code"
 CONF_APP_TYPE = "tuya_app_type"
 
@@ -81,23 +85,26 @@ class AllowedPlugins:
 
 class VirtualStates(IntFlag):
     """Virtual states"""
-    STATE_COPY_TO_MULTIPLE_STATE_NAME           = 0X0001,   #Copy the state so that it can be used with other virtual states
-    STATE_SUMMED_IN_REPORTING_PAYLOAD           = 0X0002,   #Spoof the state value to make it a total instead of an incremental value
+    STATE_COPY_TO_MULTIPLE_STATE_NAME           = 0X0001   #Copy the state so that it can be used with other virtual states
+    STATE_SUMMED_IN_REPORTING_PAYLOAD           = 0X0002   #Spoof the state value to make it a total instead of an incremental value
 
 class VirtualFunctions(IntFlag):
     """Virtual functions"""
-    FUNCTION_RESET_STATE                        = 0X0001,   #Reset the specified states
+    FUNCTION_RESET_STATE                        = 0X0001   #Reset the specified states
 
 class XTDeviceEntityFunctions(StrEnum):
     """ Functions that can be called from the device entity to alter the state of the device """
-    RECALCULATE_PERCENT_SCALE                   = "recalculate_percent_scale",
+    RECALCULATE_PERCENT_SCALE                   = "recalculate_percent_scale"
+
+class XTMultiManagerProperties(StrEnum):
+    LOCK_DEVICE_ID                              = "lock_device_id"
 
 #Defines the priority of the sources for the merging process
 #In case of conflict take the data from the lowest priority
 class XTDeviceSourcePriority(IntEnum):
-    REGULAR_TUYA    = 10,
-    TUYA_SHARED     = 20,
-    TUYA_IOT        = 30,
+    REGULAR_TUYA    = 10
+    TUYA_SHARED     = 20
+    TUYA_IOT        = 30
 
 @dataclass
 class DescriptionVirtualState:
@@ -105,7 +112,7 @@ class DescriptionVirtualState:
     
     key: str
     virtual_state_name: str
-    virtual_state_value: VirtualStates = None
+    virtual_state_value: VirtualStates | None = None
     vs_copy_to_state: list[XTDPCode] = field(default_factory=list)
     vs_copy_delta_to_state: list[XTDPCode] = field(default_factory=list)
 
@@ -115,7 +122,7 @@ class DescriptionVirtualFunction:
     
     key: str
     virtual_function_name: str
-    virtual_function_value: VirtualStates = None
+    virtual_function_value: VirtualFunctions | None = None
     vf_reset_state: list[XTDPCode] = field(default_factory=list)
 
 class WorkMode(StrEnum):
@@ -127,23 +134,18 @@ class WorkMode(StrEnum):
     WHITE = "white"
 
 
-class DPType(StrEnum):
-    """Data point types."""
-
-    BOOLEAN = "Boolean"
-    ENUM = "Enum"
-    INTEGER = "Integer"
-    JSON = "Json"
-    RAW = "Raw"
-    STRING = "String"
-
-
 class XTDPCode(StrEnum):
     """Data Point Codes used by XT.
 
     https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
     """
-
+    ACHZ = "ACHZ"
+    ACI = "ACI"
+    ACTIVEPOWER = "ActivePower"
+    ACTIVEPOWERA = "ActivePowerA"
+    ACTIVEPOWERB = "ActivePowerB"
+    ACTIVEPOWERC = "ActivePowerC"
+    ACV = "ACV"
     ADD_ELE = "add_ele" #Added watt since last heartbeat
     ADD_ELE_THIS_MONTH = "add_ele_this_month"
     ADD_ELE_THIS_YEAR = "add_ele_this_year"
@@ -186,6 +188,7 @@ class XTDPCode(StrEnum):
     BATTERY_VALUE = "battery_value"  # Battery value
     BEEP = "beep"
     BEEP_VOLUME = "beep_volume"
+    BLUETOOTH_UNLOCK = "bluetooth_unlock"
     BREATHDISTANCE_MAX = "breathdistance_max"
     BREATHDISTANCE_MIN = "breathdistance_min"
     BREATHSENSITIVITY = "breathsensitivity"
@@ -273,6 +276,10 @@ class XTDPCode(StrEnum):
     CTIME = "Ctime"
     CTIME2 = "CTime2"
     CUP_NUMBER = "cup_number"  # NUmber of cups
+    CURRENT = "Current"
+    CURRENTA = "CurrentA"
+    CURRENTB = "CurrentB"
+    CURRENTC = "CurrentC"
     CURRENT_YD = "current_yd"
     CUR_CURRENT = "cur_current"  # Actual current
     CUR_NEUTRAL = "cur_neutral"  # Total reverse energy
@@ -292,6 +299,7 @@ class XTDPCode(StrEnum):
     DETECTION_DISTANCE_MIN = "detection_distance_min"
     DETECTION_DISTANCE_MAX = "detection_distance_max"
     DETECTION_SENSITIVITY = "detection_sensitivity"
+    DEVICEID = "DeviceID"
     DEVICEKW = "DeviceKw"
     DEVICEKWH = "DeviceKwh"
     DEVICEMAXSETA = "DeviceMaxSetA"
@@ -308,8 +316,17 @@ class XTDPCode(StrEnum):
     DUSTER_CLOTH = "duster_cloth"
     ECO2 = "eco2"
     EDGE_BRUSH = "edge_brush"
+    ELECTRIC = "electric"
+    ELECTRIC_THIS_MONTH = "electric_this_month"
+    ELECTRIC_THIS_YEAR = "electric_this_year"
+    ELECTRIC_TODAY = "electric_today"
+    ELECTRIC_TOTAL = "electric_total"
     ELECTRICITY_LEFT = "electricity_left"
     EMPTY = "empty"
+    ENERGYCONSUMED = "EnergyConsumed"
+    ENERGYCONSUMEDA = "EnergyConsumedA"
+    ENERGYCONSUMEDB = "EnergyConsumedB"
+    ENERGYCONSUMEDC = "EnergyConsumedC"
     EXCRETION_TIME_DAY = "excretion_time_day"
     EXCRETION_TIMES_DAY = "excretion_times_day"
     FACTORY_RESET = "factory_reset"
@@ -335,6 +352,7 @@ class XTDPCode(StrEnum):
     FLOODLIGHT_SWITCH = "floodlight_switch"
     FLOW_VELOCITY = "flow_velocity"
     FORWARD_ENERGY_TOTAL = "forward_energy_total"
+    FREQUENCY = "Frequency"
     GAS_SENSOR_STATE = "gas_sensor_state"
     GAS_SENSOR_STATUS = "gas_sensor_status"
     GAS_SENSOR_VALUE = "gas_sensor_value"
@@ -343,11 +361,14 @@ class XTDPCode(StrEnum):
     HOLD_SENSITIVITY = "hold_sensitivity"
     HUMIDIFIER = "humidifier"  # Humidification
     HUMIDITY = "humidity"  # Humidity
+    HUMIDITY1 = "humidity1"  # Humidity
     HUMIDITY_CALIBRATION = "humidity_calibration"
     HUMIDITY_CURRENT = "humidity_current"  # Current humidity
     HUMIDITY_INDOOR = "humidity_indoor"  # Indoor humidity
     HUMIDITY_SET = "humidity_set"  # Humidity setting
     HUMIDITY_VALUE = "humidity_value"  # Humidity
+    HUM_ALARM = "hum_alarm"
+    HUM_SENSITIVITY = "hum_sensitivity"
     IDVERIFICATIONSET = "IDVerificationSet"
     ILLUMINANCE_VALUE = "illuminance_value"
     INDICATOR_LED = "indicator_led"
@@ -358,6 +379,7 @@ class XTDPCode(StrEnum):
     INSTALLATION_HEIGHT = "installation_height"
     IPC_WORK_MODE = "ipc_work_mode"
     IR_CONTROL = "ir_control"
+    KEY_REC = "key_rec"
     KEY_TONE = "key_tone"
     KILL = "kill"
     LDR = "ldr"
@@ -381,8 +403,12 @@ class XTDPCode(StrEnum):
     MANUAL_FEED = "manual_feed"
     MANUAL_LOCK = "manual_lock"
     MATERIAL = "material"  # Material
+    MAXHUM_SET = "maxhum_set"
+    MAXTEMP_SET = "maxtemp_set"
     MAX_SET = "max_set"
     METER_TYPE = "meter_type"
+    MINIHUM_SET = "minihum_set"
+    MINITEMP_SET = "minitemp_set"
     MINI_SET = "mini_set"
     MONITORING = "monitoring"
     MODE = "mode"  # Working mode / Mode
@@ -435,6 +461,7 @@ class XTDPCode(StrEnum):
     PIR_DELAY = "pir_delay"
     PIR_RADAR = "PIR_RADAR"
     PIR_SENSITIVITY = "pir_sensitivity"
+    PIR_STATE = "pir_state"
     PM1 = "pm1"
     PM10 = "pm10"
     PM25 = "pm25"
@@ -444,29 +471,45 @@ class XTDPCode(StrEnum):
     POWDER_SET = "powder_set"  # Powder
     POWER = "power"
     POWER2 = "Power"
+    POWERFACTORA = "PowerFactorA"
+    POWERFACTORB = "PowerFactorB"
+    POWERFACTORC = "PowerFactorC"
     POWERON = "poweron"
     POWERONOFF = "PowerOnOff"
     POWER_CONSUMPTION = "power_consumption"
     POWER_GO = "power_go"
     POWER_SET = "power_set"
     POWER_TOTAL = "power_total"
+    PV1_CURR = "pv1_curr"
+    PV1_VOLT = "pv1_volt"
+    PV2_CURR = "pv2_curr"
+    PV2_VOLT = "pv2_volt"
+    PVV = "PVV"
+    PVI = "PVI"
     PRESENCE_DELAY = "presence_delay"
     PRESENCE_STATE = "presence_state"
     PRESSURE_STATE = "pressure_state"
     PRESSURE_VALUE = "pressure_value"
+    PRODUCT_SPECIFICATIONS = "product_specifications"
     PUMP = "pump"
     PUMP_RESET = "pump_reset"  # Water pump reset
     QUIET_TIMING_ON = "quiet_timing_on"
     QUIET_TIME_END = "quiet_time_end"
     QUIET_TIME_START = "quiet_time_start"
+    REACTIVEPOWER = "ReactivePower"
+    REACTIVEPOWERA = "ReactivePowerA"
+    REACTIVEPOWERB = "ReactivePowerB"
+    REACTIVEPOWERC = "ReactivePowerC"
     REBOOT = "reboot"
     RECIPE = "Recipe"
     RECORD_MODE = "record_mode"
     RECORD_SWITCH = "record_switch"  # Recording switch
     RELAY_STATUS = "relay_status"
+    RELEASES = "releases"
     REMAININGTIME = "RemainingTime"
     REMAIN_TIME = "remain_time"
     REMOTE_NO_DP_KEY = "remote_no_dp_key"
+    REPORT_SENSITIVITY = "report_sensitivity"
     RESET_ADD_ELE = "reset_add_ele"
     RESET_DUSTER_CLOTH = "reset_duster_cloth"
     RESET_EDGE_BRUSH = "reset_edge_brush"
@@ -476,6 +519,10 @@ class XTDPCode(StrEnum):
     RESIDUAL_ELECTRICITY = "residual_electricity"
     RESPIRATORY_RATE = "respiratory_rate"
     RESTORE_FACTORY_SETTINGS = "restore_factory_settings"
+    REVERSE_ENERGY_A = "reverse_energy_a"
+    REVERSE_ENERGY_B = "reverse_energy_b"
+    REVERSE_ENERGY_C = "reverse_energy_c"
+    REVERSE_ENERGY_T = "reverse_energy_t"
     REVERSE_ENERGY_TOTAL = "reverse_energy_total"
     RFID = "RFID"
     ROLL_BRUSH = "roll_brush"
@@ -563,13 +610,17 @@ class XTDPCode(StrEnum):
     TARGET_DISTANCE = "target_distance"
     TARGET_DIS_CLOSEST = "target_dis_closest"  # Closest target distance
     TEMP = "temp"  # Temperature setting
+    TEMP2 = "Temp"  # Temperature setting
     TEMPCHANGER = "TempChanger"
     TEMPERATURE = "temperature"
+    TEMPERATURE2 = "Temperature"
     TEMPER_ALARM = "temper_alarm"  # Tamper alarm
     TEMPSC = "TempSc"
     TEMPSET = "TempSet"
     TEMPSHOW = "TempShow"
+    TEMPUNIT = "TempUnit"
     TEMP_ADC = "temp_adc"
+    TEMP_ALARM = "temp_alarm"
     TEMP_BOILING_C = "temp_boiling_c"
     TEMP_BOILING_F = "temp_boiling_f"
     TEMP_BOTTOM = "temp_bottom"
@@ -578,6 +629,7 @@ class XTDPCode(StrEnum):
     TEMP_CURRENT = "temp_current"  # Current temperature in °C
     TEMP_CURRENT_F = "temp_current_f"  # Current temperature in °F
     TEMP_INDOOR = "temp_indoor"  # Indoor temperature in °C
+    TEMP_SENSITIVITY = "temp_sensitivity"
     TEMP_SET = "temp_set"  # Set the temperature in °C
     TEMP_SET_1 = "temp_set_1"  # Set the warm temperature in °C
     TEMP_SET_F = "temp_set_f"  # Set the temperature in °F
@@ -593,6 +645,7 @@ class XTDPCode(StrEnum):
     TOTAL_CLEAN_AREA = "total_clean_area"
     TOTAL_CLEAN_COUNT = "total_clean_count"
     TOTAL_CLEAN_TIME = "total_clean_time"
+    TOTALENERGYCONSUMED = "TotalEnergyConsumed"
     TOTAL_FORWARD_ENERGY = "total_forward_energy"
     TOTAL_TIME = "total_time"
     TOTAL_PM = "total_pm"
@@ -601,9 +654,12 @@ class XTDPCode(StrEnum):
     TRIGGER_SENSITIVITY = "trigger_sensitivity"
     TVOC = "tvoc"
     UNIT = "unit"
+    UNIT2 = "Unit"
     UNLOCK_CARD = "unlock_card"
     UNLOCK_FACE = "unlock_face"
     UNLOCK_FINGERPRINT = "unlock_fingerprint"
+    UNLOCK_FINGER_VEIN = "unlock_finger_vein"
+    UNLOCK_HAND = "unlock_hand"
     UNLOCK_PASSWORD = "unlock_password"
     UPPER_TEMP = "upper_temp"
     UPPER_TEMP_F = "upper_temp_f"
@@ -629,6 +685,9 @@ class XTDPCode(StrEnum):
     VOICE_TIMES = "voice_times"
     VOLUME_SET = "volume_set"
     VOL_YD = "vol_yd"
+    VOLTAGEA = "VoltageA"
+    VOLTAGEB = "VoltageB"
+    VOLTAGEC = "VoltageC"
     VOLTAGE_CURRENT = "voltage_current"
     WAKEUP = "wakeup"
     WARM = "warm"  # Heat preservation

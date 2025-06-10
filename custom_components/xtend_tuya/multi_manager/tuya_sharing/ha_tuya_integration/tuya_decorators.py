@@ -25,6 +25,8 @@ class XTDecorator:
         self.callback = callback
         @functools.wraps(func)
         async def wrapped(*args, **kwargs):
+            if self.orig_func is None or self.callback is None:
+                return None
             await callback(True, *args, **kwargs)
             return_val = await self.orig_func(*args, **kwargs)
             await callback(False, *args, **kwargs)
@@ -37,6 +39,8 @@ class XTDecorator:
         self.callback = callback
         @functools.wraps(func)
         def wrapped(*args, **kwargs):
+            if self.orig_func is None or self.callback is None:
+                return None
             self.callback(True, *args, **kwargs)
             return_val = self.orig_func(*args, **kwargs)
             self.callback(False, *args, **kwargs)
@@ -44,11 +48,13 @@ class XTDecorator:
         self.func = wrapped
         return self.func
     
+    @staticmethod
     def get_async_decorator(func, callback):
         decorator = XTDecorator()
         new_func = decorator.async_wrapper(func, callback)
         return decorator, new_func
     
+    @staticmethod
     def get_decorator(func, callback):
         decorator = XTDecorator()
         new_func = decorator.wrapper(func, callback)

@@ -30,6 +30,19 @@ class XTSelectEntityDescription(TuyaSelectEntityDescription):
     """Describe an Tuya select entity."""
     pass
 
+TEMPERATURE_SELECTS: tuple[XTSelectEntityDescription, ...] = (
+    XTSelectEntityDescription(
+        key=XTDPCode.TEMP_UNIT_CONVERT,
+        translation_key="change_temp_unit",
+        entity_category=EntityCategory.CONFIG,
+    ),
+    XTSelectEntityDescription(
+        key=XTDPCode.TEMPCHANGER,
+        translation_key="change_temp_unit",
+        entity_category=EntityCategory.CONFIG,
+    ),
+)
+
 # All descriptions can be found here. Mostly the Enum data types in the
 # default instructions set of each category end up being a select.
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
@@ -42,11 +55,6 @@ SELECTS: dict[str, tuple[XTSelectEntityDescription, ...]] = {
         ),
     ),
     "dbl": (
-        XTSelectEntityDescription(
-            key=XTDPCode.TEMP_UNIT_CONVERT,
-            translation_key="change_temp_unit",
-            entity_category=EntityCategory.CONFIG,
-        ),
         XTSelectEntityDescription(
             key=XTDPCode.COUNTDOWN_SET,
             translation_key="countdown",
@@ -62,6 +70,7 @@ SELECTS: dict[str, tuple[XTSelectEntityDescription, ...]] = {
             translation_key="sound_mode",
             entity_category=EntityCategory.CONFIG,
         ),
+        *TEMPERATURE_SELECTS,
     ),
     "dj": (
         XTSelectEntityDescription(
@@ -135,6 +144,18 @@ SELECTS: dict[str, tuple[XTSelectEntityDescription, ...]] = {
             entity_category=EntityCategory.CONFIG,
         ),
     ),
+    "MPPT": (
+        XTSelectEntityDescription(
+            key=XTDPCode.TEMPUNIT,
+            translation_key="tempunit",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        XTSelectEntityDescription(
+            key=XTDPCode.UNIT2,
+            translation_key="currency",
+            entity_category=EntityCategory.CONFIG,
+        ),
+    ),
     "msp": (
         XTSelectEntityDescription(
             key=XTDPCode.CLEAN,
@@ -165,11 +186,7 @@ SELECTS: dict[str, tuple[XTSelectEntityDescription, ...]] = {
         ),
     ),
     "mzj": (
-        XTSelectEntityDescription(
-            key=XTDPCode.TEMPCHANGER,
-            translation_key="change_temp_unit",
-            entity_category=EntityCategory.CONFIG,
-        ),
+        *TEMPERATURE_SELECTS,
     ),
     "qccdz": (
         XTSelectEntityDescription(
@@ -190,6 +207,9 @@ SELECTS: dict[str, tuple[XTSelectEntityDescription, ...]] = {
             entity_category=EntityCategory.CONFIG,
         ),
     ),
+    "wk": (
+        *TEMPERATURE_SELECTS,
+    ),
     "xfj": (
         XTSelectEntityDescription(
             key=XTDPCode.MODE,
@@ -197,14 +217,23 @@ SELECTS: dict[str, tuple[XTSelectEntityDescription, ...]] = {
             entity_category=EntityCategory.CONFIG,
         ),
     ),
+    "zwjcy": (
+        *TEMPERATURE_SELECTS,
+    ),
 }
 
+#Lock duplicates
+SELECTS["videolock"] = SELECTS["jtmspro"]
+SELECTS["jtmsbh"] = SELECTS["jtmspro"]
 
 async def async_setup_entry(
     hass: HomeAssistant, entry: XTConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
     """Set up Tuya select dynamically through Tuya discovery."""
     hass_data = entry.runtime_data
+
+    if entry.runtime_data.multi_manager is None or hass_data.manager is None:
+        return
 
     merged_descriptors = SELECTS
     for new_descriptor in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(Platform.SELECT):
@@ -213,6 +242,8 @@ async def async_setup_entry(
     @callback
     def async_discover_device(device_map) -> None:
         """Discover and add a discovered Tuya select."""
+        if hass_data.manager is None:
+            return
         entities: list[XTSelectEntity] = []
         device_ids = [*device_map]
         for device_id in device_ids:
@@ -245,6 +276,7 @@ class XTSelectEntity(XTEntity, TuyaSelectEntity):
     ) -> None:
         """Init XT select."""
         super(XTSelectEntity, self).__init__(device, device_manager, description)
+        super(XTEntity, self).__init__(device, device_manager, description) # type: ignore
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description

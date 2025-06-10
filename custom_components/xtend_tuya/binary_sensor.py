@@ -48,6 +48,25 @@ TAMPER_BINARY_SENSOR = XTBinarySensorEntityDescription(
     entity_category=EntityCategory.DIAGNOSTIC,
 )
 
+PROXIMITY_BINARY_SENSOR: tuple[XTBinarySensorEntityDescription, ...] = (
+    XTBinarySensorEntityDescription(
+        key=XTDPCode.PRESENCE_STATE,
+        translation_key="pir_state",
+        device_class=BinarySensorDeviceClass.MOTION,
+        on_value="presence",
+    ),
+    XTBinarySensorEntityDescription(
+        key=XTDPCode.PIR_STATE,
+        translation_key="pir_state",
+        device_class=BinarySensorDeviceClass.MOTION,
+        on_value="pir",
+    ),
+    XTBinarySensorEntityDescription(
+        key=XTDPCode.PIR2,
+        translation_key="pir_state",
+        device_class=BinarySensorDeviceClass.MOTION,
+    ),
+)
 
 # All descriptions can be found here. Mostly the Boolean data types in the
 # default status set of each category (that don't have a set instruction)
@@ -63,11 +82,7 @@ BINARY_SENSORS: dict[str, tuple[XTBinarySensorEntityDescription, ...]] = {
         ),
     ),
     "kg": (
-        XTBinarySensorEntityDescription(
-            key=XTDPCode.PRESENCE_STATE,
-            device_class=BinarySensorDeviceClass.MOTION,
-            on_value="presence",
-        ),
+        *PROXIMITY_BINARY_SENSOR,
     ),
     "msp": (
         #If 1 is reported, it will be counted once. 
@@ -90,10 +105,7 @@ BINARY_SENSORS: dict[str, tuple[XTBinarySensorEntityDescription, ...]] = {
         ),
     ),
     "pir": (
-        XTBinarySensorEntityDescription(
-            key=XTDPCode.PIR2,
-            device_class=BinarySensorDeviceClass.MOTION,
-        ),
+        *PROXIMITY_BINARY_SENSOR,
     ),
     #"qccdz": (
     #    XTBinarySensorEntityDescription(
@@ -121,15 +133,21 @@ BINARY_SENSORS: dict[str, tuple[XTBinarySensorEntityDescription, ...]] = {
     ),
 }
 
+BINARY_SENSORS["tdq"] = BINARY_SENSORS["kg"]
+
 #Lock duplicates
 BINARY_SENSORS["videolock"] = BINARY_SENSORS["jtmspro"]
+BINARY_SENSORS["jtmsbh"] = BINARY_SENSORS["jtmspro"]
 
 async def async_setup_entry(
     hass: HomeAssistant, entry: XTConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
     """Set up Tuya binary sensor dynamically through Tuya discovery."""
     hass_data = entry.runtime_data
-
+    if hass_data.manager is None:
+        return
+    if entry.runtime_data.multi_manager is None:
+        return
     merged_descriptors = BINARY_SENSORS
     for new_descriptor in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(Platform.BINARY_SENSOR):
         merged_descriptors = merge_device_descriptors(merged_descriptors, new_descriptor)
@@ -139,6 +157,8 @@ async def async_setup_entry(
         """Discover and add a discovered Tuya binary sensor."""
         entities: list[XTBinarySensorEntity] = []
         device_ids = [*device_map]
+        if hass_data.manager is None:
+            return
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id, None):
                 if descriptions := merged_descriptors.get(device.category):
@@ -165,7 +185,7 @@ async def async_setup_entry(
 class XTBinarySensorEntity(XTEntity, TuyaBinarySensorEntity):
     """XT Binary Sensor Entity."""
 
-    entity_description: XTBinarySensorEntityDescription
+    _entity_description: XTBinarySensorEntityDescription
 
     def __init__(
         self,
@@ -175,14 +195,15 @@ class XTBinarySensorEntity(XTEntity, TuyaBinarySensorEntity):
     ) -> None:
         """Init Tuya binary sensor."""
         super(XTBinarySensorEntity, self).__init__(device, device_manager, description)
+        super(XTEntity, self).__init__(device, device_manager, description) # type: ignore
         self.device = device
         self.device_manager = device_manager
-        self.entity_description = description
+        self._entity_description = description
 
     @property
     def is_on(self) -> bool:
         is_on = super().is_on
-        if self.entity_description.device_online:
+        if self._entity_description.device_online:
             dpcode = self.entity_description.dpcode or self.entity_description.key
             self.device.online_states[dpcode] = is_on
             self.device_manager.update_device_online_status(self.device.id)

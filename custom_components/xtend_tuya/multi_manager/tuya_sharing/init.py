@@ -33,8 +33,6 @@ from ..shared.interface.device_manager import (
 from ..shared.shared_classes import (
     XTConfigEntry,
     XTDeviceMap,
-)
-from ..shared.device import (
     XTDevice,
 )
 from .xt_tuya_sharing_data import (
@@ -86,8 +84,8 @@ def get_plugin_instance() -> XTTuyaSharingDeviceManagerInterface | None:
 class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
     def __init__(self) -> None:
         super().__init__()
-        self.sharing_account: TuyaSharingData = None,
-        self.hass: HomeAssistant = None
+        self.sharing_account: TuyaSharingData | None = None
+        self.hass: HomeAssistant | None = None
 
     def get_type_name(self) -> str:
         return MESSAGE_SOURCE_TUYA_SHARING
@@ -98,13 +96,13 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
     async def setup_from_entry(self, hass: HomeAssistant, config_entry: XTConfigEntry, multi_manager: MultiManager) -> bool:
         self.multi_manager: MultiManager = multi_manager
         self.hass = hass
-        self.sharing_account: TuyaSharingData = await self._init_from_entry(hass, config_entry)
+        self.sharing_account: TuyaSharingData | None = await self._init_from_entry(hass, config_entry)
         if self.sharing_account:
             return True
         return False
     
     async def _init_from_entry(self, hass: HomeAssistant, config_entry: XTConfigEntry) -> TuyaSharingData | None:
-        ha_tuya_integration_config_manager: XTHATuyaIntegrationConfigEntryManager = None
+        ha_tuya_integration_config_manager: XTHATuyaIntegrationConfigEntryManager | None = None
         #See if our current entry is an override of a Tuya integration entry
         tuya_integration_runtime_data = get_overriden_tuya_integration_runtime_data(hass, config_entry)
         if tuya_integration_runtime_data:
@@ -134,7 +132,7 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
         sharing_device_manager.device_repository = XTSharingDeviceRepository(sharing_device_manager.customer_api, sharing_device_manager, self.multi_manager)
         sharing_device_manager.scene_repository = SceneRepository(sharing_device_manager.customer_api)
         sharing_device_manager.user_repository = UserRepository(sharing_device_manager.customer_api)
-        sharing_device_manager.add_device_listener(self.multi_manager.multi_device_listener)
+        sharing_device_manager.add_device_listener(self.multi_manager.multi_device_listener) # type: ignore
         return TuyaSharingData(
             device_manager=sharing_device_manager, 
             device_ids=[], 
@@ -142,6 +140,8 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
             )
 
     def update_device_cache(self):
+        if self.sharing_account is None:
+            return None
         try:
             self.sharing_account.device_manager.update_device_cache()
             new_device_ids: list[str] = [device_id for device_id in self.sharing_account.device_manager.device_map]
@@ -162,36 +162,56 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
             raise
     
     def get_available_device_maps(self) -> list[XTDeviceMap]:
-        return_list: list[dict[str, XTDevice]] = []
+        return_list: list[XTDeviceMap] = []
+        if self.sharing_account is None or self.sharing_account.device_manager is None:
+            return return_list
         if other_manager := self.sharing_account.device_manager.get_overriden_device_manager():
             return_list.append(XTDeviceMap(other_manager.device_map, XTDeviceSourcePriority.REGULAR_TUYA))
         return_list.append(XTDeviceMap(self.sharing_account.device_manager.device_map, XTDeviceSourcePriority.TUYA_SHARED))
         return return_list
     
     def refresh_mq(self):
+        if self.sharing_account is None:
+            return None
         self.sharing_account.device_manager.refresh_mq()
     
     def remove_device_listeners(self) -> None:
-        self.sharing_account.device_manager.remove_device_listener(self.multi_manager.multi_device_listener)
+        if self.sharing_account is None:
+            return None
+        self.sharing_account.device_manager.remove_device_listener(self.multi_manager.multi_device_listener) # type: ignore
     
     def unload(self):
+        if (
+            self.sharing_account is None or 
+            self.sharing_account.device_manager.user_repository is None or
+            self.sharing_account.device_manager.terminal_id is None
+        ):
+            return None
         if not self.multi_manager.get_account_by_name(MESSAGE_SOURCE_TUYA_IOT):
             self.sharing_account.device_manager.user_repository.unload(self.sharing_account.device_manager.terminal_id)
     
-    def on_message(self, msg: str):
+    def on_message(self, msg: dict):
+        if self.sharing_account is None:
+            return None
         self.sharing_account.device_manager.on_message(msg)
     
     def query_scenes(self) -> list:
+        if self.sharing_account is None:
+            return []
         #Regular Tuya scenes will be deleted by the cleanup_device_registry, readd them regardless of if we override or not
         return self.sharing_account.device_manager.query_scenes()
     
     def get_device_stream_allocate(
             self, device_id: str, stream_type: Literal["flv", "hls", "rtmp", "rtsp"]
     ) -> Optional[str]:
+        if self.sharing_account is None:
+            return None
         if device_id in self.sharing_account.device_ids:
             return self.sharing_account.device_manager.get_device_stream_allocate(device_id, stream_type)
     
     def get_device_registry_identifiers(self) -> list:
+        if self.sharing_account is None:
+            return []
         if self.sharing_account.device_manager.reuse_config:
             return [DOMAIN_ORIG, DOMAIN]
         return [DOMAIN]
@@ -201,6 +221,8 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
 
     def on_update_device(self, device: XTDevice) -> list[str] | None:
         return_list: list[str] = []
+        if self.sharing_account is None:
+            return None
         if device.id in self.sharing_account.device_ids:
             return_list.append(TUYA_HA_SIGNAL_UPDATE_ENTITY)
         if self.sharing_account.device_manager.reuse_config:
@@ -211,6 +233,8 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
     
     def on_add_device(self, device: XTDevice) -> list[str] | None:
         return_list: list[str] = []
+        if self.sharing_account is None:
+            return None
         if device.id in self.sharing_account.device_ids:
             return_list.append(TUYA_DISCOVERY_NEW)
         if self.sharing_account.device_manager.reuse_config:
@@ -221,13 +245,17 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
     
     def on_mqtt_stop(self):
         if (
+            self.sharing_account is not None and
             self.sharing_account.device_manager.mq 
             and not self.sharing_account.device_manager.reuse_config
         ):
             self.sharing_account.device_manager.mq.stop()
     
     def on_post_setup(self):
-        if self.sharing_account.ha_tuya_integration_config_manager:
+        if self.sharing_account is None:
+            return None
+        
+        if self.sharing_account.ha_tuya_integration_config_manager is not None:
             decorate_tuya_integration(self.sharing_account.ha_tuya_integration_config_manager)
 
         for device in self.sharing_account.device_manager.device_map.values():
@@ -238,11 +266,15 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
             self.multi_manager.multi_device_listener.trigger_device_discovery(device, [TUYA_DISCOVERY_NEW_ORIG])
     
     def get_platform_descriptors_to_merge(self, platform: Platform) -> Any:
+        if self.sharing_account is None:
+            return None
         if self.sharing_account.device_manager.reuse_config:
             return None
         return get_tuya_platform_descriptors(platform)
     
     def send_commands(self, device_id: str, commands: list[dict[str, Any]]):
+        if self.sharing_account is None:
+            return None
         regular_commands: list[dict[str, Any]] = []
         devices = self.get_devices_from_device_id(device_id)
         for command in commands:
@@ -251,34 +283,35 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
 
             #Filter commands that require the use of OpenAPI
             skip_command = False
-            for device in devices:
-                if dpId := self.multi_manager._read_dpId_from_code(command_code, device):
-                    if device.local_strategy[dpId].get("use_open_api", False):
-                        skip_command = True
-                        break
+            if devices is not None:
+                for device in devices:
+                    if dpId := self.multi_manager._read_dpId_from_code(command_code, device):
+                        if device.local_strategy[dpId].get("use_open_api", False):
+                            skip_command = True
+                            break
             if not skip_command:
                 regular_commands.append(command)
         
         if regular_commands:
             self.sharing_account.device_manager.send_commands(device_id, regular_commands)
     
-
-    @overload
-    def convert_to_xt_device(self, device: Any, device_source_priority: XTDeviceSourcePriority | None = None) -> XTDevice: ...
-    
-    def convert_to_xt_device(self, device: CustomerDevice, device_source_priority: XTDeviceSourcePriority | None = None) -> XTDevice:
-        device: XTDevice = XTDevice.from_compatible_device(device, device_source_priority=device_source_priority)
+    def convert_to_xt_device(self, device: Any, device_source_priority: XTDeviceSourcePriority | None = None) -> XTDevice:
+        device_new: XTDevice = XTDevice.from_compatible_device(device, device_source_priority=device_source_priority)
         if device_source_priority == XTDeviceSourcePriority.REGULAR_TUYA:
-            device.force_compatibility = True
-        return device
+            device_new.force_compatibility = True
+        return device_new
     
     def send_lock_unlock_command(
-            self, device_id: str, lock: bool
+            self, device: XTDevice, lock: bool
     ) -> bool:
-        return self.sharing_account.device_manager.send_lock_unlock_command(device_id, lock)
+        if self.sharing_account is None:
+            return False
+        return self.sharing_account.device_manager.send_lock_unlock_command(device, lock)
     
-    def call_api(self, method: str, url: str, payload: str) -> str | None:
-        params: dict[str, any] = None
+    def call_api(self, method: str, url: str, payload: str | None) -> dict[str, Any] | None:
+        params: dict[str, Any] | None = None
+        if self.sharing_account is None or self.sharing_account.device_manager.customer_api is None:
+            return None
         if payload:
             params = json.loads(payload)
         match method:
@@ -289,5 +322,7 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
         return None
     
     def trigger_scene(self, home_id: str, scene_id: str) -> bool:
+        if self.sharing_account is None:
+            return False
         self.sharing_account.device_manager.trigger_scene(home_id, scene_id)
         return True

@@ -27,6 +27,8 @@ from tuya_iot.openmq import (
     TO_C_CUSTOM_MQTT_CONFIG_API,
     AuthType,
     TO_C_SMART_HOME_MQTT_CONFIG_API,
+    CONNECT_FAILED_NOT_AUTHORISED,
+    time,
 )
 
 from ...const import (
@@ -39,23 +41,47 @@ from .xt_tuya_iot_openapi import (
 class XTIOTTuyaMQConfig(TuyaMQConfig):
     def __init__(self, mqConfigResponse: dict[str, Any] = {}) -> None:
         """Init TuyaMQConfig."""
-        self.url: str = None
-        self.client_id: str = None
-        self.username: str = None
-        self.password: str = None
-        self.source_topic: dict = None
-        self.sink_topic: dict = None
+        self.url: str| None = None
+        self.client_id: str | None = None
+        self.username: str | None = None
+        self.password: str | None = None
+        self.source_topic: dict[str, str] | None = None
+        self.sink_topic: dict[str, str] | None = None
         self.expire_time: int = 0
         super().__init__(mqConfigResponse)
 
 class XTIOTOpenMQ(TuyaOpenMQ):
-    def __init__(self, api: TuyaOpenAPI) -> None:
-        super().__init__(api)
-        self.api: XTIOTOpenAPI = api
 
-    def _get_mqtt_config(self) -> Optional[XTIOTTuyaMQConfig]:
-        if not self.api.is_connect():
+    link_id: str | None = None
+    class_id: str | None = None
+    sleep_time: float | None = None
+
+    def __init__(self, api: XTIOTOpenAPI) -> None:
+        if self.link_id is None:
+            self.link_id: str | None = f"tuya.{uuid.uuid1()}"
+        if self.class_id is None:
+            self.class_id: str | None = "IOT"
+        if self.sleep_time is None:
+            self.sleep_time: float | None = 0
+        super().__init__(api)
+        self.api: XTIOTOpenAPI = api # type: ignore
+
+    def run(self):
+        """Method representing the thread's activity which should not be used directly."""
+        if self.sleep_time:
+            time.sleep(self.sleep_time)
+        while not self._stop_event.is_set():
+            self.__run_mqtt()
+
+            # reconnect every 2 hours required.
+            time.sleep(self.mq_config.expire_time - 60)
+
+    def _get_mqtt_config(self, first_pass = True) -> Optional[XTIOTTuyaMQConfig]:
+        LOGGER.debug(f"[{self.class_id}]Calling _get_mqtt_config")
+        if self.api.is_connect() is False and self.api.reconnect() is False:
             LOGGER.debug(f"_get_mqtt_config failed: not connected", stack_info=True)
+            return None
+        if self.api.token_info is None:
             return None
         response = self.api.post(
             TO_C_CUSTOM_MQTT_CONFIG_API
@@ -63,7 +89,7 @@ class XTIOTOpenMQ(TuyaOpenMQ):
             else TO_C_SMART_HOME_MQTT_CONFIG_API,
             {
                 "uid": self.api.token_info.uid,
-                "link_id": f"tuya.{uuid.uuid1()}",
+                "link_id": self.link_id,
                 "link_type": "mqtt",
                 "topics": "device",
                 "msg_encrypted_version": "2.0"
@@ -73,6 +99,9 @@ class XTIOTOpenMQ(TuyaOpenMQ):
         )
 
         if response.get("success", False) is False:
+            if first_pass:
+                self.api.reconnect()
+                return self._get_mqtt_config(first_pass=False)
             return None
 
         return XTIOTTuyaMQConfig(response)
@@ -89,6 +118,12 @@ class XTIOTOpenMQ(TuyaOpenMQ):
     #
     # def _on_publish(self, mqttc: mqtt.Client, user_data: Any, mid: int, reason_code: mqtt_ReasonCode = None, properties: mqtt_Properties = None):
     #     pass
+
+    def _on_disconnect(self, client, userdata, rc):
+        if rc != 0:
+            LOGGER.error(f"Unexpected disconnection.{rc}")
+        else:
+            LOGGER.debug("disconnect")
 
     def _start(self, mq_config: TuyaMQConfig) -> mqtt.Client:
         #mqttc = mqtt.Client(callback_api_version=mqtt_CallbackAPIVersion.VERSION2 ,client_id=mq_config.client_id)
@@ -110,3 +145,27 @@ class XTIOTOpenMQ(TuyaOpenMQ):
 
         mqttc.loop_start()
         return mqttc
+    
+    def _on_connect(self, mqttc: mqtt.Client, user_data: Any, flags, rc):
+        LOGGER.debug(f"connect flags->{flags}, rc->{rc}")
+        if rc == 0:
+            if self.mq_config.source_topic is not None:
+                for (key, value) in self.mq_config.source_topic.items():
+                    mqttc.subscribe(value)
+        elif rc == CONNECT_FAILED_NOT_AUTHORISED:
+            self.__run_mqtt()
+
+    def __run_mqtt(self):
+        mq_config = self._get_mqtt_config()
+        if mq_config is None:
+            LOGGER.error("error while get mqtt config", stack_info=True)
+            return
+
+        self.mq_config = mq_config
+
+        LOGGER.debug(f"connecting {mq_config.url}")
+        mqttc = self._start(mq_config)
+
+        if self.client:
+            self.client.disconnect()
+        self.client = mqttc

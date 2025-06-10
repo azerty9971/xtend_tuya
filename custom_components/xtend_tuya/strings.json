@@ -161,6 +161,9 @@
   },
   "entity": {
     "binary_sensor": {
+      "pir_state": {
+        "name": "Proximity sensor"
+      },
       "online": {
         "name": "Device online"
       },
@@ -314,6 +317,27 @@
       }
     },
     "number": {
+      "maxhum_set": {
+        "name": "Maximum humidity"
+      },
+      "minihum_set": {
+        "name": "Minimum humidity"
+      },
+      "hum_sensitivity": {
+        "name": "Humidity sensitivity"
+      },
+      "maxtemp_set": {
+        "name": "Maximum temperature"
+      },
+      "minitemp_set": {
+        "name": "Minimum temperature"
+      },
+      "temp_sensitivity": {
+        "name": "Temperature sensitivity"
+      },
+      "report_sensitivity": {
+        "name": "Report sensitivity"
+      },
       "b_detection_distance_max": {
         "name": "Max breath detection distance"
       },
@@ -607,6 +631,21 @@
       }
     },
     "select": {
+      "currency": {
+        "name": "Currency",
+        "state": {
+          "euro": "Euro",
+          "usd": "USD",
+          "rmb": "RMB"
+        }
+      },
+      "tempunit": {
+        "name": "Temperature unit",
+        "state": {
+          "centigrade": "Celsius",
+          "fahrenheit_degree": "Fahrenheit"
+        }
+      },
       "solar_en_total": {
         "name": "Solar energy total",
         "state": {
@@ -1116,6 +1155,146 @@
       }
     },
     "sensor": {
+      "frequency": {
+        "name": "Frequency"
+      },
+      "reactivepower": {
+        "name": "Reactive power"
+      },
+      "reactivepowera": {
+        "name": "Reactive power A"
+      },
+      "reactivepowerb": {
+        "name": "Reactive power B"
+      },
+      "reactivepowerc": {
+        "name": "Reactive power C"
+      },
+      "powerfactora": {
+        "name": "Power factor A"
+      },
+      "powerfactorb": {
+        "name": "Power factor B"
+      },
+      "powerfactorc": {
+        "name": "Power factor C"
+      },
+      "currenta": {
+        "name": "Current A"
+      },
+      "currentb": {
+        "name": "Current B"
+      },
+      "currentc": {
+        "name": "Current C"
+      },
+      "activepower": {
+        "name": "Active power"
+      },
+      "activepowera": {
+        "name": "Active power A"
+      },
+      "activepowerb": {
+        "name": "Active power B"
+      },
+      "activepowerc": {
+        "name": "Active power C"
+      },
+      "energyconsumed": {
+        "name": "Energy consumed"
+      },
+      "energyconsumeda": {
+        "name": "Energy consumed A"
+      },
+      "energyconsumedb": {
+        "name": "Energy consumed B"
+      },
+      "energyconsumedc": {
+        "name": "Energy consumed C"
+      },
+      "gross_generation_a":
+      {
+        "name": "Gross generation A"
+      },
+      "gross_generation_b":
+      {
+        "name": "Gross generation B"
+      },
+      "gross_generation_c":
+      {
+        "name": "Gross generation C"
+      },
+      "temp_alarm": {
+        "name": "Temperature alarm",
+        "state": {
+          "loweralarm": "Low temperature",
+          "upperalarm": "High temperature",
+          "cancel": "None"
+        }
+      },
+      "hum_alarm": {
+        "name": "Humidity alarm",
+        "state": {
+          "loweralarm": "Low humidity",
+          "upperalarm": "High humidity",
+          "cancel": "None"
+        }
+      },
+      "product_specifications": {
+        "name": "Product specification",
+        "state": {
+          "europe": "Europe",
+          "america": "America"
+        }
+      },
+      "deviceid": {
+        "name": "Device ID"
+      },
+      "achz": {
+        "name": "Grid Frequency"
+      },
+      "acv": {
+        "name": "Grid voltage"
+      },
+      "aci": {
+        "name": "Grid current"
+      },
+      "electric": {
+        "name": "Power production"
+      },
+      "electric_this_month": {
+        "name": "Monthly production"
+      },
+      "electric_this_year": {
+        "name": "Yearly production"
+      },
+      "electric_today": {
+        "name": "Daily production"
+      },
+      "electric_total": {
+        "name": "Total power production"
+      },
+      "pv1_volt": {
+        "name": "Panel 1 voltage"
+      },
+      "pv1_curr": {
+        "name": "Panel 1 current"
+      },
+      "pv2_volt": {
+        "name": "Panel 2 voltage"
+      },
+      "pv2_curr": {
+        "name": "Panel 2 current"
+      },
+      "pvv": {
+        "name": "Total panel voltage"
+      },
+      "pvi": {
+        "name": "Total panel 1 current"
+      },
+      "releases": {
+        "name": "Release"
+      },
       "meter_type": {
         "name": "Meter type",
         "state": {
@@ -1125,6 +1304,12 @@
           "1_phase_3_wire": "1 Phase 3 wires",
           "other": "Other"
         }
+      },
+      "unlock_hand": {
+        "name": "Hand unlock user"
+      },
+      "unlock_finger_vein": {
+        "name": "Finger vein unlock user"
       },
       "unlock_card": {
         "name": "Card unlock user"
@@ -1666,7 +1851,12 @@
         "name": "Voltage"
       },
       "battery_state": {
-        "name": "Battery state"
+        "name": "Battery state",
+        "state": {
+          "low": "Low",
+          "middle": "Middle",
+          "high": "High"
+        }
       },
       "gas": {
         "name": "Gas"
@@ -1803,6 +1993,9 @@
       }
     },
     "switch": {
+      "key_rec": {
+        "name": "Key tone"
+      },
       "switch_enabled": {
         "name": "Switch enabled"
       },
@@ -2207,6 +2400,17 @@
           "confirm": {
             "description": "The integration \"{name}\" (`{config_entry_id}`) Does not have Tuya OpenAPI credentials\n\nWithout this, a lot of entities might be missing in your devices.\n\nTo fix this warning please follow the guide at [this URL](https://github.com/azerty9971/xtend_tuya/blob/main/docs/cloud_credentials.md), then restart Home Assistant.",
             "title": "Tuya OpenAPI account not configured"
+          }
+        }
+      }
+    },
+    "tuya_iot_lock_not_subscribed": {
+      "title": "Tuya OpenAPI account badly configured (lock)",
+      "fix_flow": {
+        "step": {
+          "confirm": {
+            "description": "The integration \"{name}\" (`{config_entry_id}`) Does not have a Tuya OpenAPI account that is subscribed to the Smart Lock Open Service\n\nWithout this, locks will not function properly.\n\nTo fix this warning please follow the guide at [this URL](https://github.com/azerty9971/xtend_tuya/blob/main/docs/configure_locks.md), then restart Home Assistant.",
+            "title": "Tuya OpenAPI account badly configured (lock)"
           }
         }
       }

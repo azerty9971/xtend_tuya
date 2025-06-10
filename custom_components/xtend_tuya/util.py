@@ -3,7 +3,7 @@
 from __future__ import annotations
 import copy
 import traceback
-from typing import NamedTuple
+from typing import NamedTuple, Any
 from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.entity import EntityDescription
@@ -20,6 +20,8 @@ from tuya_sharing.manager import (
 
 from .multi_manager.multi_manager import (
     MultiManager,
+)
+from .multi_manager.shared.shared_classes import (
     XTConfigEntry,
     XTDevice,
 )
@@ -27,7 +29,9 @@ from .multi_manager.multi_manager import (
 def log_stack(message: str):
     LOGGER.debug(message, stack_info=True)
 
-def get_default_value(dp_type: DPType) -> any:
+def get_default_value(dp_type: DPType | None) -> Any:
+    if dp_type is None:
+        return None
     match dp_type:
         case DPType.BOOLEAN:
             return False
@@ -60,18 +64,19 @@ def remap_value(
 class ConfigEntryRuntimeData(NamedTuple):
     device_manager: Manager
     device_listener: SharingDeviceListener
-    generic_runtime_data: any
+    generic_runtime_data: Any
 
 def get_config_entry_runtime_data(hass: HomeAssistant, entry: ConfigEntry, domain: str) -> ConfigEntryRuntimeData | None:
     if not entry:
         return None
     runtime_data = None
+    device_manager = None
+    device_listener = None
     if (
         not hasattr(entry, 'runtime_data') 
         or entry.runtime_data is None
     ):
         #Try to fetch the manager using the old way
-        device_manager = None
         if (
             domain in hass.data and
             entry.entry_id in hass.data[domain]
@@ -89,7 +94,7 @@ def get_config_entry_runtime_data(hass: HomeAssistant, entry: ConfigEntry, domai
         runtime_data = entry.runtime_data
         device_manager = entry.runtime_data.manager
         device_listener = entry.runtime_data.listener
-    if device_manager is not None:
+    if device_manager is not None and device_listener is not None:
         return ConfigEntryRuntimeData(device_manager=device_manager, generic_runtime_data=runtime_data, device_listener=device_listener)
     else:
         return None
@@ -97,7 +102,7 @@ def get_config_entry_runtime_data(hass: HomeAssistant, entry: ConfigEntry, domai
 def get_domain_config_entries(hass: HomeAssistant, domain: str) -> list[ConfigEntry]:
     return hass.config_entries.async_entries(domain, False, False)
 
-def get_overriden_config_entry(hass: HomeAssistant, entry: XTConfigEntry, other_domain: str) -> ConfigEntry:
+def get_overriden_config_entry(hass: HomeAssistant, entry: XTConfigEntry, other_domain: str) -> ConfigEntry | None:
     other_domain_config_entries = get_domain_config_entries(hass, other_domain)
     for od_config_entry in other_domain_config_entries:
         if entry.title == od_config_entry.title:
@@ -141,7 +146,7 @@ def append_dictionnaries(dict1: dict, dict2: dict) -> dict:
             return_dict[category] = copy.deepcopy(dict2[category])
     return return_dict
 
-def append_lists(list1: list, list2: list) -> list:
+def append_lists(list1: list, list2: list | None) -> list:
     return_list = copy.deepcopy(list(list1))
     if list2:
         for item in list2:
@@ -161,7 +166,7 @@ def get_all_multi_managers(hass: HomeAssistant) -> list[MultiManager]:
     config_entries = get_domain_config_entries(hass, DOMAIN)
     for config_entry in config_entries:
         if runtime_data := get_config_entry_runtime_data(hass, config_entry, DOMAIN):
-            return_list.append(runtime_data.device_manager)
+            return_list.append(runtime_data.device_manager) # type: ignore
     return return_list
 
 def get_device_multi_manager(hass: HomeAssistant, device: XTDevice) -> MultiManager | None:

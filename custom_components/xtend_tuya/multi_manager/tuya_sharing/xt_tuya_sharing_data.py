@@ -15,4 +15,4 @@ from .xt_tuya_sharing_manager import (
 class TuyaSharingData(NamedTuple):
     device_manager: XTSharingDeviceManager
     device_ids: list[str] #List of device IDs that are managed by the manager before the managers device merging process
-    ha_tuya_integration_config_manager: XTHATuyaIntegrationConfigEntryManager
+    ha_tuya_integration_config_manager: XTHATuyaIntegrationConfigEntryManager | None
