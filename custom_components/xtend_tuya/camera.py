@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
-import asyncio
+import json
 
 from webrtc_models import (
     RTCIceCandidateInit,
+    RTCIceServer,
 )
 
 from homeassistant.const import Platform
@@ -120,7 +121,14 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
             return None
         if ice_servers := await self.iot_manager.async_get_webrtc_ice_servers(self.device, "GO2RTC", self.hass):
             self.webrtc_configuration = WebRTCClientConfiguration()
-            LOGGER.warning(f"Retrieved ICE servers: {ice_servers}")
+            ice_servers_dict: list[dict[str, str]] = json.loads(ice_servers)
+            ice_list: list[RTCIceServer] = []
+            for ice_server in ice_servers_dict:
+                if url := ice_server.get("urls"):
+                    credential = ice_server.get("credential")
+                    username = ice_server.get("username")
+                    ice_list.append(RTCIceServer(urls=url, username=username, credential=credential))
+            self.webrtc_configuration.configuration.ice_servers = ice_list
 
     async def async_handle_async_webrtc_offer(
         self, offer_sdp: str, session_id: str, send_message: WebRTCSendMessage
