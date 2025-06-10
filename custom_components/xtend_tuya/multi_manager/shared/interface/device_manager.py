@@ -6,6 +6,8 @@ from typing import Optional, Literal, Any
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 
+from homeassistant.components.camera.webrtc import WebRTCSendMessage
+
 from ..shared_classes import (
     XTConfigEntry,
     XTDeviceMap,
@@ -138,6 +140,11 @@ class XTDeviceManagerInterface(ABC):
         return None
     
     def send_webrtc_trickle_ice(self, device_id: str, session_id: str, candidate: str) -> str | None:
+        return None
+    
+    async def async_handle_async_webrtc_offer(
+        self, offer_sdp: str, session_id: str, send_message: WebRTCSendMessage, device: XTDevice
+    ) -> None:
         return None
     
     async def on_loading_finalized(self, hass: HomeAssistant, config_entry: XTConfigEntry, multi_manager: MultiManager):

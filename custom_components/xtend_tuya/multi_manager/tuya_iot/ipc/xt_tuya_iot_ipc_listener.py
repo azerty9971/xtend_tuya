@@ -25,6 +25,8 @@ class XTIOTIPCListener:
                 msg_content = data.get("msg", {})
                 match sdp_type:
                     case "answer":
+                        LOGGER.warning(f"ANSWER: {msg_content}")
                         self.ipc_manager.webrtc_manager.set_sdp_answer(session_id, msg_content)
                     case "candidate":
+                        LOGGER.warning(f"CANDIDATE: {msg_content}")
                         self.ipc_manager.webrtc_manager.add_sdp_answer_candidate(session_id, msg_content)

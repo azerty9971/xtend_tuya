@@ -22,6 +22,7 @@ from .xt_tuya_iot_manager import (
 from ..shared.interface.device_manager import (
     XTDeviceManagerInterface,
     IssueSeverity,
+    WebRTCSendMessage,
 )
 from ..shared.shared_classes import (
     XTConfigEntry,
@@ -398,3 +399,10 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
         if self.iot_account is None:
             return None
         return self.iot_account.device_manager.ipc_manager.webrtc_manager.send_webrtc_trickle_ice(device_id, session_id, candidate)
+    
+    async def async_handle_async_webrtc_offer(
+        self, offer_sdp: str, session_id: str, send_message: WebRTCSendMessage, device: XTDevice
+    ) -> None:
+        if self.iot_account is None:
+            return None
+        return await self.iot_account.device_manager.ipc_manager.webrtc_manager.async_handle_async_webrtc_offer(offer_sdp, session_id, send_message, device)

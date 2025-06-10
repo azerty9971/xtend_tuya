@@ -5,11 +5,28 @@ from datetime import datetime, timedelta
 import time
 import json
 
+from webrtc_models import (
+    RTCConfiguration,
+    RTCIceCandidate,
+    RTCIceCandidateInit,
+    RTCIceServer,
+)
+
+from homeassistant.components.camera.webrtc import (
+    WebRTCSendMessage,
+    WebRTCCandidate,
+    WebRTCAnswer,
+)
+
 from .....const import (
     LOGGER,  # noqa: F401
 )
 from ..xt_tuya_iot_ipc_manager import (
     XTIOTIPCManager,
+)
+
+from ....shared.shared_classes import (
+    XTDevice,
 )
 
 class XTIOTWebRTCSession:
@@ -20,6 +37,8 @@ class XTIOTWebRTCSession:
     final_answer: str | None
     answer_candidates: list[dict]
     has_all_candidates: bool
+    message_callback: WebRTCSendMessage | None = None
+    offer_candidate: list[str]
 
     def __init__(self, ttl: int = 600) -> None:
         self.webrtc_config = {}
@@ -30,6 +49,8 @@ class XTIOTWebRTCSession:
         self.answer_candidates = []
         self.valid_until = datetime.now() + timedelta(0, ttl)
         self.has_all_candidates = False
+        self.message_callback = None
+        self.offer_candidate = []
     
     def __repr__(self) -> str:
         answer = ""
@@ -71,15 +92,19 @@ class XTIOTWebRTCManager:
             return
         self._create_session_if_necessary(session_id)
         self.sdp_exchange[session_id].answer = answer
+        if callback := self.sdp_exchange[session_id].message_callback:
+            callback(WebRTCAnswer(answer=f"{answer}"))
     
     def add_sdp_answer_candidate(self, session_id: str | None, candidate: dict) -> None:
         if session_id is None:
             return
         self._create_session_if_necessary(session_id)
         self.sdp_exchange[session_id].answer_candidates.append(candidate)
-        candidate_str = candidate.get("candidate", None)
-        if candidate_str == '':
+        candidate_str = candidate.get("candidate", "")
+        if candidate_str == "":
             self.sdp_exchange[session_id].has_all_candidates = True
+        if callback := self.sdp_exchange[session_id].message_callback:
+            callback(WebRTCCandidate(candidate=RTCIceCandidate(candidate=candidate_str)))
 
     def set_config(self, session_id: str, config: dict[str, Any]):
         self._create_session_if_necessary(session_id)
@@ -360,3 +385,82 @@ class XTIOTWebRTCManager:
                     self.ipc_manager.publish_to_ipc_mqtt(topic, json.dumps(payload))
                 return ""
         return None
+    
+    async def async_handle_async_webrtc_offer(
+        self, offer_sdp: str, session_id: str, send_message: WebRTCSendMessage, device: XTDevice
+    ) -> None:
+        self._create_session_if_necessary(session_id)
+        session_data = self.get_webrtc_session(session_id)
+        if session_data is None:
+            return None
+        session_data.message_callback = send_message
+        self.get_config(device.id, session_id)
+        self.set_original_sdp_offer(session_id, offer_sdp)
+        offer_changed = self.get_candidates_from_offer(session_id, offer_sdp)
+        self.set_sdp_offer(session_id, offer_changed)
+        sdp_offer_payload = self.format_offer_payload(session_id, offer_sdp, device)
+        self.send_to_ipc_mqtt(session_id, device, json.dumps(sdp_offer_payload))
+    
+    def get_candidates_from_offer(self, session_id: str, offer_sdp: str) -> str:
+        session_data = self.get_webrtc_session(session_id)
+        sdp_offer = str(offer_sdp)
+        if session_data is None:
+            return sdp_offer
+        offer_candidates = []
+        ENDLINE = "\r\n"
+        candidate_found = True
+        while candidate_found:
+            offset = sdp_offer.find("a=candidate:")
+            if offset == -1:
+                candidate_found = False
+                break
+            end_offset = sdp_offer.find(ENDLINE, offset) + len(ENDLINE)
+            if end_offset <= offset:
+                break
+            candidate_str = sdp_offer[offset:end_offset]
+            if candidate_str not in offer_candidates:
+                offer_candidates.append(candidate_str)
+            sdp_offer = sdp_offer.replace(candidate_str, "")
+        if len(offer_candidates) > 0:
+            session_data.offer_candidate = offer_candidates
+        return sdp_offer
+    
+    def format_offer_payload(self, session_id: str, offer_sdp: str, device: XTDevice, channel: str = "high") -> dict[str, Any] | None:
+        if webrtc_config := self.get_config(device.id, session_id):
+            return {
+                "protocol":302,
+                "pv":"2.2",
+                "t":int(time.time()),
+                "data":{
+                    "header":{
+                        "from":f"{self.ipc_manager.get_from()}",
+                        "to":f"{device.id}",
+                        #"sub_dev_id":"",
+                        "sessionid":f"{session_id}",
+                        "moto_id":f"{webrtc_config.get("moto_id", "!!!MOTO_ID_NOT_FOUND!!!")}",
+                        #"tid":"",
+                        "type":"offer",
+                    },
+                    "msg":{
+                        "sdp":f"{offer_sdp}",
+                        "auth":f"{webrtc_config.get("auth", "!!!AUTH_NOT_FOUND!!!")}",
+                        "mode":"webrtc",
+                        "stream_type":self._get_stream_type(device.id, session_id, channel),
+                    }
+                },
+            }
+        return None
+    
+    def send_to_ipc_mqtt(self, session_id: str, device: XTDevice, payload: str):
+        webrtc_config = self.get_config(device.id, session_id)
+        if (
+            self.ipc_manager.ipc_mq.mq_config is None or 
+            self.ipc_manager.ipc_mq.mq_config.sink_topic is None or 
+            webrtc_config is None
+        ):
+            return None
+        for topic in self.ipc_manager.ipc_mq.mq_config.sink_topic.values():
+            topic = topic.replace("{device_id}", device.id)
+            topic = topic.replace("moto_id", webrtc_config.get("moto_id", "!!!MOTO_ID_NOT_FOUND!!!"))
+            LOGGER.warning(f"Sending to IPC: {payload}")
+            self.ipc_manager.publish_to_ipc_mqtt(topic, payload)

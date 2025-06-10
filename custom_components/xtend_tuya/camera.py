@@ -17,9 +17,10 @@ from .multi_manager.multi_manager import (
     XTConfigEntry,
     MultiManager,
     XTDevice,
+    XTDeviceManagerInterface,
 )
 
-from .const import TUYA_DISCOVERY_NEW, LOGGER, XTDPCode
+from .const import TUYA_DISCOVERY_NEW, LOGGER, XTDPCode, MESSAGE_SOURCE_TUYA_IOT
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaCameraEntity,
 )
@@ -84,6 +85,12 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         super(XTEntity, self).__init__(device, device_manager) # type: ignore
         self.device = device
         self.device_manager = device_manager
+        self.iot_manager: XTDeviceManagerInterface | None = None
+        if iot_manager := device_manager.get_account_by_name(account_name=MESSAGE_SOURCE_TUYA_IOT):
+            self.iot_manager = iot_manager
+        if self.iot_manager is not None:
+            self._supports_native_sync_webrtc = False
+            self._supports_native_async_webrtc = False
     
     @staticmethod
     def should_entity_be_added(hass: HomeAssistant, device: XTDevice, multi_manager: MultiManager) -> bool:
@@ -98,6 +105,8 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
     async def async_handle_async_webrtc_offer(
         self, offer_sdp: str, session_id: str, send_message: WebRTCSendMessage
     ) -> None:
+        if self.iot_manager is None:
+            return await super().async_handle_async_webrtc_offer(offer_sdp, session_id, send_message)
         LOGGER.warning(f"async_handle_async_webrtc_offer: offer sdp:  {offer_sdp}")
         LOGGER.warning(f"async_handle_async_webrtc_offer: session_id: {session_id}")
-        pass
+        return await self.iot_manager.async_handle_async_webrtc_offer(offer_sdp, session_id, send_message, self.device)
