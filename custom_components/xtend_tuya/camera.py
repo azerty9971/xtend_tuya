@@ -129,14 +129,15 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
                     username = ice_server.get("username")
                     ice_list.append(RTCIceServer(urls=url, username=username, credential=credential))
             self.webrtc_configuration.configuration.ice_servers = ice_list
+            self.webrtc_configuration.get_candidates_upfront = True
 
     async def async_handle_async_webrtc_offer(
         self, offer_sdp: str, session_id: str, send_message: WebRTCSendMessage
     ) -> None:
         if self.iot_manager is None:
             return await super().async_handle_async_webrtc_offer(offer_sdp, session_id, send_message)
-        #LOGGER.warning(f"async_handle_async_webrtc_offer: offer sdp:  {offer_sdp}")
-        LOGGER.warning(f"async_handle_async_webrtc_offer: session_id: {session_id}")
+        LOGGER.warning(f"async_handle_async_webrtc_offer: offer sdp:  {offer_sdp}")
+        #LOGGER.warning(f"async_handle_async_webrtc_offer: session_id: {session_id}")
         return await self.iot_manager.async_handle_async_webrtc_offer(offer_sdp, session_id, send_message, self.device, self.hass)
     
     async def async_on_webrtc_candidate(
@@ -145,8 +146,8 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         """Handle a WebRTC candidate."""
         if self.iot_manager is None:
             return await super().async_on_webrtc_candidate(session_id, candidate)
-        #LOGGER.warning(f"async_on_webrtc_candidate: candidate:  {candidate}")
-        LOGGER.warning(f"async_on_webrtc_candidate: session_id: {session_id}")
+        LOGGER.warning(f"async_on_webrtc_candidate: candidate:  {candidate}")
+        #LOGGER.warning(f"async_on_webrtc_candidate: session_id: {session_id}")
         return await self.iot_manager.async_on_webrtc_candidate(session_id, candidate, self.device)
     
     @callback
