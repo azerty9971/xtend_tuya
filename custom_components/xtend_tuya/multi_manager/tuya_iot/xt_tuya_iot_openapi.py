@@ -179,7 +179,7 @@ class XTIOTOpenAPI(TuyaOpenAPI):
     def is_connect(self) -> bool:
         """Is connect to tuya cloud."""
         ret_val = super().is_connect()
-        LOGGER.debug(f"[API]is_connect = {ret_val}")
+        #LOGGER.debug(f"[API]is_connect = {ret_val}")
         return ret_val
     
     def test_validity(self) -> dict[str, Any]:
