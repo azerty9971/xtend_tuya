@@ -13,7 +13,7 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.components.camera.webrtc import WebRTCSendMessage, WebRTCClientConfiguration
-
+from homeassistant.components.stream import Stream
 from .util import (
     append_lists
 )
@@ -93,6 +93,7 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         self.device_manager = device_manager
         self.iot_manager: XTDeviceManagerInterface | None = None
         self.hass = hass
+        self.webrtc_configuration: WebRTCClientConfiguration | None = None
         if iot_manager := device_manager.get_account_by_name(account_name=MESSAGE_SOURCE_TUYA_IOT):
             self.iot_manager = iot_manager
         if self.iot_manager is None:
@@ -133,7 +134,10 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         """Return the WebRTC client configuration adjustable per integration."""
         if self.iot_manager is None:
             return super()._async_get_webrtc_client_configuration()
-        webrtc_config = WebRTCClientConfiguration()
-        if ice_config := self.iot_manager.get_webrtc_ice_servers(self.device.id, None, "GO2RTC", self.hass):
-            LOGGER.warning(f"ICE_CONFIG: {ice_config}")
-        return webrtc_config
+        LOGGER.warning(f"_async_get_webrtc_client_configuration")
+        self.webrtc_configuration = WebRTCClientConfiguration()
+        return self.webrtc_configuration
+    
+    async def async_create_stream(self) -> Stream | None:
+        LOGGER.warning(f"async_create_stream")
+        return await super().async_create_stream()
