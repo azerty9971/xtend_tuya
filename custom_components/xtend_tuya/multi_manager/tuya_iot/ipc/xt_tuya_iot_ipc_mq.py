@@ -18,6 +18,7 @@ from tuya_iot.openmq import (
 from ..xt_tuya_iot_mq import (
     XTIOTOpenMQ,
     XTIOTTuyaMQConfig,
+    TuyaMQConfig,
 )
 from ..xt_tuya_iot_openapi import (
     XTIOTOpenAPI,
@@ -42,3 +43,24 @@ class XTIOTOpenMQIPC(XTIOTOpenMQ):
         LOGGER.warning(f"IPC Message: {msg_dict}")
         for listener in self.message_listeners:
             listener(msg_dict)
+    
+    def _start(self, mq_config: TuyaMQConfig) -> mqtt.Client:
+        #mqttc = mqtt.Client(callback_api_version=mqtt_CallbackAPIVersion.VERSION2 ,client_id=mq_config.client_id)
+        mqttc = mqtt.Client(client_id=mq_config.client_id)
+        mqttc.username_pw_set(mq_config.username, mq_config.password)
+        mqttc.user_data_set({"mqConfig": mq_config})
+        mqttc.on_connect = self._on_connect
+        mqttc.on_message = self._on_message
+        mqttc.on_subscribe = self._on_subscribe
+        mqttc.on_log = self._on_log
+        #mqttc.on_publish = self._on_publish
+        mqttc.on_disconnect = self._on_disconnect
+
+        url = urlsplit(mq_config.url)
+        if url.scheme == "ssl":
+            mqttc.tls_set()
+
+        mqttc.connect(url.hostname, url.port)
+
+        mqttc.loop_start()
+        return mqttc
