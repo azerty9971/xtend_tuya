@@ -7,6 +7,7 @@ from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.components.camera.webrtc import WebRTCSendMessage
 
 from .util import (
     append_lists
@@ -93,3 +94,10 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         if device.category in ["videolock"]:
             return True
         return False
+    
+    async def async_handle_async_webrtc_offer(
+        self, offer_sdp: str, session_id: str, send_message: WebRTCSendMessage
+    ) -> None:
+        LOGGER.warning(f"async_handle_async_webrtc_offer: offer sdp:  {offer_sdp}")
+        LOGGER.warning(f"async_handle_async_webrtc_offer: session_id: {session_id}")
+        pass
