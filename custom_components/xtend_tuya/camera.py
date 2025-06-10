@@ -12,7 +12,7 @@ from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.components.camera.webrtc import WebRTCSendMessage
+from homeassistant.components.camera.webrtc import WebRTCSendMessage, WebRTCClientConfiguration
 
 from .util import (
     append_lists
@@ -126,3 +126,14 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
             return await super().async_on_webrtc_candidate(session_id, candidate)
         LOGGER.warning(f"async_on_webrtc_candidate: candidate:  {candidate}")
         LOGGER.warning(f"async_on_webrtc_candidate: session_id: {session_id}")
+        return await self.iot_manager.async_on_webrtc_candidate(session_id, candidate, self.device)
+    
+    @callback
+    def _async_get_webrtc_client_configuration(self) -> WebRTCClientConfiguration:
+        """Return the WebRTC client configuration adjustable per integration."""
+        if self.iot_manager is None:
+            return super()._async_get_webrtc_client_configuration()
+        webrtc_config = WebRTCClientConfiguration()
+        if ice_config := self.iot_manager.get_webrtc_ice_servers(self.device.id, None, "GO2RTC"):
+            LOGGER.warning(f"ICE_CONFIG: {ice_config}")
+        return webrtc_config

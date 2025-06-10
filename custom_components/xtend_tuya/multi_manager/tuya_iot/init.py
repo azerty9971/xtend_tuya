@@ -3,6 +3,9 @@ from __future__ import annotations
 import requests
 import json
 from typing import Optional, Literal, Any, overload
+from webrtc_models import (
+    RTCIceCandidateInit,
+)
 
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
@@ -377,7 +380,7 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
             return None
         return self.iot_account.device_manager.ipc_manager.webrtc_manager.get_sdp_answer(device_id, session_id, sdp_offer, channel)
     
-    def get_webrtc_ice_servers(self, device_id: str, session_id: str, format: str) -> str | None:
+    def get_webrtc_ice_servers(self, device_id: str, session_id: str | None, format: str) -> str | None:
         if self.iot_account is None:
             return None
         return self.iot_account.device_manager.ipc_manager.webrtc_manager.get_ice_servers(device_id, session_id, format)
@@ -406,3 +409,10 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
         if self.iot_account is None:
             return None
         return await self.iot_account.device_manager.ipc_manager.webrtc_manager.async_handle_async_webrtc_offer(offer_sdp, session_id, send_message, device, hass)
+    
+    async def async_on_webrtc_candidate(
+        self, session_id: str, candidate: RTCIceCandidateInit, device: XTDevice
+    ) -> None:
+        if self.iot_account is None:
+            return None
+        return await self.iot_account.device_manager.ipc_manager.webrtc_manager.async_on_webrtc_candidate(session_id, candidate, device)

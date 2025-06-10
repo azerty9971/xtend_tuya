@@ -6,6 +6,10 @@ from typing import Optional, Literal, Any
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 
+from webrtc_models import (
+    RTCIceCandidateInit,
+)
+
 from homeassistant.components.camera.webrtc import WebRTCSendMessage
 
 from ..shared_classes import (
@@ -130,7 +134,7 @@ class XTDeviceManagerInterface(ABC):
     def get_webrtc_sdp_answer(self, device_id: str, session_id: str, sdp_offer: str, channel: str) -> str | None:
         return None
     
-    def get_webrtc_ice_servers(self, device_id: str, session_id: str, format: str) -> str | None:
+    def get_webrtc_ice_servers(self, device_id: str, session_id: str | None, format: str) -> str | None:
         return None
     
     def get_webrtc_exchange_debug(self, session_id: str) -> str | None:
@@ -146,6 +150,11 @@ class XTDeviceManagerInterface(ABC):
         self, offer_sdp: str, session_id: str, send_message: WebRTCSendMessage, device: XTDevice, hass: HomeAssistant
     ) -> None:
         return None
+    
+    async def async_on_webrtc_candidate(
+        self, session_id: str, candidate: RTCIceCandidateInit, device: XTDevice
+    ) -> None:
+        pass
     
     async def on_loading_finalized(self, hass: HomeAssistant, config_entry: XTConfigEntry, multi_manager: MultiManager):
         pass

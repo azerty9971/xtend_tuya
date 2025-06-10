@@ -75,7 +75,9 @@ class XTIOTWebRTCManager:
         self.sdp_exchange: dict[str, XTIOTWebRTCSession] = {}
         self.ipc_manager = ipc_manager
     
-    def get_webrtc_session(self, session_id: str) -> XTIOTWebRTCSession | None:
+    def get_webrtc_session(self, session_id: str | None) -> XTIOTWebRTCSession | None:
+        if session_id is None:
+            return None
         self._clean_cache()
         if result := self.sdp_exchange.get(session_id):
             return result
@@ -139,21 +141,22 @@ class XTIOTWebRTCManager:
                 return await current_exchange.hass.async_add_executor_job(self._get_config_from_cloud, device_id, session_id)
         return self._get_config_from_cloud(device_id, session_id)
 
-    def get_config(self, device_id: str, session_id: str) -> dict | None:
+    def get_config(self, device_id: str, session_id: str | None) -> dict | None:
         if current_exchange := self.get_webrtc_session(session_id):
             if current_exchange.webrtc_config:
                 return current_exchange.webrtc_config
         return self._get_config_from_cloud(device_id, session_id)
     
-    def _get_config_from_cloud(self, device_id: str, session_id: str) -> dict | None:
+    def _get_config_from_cloud(self, device_id: str, session_id: str | None) -> dict | None:
         webrtc_config = self.ipc_manager.api.get(f"/v1.0/devices/{device_id}/webrtc-configs")
         if webrtc_config.get("success"):
             result = webrtc_config.get("result", {})
-            self.set_config(session_id, result)
+            if session_id is not None:
+                self.set_config(session_id, result)
             return result
         return None
     
-    def get_ice_servers(self, device_id: str, session_id: str, format: str) -> str | None:
+    def get_ice_servers(self, device_id: str, session_id: str | None, format: str) -> str | None:
         if config := self.get_config(device_id, session_id):
             p2p_config: dict = config.get("p2p_config", {})
             ice_str = p2p_config.get("ices", "{}")
@@ -414,6 +417,12 @@ class XTIOTWebRTCManager:
         self.set_sdp_offer(session_id, offer_changed)
         sdp_offer_payload = self.format_offer_payload(session_id, offer_sdp, device)
         self.send_to_ipc_mqtt(session_id, device, json.dumps(sdp_offer_payload))
+
+    async def async_on_webrtc_candidate(
+        self, session_id: str, candidate: RTCIceCandidateInit, device: XTDevice
+    ) -> None:
+        if payload := self.format_offer_candidate(session_id, candidate.candidate, device):
+            self.send_to_ipc_mqtt(session_id, device, json.dumps(payload))
     
     def get_candidates_from_offer(self, session_id: str, offer_sdp: str) -> str:
         session_data = self.get_webrtc_session(session_id)
@@ -460,6 +469,31 @@ class XTIOTWebRTCManager:
                         "auth":f"{webrtc_config.get("auth", "!!!AUTH_NOT_FOUND!!!")}",
                         "mode":"webrtc",
                         "stream_type":self._get_stream_type(device.id, session_id, channel),
+                    }
+                },
+            }
+        return None
+    
+    def format_offer_candidate(self, session_id: str, candidate: str, device: XTDevice) -> dict[str, Any] | None:
+        if webrtc_config := self.get_config(device.id, session_id):
+            moto_id =  webrtc_config.get("moto_id", "!!!MOTO_ID_NOT_FOUND!!!")
+            return {
+                "protocol":302,
+                "pv":"2.2",
+                "t":int(time.time()),
+                "data":{
+                    "header":{
+                        "type":"candidate",
+                        "from":f"{self.ipc_manager.get_from()}",
+                        "to":f"{device.id}",
+                        "sub_dev_id":"",
+                        "sessionid":f"{session_id}",
+                        "moto_id":f"{moto_id}",
+                        "tid":""
+                    },
+                    "msg":{
+                        "mode":"webrtc",
+                        "candidate": candidate
                     }
                 },
             }
