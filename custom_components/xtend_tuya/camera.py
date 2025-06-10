@@ -134,6 +134,6 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         if self.iot_manager is None:
             return super()._async_get_webrtc_client_configuration()
         webrtc_config = WebRTCClientConfiguration()
-        if ice_config := self.iot_manager.get_webrtc_ice_servers(self.device.id, None, "GO2RTC"):
+        if ice_config := self.hass.async_add_executor_job(self.iot_manager.get_webrtc_ice_servers, self.device.id, None, "GO2RTC"):
             LOGGER.warning(f"ICE_CONFIG: {ice_config}")
         return webrtc_config
