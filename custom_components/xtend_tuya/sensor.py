@@ -288,22 +288,28 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         reset_yearly=True,
     ),
     XTSensorEntityDescription(
+        key=XTDPCode.ENERGYCONSUMED,
+        translation_key="energyconsumed",
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL
+    ),
+    XTSensorEntityDescription(
         key=XTDPCode.ENERGYCONSUMEDA,
         translation_key="energyconsumeda",
         device_class=SensorDeviceClass.ENERGY,
-        state_class=SensorStateClass.TOTAL_INCREASING
+        state_class=SensorStateClass.TOTAL
     ),
     XTSensorEntityDescription(
         key=XTDPCode.ENERGYCONSUMEDB,
         translation_key="energyconsumedb",
         device_class=SensorDeviceClass.ENERGY,
-        state_class=SensorStateClass.TOTAL_INCREASING
+        state_class=SensorStateClass.TOTAL
     ),
     XTSensorEntityDescription(
         key=XTDPCode.ENERGYCONSUMEDC,
         translation_key="energyconsumedc",
         device_class=SensorDeviceClass.ENERGY,
-        state_class=SensorStateClass.TOTAL_INCREASING
+        state_class=SensorStateClass.TOTAL
     ),
     XTSensorEntityDescription(
         key=XTDPCode.FORWARD_ENERGY_TOTAL,

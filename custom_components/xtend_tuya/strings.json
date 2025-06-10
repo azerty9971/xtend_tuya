@@ -1200,6 +1200,9 @@
       "activepowerc": {
         "name": "Active power C"
       },
+      "energyconsumed": {
+        "name": "Energy consumed"
+      },
       "energyconsumeda": {
         "name": "Energy consumed A"
       },

@@ -64,9 +64,14 @@ class XTMergingManager:
         higher_priority.status = XTMergingManager.smart_merge(higher_priority.status, lower_priority.status, None, "status")
         higher_priority.local_strategy = XTMergingManager.smart_merge(higher_priority.local_strategy, lower_priority.local_strategy, msg_queue, "local_strategy")
         if msg_queue:
-            LOGGER.warning(f"Messages for merging of {higher_bak} and {lower_bak}:")
-            for msg in msg_queue:
-                LOGGER.warning(msg)
+            if multi_manager is not None:
+                multi_manager.device_watcher.report_message(device1.id, f"Messages for merging of {higher_bak} and {lower_bak}:")
+                for msg in msg_queue:
+                    multi_manager.device_watcher.report_message(device1.id, msg)
+            else:
+                LOGGER.warning(f"Messages for merging of {higher_bak} and {lower_bak}:")
+                for msg in msg_queue:
+                    LOGGER.warning(msg)
 
         #Now link the references so that they point to the same structure in memory
         lower_priority.status_range = higher_priority.status_range
