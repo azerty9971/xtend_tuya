@@ -135,13 +135,17 @@ class XTIOTWebRTCManager:
         if session_id not in self.sdp_exchange:
             self.sdp_exchange[session_id] = XTIOTWebRTCSession()
     
-    async def async_get_config(self, device_id: str, session_id: str | None) -> dict | None:
+    async def async_get_config(self, device_id: str, session_id: str | None, hass: HomeAssistant | None = None) -> dict | None:
+        local_hass = hass
         if current_exchange := self.get_webrtc_session(session_id):
             if current_exchange.webrtc_config:
                 return current_exchange.webrtc_config
             if current_exchange.hass is not None:
-                return await current_exchange.hass.async_add_executor_job(self._get_config_from_cloud, device_id, session_id)
-        return self._get_config_from_cloud(device_id, session_id)
+                local_hass = hass
+        if local_hass is not None:
+            return await local_hass.async_add_executor_job(self._get_config_from_cloud, device_id, session_id)
+        else:
+            return self._get_config_from_cloud(device_id, session_id)
 
     def get_config(self, device_id: str, session_id: str | None) -> dict | None:
         if current_exchange := self.get_webrtc_session(session_id):
@@ -158,8 +162,8 @@ class XTIOTWebRTCManager:
             return result
         return None
     
-    async def async_get_ice_servers(self, device_id: str, session_id: str | None, format: str) -> str | None:
-        if config := await self.async_get_config(device_id, session_id):
+    async def async_get_ice_servers(self, device_id: str, session_id: str | None, format: str, hass: HomeAssistant) -> str | None:
+        if config := await self.async_get_config(device_id, session_id, hass):
             p2p_config: dict = config.get("p2p_config", {})
             ice_str = p2p_config.get("ices", "{}")
             match format:
