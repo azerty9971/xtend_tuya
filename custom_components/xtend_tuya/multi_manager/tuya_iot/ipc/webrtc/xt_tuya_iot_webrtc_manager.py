@@ -12,6 +12,8 @@ from webrtc_models import (
     RTCIceServer,
 )
 
+from homeassistant.core import HomeAssistant
+
 from homeassistant.components.camera.webrtc import (
     WebRTCSendMessage,
     WebRTCCandidate,
@@ -39,6 +41,7 @@ class XTIOTWebRTCSession:
     has_all_candidates: bool
     message_callback: WebRTCSendMessage | None = None
     offer_candidate: list[str]
+    hass: HomeAssistant | None
 
     def __init__(self, ttl: int = 600) -> None:
         self.webrtc_config = {}
@@ -128,11 +131,21 @@ class XTIOTWebRTCManager:
         if session_id not in self.sdp_exchange:
             self.sdp_exchange[session_id] = XTIOTWebRTCSession()
     
+    async def async_get_config(self, device_id: str, session_id: str) -> dict | None:
+        if current_exchange := self.get_webrtc_session(session_id):
+            if current_exchange.webrtc_config:
+                return current_exchange.webrtc_config
+            if current_exchange.hass is not None:
+                return await current_exchange.hass.async_add_executor_job(self._get_config_from_cloud, device_id, session_id)
+        return self._get_config_from_cloud(device_id, session_id)
+
     def get_config(self, device_id: str, session_id: str) -> dict | None:
         if current_exchange := self.get_webrtc_session(session_id):
             if current_exchange.webrtc_config:
                 return current_exchange.webrtc_config
-        
+        return self._get_config_from_cloud(device_id, session_id)
+    
+    def _get_config_from_cloud(self, device_id: str, session_id: str) -> dict | None:
         webrtc_config = self.ipc_manager.api.get(f"/v1.0/devices/{device_id}/webrtc-configs")
         if webrtc_config.get("success"):
             result = webrtc_config.get("result", {})
@@ -387,14 +400,15 @@ class XTIOTWebRTCManager:
         return None
     
     async def async_handle_async_webrtc_offer(
-        self, offer_sdp: str, session_id: str, send_message: WebRTCSendMessage, device: XTDevice
+        self, offer_sdp: str, session_id: str, send_message: WebRTCSendMessage, device: XTDevice, hass: HomeAssistant
     ) -> None:
         self._create_session_if_necessary(session_id)
         session_data = self.get_webrtc_session(session_id)
         if session_data is None:
             return None
         session_data.message_callback = send_message
-        self.get_config(device.id, session_id)
+        session_data.hass = hass
+        await self.async_get_config(device.id, session_id)
         self.set_original_sdp_offer(session_id, offer_sdp)
         offer_changed = self.get_candidates_from_offer(session_id, offer_sdp)
         self.set_sdp_offer(session_id, offer_changed)

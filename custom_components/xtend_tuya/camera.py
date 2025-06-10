@@ -61,7 +61,7 @@ async def async_setup_entry(
             if device := hass_data.manager.device_map.get(device_id):
                 if device.category in merged_categories:
                     if XTCameraEntity.should_entity_be_added(hass, device, hass_data.manager):
-                        entities.append(XTCameraEntity(device, hass_data.manager))
+                        entities.append(XTCameraEntity(device, hass_data.manager, hass))
 
         async_add_entities(entities)
 
@@ -79,6 +79,7 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         self,
         device: XTDevice,
         device_manager: MultiManager,
+        hass: HomeAssistant,
     ) -> None:
         """Init XT Camera."""
         super(XTCameraEntity, self).__init__(device, device_manager)
@@ -86,6 +87,7 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         self.device = device
         self.device_manager = device_manager
         self.iot_manager: XTDeviceManagerInterface | None = None
+        self.hass = hass
         if iot_manager := device_manager.get_account_by_name(account_name=MESSAGE_SOURCE_TUYA_IOT):
             self.iot_manager = iot_manager
         if self.iot_manager is None:
@@ -109,4 +111,4 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
             return await super().async_handle_async_webrtc_offer(offer_sdp, session_id, send_message)
         LOGGER.warning(f"async_handle_async_webrtc_offer: offer sdp:  {offer_sdp}")
         LOGGER.warning(f"async_handle_async_webrtc_offer: session_id: {session_id}")
-        return await self.iot_manager.async_handle_async_webrtc_offer(offer_sdp, session_id, send_message, self.device)
+        return await self.iot_manager.async_handle_async_webrtc_offer(offer_sdp, session_id, send_message, self.device, self.hass)

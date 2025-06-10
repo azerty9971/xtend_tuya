@@ -143,7 +143,7 @@ class XTDeviceManagerInterface(ABC):
         return None
     
     async def async_handle_async_webrtc_offer(
-        self, offer_sdp: str, session_id: str, send_message: WebRTCSendMessage, device: XTDevice
+        self, offer_sdp: str, session_id: str, send_message: WebRTCSendMessage, device: XTDevice, hass: HomeAssistant
     ) -> None:
         return None
     
