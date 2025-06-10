@@ -453,6 +453,7 @@ class XTIOTWebRTCManager:
         await self.async_get_config(device.id, session_id, hass)
         self.set_original_sdp_offer(session_id, offer_sdp)
         offer_changed = self.get_candidates_from_offer(session_id, offer_sdp)
+        offer_changed = self.fix_offer(offer_changed)
         self.set_sdp_offer(session_id, offer_changed)
         sdp_offer_payload = self.format_offer_payload(session_id, offer_sdp, device)
         self.send_to_ipc_mqtt(session_id, device, json.dumps(sdp_offer_payload))
@@ -460,6 +461,8 @@ class XTIOTWebRTCManager:
         for candidate in session_data.offer_candidate:
             if candidate_payload := self.format_offer_candidate(session_id, candidate, device):
                 self.send_to_ipc_mqtt(session_id, device, json.dumps(candidate_payload))
+        time.sleep(1)
+        self.send_to_ipc_mqtt(session_id, device, json.dumps(self.format_offer_candidate(session_id, "", device)))
 
     async def async_on_webrtc_candidate(
         self, session_id: str, candidate: RTCIceCandidateInit, device: XTDevice
@@ -496,6 +499,21 @@ class XTIOTWebRTCManager:
         if len(offer_candidates) > 0:
             session_data.offer_candidate = offer_candidates
         return sdp_offer
+    
+    def fix_offer(self, offer_sdp: str) -> str:
+        ENDLINE = "\r\n"
+        extmap_found = True
+        while extmap_found:
+            offset = offer_sdp.find("a=extmap:")
+            if offset == -1:
+                extmap_found = False
+                break
+            end_offset = offer_sdp.find(ENDLINE, offset) + len(ENDLINE)
+            if end_offset <= offset:
+                break
+            candidate_str = offer_sdp[offset:end_offset]
+            offer_sdp = offer_sdp.replace(candidate_str, "")
+        return offer_sdp
     
     def format_offer_payload(self, session_id: str, offer_sdp: str, device: XTDevice, channel: str = "high") -> dict[str, Any] | None:
         if webrtc_config := self.get_config(device.id, session_id):
