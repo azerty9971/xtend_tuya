@@ -603,10 +603,11 @@ class XTIOTWebRTCManager:
                         answer_sdp = answer_sdp[0:mode_offset] + new_mode + answer_sdp[mode_offset+len(mode_to_search):]
                         break
             
-            #Change returned RTPMap from 103 to 126 to have a matching video stream
-            answer_sdp = answer_sdp.replace(":103 ", ":126 ")
-            answer_sdp = answer_sdp.replace("a=fmtp:126 level-asymmetry-allowed=1;packetization-mode=1;profile-level-id=42001f", "a=fmtp:126 profile-level-id=42e01f;level-asymmetry-allowed=1;packetization-mode=1")
-            answer_sdp = answer_sdp.replace(f"a=rtcp-fb:126 nack pli{ENDLINE}", f"a=rtcp-fb:126 nack pli{ENDLINE}a=rtcp-fb:126 transport-cc{ENDLINE}")
+            #Change returned RTPMap from 103 to 126 to have a matching video stream (support for Firefox)
+            if answer_sdp.find(":126 ") == -1 and answer_sdp.find(":103 ") != -1:
+                answer_sdp = answer_sdp.replace(":103 ", ":126 ")
+                answer_sdp = answer_sdp.replace("a=fmtp:126 level-asymmetry-allowed=1;packetization-mode=1;profile-level-id=42001f", "a=fmtp:126 profile-level-id=42e01f;level-asymmetry-allowed=1;packetization-mode=1")
+                answer_sdp = answer_sdp.replace(f"a=rtcp-fb:126 nack pli{ENDLINE}", f"a=rtcp-fb:126 nack pli{ENDLINE}a=rtcp-fb:126 transport-cc{ENDLINE}")
         return answer_sdp
     
     def format_offer_payload(self, session_id: str, offer_sdp: str, device: XTDevice, channel: str = "high") -> dict[str, Any] | None:
