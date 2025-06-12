@@ -575,8 +575,7 @@ class XTIOTWebRTCManager:
                 match_tuple: tuple | None = webrtc_session.answer_codec_manager.get_closest_same_codec_rtpmap(webrtc_session.offer_codec_manager, m_section)
                 if match_tuple is not None:
                     full_match_found, best_answer_rtpmap, best_offer_rtpmap = match_tuple
-                    if full_match_found is False:
-                        LOGGER.warning(f"No matching RTPMap found for section {m_section}, closest are {best_answer_rtpmap} and {best_offer_rtpmap}")
+                    LOGGER.warning(f"RTPMap comparison result for {m_section}({full_match_found}), closest are {best_answer_rtpmap} and {best_offer_rtpmap}")
 
         while fingerprint_found:
             offset = answer_sdp.find("a=fingerprint:", searched_offset)
