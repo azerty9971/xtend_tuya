@@ -46,6 +46,8 @@ class XTIOTWebRTCSession:
     hass: HomeAssistant | None
     offer_sent: bool = False
     modes: dict[str, str]
+    offer_codec_manager: XTIOTWebRTCCodecManager | None = None
+    answer_codec_manager: XTIOTWebRTCCodecManager | None = None
 
     def __init__(self, ttl: int = 600) -> None:
         self.webrtc_config = None
@@ -60,6 +62,8 @@ class XTIOTWebRTCSession:
         self.offer_candidate = []
         self.offer_sent = False
         self.modes = {}
+        self.offer_codec_manager = None
+        self.answer_codec_manager = None
     
     def __repr__(self) -> str:
         answer = ""
@@ -520,6 +524,8 @@ class XTIOTWebRTCManager:
 
         if webrtc_session is None:
             return offer_sdp
+        
+        webrtc_session.offer_codec_manager = XTIOTWebRTCCodecManager(offer_sdp)
 
         while extmap_found:
             offset = offer_sdp.find("a=extmap:")
@@ -560,6 +566,17 @@ class XTIOTWebRTCManager:
 
         if webrtc_session is None:
             return answer_sdp
+        
+        webrtc_session.answer_codec_manager = XTIOTWebRTCCodecManager(answer_sdp)
+
+        if webrtc_session.offer_codec_manager is not None:
+            m_sections: list[str] = webrtc_session.answer_codec_manager.get_m_sections()
+            for m_section in m_sections:
+                match_tuple: tuple | None = webrtc_session.answer_codec_manager.get_closest_same_codec_rtpmap(webrtc_session.offer_codec_manager, m_section)
+                if match_tuple is not None:
+                    full_match_found, best_answer_rtpmap, best_offer_rtpmap = match_tuple
+                    if full_match_found is False:
+                        LOGGER.warning(f"No matching RTPMap found for section {m_section}, closest are {best_answer_rtpmap} and {best_offer_rtpmap}")
 
         while fingerprint_found:
             offset = answer_sdp.find("a=fingerprint:", searched_offset)
@@ -578,6 +595,8 @@ class XTIOTWebRTCManager:
             answer_sdp = answer_sdp.replace(fingerprint_orig_str, fingerprint_new_str)
         
         if webrtc_session.offer is not None and webrtc_session.offer.find("mozilla") != -1:
+            #Firefox has a much more strict SDP checking mecanism than Chrome, fix the answer so that it accepts it
+
             #Fix send/receive mode for Firefox
             searched_offset = 0
             has_more_m_sections = True
@@ -674,3 +693,170 @@ class XTIOTWebRTCManager:
             topic = topic.replace("moto_id", webrtc_config.get("moto_id", "!!!MOTO_ID_NOT_FOUND!!!"))
             #LOGGER.warning(f"Sending to IPC: {payload}")
             self.ipc_manager.publish_to_ipc_mqtt(topic, payload)
+
+class XTIOTWebRTCCodecManager:
+    def __init__(self, sdp_offer_answer: str) -> None:
+        self.sdp_offer_answer = sdp_offer_answer
+        self.rtpmap: dict[str, dict[str, list[XTIOTWebRTCRTPMap]]] = {}
+        self._parse_offer_answer()
+    
+    def _parse_offer_answer(self):
+        sdp_lines = self.sdp_offer_answer.split(ENDLINE)
+        m_line: str | None = None
+        id_dict: dict[int, XTIOTWebRTCRTPMap] = {}
+        for sdp_line in sdp_lines:
+            if sdp_line.startswith("m="):
+                m_line = sdp_line
+            if sdp_line.startswith("a=rtpmap:"):
+               if m_line is not None:
+                    rtpmap = XTIOTWebRTCRTPMap(sdp_line, m_line)
+                    if codec := rtpmap.get_codec():
+                        m_line_section = rtpmap.get_m_line_section()
+                        if m_line_section not in self.rtpmap:
+                            self.rtpmap[m_line_section] = {}
+                            self.rtpmap[m_line_section][codec] = []
+                        self.rtpmap[m_line_section][codec].append(rtpmap)
+                        if rtpmap_id := rtpmap.get_rtpmap_id():
+                            id_dict[rtpmap_id] = rtpmap
+        for sdp_line in sdp_lines:
+            if (
+                sdp_line.startswith("a=rtcp-fb:") or
+                sdp_line.startswith("a=fmtp:")
+            ):
+                if rtpmap_id := XTIOTWebRTCRTPMap.get_a_line_id(sdp_line):
+                    if rtpmap_id in id_dict:
+                        id_dict[rtpmap_id].add_a_line(sdp_line)
+    
+    def get_m_sections(self) -> list[str]:
+        return_list: list[str] = []
+        for m_section in self.rtpmap:
+            return_list.append(m_section)
+        return return_list
+
+    def get_closest_same_codec_rtpmap(self, other_codec_manager: XTIOTWebRTCCodecManager, m_line_section: str) -> tuple[bool, XTIOTWebRTCRTPMap, XTIOTWebRTCRTPMap] | None:
+        if m_line_section not in self.rtpmap or m_line_section not in other_codec_manager.rtpmap:
+            return None
+        own_codec_map = self.rtpmap[m_line_section]
+        other_codec_map = other_codec_manager.rtpmap[m_line_section]
+        match_score: float = -1
+        best_own_rtpmap: XTIOTWebRTCRTPMap | None = None
+        best_other_rtpmap: XTIOTWebRTCRTPMap | None = None
+        for codec in own_codec_map:
+            if codec in other_codec_map:
+                for own_rtpmap in own_codec_map[codec]:
+                    for other_rtpmap in other_codec_map[codec]:
+                        total, matching = own_rtpmap.get_comparison_score(other_rtpmap)
+                        if total == matching:
+                            #Found a full match, return it
+                            return True, own_rtpmap, other_rtpmap
+                        if total == 0:
+                            continue
+                        cur_match_score = matching / total
+                        if cur_match_score > match_score:
+                            match_score = cur_match_score
+                            best_own_rtpmap = own_rtpmap
+                            best_other_rtpmap = other_rtpmap
+        if best_own_rtpmap is not None and best_other_rtpmap is not None:
+            return False, best_own_rtpmap, best_other_rtpmap
+        return None
+                
+class XTIOTWebRTCRTPMap:
+    def __init__(self, rtpmap_line: str, m_line: str) -> None:
+        self.rtpmap = rtpmap_line
+        self.m_line = m_line
+        self.a_lines: dict[str, XTIOTWebRTCRTPMapALineGroup] = {} #dict[a=...:, tokens]
+    
+    def __repr__(self) -> str:
+        return self.rtpmap
+
+    def get_m_line_section(self) -> str:
+        return self.m_line[2:]
+    
+    @staticmethod
+    def get_a_line_id(a_line: str) -> int | None:
+        rtpmap_split = a_line.split(" ")
+        if len(rtpmap_split) > 1:
+            left = rtpmap_split[0]
+            left_split = left.split(":")
+            if len(left_split) > 1:
+                id = left_split[1]
+                if id.isdigit():
+                    return int(id)
+        return None
+
+    def get_rtpmap_id(self) -> int | None:
+        return XTIOTWebRTCRTPMap.get_a_line_id(self.rtpmap)
+    
+    def get_codec(self) -> str | None:
+        rtpmap_split = self.rtpmap.split(" ", 1)
+        if len(rtpmap_split) > 1:
+            return rtpmap_split[1]
+        return None
+    
+    def add_a_line(self, a_line: str) -> None:
+        a_line_split = a_line.split(":")
+        if len(a_line_split) > 1:
+            a_line_left = a_line_split[0]
+            if a_line_left not in self.a_lines:
+                self.a_lines[a_line_left] = XTIOTWebRTCRTPMapALineGroup()
+            self.a_lines[a_line_left].add_a_line_tokens(a_line)
+        return None
+    
+    def get_comparison_score(self, other_rtpmap: XTIOTWebRTCRTPMap) -> tuple[int, int]:
+        total_lines: int = 0
+        matching_lines: int = 0
+        a_left_list: list[str] = []
+        for a_left in self.a_lines:
+            if a_left not in a_left_list:
+                a_left_list.append(a_left)
+        for a_left in other_rtpmap.a_lines:
+            if a_left not in a_left_list:
+                a_left_list.append(a_left)
+        for a_left in a_left_list:
+            if a_left in self.a_lines and a_left in other_rtpmap.a_lines:
+                compare_total_lines, compare_matching_lines = self.a_lines[a_left].get_comparison_score(other_rtpmap.a_lines[a_left])
+            elif a_left in self.a_lines:
+                compare_total_lines, compare_matching_lines = self.a_lines[a_left].get_comparison_score(None)
+            else:
+                compare_total_lines, compare_matching_lines = other_rtpmap.a_lines[a_left].get_comparison_score(None)
+            total_lines += compare_total_lines
+            matching_lines += compare_matching_lines
+        return total_lines, matching_lines
+
+class XTIOTWebRTCRTPMapALineGroup:
+    def __init__(self) -> None:
+        self.a_line_tokens: dict[str, str | None] = {}
+    
+    def add_a_line_tokens(self, a_line: str) -> None:
+        a_line_split = a_line.split(" ", 1)
+        if len(a_line_split) > 1:
+            values_raw = a_line_split[1]
+            value_props = values_raw.split(";")
+            for value_prop in value_props:
+                value_prop_split = value_prop.split("=", 1)
+                if len(value_prop_split) == 2:
+                    self.a_line_tokens[value_prop_split[0]] = value_prop_split[1]
+                else:
+                    self.a_line_tokens[value_prop] = None
+    
+    def get_comparison_score(self, other_rtpmap_a_line_group: XTIOTWebRTCRTPMapALineGroup | None) -> tuple[int, int]:
+        total_lines: int = 0
+        matching_lines: int = 0
+        if other_rtpmap_a_line_group is None:
+            #Get the number of attributes + values and return it as unmatched lines
+            for token in self.a_line_tokens:
+                if self.a_line_tokens[token] is None:
+                    total_lines += 1
+                else:
+                    total_lines += 2
+        else:
+            for token in self.a_line_tokens:
+                if token in other_rtpmap_a_line_group.a_line_tokens:
+                    total_lines += 1
+                    matching_lines += 1
+                    if self.a_line_tokens[token] == other_rtpmap_a_line_group.a_line_tokens[token]:
+                        total_lines += 1
+                        matching_lines += 1
+                    else:
+                        total_lines += 1
+        return total_lines, matching_lines
