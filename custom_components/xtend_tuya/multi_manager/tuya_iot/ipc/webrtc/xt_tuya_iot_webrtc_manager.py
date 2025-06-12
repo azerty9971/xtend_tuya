@@ -775,7 +775,10 @@ class XTIOTWebRTCRTPMap:
         return self.rtpmap
 
     def get_m_line_section(self) -> str:
-        return self.m_line[2:]
+        m_line_split = self.m_line.split(" ", 1)
+        if len(m_line_split) > 1:
+            return m_line_split[0][2:]
+        return self.m_line
     
     @staticmethod
     def get_a_line_id(a_line: str) -> int | None:
