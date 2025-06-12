@@ -698,6 +698,9 @@ class XTIOTWebRTCCodecManager:
         self.sdp_offer_answer = sdp_offer_answer
         self.rtpmap: dict[str, dict[str, list[XTIOTWebRTCRTPMap]]] = {}
         self._parse_offer_answer()
+
+    def __repr__(self) -> str:
+        return f"{self.rtpmap}"
     
     def _parse_offer_answer(self):
         sdp_lines = self.sdp_offer_answer.split(ENDLINE)
@@ -734,7 +737,7 @@ class XTIOTWebRTCCodecManager:
         return return_list
 
     def get_closest_same_codec_rtpmap(self, other_codec_manager: XTIOTWebRTCCodecManager, m_line_section: str) -> tuple[bool, XTIOTWebRTCRTPMap, XTIOTWebRTCRTPMap] | None:
-        LOGGER.warning(f"get_closest_same_codec_rtpmap")
+        LOGGER.warning(f"get_closest_same_codec_rtpmap: {self} <=> {other_codec_manager}")
         if m_line_section not in self.rtpmap or m_line_section not in other_codec_manager.rtpmap:
             return None
         own_codec_map = self.rtpmap[m_line_section]
