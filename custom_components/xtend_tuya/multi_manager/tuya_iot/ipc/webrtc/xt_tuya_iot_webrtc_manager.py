@@ -734,6 +734,7 @@ class XTIOTWebRTCCodecManager:
         return return_list
 
     def get_closest_same_codec_rtpmap(self, other_codec_manager: XTIOTWebRTCCodecManager, m_line_section: str) -> tuple[bool, XTIOTWebRTCRTPMap, XTIOTWebRTCRTPMap] | None:
+        LOGGER.warning(f"get_closest_same_codec_rtpmap")
         if m_line_section not in self.rtpmap or m_line_section not in other_codec_manager.rtpmap:
             return None
         own_codec_map = self.rtpmap[m_line_section]
@@ -746,6 +747,7 @@ class XTIOTWebRTCCodecManager:
                 for own_rtpmap in own_codec_map[codec]:
                     for other_rtpmap in other_codec_map[codec]:
                         total, matching = own_rtpmap.get_comparison_score(other_rtpmap)
+                        LOGGER.warning(f"Comparison score of {own_rtpmap} and {other_rtpmap}: {matching} on {total}")
                         if total == matching:
                             #Found a full match, return it
                             return True, own_rtpmap, other_rtpmap
