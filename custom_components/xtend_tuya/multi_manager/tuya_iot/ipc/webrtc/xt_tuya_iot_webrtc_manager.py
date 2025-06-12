@@ -714,6 +714,7 @@ class XTIOTWebRTCCodecManager:
                         m_line_section = rtpmap.get_m_line_section()
                         if m_line_section not in self.rtpmap:
                             self.rtpmap[m_line_section] = {}
+                        if codec not in self.rtpmap[m_line_section]:
                             self.rtpmap[m_line_section][codec] = []
                         self.rtpmap[m_line_section][codec].append(rtpmap)
                         if rtpmap_id := rtpmap.get_rtpmap_id():
