@@ -859,4 +859,15 @@ class XTIOTWebRTCRTPMapALineGroup:
                         matching_lines += 1
                     else:
                         total_lines += 1
+                else:
+                    if self.a_line_tokens[token] is None:
+                        total_lines += 1
+                    else:
+                        total_lines += 2
+            for token in other_rtpmap_a_line_group.a_line_tokens:
+                if token not in self.a_line_tokens:
+                    if other_rtpmap_a_line_group.a_line_tokens[token] is None:
+                        total_lines += 1
+                    else:
+                        total_lines += 2
         return total_lines, matching_lines
