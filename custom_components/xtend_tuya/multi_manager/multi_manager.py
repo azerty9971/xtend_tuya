@@ -38,6 +38,7 @@ class MultiManager:  # noqa: F811
         self.debug_helper = DebugHelper(self)
         self.scene_id: list[str] = []
         self.general_properties: dict[str, Any] = {}
+        self.entity_parsers: dict[str, XTCustomEntityParser] = {}
 
     @property
     def device_map(self):
@@ -71,6 +72,9 @@ class MultiManager:  # noqa: F811
         for account in self.accounts.values():
             await self.hass.async_add_executor_job(account.on_post_setup)
     
+    async def setup_entity_parsers(self, hass: HomeAssistant) -> None:
+        await XTCustomEntityParser.setup_entity_parsers(hass, self)
+    
     def get_domain_identifiers_of_device(self, device_id: str) -> list:
         return_list: list = []
         for account in self.accounts.values():
@@ -81,6 +85,9 @@ class MultiManager:  # noqa: F811
         return_list: list = []
         for account in self.accounts.values():
             if new_descriptors := account.get_platform_descriptors_to_merge(platform):
+                return_list.append(new_descriptors)
+        for entity_parser in self.entity_parsers.values():
+            if new_descriptors := entity_parser.get_descriptors_to_merge(platform):
                 return_list.append(new_descriptors)
         return return_list
     
@@ -443,4 +450,8 @@ from ..util import (
 
 from .shared.interface.device_manager import (
     XTDeviceManagerInterface,
+)
+
+from ..entity_parser.entity_parser import (
+    XTCustomEntityParser,
 )

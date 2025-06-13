@@ -77,7 +77,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
             name=device.name,
             model=f"{device.product_name} (unsupported)",
         )
-        
+    
+    await multi_manager.setup_entity_parsers(hass)
+
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
     # If the device does not register any entities, the device does not need to subscribe

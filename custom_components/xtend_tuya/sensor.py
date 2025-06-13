@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 import datetime
+from typing import Any
 
 from dataclasses import dataclass, field
-
+from .const import LOGGER
 
 from homeassistant.components.sensor import (
     SensorDeviceClass,
@@ -15,6 +16,7 @@ from homeassistant.components.sensor import (
 )
 from homeassistant.const import (
     UnitOfEnergy,
+    UnitOfTemperature,
     Platform,
     PERCENTAGE,
     EntityCategory,
@@ -68,6 +70,15 @@ class XTSensorEntityDescription(TuyaSensorEntityDescription):
     restoredata: bool = False
     recalculate_scale_for_percentage: bool = False
     recalculate_scale_for_percentage_threshold: int = 100 #Maximum percentage that the sensor can display (default = 100%)
+
+    def get_entity_instance(self, 
+                            device: XTDevice, 
+                            device_manager: MultiManager, 
+                            description: XTSensorEntityDescription
+                            ) -> XTSensorEntity:
+        return XTSensorEntity(device=device, 
+                              device_manager=device_manager, 
+                              description=description)
 
 # Commonly used battery sensors, that are re-used in the sensors down below.
 BATTERY_SENSORS: tuple[XTSensorEntityDescription, ...] = (
@@ -782,7 +793,7 @@ LOCK_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         entity_registry_enabled_default=True,
     ),
 )
-
+    
 # All descriptions can be found here. Mostly the Integer data types in the
 # default status set of each category (that don't have a set instruction)
 # end up being a sensor.
@@ -1212,6 +1223,8 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
     ),
     "wsdcg": (
         *TEMPERATURE_SENSORS,
+        *HUMIDITY_SENSORS,
+        *BATTERY_SENSORS,
     ),
     "xfj": (
         XTSensorEntityDescription(
@@ -1312,7 +1325,7 @@ async def async_setup_entry(
             if device := hass_data.manager.device_map.get(device_id):
                 if descriptions := merged_descriptors.get(device.category):
                     entities.extend(
-                        XTSensorEntity(device, hass_data.manager, XTSensorEntityDescription(**description.__dict__))
+                        XTSensorEntity.get_entity_instance(description, device, hass_data.manager)
                         for description in descriptions
                         if description.key in device.status
                     )
@@ -1484,3 +1497,9 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor): # type: ignore
         if self.cancel_reset_after_x_seconds:
             self.cancel_reset_after_x_seconds()
         self.cancel_reset_after_x_seconds = async_call_later(self.hass, self.entity_description.reset_after_x_seconds, self.reset_value)
+    
+    @staticmethod
+    def get_entity_instance(description: XTSensorEntityDescription, device: XTDevice, device_manager: MultiManager) -> XTSensorEntity:
+        if hasattr(description, "get_entity_instance") and callable(getattr(description, "get_entity_instance")):
+            return description.get_entity_instance(device, device_manager, description)
+        return XTSensorEntity(device, device_manager, XTSensorEntityDescription(**description.__dict__))
