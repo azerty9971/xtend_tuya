@@ -1325,7 +1325,7 @@ async def async_setup_entry(
             if device := hass_data.manager.device_map.get(device_id):
                 if descriptions := merged_descriptors.get(device.category):
                     entities.extend(
-                        description.get_entity_instance(device, hass_data.manager, description)
+                        XTSensorEntity.get_entity_instance(description, device, hass_data.manager)
                         for description in descriptions
                         if description.key in device.status
                     )
@@ -1497,3 +1497,9 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor): # type: ignore
         if self.cancel_reset_after_x_seconds:
             self.cancel_reset_after_x_seconds()
         self.cancel_reset_after_x_seconds = async_call_later(self.hass, self.entity_description.reset_after_x_seconds, self.reset_value)
+    
+    @staticmethod
+    def get_entity_instance(description: XTSensorEntityDescription, device: XTDevice, device_manager: MultiManager) -> XTSensorEntity:
+        if hasattr(description, "get_entity_instance") and callable(getattr(description, "get_entity_instance")):
+            return description.get_entity_instance(device, device_manager, description)
+        return XTSensorEntity(device, device_manager, description)
