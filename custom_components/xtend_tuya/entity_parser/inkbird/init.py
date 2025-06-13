@@ -6,9 +6,8 @@ from homeassistant.const import (
     Platform,
 )
 
-from .sensor import (
+from ..entity_parser import (
     XTCustomEntityParser,
-    InkbirdSensor
 )
 
 def get_plugin_instance(platform: Platform) -> XTCustomEntityParser | None:
@@ -24,3 +23,7 @@ class InkbirdEntityParser(XTCustomEntityParser):
             case Platform.SENSOR:
                 return InkbirdSensor.get_descriptors_to_merge()
         return None
+    
+from .sensor import (
+    InkbirdSensor
+)

@@ -27,9 +27,6 @@ from ...multi_manager.multi_manager import (
     XTDevice,
     MultiManager,
 )
-from ..entity_parser import (
-    XTCustomEntityParser,
-)
 from .const import (
     INKBIRD_CHANNELS
 )
