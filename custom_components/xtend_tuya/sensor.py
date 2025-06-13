@@ -1502,4 +1502,4 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor): # type: ignore
     def get_entity_instance(description: XTSensorEntityDescription, device: XTDevice, device_manager: MultiManager) -> XTSensorEntity:
         if hasattr(description, "get_entity_instance") and callable(getattr(description, "get_entity_instance")):
             return description.get_entity_instance(device, device_manager, description)
-        return XTSensorEntity(device, device_manager, description)
+        return XTSensorEntity(device, device_manager, XTSensorEntityDescription(**description.__dict__))
