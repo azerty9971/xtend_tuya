@@ -10,7 +10,7 @@ from ..entity_parser import (
     XTCustomEntityParser,
 )
 
-def get_plugin_instance(platform: Platform) -> XTCustomEntityParser | None:
+def get_plugin_instance() -> XTCustomEntityParser | None:
     return InkbirdEntityParser()
 
 class InkbirdEntityParser(XTCustomEntityParser):
