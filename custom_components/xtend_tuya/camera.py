@@ -196,6 +196,12 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
                     cancel_on_shutdown=True,
                 ))
         return await self.iot_manager.async_handle_async_webrtc_offer(offer_sdp, session_id, send_message, self.device, self.hass)
+    
+    @callback
+    def async_close_session(self, session_id: str) -> None:
+        """Close the session."""
+        LOGGER.warning(f"Closing WebRTC session {session_id}")
+        return  ## This is an optional method so we need a default here.
 
     def send_closing_candidate(self, session_id: str, device: XTDevice , *_: Any) -> None:
         if self.iot_manager is None:
