@@ -466,7 +466,9 @@ class XTIOTWebRTCManager:
         offer_changed = self.fix_offer(offer_changed, session_id)
         self.set_sdp_offer(session_id, offer_changed)
         sdp_offer_payload = self.format_offer_payload(session_id, offer_changed, device)
+        resolution_payload = self.format_resolution(session_id, 0, device)
         self.send_to_ipc_mqtt(session_id, device, json.dumps(sdp_offer_payload))
+        self.send_to_ipc_mqtt(session_id, device, json.dumps(resolution_payload))
         session_data.offer_sent = True
         for candidate in session_data.offer_candidate:
             if candidate_payload := self.format_offer_candidate(session_id, candidate, device):
@@ -666,6 +668,32 @@ class XTIOTWebRTCManager:
                     "msg":{
                         "mode":"webrtc",
                         "candidate": candidate
+                    }
+                },
+            }
+        return None
+    
+    def format_resolution(self, session_id: str, resolution: int, device: XTDevice) -> dict[str, Any] | None:
+        #resolution 0 if HD, 1 is SD
+        if webrtc_config := self.get_config(device.id, session_id):
+            moto_id =  webrtc_config.get("moto_id", "!!!MOTO_ID_NOT_FOUND!!!")
+            return {
+                "protocol":312,
+                "pv":"2.2",
+                "t":int(time.time()),
+                "data":{
+                    "header":{
+                        "type":"candidate",
+                        "from":f"{self.ipc_manager.get_from()}",
+                        "to":f"{device.id}",
+                        "sub_dev_id":"",
+                        "sessionid":f"{session_id}",
+                        "moto_id":f"{moto_id}",
+                        "tid":""
+                    },
+                    "msg":{
+                        "mode":"webrtc",
+                        "cmdValue": resolution
                     }
                 },
             }
