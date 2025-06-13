@@ -795,16 +795,16 @@ LOCK_SENSORS: tuple[XTSensorEntityDescription, ...] = (
 
 
 INKBIRD_CHANNELS = [
-    (XTDPCode.CH_0, "ch0", True, True, False)
-    (XTDPCode.CH_1, "ch1", True, False, True)
-    (XTDPCode.CH_2, "ch2", True, False, True)
-    (XTDPCode.CH_3, "ch3", True, False, True)
-    (XTDPCode.CH_4, "ch4", True, False, True)
-    (XTDPCode.CH_5, "ch5", True, False, True)
-    (XTDPCode.CH_6, "ch6", True, False, True)
-    (XTDPCode.CH_7, "ch7", True, False, True)
-    (XTDPCode.CH_8, "ch8", True, False, True)
-    (XTDPCode.CH_9, "ch9", True, False, True)
+    (XTDPCode.CH_0, "ch0", True, True, False),
+    (XTDPCode.CH_1, "ch1", True, False, True),
+    (XTDPCode.CH_2, "ch2", True, False, True),
+    (XTDPCode.CH_3, "ch3", True, False, True),
+    (XTDPCode.CH_4, "ch4", True, False, True),
+    (XTDPCode.CH_5, "ch5", True, False, True),
+    (XTDPCode.CH_6, "ch6", True, False, True),
+    (XTDPCode.CH_7, "ch7", True, False, True),
+    (XTDPCode.CH_8, "ch8", True, False, True),
+    (XTDPCode.CH_9, "ch9", True, False, True),
 ]
 
 _INKBIRD_CHANNEL_SENSORS: list[InkbirdSensorEntityDescription] = []
