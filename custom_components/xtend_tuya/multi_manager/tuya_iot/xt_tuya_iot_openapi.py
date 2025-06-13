@@ -83,8 +83,10 @@ class XTIOTOpenAPI(TuyaOpenAPI):
         self.connecting = False
         self.non_user_specific_api = non_user_specific_api
         if self.auth_type == AuthType.CUSTOM:
+            self.__login_path = TO_C_CUSTOM_TOKEN_API
             self.__refresh_path = TO_C_CUSTOM_REFRESH_TOKEN_API
         else:
+            self.__login_path = TO_C_SMART_HOME_TOKEN_API
             self.__refresh_path = TO_C_SMART_HOME_REFRESH_TOKEN_API
 
         self.token_info = None
