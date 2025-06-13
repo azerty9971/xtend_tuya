@@ -178,7 +178,7 @@ class XTIOTWebRTCManager:
                 self.set_config(session_id, result)
             else:
                 self.set_config(device_id, result)
-            LOGGER.warning(f"WebRTC Config: {result}")
+            #LOGGER.warning(f"WebRTC Config: {result}")
             return result
         return None
     
@@ -556,7 +556,7 @@ class XTIOTWebRTCManager:
                     webrtc_session.modes[audio_video] = mode_to_search
                     break
             searched_offset = end_of_section
-        LOGGER.warning(f"Stored modes: {webrtc_session.modes}")
+        #LOGGER.warning(f"Stored modes: {webrtc_session.modes}")
         return offer_sdp
     
     def fix_answer(self, answer_sdp: str, session_id: str) -> str:
@@ -572,10 +572,15 @@ class XTIOTWebRTCManager:
         if webrtc_session.offer_codec_manager is not None:
             m_sections: list[str] = webrtc_session.answer_codec_manager.get_m_sections()
             for m_section in m_sections:
-                match_tuple: tuple | None = webrtc_session.answer_codec_manager.get_closest_same_codec_rtpmap(webrtc_session.offer_codec_manager, m_section)
+                match_tuple = webrtc_session.answer_codec_manager.get_closest_same_codec_rtpmap(webrtc_session.offer_codec_manager, m_section)
                 if match_tuple is not None:
                     full_match_found, best_answer_rtpmap, best_offer_rtpmap = match_tuple
-                    LOGGER.warning(f"RTPMap comparison result for {m_section}({full_match_found}), closest are {best_answer_rtpmap} and {best_offer_rtpmap}")
+                    #LOGGER.warning(f"RTPMap comparison result for {m_section}({full_match_found}), closest are {best_answer_rtpmap} and {best_offer_rtpmap}")
+                    if full_match_found is False:
+                        #Fix the RTPMAP based on the offer RTPMAP
+                        string_replacements = best_answer_rtpmap.get_string_replacements(best_offer_rtpmap)
+                        for source in string_replacements:
+                            answer_sdp.replace(source, string_replacements[source])
 
         while fingerprint_found:
             offset = answer_sdp.find("a=fingerprint:", searched_offset)
@@ -737,7 +742,6 @@ class XTIOTWebRTCCodecManager:
         return return_list
 
     def get_closest_same_codec_rtpmap(self, other_codec_manager: XTIOTWebRTCCodecManager, m_line_section: str) -> tuple[bool, XTIOTWebRTCRTPMap, XTIOTWebRTCRTPMap] | None:
-        LOGGER.warning(f"get_closest_same_codec_rtpmap: {self} <=> {other_codec_manager}")
         if m_line_section not in self.rtpmap or m_line_section not in other_codec_manager.rtpmap:
             return None
         own_codec_map = self.rtpmap[m_line_section]
@@ -750,7 +754,6 @@ class XTIOTWebRTCCodecManager:
                 for own_rtpmap in own_codec_map[codec]:
                     for other_rtpmap in other_codec_map[codec]:
                         total, matching = own_rtpmap.get_comparison_score(other_rtpmap)
-                        LOGGER.warning(f"Comparison score of {own_rtpmap} and {other_rtpmap}: {matching} on {total}")
                         if total == matching:
                             #Found a full match, return it
                             return True, own_rtpmap, other_rtpmap
@@ -830,12 +833,47 @@ class XTIOTWebRTCRTPMap:
             total_lines += compare_total_lines
             matching_lines += compare_matching_lines
         return total_lines, matching_lines
+    
+    def get_string_replacements(self, result_rtpmap: XTIOTWebRTCRTPMap) -> dict[str, str]:
+        return_dict: dict[str, str] = {}
+        matching_a_tags: list[str] = []
+        not_matching_own_a_tags: list[str] = []
+        not_matching_other_a_tags: list[str] = []
+        new_a_line = ""
+        for a_tag in self.a_lines:
+            if a_tag in result_rtpmap.a_lines:
+                matching_a_tags.append(a_tag)
+            else:
+                not_matching_own_a_tags.append(a_tag)
+        for a_tag in result_rtpmap.a_lines:
+            if a_tag not in self.a_lines:
+                not_matching_other_a_tags.append(a_tag)
+        for a_tag in not_matching_own_a_tags:
+            for a_lines in self.a_lines[a_tag].raw_a_lines:
+                return_dict[a_lines] = ""
+        for a_tag in not_matching_other_a_tags:
+            for a_lines in result_rtpmap.a_lines[a_tag].raw_a_lines:
+                new_a_line = new_a_line + a_lines + ENDLINE
+        for a_tag in matching_a_tags:
+            a_lines: str | None = None
+            for a_lines in self.a_lines[a_tag].raw_a_lines:
+                return_dict[a_lines] = ""
+            if a_lines is not None:
+                for a_lines in result_rtpmap.a_lines[a_tag].raw_a_lines:
+                    new_a_line = new_a_line + a_lines + ENDLINE
+                return_dict[a_lines] = new_a_line
+                new_a_line = ""
+        
+        return return_dict
 
 class XTIOTWebRTCRTPMapALineGroup:
     def __init__(self) -> None:
         self.a_line_tokens: dict[str, str | None] = {}
+        self.raw_a_lines: list[str] = []
     
     def add_a_line_tokens(self, a_line: str) -> None:
+        if a_line not in self.raw_a_lines:
+            self.raw_a_lines.append(a_line)
         a_line_split = a_line.split(" ", 1)
         if len(a_line_split) > 1:
             values_raw = a_line_split[1]
