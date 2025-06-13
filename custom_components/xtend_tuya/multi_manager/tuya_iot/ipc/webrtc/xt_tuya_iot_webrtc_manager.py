@@ -863,7 +863,7 @@ class XTIOTWebRTCRTPMap:
                     new_a_line = new_a_line + a_lines + ENDLINE
                 return_dict[a_lines] = new_a_line
                 new_a_line = ""
-        
+        LOGGER.warning(f"String replacement: {return_dict}")
         return return_dict
 
 class XTIOTWebRTCRTPMapALineGroup:
