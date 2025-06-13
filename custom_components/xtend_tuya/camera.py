@@ -174,7 +174,7 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         if self.iot_manager is None:
             return None
         self.iot_manager.on_webrtc_candidate(session_id, RTCIceCandidateInit(candidate=""), device)
-        time.sleep(1)
+        time.sleep(5)
         self.iot_manager.set_webrtc_resolution(session_id, 0, device)
 
     async def async_on_webrtc_candidate(
