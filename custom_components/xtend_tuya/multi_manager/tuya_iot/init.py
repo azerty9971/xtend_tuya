@@ -2,7 +2,11 @@ from __future__ import annotations
 
 import requests
 import json
+import asyncio
 from typing import Optional, Literal, Any, overload
+from webrtc_models import (
+    RTCIceCandidateInit,
+)
 
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
@@ -22,6 +26,7 @@ from .xt_tuya_iot_manager import (
 from ..shared.interface.device_manager import (
     XTDeviceManagerInterface,
     IssueSeverity,
+    WebRTCSendMessage,
 )
 from ..shared.shared_classes import (
     XTConfigEntry,
@@ -376,11 +381,18 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
             return None
         return self.iot_account.device_manager.ipc_manager.webrtc_manager.get_sdp_answer(device_id, session_id, sdp_offer, channel)
     
-    def get_webrtc_ice_servers(self, device_id: str, session_id: str, format: str) -> str | None:
+    def get_webrtc_ice_servers(self, device_id: str, session_id: str | None, format: str, hass: HomeAssistant) -> str | None:
         if self.iot_account is None:
             return None
-        return self.iot_account.device_manager.ipc_manager.webrtc_manager.get_ice_servers(device_id, session_id, format)
+        return hass.async_create_task(self.iot_account.device_manager.ipc_manager.webrtc_manager.async_get_ice_servers(device_id, session_id, format, hass)).result()
     
+    async def async_get_webrtc_ice_servers(
+        self, device: XTDevice, format: str, hass: HomeAssistant
+    ) -> tuple[str, dict] | None:
+        if self.iot_account is None:
+            return None
+        return await hass.async_add_executor_job(self.iot_account.device_manager.ipc_manager.webrtc_manager.get_ice_servers, device.id, None, format)
+
     def get_webrtc_exchange_debug(self, session_id: str) -> str | None:
         if self.iot_account is None:
             return None
@@ -398,3 +410,34 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
         if self.iot_account is None:
             return None
         return self.iot_account.device_manager.ipc_manager.webrtc_manager.send_webrtc_trickle_ice(device_id, session_id, candidate)
+    
+    async def async_handle_async_webrtc_offer(
+        self, offer_sdp: str, session_id: str, send_message: WebRTCSendMessage, device: XTDevice, hass: HomeAssistant
+    ) -> None:
+        if self.iot_account is None:
+            return None
+        return await self.iot_account.device_manager.ipc_manager.webrtc_manager.async_handle_async_webrtc_offer(offer_sdp, session_id, send_message, device, hass)
+    
+    async def async_on_webrtc_candidate(
+        self, session_id: str, candidate: RTCIceCandidateInit, device: XTDevice
+    ) -> None:
+        if self.iot_account is None:
+            return None
+        return await self.iot_account.device_manager.ipc_manager.webrtc_manager.async_on_webrtc_candidate(session_id, candidate, device)
+    
+    def on_webrtc_candidate(
+        self, session_id: str, candidate: RTCIceCandidateInit, device: XTDevice
+    ) -> None:
+        if self.iot_account is None:
+            return None
+        return self.iot_account.device_manager.ipc_manager.webrtc_manager.on_webrtc_candidate(session_id, candidate, device)
+    
+    def on_webrtc_close_session(self, session_id: str, device: XTDevice) -> None:
+        if self.iot_account is None:
+            return None
+        return self.iot_account.device_manager.ipc_manager.webrtc_manager.on_webrtc_close_session(session_id, device)
+    
+    def set_webrtc_resolution(self, session_id: str, resolution: int, device: XTDevice) -> None:
+        if self.iot_account is None:
+            return None
+        return self.iot_account.device_manager.ipc_manager.webrtc_manager.set_resolution(session_id, resolution, device)
