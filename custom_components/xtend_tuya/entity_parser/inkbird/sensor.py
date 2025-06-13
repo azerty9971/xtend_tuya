@@ -83,6 +83,7 @@ class InkbirdSensor:
                         entity_registry_enabled_default=enabled_by_default,
                     )
                 )
+        LOGGER.warning("Initialization of Inkbird successful")
     
     @staticmethod
     def get_descriptors_to_merge() -> dict[str, tuple[XTSensorEntityDescription, ...]] | None:
