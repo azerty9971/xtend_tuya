@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import functools
 from typing import Any, cast
+import time
 
 from webrtc_models import (
     RTCIceCandidateInit,
@@ -173,6 +174,8 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         if self.iot_manager is None:
             return None
         self.iot_manager.on_webrtc_candidate(session_id, RTCIceCandidateInit(candidate=""), device)
+        time.sleep(1)
+        self.iot_manager.set_webrtc_resolution(session_id, 0, device)
 
     async def async_on_webrtc_candidate(
         self, session_id: str, candidate: RTCIceCandidateInit

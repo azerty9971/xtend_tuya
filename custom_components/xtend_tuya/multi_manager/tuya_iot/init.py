@@ -431,3 +431,8 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
         if self.iot_account is None:
             return None
         return self.iot_account.device_manager.ipc_manager.webrtc_manager.on_webrtc_candidate(session_id, candidate, device)
+    
+    def set_webrtc_resolution(self, session_id: str, resolution: int, device: XTDevice) -> None:
+        if self.iot_account is None:
+            return None
+        return self.iot_account.device_manager.ipc_manager.webrtc_manager.set_resolution(session_id, resolution, device)

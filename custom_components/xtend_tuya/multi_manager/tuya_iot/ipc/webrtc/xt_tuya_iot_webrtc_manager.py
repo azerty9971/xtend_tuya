@@ -123,6 +123,10 @@ class XTIOTWebRTCManager:
         if callback := self.sdp_exchange[session_id].message_callback:
             ice_candidate = candidate_str.removeprefix("a=").removesuffix(ENDLINE)
             callback(WebRTCCandidate(candidate=RTCIceCandidate(candidate=ice_candidate)))
+    
+    def set_resolution(self, session_id: str, resolution: int, device: XTDevice) -> None:
+        resolution_payload = self.format_resolution(session_id, resolution, device)
+        self.send_to_ipc_mqtt(session_id, device, json.dumps(resolution_payload))
 
     def set_config(self, session_id: str, config: dict[str, Any]):
         self._create_session_if_necessary(session_id)
@@ -467,10 +471,6 @@ class XTIOTWebRTCManager:
         self.set_sdp_offer(session_id, offer_changed)
         sdp_offer_payload = self.format_offer_payload(session_id, offer_changed, device)
         self.send_to_ipc_mqtt(session_id, device, json.dumps(sdp_offer_payload))
-
-        resolution_payload = self.format_resolution(session_id, 2, device)
-        self.send_to_ipc_mqtt(session_id, device, json.dumps(resolution_payload))
-
         session_data.offer_sent = True
         for candidate in session_data.offer_candidate:
             if candidate_payload := self.format_offer_candidate(session_id, candidate, device):
