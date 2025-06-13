@@ -1621,6 +1621,10 @@ class InkbirdChannelSensorEntity(XTSensorEntity):
         # Override unique_id to include data_key for uniqueness
         self._attr_unique_id = f"{self.device.id}_{description.key}_{description.data_key}"
         LOGGER.info("🐦 Created InkbirdChannelSensorEntity with unique_id: %s", self._attr_unique_id)
+        
+        # Initialize parsed data
+        self._update_parsed_data()
+        LOGGER.info("🐦 Initial data update completed for %s", self._attr_unique_id)
     
     @property 
     def native_value(self) -> Any:
@@ -1658,8 +1662,8 @@ class InkbirdChannelSensorEntity(XTSensorEntity):
     def _update_parsed_data(self) -> None:
         """Update parsed data from device status."""
         
-        LOGGER.debug("🐦 Updating parsed data for %s (key: %s)", self.entity_id, self.entity_description.key)
-        LOGGER.debug("🐦 Device status keys: %s", list(self.device.status.keys()) if self.device.status else "None")
+        LOGGER.info("🐦 Updating parsed data for %s (key: %s)", self.entity_id, self.entity_description.key)
+        LOGGER.info("🐦 Device status keys: %s", list(self.device.status.keys()) if self.device.status else "None")
         
         if raw_data := self.device.status.get(self.entity_description.key):
             LOGGER.info("🐦 Found raw data for %s: %s", self.entity_id, raw_data)
@@ -1674,7 +1678,7 @@ class InkbirdChannelSensorEntity(XTSensorEntity):
                 LOGGER.warning("🐦 Failed to parse Inkbird data for %s: %s", self.entity_id, e)
                 self._parsed_data = None
         else:
-            LOGGER.debug("🐦 No raw data found for key '%s' in device status for %s", 
+            LOGGER.info("🐦 No raw data found for key '%s' in device status for %s", 
                         self.entity_description.key, self.entity_id)
             self._parsed_data = None
     
@@ -1689,6 +1693,3 @@ class InkbirdChannelSensorEntity(XTSensorEntity):
         LOGGER.debug("🐦 _handle_coordinator_update called for %s", self.entity_id)
         self._update_parsed_data()
         super()._handle_coordinator_update()
-        """Handle updated data from the coordinator."""
-        super()._handle_coordinator_update()
-        self._update_parsed_data()
