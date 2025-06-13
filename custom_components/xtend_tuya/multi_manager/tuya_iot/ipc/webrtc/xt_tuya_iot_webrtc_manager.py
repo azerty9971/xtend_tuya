@@ -574,7 +574,7 @@ class XTIOTWebRTCManager:
                 match_tuple = webrtc_session.answer_codec_manager.get_closest_same_codec_rtpmap(webrtc_session.offer_codec_manager, m_section)
                 if match_tuple is not None:
                     full_match_found, best_answer_rtpmap, best_offer_rtpmap = match_tuple
-                    #LOGGER.warning(f"RTPMap comparison result for {m_section}({full_match_found}), closest are {best_answer_rtpmap} and {best_offer_rtpmap}")
+                    LOGGER.warning(f"RTPMap comparison result for {m_section}({full_match_found}), closest are ANSWER({best_answer_rtpmap}) and OFFER({best_offer_rtpmap})")
                     if full_match_found is False:
                         #Fix the RTPMAP based on the offer RTPMAP
                         string_replacements = best_answer_rtpmap.get_string_replacements(best_offer_rtpmap)
@@ -769,7 +769,11 @@ class XTIOTWebRTCRTPMap:
         self.a_lines: dict[str, XTIOTWebRTCRTPMapALineGroup] = {} #dict[a=...:, tokens]
     
     def __repr__(self) -> str:
-        return self.rtpmap
+        return_str = self.rtpmap + ENDLINE
+        for a_tag in self.a_lines:
+            for a_lines in self.a_lines[a_tag].raw_a_lines:
+                return_str += a_lines + ENDLINE
+        return return_str
 
     def get_m_line_section(self) -> str:
         m_line_split = self.m_line.split(" ", 1)
@@ -844,18 +848,18 @@ class XTIOTWebRTCRTPMap:
                 not_in_my_a_tag.append(a_tag)
         for a_tag in not_in_other_a_tag:
             for a_lines in self.a_lines[a_tag].raw_a_lines:
-                return_dict[a_lines] = ""
+                return_dict[a_lines + ENDLINE] = ""
         for a_tag in not_in_my_a_tag:
             for a_lines in result_rtpmap.a_lines[a_tag].raw_a_lines:
                 new_a_line = new_a_line + a_lines + ENDLINE
         for a_tag in matching_a_tags:
             a_lines: str | None = None
             for a_lines in self.a_lines[a_tag].raw_a_lines:
-                return_dict[a_lines] = ""
+                return_dict[a_lines + ENDLINE] = ""
             if a_lines is not None:
                 for a_lines in result_rtpmap.a_lines[a_tag].raw_a_lines:
                     new_a_line = new_a_line + a_lines + ENDLINE
-                return_dict[a_lines] = new_a_line
+                return_dict[a_lines + ENDLINE] = new_a_line
                 new_a_line = ""
         LOGGER.warning(f"String replacement: {return_dict}")
         return return_dict
