@@ -496,6 +496,14 @@ class XTIOTWebRTCManager:
             if payload := self.format_offer_candidate(session_id, candidate_str, device):
                 self.send_to_ipc_mqtt(session_id, device, json.dumps(payload))
     
+    def on_webrtc_close_session(self, session_id: str, device: XTDevice) -> None:
+        session_data = self.get_webrtc_session(session_id)
+        if session_data is None:
+            return None
+        if payload := self.format_close_session(session_id, device):
+            self.send_to_ipc_mqtt(session_id, device, json.dumps(payload))
+        return None
+    
     def get_candidates_from_offer(self, session_id: str, offer_sdp: str) -> str:
         session_data = self.get_webrtc_session(session_id)
         sdp_offer = str(offer_sdp)
@@ -696,6 +704,30 @@ class XTIOTWebRTCManager:
                     "msg":{
                         "mode":"webrtc",
                         "cmdValue": resolution
+                    }
+                },
+            }
+        return None
+    
+    def format_close_session(self, session_id: str, device: XTDevice) -> dict[str, Any] | None:
+        if webrtc_config := self.get_config(device.id, session_id):
+            moto_id =  webrtc_config.get("moto_id", "!!!MOTO_ID_NOT_FOUND!!!")
+            return {
+                "protocol":302,
+                "pv":"2.2",
+                "t":int(time.time()),
+                "data":{
+                    "header":{
+                        "type":"disconnect",
+                        "from":f"{self.ipc_manager.get_from()}",
+                        "to":f"{device.id}",
+                        "sub_dev_id":"",
+                        "sessionid":f"{session_id}",
+                        "moto_id":f"{moto_id}",
+                        "tid":""
+                    },
+                    "msg":{
+                        "mode":"webrtc"
                     }
                 },
             }

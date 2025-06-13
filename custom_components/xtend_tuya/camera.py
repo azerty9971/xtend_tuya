@@ -200,8 +200,10 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
     @callback
     def close_webrtc_session(self, session_id: str) -> None:
         """Close the session."""
+        if self.iot_manager is None:
+            return None
         LOGGER.warning(f"Closing WebRTC session {session_id}")
-        return  ## This is an optional method so we need a default here.
+        self.iot_manager.on_webrtc_close_session(session_id, self.device)
 
     def send_closing_candidate(self, session_id: str, device: XTDevice , *_: Any) -> None:
         if self.iot_manager is None:
