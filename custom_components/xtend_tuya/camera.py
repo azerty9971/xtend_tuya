@@ -202,7 +202,6 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         """Close the session."""
         if self.iot_manager is None:
             return None
-        LOGGER.warning(f"Closing WebRTC session {session_id}")
         self.iot_manager.on_webrtc_close_session(session_id, self.device)
 
     def send_closing_candidate(self, session_id: str, device: XTDevice , *_: Any) -> None:
