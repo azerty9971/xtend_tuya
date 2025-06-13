@@ -30,6 +30,8 @@ class XTCustomEntityParser:
         #subdirs = await self.hass.async_add_executor_job(os.listdir, os.path.dirname(__file__))
         subdirs = os.listdir(os.path.dirname(__file__))
         for directory in subdirs:
+            if directory.startswith("__"):
+                continue
             if os.path.isdir(os.path.dirname(__file__) + os.sep + directory):
                 load_path = f".{directory}.init"
                 try:
