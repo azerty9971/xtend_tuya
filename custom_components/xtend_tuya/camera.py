@@ -155,7 +155,6 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
                     username = ice_server.get("username")
                     ice_list.append(RTCIceServer(urls=url, username=username, credential=credential))
             self.webrtc_configuration.configuration.ice_servers = ice_list
-            self.webrtc_configuration.get_candidates_upfront = True
         if webrtc_config:
             if audio_attribute := cast(dict | None, webrtc_config.get("audio_attributes")):
                 if call_mode := cast(list | None, audio_attribute.get("call_mode")):
