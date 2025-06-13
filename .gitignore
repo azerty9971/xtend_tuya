@@ -1,2 +1,2 @@
 .devcontainer/
-*.log
+*/**.log
