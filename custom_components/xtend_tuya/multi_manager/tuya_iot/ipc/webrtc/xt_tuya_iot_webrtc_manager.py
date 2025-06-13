@@ -465,12 +465,12 @@ class XTIOTWebRTCManager:
         offer_changed = self.get_candidates_from_offer(session_id, offer_sdp)
         offer_changed = self.fix_offer(offer_changed, session_id)
         self.set_sdp_offer(session_id, offer_changed)
+        sdp_offer_payload = self.format_offer_payload(session_id, offer_changed, device)
+        self.send_to_ipc_mqtt(session_id, device, json.dumps(sdp_offer_payload))
 
         resolution_payload = self.format_resolution(session_id, 0, device)
         self.send_to_ipc_mqtt(session_id, device, json.dumps(resolution_payload))
 
-        sdp_offer_payload = self.format_offer_payload(session_id, offer_changed, device)
-        self.send_to_ipc_mqtt(session_id, device, json.dumps(sdp_offer_payload))
         session_data.offer_sent = True
         for candidate in session_data.offer_candidate:
             if candidate_payload := self.format_offer_candidate(session_id, candidate, device):
