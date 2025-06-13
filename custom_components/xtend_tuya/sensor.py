@@ -1419,7 +1419,7 @@ async def async_setup_entry(
                         
                         # Skip unwanted sensors for Inkbird devices
                         if is_inkbird_device and description.key in [XTDPCode.VA_TEMPERATURE, XTDPCode.TEMPERATURE]:
-                            LOGGER.info("🐦 Skipping unwanted sensor %s for Inkbird device %s", description.key, device_id)
+                            LOGGER.warning("🐦 SKIPPING unwanted sensor %s for Inkbird device %s", description.key, device_id)
                             continue
                             
                         if description.key in device.status:
@@ -1667,9 +1667,12 @@ class InkbirdChannelSensorEntity(XTSensorEntity):
     @property
     def native_unit_of_measurement(self) -> str | None:
         """Return the native unit of measurement."""
-        if self.entity_description.data_key == "temperature" and self._parsed_data:
-            # Use the temperature unit from the parsed data
-            return self._parsed_data.temperature_unit
+        if self.entity_description.data_key == "temperature":
+            # Use the temperature unit from the parsed data if available
+            if self._parsed_data and self._parsed_data.temperature_unit:
+                return self._parsed_data.temperature_unit  # This should be a string now
+            else:
+                return UnitOfTemperature.CELSIUS  # Default to Celsius if None
         return self.entity_description.native_unit_of_measurement
     
     def _update_parsed_data(self) -> None:
