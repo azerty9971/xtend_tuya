@@ -857,8 +857,8 @@ class XTIOTWebRTCRTPMap:
             for a_lines in self.a_lines[a_tag].raw_a_lines:
                 return_dict[a_lines + ENDLINE] = ""
             if a_lines is not None:
-                for a_lines in result_rtpmap.a_lines[a_tag].raw_a_lines:
-                    new_a_line = new_a_line + a_lines + ENDLINE
+                for a_lines_result in result_rtpmap.a_lines[a_tag].raw_a_lines:
+                    new_a_line = new_a_line + a_lines_result + ENDLINE
                 return_dict[a_lines + ENDLINE] = new_a_line
                 new_a_line = ""
         LOGGER.warning(f"String replacement: {return_dict}")
