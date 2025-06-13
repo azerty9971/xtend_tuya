@@ -28,7 +28,7 @@ class XTCustomEntityParser:
     async def setup_entity_parsers(hass: HomeAssistant, multi_manager: MultiManager) -> None:
         #Load all the plugins
         #subdirs = await self.hass.async_add_executor_job(os.listdir, os.path.dirname(__file__))
-        subdirs = os.listdir(os.path.dirname(__file__))
+        subdirs = await hass.async_add_executor_job(partial(os.listdir, path=os.path.dirname(__file__)))
         for directory in subdirs:
             if directory.startswith("__"):
                 continue
