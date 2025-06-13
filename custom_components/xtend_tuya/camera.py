@@ -74,12 +74,10 @@ async def async_setup_entry(
                     if XTCameraEntity.should_entity_be_added(hass, device, hass_data.manager):
                         entities.append(XTCameraEntity(device, hass_data.manager, hass))
 
-        async_add_entities(entities)
-
     async_discover_device([*hass_data.manager.device_map])
-
     for entity in entities:
         await entity.get_webrtc_config()
+    async_add_entities(entities)
 
     entry.async_on_unload(
         async_dispatcher_connect(hass, TUYA_DISCOVERY_NEW, async_discover_device)
@@ -170,7 +168,7 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
             ))
         self.wait_for_candidates = async_call_later(
             self.hass, 
-            10, 
+            2, 
             HassJob(
                 functools.partial(self.send_resolution_update, session_id, self.device),
                 job_type=HassJobType.Callback,
