@@ -795,20 +795,21 @@ LOCK_SENSORS: tuple[XTSensorEntityDescription, ...] = (
 
 
 INKBIRD_CHANNELS = [
-    (XTDPCode.CH_0, "ch0", True, True, False),
-    (XTDPCode.CH_1, "ch1", True, False, True),
-    (XTDPCode.CH_2, "ch2", True, False, True),
-    (XTDPCode.CH_3, "ch3", True, False, True),
-    (XTDPCode.CH_4, "ch4", True, False, True),
-    (XTDPCode.CH_5, "ch5", True, False, True),
-    (XTDPCode.CH_6, "ch6", True, False, True),
-    (XTDPCode.CH_7, "ch7", True, False, True),
-    (XTDPCode.CH_8, "ch8", True, False, True),
-    (XTDPCode.CH_9, "ch9", True, False, True),
+    # (DP_Code, label, temperature, humidity, battery, enabled_by_default)
+    (XTDPCode.CH_0, "ch0", True, True, False, True),   # Base station
+    (XTDPCode.CH_1, "ch1", True, False, True, True),   
+    (XTDPCode.CH_2, "ch2", True, False, True, False),  
+    (XTDPCode.CH_3, "ch3", True, False, True, False),  
+    (XTDPCode.CH_4, "ch4", True, False, True, False),  
+    (XTDPCode.CH_5, "ch5", True, False, True, False),  
+    (XTDPCode.CH_6, "ch6", True, False, True, False),  
+    (XTDPCode.CH_7, "ch7", True, False, True, False),  
+    (XTDPCode.CH_8, "ch8", True, False, True, False),  
+    (XTDPCode.CH_9, "ch9", True, False, True, False),  
 ]
 
 _INKBIRD_CHANNEL_SENSORS: list[InkbirdSensorEntityDescription] = []
-for key, label, temperature, humidity, battery in INKBIRD_CHANNELS:
+for key, label, temperature, humidity, battery, enabled_by_default in INKBIRD_CHANNELS:
     if temperature:
         _INKBIRD_CHANNEL_SENSORS.append(
             InkbirdSensorEntityDescription(
@@ -818,7 +819,7 @@ for key, label, temperature, humidity, battery in INKBIRD_CHANNELS:
                 device_class=SensorDeviceClass.TEMPERATURE,
                 state_class=SensorStateClass.MEASUREMENT,
                 native_unit_of_measurement=UnitOfTemperature.CELSIUS,
-                entity_registry_enabled_default=True,
+                entity_registry_enabled_default=enabled_by_default,
             )
         )
     if humidity:
@@ -830,7 +831,7 @@ for key, label, temperature, humidity, battery in INKBIRD_CHANNELS:
                 device_class=SensorDeviceClass.HUMIDITY,
                 state_class=SensorStateClass.MEASUREMENT,
                 native_unit_of_measurement=PERCENTAGE,
-                entity_registry_enabled_default=True,
+                entity_registry_enabled_default=enabled_by_default,
             )
         )
     if battery:
@@ -843,7 +844,7 @@ for key, label, temperature, humidity, battery in INKBIRD_CHANNELS:
                 state_class=SensorStateClass.MEASUREMENT,
                 native_unit_of_measurement=PERCENTAGE,
                 entity_category=EntityCategory.DIAGNOSTIC,
-                entity_registry_enabled_default=True,
+                entity_registry_enabled_default=enabled_by_default,
             )
         )
 
