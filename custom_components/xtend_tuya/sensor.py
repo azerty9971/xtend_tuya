@@ -817,6 +817,7 @@ for key, label, temperature, humidity, battery in INKBIRD_CHANNELS:
                 translation_key=f"{label}_temperature",
                 device_class=SensorDeviceClass.TEMPERATURE,
                 state_class=SensorStateClass.MEASUREMENT,
+                native_unit_of_measurement=UnitOfTemperature.CELSIUS,
                 entity_registry_enabled_default=True,
             )
         )
