@@ -466,8 +466,8 @@ class XTIOTWebRTCManager:
         offer_changed = self.fix_offer(offer_changed, session_id)
         self.set_sdp_offer(session_id, offer_changed)
 
-        resolution_payload = self.format_resolution(session_id, 1, device)
-        self.send_to_ipc_mqtt(session_id, device, json.dumps(resolution_payload))
+        #resolution_payload = self.format_resolution(session_id, 1, device)
+        #self.send_to_ipc_mqtt(session_id, device, json.dumps(resolution_payload))
 
         sdp_offer_payload = self.format_offer_payload(session_id, offer_changed, device)
         self.send_to_ipc_mqtt(session_id, device, json.dumps(sdp_offer_payload))
