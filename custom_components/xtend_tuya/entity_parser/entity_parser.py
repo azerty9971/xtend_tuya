@@ -4,6 +4,7 @@ import os
 from functools import partial
 import importlib
 from typing import Any
+from abc import abstractmethod
 
 from homeassistant.const import (
     Platform
@@ -21,8 +22,9 @@ class XTCustomEntityParser:
     def __init__(self) -> None:
         pass
 
+    @abstractmethod
     def get_descriptors_to_merge(self, platform: Platform) -> Any:
-        return None
+        pass
 
     @staticmethod
     async def setup_entity_parsers(hass: HomeAssistant, multi_manager: MultiManager) -> None:
