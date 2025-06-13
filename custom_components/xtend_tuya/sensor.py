@@ -793,7 +793,7 @@ LOCK_SENSORS: tuple[XTSensorEntityDescription, ...] = (
 )
 
 INKBIRD_CHANNEL_SENSORS: tuple[InkbirdSensorEntityDescription, ...] = (
-    # Channel 0 sensors
+    # Channel 0 sensors (Base Station - no battery)
     InkbirdSensorEntityDescription(
         key=XTDPCode.CH_0,
         data_key="temperature",
@@ -809,16 +809,6 @@ INKBIRD_CHANNEL_SENSORS: tuple[InkbirdSensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.HUMIDITY,
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=PERCENTAGE,
-        entity_registry_enabled_default=True,
-    ),
-    InkbirdSensorEntityDescription(
-        key=XTDPCode.CH_0,
-        data_key="battery",
-        translation_key="ch0_battery",
-        device_class=SensorDeviceClass.BATTERY,
-        state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement=PERCENTAGE,
-        entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=True,
     ),
     # Channel 1 sensors
@@ -1597,6 +1587,17 @@ class InkbirdChannelSensorEntity(XTSensorEntity):
     
     entity_description: InkbirdSensorEntityDescription
     _parsed_data: InkbirdB64TypeData | None = None
+    
+    def __init__(
+        self,
+        device: XTDevice,
+        device_manager: MultiManager,
+        description: InkbirdSensorEntityDescription,
+    ) -> None:
+        """Initialize Inkbird channel sensor."""
+        super().__init__(device, device_manager, description)
+        # Override unique_id to include data_key for uniqueness
+        self._attr_unique_id = f"{self.device.id}_{description.key}_{description.data_key}"
     
     @property 
     def native_value(self) -> Any:

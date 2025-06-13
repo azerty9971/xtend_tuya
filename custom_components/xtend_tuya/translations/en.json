@@ -1372,13 +1372,10 @@
         "name": "Voltage C"
       },
       "ch0_temperature": {
-        "name": "Channel 0 Temperature"
+        "name": "Base Station Temperature"
       },
       "ch0_humidity": {
-        "name": "Channel 0 Humidity"
-      },
-      "ch0_battery": {
-        "name": "Channel 0 Battery"
+        "name": "Base Station Humidity"
       },
       "ch1_temperature": {
         "name": "Channel 1 Temperature"
