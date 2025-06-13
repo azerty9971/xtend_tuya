@@ -185,7 +185,7 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
     def send_resolution_update(self, session_id: str, device: XTDevice , *_: Any) -> None:
         if self.iot_manager is None:
             return None
-        self.iot_manager.set_webrtc_resolution(session_id, 1, device)
+        self.iot_manager.set_webrtc_resolution(session_id, 0, device)
 
     async def async_on_webrtc_candidate(
         self, session_id: str, candidate: RTCIceCandidateInit
