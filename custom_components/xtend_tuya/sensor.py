@@ -1599,6 +1599,7 @@ class InkbirdChannelSensorEntity(XTSensorEntity):
     
     entity_description: InkbirdSensorEntityDescription
     _parsed_data: InkbirdB64TypeData | None = None
+    _last_raw_data: str | None = None  # Track last raw data to detect changes
     
     def __init__(
         self,
@@ -1623,6 +1624,12 @@ class InkbirdChannelSensorEntity(XTSensorEntity):
         """Return the native value of the sensor."""
         from .const import LOGGER
         LOGGER.debug("🐦 Getting native_value for %s (data_key: %s)", self.entity_id, self.entity_description.data_key)
+        
+        # Check if raw data has changed since last parse
+        current_raw_data = self.device.status.get(self.entity_description.key)
+        if current_raw_data != self._last_raw_data:
+            LOGGER.debug("🐦 Raw data changed for %s: %s -> %s", self.entity_id, self._last_raw_data, current_raw_data)
+            self._update_parsed_data()
         
         if not self._parsed_data:
             LOGGER.debug("🐦 No parsed data available for %s", self.entity_id)
@@ -1662,6 +1669,8 @@ class InkbirdChannelSensorEntity(XTSensorEntity):
         LOGGER.info("🐦 Device status keys: %s", list(self.device.status.keys()) if self.device.status else "None")
         
         if raw_data := self.device.status.get(self.entity_description.key):
+            # Update last raw data tracker
+            self._last_raw_data = raw_data
             LOGGER.info("🐦 Found raw data for %s: %s", self.entity_id, raw_data)
             try:
                 self._parsed_data = InkbirdB64TypeData.from_raw(raw_data)
@@ -1676,6 +1685,7 @@ class InkbirdChannelSensorEntity(XTSensorEntity):
         else:
             LOGGER.info("🐦 No raw data found for key '%s' in device status for %s", 
                         self.entity_description.key, self.entity_id)
+            self._last_raw_data = None
             self._parsed_data = None
     
     async def async_update(self) -> None:
@@ -1683,9 +1693,11 @@ class InkbirdChannelSensorEntity(XTSensorEntity):
         LOGGER.debug("🐦 async_update called for %s", self.entity_id)
         await super().async_update()
         self._update_parsed_data()
+        LOGGER.debug("🐦 async_update completed for %s", self.entity_id)
     
     def _handle_coordinator_update(self) -> None:
         """Handle updated data from the coordinator."""
         LOGGER.debug("🐦 _handle_coordinator_update called for %s", self.entity_id)
-        self._update_parsed_data()
         super()._handle_coordinator_update()
+        self._update_parsed_data()
+        LOGGER.debug("🐦 _handle_coordinator_update completed for %s", self.entity_id)
