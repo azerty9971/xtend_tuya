@@ -1,0 +1,4 @@
+.devcontainer/
+*.log
+*.logs
+__pycache__
