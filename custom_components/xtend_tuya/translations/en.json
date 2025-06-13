@@ -1380,20 +1380,56 @@
       "ch1_temperature": {
         "name": "Channel 1 Temperature"
       },
-      "ch1_humidity": {
-        "name": "Channel 1 Humidity"
-      },
       "ch1_battery": {
         "name": "Channel 1 Battery"
       },
       "ch2_temperature": {
         "name": "Channel 2 Temperature"
       },
-      "ch2_humidity": {
-        "name": "Channel 2 Humidity"
-      },
       "ch2_battery": {
         "name": "Channel 2 Battery"
+      },
+      "ch3_temperature": {
+        "name": "Channel 3 Temperature"
+      },
+      "ch3_battery": {
+        "name": "Channel 3 Battery"
+      },
+      "ch4_temperature": {
+        "name": "Channel 4 Temperature"
+      },
+      "ch4_battery": {
+        "name": "Channel 4 Battery"
+      },
+      "ch5_temperature": {
+        "name": "Channel 5 Temperature"
+      },
+      "ch5_battery": {
+        "name": "Channel 5 Battery"
+      },
+      "ch6_temperature": {
+        "name": "Channel 6 Temperature"
+      },
+      "ch6_battery": {
+        "name": "Channel 6 Battery"
+      },
+      "ch7_temperature": {
+        "name": "Channel 7 Temperature"
+      },
+      "ch7_battery": {
+        "name": "Channel 7 Battery"
+      },
+      "ch8_temperature": {
+        "name": "Channel 8 Temperature"
+      },
+      "ch8_battery": {
+        "name": "Channel 8 Battery"
+      },
+      "ch9_temperature": {
+        "name": "Channel 9 Temperature"
+      },
+      "ch9_battery": {
+        "name": "Channel 9 Battery"
       },
       "phaseflag": {
         "name": "Phase",
