@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import functools
 from typing import Any, cast
-import time
+from enum import IntEnum
 
 from webrtc_models import (
     RTCIceCandidateInit,
@@ -37,6 +37,10 @@ from .ha_tuya_integration.tuya_integration_imports import (
 from .entity import (
     XTEntity,
 )
+
+class WebRTCStreamQuality(IntEnum):
+    HIGH_QUALITY = 0
+    LOW_QUALITY  = 1
 
 # All descriptions can be found here:
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
@@ -77,6 +81,8 @@ async def async_setup_entry(
     async_discover_device([*hass_data.manager.device_map])
     for entity in entities:
         await entity.get_webrtc_config()
+        if entity.has_multiple_streams:
+            entities.append(XTCameraEntity(entity.device, hass_data.manager, hass, WebRTCStreamQuality.LOW_QUALITY))
     async_add_entities(entities)
 
     entry.async_on_unload(
@@ -92,6 +98,7 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         device: XTDevice,
         device_manager: MultiManager,
         hass: HomeAssistant,
+        stream_quality: WebRTCStreamQuality = WebRTCStreamQuality.HIGH_QUALITY
     ) -> None:
         """Init XT Camera."""
         super(XTCameraEntity, self).__init__(device, device_manager)
@@ -102,6 +109,9 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         self.hass = hass
         self.webrtc_configuration: WebRTCClientConfiguration | None = None
         self.wait_for_candidates = None
+        self.supports_2way_audio: bool = False
+        self.has_multiple_streams: bool = False
+        self.stream_quality = stream_quality
         if iot_manager := device_manager.get_account_by_name(account_name=MESSAGE_SOURCE_TUYA_IOT):
             self.iot_manager = iot_manager
         if self.iot_manager is None:
@@ -146,10 +156,15 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
                 if call_mode := cast(list | None, audio_attribute.get("call_mode")):
                     if 2 in call_mode:
                         #Device supports 2 way audio
-                        pass
+                        self.supports_2way_audio = True
             if not webrtc_config.get("supports_webrtc", False):
                 #Disable WebRTC in case we don't support it
                 self.disable_webrtc()
+            if skill_str := webrtc_config.get("skill"):
+                skill_dict: dict[str, Any] = json.loads(skill_str)
+                video_list: list[dict[str, Any]] = skill_dict.get("videos", [])
+                if len(video_list) > 1:
+                    self.has_multiple_streams = True
 
     async def async_handle_async_webrtc_offer(
         self, offer_sdp: str, session_id: str, send_message: WebRTCSendMessage
@@ -166,14 +181,15 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
                 job_type=HassJobType.Callback,
                 cancel_on_shutdown=True,
             ))
-        self.wait_for_candidates = async_call_later(
-            self.hass, 
-            2, 
-            HassJob(
-                functools.partial(self.send_resolution_update, session_id, self.device),
-                job_type=HassJobType.Callback,
-                cancel_on_shutdown=True,
-            ))
+        if self.has_multiple_streams:
+            self.wait_for_candidates = async_call_later(
+                self.hass, 
+                2, 
+                HassJob(
+                    functools.partial(self.send_resolution_update, session_id, self.device, self.stream_quality),
+                    job_type=HassJobType.Callback,
+                    cancel_on_shutdown=True,
+                ))
         return await self.iot_manager.async_handle_async_webrtc_offer(offer_sdp, session_id, send_message, self.device, self.hass)
 
     def send_closing_candidate(self, session_id: str, device: XTDevice , *_: Any) -> None:
@@ -182,10 +198,10 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         self.iot_manager.on_webrtc_candidate(session_id, RTCIceCandidateInit(candidate=""), device)
     
     
-    def send_resolution_update(self, session_id: str, device: XTDevice , *_: Any) -> None:
+    def send_resolution_update(self, session_id: str, device: XTDevice, quality: WebRTCStreamQuality, *_: Any) -> None:
         if self.iot_manager is None:
             return None
-        self.iot_manager.set_webrtc_resolution(session_id, 0, device)
+        self.iot_manager.set_webrtc_resolution(session_id, quality, device)
 
     async def async_on_webrtc_candidate(
         self, session_id: str, candidate: RTCIceCandidateInit
