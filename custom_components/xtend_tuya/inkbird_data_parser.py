@@ -53,17 +53,14 @@ class InkbirdB64TypeData:
                 decoded_bytes = base64.b64decode(data)
                 LOGGER.debug("🐦 Decoded bytes: %s (length: %d)", decoded_bytes.hex(), len(decoded_bytes))
                 
-                if len(decoded_bytes) >= 11:
-                    # TODO: Identify what the skipped bytes are in the base station data
-                    _temperature, _humidity, _, battery = struct.Struct("<hHIb").unpack(
-                        decoded_bytes[1:11]
-                    )
-                    temperature = _temperature / 10.0
-                    humidity = _humidity / 10.0
-                    LOGGER.info("🐦 Parsed values - temp: %s, humidity: %s, battery: %s", 
-                               temperature, humidity, battery)
-                else:
-                    LOGGER.warning("🐦 Decoded bytes too short: %d (need at least 11)", len(decoded_bytes))
+                # TODO: Identify what the skipped bytes are in the base station data
+                _temperature, _humidity, _, battery = struct.Struct("<hHIb").unpack(
+                    decoded_bytes[1:11]
+                )
+                temperature = _temperature / 10.0
+                humidity = _humidity / 10.0
+                LOGGER.info("🐦 Parsed values - temp: %s, humidity: %s, battery: %s", 
+                           temperature, humidity, battery)
             except Exception as e:
                 LOGGER.error("🐦 InkbirdB64TypeData.from_raw: %s", e)
                 raise ValueError(f"Invalid data: {data}") from e
