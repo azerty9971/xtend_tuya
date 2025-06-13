@@ -793,83 +793,61 @@ LOCK_SENSORS: tuple[XTSensorEntityDescription, ...] = (
     ),
 )
 
-INKBIRD_CHANNEL_SENSORS: tuple[InkbirdSensorEntityDescription, ...] = (
-    # Channel 0 sensors (Base Station - no battery)
-    InkbirdSensorEntityDescription(
-        key=XTDPCode.CH_0,
-        data_key="temperature",
-        translation_key="ch0_temperature",
-        device_class=SensorDeviceClass.TEMPERATURE,
-        state_class=SensorStateClass.MEASUREMENT,
-        entity_registry_enabled_default=True,
-    ),
-    InkbirdSensorEntityDescription(
-        key=XTDPCode.CH_0,
-        data_key="humidity", 
-        translation_key="ch0_humidity",
-        device_class=SensorDeviceClass.HUMIDITY,
-        state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement=PERCENTAGE,
-        entity_registry_enabled_default=True,
-    ),
-    # Channel 1 sensors
-    InkbirdSensorEntityDescription(
-        key=XTDPCode.CH_1,
-        data_key="temperature",
-        translation_key="ch1_temperature", 
-        device_class=SensorDeviceClass.TEMPERATURE,
-        state_class=SensorStateClass.MEASUREMENT,
-        entity_registry_enabled_default=True,
-    ),
-    InkbirdSensorEntityDescription(
-        key=XTDPCode.CH_1,
-        data_key="humidity",
-        translation_key="ch1_humidity",
-        device_class=SensorDeviceClass.HUMIDITY,
-        state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement=PERCENTAGE,
-        entity_registry_enabled_default=True,
-    ),
-    InkbirdSensorEntityDescription(
-        key=XTDPCode.CH_1,
-        data_key="battery",
-        translation_key="ch1_battery",
-        device_class=SensorDeviceClass.BATTERY,
-        state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement=PERCENTAGE,
-        entity_category=EntityCategory.DIAGNOSTIC,
-        entity_registry_enabled_default=True,
-    ),
-    # Channel 2 sensors
-    InkbirdSensorEntityDescription(
-        key=XTDPCode.CH_2,
-        data_key="temperature",
-        translation_key="ch2_temperature",
-        device_class=SensorDeviceClass.TEMPERATURE, 
-        state_class=SensorStateClass.MEASUREMENT,
-        entity_registry_enabled_default=True,
-    ),
-    InkbirdSensorEntityDescription(
-        key=XTDPCode.CH_2,
-        data_key="humidity",
-        translation_key="ch2_humidity",
-        device_class=SensorDeviceClass.HUMIDITY,
-        state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement=PERCENTAGE,
-        entity_registry_enabled_default=True,
-    ),
-    InkbirdSensorEntityDescription(
-        key=XTDPCode.CH_2,
-        data_key="battery",
-        translation_key="ch2_battery",
-        device_class=SensorDeviceClass.BATTERY,
-        state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement=PERCENTAGE,
-        entity_category=EntityCategory.DIAGNOSTIC,
-        entity_registry_enabled_default=True,
-    ),
-)
 
+INKBIRD_CHANNELS = [
+    (XTDPCode.CH_0, "ch0", True, True, False)
+    (XTDPCode.CH_1, "ch1", True, False, True)
+    (XTDPCode.CH_2, "ch2", True, False, True)
+    (XTDPCode.CH_3, "ch3", True, False, True)
+    (XTDPCode.CH_4, "ch4", True, False, True)
+    (XTDPCode.CH_5, "ch5", True, False, True)
+    (XTDPCode.CH_6, "ch6", True, False, True)
+    (XTDPCode.CH_7, "ch7", True, False, True)
+    (XTDPCode.CH_8, "ch8", True, False, True)
+    (XTDPCode.CH_9, "ch9", True, False, True)
+]
+
+_INKBIRD_CHANNEL_SENSORS: list[InkbirdSensorEntityDescription] = []
+for key, label, temperature, humidity, battery in INKBIRD_CHANNELS:
+    if temperature:
+        _INKBIRD_CHANNEL_SENSORS.append(
+            InkbirdSensorEntityDescription(
+                key=key,
+                data_key="temperature",
+                translation_key=f"{label}_temperature",
+                device_class=SensorDeviceClass.TEMPERATURE,
+                state_class=SensorStateClass.MEASUREMENT,
+                entity_registry_enabled_default=True,
+            )
+        )
+    if humidity:
+        _INKBIRD_CHANNEL_SENSORS.append(
+            InkbirdSensorEntityDescription(
+                key=key,
+                data_key="humidity",
+                translation_key=f"{label}_humidity",
+                device_class=SensorDeviceClass.HUMIDITY,
+                state_class=SensorStateClass.MEASUREMENT,
+                native_unit_of_measurement=PERCENTAGE,
+                entity_registry_enabled_default=True,
+            )
+        )
+    if battery:
+        _INKBIRD_CHANNEL_SENSORS.append(
+            InkbirdSensorEntityDescription(
+                key=key,
+                data_key="battery",
+                translation_key=f"{label}_battery",
+                device_class=SensorDeviceClass.BATTERY,
+                state_class=SensorStateClass.MEASUREMENT,
+                native_unit_of_measurement=PERCENTAGE,
+                entity_category=EntityCategory.DIAGNOSTIC,
+                entity_registry_enabled_default=True,
+            )
+        )
+
+INKBIRD_CHANNEL_SENSORS: tuple[InkbirdSensorEntityDescription, ...] = tuple(_INKBIRD_CHANNEL_SENSORS)
+    
 # All descriptions can be found here. Mostly the Integer data types in the
 # default status set of each category (that don't have a set instruction)
 # end up being a sensor.
@@ -1667,10 +1645,10 @@ class InkbirdChannelSensorEntity(XTSensorEntity):
     @property
     def native_unit_of_measurement(self) -> str | None:
         """Return the native unit of measurement."""
-        if self.entity_description.data_key == "temperature":
-            # Use the temperature unit from the parsed data if available
-            if self._parsed_data and self._parsed_data.temperature_unit:
-                return self._parsed_data.temperature_unit  # This should be a string now
+        if self.entity_description.data_key == "temperature" and self._parsed_data:
+            # Use the temperature unit from the parsed data
+            if self._parsed_data.temperature_unit:
+                return self._parsed_data.temperature_unit.value  # Convert enum to string
             else:
                 return UnitOfTemperature.CELSIUS  # Default to Celsius if None
         return self.entity_description.native_unit_of_measurement
