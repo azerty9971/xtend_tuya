@@ -65,6 +65,7 @@ async def async_setup_entry(
         merged_categories = tuple(append_lists(list(merged_categories), new_descriptor))
 
     entities: list[XTCameraEntity] = []
+    extra_entities: list[XTCameraEntity] = []
 
     @callback
     def async_discover_device(device_map) -> None:
@@ -82,7 +83,9 @@ async def async_setup_entry(
     for entity in entities:
         await entity.get_webrtc_config()
         if entity.has_multiple_streams:
-            entities.append(XTCameraEntity(entity.device, hass_data.manager, hass, WebRTCStreamQuality.LOW_QUALITY))
+            extra_entities.append(XTCameraEntity(entity.device, hass_data.manager, hass, WebRTCStreamQuality.LOW_QUALITY))
+    for entity in extra_entities:
+        entities.append(entity)
     async_add_entities(entities)
 
     entry.async_on_unload(
