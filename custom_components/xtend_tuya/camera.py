@@ -168,13 +168,25 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
                 job_type=HassJobType.Callback,
                 cancel_on_shutdown=True,
             ))
+        self.wait_for_candidates = async_call_later(
+            self.hass, 
+            10, 
+            HassJob(
+                functools.partial(self.send_resolution_update, session_id, self.device),
+                job_type=HassJobType.Callback,
+                cancel_on_shutdown=True,
+            ))
         return await self.iot_manager.async_handle_async_webrtc_offer(offer_sdp, session_id, send_message, self.device, self.hass)
 
     def send_closing_candidate(self, session_id: str, device: XTDevice , *_: Any) -> None:
         if self.iot_manager is None:
             return None
         self.iot_manager.on_webrtc_candidate(session_id, RTCIceCandidateInit(candidate=""), device)
-        time.sleep(5)
+    
+    
+    def send_resolution_update(self, session_id: str, device: XTDevice , *_: Any) -> None:
+        if self.iot_manager is None:
+            return None
         self.iot_manager.set_webrtc_resolution(session_id, 1, device)
 
     async def async_on_webrtc_candidate(
