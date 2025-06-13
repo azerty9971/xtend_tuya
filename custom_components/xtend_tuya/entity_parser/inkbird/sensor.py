@@ -31,20 +31,15 @@ from .const import (
     INKBIRD_CHANNELS
 )
 
-_INKBIRD_CHANNEL_SENSORS: list[InkbirdSensorEntityDescription] = []
-INKBIRD_CHANNEL_SENSORS: tuple[InkbirdSensorEntityDescription, ...] = tuple(_INKBIRD_CHANNEL_SENSORS)
-INKBIRD_SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
-    "wsdcg": (
-        *INKBIRD_CHANNEL_SENSORS,
-    ),
-}
-
 class InkbirdSensor:
+    INKBIRD_SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {}
+
     @staticmethod
     def initialize_sensor() -> None:
+        inkbird_channel_sensors: list[InkbirdSensorEntityDescription] = []
         for key, label, temperature, humidity, battery, enabled_by_default in INKBIRD_CHANNELS:
             if temperature:
-                _INKBIRD_CHANNEL_SENSORS.append(
+                inkbird_channel_sensors.append(
                     InkbirdSensorEntityDescription(
                         key=key,
                         data_key="temperature",
@@ -56,7 +51,7 @@ class InkbirdSensor:
                     )
                 )
             if humidity:
-                _INKBIRD_CHANNEL_SENSORS.append(
+                inkbird_channel_sensors.append(
                     InkbirdSensorEntityDescription(
                         key=key,
                         data_key="humidity",
@@ -68,7 +63,7 @@ class InkbirdSensor:
                     )
                 )
             if battery:
-                _INKBIRD_CHANNEL_SENSORS.append(
+                inkbird_channel_sensors.append(
                     InkbirdSensorEntityDescription(
                         key=key,
                         data_key="battery",
@@ -80,11 +75,16 @@ class InkbirdSensor:
                         entity_registry_enabled_default=enabled_by_default,
                     )
                 )
-        LOGGER.warning("Initialization of Inkbird successful")
+        INKBIRD_CHANNEL_SENSORS: tuple[InkbirdSensorEntityDescription, ...] = tuple(inkbird_channel_sensors)
+        InkbirdSensor.INKBIRD_SENSORS = {
+            "wsdcg": (
+                *INKBIRD_CHANNEL_SENSORS,
+            ),
+        }
     
     @staticmethod
     def get_descriptors_to_merge() -> dict[str, tuple[XTSensorEntityDescription, ...]] | None:
-        return INKBIRD_SENSORS
+        return InkbirdSensor.INKBIRD_SENSORS
 
 @dataclass(frozen=True)
 class InkbirdSensorEntityDescription(XTSensorEntityDescription):
