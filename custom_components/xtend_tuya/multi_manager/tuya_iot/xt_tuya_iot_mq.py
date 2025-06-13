@@ -97,7 +97,7 @@ class XTIOTOpenMQ(TuyaOpenMQ):
                     if (self.api.auth_type == AuthType.CUSTOM)
                     else "1.0",
                 }
-        LOGGER.warning(f"Calling {path} => {body}")
+        #LOGGER.warning(f"Calling {path} => {body}")
         response = self.api.post(path, body)
 
         if response.get("success", False) is False:

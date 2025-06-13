@@ -151,15 +151,12 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
             if not webrtc_config.get("supports_webrtc", False):
                 #Disable WebRTC in case we don't support it
                 self.disable_webrtc()
-            LOGGER.warning(f"Returned RTC Config: {webrtc_config}")
 
     async def async_handle_async_webrtc_offer(
         self, offer_sdp: str, session_id: str, send_message: WebRTCSendMessage
     ) -> None:
         if self.iot_manager is None:
             return await super().async_handle_async_webrtc_offer(offer_sdp, session_id, send_message)
-        #LOGGER.warning(f"async_handle_async_webrtc_offer: offer sdp:  {offer_sdp}")
-        #LOGGER.warning(f"async_handle_async_webrtc_offer: session_id: {session_id}")
         if self.wait_for_candidates:
             self.wait_for_candidates()
         self.wait_for_candidates = async_call_later(
@@ -175,7 +172,6 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
     def send_closing_candidate(self, session_id: str, device: XTDevice , *_: Any) -> None:
         if self.iot_manager is None:
             return None
-        #LOGGER.warning(f"send_closing_candidate")
         self.iot_manager.on_webrtc_candidate(session_id, RTCIceCandidateInit(candidate=""), device)
 
     async def async_on_webrtc_candidate(
@@ -184,8 +180,6 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         """Handle a WebRTC candidate."""
         if self.iot_manager is None:
             return await super().async_on_webrtc_candidate(session_id, candidate)
-        #LOGGER.warning(f"async_on_webrtc_candidate: candidate:  {candidate}")
-        #LOGGER.warning(f"async_on_webrtc_candidate: session_id: {session_id}")
         return await self.iot_manager.async_on_webrtc_candidate(session_id, candidate, self.device)
     
     @callback
@@ -193,5 +187,4 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         """Return the WebRTC client configuration adjustable per integration."""
         if self.iot_manager is None or self.webrtc_configuration is None:
             return super()._async_get_webrtc_client_configuration()
-        #LOGGER.warning(f"_async_get_webrtc_client_configuration")
         return self.webrtc_configuration

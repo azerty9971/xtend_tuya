@@ -184,6 +184,62 @@ class XTIOTOpenAPI(TuyaOpenAPI):
     
     def test_validity(self) -> dict[str, Any]:
         return self.get("/v2.0/cloud/space/child")
+    
+    def get(self, path: str, params: dict[str, Any] | None = None) -> dict[str, Any]:
+        """Http Get.
+
+        Requests the server to return specified resources.
+
+        Args:
+            path (str): api path
+            params (map): request parameter
+
+        Returns:
+            response: response body
+        """
+        return self.__request("GET", path, params, None)
+
+    def post(self, path: str, body: dict[str, Any] | None = None) -> dict[str, Any]:
+        """Http Post.
+
+        Requests the server to update specified resources.
+
+        Args:
+            path (str): api path
+            body (map): request body
+
+        Returns:
+            response: response body
+        """
+        return self.__request("POST", path, None, body)
+
+    def put(self, path: str, body: dict[str, Any] | None = None) -> dict[str, Any]:
+        """Http Put.
+
+        Requires the server to perform specified operations.
+
+        Args:
+            path (str): api path
+            body (map): request body
+
+        Returns:
+            response: response body
+        """
+        return self.__request("PUT", path, None, body)
+
+    def delete(self, path: str, params: dict[str, Any] | None = None) -> dict[str, Any]:
+        """Http Delete.
+
+        Requires the server to delete specified resources.
+
+        Args:
+            path (str): api path
+            params (map): request param
+
+        Returns:
+            response: response body
+        """
+        return self.__request("DELETE", path, params, None)
 
     def __request(
         self,
@@ -228,7 +284,7 @@ class XTIOTOpenAPI(TuyaOpenAPI):
 
         if response.ok is False:
             LOGGER.error(
-                f"[API]Response error: code={response.status_code}, body={body}"
+                f"[API]Response error: code={response.status_code}, body={body if body is not None else ""}"
             )
             return {}
 

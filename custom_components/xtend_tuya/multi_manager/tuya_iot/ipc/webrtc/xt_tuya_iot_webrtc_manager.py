@@ -110,7 +110,6 @@ class XTIOTWebRTCManager:
         if callback := self.sdp_exchange[session_id].message_callback:
             sdp_answer = answer.get("sdp", "")
             sdp_answer = self.fix_answer(sdp_answer, session_id)
-            LOGGER.warning(f"SDP Answer {sdp_answer}")
             callback(WebRTCAnswer(answer=sdp_answer))
     
     def add_sdp_answer_candidate(self, session_id: str | None, candidate: dict) -> None:
@@ -123,7 +122,6 @@ class XTIOTWebRTCManager:
             self.sdp_exchange[session_id].has_all_candidates = True
         if callback := self.sdp_exchange[session_id].message_callback:
             ice_candidate = candidate_str.removeprefix("a=").removesuffix(ENDLINE)
-            #LOGGER.warning(f"Returning ICE candidate {ice_candidate}")
             callback(WebRTCCandidate(candidate=RTCIceCandidate(candidate=ice_candidate)))
 
     def set_config(self, session_id: str, config: dict[str, Any]):
@@ -179,7 +177,6 @@ class XTIOTWebRTCManager:
                 self.set_config(session_id, result)
             else:
                 self.set_config(device_id, result)
-            #LOGGER.warning(f"WebRTC Config: {result}")
             return result
         return None
     
@@ -555,14 +552,12 @@ class XTIOTWebRTCManager:
                     webrtc_session.modes[audio_video] = mode_to_search
                     break
             searched_offset = end_of_section
-        #LOGGER.warning(f"Stored modes: {webrtc_session.modes}")
         return offer_sdp
     
     def fix_answer(self, answer_sdp: str, session_id: str) -> str:
         webrtc_session = self.get_webrtc_session(session_id)
         fingerprint_found = True
         searched_offset: int = 0
-        LOGGER.warning(f"Base ANSWER: {answer_sdp}")
         if webrtc_session is None:
             return answer_sdp
         
@@ -574,7 +569,6 @@ class XTIOTWebRTCManager:
                 match_tuple = webrtc_session.answer_codec_manager.get_closest_same_codec_rtpmap(webrtc_session.offer_codec_manager, m_section)
                 if match_tuple is not None:
                     full_match_found, best_answer_rtpmap, best_offer_rtpmap = match_tuple
-                    LOGGER.warning(f"RTPMap comparison result for {m_section}({full_match_found}), closest are ANSWER({best_answer_rtpmap}) and OFFER({best_offer_rtpmap})")
                     if full_match_found is False:
                         #Fix the RTPMAP based on the offer RTPMAP
                         string_replacements = best_answer_rtpmap.get_string_replacements(best_offer_rtpmap)
@@ -624,7 +618,6 @@ class XTIOTWebRTCManager:
                             new_mode = mode_to_search
                         answer_sdp = answer_sdp[0:mode_offset] + new_mode + answer_sdp[mode_offset+len(mode_to_search):]
                         break
-        LOGGER.warning(f"Resulting ANSWER: {answer_sdp}")
         return answer_sdp
     
     def format_offer_payload(self, session_id: str, offer_sdp: str, device: XTDevice, channel: str = "high") -> dict[str, Any] | None:
@@ -689,7 +682,6 @@ class XTIOTWebRTCManager:
         for topic in self.ipc_manager.ipc_mq.mq_config.sink_topic.values():
             topic = topic.replace("{device_id}", device.id)
             topic = topic.replace("moto_id", webrtc_config.get("moto_id", "!!!MOTO_ID_NOT_FOUND!!!"))
-            #LOGGER.warning(f"Sending to IPC: {payload}")
             self.ipc_manager.publish_to_ipc_mqtt(topic, payload)
 
 class XTIOTWebRTCCodecManager:
@@ -861,7 +853,6 @@ class XTIOTWebRTCRTPMap:
                     new_a_line = new_a_line + a_lines_result + ENDLINE
                 return_dict[a_lines + ENDLINE] = new_a_line
                 new_a_line = ""
-        LOGGER.warning(f"String replacement: {return_dict}")
         return return_dict
 
 class XTIOTWebRTCRTPMapALineGroup:
