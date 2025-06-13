@@ -562,7 +562,7 @@ class XTIOTWebRTCManager:
         webrtc_session = self.get_webrtc_session(session_id)
         fingerprint_found = True
         searched_offset: int = 0
-
+        LOGGER.warning(f"Base ANSWER: {answer_sdp}")
         if webrtc_session is None:
             return answer_sdp
         
@@ -624,7 +624,7 @@ class XTIOTWebRTCManager:
                             new_mode = mode_to_search
                         answer_sdp = answer_sdp[0:mode_offset] + new_mode + answer_sdp[mode_offset+len(mode_to_search):]
                         break
-
+        LOGGER.warning(f"Resulting ANSWER: {answer_sdp}")
         return answer_sdp
     
     def format_offer_payload(self, session_id: str, offer_sdp: str, device: XTDevice, channel: str = "high") -> dict[str, Any] | None:
@@ -831,21 +831,21 @@ class XTIOTWebRTCRTPMap:
     def get_string_replacements(self, result_rtpmap: XTIOTWebRTCRTPMap) -> dict[str, str]:
         return_dict: dict[str, str] = {}
         matching_a_tags: list[str] = []
-        not_matching_own_a_tags: list[str] = []
-        not_matching_other_a_tags: list[str] = []
+        not_in_other_a_tag: list[str] = []
+        not_in_my_a_tag: list[str] = []
         new_a_line = ""
         for a_tag in self.a_lines:
             if a_tag in result_rtpmap.a_lines:
                 matching_a_tags.append(a_tag)
             else:
-                not_matching_own_a_tags.append(a_tag)
+                not_in_other_a_tag.append(a_tag)
         for a_tag in result_rtpmap.a_lines:
             if a_tag not in self.a_lines:
-                not_matching_other_a_tags.append(a_tag)
-        for a_tag in not_matching_own_a_tags:
+                not_in_my_a_tag.append(a_tag)
+        for a_tag in not_in_other_a_tag:
             for a_lines in self.a_lines[a_tag].raw_a_lines:
                 return_dict[a_lines] = ""
-        for a_tag in not_matching_other_a_tags:
+        for a_tag in not_in_my_a_tag:
             for a_lines in result_rtpmap.a_lines[a_tag].raw_a_lines:
                 new_a_line = new_a_line + a_lines + ENDLINE
         for a_tag in matching_a_tags:
