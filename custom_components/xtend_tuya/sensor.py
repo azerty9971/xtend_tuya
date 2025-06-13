@@ -55,8 +55,6 @@ from .ha_tuya_integration.tuya_integration_imports import (
     TuyaDEVICE_CLASS_UNITS,
 )
 
-from .entity_parser.inkbird.sensor import InkbirdB64TypeData
-
 @dataclass(frozen=True)
 class XTSensorEntityDescription(TuyaSensorEntityDescription):
     """Describes XT sensor entity."""
