@@ -84,6 +84,7 @@ class InkbirdSensor:
     
     @staticmethod
     def get_descriptors_to_merge() -> dict[str, tuple[XTSensorEntityDescription, ...]] | None:
+        LOGGER.warning(f"Added descriptors: {InkbirdSensor.INKBIRD_SENSORS}")
         return InkbirdSensor.INKBIRD_SENSORS
 
 @dataclass(frozen=True)
