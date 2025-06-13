@@ -3,8 +3,11 @@
 from __future__ import annotations
 
 import datetime
+from typing import Any
 
 from dataclasses import dataclass, field
+
+from .inkbird_data_parser import InkbirdB64TypeData
 
 
 from homeassistant.components.sensor import (
@@ -68,6 +71,12 @@ class XTSensorEntityDescription(TuyaSensorEntityDescription):
     restoredata: bool = False
     recalculate_scale_for_percentage: bool = False
     recalculate_scale_for_percentage_threshold: int = 100 #Maximum percentage that the sensor can display (default = 100%)
+
+@dataclass(frozen=True)
+class InkbirdSensorEntityDescription(XTSensorEntityDescription):
+    """Describes Inkbird sensor entity with data parsing."""
+    
+    data_key: str | None = None  # Key for which data to extract (temperature, humidity, battery)
 
 # Commonly used battery sensors, that are re-used in the sensors down below.
 BATTERY_SENSORS: tuple[XTSensorEntityDescription, ...] = (
@@ -783,6 +792,93 @@ LOCK_SENSORS: tuple[XTSensorEntityDescription, ...] = (
     ),
 )
 
+INKBIRD_CHANNEL_SENSORS: tuple[InkbirdSensorEntityDescription, ...] = (
+    # Channel 0 sensors
+    InkbirdSensorEntityDescription(
+        key=XTDPCode.CH_0,
+        data_key="temperature",
+        translation_key="ch0_temperature",
+        device_class=SensorDeviceClass.TEMPERATURE,
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_registry_enabled_default=True,
+    ),
+    InkbirdSensorEntityDescription(
+        key=XTDPCode.CH_0,
+        data_key="humidity", 
+        translation_key="ch0_humidity",
+        device_class=SensorDeviceClass.HUMIDITY,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=PERCENTAGE,
+        entity_registry_enabled_default=True,
+    ),
+    InkbirdSensorEntityDescription(
+        key=XTDPCode.CH_0,
+        data_key="battery",
+        translation_key="ch0_battery",
+        device_class=SensorDeviceClass.BATTERY,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=PERCENTAGE,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=True,
+    ),
+    # Channel 1 sensors
+    InkbirdSensorEntityDescription(
+        key=XTDPCode.CH_1,
+        data_key="temperature",
+        translation_key="ch1_temperature", 
+        device_class=SensorDeviceClass.TEMPERATURE,
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_registry_enabled_default=True,
+    ),
+    InkbirdSensorEntityDescription(
+        key=XTDPCode.CH_1,
+        data_key="humidity",
+        translation_key="ch1_humidity",
+        device_class=SensorDeviceClass.HUMIDITY,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=PERCENTAGE,
+        entity_registry_enabled_default=True,
+    ),
+    InkbirdSensorEntityDescription(
+        key=XTDPCode.CH_1,
+        data_key="battery",
+        translation_key="ch1_battery",
+        device_class=SensorDeviceClass.BATTERY,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=PERCENTAGE,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=True,
+    ),
+    # Channel 2 sensors
+    InkbirdSensorEntityDescription(
+        key=XTDPCode.CH_2,
+        data_key="temperature",
+        translation_key="ch2_temperature",
+        device_class=SensorDeviceClass.TEMPERATURE, 
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_registry_enabled_default=True,
+    ),
+    InkbirdSensorEntityDescription(
+        key=XTDPCode.CH_2,
+        data_key="humidity",
+        translation_key="ch2_humidity",
+        device_class=SensorDeviceClass.HUMIDITY,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=PERCENTAGE,
+        entity_registry_enabled_default=True,
+    ),
+    InkbirdSensorEntityDescription(
+        key=XTDPCode.CH_2,
+        data_key="battery",
+        translation_key="ch2_battery",
+        device_class=SensorDeviceClass.BATTERY,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=PERCENTAGE,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=True,
+    ),
+)
+
 # All descriptions can be found here. Mostly the Integer data types in the
 # default status set of each category (that don't have a set instruction)
 # end up being a sensor.
@@ -1212,6 +1308,9 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
     ),
     "wsdcg": (
         *TEMPERATURE_SENSORS,
+        *HUMIDITY_SENSORS,
+        *BATTERY_SENSORS,
+        *INKBIRD_CHANNEL_SENSORS,
     ),
     "xfj": (
         XTSensorEntityDescription(
@@ -1311,11 +1410,18 @@ async def async_setup_entry(
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
                 if descriptions := merged_descriptors.get(device.category):
-                    entities.extend(
-                        XTSensorEntity(device, hass_data.manager, XTSensorEntityDescription(**description.__dict__))
-                        for description in descriptions
-                        if description.key in device.status
-                    )
+                    for description in descriptions:
+                        if description.key in device.status:
+                            # Check if this is an Inkbird sensor description
+                            if isinstance(description, InkbirdSensorEntityDescription):
+                                entity = InkbirdChannelSensorEntity(
+                                    device, hass_data.manager, description
+                                )
+                            else:
+                                entity = XTSensorEntity(
+                                    device, hass_data.manager, XTSensorEntityDescription(**description.__dict__)
+                                )
+                            entities.append(entity)
 
         async_add_entities(entities)
 
@@ -1484,3 +1590,54 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor): # type: ignore
         if self.cancel_reset_after_x_seconds:
             self.cancel_reset_after_x_seconds()
         self.cancel_reset_after_x_seconds = async_call_later(self.hass, self.entity_description.reset_after_x_seconds, self.reset_value)
+
+
+class InkbirdChannelSensorEntity(XTSensorEntity):
+    """Inkbird Channel Sensor Entity with base64 data parsing."""
+    
+    entity_description: InkbirdSensorEntityDescription
+    _parsed_data: InkbirdB64TypeData | None = None
+    
+    @property 
+    def native_value(self) -> Any:
+        """Return the native value of the sensor."""
+        if not self._parsed_data:
+            return None
+            
+        if self.entity_description.data_key == "temperature":
+            return self._parsed_data.temperature
+        elif self.entity_description.data_key == "humidity":
+            return self._parsed_data.humidity
+        elif self.entity_description.data_key == "battery":
+            return self._parsed_data.battery
+        
+        return None
+    
+    @property
+    def native_unit_of_measurement(self) -> str | None:
+        """Return the native unit of measurement."""
+        if self.entity_description.data_key == "temperature" and self._parsed_data:
+            return self._parsed_data.temperature_unit
+        return self.entity_description.native_unit_of_measurement
+    
+    def _update_parsed_data(self) -> None:
+        """Update parsed data from device status."""
+        if raw_data := self.device.status.get(self.entity_description.key):
+            try:
+                self._parsed_data = InkbirdB64TypeData.from_raw(raw_data)
+            except (ValueError, TypeError) as e:
+                from .const import LOGGER
+                LOGGER.warning("Failed to parse Inkbird data for %s: %s", self.entity_id, e)
+                self._parsed_data = None
+        else:
+            self._parsed_data = None
+    
+    async def async_update(self) -> None:
+        """Update the sensor."""
+        await super().async_update()
+        self._update_parsed_data()
+    
+    def _handle_coordinator_update(self) -> None:
+        """Handle updated data from the coordinator."""
+        super()._handle_coordinator_update()
+        self._update_parsed_data()

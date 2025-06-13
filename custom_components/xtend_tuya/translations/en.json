@@ -779,8 +779,7 @@
           "high": "High"
         }
       },
-      "key_tone":
-      {
+      "key_tone": {
         "name": "Key tone",
         "state": {
           "0": "High",
@@ -791,8 +790,7 @@
           "mute": "Mute"
         }
       },
-      "change_temp_unit":
-      {
+      "change_temp_unit": {
         "name": "Temperature unit",
         "state": {
           "0": "C°",
@@ -803,8 +801,7 @@
           "f": "F"
         }
       },
-      "cat_litter_box_clean":
-      {
+      "cat_litter_box_clean": {
         "name": "Manual shoveling",
         "state": {
           "0": "Not shoveling",
@@ -812,8 +809,7 @@
           "2": "Pause manual shoveling"
         }
       },
-      "cat_litter_box_empty":
-      {
+      "cat_litter_box_empty": {
         "name": "Manual dumping",
         "state": {
           "0": "Not dumping",
@@ -1212,16 +1208,13 @@
       "energyconsumedc": {
         "name": "Energy consumed C"
       },
-      "gross_generation_a":
-      {
+      "gross_generation_a": {
         "name": "Gross generation A"
       },
-      "gross_generation_b":
-      {
+      "gross_generation_b": {
         "name": "Gross generation B"
       },
-      "gross_generation_c":
-      {
+      "gross_generation_c": {
         "name": "Gross generation C"
       },
       "temp_alarm": {
@@ -1377,6 +1370,33 @@
       },
       "c_voltage": {
         "name": "Voltage C"
+      },
+      "ch0_temperature": {
+        "name": "Channel 0 Temperature"
+      },
+      "ch0_humidity": {
+        "name": "Channel 0 Humidity"
+      },
+      "ch0_battery": {
+        "name": "Channel 0 Battery"
+      },
+      "ch1_temperature": {
+        "name": "Channel 1 Temperature"
+      },
+      "ch1_humidity": {
+        "name": "Channel 1 Humidity"
+      },
+      "ch1_battery": {
+        "name": "Channel 1 Battery"
+      },
+      "ch2_temperature": {
+        "name": "Channel 2 Temperature"
+      },
+      "ch2_humidity": {
+        "name": "Channel 2 Humidity"
+      },
+      "ch2_battery": {
+        "name": "Channel 2 Battery"
       },
       "phaseflag": {
         "name": "Phase",
@@ -1547,12 +1567,10 @@
           "closed": "Closed"
         }
       },
-      "temp_show":
-      {
+      "temp_show": {
         "name": "Current temperature"
       },
-      "mzj_work_status":
-      {
+      "mzj_work_status": {
         "name": "Work status",
         "state": {
           "stop": "Stopped",
@@ -1563,12 +1581,10 @@
           "2": "Complete"
         }
       },
-      "gross_generation":
-      {
+      "gross_generation": {
         "name": "Gross generation"
       },
-      "liquid_state":
-      {
+      "liquid_state": {
         "name": "Liquid state",
         "state": {
           "normal": "Normal",
@@ -1579,20 +1595,16 @@
           "2": "Upper alarm"
         }
       },
-      "liquid_depth":
-      {
+      "liquid_depth": {
         "name": "Liquid depth"
       },
-      "liquid_level_percent":
-      {
+      "liquid_level_percent": {
         "name": "Liquid level"
       },
-      "heart_rate":
-      {
+      "heart_rate": {
         "name": "Heart rate"
       },
-      "respiratory_rate":
-      {
+      "respiratory_rate": {
         "name": "Respiratory rate"
       },
       "sleep_stage": {
@@ -1604,20 +1616,16 @@
           "1": "Awake"
         }
       },
-      "time_get_in_bed":
-      {
+      "time_get_in_bed": {
         "name": "Time get in bed"
       },
-      "off_bed_time":
-      {
+      "off_bed_time": {
         "name": "Time get out of bed"
       },
-      "clct_time":
-      {
+      "clct_time": {
         "name": "Collected time"
       },
-      "wnykq_ir_control":
-      {
+      "wnykq_ir_control": {
         "name": "IR control",
         "state": {
           "0": "Study",
@@ -1645,16 +1653,16 @@
       "msp_history": {
         "name": "History",
         "state": {
-          "0":  "None",
-          "1":  "Automatic shoveling completed",
-          "2":  "Manual shoveling completed",
-          "3":  "Trash bin extraction",
-          "4":  "Trash bin reinstallation",
-          "5":  "Start automatic deodorization",
-          "6":  "Start manual deodorization",
-          "7":  "Temperature in the cabin is too high",
-          "8":  "The temperature inside the cabin is suitable",
-          "9":  "Sand dumping completed",
+          "0": "None",
+          "1": "Automatic shoveling completed",
+          "2": "Manual shoveling completed",
+          "3": "Trash bin extraction",
+          "4": "Trash bin reinstallation",
+          "5": "Start automatic deodorization",
+          "6": "Start manual deodorization",
+          "7": "Temperature in the cabin is too high",
+          "8": "The temperature inside the cabin is suitable",
+          "9": "Sand dumping completed",
           "10": "Sand dumping canceled",
           "11": "Litter shoveling canceled",
           "12": "Enter Do Not Disturb mode",
@@ -2002,22 +2010,22 @@
       "control_skip": {
         "name": "Skip control"
       },
-      "id_verification_set":{
+      "id_verification_set": {
         "name": "Set ID verification"
       },
-      "rfid":{
+      "rfid": {
         "name": "RFID"
       },
-      "uv_light":{
+      "uv_light": {
         "name": "UV light"
       },
-      "switch_pir":{
+      "switch_pir": {
         "name": "Switch PIR"
       },
-      "photo_again":{
+      "photo_again": {
         "name": "Take another photo"
       },
-      "one_click_cleanup":{
+      "one_click_cleanup": {
         "name": "One click cleanup"
       },
       "sleeping": {
