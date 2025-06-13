@@ -579,7 +579,7 @@ class XTIOTWebRTCManager:
                         #Fix the RTPMAP based on the offer RTPMAP
                         string_replacements = best_answer_rtpmap.get_string_replacements(best_offer_rtpmap)
                         for source in string_replacements:
-                            answer_sdp.replace(source, string_replacements[source])
+                            answer_sdp = answer_sdp.replace(source, string_replacements[source])
 
         while fingerprint_found:
             offset = answer_sdp.find("a=fingerprint:", searched_offset)
