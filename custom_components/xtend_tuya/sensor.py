@@ -3,9 +3,12 @@
 from __future__ import annotations
 
 import datetime
+from typing import Any
 
 from dataclasses import dataclass, field
 
+from .inkbird_data_parser import InkbirdB64TypeData
+from .const import LOGGER
 
 from homeassistant.components.sensor import (
     SensorDeviceClass,
@@ -15,6 +18,7 @@ from homeassistant.components.sensor import (
 )
 from homeassistant.const import (
     UnitOfEnergy,
+    UnitOfTemperature,
     Platform,
     PERCENTAGE,
     EntityCategory,
@@ -68,6 +72,12 @@ class XTSensorEntityDescription(TuyaSensorEntityDescription):
     restoredata: bool = False
     recalculate_scale_for_percentage: bool = False
     recalculate_scale_for_percentage_threshold: int = 100 #Maximum percentage that the sensor can display (default = 100%)
+
+@dataclass(frozen=True)
+class InkbirdSensorEntityDescription(XTSensorEntityDescription):
+    """Describes Inkbird sensor entity with data parsing."""
+    
+    data_key: str | None = None  # Key for which data to extract (temperature, humidity, battery)
 
 # Commonly used battery sensors, that are re-used in the sensors down below.
 BATTERY_SENSORS: tuple[XTSensorEntityDescription, ...] = (
@@ -783,6 +793,63 @@ LOCK_SENSORS: tuple[XTSensorEntityDescription, ...] = (
     ),
 )
 
+
+INKBIRD_CHANNELS = [
+    # (DP_Code, label, temperature, humidity, battery, enabled_by_default)
+    (XTDPCode.CH_0, "ch0", True, True, False, True),   # Base station
+    (XTDPCode.CH_1, "ch1", True, False, True, True),   
+    (XTDPCode.CH_2, "ch2", True, False, True, False),  
+    (XTDPCode.CH_3, "ch3", True, False, True, False),  
+    (XTDPCode.CH_4, "ch4", True, False, True, False),  
+    (XTDPCode.CH_5, "ch5", True, False, True, False),  
+    (XTDPCode.CH_6, "ch6", True, False, True, False),  
+    (XTDPCode.CH_7, "ch7", True, False, True, False),  
+    (XTDPCode.CH_8, "ch8", True, False, True, False),  
+    (XTDPCode.CH_9, "ch9", True, False, True, False),  
+]
+
+_INKBIRD_CHANNEL_SENSORS: list[InkbirdSensorEntityDescription] = []
+for key, label, temperature, humidity, battery, enabled_by_default in INKBIRD_CHANNELS:
+    if temperature:
+        _INKBIRD_CHANNEL_SENSORS.append(
+            InkbirdSensorEntityDescription(
+                key=key,
+                data_key="temperature",
+                translation_key=f"{label}_temperature",
+                device_class=SensorDeviceClass.TEMPERATURE,
+                state_class=SensorStateClass.MEASUREMENT,
+                native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+                entity_registry_enabled_default=enabled_by_default,
+            )
+        )
+    if humidity:
+        _INKBIRD_CHANNEL_SENSORS.append(
+            InkbirdSensorEntityDescription(
+                key=key,
+                data_key="humidity",
+                translation_key=f"{label}_humidity",
+                device_class=SensorDeviceClass.HUMIDITY,
+                state_class=SensorStateClass.MEASUREMENT,
+                native_unit_of_measurement=PERCENTAGE,
+                entity_registry_enabled_default=enabled_by_default,
+            )
+        )
+    if battery:
+        _INKBIRD_CHANNEL_SENSORS.append(
+            InkbirdSensorEntityDescription(
+                key=key,
+                data_key="battery",
+                translation_key=f"{label}_battery",
+                device_class=SensorDeviceClass.BATTERY,
+                state_class=SensorStateClass.MEASUREMENT,
+                native_unit_of_measurement=PERCENTAGE,
+                entity_category=EntityCategory.DIAGNOSTIC,
+                entity_registry_enabled_default=enabled_by_default,
+            )
+        )
+
+INKBIRD_CHANNEL_SENSORS: tuple[InkbirdSensorEntityDescription, ...] = tuple(_INKBIRD_CHANNEL_SENSORS)
+    
 # All descriptions can be found here. Mostly the Integer data types in the
 # default status set of each category (that don't have a set instruction)
 # end up being a sensor.
@@ -1212,6 +1279,9 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
     ),
     "wsdcg": (
         *TEMPERATURE_SENSORS,
+        *HUMIDITY_SENSORS,
+        *BATTERY_SENSORS,
+        *INKBIRD_CHANNEL_SENSORS,
     ),
     "xfj": (
         XTSensorEntityDescription(
@@ -1304,19 +1374,57 @@ async def async_setup_entry(
     @callback
     def async_discover_device(device_map) -> None:
         """Discover and add a discovered Tuya sensor."""
+        from .const import LOGGER
+        LOGGER.info("🐦 async_discover_device called with %d devices", len(device_map))
+        
         if hass_data.manager is None:
+            LOGGER.warning("🐦 hass_data.manager is None, returning")
             return
         entities: list[XTSensorEntity] = []
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
+                LOGGER.debug("🐦 Processing device %s (category: %s)", device_id, device.category)
+                LOGGER.debug("🐦 Device status keys: %s", list(device.status.keys()) if device.status else "None")
+                
                 if descriptions := merged_descriptors.get(device.category):
-                    entities.extend(
-                        XTSensorEntity(device, hass_data.manager, XTSensorEntityDescription(**description.__dict__))
-                        for description in descriptions
-                        if description.key in device.status
-                    )
+                    LOGGER.debug("🐦 Found %d descriptions for category %s", len(descriptions), device.category)
+                    
+                    # Check if this is an Inkbird device (has channel data)
+                    is_inkbird_device = any(key.startswith('ch_') for key in device.status.keys()) if device.status else False
+                    LOGGER.debug("🐦 Device %s is_inkbird_device: %s", device_id, is_inkbird_device)
+                    
+                    for description in descriptions:
+                        LOGGER.debug("🐦 Checking description key: %s", description.key)
+                        
+                        # Skip unwanted sensors for Inkbird devices
+                        if is_inkbird_device and description.key in [XTDPCode.VA_TEMPERATURE, XTDPCode.TEMPERATURE]:
+                            LOGGER.warning("🐦 SKIPPING unwanted sensor %s for Inkbird device %s", description.key, device_id)
+                            continue
+                            
+                        if description.key in device.status:
+                            LOGGER.info("🐦 Device %s has key %s in status", device_id, description.key)
+                            # Check if this is an Inkbird sensor description
+                            if isinstance(description, InkbirdSensorEntityDescription):
+                                LOGGER.info("🐦 Creating InkbirdChannelSensorEntity for device %s, key %s, data_key %s", 
+                                           device_id, description.key, description.data_key)
+                                entity = InkbirdChannelSensorEntity(
+                                    device, hass_data.manager, description
+                                )
+                            else:
+                                LOGGER.debug("🐦 Creating regular XTSensorEntity for device %s, key %s", device_id, description.key)
+                                entity = XTSensorEntity(
+                                    device, hass_data.manager, XTSensorEntityDescription(**description.__dict__)
+                                )
+                            entities.append(entity)
+                        else:
+                            LOGGER.debug("🐦 Device %s does not have key %s in status", device_id, description.key)
+                else:
+                    LOGGER.debug("🐦 No descriptions found for category %s", device.category)
+            else:
+                LOGGER.warning("🐦 Device %s not found in device_map", device_id)
 
+        LOGGER.info("🐦 Adding %d sensor entities", len(entities))
         async_add_entities(entities)
 
     hass_data.manager.register_device_descriptors("sensors", merged_descriptors)
@@ -1484,3 +1592,112 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor): # type: ignore
         if self.cancel_reset_after_x_seconds:
             self.cancel_reset_after_x_seconds()
         self.cancel_reset_after_x_seconds = async_call_later(self.hass, self.entity_description.reset_after_x_seconds, self.reset_value)
+
+
+class InkbirdChannelSensorEntity(XTSensorEntity):
+    """Inkbird Channel Sensor Entity with base64 data parsing."""
+    
+    entity_description: InkbirdSensorEntityDescription
+    _parsed_data: InkbirdB64TypeData | None = None
+    _last_raw_data: str | None = None  # Track last raw data to detect changes
+    
+    def __init__(
+        self,
+        device: XTDevice,
+        device_manager: MultiManager,
+        description: InkbirdSensorEntityDescription,
+    ) -> None:
+        """Initialize Inkbird channel sensor."""
+        LOGGER.info("🐦 Initializing InkbirdChannelSensorEntity for device %s, key %s, data_key %s", 
+                   device.id, description.key, description.data_key)
+        super().__init__(device, device_manager, description)
+        # Override unique_id to include data_key for uniqueness
+        self._attr_unique_id = f"{self.device.id}_{description.key}_{description.data_key}"
+        LOGGER.info("🐦 Created InkbirdChannelSensorEntity with unique_id: %s", self._attr_unique_id)
+        
+        # Initialize parsed data
+        self._update_parsed_data()
+        LOGGER.info("🐦 Initial data update completed for %s", self._attr_unique_id)
+    
+    @property 
+    def native_value(self) -> Any:
+        """Return the native value of the sensor."""
+        from .const import LOGGER
+        LOGGER.debug("🐦 Getting native_value for %s (data_key: %s)", self.entity_id, self.entity_description.data_key)
+        
+        # Check if raw data has changed since last parse
+        current_raw_data = self.device.status.get(self.entity_description.key)
+        if current_raw_data != self._last_raw_data:
+            LOGGER.debug("🐦 Raw data changed for %s: %s -> %s", self.entity_id, self._last_raw_data, current_raw_data)
+            self._update_parsed_data()
+        
+        if not self._parsed_data:
+            LOGGER.debug("🐦 No parsed data available for %s", self.entity_id)
+            return None
+            
+        if self.entity_description.data_key == "temperature":
+            value = self._parsed_data.temperature
+            LOGGER.debug("🐦 Temperature value for %s: %s", self.entity_id, value)
+            return value
+        elif self.entity_description.data_key == "humidity":
+            value = self._parsed_data.humidity
+            LOGGER.debug("🐦 Humidity value for %s: %s", self.entity_id, value)
+            return value
+        elif self.entity_description.data_key == "battery":
+            value = self._parsed_data.battery
+            LOGGER.debug("🐦 Battery value for %s: %s", self.entity_id, value)
+            return value
+        
+        LOGGER.debug("🐦 Unknown data_key '%s' for %s", self.entity_description.data_key, self.entity_id)
+        return None
+    
+    @property
+    def native_unit_of_measurement(self) -> str | None:
+        """Return the native unit of measurement."""
+        if self.entity_description.data_key == "temperature" and self._parsed_data:
+            # Use the temperature unit from the parsed data
+            if self._parsed_data.temperature_unit:
+                return self._parsed_data.temperature_unit.value  # Convert enum to string
+            else:
+                return UnitOfTemperature.CELSIUS  # Default to Celsius if None
+        return self.entity_description.native_unit_of_measurement
+    
+    def _update_parsed_data(self) -> None:
+        """Update parsed data from device status."""
+        
+        LOGGER.info("🐦 Updating parsed data for %s (key: %s)", self.entity_id, self.entity_description.key)
+        LOGGER.info("🐦 Device status keys: %s", list(self.device.status.keys()) if self.device.status else "None")
+        
+        if raw_data := self.device.status.get(self.entity_description.key):
+            # Update last raw data tracker
+            self._last_raw_data = raw_data
+            LOGGER.info("🐦 Found raw data for %s: %s", self.entity_id, raw_data)
+            try:
+                self._parsed_data = InkbirdB64TypeData.from_raw(raw_data)
+                LOGGER.info("🐦 Successfully parsed data for %s: temp=%s, hum=%s, bat=%s", 
+                           self.entity_id, 
+                           self._parsed_data.temperature,
+                           self._parsed_data.humidity, 
+                           self._parsed_data.battery)
+            except (ValueError, TypeError) as e:
+                LOGGER.warning("🐦 Failed to parse Inkbird data for %s: %s", self.entity_id, e)
+                self._parsed_data = None
+        else:
+            LOGGER.info("🐦 No raw data found for key '%s' in device status for %s", 
+                        self.entity_description.key, self.entity_id)
+            self._last_raw_data = None
+            self._parsed_data = None
+    
+    async def async_update(self) -> None:
+        """Update the sensor."""
+        LOGGER.debug("🐦 async_update called for %s", self.entity_id)
+        await super().async_update()
+        self._update_parsed_data()
+        LOGGER.debug("🐦 async_update completed for %s", self.entity_id)
+    
+    def _handle_coordinator_update(self) -> None:
+        """Handle updated data from the coordinator."""
+        LOGGER.debug("🐦 _handle_coordinator_update called for %s", self.entity_id)
+        super()._handle_coordinator_update()
+        self._update_parsed_data()
+        LOGGER.debug("🐦 _handle_coordinator_update completed for %s", self.entity_id)

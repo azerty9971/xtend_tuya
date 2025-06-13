@@ -219,6 +219,19 @@ class XTDPCode(StrEnum):
     CH2O_VALUE = "ch2o_value"
     CH4_SENSOR_STATE = "ch4_sensor_state"
     CH4_SENSOR_VALUE = "ch4_sensor_value"
+    # Channel data points for multi-sensor devices
+    CH_0 = "ch_0"           # Channel 0 sensor data
+    CH_1 = "ch_1"           # Channel 1 sensor data
+    CH_2 = "ch_2"           # Channel 2 sensor data
+    CH_3 = "ch_3"           # Channel 3 sensor data
+    CH_4 = "ch_4"           # Channel 4 sensor data
+    CH_5 = "ch_5"           # Channel 5 sensor data
+    CH_6 = "ch_6"           # Channel 6 sensor data
+    CH_7 = "ch_7"           # Channel 7 sensor data
+    CH_8 = "ch_8"           # Channel 8 sensor data
+    CH_9 = "ch_9"           # Channel 9 sensor data
+    CH_PARA = "ch_para"     # Channel parameters
+    CH_CFG = "ch_cfg"       # Channel configuration
     CHARGE_CUR_SET = "charge_cur_set"
     CHARGE_ENERGY = "charge_energy"
     CHARGE_ENERGY_ONCE = "charge_energy_once"
