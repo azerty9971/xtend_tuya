@@ -16,7 +16,7 @@ from .const import LOGGER
 class InkbirdB64TypeData:
     """B64Temperature Type Data."""
 
-    temperature_unit: UnitOfTemperature | None = None
+    temperature_unit: UnitOfTemperature = UnitOfTemperature.CELSIUS
     temperature: float | None = None
     humidity: float | None = None
     battery: int | None = None
@@ -36,18 +36,13 @@ class InkbirdB64TypeData:
         """Parse the raw, base64 encoded data and return a InkbirdB64TypeData object."""
         LOGGER.info("🐦 InkbirdB64TypeData.from_raw called with data: %s", data)
         
-        temperature_unit: UnitOfTemperature | None = None
+        temperature_unit: UnitOfTemperature = UnitOfTemperature.CELSIUS
         battery: int | None = None
         temperature: float | None = None
         humidity: float | None = None
 
         if len(data) > 0:
             try:
-                # Only set Celsius if base64 starts with 'C', otherwise leave as None
-                # Let Home Assistant handle the default temperature unit
-                if data[0] == "C":
-                    temperature_unit = UnitOfTemperature.CELSIUS
-                    
                 decoded_bytes = base64.b64decode(data)
                 LOGGER.debug("🐦 Decoded bytes: %s (length: %d)", decoded_bytes.hex(), len(decoded_bytes))
                 
