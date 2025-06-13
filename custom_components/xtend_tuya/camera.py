@@ -106,6 +106,7 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         """Init XT Camera."""
         super(XTCameraEntity, self).__init__(device, device_manager)
         super(XTEntity, self).__init__(device, device_manager) # type: ignore
+        self._attr_unique_id = f"tuya.{device.id}_{stream_quality}"
         self.device = device
         self.device_manager = device_manager
         self.iot_manager: XTDeviceManagerInterface | None = None
