@@ -43,24 +43,22 @@ class InkbirdB64TypeData:
 
         if len(data) > 0:
             try:
+                # Only set Celsius if base64 starts with 'C', otherwise leave as None
+                # Let Home Assistant handle the default temperature unit
                 if data[0] == "C":
                     temperature_unit = UnitOfTemperature.CELSIUS
-                    LOGGER.debug("🐦 Detected Celsius temperature unit")
-                else:
-                    temperature_unit = UnitOfTemperature.FAHRENHEIT
-                    LOGGER.debug("🐦 Detected Fahrenheit temperature unit")
                     
                 decoded_bytes = base64.b64decode(data)
                 LOGGER.debug("🐦 Decoded bytes: %s (length: %d)", decoded_bytes.hex(), len(decoded_bytes))
                 
+                # Parse temperature, humidity, unknown value, battery from bytes 1-10
                 # TODO: Identify what the skipped bytes are in the base station data
                 _temperature, _humidity, _, battery = struct.Struct("<hHIb").unpack(
                     decoded_bytes[1:11]
                 )
-                temperature = _temperature / 10.0
-                humidity = _humidity / 10.0
-                LOGGER.info("🐦 Parsed values - temp: %s, humidity: %s, battery: %s", 
-                           temperature, humidity, battery)
+                (temperature, humidity) = _temperature / 10.0, _humidity / 10.0
+                LOGGER.info("🐦 Parsed values - temp: %s°, humidity: %s%%, battery: %s%%, unit: %s", 
+                           temperature, humidity, battery, temperature_unit)
             except Exception as e:
                 LOGGER.error("🐦 InkbirdB64TypeData.from_raw: %s", e)
                 raise ValueError(f"Invalid data: {data}") from e

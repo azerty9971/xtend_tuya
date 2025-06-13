@@ -18,6 +18,7 @@ from homeassistant.components.sensor import (
 )
 from homeassistant.const import (
     UnitOfEnergy,
+    UnitOfTemperature,
     Platform,
     PERCENTAGE,
     EntityCategory,
@@ -1408,8 +1409,19 @@ async def async_setup_entry(
                 
                 if descriptions := merged_descriptors.get(device.category):
                     LOGGER.debug("🐦 Found %d descriptions for category %s", len(descriptions), device.category)
+                    
+                    # Check if this is an Inkbird device (has channel data)
+                    is_inkbird_device = any(key.startswith('ch_') for key in device.status.keys()) if device.status else False
+                    LOGGER.debug("🐦 Device %s is_inkbird_device: %s", device_id, is_inkbird_device)
+                    
                     for description in descriptions:
                         LOGGER.debug("🐦 Checking description key: %s", description.key)
+                        
+                        # Skip unwanted sensors for Inkbird devices
+                        if is_inkbird_device and description.key in [XTDPCode.VA_TEMPERATURE, XTDPCode.TEMPERATURE]:
+                            LOGGER.info("🐦 Skipping unwanted sensor %s for Inkbird device %s", description.key, device_id)
+                            continue
+                            
                         if description.key in device.status:
                             LOGGER.info("🐦 Device %s has key %s in status", device_id, description.key)
                             # Check if this is an Inkbird sensor description
@@ -1656,6 +1668,7 @@ class InkbirdChannelSensorEntity(XTSensorEntity):
     def native_unit_of_measurement(self) -> str | None:
         """Return the native unit of measurement."""
         if self.entity_description.data_key == "temperature" and self._parsed_data:
+            # Use the temperature unit from the parsed data
             return self._parsed_data.temperature_unit
         return self.entity_description.native_unit_of_measurement
     
