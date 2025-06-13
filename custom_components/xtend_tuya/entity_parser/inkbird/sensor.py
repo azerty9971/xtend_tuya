@@ -5,7 +5,7 @@ from __future__ import annotations
 import base64
 import struct
 from dataclasses import dataclass
-from typing import Self, Any, cast
+from typing import Self, Any
 
 from homeassistant.components.sensor import (
     SensorDeviceClass,
@@ -13,12 +13,11 @@ from homeassistant.components.sensor import (
 )
 from homeassistant.const import (
     UnitOfTemperature,
-    Platform,
     PERCENTAGE,
     EntityCategory,
 )
 
-from ...const import LOGGER, XTDPCode
+from ...const import LOGGER
 from ...sensor import (
     XTSensorEntity,
     XTSensorEntityDescription,
@@ -84,7 +83,6 @@ class InkbirdSensor:
     
     @staticmethod
     def get_descriptors_to_merge() -> dict[str, tuple[XTSensorEntityDescription, ...]] | None:
-        LOGGER.warning(f"Added descriptors: {InkbirdSensor.INKBIRD_SENSORS}")
         return InkbirdSensor.INKBIRD_SENSORS
 
 @dataclass(frozen=True)
@@ -98,7 +96,7 @@ class InkbirdSensorEntityDescription(XTSensorEntityDescription):
                             device_manager: MultiManager, 
                             description: XTSensorEntityDescription
                             ) -> XTSensorEntity:
-        return InkbirdChannelSensorEntity(device=device, 
+        return InkbirdSensorEntity(device=device, 
                               device_manager=device_manager, 
                               description=description)
 
@@ -159,7 +157,7 @@ class InkbirdB64TypeData:
         LOGGER.info("🐦 Created InkbirdB64TypeData: %s", result)
         return result
 
-class InkbirdChannelSensorEntity(XTSensorEntity):
+class InkbirdSensorEntity(XTSensorEntity):
     """Inkbird Channel Sensor Entity with base64 data parsing."""
     
     entity_description: InkbirdSensorEntityDescription
