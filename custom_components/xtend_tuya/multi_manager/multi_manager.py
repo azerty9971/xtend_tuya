@@ -20,9 +20,6 @@ from ..const import (
     XTDeviceSourcePriority,
     XTMultiManagerProperties,
 )
-from ..entity_parser.entity_parser import (
-    XTCustomEntityParser,
-)
     
 class MultiManager:  # noqa: F811
     def __init__(self, hass: HomeAssistant) -> None:
@@ -453,4 +450,8 @@ from ..util import (
 
 from .shared.interface.device_manager import (
     XTDeviceManagerInterface,
+)
+
+from ..entity_parser.entity_parser import (
+    XTCustomEntityParser,
 )
