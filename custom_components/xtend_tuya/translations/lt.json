@@ -5,29 +5,23 @@
         },
         "error": {
             "invalid_auth": "Neteisingas autentifikavimas",
-            "login_error": "Prisijungimo klaida ( {code} ): {msg}",
-            "reauth_successful": "Pakartotinis autentifikavimas buvo s\u0117kmingas"
+            "login_error": "Prisijungimo klaida ({code}): {msg}"
         },
         "step": {
             "reauth_user_code": {
                 "data": {
-                    "user_code": "Vartotojo kodas"
+                    "user_code": "Naudotojo kodas"
                 },
-                "description": "Tuya integracija dabar naudoja patobulint\u0105 prisijungimo metod\u0105. Nor\u0117dami i\u0161 naujo autentifikuoti savo Smart Life arba Tuya Smart paskyr\u0105, turite \u012fvesti savo vartotojo kod\u0105. \n\n \u0160\u012f kod\u0105 galite rasti program\u0117l\u0117je \u201eSmart Life\u201c arba \u201eTuya Smart\u201c program\u0117l\u0117je **Nustatym\u0173** > **Paskyra ir sauga** ekrane ir \u012fveskite lauke **Vartotojo kodas** rodom\u0105 kod\u0105. Naudotojo kodas yra did\u017eiosios ir ma\u017eosios raid\u0117s, b\u016btinai \u012fveskite j\u012f tiksliai taip, kaip parodyta program\u0117l\u0117je."
+                "description": "Tuya integracija dabar naudoja patobulint\u0105 prisijungimo metod\u0105. Nor\u0117dami i\u0161 naujo autentifikuoti savo Smart Life arba Tuya Smart paskyr\u0105, turite \u012fvesti savo naudotojo kod\u0105. \n\n \u0160\u012f kod\u0105 galite rasti program\u0117l\u0117je \u201eSmart Life\u201c arba \u201eTuya Smart\u201c program\u0117l\u0117je **Nustatym\u0173** > **Paskyra ir sauga** ekrane ir \u012fveskite lauke **Naudotojo kodas** rodom\u0105 kod\u0105. Naudotojo kodas yra did\u017eiosios ir ma\u017eosios raid\u0117s, b\u016btinai \u012fveskite j\u012f tiksliai taip, kaip parodyta program\u0117l\u0117je."
             },
             "scan": {
-                "description": "Nor\u0117dami u\u017ebaigti prisijungim\u0105, naudokite program\u0105 \u201eSmart Life\u201c arba \u201eTuya Smart\u201c program\u0105, kad nuskaitytum\u0117te toliau pateikt\u0105 QR kod\u0105. \n\n Atlik\u0119 \u0161\u012f veiksm\u0105 programoje, pereikite prie kito veiksmo."
+                "description": "Naudodamiesi program\u0117le Smart Life arba Tuya Smart program\u0117le nuskaitykite toliau nurodyt\u0105 QR kod\u0105, kad u\u017ebaigtum\u0117te prisijungim\u0105. Atlik\u0119 \u0161\u012f veiksm\u0105 program\u0117l\u0117je, pereikite prie kito veiksmo."
             },
             "user": {
                 "data": {
-                    "access_id": "Tuya IoT prieigos ID",
-                    "access_secret": "Tuya IoT prieigos paslaptis",
-                    "country_code": "\u0160alis",
-                    "password": "Slapta\u017eodis",
-                    "user_code": "Vartotojo kodas",
-                    "username": "Paskyra"
+                    "user_code": "Naudotojo kodas"
                 },
-                "description": "\u012eveskite savo Smart Life arba Tuya Smart vartotojo kod\u0105. \n\n \u0160\u012f kod\u0105 galite rasti program\u0117l\u0117je \u201eSmart Life\u201c arba \u201eTuya Smart\u201c program\u0117l\u0117je **Nustatym\u0173** > **Paskyra ir sauga** ekrane ir \u012fveskite lauke **Vartotojo kodas** rodom\u0105 kod\u0105. Naudotojo kodas yra did\u017eiosios ir ma\u017eosios raid\u0117s, b\u016btinai \u012fveskite j\u012f tiksliai taip, kaip parodyta program\u0117l\u0117je."
+                "description": "\u012eveskite savo Smart Life arba Tuya Smart naudotojo kod\u0105. \n\n \u0160\u012f kod\u0105 galite rasti program\u0117l\u0117je \u201eSmart Life\u201c arba \u201eTuya Smart\u201c program\u0117l\u0117je **Nustatym\u0173** > **Paskyra ir sauga** ekrane ir \u012fveskite lauke **Naudotojo kodas** rodom\u0105 kod\u0105. Naudotojo kodas yra did\u017eiosios ir ma\u017eosios raid\u0117s, b\u016btinai \u012fveskite j\u012f tiksliai taip, kaip parodyta program\u0117l\u0117je."
             }
         }
     },
@@ -107,6 +101,20 @@
                 "name": "Durys 3"
             }
         },
+        "event": {
+            "numbered_button": {
+                "name": "Mygtukas {button_number}",
+                "state_attributes": {
+                    "event_type": {
+                        "state": {
+                            "click": "Paspausta",
+                            "double_click": "Dukart spaustas",
+                            "press": "Ilgai spaustas"
+                        }
+                    }
+                }
+            }
+        },
         "light": {
             "backlight": {
                 "name": "Foninis ap\u0161vietimas"
@@ -125,6 +133,9 @@
             }
         },
         "number": {
+            "alarm_duration": {
+                "name": "Signalizacijos trukm\u0117"
+            },
             "cloud_recipe": {
                 "name": "Debes\u0173 receptas"
             },
@@ -179,6 +190,9 @@
             "sensitivity": {
                 "name": "Jautrumas"
             },
+            "target_dis_closest": {
+                "name": "Artimiausias taikinio atstumas"
+            },
             "temperature": {
                 "name": "Temperat\u016bra"
             },
@@ -213,6 +227,20 @@
                     "0": "Automatinis",
                     "1": "I\u0161jungta",
                     "2": "\u012ejungta"
+                }
+            },
+            "blanket_level": {
+                "state": {
+                    "level_1": "\u017demas",
+                    "level_10": "Auk\u0161tas",
+                    "level_2": "2 lygis",
+                    "level_3": "3 lygis",
+                    "level_4": "4 lygis",
+                    "level_5": "5 lygis",
+                    "level_6": "6 lygis",
+                    "level_7": "7 lygis",
+                    "level_8": "8 lygis",
+                    "level_9": "9 lygis"
                 }
             },
             "brightness": {
@@ -255,13 +283,6 @@
                 "state": {
                     "0": "Ma\u017eas jautrumas",
                     "1": "Didelis jautrumas"
-                }
-            },
-            "fan_angle": {
-                "state": {
-                    "30": "30\u00b0",
-                    "60": "60\u00b0",
-                    "90": "90\u00b0"
                 }
             },
             "fingerbot_mode": {
@@ -309,7 +330,7 @@
                 "state": {
                     "auto": "Automatinis",
                     "health": "Sveikata",
-                    "humidity": "Dr\u0117gm\u0117",
+                    "humidity": "Oro dr\u0117gm\u0117",
                     "sleep": "Miegas",
                     "work": "Darbas"
                 }
@@ -362,9 +383,9 @@
             "motion_sensitivity": {
                 "name": "Judesio aptikimo jautrumas",
                 "state": {
-                    "0": "Ma\u017eas jautrumas",
-                    "1": "Vidutinis jautrumas",
-                    "2": "Didelis jautrumas"
+                    "0": "\u017demas",
+                    "1": "Vidutinis",
+                    "2": "Auk\u0161tas"
                 }
             },
             "record_mode": {
@@ -386,7 +407,7 @@
                 }
             },
             "target_humidity": {
-                "name": "Tikslin\u0117 dr\u0117gm\u0117"
+                "name": "Tikslin\u0117 oro dr\u0117gm\u0117"
             },
             "temperature_level": {
                 "name": "Temperat\u016bros lygis"
@@ -413,17 +434,17 @@
                 "state": {
                     "bow": "Lankas",
                     "chargego": "Gr\u012f\u017eti \u012f stotel\u0119",
-                    "left_bow": "Kair\u0117n nusilenk",
-                    "left_spiral": "Spiral\u0117 kair\u0117je",
+                    "left_bow": "Lankas \u012f kair\u0119",
+                    "left_spiral": "Kairin\u0117 spiral\u0117",
                     "mop": "Plauna",
                     "part": "Dalis",
-                    "partial_bow": "Dalinai nusilenk",
+                    "partial_bow": "Lankas i\u0161 dalies",
                     "pick_zone": "Pasirinkite zon\u0105",
                     "point": "Ta\u0161kas valymas",
                     "pose": "Poza",
                     "random": "Atsitiktinis",
-                    "right_bow": "Lenkis \u012f de\u0161in\u0119",
-                    "right_spiral": "Spiralin\u0117 de\u0161in\u0117",
+                    "right_bow": "Lankas \u012f de\u0161in\u0119",
+                    "right_spiral": "De\u0161inin\u0117 spiral\u0117",
                     "single": "Vienas",
                     "smart": "I\u0161manusis",
                     "spiral": "Spiral\u0117",
@@ -467,6 +488,17 @@
                     "severe": "Sunkus"
                 }
             },
+            "air_quality_index": {
+                "name": "Oro kokyb\u0117s indeksas",
+                "state": {
+                    "level_1": "Lygis 1",
+                    "level_2": "Lygis 2",
+                    "level_3": "Lygis 3",
+                    "level_4": "Lygis 4",
+                    "level_5": "Lygis 5",
+                    "level_6": "Lygis 6"
+                }
+            },
             "battery": {
                 "name": "Baterija"
             },
@@ -489,13 +521,16 @@
                 "name": "Anglies dioksido koncentracija"
             },
             "current": {
-                "name": "Dabartin\u0117"
+                "name": "Srov\u0117"
             },
             "current_temperature": {
                 "name": "Dabartin\u0117 temperat\u016bra"
             },
             "duster_cloth_life": {
                 "name": "\u0160luost\u0117s eksploatavimo laikas"
+            },
+            "filter_duration": {
+                "name": "Filtro trukm\u0117"
             },
             "filter_life": {
                 "name": "Filtro tarnavimo laikas"
@@ -510,10 +545,10 @@
                 "name": "Dujos"
             },
             "humidity": {
-                "name": "Dr\u0117gm\u0117"
+                "name": "Oro dr\u0117gm\u0117"
             },
             "illuminance": {
-                "name": "Ap\u0161vietimas"
+                "name": "Ap\u0161vieta"
             },
             "last_amount": {
                 "name": "Paskutin\u0117 suma"
@@ -566,6 +601,9 @@
             "power": {
                 "name": "Galia"
             },
+            "pump_time": {
+                "name": "Vandens siurblio veikimo trukm\u0117"
+            },
             "remaining_time": {
                 "name": "Lik\u0119s laikas"
             },
@@ -582,7 +620,7 @@
                 "name": "B\u016bsena",
                 "state": {
                     "boiling_temp": "Virimo temperat\u016bra",
-                    "cooling": "Au\u0161inimas",
+                    "cooling": "V\u0117sinimas",
                     "heating": "\u0160ildymas",
                     "heating_temp": "\u0160ildymo temperat\u016bra",
                     "reserve_1": "Rezervas 1",
@@ -593,21 +631,13 @@
                 }
             },
             "status": {
-                "name": "B\u016bsena",
-                "state": {
-                    "boiling_temp": "Virimo temperat\u016bra",
-                    "cooling": "Au\u0161inimas",
-                    "heating": "\u0160ildymas",
-                    "heating_temp": "\u0160ildymo temperat\u016bra",
-                    "reserve_1": "Rezervas 1",
-                    "reserve_2": "Rezervas 2",
-                    "reserve_3": "Rezervas 3",
-                    "standby": "Bud\u0117jimo re\u017eimas",
-                    "warm": "\u0160ilumos i\u0161saugojimas"
-                }
+                "name": "B\u016bsena"
             },
             "temperature": {
                 "name": "Temperat\u016bra"
+            },
+            "temperature_external": {
+                "name": "Zondo temperat\u016bra"
             },
             "total_absorption_particles": {
                 "name": "Bendra daleli\u0173 absorbcija"
@@ -636,14 +666,20 @@
             "total_watering_time": {
                 "name": "Bendras laistymo laikas"
             },
+            "uv_runtime": {
+                "name": "UV veikimo laikas"
+            },
             "voc": {
-                "name": "VOCs"
+                "name": "Lakieji organiniai junginiai"
             },
             "voltage": {
                 "name": "\u012etampa"
             },
             "water_level": {
                 "name": "Vandens lygis"
+            },
+            "water_time": {
+                "name": "Vandens naudojimo trukm\u0117"
             }
         },
         "switch": {
@@ -854,32 +890,6 @@
             "wide_dynamic_range": {
                 "name": "Platus dinaminis diapazonas"
             }
-        }
-    },
-    "issues": {
-        "service_deprecation_turn_off": {
-            "description": "\u201eTuya\u201c vakuuminis palaikymas, skirtas vacuum.turn_off paslaugai, nebenaudojamas ir bus pa\u0161alintas naudojant \u201eHome Assistant\u201c 2024.2; Pakoreguokite bet kok\u012f automatizavim\u0105 ar scenarij\u0173, kuris naudoja paslaug\u0105, kad i\u0161kviestum\u0117te vacuum.stop ir toliau pasirinkite pateikti, kad pa\u017eym\u0117tum\u0117te \u0161i\u0105 problem\u0105 kaip i\u0161spr\u0119sta.",
-            "fix_flow": {
-                "step": {
-                    "confirm": {
-                        "description": "\u201eTuya\u201c vakuuminis palaikymas, skirtas vacuum.turn_off paslaugai, nebenaudojamas ir bus pa\u0161alintas naudojant \u201eHome Assistant\u201c 2024.2; Pakoreguokite bet kok\u012f automatizavim\u0105 ar scenarij\u0173, kuris naudoja paslaug\u0105, kad i\u0161kviestum\u0117te vacuum.stop ir toliau pasirinkite pateikti, kad pa\u017eym\u0117tum\u0117te \u0161i\u0105 problem\u0105 kaip i\u0161spr\u0119sta.",
-                        "title": "Tuya vakuuminis palaikymas vacuum.turn_off \u0161alinamas"
-                    }
-                }
-            },
-            "title": "Tuya vakuuminis palaikymas vacuum.turn_off \u0161alinamas"
-        },
-        "service_deprecation_turn_on": {
-            "description": "\u201eTuya\u201c vakuuminis palaikymas, skirtas vacuum.turn_on paslaugai, nebenaudojamas ir bus pa\u0161alintas naudojant \u201eHome Assistant\u201c 2024.2; Pakoreguokite bet kok\u012f automatizavim\u0105 ar scenarij\u0173, kuris naudoja paslaug\u0105, kad i\u0161kviestum\u0117te vacuum.start, ir toliau pasirinkite pateikti, kad pa\u017eym\u0117tum\u0117te \u0161i\u0105 problem\u0105 kaip i\u0161spr\u0119st\u0105.",
-            "fix_flow": {
-                "step": {
-                    "confirm": {
-                        "description": "\u201eTuya\u201c vakuuminis palaikymas, skirtas vacuum.turn_on paslaugai, nebenaudojamas ir bus pa\u0161alintas naudojant \u201eHome Assistant\u201c 2024.2; Pakoreguokite bet kok\u012f automatizavim\u0105 ar scenarij\u0173, kuris naudoja paslaug\u0105, kad i\u0161kviestum\u0117te vacuum.start, ir toliau pasirinkite pateikti, kad pa\u017eym\u0117tum\u0117te \u0161i\u0105 problem\u0105 kaip i\u0161spr\u0119st\u0105.",
-                        "title": "Tuya vakuumo palaikymas, skirtas vacuum.turn_on, pa\u0161alinamas"
-                    }
-                }
-            },
-            "title": "Tuya vakuumo palaikymas, skirtas vacuum.turn_on, pa\u0161alinamas"
         }
     }
 }

@@ -1,23 +1,11 @@
 {
     "config": {
         "abort": {
-            "reauth_successful": "Ponowne uwierzytelnienie powiod\u0142o si\u0119"
+            "reauth_successful": "Ponowne uwierzytelnienie si\u0119 powiod\u0142o"
         },
         "error": {
             "invalid_auth": "Niepoprawne uwierzytelnienie",
-            "login_error": "B\u0142\u0105d logowania ({code}): {msg}",
-            "reauth_successful": "Ponowne uwierzytelnienie powiod\u0142o si\u0119"
-        },
-        "step": {
-            "user": {
-                "data": {
-                    "access_id": "Identyfikator dost\u0119pu do Tuya IoT",
-                    "access_secret": "Has\u0142o dost\u0119pu do Tuya IoT",
-                    "country_code": "Kraj",
-                    "password": "Has\u0142o",
-                    "username": "Konto"
-                }
-            }
+            "login_error": "B\u0142\u0105d logowania ({code}): {msg}"
         }
     },
     "entity": {
@@ -58,16 +46,7 @@
             },
             "time": {
                 "name": "Czas"
-            },
-            "warm_temperature": {
-                "name": "Utrzymywana temperatura"
-              },
-              "temperature_after_boiling": {
-                "name": "Temperatura po zagotowaniu"
-              },
-              "heat_preservation_time": {
-                "name": "Czas podtrzymania ciep\u0142a"
-              }
+            }
         },
         "select": {
             "basic_anti_flicker": {
@@ -116,13 +95,6 @@
                     "1": "wysoka czu\u0142o\u015b\u0107"
                 }
             },
-            "fan_angle": {
-                "state": {
-                    "30": "30\u00b0",
-                    "60": "60\u00b0",
-                    "90": "90\u00b0"
-                }
-            },
             "fingerbot_mode": {
                 "state": {
                     "click": "naci\u015bni\u0119cie",
@@ -161,7 +133,6 @@
             },
             "humidifier_spray_mode": {
                 "state": {
-                    "auto": "automatyczny",
                     "health": "zdrowotny",
                     "humidity": "wilgotno\u015b\u0107",
                     "sleep": "noc",
@@ -201,11 +172,6 @@
                     "relay": "wska\u017c stan w\u0142./wy\u0142."
                 }
             },
-            "motion_sensitivity": {
-                "state": {
-                    "1": "\u015brednia czu\u0142o\u015b\u0107"
-                }
-            },
             "record_mode": {
                 "state": {
                     "1": "tylko nagrywanie zdarze\u0144",
@@ -225,8 +191,6 @@
             "vacuum_cistern": {
                 "state": {
                     "closed": "zamkni\u0119to",
-                    "high": "wysoki",
-                    "low": "niski",
                     "middle": "\u015bredni"
                 }
             },
@@ -250,7 +214,7 @@
                     "single": "pojedyncze",
                     "smart": "smart",
                     "spiral": "spirala",
-                    "standby": "tryb czuwania",
+                    "standby": "Tryb czuwania",
                     "zone": "strefa"
                 }
             },
@@ -315,22 +279,11 @@
             },
             "sous_vide_status": {
                 "state": {
-                    "standby": "tryb czuwania"
+                    "standby": "Tryb czuwania"
                 }
             },
             "status": {
-                "name": "Status",
-                "state": {
-                    "boiling_temp": "temperatura wrzenia",
-                    "cooling": "ch\u0142odzenie",
-                    "heating": "grzanie",
-                    "heating_temp": "temperatura ogrzewania",
-                    "reserve_1": "rezerwa 1",
-                    "reserve_2": "rezerwa 2",
-                    "reserve_3": "rezerwa 3",
-                    "standby": "tryb czuwania",
-                    "warm": "utrzymywanie ciep\u0142a"
-                }
+                "name": "Status"
             },
             "temperature": {
                 "name": "Temperatura"

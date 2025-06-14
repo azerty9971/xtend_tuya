@@ -5,8 +5,7 @@
         },
         "error": {
             "invalid_auth": "Autenticaci\u00f3n no v\u00e1lida",
-            "login_error": "Error de inicio de sesi\u00f3n ({code}): {msg}",
-            "reauth_successful": "La autenticaci\u00f3n se volvi\u00f3 a realizar correctamente"
+            "login_error": "Error de inicio de sesi\u00f3n ({code}): {msg}"
         },
         "step": {
             "reauth_user_code": {
@@ -16,16 +15,11 @@
                 "description": "La integraci\u00f3n Tuya ahora utiliza un m\u00e9todo de inicio de sesi\u00f3n mejorado. Para volver a autenticarse con tu cuenta Smart Life o Tuya Smart, debes introducir tu c\u00f3digo de usuario. \n\nPuedes encontrar este c\u00f3digo en la aplicaci\u00f3n Smart Life o en la aplicaci\u00f3n Tuya Smart en la pantalla **Configuraci\u00f3n** > **Cuenta y seguridad** e introducir el c\u00f3digo que se muestra en el campo **C\u00f3digo de usuario**. El c\u00f3digo de usuario distingue entre may\u00fasculas y min\u00fasculas; aseg\u00farate de introducirlo exactamente como se muestra en la aplicaci\u00f3n."
             },
             "scan": {
-                "description": "Utiliza la aplicaci\u00f3n Smart Life o la aplicaci\u00f3n Tuya Smart para escanear el siguiente c\u00f3digo QR y completar el inicio de sesi\u00f3n.\n\nContin\u00faa con el siguiente paso una vez que hayas completado este paso en la aplicaci\u00f3n."
+                "description": "Utiliza la aplicaci\u00f3n Smart Life o la aplicaci\u00f3n Tuya Smart para escanear el siguiente c\u00f3digo QR para completar el inicio de sesi\u00f3n. \n \nContin\u00faa con el siguiente paso una vez que hayas completado este paso en la aplicaci\u00f3n."
             },
             "user": {
                 "data": {
-                    "access_id": "ID de acceso a Tuya IoT",
-                    "access_secret": "Secreto de acceso a Tuya IoT",
-                    "country_code": "Pa\u00eds",
-                    "password": "Contrase\u00f1a",
-                    "user_code": "C\u00f3digo de usuario",
-                    "username": "Cuenta"
+                    "user_code": "C\u00f3digo de usuario"
                 },
                 "description": "Introduce tu c\u00f3digo de usuario Smart Life o Tuya Smart. \n\nPuedes encontrar este c\u00f3digo en la aplicaci\u00f3n Smart Life o en la aplicaci\u00f3n Tuya Smart en la pantalla **Configuraci\u00f3n** > **Cuenta y seguridad** e introducir el c\u00f3digo que se muestra en el campo **C\u00f3digo de usuario**. El c\u00f3digo de usuario distingue entre may\u00fasculas y min\u00fasculas; aseg\u00farate de introducirlo exactamente como se muestra en la aplicaci\u00f3n."
             }
@@ -107,6 +101,20 @@
                 "name": "Puerta 3"
             }
         },
+        "event": {
+            "numbered_button": {
+                "name": "Bot\u00f3n {button_number}",
+                "state_attributes": {
+                    "event_type": {
+                        "state": {
+                            "click": "Pulsaci\u00f3n",
+                            "double_click": "Doble pulsaci\u00f3n",
+                            "press": "Pulsaci\u00f3n larga"
+                        }
+                    }
+                }
+            }
+        },
         "light": {
             "backlight": {
                 "name": "Luz de fondo"
@@ -125,6 +133,9 @@
             }
         },
         "number": {
+            "alarm_duration": {
+                "name": "Duraci\u00f3n de la alarma"
+            },
             "cloud_recipe": {
                 "name": "Receta en la nube"
             },
@@ -179,6 +190,9 @@
             "sensitivity": {
                 "name": "Sensibilidad"
             },
+            "target_dis_closest": {
+                "name": "Distancia objetivo m\u00e1s cercana"
+            },
             "temperature": {
                 "name": "Temperatura"
             },
@@ -213,6 +227,20 @@
                     "0": "Autom\u00e1tico",
                     "1": "Apagado",
                     "2": "Encendido"
+                }
+            },
+            "blanket_level": {
+                "state": {
+                    "level_1": "Bajo",
+                    "level_10": "Alto",
+                    "level_2": "Nivel 2",
+                    "level_3": "Nivel 3",
+                    "level_4": "Nivel 4",
+                    "level_5": "Nivel 5",
+                    "level_6": "Nivel 6",
+                    "level_7": "Nivel 7",
+                    "level_8": "Nivel 8",
+                    "level_9": "Nivel 9"
                 }
             },
             "brightness": {
@@ -255,13 +283,6 @@
                 "state": {
                     "0": "Baja sensibilidad",
                     "1": "Alta sensibilidad"
-                }
-            },
-            "fan_angle": {
-                "state": {
-                    "30": "30\u00b0",
-                    "60": "60\u00b0",
-                    "90": "90\u00b0"
                 }
             },
             "fingerbot_mode": {
@@ -307,7 +328,7 @@
             "humidifier_spray_mode": {
                 "name": "Modo de pulverizaci\u00f3n",
                 "state": {
-                    "auto": "Autom\u00e1tico",
+                    "auto": "Auto",
                     "health": "Salud",
                     "humidity": "Humedad",
                     "sleep": "Dormir",
@@ -362,9 +383,9 @@
             "motion_sensitivity": {
                 "name": "Sensibilidad de detecci\u00f3n de movimiento",
                 "state": {
-                    "0": "Baja sensibilidad",
-                    "1": "Sensibilidad media",
-                    "2": "Alta sensibilidad"
+                    "0": "Bajo",
+                    "1": "Medio",
+                    "2": "Alto"
                 }
             },
             "record_mode": {
@@ -395,8 +416,8 @@
                 "name": "Ajuste del dep\u00f3sito de agua",
                 "state": {
                     "closed": "Cerrada",
-                    "high": "Alta",
-                    "low": "Baja",
+                    "high": "Alto",
+                    "low": "Bajo",
                     "middle": "Media"
                 }
             },
@@ -467,6 +488,17 @@
                     "severe": "Severo"
                 }
             },
+            "air_quality_index": {
+                "name": "\u00cdndice de calidad del aire",
+                "state": {
+                    "level_1": "Nivel 1",
+                    "level_2": "Nivel 2",
+                    "level_3": "Nivel 3",
+                    "level_4": "Nivel 4",
+                    "level_5": "Nivel 5",
+                    "level_6": "Nivel 6"
+                }
+            },
             "battery": {
                 "name": "Bater\u00eda"
             },
@@ -496,6 +528,9 @@
             },
             "duster_cloth_life": {
                 "name": "Vida \u00fatil de la gamuza"
+            },
+            "filter_duration": {
+                "name": "Duraci\u00f3n del filtro"
             },
             "filter_life": {
                 "name": "Vida \u00fatil del filtro"
@@ -566,6 +601,9 @@
             "power": {
                 "name": "Potencia"
             },
+            "pump_time": {
+                "name": "Duraci\u00f3n de la bomba de agua"
+            },
             "remaining_time": {
                 "name": "Tiempo restante"
             },
@@ -593,21 +631,13 @@
                 }
             },
             "status": {
-                "name": "Estado",
-                "state": {
-                    "boiling_temp": "Temperatura de ebullici\u00f3n",
-                    "cooling": "Refrigeraci\u00f3n",
-                    "heating": "Calefacci\u00f3n",
-                    "heating_temp": "Temperatura de calefacci\u00f3n",
-                    "reserve_1": "Reserva 1",
-                    "reserve_2": "Reserva 2",
-                    "reserve_3": "Reserva 3",
-                    "standby": "En espera",
-                    "warm": "Conservaci\u00f3n del calor"
-                }
+                "name": "Estado"
             },
             "temperature": {
                 "name": "Temperatura"
+            },
+            "temperature_external": {
+                "name": "Temperatura de la sonda"
             },
             "total_absorption_particles": {
                 "name": "Total de absorci\u00f3n de part\u00edculas"
@@ -637,7 +667,7 @@
                 "name": "Tiempo total de riego"
             },
             "voc": {
-                "name": "COV"
+                "name": "Compuestos org\u00e1nicos vol\u00e1tiles"
             },
             "voltage": {
                 "name": "Voltaje"
@@ -854,32 +884,6 @@
             "wide_dynamic_range": {
                 "name": "Amplio rango din\u00e1mico"
             }
-        }
-    },
-    "issues": {
-        "service_deprecation_turn_off": {
-            "description": "El soporte del aspirador Tuya para el servicio vacuum.turn_off est\u00e1 obsoleto y se eliminar\u00e1 en Home Assistant 2024.2; Por favor, ajusta cualquier automatizaci\u00f3n o script que use el servicio para llamar a vacuum.stop y selecciona enviar a continuaci\u00f3n para marcar este problema como resuelto.",
-            "fix_flow": {
-                "step": {
-                    "confirm": {
-                        "description": "El soporte del aspirador Tuya para el servicio vacuum.turn_off est\u00e1 obsoleto y se eliminar\u00e1 en Home Assistant 2024.2; Por favor, ajusta cualquier automatizaci\u00f3n o script que use el servicio para llamar a vacuum.stop y selecciona enviar a continuaci\u00f3n para marcar este problema como resuelto.",
-                        "title": "Se va a eliminar el soporte del aspirador Tuya para vacuum.turn_off"
-                    }
-                }
-            },
-            "title": "Se va a eliminar el soporte del aspirador Tuya para vacuum.turn_off"
-        },
-        "service_deprecation_turn_on": {
-            "description": "El soporte del aspirador Tuya para el servicio vacuum.turn_on est\u00e1 obsoleto y se eliminar\u00e1 en Home Assistant 2024.2; Por favor, ajusta cualquier automatizaci\u00f3n o script que use el servicio para llamar a vacuum.start y selecciona enviar a continuaci\u00f3n para marcar este problema como resuelto.",
-            "fix_flow": {
-                "step": {
-                    "confirm": {
-                        "description": "El soporte del aspirador Tuya para el servicio vacuum.turn_on est\u00e1 obsoleto y se eliminar\u00e1 en Home Assistant 2024.2; Por favor, ajusta cualquier automatizaci\u00f3n o script que use el servicio para llamar a vacuum.start y selecciona enviar a continuaci\u00f3n para marcar este problema como resuelto.",
-                        "title": "Se va a eliminar el soporte del aspirador Tuya para vacuum.turn_on"
-                    }
-                }
-            },
-            "title": "Se va a eliminar el soporte del aspirador Tuya para vacuum.turn_on"
         }
     }
 }

@@ -1,7 +1,36 @@
 {
     "state": {
         "tuya__countdown": {
+            "1h": "1 ura",
+            "2h": "2 uri",
+            "3h": "3 ure",
+            "4h": "4 ure",
+            "5h": "5 ur",
+            "6h": "6 ur",
             "cancel": "Prekli\u010di"
+        },
+        "tuya__curtain_mode": {
+            "morning": "Jutro",
+            "night": "No\u010d"
+        },
+        "tuya__curtain_motor_mode": {
+            "back": "Nazaj",
+            "forward": "Naprej"
+        },
+        "tuya__fingerbot_mode": {
+            "switch": "Stikalo"
+        },
+        "tuya__humidifier_level": {
+            "level_1": "Nivo 1",
+            "level_10": "Nivo 10",
+            "level_2": "Nivo 2",
+            "level_3": "Nivo 3",
+            "level_4": "Nivo 4",
+            "level_5": "Nivo 5",
+            "level_6": "Nivo 6",
+            "level_7": "Nivo 7",
+            "level_8": "Nivo 8",
+            "level_9": "Nivo 9"
         },
         "tuya__humidifier_spray_mode": {
             "auto": "Samodejno",
@@ -16,17 +45,17 @@
             "led": "LED"
         },
         "tuya__light_mode": {
-            "none": "Izkl.",
+            "none": "Izklopljeno",
             "pos": "Navedite lokacijo stikala",
             "relay": "Navedite stanje vklopa/izklopa"
         },
         "tuya__relay_status": {
             "last": "Zapomni si zadnje stanje",
             "memory": "Zapomni si zadnje stanje",
-            "off": "Izkl.",
+            "off": "Izklopljeno",
             "on": "Vklopljeno",
-            "power_off": "Izkl.",
-            "power_on": "Vkl."
+            "power_off": "Izklopljeno",
+            "power_on": "Vklopljeno"
         },
         "tuya__vacuum_cistern": {
             "closed": "Zaprto"

@@ -5,8 +5,7 @@
         },
         "error": {
             "invalid_auth": "Autentica\u00e7\u00e3o inv\u00e1lida",
-            "login_error": "Erro de in\u00edcio de sess\u00e3o ({code}): {msg}",
-            "reauth_successful": "Reautentica\u00e7\u00e3o bem sucedida"
+            "login_error": "Erro de in\u00edcio de sess\u00e3o ({code}): {msg}"
         },
         "step": {
             "reauth_user_code": {
@@ -16,16 +15,13 @@
                 "description": "A integra\u00e7\u00e3o Tuya utiliza agora um m\u00e9todo de in\u00edcio de sess\u00e3o melhorado. Para voltar a autenticar a sua conta Smart Life ou Tuya Smart, \u00e9 necess\u00e1rio introduzir o seu c\u00f3digo de utilizador.\n\nPode encontrar este c\u00f3digo na aplica\u00e7\u00e3o Smart Life ou na aplica\u00e7\u00e3o Tuya Smart no ecr\u00e3 **Configura\u00e7\u00f5es** > **Conta e seguran\u00e7a** e introduzir o c\u00f3digo apresentado no campo **C\u00f3digo do utilizador**. O c\u00f3digo de utilizador \u00e9 sens\u00edvel a mai\u00fasculas e min\u00fasculas, por isso, certifique-se de que o introduz exatamente como \u00e9 apresentado na aplica\u00e7\u00e3o."
             },
             "scan": {
-                "description": "Utilize a aplica\u00e7\u00e3o Smart Life ou a aplica\u00e7\u00e3o Tuya Smart para digitalizar o seguinte c\u00f3digo QR para concluir o in\u00edcio de sess\u00e3o.\n\nContinue para o passo seguinte depois de ter conclu\u00eddo este passo na aplica\u00e7\u00e3o."
+                "description": "Utilize a aplica\u00e7\u00e3o Smart Life ou a aplica\u00e7\u00e3o Tuya Smart para digitalizar o seguinte c\u00f3digo QR para concluir o in\u00edcio de sess\u00e3o.\n\nContinue para o passo seguinte quando tiver conclu\u00eddo este passo na aplica\u00e7\u00e3o."
             },
             "user": {
                 "data": {
-                    "access_id": "ID de acesso Tuya IoT",
-                    "access_secret": "Segredo de acesso Tuya IoT",
-                    "country_code": "Pa\u00eds",
-                    "password": "Palavra-passe",
                     "user_code": "C\u00f3digo de utilizador"
-                }
+                },
+                "description": "Introduza o seu c\u00f3digo de utilizador Smart Life ou Tuya Smart.\n\nPode encontrar este c\u00f3digo na aplica\u00e7\u00e3o Smart Life ou Tuya Smart em **Configura\u00e7\u00f5es** > **Conta e Seguran\u00e7a**, e introduza o c\u00f3digo mostrado no campo **C\u00f3digo de Utilizador**. O c\u00f3digo de utilizador \u00e9 sens\u00edvel a mai\u00fasculas e min\u00fasculas, por favor, certifique-se de que o introduz exatamente como mostrado na aplica\u00e7\u00e3o."
             }
         }
     },
@@ -83,6 +79,12 @@
             }
         },
         "cover": {
+            "blind": {
+                "name": "Estore"
+            },
+            "curtain": {
+                "name": "Cortina"
+            },
             "curtain_2": {
                 "name": "Cortina 2"
             },
@@ -99,12 +101,26 @@
                 "name": "Porta 3"
             }
         },
+        "event": {
+            "numbered_button": {
+                "name": "Bot\u00e3o {button_number}",
+                "state_attributes": {
+                    "event_type": {
+                        "state": {
+                            "click": "Clicado",
+                            "double_click": "Clique duas vezes",
+                            "press": "Press\u00e3o prolongada"
+                        }
+                    }
+                }
+            }
+        },
         "light": {
             "backlight": {
                 "name": "Luz de fundo"
             },
             "light": {
-                "name": "Ilumina\u00e7\u00e3o"
+                "name": "Luz"
             },
             "light_2": {
                 "name": "Luz 2"
@@ -117,6 +133,9 @@
             }
         },
         "number": {
+            "alarm_duration": {
+                "name": "Dura\u00e7\u00e3o do alarme"
+            },
             "cloud_recipe": {
                 "name": "Receita de nuvem"
             },
@@ -171,6 +190,12 @@
             "sensitivity": {
                 "name": "Sensibilidade"
             },
+            "target_dis_closest": {
+                "name": "Dist\u00e2ncia mais curta ao alvo"
+            },
+            "temperature": {
+                "name": "Temperatura"
+            },
             "temperature_after_boiling": {
                 "name": "Temperatura ap\u00f3s ebuli\u00e7\u00e3o"
             },
@@ -202,6 +227,20 @@
                     "0": "Autom\u00e1tico",
                     "1": "Desligado",
                     "2": "Ligado"
+                }
+            },
+            "blanket_level": {
+                "state": {
+                    "level_1": "Baixo",
+                    "level_10": "Alto",
+                    "level_2": "N\u00edvel 2",
+                    "level_3": "N\u00edvel 3",
+                    "level_4": "N\u00edvel 4",
+                    "level_5": "N\u00edvel 5",
+                    "level_6": "N\u00edvel 6",
+                    "level_7": "N\u00edvel 7",
+                    "level_8": "N\u00edvel 8",
+                    "level_9": "N\u00edvel 9"
                 }
             },
             "brightness": {
@@ -244,13 +283,6 @@
                 "state": {
                     "0": "Baixa sensibilidade",
                     "1": "Alta sensibilidade"
-                }
-            },
-            "fan_angle": {
-                "state": {
-                    "30": "30\u00b0",
-                    "60": "60\u00b0",
-                    "90": "90\u00b0"
                 }
             },
             "fingerbot_mode": {
@@ -296,7 +328,7 @@
             "humidifier_spray_mode": {
                 "name": "Modo de pulveriza\u00e7\u00e3o",
                 "state": {
-                    "auto": "Autom\u00e1tico",
+                    "auto": "Auto",
                     "health": "Sa\u00fade",
                     "humidity": "Humidade",
                     "sleep": "Dormir",
@@ -338,6 +370,7 @@
                 "name": "Modo de luz indicadora",
                 "state": {
                     "none": "Desligado",
+                    "pos": "Indica estado de interruptor invertido",
                     "relay": "Indicar o estado ligado/desligado do interruptor"
                 }
             },
@@ -350,7 +383,9 @@
             "motion_sensitivity": {
                 "name": "Sensibilidade da dete\u00e7\u00e3o de movimento",
                 "state": {
-                    "1": "Sensibilidade m\u00e9dia"
+                    "0": "Baixo",
+                    "1": "M\u00e9dio",
+                    "2": "Alto"
                 }
             },
             "record_mode": {
@@ -364,6 +399,7 @@
                 "name": "Comportamento ao ligar",
                 "state": {
                     "last": "Lembrar \u00faltimo estado",
+                    "memory": "Lembrar \u00faltimo estado",
                     "off": "Desligado",
                     "on": "Ligado",
                     "power_off": "Desligado",
@@ -379,6 +415,7 @@
             "vacuum_cistern": {
                 "name": "Regula\u00e7\u00e3o do dep\u00f3sito de \u00e1gua",
                 "state": {
+                    "closed": "Fechada",
                     "high": "Alto",
                     "low": "Baixo",
                     "middle": "M\u00e9dio"
@@ -397,14 +434,22 @@
                 "state": {
                     "bow": "Arco",
                     "chargego": "Voltar \u00e0 doca",
+                    "left_bow": "Arco \u00e0 esquerda",
+                    "left_spiral": "Espiral \u00e0 esquerda",
                     "mop": "Esfregona",
                     "part": "Parte",
+                    "partial_bow": "Arco parcial",
+                    "pick_zone": "Escolher zona",
                     "point": "Ponto",
                     "pose": "Pose",
                     "random": "Aleat\u00f3rio",
+                    "right_bow": "Arco \u00e0 direita",
+                    "right_spiral": "Espiral \u00e0 direita",
                     "single": "\u00danico",
                     "smart": "Inteligente",
                     "spiral": "Espiral",
+                    "standby": "Em espera",
+                    "wall_follow": "Seguir parede",
                     "zone": "Zona"
                 }
             },
@@ -418,6 +463,19 @@
             },
             "volume": {
                 "name": "Volume"
+            },
+            "weather_delay": {
+                "name": "Diferimento meteorol\u00f3gico",
+                "state": {
+                    "120h": "120h",
+                    "144h": "144h",
+                    "168h": "168h",
+                    "24h": "24h",
+                    "48h": "48h",
+                    "72h": "72h",
+                    "96h": "96h",
+                    "cancel": "Cancelar"
+                }
             }
         },
         "sensor": {
@@ -428,6 +486,17 @@
                     "great": "\u00d3timo",
                     "mild": "Moderado",
                     "severe": "Grave"
+                }
+            },
+            "air_quality_index": {
+                "name": "\u00cdndice de qualidade do ar",
+                "state": {
+                    "level_1": "N\u00edvel 1",
+                    "level_2": "N\u00edvel 2",
+                    "level_3": "N\u00edvel 3",
+                    "level_4": "N\u00edvel 4",
+                    "level_5": "N\u00edvel 5",
+                    "level_6": "N\u00edvel 6"
                 }
             },
             "battery": {
@@ -452,13 +521,16 @@
                 "name": "Concentra\u00e7\u00e3o de di\u00f3xido de carbono"
             },
             "current": {
-                "name": "Tens\u00e3o"
+                "name": "Corrente"
             },
             "current_temperature": {
                 "name": "Temperatura atual"
             },
             "duster_cloth_life": {
                 "name": "Vida \u00fatil do pano de p\u00f3"
+            },
+            "filter_duration": {
+                "name": "Dura\u00e7\u00e3o do filtro"
             },
             "filter_life": {
                 "name": "Vida \u00fatil do filtro"
@@ -529,6 +601,9 @@
             "power": {
                 "name": "Pot\u00eancia"
             },
+            "pump_time": {
+                "name": "Dura\u00e7\u00e3o da bomba de \u00e1gua"
+            },
             "remaining_time": {
                 "name": "Tempo restante"
             },
@@ -546,7 +621,7 @@
                 "state": {
                     "boiling_temp": "Temperatura de ebuli\u00e7\u00e3o",
                     "cooling": "Arrefecimento",
-                    "heating": "Aquecimento",
+                    "heating": "A aquecer",
                     "heating_temp": "Temperatura de aquecimento",
                     "reserve_1": "Reserva 1",
                     "reserve_2": "Reserva 2",
@@ -556,20 +631,13 @@
                 }
             },
             "status": {
-                "name": "Estado",
-                "state": {
-                    "boiling_temp": "Temperatura de ebuli\u00e7\u00e3o",
-                    "cooling": "Arrefecimento",
-                    "heating": "Aquecimento",
-                    "heating_temp": "Temperatura de aquecimento",
-                    "reserve_1": "Reserva 1",
-                    "reserve_2": "Reserva 2",
-                    "reserve_3": "Reserva 3",
-                    "warm": "Conserva\u00e7\u00e3o do calor"
-                }
+                "name": "Estado"
             },
             "temperature": {
                 "name": "Temperatura"
+            },
+            "temperature_external": {
+                "name": "Temperatura da sonda"
             },
             "total_absorption_particles": {
                 "name": "Absor\u00e7\u00e3o total de part\u00edculas"
@@ -589,17 +657,29 @@
             "total_operating_time": {
                 "name": "Tempo total de funcionamento"
             },
+            "total_production": {
+                "name": "Produ\u00e7\u00e3o total"
+            },
             "total_volatile_organic_compound": {
                 "name": "Composto org\u00e2nico vol\u00e1til total"
             },
+            "total_watering_time": {
+                "name": "Tempo total de rega"
+            },
+            "uv_runtime": {
+                "name": "Tempo de funcionamento UV"
+            },
             "voc": {
-                "name": "COVs"
+                "name": "Compostos org\u00e2nicos vol\u00e1teis"
             },
             "voltage": {
-                "name": "Voltagem"
+                "name": "Tens\u00e3o"
             },
             "water_level": {
                 "name": "N\u00edvel de \u00e1gua"
+            },
+            "water_time": {
+                "name": "Dura\u00e7\u00e3o da utiliza\u00e7\u00e3o da \u00e1gua"
             }
         },
         "switch": {
@@ -686,6 +766,9 @@
             },
             "privacy_mode": {
                 "name": "Modo de privacidade"
+            },
+            "pump": {
+                "name": "Bomba"
             },
             "radio": {
                 "name": "R\u00e1dio"
@@ -807,32 +890,6 @@
             "wide_dynamic_range": {
                 "name": "Ampla gama din\u00e2mica"
             }
-        }
-    },
-    "issues": {
-        "service_deprecation_turn_off": {
-            "description": "O suporte do servi\u00e7o vacuum.turn_off est\u00e1 obsoleto e ser\u00e1 removido no Home Assistant 2024.2; Ajuste qualquer automa\u00e7\u00e3o ou script que use o servi\u00e7o para chamar vacuum.stop e selecione enviar abaixo para marcar este problema como resolvido.",
-            "fix_flow": {
-                "step": {
-                    "confirm": {
-                        "description": "O suporte do servi\u00e7o vacuum.turn_off est\u00e1 obsoleto e ser\u00e1 removido no Home Assistant 2024.2; Ajuste qualquer automa\u00e7\u00e3o ou script que use o servi\u00e7o para chamar vacuum.stop e selecione enviar abaixo para marcar este problema como resolvido.",
-                        "title": "O suporte do servi\u00e7o vacuum.turn_off est\u00e1 a ser removido"
-                    }
-                }
-            },
-            "title": "O suporte do servi\u00e7o vacuum.turn_off est\u00e1 a ser removido"
-        },
-        "service_deprecation_turn_on": {
-            "description": "O suporte para o servi\u00e7o vacuum.turn_on est\u00e1 obsoleto e ser\u00e1 removido no Home Assistant 2024.2; Ajuste qualquer automa\u00e7\u00e3o ou script que use o servi\u00e7o para chamar vacuum.start e selecione enviar abaixo para marcar este problema como resolvido.",
-            "fix_flow": {
-                "step": {
-                    "confirm": {
-                        "description": "O suporte para o servi\u00e7o vacuum.turn_on est\u00e1 obsoleto e ser\u00e1 removido no Home Assistant 2024.2; Ajuste qualquer automa\u00e7\u00e3o ou script que use o servi\u00e7o para chamar vacuum.start e selecione enviar abaixo para marcar este problema como resolvido.",
-                        "title": "O suporte do servi\u00e7o vacuum.turn_on est\u00e1 a ser removido"
-                    }
-                }
-            },
-            "title": "O suporte do servi\u00e7o vacuum.turn_on est\u00e1 a ser removido"
         }
     }
 }
