@@ -106,7 +106,7 @@ async def async_setup_entry(
         merged_descriptors = merge_device_descriptors(merged_descriptors, new_descriptor)
 
     @callback
-    def async_discover_device(device_map) -> None:
+    def async_discover_device(device_map, restrict_dpcode: str | None = None) -> None:
         """Discover and add a discovered Tuya buttons."""
         if hass_data.manager is None:
             return
@@ -137,12 +137,12 @@ async def async_setup_entry(
                     entities.extend(
                         XTButtonEntity(device, hass_data.manager, description)
                         for description in descriptions
-                        if description.key in device.status
+                        if description.key in device.status and (restrict_dpcode is None or restrict_dpcode == description.key)
                     )
                     for description in descriptions:
                         if description.vf_reset_state:
                             for reset_state in description.vf_reset_state:
-                                if reset_state in device.status:
+                                if reset_state in device.status and (restrict_dpcode is None or restrict_dpcode == reset_state):
                                     entities.append(
                                         XTButtonEntity.get_entity_instance(description, device, hass_data.manager)
                                     )
@@ -151,12 +151,12 @@ async def async_setup_entry(
                     entities.extend(
                         XTButtonEntity(device, hass_data.manager, description)
                         for description in descriptions
-                        if description.key in device.status
+                        if description.key in device.status and (restrict_dpcode is None or restrict_dpcode == description.key)
                     )
                     for description in descriptions:
                         if description.vf_reset_state:
                             for reset_state in description.vf_reset_state:
-                                if reset_state in device.status:
+                                if reset_state in device.status and (restrict_dpcode is None or restrict_dpcode == reset_state):
                                     entities.append(
                                         XTButtonEntity.get_entity_instance(description, device, hass_data.manager)
                                     )

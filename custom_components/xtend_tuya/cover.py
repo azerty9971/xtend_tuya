@@ -132,7 +132,7 @@ async def async_setup_entry(
         merged_descriptors = merge_device_descriptors(merged_descriptors, new_descriptor)
 
     @callback
-    def async_discover_device(device_map) -> None:
+    def async_discover_device(device_map, restrict_dpcode: str | None = None) -> None:
         """Discover and add a discovered tuya cover."""
         if hass_data.manager is None:
             return
@@ -148,7 +148,7 @@ async def async_setup_entry(
                             if (
                                 description.key in device.function
                                 or description.key in device.status_range
-                            )
+                            ) and (restrict_dpcode is None or restrict_dpcode == description.key)
                         )
                     continue
                 if descriptions := merged_descriptors.get(device.category):
@@ -158,7 +158,7 @@ async def async_setup_entry(
                         if (
                             description.key in device.function
                             or description.key in device.status_range
-                        )
+                        ) and (restrict_dpcode is None or restrict_dpcode == description.key)
                     )
                 if descriptions := merged_descriptors.get(CROSS_CATEGORY_DEVICE_DESCRIPTOR):
                     entities.extend(
@@ -167,7 +167,7 @@ async def async_setup_entry(
                         if (
                             description.key in device.function
                             or description.key in device.status_range
-                        )
+                        ) and (restrict_dpcode is None or restrict_dpcode == description.key)
                     )
 
         async_add_entities(entities)
@@ -196,6 +196,7 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         super(XTCoverEntity, self).__init__(device, device_manager, description)
         super(XTEntity, self).__init__(device, device_manager, description) # type: ignore
         self.device = device
+        device_manager.post_setup_callbacks.append(self.add_cover_open_close_option)
 
     @property
     def is_cover_position_reversed(self) -> bool:
@@ -203,14 +204,13 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         control_back_mode = self.device.status.get(control_back_mode_dpcode, "forward") if control_back_mode_dpcode else "forward"
         return control_back_mode != "forward"
 
-    async def async_added_to_hass(self) -> None:
-        await super().async_added_to_hass()
+    def add_cover_open_close_option(self) -> None:
         if self.device.get_preference(f"{XTDevice.XTDevicePreference.IS_A_COVER_DEVICE}") is None:
             self.device.set_preference(f"{XTDevice.XTDevicePreference.IS_A_COVER_DEVICE}", True)
             if XTDPCode.COVER_OPEN_CLOSE_IS_INVERTED not in self.device.status:
                 self.device.status[XTDPCode.COVER_OPEN_CLOSE_IS_INVERTED] = False
-            #self.device.set_preference(f"{XTDevice.XTDevicePreference.REDISCOVER_CROSS_CAT_ENTITIES}", True)
-            #dispatcher_send(self.hass, TUYA_DISCOVERY_NEW, [self.device.id])
+                #self.device.set_preference(f"{XTDevice.XTDevicePreference.REDISCOVER_CROSS_CAT_ENTITIES}", True)
+                dispatcher_send(self.hass, TUYA_DISCOVERY_NEW, [self.device.id], XTDPCode.COVER_OPEN_CLOSE_IS_INVERTED)
 
 
     @staticmethod

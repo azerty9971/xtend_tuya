@@ -39,6 +39,7 @@ class MultiManager:  # noqa: F811
         self.scene_id: list[str] = []
         self.general_properties: dict[str, Any] = {}
         self.entity_parsers: dict[str, XTCustomEntityParser] = {}
+        self.post_setup_callbacks: list = []
 
     @property
     def device_map(self):
@@ -388,6 +389,8 @@ class MultiManager:  # noqa: F811
     async def on_loading_finalized(self, hass: HomeAssistant, config_entry: XTConfigEntry):
         for account in self.accounts.values():
             await account.on_loading_finalized(hass, config_entry, self)
+        for callback in self.post_setup_callbacks:
+            callback()
 
     def set_general_property(self, property_id: XTMultiManagerProperties, property_value: Any):
         self.general_properties[property_id] = property_value

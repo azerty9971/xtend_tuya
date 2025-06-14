@@ -67,7 +67,7 @@ async def async_setup_entry(
         merged_descriptions = append_dictionnaries(merged_descriptions, new_descriptor)
 
     @callback
-    def async_discover_device(device_map) -> None:
+    def async_discover_device(device_map, restrict_dpcode: str | None = None) -> None:
         """Discover and add a discovered Tuya climate."""
         if hass_data.manager is None:
             return

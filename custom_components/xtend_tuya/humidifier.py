@@ -59,7 +59,7 @@ async def async_setup_entry(
         merged_categories = append_dictionnaries(merged_categories, new_descriptor)
 
     @callback
-    def async_discover_device(device_map) -> None:
+    def async_discover_device(device_map, restrict_dpcode: str | None = None) -> None:
         """Discover and add a discovered Tuya (de)humidifier."""
         if hass_data.manager is None:
             return
