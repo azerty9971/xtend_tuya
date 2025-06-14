@@ -1496,6 +1496,8 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor): # type: ignore
         if self.entity_description.restoredata:
             self._restored_data = await self.async_get_last_sensor_data()
             if self._restored_data is not None and self._restored_data.native_value is not None:
+                if self.entity_description.key == XTDPCode.COVER_OPEN_CLOSE_IS_INVERTED:
+                    LOGGER.warning(f"Restoring XTDPCode.COVER_OPEN_CLOSE_IS_INVERTED: {self._restored_data.native_value}")
                 # Scale integer/float value
                 if isinstance(self._type_data, TuyaIntegerTypeData):
                     scaled_value_back = self._type_data.scale_value_back(self._restored_data.native_value) # type: ignore
