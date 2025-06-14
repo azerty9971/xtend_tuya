@@ -44,6 +44,15 @@ class XTLightEntityDescription(TuyaLightEntityDescription):
     color_mode: TuyaDPCode | XTDPCode | None = None # type: ignore
     color_temp: TuyaDPCode | tuple[TuyaDPCode, ...] | XTDPCode | tuple[XTDPCode, ...] | None = None # type: ignore
 
+    def get_entity_instance(self, 
+                            device: XTDevice, 
+                            device_manager: MultiManager, 
+                            description: XTLightEntityDescription
+                            ) -> XTLightEntity:
+        return XTLightEntity(device=device, 
+                              device_manager=device_manager, 
+                              description=description)
+
 LIGHTS: dict[str, tuple[XTLightEntityDescription, ...]] = {
     "dbl": (
         XTLightEntityDescription(
@@ -79,7 +88,7 @@ async def async_setup_entry(
             if device := hass_data.manager.device_map.get(device_id):
                 if descriptions := merged_descriptors.get(device.category):
                     entities.extend(
-                        XTLightEntity(device, hass_data.manager, XTLightEntityDescription(**description.__dict__))
+                        XTLightEntity.get_entity_instance(description, device, hass_data.manager)
                         for description in descriptions
                         if description.key in device.status
                     )
@@ -120,3 +129,9 @@ class XTLightEntity(XTEntity, TuyaLightEntity):
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description
+    
+    @staticmethod
+    def get_entity_instance(description: XTLightEntityDescription, device: XTDevice, device_manager: MultiManager) -> XTLightEntity:
+        if hasattr(description, "get_entity_instance") and callable(getattr(description, "get_entity_instance")):
+            return description.get_entity_instance(device, device_manager, description)
+        return XTLightEntity(device, device_manager, XTLightEntityDescription(**description.__dict__))

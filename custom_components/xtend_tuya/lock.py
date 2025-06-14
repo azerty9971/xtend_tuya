@@ -26,9 +26,6 @@ from .multi_manager.multi_manager import (
     MultiManager,
     XTDevice,
 )
-from .ha_tuya_integration.tuya_integration_imports import (
-    TuyaEntity,
-)
 from .entity import (
     XTEntity,
 )
@@ -39,6 +36,15 @@ class XTLockEntityDescription(LockEntityDescription):
     unlock_status_list: list[XTDPCode] = field(default_factory=list)
     temporary_unlock: bool = False
     manual_unlock_command: list[XTDPCode] = field(default_factory=list)
+
+    def get_entity_instance(self, 
+                            device: XTDevice, 
+                            device_manager: MultiManager, 
+                            description: XTLockEntityDescription
+                            ) -> XTLockEntity:
+        return XTLockEntity(device=device, 
+                              device_manager=device_manager, 
+                              description=description)
 
 LOCKS: dict[str, XTLockEntityDescription] = {
     "jtmsbh": XTLockEntityDescription(
@@ -92,9 +98,7 @@ async def async_setup_entry(
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
                 if device.category in merged_descriptors:
-                    entities.append(XTLockEntity(
-                                    device, hass_data.manager, merged_descriptors[device.category]
-                                ))
+                    entities.append(XTLockEntity.get_entity_instance(merged_descriptors[device.category], device, hass_data.manager))
         async_add_entities(entities)
 
     async_discover_device([*hass_data.manager.device_map])
@@ -186,3 +190,9 @@ class XTLockEntity(XTEntity, LockEntity): # type: ignore
     def open(self, **kwargs: Any) -> None:
         """Open the door latch."""
         raise NotImplementedError
+    
+    @staticmethod
+    def get_entity_instance(description: XTLockEntityDescription, device: XTDevice, device_manager: MultiManager) -> XTLockEntity:
+        if hasattr(description, "get_entity_instance") and callable(getattr(description, "get_entity_instance")):
+            return description.get_entity_instance(device, device_manager, description)
+        return XTLockEntity(device, device_manager, XTLockEntityDescription(**description.__dict__))

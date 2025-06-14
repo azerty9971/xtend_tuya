@@ -26,7 +26,15 @@ from .ha_tuya_integration.tuya_integration_imports import (
 )
 
 class XTSirenEntityDescription(TuyaSirenEntityDescription, frozen_or_thawed=True):
-    pass
+    
+    def get_entity_instance(self, 
+                            device: XTDevice, 
+                            device_manager: MultiManager, 
+                            description: XTSirenEntityDescription
+                            ) -> XTSirenEntity:
+        return XTSirenEntity(device=device, 
+                              device_manager=device_manager, 
+                              description=description)
 
 # All descriptions can be found here:
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
@@ -58,7 +66,7 @@ async def async_setup_entry(
             if device := hass_data.manager.device_map.get(device_id):
                 if descriptions := merged_descriptors.get(device.category):
                     entities.extend(
-                        XTSirenEntity(device, hass_data.manager, XTSirenEntityDescription(**description.__dict__))
+                        XTSirenEntity.get_entity_instance(description, device, hass_data.manager)
                         for description in descriptions
                         if description.key in device.status
                     )
@@ -87,3 +95,9 @@ class XTSirenEntity(XTEntity, TuyaSirenEntity):
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description
+
+    @staticmethod
+    def get_entity_instance(description: XTSirenEntityDescription, device: XTDevice, device_manager: MultiManager) -> XTSirenEntity:
+        if hasattr(description, "get_entity_instance") and callable(getattr(description, "get_entity_instance")):
+            return description.get_entity_instance(device, device_manager, description)
+        return XTSirenEntity(device, device_manager, XTSirenEntityDescription(**description.__dict__))

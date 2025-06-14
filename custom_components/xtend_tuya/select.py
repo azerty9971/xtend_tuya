@@ -28,7 +28,15 @@ from .ha_tuya_integration.tuya_integration_imports import (
 
 class XTSelectEntityDescription(TuyaSelectEntityDescription):
     """Describe an Tuya select entity."""
-    pass
+
+    def get_entity_instance(self, 
+                            device: XTDevice, 
+                            device_manager: MultiManager, 
+                            description: XTSelectEntityDescription
+                            ) -> XTSelectEntity:
+        return XTSelectEntity(device=device, 
+                              device_manager=device_manager, 
+                              description=description)
 
 TEMPERATURE_SELECTS: tuple[XTSelectEntityDescription, ...] = (
     XTSelectEntityDescription(
@@ -250,7 +258,7 @@ async def async_setup_entry(
             if device := hass_data.manager.device_map.get(device_id):
                 if descriptions := merged_descriptors.get(device.category):
                     entities.extend(
-                        XTSelectEntity(device, hass_data.manager, XTSelectEntityDescription(**description.__dict__))
+                        XTSelectEntity.get_entity_instance(description, device, hass_data.manager)
                         for description in descriptions
                         if description.key in device.status
                     )
@@ -280,3 +288,9 @@ class XTSelectEntity(XTEntity, TuyaSelectEntity):
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description
+    
+    @staticmethod
+    def get_entity_instance(description: XTSelectEntityDescription, device: XTDevice, device_manager: MultiManager) -> XTSelectEntity:
+        if hasattr(description, "get_entity_instance") and callable(getattr(description, "get_entity_instance")):
+            return description.get_entity_instance(device, device_manager, description)
+        return XTSelectEntity(device, device_manager, XTSelectEntityDescription(**description.__dict__))
