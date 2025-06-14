@@ -42,6 +42,7 @@ from .const import (
     DPType,
     VirtualStates,  # noqa: F401
     XTDeviceEntityFunctions,
+    CROSS_CATEGORY_DEVICE_DESCRIPTOR,
 )
 from .entity import (
     XTEntity,
@@ -799,6 +800,15 @@ LOCK_SENSORS: tuple[XTSensorEntityDescription, ...] = (
 # end up being a sensor.
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
 SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
+    CROSS_CATEGORY_DEVICE_DESCRIPTOR: (
+        XTSensorEntityDescription(
+            key=XTDPCode.COVER_OPEN_CLOSE_IS_INVERTED,
+            translation_key="cover_open_close_is_inverted",
+            entity_registry_enabled_default=True,
+            entity_registry_visible_default=False,
+            restoredata=True,
+        ),
+    ),
     "cl": (
         *BATTERY_SENSORS,
     ),

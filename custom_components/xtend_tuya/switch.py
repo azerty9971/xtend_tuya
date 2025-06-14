@@ -16,7 +16,7 @@ from .multi_manager.multi_manager import (
     MultiManager,
     XTDevice,
 )
-from .const import TUYA_DISCOVERY_NEW, XTDPCode
+from .const import TUYA_DISCOVERY_NEW, XTDPCode, CROSS_CATEGORY_DEVICE_DESCRIPTOR
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaSwitchEntity,
     TuyaSwitchEntityDescription,
@@ -41,6 +41,13 @@ class XTSwitchEntityDescription(TuyaSwitchEntityDescription, frozen_or_thawed=Tr
 # default instruction set of each category end up being a Switch.
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
 SWITCHES: dict[str, tuple[XTSwitchEntityDescription, ...]] = {
+    CROSS_CATEGORY_DEVICE_DESCRIPTOR: (
+        XTSwitchEntityDescription(
+            key=XTDPCode.COVER_OPEN_CLOSE_IS_INVERTED,
+            translation_key="cover_open_close_is_inverted",
+            entity_category=EntityCategory.CONFIG,
+        ),
+    ),
     "cwwsq": (
         XTSwitchEntityDescription(
             key=XTDPCode.KEY_REC,
@@ -402,7 +409,24 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
+                if device.get_preference(f"{XTDevice.XTDevicePreference.REDISCOVER_CROSS_CAT_ENTITIES}", False):
+                    if descriptions := merged_descriptors.get(CROSS_CATEGORY_DEVICE_DESCRIPTOR):
+                        entities.extend(
+                            XTSwitchEntity.get_entity_instance(description, device, hass_data.manager)
+                            for description in descriptions
+                            if (
+                                description.key in device.function
+                                or description.key in device.status_range
+                            )
+                        )
+                    continue
                 if descriptions := merged_descriptors.get(device.category):
+                    entities.extend(
+                        XTSwitchEntity.get_entity_instance(description, device, hass_data.manager)
+                        for description in descriptions
+                        if description.key in device.status
+                    )
+                if descriptions := merged_descriptors.get(CROSS_CATEGORY_DEVICE_DESCRIPTOR):
                     entities.extend(
                         XTSwitchEntity.get_entity_instance(description, device, hass_data.manager)
                         for description in descriptions

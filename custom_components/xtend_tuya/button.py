@@ -19,7 +19,7 @@ from .multi_manager.multi_manager import (
     XTDevice,
 )
 
-from .const import TUYA_DISCOVERY_NEW, XTDPCode, VirtualFunctions
+from .const import TUYA_DISCOVERY_NEW, XTDPCode, VirtualFunctions, CROSS_CATEGORY_DEVICE_DESCRIPTOR
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaButtonEntity,
     TuyaButtonEntityDescription,
@@ -114,7 +114,40 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
+                if device.get_preference(f"{XTDevice.XTDevicePreference.REDISCOVER_CROSS_CAT_ENTITIES}", False):
+                    if descriptions := merged_descriptors.get(CROSS_CATEGORY_DEVICE_DESCRIPTOR):
+                        entities.extend(
+                            XTButtonEntity.get_entity_instance(description, device, hass_data.manager)
+                            for description in descriptions
+                            if (
+                                description.key in device.function
+                                or description.key in device.status_range
+                            )
+                        )
+                        for description in descriptions:
+                            if description.vf_reset_state:
+                                for reset_state in description.vf_reset_state:
+                                    if reset_state in device.status:
+                                        entities.append(
+                                            XTButtonEntity.get_entity_instance(description, device, hass_data.manager)
+                                        )
+                                    break
+                    continue
                 if descriptions := merged_descriptors.get(device.category):
+                    entities.extend(
+                        XTButtonEntity(device, hass_data.manager, description)
+                        for description in descriptions
+                        if description.key in device.status
+                    )
+                    for description in descriptions:
+                        if description.vf_reset_state:
+                            for reset_state in description.vf_reset_state:
+                                if reset_state in device.status:
+                                    entities.append(
+                                        XTButtonEntity.get_entity_instance(description, device, hass_data.manager)
+                                    )
+                                break
+                if descriptions := merged_descriptors.get(CROSS_CATEGORY_DEVICE_DESCRIPTOR):
                     entities.extend(
                         XTButtonEntity(device, hass_data.manager, description)
                         for description in descriptions

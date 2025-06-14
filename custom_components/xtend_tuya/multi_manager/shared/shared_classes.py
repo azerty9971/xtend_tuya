@@ -3,6 +3,7 @@ from typing import NamedTuple, Any, Optional
 from collections import UserDict
 from dataclasses import dataclass
 import copy
+from enum import StrEnum
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from tuya_sharing import (
@@ -139,6 +140,15 @@ class XTDevice(TuyaDevice):
     device_source_priority: int | None = None
     force_compatibility: bool = False   #Force the device functions/status_range/state to remain untouched after merging
     device_preference: dict[str, Any] = {}
+
+    class XTDevicePreference(StrEnum):
+        REDISCOVER_CROSS_CAT_ENTITIES       = "REDISCOVER_CROSS_CAT_ENTITIES"
+        IS_A_COVER_DEVICE                   = "IS_A_COVER_DEVICE"
+        LOCK_MANUAL_UNLOCK_COMMAND          = "LOCK_MANUAL_UNLOCK_COMMAND"
+        LOCK_GET_SUPPORTED_UNLOCK_TYPES     = "_LOCK_GET_SUPPORTED_UNLOCK_TYPES"
+        LOCK_GET_DOOR_LOCK_PASSWORD_TICKET  = "_LOCK_GET_DOOR_LOCK_PASSWORD_TICKET"
+        LOCK_CALL_DOOR_OPERATE              = "_LOCK_CALL_DOOR_OPERATE"
+        LOCK_CALL_DOOR_OPEN                 = "_LOCK_CALL_DOOR_OPEN"
 
     def __init__(self, **kwargs: Any) -> None:
         self.source = ""

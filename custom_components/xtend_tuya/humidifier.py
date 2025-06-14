@@ -18,7 +18,7 @@ from .multi_manager.multi_manager import (
     MultiManager,
     XTDevice,
 )
-from .const import TUYA_DISCOVERY_NEW
+from .const import TUYA_DISCOVERY_NEW, CROSS_CATEGORY_DEVICE_DESCRIPTOR
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaHumidifierEntity,
     TuyaHumidifierEntityDescription,
@@ -67,6 +67,8 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
+                if device.get_preference(f"{XTDevice.XTDevicePreference.REDISCOVER_CROSS_CAT_ENTITIES}", False):
+                    continue
                 if description := merged_categories.get(device.category):
                     entities.append(
                         XTHumidifierEntity.get_entity_instance(description, device, hass_data.manager)

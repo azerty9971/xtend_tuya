@@ -16,7 +16,7 @@ from .multi_manager.multi_manager import (
     MultiManager,
     XTDevice,
 )
-from .const import TUYA_DISCOVERY_NEW
+from .const import TUYA_DISCOVERY_NEW, CROSS_CATEGORY_DEVICE_DESCRIPTOR
 from .entity import (
     XTEntity,
 )
@@ -64,7 +64,24 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
+                if device.get_preference(f"{XTDevice.XTDevicePreference.REDISCOVER_CROSS_CAT_ENTITIES}", False):
+                    if descriptions := merged_descriptors.get(CROSS_CATEGORY_DEVICE_DESCRIPTOR):
+                        entities.extend(
+                            XTSirenEntity.get_entity_instance(description, device, hass_data.manager)
+                            for description in descriptions
+                            if (
+                                description.key in device.function
+                                or description.key in device.status_range
+                            )
+                        )
+                    continue
                 if descriptions := merged_descriptors.get(device.category):
+                    entities.extend(
+                        XTSirenEntity.get_entity_instance(description, device, hass_data.manager)
+                        for description in descriptions
+                        if description.key in device.status
+                    )
+                if descriptions := merged_descriptors.get(CROSS_CATEGORY_DEVICE_DESCRIPTOR):
                     entities.extend(
                         XTSirenEntity.get_entity_instance(description, device, hass_data.manager)
                         for description in descriptions

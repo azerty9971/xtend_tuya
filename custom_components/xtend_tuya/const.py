@@ -57,6 +57,8 @@ SMARTLIFE_APP = "smartlife"
 MESSAGE_SOURCE_TUYA_IOT = "tuya_iot"
 MESSAGE_SOURCE_TUYA_SHARING = "tuya_sharing"
 
+CROSS_CATEGORY_DEVICE_DESCRIPTOR: str = "cross_category_device_descriptor"
+
 PLATFORMS = [
     Platform.ALARM_CONTROL_PANEL,
     Platform.BINARY_SENSOR,
@@ -285,6 +287,7 @@ class XTDPCode(StrEnum):
     COUNTDOWN_8 = "countdown_8"
     COUNTDOWN_LEFT = "countdown_left"
     COUNTDOWN_SET = "countdown_set"  # Countdown setting
+    COVER_OPEN_CLOSE_IS_INVERTED = "cover_open_close_is_inverted"
     CRY_DETECTION_SWITCH = "cry_detection_switch"
     CTIME = "Ctime"
     CTIME2 = "CTime2"

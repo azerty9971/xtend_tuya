@@ -22,7 +22,7 @@ from .multi_manager.multi_manager import (
     MultiManager,
     XTDevice,
 )
-from .const import TUYA_DISCOVERY_NEW, XTDPCode, DPType
+from .const import TUYA_DISCOVERY_NEW, XTDPCode, DPType, CROSS_CATEGORY_DEVICE_DESCRIPTOR
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaClimateEntity,
     TuyaClimateEntityDescription,
@@ -75,6 +75,8 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
+                if device.get_preference(f"{XTDevice.XTDevicePreference.REDISCOVER_CROSS_CAT_ENTITIES}", False):
+                    continue
                 if device and device.category in merged_descriptions:
                     entities.append(
                         XTClimateEntity.get_entity_instance(merged_descriptions[device.category], 

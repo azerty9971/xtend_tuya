@@ -3,13 +3,14 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import asyncio
 
 from homeassistant.components.cover import (
     CoverDeviceClass,
 )
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers.dispatcher import async_dispatcher_connect
+from homeassistant.helpers.dispatcher import async_dispatcher_connect, dispatcher_send
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .const import (
@@ -24,7 +25,7 @@ from .multi_manager.multi_manager import (
     MultiManager,
     XTDevice,
 )
-from .const import TUYA_DISCOVERY_NEW, XTDPCode
+from .const import TUYA_DISCOVERY_NEW, XTDPCode, CROSS_CATEGORY_DEVICE_DESCRIPTOR
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaCoverEntity,
     TuyaCoverEntityDescription,
@@ -139,7 +140,27 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
+                if device.get_preference(f"{XTDevice.XTDevicePreference.REDISCOVER_CROSS_CAT_ENTITIES}", False):
+                    if descriptions := merged_descriptors.get(CROSS_CATEGORY_DEVICE_DESCRIPTOR):
+                        entities.extend(
+                            XTCoverEntity.get_entity_instance(description, device, hass_data.manager)
+                            for description in descriptions
+                            if (
+                                description.key in device.function
+                                or description.key in device.status_range
+                            )
+                        )
+                    continue
                 if descriptions := merged_descriptors.get(device.category):
+                    entities.extend(
+                        XTCoverEntity.get_entity_instance(description, device, hass_data.manager)
+                        for description in descriptions
+                        if (
+                            description.key in device.function
+                            or description.key in device.status_range
+                        )
+                    )
+                if descriptions := merged_descriptors.get(CROSS_CATEGORY_DEVICE_DESCRIPTOR):
                     entities.extend(
                         XTCoverEntity.get_entity_instance(description, device, hass_data.manager)
                         for description in descriptions
@@ -171,156 +192,26 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         description: XTCoverEntityDescription,
     ) -> None:
         """Initialize the cover entity."""
-        # Initialize the entity
+        
         super(XTCoverEntity, self).__init__(device, device_manager, description)
         super(XTEntity, self).__init__(device, device_manager, description) # type: ignore
-
+        self.device = device
 
     @property
-    def current_cover_position(self) -> int | None:
-        """Return current cover position."""
-        # Get the position from the parent implementation
-        position = super().current_cover_position
-        
-        if position is None:
-            return None
-            
-        # Get control_back_mode directly from device status
+    def is_cover_position_reversed(self) -> bool:
         control_back_mode_dpcode = self.entity_description.control_back_mode
         control_back_mode = self.device.status.get(control_back_mode_dpcode, "forward") if control_back_mode_dpcode else "forward"
-        
-        # Determine if reverse mode
-        is_reverse_mode = control_back_mode != "forward"
-        
-        # Convert position based on mode
-        if is_reverse_mode:
-            # In reverse mode, positions match (0=closed, 100=open)
-            return position
-        # In standard mode, positions are inverted (Tuya: 0=open, 100=closed)
-        return 100 - position
+        return control_back_mode != "forward"
 
-    async def async_set_cover_position(self, **kwargs) -> None:
-        """Set the cover position."""
-        position = kwargs.get("position")
-        if position is None:
-            return
+    async def async_added_to_hass(self) -> None:
+        await super().async_added_to_hass()
+        if self.device.get_preference(f"{XTDevice.XTDevicePreference.IS_A_COVER_DEVICE}") is None:
+            self.device.set_preference(f"{XTDevice.XTDevicePreference.IS_A_COVER_DEVICE}", True)
+            if XTDPCode.COVER_OPEN_CLOSE_IS_INVERTED not in self.device.status:
+                self.device.status[XTDPCode.COVER_OPEN_CLOSE_IS_INVERTED] = False
+            self.device.set_preference(f"{XTDevice.XTDevicePreference.REDISCOVER_CROSS_CAT_ENTITIES}", True)
+            dispatcher_send(self.hass, TUYA_DISCOVERY_NEW, [self.device.id])
 
-        # Get control_back_mode directly from device status
-        control_back_mode_dpcode = self.entity_description.control_back_mode
-        control_back_mode = self.device.status.get(control_back_mode_dpcode, "forward") if control_back_mode_dpcode else "forward"
-        is_reverse_mode = control_back_mode != "forward"
-        
-        # Convert from Home Assistant position to Tuya position
-        if is_reverse_mode:
-            # In reverse mode, positions match (0=closed, 100=open)
-            tuya_position = position
-        else:
-            # In standard mode, positions are inverted (HA: 0=closed, 100=open)
-            tuya_position = 100 - position
-        
-        # Run the blocking command in a separate thread
-        import asyncio
-        command = {
-            "code": self.entity_description.set_position,
-            "value": tuya_position,
-        }
-        await asyncio.get_event_loop().run_in_executor(
-            None, 
-            lambda: self.device_manager.send_commands(self.device.id, [command])
-        )
-
-    async def async_open_cover(self, **kwargs) -> None:
-        """Open the cover."""
-        # Get control_back_mode directly from device status
-        control_back_mode_dpcode = self.entity_description.control_back_mode
-        control_back_mode = self.device.status.get(control_back_mode_dpcode, "forward") if control_back_mode_dpcode else "forward"
-        is_reverse_mode = control_back_mode != "forward"
-        
-        # For open, in standard mode we need to send 0 to Tuya
-        # In reverse mode, we need to send 100
-        tuya_position = 100 if is_reverse_mode else 0
-        
-        import asyncio
-        command = None
-        
-        # Use specific open instruction if available
-        if hasattr(self.entity_description, "open_instruction_value"):
-            command = {
-                "code": self.entity_description.key,
-                "value": self.entity_description.open_instruction_value,
-            }
-        elif hasattr(self.entity_description, "set_position"):
-            command = {
-                "code": self.entity_description.set_position,
-                "value": tuya_position,
-            }
-            
-        if command:
-            LOGGER.debug("Opening cover with command: %s", command)
-            await asyncio.get_event_loop().run_in_executor(
-                None, 
-                lambda: self.device_manager.send_commands(self.device.id, [command])
-            )
-        else:
-            # Fall back to parent implementation
-            await super().async_open_cover(**kwargs)
-
-    async def async_close_cover(self, **kwargs) -> None:
-        """Close the cover."""
-        # Get control_back_mode directly from device status
-        control_back_mode_dpcode = self.entity_description.control_back_mode
-        control_back_mode = self.device.status.get(control_back_mode_dpcode, "forward") if control_back_mode_dpcode else "forward"
-        is_reverse_mode = control_back_mode != "forward"
-        
-        # For close, in standard mode we need to send 100 to Tuya
-        # In reverse mode, we need to send 0
-        tuya_position = 0 if is_reverse_mode else 100
-        
-        import asyncio
-        command = None
-        
-        # Use specific close instruction if available
-        if hasattr(self.entity_description, "close_instruction_value"):
-            command = {
-                "code": self.entity_description.key,
-                "value": self.entity_description.close_instruction_value,
-            }
-        elif hasattr(self.entity_description, "set_position"):
-            command = {
-                "code": self.entity_description.set_position,
-                "value": tuya_position,
-            }
-            
-        if command:
-            LOGGER.debug("Closing cover with command: %s", command)
-            await asyncio.get_event_loop().run_in_executor(
-                None, 
-                lambda: self.device_manager.send_commands(self.device.id, [command])
-            )
-        else:
-            # Fall back to parent implementation
-            await super().async_close_cover(**kwargs)
-
-    async def async_stop_cover(self, **kwargs) -> None:
-        """Stop the cover."""
-        import asyncio
-        command = None
-        
-        # Use specific stop instruction if available
-        if hasattr(self.entity_description, "stop_instruction_value"):
-            command = {
-                "code": self.entity_description.key,
-                "value": self.entity_description.stop_instruction_value,
-            }
-        
-        if command:
-            await asyncio.get_event_loop().run_in_executor(
-                None, 
-                lambda: self.device_manager.send_commands(self.device.id, [command])
-            )
-        else:
-            # Fall back to parent implementation if our approach doesn't work
-            await super().async_stop_cover(**kwargs)
 
     @staticmethod
     def get_entity_instance(description: XTCoverEntityDescription, device: XTDevice, device_manager: MultiManager) -> XTCoverEntity:

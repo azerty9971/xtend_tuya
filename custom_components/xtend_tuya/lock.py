@@ -17,6 +17,7 @@ from .const import (
     TUYA_DISCOVERY_NEW,
     XTDPCode,
     XTMultiManagerProperties,
+    CROSS_CATEGORY_DEVICE_DESCRIPTOR,
 )
 from .util import (
     append_dictionnaries,
@@ -97,6 +98,8 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
+                if device.get_preference(f"{XTDevice.XTDevicePreference.REDISCOVER_CROSS_CAT_ENTITIES}", False):
+                    continue
                 if device.category in merged_descriptors:
                     entities.append(XTLockEntity.get_entity_instance(merged_descriptors[device.category], device, hass_data.manager))
         async_add_entities(entities)
@@ -132,7 +135,7 @@ class XTLockEntity(XTEntity, LockEntity): # type: ignore
             self.temporary_unlock = True
         device_manager.set_general_property(XTMultiManagerProperties.LOCK_DEVICE_ID, device.id)
         if len(description.manual_unlock_command) > 0:
-            device.set_preference(f"manual_unlock_command", description.manual_unlock_command)
+            device.set_preference(f"{XTDevice.XTDevicePreference.LOCK_MANUAL_UNLOCK_COMMAND}", description.manual_unlock_command)
 
     @property
     def is_locked(self) -> bool | None: # type: ignore
