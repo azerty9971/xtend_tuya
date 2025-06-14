@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 from homeassistant.const import EntityCategory, Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
@@ -27,6 +29,7 @@ from .entity import (
 
 class XTSwitchEntityDescription(TuyaSwitchEntityDescription, frozen_or_thawed=True):
     override_tuya: bool = False
+    dont_send_to_cloud: bool = False
 
     def get_entity_instance(self, 
                             device: XTDevice, 
@@ -46,6 +49,7 @@ SWITCHES: dict[str, tuple[XTSwitchEntityDescription, ...]] = {
             key=XTDPCode.COVER_OPEN_CLOSE_IS_INVERTED,
             translation_key="cover_open_close_is_inverted",
             entity_category=EntityCategory.CONFIG,
+            dont_send_to_cloud=True
         ),
     ),
     "cwwsq": (
@@ -409,17 +413,6 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if device.get_preference(f"{XTDevice.XTDevicePreference.REDISCOVER_CROSS_CAT_ENTITIES}", False):
-                    if descriptions := merged_descriptors.get(CROSS_CATEGORY_DEVICE_DESCRIPTOR):
-                        entities.extend(
-                            XTSwitchEntity.get_entity_instance(description, device, hass_data.manager)
-                            for description in descriptions
-                            if (
-                                description.key in device.function
-                                or description.key in device.status_range
-                            ) and (restrict_dpcode is None or restrict_dpcode == description.key)
-                        )
-                    continue
                 if descriptions := merged_descriptors.get(device.category):
                     entities.extend(
                         XTSwitchEntity.get_entity_instance(description, device, hass_data.manager)
@@ -445,6 +438,7 @@ async def async_setup_entry(
 
 class XTSwitchEntity(XTEntity, TuyaSwitchEntity):
     """XT Switch Device."""
+    entity_description: XTSwitchEntityDescription
 
     def __init__(
         self,
@@ -457,8 +451,23 @@ class XTSwitchEntity(XTEntity, TuyaSwitchEntity):
         super(XTEntity, self).__init__(device, device_manager, description) # type: ignore
         self.device = device
         self.device_manager = device_manager
-        self.entity_description = description
+        self.entity_description = description # type: ignore
     
+    def turn_on(self, **kwargs: Any) -> None:
+        """Turn the switch on."""
+        if self.entity_description.dont_send_to_cloud:
+            self.device.status[self.entity_description.key] = True
+        else:
+            super().turn_on(**kwargs)
+
+
+    def turn_off(self, **kwargs: Any) -> None:
+        """Turn the switch off."""
+        if self.entity_description.dont_send_to_cloud:
+            self.device.status[self.entity_description.key] = False
+        else:
+            super().turn_off(**kwargs)
+
     @staticmethod
     def get_entity_instance(description: XTSwitchEntityDescription, device: XTDevice, device_manager: MultiManager) -> XTSwitchEntity:
         if hasattr(description, "get_entity_instance") and callable(getattr(description, "get_entity_instance")):
