@@ -457,6 +457,7 @@ class XTSwitchEntity(XTEntity, TuyaSwitchEntity):
         """Turn the switch on."""
         if self.entity_description.dont_send_to_cloud:
             self.device.status[self.entity_description.key] = True
+            self.device_manager.multi_device_listener.update_device(self.device, [self.entity_description.key])
         else:
             super().turn_on(**kwargs)
 
@@ -465,6 +466,7 @@ class XTSwitchEntity(XTEntity, TuyaSwitchEntity):
         """Turn the switch off."""
         if self.entity_description.dont_send_to_cloud:
             self.device.status[self.entity_description.key] = False
+            self.device_manager.multi_device_listener.update_device(self.device, [self.entity_description.key])
         else:
             super().turn_off(**kwargs)
 
