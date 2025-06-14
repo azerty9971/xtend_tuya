@@ -1503,6 +1503,7 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor): # type: ignore
 
                 if device := self.device_manager.device_map.get(self.device.id, None):
                     device.status[self.entity_description.key] = self._restored_data.native_value
+                    self.async_write_ha_state()
     
     @callback
     async def _on_state_change_event(self, event: Event[EventStateChangedData]):
