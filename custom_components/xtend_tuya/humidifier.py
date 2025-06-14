@@ -63,12 +63,12 @@ async def async_setup_entry(
         """Discover and add a discovered Tuya (de)humidifier."""
         if hass_data.manager is None:
             return
+        if restrict_dpcode is not None:
+            return None
         entities: list[XTHumidifierEntity] = []
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if device.get_preference(f"{XTDevice.XTDevicePreference.REDISCOVER_CROSS_CAT_ENTITIES}", False):
-                    continue
                 if description := merged_categories.get(device.category):
                     entities.append(
                         XTHumidifierEntity.get_entity_instance(description, device, hass_data.manager)

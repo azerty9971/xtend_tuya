@@ -71,12 +71,12 @@ async def async_setup_entry(
         """Discover and add a discovered Tuya climate."""
         if hass_data.manager is None:
             return
+        if restrict_dpcode is not None:
+            return None
         entities: list[XTClimateEntity] = []
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if device.get_preference(f"{XTDevice.XTDevicePreference.REDISCOVER_CROSS_CAT_ENTITIES}", False):
-                    continue
                 if device and device.category in merged_descriptions:
                     entities.append(
                         XTClimateEntity.get_entity_instance(merged_descriptions[device.category], 

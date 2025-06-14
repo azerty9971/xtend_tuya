@@ -41,6 +41,8 @@ async def async_setup_entry(
         """Discover and add a discovered Tuya vacuum."""
         if hass_data.manager is None:
             return
+        if restrict_dpcode is not None:
+            return None
         entities: list[XTVacuumEntity] = []
         device_ids = [*device_map]
         for device_id in device_ids:

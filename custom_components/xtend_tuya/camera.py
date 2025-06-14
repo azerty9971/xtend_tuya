@@ -72,6 +72,8 @@ async def async_setup_entry(
         """Discover and add a discovered Tuya camera."""
         if hass_data.manager is None:
             return
+        if restrict_dpcode is not None:
+            return None
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):

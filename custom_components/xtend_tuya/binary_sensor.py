@@ -167,17 +167,6 @@ async def async_setup_entry(
             return
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id, None):
-                if device.get_preference(f"{XTDevice.XTDevicePreference.REDISCOVER_CROSS_CAT_ENTITIES}", False):
-                    if descriptions := merged_descriptors.get(CROSS_CATEGORY_DEVICE_DESCRIPTOR):
-                        entities.extend(
-                            XTBinarySensorEntity.get_entity_instance(description, device, hass_data.manager)
-                            for description in descriptions
-                            if (
-                                description.key in device.function
-                                or description.key in device.status_range
-                            ) and (restrict_dpcode is None or restrict_dpcode == description.key)
-                        )
-                    continue
                 if descriptions := merged_descriptors.get(device.category):
                     for description in descriptions:
                         dpcode = description.dpcode or description.key

@@ -142,7 +142,6 @@ class XTDevice(TuyaDevice):
     device_preference: dict[str, Any] = {}
 
     class XTDevicePreference(StrEnum):
-        REDISCOVER_CROSS_CAT_ENTITIES       = "REDISCOVER_CROSS_CAT_ENTITIES"
         IS_A_COVER_DEVICE                   = "IS_A_COVER_DEVICE"
         LOCK_MANUAL_UNLOCK_COMMAND          = "LOCK_MANUAL_UNLOCK_COMMAND"
         LOCK_GET_SUPPORTED_UNLOCK_TYPES     = "_LOCK_GET_SUPPORTED_UNLOCK_TYPES"
