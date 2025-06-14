@@ -286,6 +286,7 @@ class XTIOTOpenAPI(TuyaOpenAPI):
                 response = self.session.request(
                     method, self.endpoint + path, params=params, json=body, headers=headers
                 )
+                break
             except Exception:
                 LOGGER.debug(f"[API]Exception in request, waiting for 2 seconds and retrying")
                 time.sleep(2)
