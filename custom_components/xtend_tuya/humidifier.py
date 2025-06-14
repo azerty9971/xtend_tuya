@@ -30,7 +30,15 @@ from .entity import (
 @dataclass(frozen=True)
 class XTHumidifierEntityDescription(TuyaHumidifierEntityDescription):
     """Describe an XT (de)humidifier entity."""
-    pass
+    
+    def get_entity_instance(self, 
+                            device: XTDevice, 
+                            device_manager: MultiManager, 
+                            description: XTHumidifierEntityDescription
+                            ) -> XTHumidifierEntity:
+        return XTHumidifierEntity(device=device, 
+                              device_manager=device_manager, 
+                              description=description)
 
 
 HUMIDIFIERS: dict[str, XTHumidifierEntityDescription] = {
@@ -61,7 +69,7 @@ async def async_setup_entry(
             if device := hass_data.manager.device_map.get(device_id):
                 if description := merged_categories.get(device.category):
                     entities.append(
-                        XTHumidifierEntity(device, hass_data.manager, XTHumidifierEntityDescription(**description.__dict__))
+                        XTHumidifierEntity.get_entity_instance(description, device, hass_data.manager)
                     )
         async_add_entities(entities)
 
@@ -87,3 +95,9 @@ class XTHumidifierEntity(XTEntity, TuyaHumidifierEntity):
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description
+
+    @staticmethod
+    def get_entity_instance(description: XTHumidifierEntityDescription, device: XTDevice, device_manager: MultiManager) -> XTHumidifierEntity:
+        if hasattr(description, "get_entity_instance") and callable(getattr(description, "get_entity_instance")):
+            return description.get_entity_instance(device, device_manager, description)
+        return XTHumidifierEntity(device, device_manager, XTHumidifierEntityDescription(**description.__dict__))

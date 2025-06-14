@@ -55,6 +55,7 @@ class XTIOTOpenMQ(TuyaOpenMQ):
     link_id: str | None = None
     class_id: str | None = None
     sleep_time: float | None = None
+    topics: str | None = None
 
     def __init__(self, api: XTIOTOpenAPI) -> None:
         if self.link_id is None:
@@ -63,6 +64,8 @@ class XTIOTOpenMQ(TuyaOpenMQ):
             self.class_id: str | None = "IOT"
         if self.sleep_time is None:
             self.sleep_time: float | None = 0
+        if self.topics is None:
+            self.topics: str | None = "device"
         super().__init__(api)
         self.api: XTIOTOpenAPI = api # type: ignore
 
@@ -83,20 +86,19 @@ class XTIOTOpenMQ(TuyaOpenMQ):
             return None
         if self.api.token_info is None:
             return None
-        response = self.api.post(
-            TO_C_CUSTOM_MQTT_CONFIG_API
-            if (self.api.auth_type == AuthType.CUSTOM)
-            else TO_C_SMART_HOME_MQTT_CONFIG_API,
-            {
-                "uid": self.api.token_info.uid,
-                "link_id": self.link_id,
-                "link_type": "mqtt",
-                "topics": "device",
-                "msg_encrypted_version": "2.0"
-                if (self.api.auth_type == AuthType.CUSTOM)
-                else "1.0",
-            },
-        )
+        
+        path = TO_C_CUSTOM_MQTT_CONFIG_API if (self.api.auth_type == AuthType.CUSTOM) else TO_C_SMART_HOME_MQTT_CONFIG_API
+        body =  {
+                    "uid": self.api.token_info.uid,
+                    "link_id": self.link_id,
+                    "link_type": "mqtt",
+                    "topics": self.topics,
+                    "msg_encrypted_version": "2.0"
+                    if (self.api.auth_type == AuthType.CUSTOM)
+                    else "1.0",
+                }
+        #LOGGER.warning(f"Calling {path} => {body}")
+        response = self.api.post(path, body)
 
         if response.get("success", False) is False:
             if first_pass:

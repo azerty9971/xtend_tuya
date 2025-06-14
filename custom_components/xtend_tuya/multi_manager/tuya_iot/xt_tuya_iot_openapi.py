@@ -83,8 +83,10 @@ class XTIOTOpenAPI(TuyaOpenAPI):
         self.connecting = False
         self.non_user_specific_api = non_user_specific_api
         if self.auth_type == AuthType.CUSTOM:
+            self.__login_path = TO_C_CUSTOM_TOKEN_API
             self.__refresh_path = TO_C_CUSTOM_REFRESH_TOKEN_API
         else:
+            self.__login_path = TO_C_SMART_HOME_TOKEN_API
             self.__refresh_path = TO_C_SMART_HOME_REFRESH_TOKEN_API
 
         self.token_info = None
@@ -184,6 +186,62 @@ class XTIOTOpenAPI(TuyaOpenAPI):
     
     def test_validity(self) -> dict[str, Any]:
         return self.get("/v2.0/cloud/space/child")
+    
+    def get(self, path: str, params: dict[str, Any] | None = None) -> dict[str, Any]:
+        """Http Get.
+
+        Requests the server to return specified resources.
+
+        Args:
+            path (str): api path
+            params (map): request parameter
+
+        Returns:
+            response: response body
+        """
+        return self.__request("GET", path, params, None)
+
+    def post(self, path: str, body: dict[str, Any] | None = None) -> dict[str, Any]:
+        """Http Post.
+
+        Requests the server to update specified resources.
+
+        Args:
+            path (str): api path
+            body (map): request body
+
+        Returns:
+            response: response body
+        """
+        return self.__request("POST", path, None, body)
+
+    def put(self, path: str, body: dict[str, Any] | None = None) -> dict[str, Any]:
+        """Http Put.
+
+        Requires the server to perform specified operations.
+
+        Args:
+            path (str): api path
+            body (map): request body
+
+        Returns:
+            response: response body
+        """
+        return self.__request("PUT", path, None, body)
+
+    def delete(self, path: str, params: dict[str, Any] | None = None) -> dict[str, Any]:
+        """Http Delete.
+
+        Requires the server to delete specified resources.
+
+        Args:
+            path (str): api path
+            params (map): request param
+
+        Returns:
+            response: response body
+        """
+        return self.__request("DELETE", path, params, None)
 
     def __request(
         self,
@@ -222,13 +280,20 @@ class XTIOTOpenAPI(TuyaOpenAPI):
                 t = {int(time.time()*1000)}"
         ) """
 
-        response = self.session.request(
-            method, self.endpoint + path, params=params, json=body, headers=headers
-        )
+        response = requests.Response()
+        for _ in range(10):
+            try:
+                response = self.session.request(
+                    method, self.endpoint + path, params=params, json=body, headers=headers
+                )
+                break
+            except Exception:
+                LOGGER.debug(f"[API]Exception in request, waiting for 2 seconds and retrying")
+                time.sleep(2)
 
         if response.ok is False:
             LOGGER.error(
-                f"[API]Response error: code={response.status_code}, body={body}"
+                f"[API]Response error: code={response.status_code}, body={body if body is not None else ""}"
             )
             return {}
 

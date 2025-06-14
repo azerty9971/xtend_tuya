@@ -28,6 +28,15 @@ from .entity import (
 class XTSwitchEntityDescription(TuyaSwitchEntityDescription, frozen_or_thawed=True):
     override_tuya: bool = False
 
+    def get_entity_instance(self, 
+                            device: XTDevice, 
+                            device_manager: MultiManager, 
+                            description: XTSwitchEntityDescription
+                            ) -> XTSwitchEntity:
+        return XTSwitchEntity(device=device, 
+                              device_manager=device_manager, 
+                              description=description)
+
 # All descriptions can be found here. Mostly the Boolean data types in the
 # default instruction set of each category end up being a Switch.
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
@@ -395,7 +404,7 @@ async def async_setup_entry(
             if device := hass_data.manager.device_map.get(device_id):
                 if descriptions := merged_descriptors.get(device.category):
                     entities.extend(
-                        XTSwitchEntity(device, hass_data.manager, XTSwitchEntityDescription(**description.__dict__))
+                        XTSwitchEntity.get_entity_instance(description, device, hass_data.manager)
                         for description in descriptions
                         if description.key in device.status
                     )
@@ -425,4 +434,10 @@ class XTSwitchEntity(XTEntity, TuyaSwitchEntity):
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description
+    
+    @staticmethod
+    def get_entity_instance(description: XTSwitchEntityDescription, device: XTDevice, device_manager: MultiManager) -> XTSwitchEntity:
+        if hasattr(description, "get_entity_instance") and callable(getattr(description, "get_entity_instance")):
+            return description.get_entity_instance(device, device_manager, description)
+        return XTSwitchEntity(device, device_manager, XTSwitchEntityDescription(**description.__dict__))
 
