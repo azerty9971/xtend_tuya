@@ -122,7 +122,7 @@ class InkbirdB64TypeData:
     @classmethod
     def from_raw(cls, data: str) -> Self:
         """Parse the raw, base64 encoded data and return a InkbirdB64TypeData object."""
-        LOGGER.info("🐦 InkbirdB64TypeData.from_raw called with data: %s", data)
+        #LOGGER.info("🐦 InkbirdB64TypeData.from_raw called with data: %s", data)
         
         temperature_unit: UnitOfTemperature = UnitOfTemperature.CELSIUS
         battery: int | None = None
@@ -132,7 +132,7 @@ class InkbirdB64TypeData:
         if len(data) > 0:
             try:
                 decoded_bytes = base64.b64decode(data)
-                LOGGER.debug("🐦 Decoded bytes: %s (length: %d)", decoded_bytes.hex(), len(decoded_bytes))
+                #LOGGER.debug("🐦 Decoded bytes: %s (length: %d)", decoded_bytes.hex(), len(decoded_bytes))
                 
                 # Parse temperature, humidity, unknown value, battery from bytes 1-10
                 # TODO: Identify what the skipped bytes are in the base station data
@@ -140,8 +140,8 @@ class InkbirdB64TypeData:
                     decoded_bytes[1:11]
                 )
                 (temperature, humidity) = _temperature / 10.0, _humidity / 10.0
-                LOGGER.info("🐦 Parsed values - temp: %s°, humidity: %s%%, battery: %s%%, unit: %s", 
-                           temperature, humidity, battery, temperature_unit)
+                #LOGGER.info("🐦 Parsed values - temp: %s°, humidity: %s%%, battery: %s%%, unit: %s", 
+                #           temperature, humidity, battery, temperature_unit)
             except Exception as e:
                 LOGGER.error("🐦 InkbirdB64TypeData.from_raw: %s", e)
                 raise ValueError(f"Invalid data: {data}") from e
@@ -154,7 +154,7 @@ class InkbirdB64TypeData:
             temperature_unit=temperature_unit,
             battery=battery,
         )
-        LOGGER.info("🐦 Created InkbirdB64TypeData: %s", result)
+        #LOGGER.info("🐦 Created InkbirdB64TypeData: %s", result)
         return result
 
 class InkbirdSensorEntity(XTSensorEntity):
@@ -173,46 +173,46 @@ class InkbirdSensorEntity(XTSensorEntity):
         self.entity_description = description # type: ignore
         
         """Initialize Inkbird channel sensor."""
-        LOGGER.info("🐦 Initializing InkbirdChannelSensorEntity for device %s, key %s, data_key %s", 
-                   device.id, description.key, self.entity_description.data_key)
+        #LOGGER.info("🐦 Initializing InkbirdChannelSensorEntity for device %s, key %s, data_key %s", 
+        #           device.id, description.key, self.entity_description.data_key)
         super().__init__(device, device_manager, description)
         # Override unique_id to include data_key for uniqueness
         self._attr_unique_id = f"{self.device.id}_{description.key}_{self.entity_description.data_key}"
-        LOGGER.info("🐦 Created InkbirdChannelSensorEntity with unique_id: %s", self._attr_unique_id)
+        #LOGGER.info("🐦 Created InkbirdChannelSensorEntity with unique_id: %s", self._attr_unique_id)
         
         # Initialize parsed data
         self._update_parsed_data()
-        LOGGER.info("🐦 Initial data update completed for %s", self._attr_unique_id)
+        #LOGGER.info("🐦 Initial data update completed for %s", self._attr_unique_id)
     
     @property 
     def native_value(self) -> Any:
         """Return the native value of the sensor."""
-        LOGGER.debug("🐦 Getting native_value for %s (data_key: %s)", self.entity_id, self.entity_description.data_key)
+        #LOGGER.debug("🐦 Getting native_value for %s (data_key: %s)", self.entity_id, self.entity_description.data_key)
         
         # Check if raw data has changed since last parse
         current_raw_data = self.device.status.get(self.entity_description.key)
         if current_raw_data != self._last_raw_data:
-            LOGGER.debug("🐦 Raw data changed for %s: %s -> %s", self.entity_id, self._last_raw_data, current_raw_data)
+            #LOGGER.debug("🐦 Raw data changed for %s: %s -> %s", self.entity_id, self._last_raw_data, current_raw_data)
             self._update_parsed_data()
         
         if not self._parsed_data:
-            LOGGER.debug("🐦 No parsed data available for %s", self.entity_id)
+            #LOGGER.debug("🐦 No parsed data available for %s", self.entity_id)
             return None
             
         if self.entity_description.data_key == "temperature":
             value = self._parsed_data.temperature
-            LOGGER.debug("🐦 Temperature value for %s: %s", self.entity_id, value)
+            #LOGGER.debug("🐦 Temperature value for %s: %s", self.entity_id, value)
             return value
         elif self.entity_description.data_key == "humidity":
             value = self._parsed_data.humidity
-            LOGGER.debug("🐦 Humidity value for %s: %s", self.entity_id, value)
+            #LOGGER.debug("🐦 Humidity value for %s: %s", self.entity_id, value)
             return value
         elif self.entity_description.data_key == "battery":
             value = self._parsed_data.battery
-            LOGGER.debug("🐦 Battery value for %s: %s", self.entity_id, value)
+            #LOGGER.debug("🐦 Battery value for %s: %s", self.entity_id, value)
             return value
         
-        LOGGER.debug("🐦 Unknown data_key '%s' for %s", self.entity_description.data_key, self.entity_id)
+        #LOGGER.debug("🐦 Unknown data_key '%s' for %s", self.entity_description.data_key, self.entity_id)
         return None
     
     @property
@@ -229,25 +229,25 @@ class InkbirdSensorEntity(XTSensorEntity):
     def _update_parsed_data(self) -> None:
         """Update parsed data from device status."""
         
-        LOGGER.info("🐦 Updating parsed data for %s (key: %s)", self.entity_id, self.entity_description.key)
-        LOGGER.info("🐦 Device status keys: %s", list(self.device.status.keys()) if self.device.status else "None")
+        #LOGGER.info("🐦 Updating parsed data for %s (key: %s)", self.entity_id, self.entity_description.key)
+        #LOGGER.info("🐦 Device status keys: %s", list(self.device.status.keys()) if self.device.status else "None")
         
         if raw_data := self.device.status.get(self.entity_description.key):
             # Update last raw data tracker
             self._last_raw_data = raw_data
-            LOGGER.info("🐦 Found raw data for %s: %s", self.entity_id, raw_data)
+            #LOGGER.info("🐦 Found raw data for %s: %s", self.entity_id, raw_data)
             try:
                 self._parsed_data = InkbirdB64TypeData.from_raw(raw_data)
-                LOGGER.info("🐦 Successfully parsed data for %s: temp=%s, hum=%s, bat=%s", 
-                           self.entity_id, 
-                           self._parsed_data.temperature,
-                           self._parsed_data.humidity, 
-                           self._parsed_data.battery)
+                #LOGGER.info("🐦 Successfully parsed data for %s: temp=%s, hum=%s, bat=%s", 
+                #           self.entity_id, 
+                #           self._parsed_data.temperature,
+                #           self._parsed_data.humidity, 
+                #           self._parsed_data.battery)
             except (ValueError, TypeError) as e:
                 LOGGER.warning("🐦 Failed to parse Inkbird data for %s: %s", self.entity_id, e)
                 self._parsed_data = None
         else:
-            LOGGER.info("🐦 No raw data found for key '%s' in device status for %s", 
-                        self.entity_description.key, self.entity_id)
+            #LOGGER.info("🐦 No raw data found for key '%s' in device status for %s", 
+            #            self.entity_description.key, self.entity_id)
             self._last_raw_data = None
             self._parsed_data = None
