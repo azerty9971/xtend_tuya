@@ -1,12 +1,11 @@
 {
     "config": {
         "abort": {
-            "reauth_successful": "Az \u00fajrahiteles\u00edt\u00e9s sikeres volt."
+            "reauth_successful": "Az \u00fajrahiteles\u00edt\u00e9s sikeres volt"
         },
         "error": {
             "invalid_auth": "\u00c9rv\u00e9nytelen hiteles\u00edt\u00e9s",
-            "login_error": "Bejelentkez\u00e9si hiba ({code}): {msg}",
-            "reauth_successful": "Az \u00fajrahiteles\u00edt\u00e9s sikeres volt."
+            "login_error": "Bejelentkez\u00e9si hiba ({code}): {msg}"
         },
         "step": {
             "reauth_user_code": {
@@ -20,12 +19,7 @@
             },
             "user": {
                 "data": {
-                    "access_id": "Tuya IoT Access ID (azonos\u00edt\u00f3)",
-                    "access_secret": "Tuya IoT Access Secret (jelsz\u00f3)",
-                    "country_code": "Orsz\u00e1g",
-                    "password": "Jelsz\u00f3",
-                    "user_code": "Felhaszn\u00e1l\u00f3i k\u00f3d",
-                    "username": "Felhaszn\u00e1l\u00f3in\u00e9v"
+                    "user_code": "Felhaszn\u00e1l\u00f3i k\u00f3d"
                 },
                 "description": "Adja meg Smart Life vagy Tuya Smart felhaszn\u00e1l\u00f3i k\u00f3dj\u00e1t.\n\nEzt a k\u00f3dot a Smart Life alkalmaz\u00e1sban vagy a Tuya Smart alkalmaz\u00e1sban tal\u00e1lja a **Be\u00e1ll\u00edt\u00e1sok** > **Fi\u00f3k \u00e9s biztons\u00e1g** k\u00e9perny\u0151n, \u00e9s \u00edrja be a **Felhaszn\u00e1l\u00f3i k\u00f3d** mez\u0151ben l\u00e1that\u00f3 k\u00f3dot. A felhaszn\u00e1l\u00f3i k\u00f3d megk\u00fcl\u00f6nb\u00f6zteti a kis- \u00e9s nagybet\u0171ket, k\u00e9rj\u00fck, \u00fcgyeljen arra, hogy pontosan az alkalmaz\u00e1sban l\u00e1that\u00f3 m\u00f3don adja meg."
             }
@@ -107,6 +101,20 @@
                 "name": "Ajt\u00f3 3"
             }
         },
+        "event": {
+            "numbered_button": {
+                "name": "Gomb {button_number}",
+                "state_attributes": {
+                    "event_type": {
+                        "state": {
+                            "click": "Kattintva",
+                            "double_click": "Dupla kattint\u00e1s",
+                            "press": "Hosszan lenyomva"
+                        }
+                    }
+                }
+            }
+        },
         "light": {
             "backlight": {
                 "name": "H\u00e1tt\u00e9rvil\u00e1g\u00edt\u00e1s"
@@ -125,6 +133,9 @@
             }
         },
         "number": {
+            "alarm_duration": {
+                "name": "Riaszt\u00e1s id\u0151tartama"
+            },
             "cloud_recipe": {
                 "name": "Felh\u0151 recept"
             },
@@ -179,6 +190,9 @@
             "sensitivity": {
                 "name": "\u00c9rz\u00e9kenys\u00e9g"
             },
+            "target_dis_closest": {
+                "name": "Legk\u00f6zelebbi c\u00e9lpont t\u00e1vols\u00e1ga"
+            },
             "temperature": {
                 "name": "H\u0151m\u00e9rs\u00e9klet"
             },
@@ -213,6 +227,20 @@
                     "0": "Automatikus",
                     "1": "Ki",
                     "2": "Be"
+                }
+            },
+            "blanket_level": {
+                "state": {
+                    "level_1": "Alacsony",
+                    "level_10": "Magas",
+                    "level_2": "Szint 2",
+                    "level_3": "Szint 3",
+                    "level_4": "Szint 4",
+                    "level_5": "Szint 5",
+                    "level_6": "Szint 6",
+                    "level_7": "Szint 7",
+                    "level_8": "Szint 8",
+                    "level_9": "Szint 9"
                 }
             },
             "brightness": {
@@ -255,13 +283,6 @@
                 "state": {
                     "0": "Alacsony \u00e9rz\u00e9kenys\u00e9g",
                     "1": "Magas \u00e9rz\u00e9kenys\u00e9g"
-                }
-            },
-            "fan_angle": {
-                "state": {
-                    "30": "30\u00b0",
-                    "60": "60\u00b0",
-                    "90": "90\u00b0"
                 }
             },
             "fingerbot_mode": {
@@ -362,9 +383,9 @@
             "motion_sensitivity": {
                 "name": "Mozg\u00e1s\u00e9rz\u00e9kel\u00e9si \u00e9rz\u00e9kenys\u00e9g",
                 "state": {
-                    "0": "Alacsony \u00e9rz\u00e9kenys\u00e9g",
-                    "1": "K\u00f6zepes \u00e9rz\u00e9kenys\u00e9g",
-                    "2": "Magas \u00e9rz\u00e9kenys\u00e9g"
+                    "0": "Alacsony",
+                    "1": "K\u00f6zepes",
+                    "2": "Magas"
                 }
             },
             "record_mode": {
@@ -467,6 +488,17 @@
                     "severe": "S\u00falyos"
                 }
             },
+            "air_quality_index": {
+                "name": "Leveg\u0151min\u0151s\u00e9gi index",
+                "state": {
+                    "level_1": "Szint 1",
+                    "level_2": "Szint 2",
+                    "level_3": "Szint 3",
+                    "level_4": "Szint 4",
+                    "level_5": "Szint 5",
+                    "level_6": "Szint 6"
+                }
+            },
             "battery": {
                 "name": "Elem/Akku"
             },
@@ -496,6 +528,9 @@
             },
             "duster_cloth_life": {
                 "name": "Porrongy \u00e9lettartam"
+            },
+            "filter_duration": {
+                "name": "Sz\u0171r\u0151 \u00e9lettartama"
             },
             "filter_life": {
                 "name": "Sz\u0171r\u0151 \u00e9lettartam"
@@ -566,6 +601,9 @@
             "power": {
                 "name": "Teljes\u00edtm\u00e9ny"
             },
+            "pump_time": {
+                "name": "V\u00edzkeringet\u0151 szivatty\u00fa id\u0151tartama"
+            },
             "remaining_time": {
                 "name": "H\u00e1tral\u00e9v\u0151 id\u0151"
             },
@@ -593,21 +631,13 @@
                 }
             },
             "status": {
-                "name": "\u00c1llapot",
-                "state": {
-                    "boiling_temp": "Forral\u00e1si h\u0151m\u00e9rs\u00e9klet",
-                    "cooling": "H\u0171t\u00e9s",
-                    "heating": "F\u0171t\u00e9s",
-                    "heating_temp": "F\u0171t\u00e9si h\u0151m\u00e9rs\u00e9klet",
-                    "reserve_1": "1. tartal\u00e9k",
-                    "reserve_2": "2. tartal\u00e9k",
-                    "reserve_3": "3. tartal\u00e9k",
-                    "standby": "K\u00e9szenl\u00e9tben",
-                    "warm": "H\u0151megtart\u00e1s"
-                }
+                "name": "\u00c1llapot"
             },
             "temperature": {
                 "name": "H\u0151m\u00e9rs\u00e9klet"
+            },
+            "temperature_external": {
+                "name": "Szonda h\u0151m\u00e9rs\u00e9klete"
             },
             "total_absorption_particles": {
                 "name": "A r\u00e9szecsk\u00e9k teljes felsz\u00edv\u00f3d\u00e1sa"
@@ -636,6 +666,9 @@
             "total_watering_time": {
                 "name": "Teljes \u00f6nt\u00f6z\u00e9si id\u0151"
             },
+            "uv_runtime": {
+                "name": "UV m\u0171k\u00f6d\u00e9si id\u0151"
+            },
             "voc": {
                 "name": "Ill\u00e9kony szerves vegy\u00fcletek"
             },
@@ -644,6 +677,9 @@
             },
             "water_level": {
                 "name": "V\u00edzszint"
+            },
+            "water_time": {
+                "name": "V\u00edzhaszn\u00e1lat id\u0151tartama"
             }
         },
         "switch": {
@@ -854,32 +890,6 @@
             "wide_dynamic_range": {
                 "name": "Sz\u00e9les dinamikatartom\u00e1ny"
             }
-        }
-    },
-    "issues": {
-        "service_deprecation_turn_off": {
-            "description": "A Tuya porsz\u00edv\u00f3 t\u00e1mogat\u00e1sa a vacuum.turn_off szolg\u00e1ltat\u00e1sra elavult \u00e9s elt\u00e1vol\u00edt\u00e1sra ker\u00fcl a Home Assistant 2024.2 verzi\u00f3j\u00e1ban. K\u00e9rj\u00fck, hogy az \u00f6sszes automatiz\u00e1ci\u00f3t vagy scriptet, amely ezt a szolg\u00e1ltat\u00e1st haszn\u00e1lja, v\u00e1ltoztasd meg \u00e9s h\u00edvd ink\u00e1bb a vacuum.stop szolg\u00e1ltat\u00e1st. Kattints a submit \"bek\u00fcld\u00e9s\" gombra az \u00fcgy lez\u00e1r\u00e1s\u00e1hoz.",
-            "fix_flow": {
-                "step": {
-                    "confirm": {
-                        "description": "A Tuya porsz\u00edv\u00f3 t\u00e1mogat\u00e1sa a vacuum.turn_off szolg\u00e1ltat\u00e1sra elavult \u00e9s elt\u00e1vol\u00edt\u00e1sra ker\u00fcl a Home Assistant 2024.2 verzi\u00f3j\u00e1ban. K\u00e9rj\u00fck, hogy az \u00f6sszes automatiz\u00e1ci\u00f3t vagy scriptet, amely ezt a szolg\u00e1ltat\u00e1st haszn\u00e1lja, v\u00e1ltoztasd meg \u00e9s h\u00edvd ink\u00e1bb a vacuum.stop szolg\u00e1ltat\u00e1st. Kattints a submit \"bek\u00fcld\u00e9s\" gombra az \u00fcgy lez\u00e1r\u00e1s\u00e1hoz.",
-                        "title": "A Tuya porsz\u00edv\u00f3 t\u00e1mogat\u00e1sa a vacuum.turn_off szolg\u00e1ltat\u00e1sra elt\u00e1vol\u00edt\u00e1sra ker\u00fcl"
-                    }
-                }
-            },
-            "title": "A Tuya porsz\u00edv\u00f3 t\u00e1mogat\u00e1sa a vacuum.turn_off szolg\u00e1ltat\u00e1sra elt\u00e1vol\u00edt\u00e1sra ker\u00fcl"
-        },
-        "service_deprecation_turn_on": {
-            "description": "A Tuya porsz\u00edv\u00f3 t\u00e1mogat\u00e1sa a vacuum.turn_on szolg\u00e1ltat\u00e1sra elavult \u00e9s elt\u00e1vol\u00edt\u00e1sra ker\u00fcl a Home Assistant 2024.2 verzi\u00f3j\u00e1ban. K\u00e9rj\u00fck, hogy az \u00f6sszes automatiz\u00e1ci\u00f3t vagy scriptet, amely ezt a szolg\u00e1ltat\u00e1st haszn\u00e1lja, v\u00e1ltoztasd meg \u00e9s h\u00edvd ink\u00e1bb a vacuum.start szolg\u00e1ltat\u00e1st. Kattints a submit \"bek\u00fcld\u00e9s\" gombra az \u00fcgy lez\u00e1r\u00e1s\u00e1hoz.",
-            "fix_flow": {
-                "step": {
-                    "confirm": {
-                        "description": "A Tuya porsz\u00edv\u00f3 t\u00e1mogat\u00e1sa a vacuum.turn_on szolg\u00e1ltat\u00e1sra elavult \u00e9s elt\u00e1vol\u00edt\u00e1sra ker\u00fcl a Home Assistant 2024.2 verzi\u00f3j\u00e1ban. K\u00e9rj\u00fck, hogy az \u00f6sszes automatiz\u00e1ci\u00f3t vagy scriptet, amely ezt a szolg\u00e1ltat\u00e1st haszn\u00e1lja, v\u00e1ltoztasd meg \u00e9s h\u00edvd ink\u00e1bb a vacuum.start szolg\u00e1ltat\u00e1st. Kattints a submit \"bek\u00fcld\u00e9s\" gombra az \u00fcgy lez\u00e1r\u00e1s\u00e1hoz.",
-                        "title": "A Tuya porsz\u00edv\u00f3 t\u00e1mogat\u00e1sa a vacuum.turn_on szolg\u00e1ltat\u00e1sra elt\u00e1vol\u00edt\u00e1sra ker\u00fcl."
-                    }
-                }
-            },
-            "title": "A Tuya porsz\u00edv\u00f3 t\u00e1mogat\u00e1sa a vacuum.turn_on szolg\u00e1ltat\u00e1sra elt\u00e1vol\u00edt\u00e1sra ker\u00fcl."
         }
     }
 }

@@ -41,11 +41,6 @@
                 "state": {
                     "standby": "Standby"
                 }
-            },
-            "status": {
-                "state": {
-                    "standby": "Standby"
-                }
             }
         }
     }

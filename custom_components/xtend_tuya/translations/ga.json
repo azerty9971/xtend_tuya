@@ -1,0 +1,51 @@
+{
+    "entity": {
+        "event": {
+            "numbered_button": {
+                "name": "Cnaipe {button_number}",
+                "state_attributes": {
+                    "event_type": {
+                        "state": {
+                            "click": "Clice\u00e1ladh",
+                            "double_click": "Clice\u00e1il faoi dh\u00f3",
+                            "press": "Br\u00faite go fada"
+                        }
+                    }
+                }
+            }
+        },
+        "select": {
+            "blanket_level": {
+                "state": {
+                    "level_1": "\u00cdseal",
+                    "level_10": "Ard",
+                    "level_2": "Leibh\u00e9al 2",
+                    "level_3": "Leibh\u00e9al 4",
+                    "level_4": "Leibh\u00e9al 4",
+                    "level_5": "Leibh\u00e9al 5",
+                    "level_6": "Leibh\u00e9al 6",
+                    "level_7": "Leibh\u00e9al 7",
+                    "level_8": "Leibh\u00e9al 8",
+                    "level_9": "Leibh\u00e9al 9"
+                }
+            }
+        },
+        "sensor": {
+            "filter_duration": {
+                "name": "Fad an scagaire"
+            },
+            "pump_time": {
+                "name": "Fad an chaid\u00e9il uisce"
+            },
+            "temperature_external": {
+                "name": "Teocht an t\u00f3iread\u00f3ra"
+            },
+            "uv_runtime": {
+                "name": "Am rith UV"
+            },
+            "water_time": {
+                "name": "Fad \u00fas\u00e1ide uisce"
+            }
+        }
+    }
+}

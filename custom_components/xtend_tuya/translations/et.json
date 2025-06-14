@@ -5,8 +5,7 @@
         },
         "error": {
             "invalid_auth": "Tuvastamise viga",
-            "login_error": "Sisenemine nurjus ( {code} ): {msg}",
-            "reauth_successful": "Taastuvastamine \u00f5nnestus"
+            "login_error": "Sisenemine nurjus ( {code} ): {msg}"
         },
         "step": {
             "reauth_user_code": {
@@ -20,12 +19,7 @@
             },
             "user": {
                 "data": {
-                    "access_id": "Tuya IoT kasutajatunnus",
-                    "access_secret": "Tuya IoT salas\u00f5na",
-                    "country_code": "Riik",
-                    "password": "Salas\u00f5na",
-                    "user_code": "Kasutaja kood",
-                    "username": "Kasutajanimi"
+                    "user_code": "Kasutaja kood"
                 },
                 "description": "Sisesta oma Smart Life v\u00f5i Tuya Smart kasutajakood. \n\n Selle koodi leiad rakendusest Smart Life v\u00f5i rakendusest Tuya Smart men\u00fc\u00fcs **Seaded** > **Konto ja turvalisus** ning sisesta v\u00e4ljal **Kasutajakood** n\u00e4idatud kood. Kasutajakood on t\u00f5stutundlik, sisesta see kindlasti t\u00e4pselt nii, nagu rakenduses n\u00e4idatud."
             }
@@ -107,6 +101,20 @@
                 "name": "Uks 3"
             }
         },
+        "event": {
+            "numbered_button": {
+                "name": "Nupp {button_number}",
+                "state_attributes": {
+                    "event_type": {
+                        "state": {
+                            "click": "Kl\u00f5psatud",
+                            "double_click": "Topeltkl\u00f5psatud",
+                            "press": "Pikalt vajutatud"
+                        }
+                    }
+                }
+            }
+        },
         "light": {
             "backlight": {
                 "name": "Taustvalgus"
@@ -125,6 +133,9 @@
             }
         },
         "number": {
+            "alarm_duration": {
+                "name": "H\u00e4ire kestus"
+            },
             "cloud_recipe": {
                 "name": "Retsept pilveteenusest"
             },
@@ -179,6 +190,9 @@
             "sensitivity": {
                 "name": "Tundlikkus"
             },
+            "target_dis_closest": {
+                "name": "L\u00e4him sihtm\u00e4rgi kaugus"
+            },
             "temperature": {
                 "name": "Temperatuur"
             },
@@ -213,6 +227,20 @@
                     "0": "Automaatne",
                     "1": "V\u00e4ljas",
                     "2": "Sees"
+                }
+            },
+            "blanket_level": {
+                "state": {
+                    "level_1": "Madal",
+                    "level_10": "K\u00f5rge",
+                    "level_2": "Tase 2",
+                    "level_3": "Tase 3",
+                    "level_4": "Tase 4",
+                    "level_5": "Tase 5",
+                    "level_6": "Tase 6",
+                    "level_7": "Tase 7",
+                    "level_8": "Tase 8",
+                    "level_9": "Tase 9"
                 }
             },
             "brightness": {
@@ -255,13 +283,6 @@
                 "state": {
                     "0": "Madal tundlikkus",
                     "1": "K\u00f5rge tundlikkus"
-                }
-            },
-            "fan_angle": {
-                "state": {
-                    "30": "30\u00b0",
-                    "60": "60\u00b0",
-                    "90": "90\u00b0"
                 }
             },
             "fingerbot_mode": {
@@ -362,9 +383,9 @@
             "motion_sensitivity": {
                 "name": "Liikumise tuvastamise tundlikkus",
                 "state": {
-                    "0": "Madal tundlikkus",
-                    "1": "Keskmine tundlikkus",
-                    "2": "K\u00f5rge tundlikkus"
+                    "0": "Madal",
+                    "1": "Keskmine",
+                    "2": "K\u00f5rge"
                 }
             },
             "record_mode": {
@@ -467,6 +488,17 @@
                     "severe": "Ohtlik"
                 }
             },
+            "air_quality_index": {
+                "name": "\u00d5hukvaliteedi indeks",
+                "state": {
+                    "level_1": "Tase 1",
+                    "level_2": "Tase 2",
+                    "level_3": "Tase 3",
+                    "level_4": "Tase 4",
+                    "level_5": "Tase 5",
+                    "level_6": "Tase 6"
+                }
+            },
             "battery": {
                 "name": "Aku"
             },
@@ -496,6 +528,9 @@
             },
             "duster_cloth_life": {
                 "name": "Tolmulapi kasutusiga"
+            },
+            "filter_duration": {
+                "name": "Filtri t\u00f6\u00f6aeg"
             },
             "filter_life": {
                 "name": "Filtri kasutusiga"
@@ -566,6 +601,9 @@
             "power": {
                 "name": "V\u00f5imsus"
             },
+            "pump_time": {
+                "name": "Veepumba t\u00f6\u00f6aeg"
+            },
             "remaining_time": {
                 "name": "J\u00e4relej\u00e4\u00e4nud aeg"
             },
@@ -593,21 +631,13 @@
                 }
             },
             "status": {
-                "name": "Olek",
-                "state": {
-                    "boiling_temp": "Keemistemperatuur",
-                    "cooling": "Jahutamine",
-                    "heating": "K\u00fcte",
-                    "heating_temp": "K\u00fcttetemperatuur",
-                    "reserve_1": "Reserv 1",
-                    "reserve_2": "Reserv 2",
-                    "reserve_3": "Reserv 3",
-                    "standby": "Unere\u017eiimil",
-                    "warm": "Soojussalvestus"
-                }
+                "name": "Olek"
             },
             "temperature": {
                 "name": "Temperatuur"
+            },
+            "temperature_external": {
+                "name": "Sondi temperatuur"
             },
             "total_absorption_particles": {
                 "name": "Osakeste summaarne neeldumine"
@@ -636,6 +666,9 @@
             "total_watering_time": {
                 "name": "Kastmisaeg kokku"
             },
+            "uv_runtime": {
+                "name": "UV-kiirguse t\u00f6\u00f6aeg"
+            },
             "voc": {
                 "name": "Lenduvad orgaanilised \u00fchendid"
             },
@@ -644,6 +677,9 @@
             },
             "water_level": {
                 "name": "Veetase"
+            },
+            "water_time": {
+                "name": "Vee kasutamise kestus"
             }
         },
         "switch": {
@@ -854,32 +890,6 @@
             "wide_dynamic_range": {
                 "name": "K\u00fcrge d\u00fcnaamiline ulatus"
             }
-        }
-    },
-    "issues": {
-        "service_deprecation_turn_off": {
-            "description": "Tuya tolmuimeja tugi teenusele vacuum.turn_off on aegunud ja see eemaldatakse rakenduses Home Assistant 2024.2; Kohanda teenust kasutavat automatiseerimist v\u00f5i skripti, et selle asemel kutsuda vacuum.start, ja vali allpool selle probleemi lahendatuks m\u00e4rkimiseks esitamine.",
-            "fix_flow": {
-                "step": {
-                    "confirm": {
-                        "description": "Tuya tolmuimeja tugi teenusele vacuum.turn_off on aegunud ja see eemaldatakse rakenduses Home Assistant 2024.2; Kohanda teenust kasutavat automatiseerimist v\u00f5i skripti, et selle asemel kutsuda vacuum.start, ja vali allpool selle probleemi lahendatuks m\u00e4rkimiseks esitamine.",
-                        "title": "Tuya tolmuimeja tugi vacuum.turn_off jaoks eemaldatakse"
-                    }
-                }
-            },
-            "title": "Tuya tolmuimeja tugi vacuum.turn_off jaoks eemaldatakse"
-        },
-        "service_deprecation_turn_on": {
-            "description": "Tuya tolmuimeja tugi teenusele vacuum.turn_on on aegunud ja see eemaldatakse rakenduses Home Assistant 2024.2; Kohanda teenust kasutavat automatiseerimist v\u00f5i skripti, et selle asemel kutsuda vacuum.start, ja vali allpool selle probleemi lahendatuks m\u00e4rkimiseks esitamine.",
-            "fix_flow": {
-                "step": {
-                    "confirm": {
-                        "description": "Tuya tolmuimeja tugi teenusele vacuum.turn_on on aegunud ja see eemaldatakse rakenduses Home Assistant 2024.2; Kohanda teenust kasutavat automatiseerimist v\u00f5i skripti, et selle asemel kutsuda vacuum.start, ja vali allpool selle probleemi lahendatuks m\u00e4rkimiseks esitamine.",
-                        "title": "Tuya tolmuimeja tugi vacuum.turn_on jaoks eemaldatakse"
-                    }
-                }
-            },
-            "title": "Tuya tolmuimeja tugi vacuum.turn_on jaoks eemaldatakse"
         }
     }
 }

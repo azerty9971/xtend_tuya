@@ -5,29 +5,23 @@
         },
         "error": {
             "invalid_auth": "Neplatn\u00e9 overenie",
-            "login_error": "Chyba pri prihlasovan\u00ed ({code}): {msg}",
-            "reauth_successful": "Op\u00e4tovn\u00e9 overenie bolo \u00faspe\u0161n\u00e9"
+            "login_error": "Chyba pri prihlasovan\u00ed ({code}): {msg}"
         },
         "step": {
             "reauth_user_code": {
                 "data": {
                     "user_code": "Pou\u017e\u00edvate\u013esk\u00fd k\u00f3d"
                 },
-                "description": "Integr\u00e1cia Tuya teraz pou\u017e\u00edva vylep\u0161en\u00fa met\u00f3du prihl\u00e1senia. Ak sa chcete znova overi\u0165 pomocou svojho \u00fa\u010dtu Smart Life alebo Tuya Smart, mus\u00edte zada\u0165 svoj pou\u017e\u00edvate\u013esk\u00fd k\u00f3d. \n\nTento k\u00f3d n\u00e1jdete v aplik\u00e1cii Smart Life alebo Tuya Smart na obrazovke **Nastavenia** > **\u00da\u010det a zabezpe\u010denie** a zadajte k\u00f3d zobrazen\u00fd v poli **Pou\u017e\u00edvate\u013esk\u00fd k\u00f3d**. V pou\u017e\u00edvate\u013eskom k\u00f3de sa rozli\u0161uj\u00fa mal\u00e9 a ve\u013ek\u00e9 p\u00edsmen\u00e1, uistite sa, \u017ee ste ho zadali presne tak, ako je uveden\u00e9 v aplik\u00e1cii."
+                "description": "Integr\u00e1cia Tuya teraz pou\u017e\u00edva vylep\u0161en\u00fd sp\u00f4sob prihl\u00e1senia. Ak sa chcete op\u00e4tovne prihl\u00e1si\u0165 pomocou svojho \u00fa\u010dtu Smart Life alebo Tuya Smart, mus\u00edte zada\u0165 svoj pou\u017e\u00edvate\u013esk\u00fd k\u00f3d.\n\nTento k\u00f3d n\u00e1jdete v aplik\u00e1cii Smart Life alebo Tuya Smart na obrazovke **Nastavenia** &gt; **Konto a zabezpe\u010denie** a zadajte k\u00f3d uveden\u00fd v poli **U\u017e\u00edvate\u013esk\u00fd k\u00f3d**. Pri pou\u017e\u00edvate\u013eskom k\u00f3de sa rozli\u0161uj\u00fa mal\u00e9 a ve\u013ek\u00e9 p\u00edsmen\u00e1, nezabudnite ho zada\u0165 presne tak, ako je zobrazen\u00fd v aplik\u00e1cii."
             },
             "scan": {
-                "description": "Pomocou aplik\u00e1cie Smart Life alebo aplik\u00e1cie Tuya Smart naskenujte nasleduj\u00faci QR k\u00f3d a dokon\u010dite prihl\u00e1senie.\n\nPo dokon\u010den\u00ed tohto kroku v aplik\u00e1cii pokra\u010dujte \u010fal\u0161\u00edm krokom."
+                "description": "Pomocou aplik\u00e1cie Smart Life alebo aplik\u00e1cie Tuya Smart naskenujte nasleduj\u00faci k\u00f3d QR a dokon\u010dite prihl\u00e1senie. Po dokon\u010den\u00ed tohto kroku v aplik\u00e1cii pokra\u010dujte na \u010fal\u0161\u00ed krok."
             },
             "user": {
                 "data": {
-                    "access_id": "Tuya IoT Access ID",
-                    "access_secret": "Tuya IoT Access Secret",
-                    "country_code": "Krajina",
-                    "password": "Heslo",
-                    "user_code": "Pou\u017e\u00edvate\u013esk\u00fd k\u00f3d",
-                    "username": "\u00da\u010det"
+                    "user_code": "Pou\u017e\u00edvate\u013esk\u00fd k\u00f3d"
                 },
-                "description": "Zadajte svoj u\u017e\u00edvate\u013esk\u00fd k\u00f3d Smart Life alebo Tuya Smart. \n\nTento k\u00f3d n\u00e1jdete v aplik\u00e1cii Smart Life alebo Tuya Smart na obrazovke **Nastavenia** > **\u00da\u010det a zabezpe\u010denie** a zadajte k\u00f3d zobrazen\u00fd v poli **Pou\u017e\u00edvate\u013esk\u00fd k\u00f3d**. V pou\u017e\u00edvate\u013eskom k\u00f3de sa rozli\u0161uj\u00fa mal\u00e9 a ve\u013ek\u00e9 p\u00edsmen\u00e1, uistite sa, \u017ee ste ho zadali presne tak, ako je uveden\u00e9 v aplik\u00e1cii."
+                "description": "Zadajte svoj pou\u017e\u00edvate\u013esk\u00fd k\u00f3d Smart Life alebo Tuya Smart.\n\nTento k\u00f3d n\u00e1jdete v aplik\u00e1cii Smart Life alebo Tuya Smart na obrazovke **Nastavenia** &gt; **Konto a zabezpe\u010denie** a zadajte k\u00f3d uveden\u00fd v poli **U\u017e\u00edvate\u013esk\u00fd k\u00f3d**. Pri pou\u017e\u00edvate\u013eskom k\u00f3de sa rozli\u0161uj\u00fa mal\u00e9 a ve\u013ek\u00e9 p\u00edsmen\u00e1, nezabudnite ho zada\u0165 presne tak, ako je zobrazen\u00fd v aplik\u00e1cii."
             }
         }
     },
@@ -107,6 +101,20 @@
                 "name": "Dvere 3"
             }
         },
+        "event": {
+            "numbered_button": {
+                "name": "Tla\u010didlo {button_number}",
+                "state_attributes": {
+                    "event_type": {
+                        "state": {
+                            "click": "Kliknut\u00e9",
+                            "double_click": "Dvojit\u00e9 kliknutie",
+                            "press": "Dlho stla\u010den\u00e9"
+                        }
+                    }
+                }
+            }
+        },
         "light": {
             "backlight": {
                 "name": "Podsvietenie"
@@ -125,6 +133,9 @@
             }
         },
         "number": {
+            "alarm_duration": {
+                "name": "Trvanie alarmu"
+            },
             "cloud_recipe": {
                 "name": "Cloud recept"
             },
@@ -179,6 +190,9 @@
             "sensitivity": {
                 "name": "Citlivos\u0165"
             },
+            "target_dis_closest": {
+                "name": "Najbli\u017e\u0161ia cie\u013eov\u00e1 vzdialenos\u0165"
+            },
             "temperature": {
                 "name": "Teplota"
             },
@@ -213,6 +227,20 @@
                     "0": "Automaticky",
                     "1": "Neakt\u00edvny",
                     "2": "Akt\u00edvny"
+                }
+            },
+            "blanket_level": {
+                "state": {
+                    "level_1": "N\u00edzky",
+                    "level_10": "Vysok\u00fd",
+                    "level_2": "\u00darove\u0148 2",
+                    "level_3": "\u00darove\u0148 3",
+                    "level_4": "\u00darove\u0148 4",
+                    "level_5": "\u00darove\u0148 5",
+                    "level_6": "\u00darove\u0148 6",
+                    "level_7": "\u00darove\u0148 7",
+                    "level_8": "\u00darove\u0148 8",
+                    "level_9": "\u00darove\u0148 9"
                 }
             },
             "brightness": {
@@ -255,13 +283,6 @@
                 "state": {
                     "0": "N\u00edzka citlivos\u0165",
                     "1": "Vysok\u00e1 citlivos\u0165"
-                }
-            },
-            "fan_angle": {
-                "state": {
-                    "30": "30\u00b0",
-                    "60": "60\u00b0",
-                    "90": "90\u00b0"
                 }
             },
             "fingerbot_mode": {
@@ -349,7 +370,7 @@
                 "name": "Re\u017eim sveteln\u00e9ho indik\u00e1tora",
                 "state": {
                     "none": "Neakt\u00edvny",
-                    "pos": "Indik\u00e1cia stavu iinvertovan\u00e9ho prep\u00edna\u010da",
+                    "pos": "Indik\u00e1cia stavu invertovan\u00e9ho prep\u00edna\u010da",
                     "relay": "Ozna\u010duje stav zapnutia/vypnutia"
                 }
             },
@@ -362,9 +383,9 @@
             "motion_sensitivity": {
                 "name": "Citlivos\u0165 detekcie pohybu",
                 "state": {
-                    "0": "N\u00edzka citlivos\u0165",
-                    "1": "Stredn\u00e1 citlivos\u0165",
-                    "2": "Vysok\u00e1 citlivos\u0165"
+                    "0": "N\u00edzka",
+                    "1": "Stredn\u00e1",
+                    "2": "Vysok\u00e1"
                 }
             },
             "record_mode": {
@@ -467,6 +488,17 @@
                     "severe": "Z\u00e1va\u017en\u00e9"
                 }
             },
+            "air_quality_index": {
+                "name": "Index kvality ovzdu\u0161ia",
+                "state": {
+                    "level_1": "\u00darove\u0148 1",
+                    "level_2": "\u00darove\u0148 2",
+                    "level_3": "\u00darove\u0148 3",
+                    "level_4": "\u00darove\u0148 4",
+                    "level_5": "\u00darove\u0148 5",
+                    "level_6": "\u00darove\u0148 6"
+                }
+            },
             "battery": {
                 "name": "Bat\u00e9ria"
             },
@@ -496,6 +528,9 @@
             },
             "duster_cloth_life": {
                 "name": "\u017divotnos\u0165 utierky na prach"
+            },
+            "filter_duration": {
+                "name": "Trvanie filtra"
             },
             "filter_life": {
                 "name": "\u017divotnos\u0165 filtra"
@@ -566,6 +601,9 @@
             "power": {
                 "name": "V\u00fdkon"
             },
+            "pump_time": {
+                "name": "Trvanie vodn\u00e9ho \u010derpadla"
+            },
             "remaining_time": {
                 "name": "Zost\u00e1vaj\u00faci \u010das"
             },
@@ -593,21 +631,13 @@
                 }
             },
             "status": {
-                "name": "Stav",
-                "state": {
-                    "boiling_temp": "Teplota varu",
-                    "cooling": "Chladenie",
-                    "heating": "Vykurovanie",
-                    "heating_temp": "Teplota vykurovania",
-                    "reserve_1": "Rezerva 1",
-                    "reserve_2": "Rezerva 2",
-                    "reserve_3": "Rezerva 3",
-                    "standby": "Pohotovostn\u00fd re\u017eim",
-                    "warm": "Udr\u017eiavanie tepla"
-                }
+                "name": "Stav"
             },
             "temperature": {
                 "name": "Teplota"
+            },
+            "temperature_external": {
+                "name": "Teplota sondy"
             },
             "total_absorption_particles": {
                 "name": "Celkov\u00e1 absorpcia \u010dast\u00edc"
@@ -636,14 +666,20 @@
             "total_watering_time": {
                 "name": "Celkov\u00fd \u010das zavla\u017eovania"
             },
+            "uv_runtime": {
+                "name": "\u010cas behu UV"
+            },
             "voc": {
-                "name": "VOCs"
+                "name": "Prchav\u00e9 organick\u00e9 zl\u00fa\u010deniny"
             },
             "voltage": {
                 "name": "Nap\u00e4tie"
             },
             "water_level": {
                 "name": "Hladina vody"
+            },
+            "water_time": {
+                "name": "Trvanie pou\u017e\u00edvania vody"
             }
         },
         "switch": {
@@ -854,32 +890,6 @@
             "wide_dynamic_range": {
                 "name": "\u0160irok\u00fd dynamick\u00fd rozsah"
             }
-        }
-    },
-    "issues": {
-        "service_deprecation_turn_off": {
-            "description": "Podpora slu\u017eby vacuum.turn_off v syst\u00e9me Tuya vacuum je zastaran\u00e1 a bude odstr\u00e1nen\u00e1 v aplik\u00e1cii Home Assistant 2024.2; upravte v\u0161etky automatiz\u00e1cie alebo skripty, ktor\u00e9 pou\u017e\u00edvaj\u00fa t\u00fato slu\u017ebu, tak, aby namiesto toho volali vacuum.stop, a vyberte mo\u017enos\u0165 odosla\u0165 ni\u017e\u0161ie, aby ste ozna\u010dili tento probl\u00e9m ako vyrie\u0161en\u00fd.",
-            "fix_flow": {
-                "step": {
-                    "confirm": {
-                        "description": "Podpora slu\u017eby vacuum.turn_off v syst\u00e9me Tuya vacuum je zastaran\u00e1 a bude odstr\u00e1nen\u00e1 v aplik\u00e1cii Home Assistant 2024.2; upravte v\u0161etky automatiz\u00e1cie alebo skripty, ktor\u00e9 pou\u017e\u00edvaj\u00fa t\u00fato slu\u017ebu, tak, aby namiesto toho volali vacuum.stop, a vyberte mo\u017enos\u0165 odosla\u0165 ni\u017e\u0161ie, aby ste ozna\u010dili tento probl\u00e9m ako vyrie\u0161en\u00fd.",
-                        "title": "Odstra\u0148uje sa podpora v\u00e1kua Tuya pre vacuum.turn_off"
-                    }
-                }
-            },
-            "title": "Odstra\u0148uje sa podpora v\u00e1kua Tuya pre vacuum.turn_off"
-        },
-        "service_deprecation_turn_on": {
-            "description": "Podpora Tuya vacuum pre slu\u017ebu vacuum.turn_on je zastaran\u00e1 a bude odstr\u00e1nen\u00e1 v aplik\u00e1cii Home Assistant 2024.2; upravte v\u0161etky automatiz\u00e1cie alebo skripty, ktor\u00e9 pou\u017e\u00edvaj\u00fa t\u00fato slu\u017ebu, aby namiesto toho volali vacuum.start, a vyberte odosla\u0165 ni\u017e\u0161ie, aby ste ozna\u010dili tento probl\u00e9m ako vyrie\u0161en\u00fd.",
-            "fix_flow": {
-                "step": {
-                    "confirm": {
-                        "description": "Podpora Tuya vacuum pre slu\u017ebu vacuum.turn_on je zastaran\u00e1 a bude odstr\u00e1nen\u00e1 v aplik\u00e1cii Home Assistant 2024.2; upravte v\u0161etky automatiz\u00e1cie alebo skripty, ktor\u00e9 pou\u017e\u00edvaj\u00fa t\u00fato slu\u017ebu, aby namiesto toho volali vacuum.start, a vyberte odosla\u0165 ni\u017e\u0161ie, aby ste ozna\u010dili tento probl\u00e9m ako vyrie\u0161en\u00fd.",
-                        "title": "Odstra\u0148uje sa podpora v\u00e1kua Tuya pre vacuum.turn_on"
-                    }
-                }
-            },
-            "title": "Odstra\u0148uje sa podpora v\u00e1kua Tuya pre vacuum.turn_on"
         }
     }
 }

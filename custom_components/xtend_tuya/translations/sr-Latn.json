@@ -1,5 +1,16 @@
 {
     "entity": {
+        "cover": {
+            "blind": {
+                "name": "Venecijaner"
+            },
+            "curtain": {
+                "name": "Zavesa"
+            },
+            "door": {
+                "name": "Vrata"
+            }
+        },
         "select": {
             "countdown": {
                 "name": "Odbrojavanje",

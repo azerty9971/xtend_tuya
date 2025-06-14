@@ -5,8 +5,7 @@
         },
         "error": {
             "invalid_auth": "Autentica\u00e7\u00e3o inv\u00e1lida",
-            "login_error": "Erro de login ({code}): {msg}",
-            "reauth_successful": "A reautentica\u00e7\u00e3o foi bem-sucedida"
+            "login_error": "Erro de login ({code}): {msg}"
         },
         "step": {
             "reauth_user_code": {
@@ -15,17 +14,9 @@
                 },
                 "description": "A integra\u00e7\u00e3o do Tuya agora usa um m\u00e9todo de login aprimorado. Para autenticar novamente com sua conta Smart Life ou Tuya Smart, voc\u00ea precisa inserir seu c\u00f3digo de utilizador. \n\n Voc\u00ea pode encontrar esse c\u00f3digo no aplicativo Smart Life ou no aplicativo Tuya Smart em **Configura\u00e7\u00f5es** > **Conta e seguran\u00e7a** e inserir o c\u00f3digo mostrado no campo **C\u00f3digo de utilizador**. O c\u00f3digo de utilizador diferencia mai\u00fasculas de min\u00fasculas. Certifique-se de inseri-lo exatamente como mostrado no aplicativo."
             },
-            "scan": {
-                "description": "Use o aplicativo Smart Life ou Tuya Smart para digitalizar o seguinte c\u00f3digo QR para concluir o login. \n\n Continue para a pr\u00f3xima etapa depois de conclu\u00ed-la no aplicativo."
-            },
             "user": {
                 "data": {
-                    "access_id": "Tuya IoT Access ID",
-                    "access_secret": "Tuya IoT Access Secret",
-                    "country_code": "Pa\u00eds",
-                    "password": "Senha do aplicativo",
-                    "user_code": "C\u00f3digo de utilizador",
-                    "username": "Usu\u00e1rio do Aplicativo"
+                    "user_code": "C\u00f3digo de utilizador"
                 },
                 "description": "Digite seu c\u00f3digo de usu\u00e1rio Smart Life ou Tuya Smart. \n\n Voc\u00ea pode encontrar esse c\u00f3digo no aplicativo Smart Life ou no aplicativo Tuya Smart em **Configura\u00e7\u00f5es** > **Conta e seguran\u00e7a** e inserir o c\u00f3digo mostrado no campo **C\u00f3digo de utilizador**. O c\u00f3digo de utilizador diferencia mai\u00fasculas de min\u00fasculas. Certifique-se de inseri-lo exatamente como mostrado no aplicativo."
             }
@@ -215,6 +206,20 @@
                     "2": "Ligado"
                 }
             },
+            "blanket_level": {
+                "state": {
+                    "level_1": "Baixo",
+                    "level_10": "Alto",
+                    "level_2": "N\u00edvel 2",
+                    "level_3": "N\u00edvel 3",
+                    "level_4": "N\u00edvel 4",
+                    "level_5": "N\u00edvel 5",
+                    "level_6": "N\u00edvel 6",
+                    "level_7": "N\u00edvel 7",
+                    "level_8": "N\u00edvel 8",
+                    "level_9": "N\u00edvel 9"
+                }
+            },
             "brightness": {
                 "name": "Brilho"
             },
@@ -255,13 +260,6 @@
                 "state": {
                     "0": "Baixa sensibilidade",
                     "1": "Alta sensibilidade"
-                }
-            },
-            "fan_angle": {
-                "state": {
-                    "30": "30\u00b0",
-                    "60": "60\u00b0",
-                    "90": "90\u00b0"
                 }
             },
             "fingerbot_mode": {
@@ -307,7 +305,6 @@
             "humidifier_spray_mode": {
                 "name": "Modo de pulveriza\u00e7\u00e3o",
                 "state": {
-                    "auto": "Auto",
                     "health": "Sa\u00fade",
                     "humidity": "Umidade",
                     "sleep": "Sono",
@@ -359,12 +356,7 @@
                 "name": "Modo"
             },
             "motion_sensitivity": {
-                "name": "Sensibilidade de detec\u00e7\u00e3o de movimento",
-                "state": {
-                    "0": "Baixa sensibilidade",
-                    "1": "M\u00e9dia sensibilidade",
-                    "2": "Alta sensibilidade"
-                }
+                "name": "Sensibilidade de detec\u00e7\u00e3o de movimento"
             },
             "record_mode": {
                 "name": "Modo de grava\u00e7\u00e3o",
@@ -394,8 +386,6 @@
                 "name": "Ajuste da caixa d'\u00e1gua",
                 "state": {
                     "closed": "Fechado",
-                    "high": "Alto",
-                    "low": "Baixo",
                     "middle": "M\u00e9dio"
                 }
             },
@@ -466,6 +456,16 @@
                     "severe": "Forte"
                 }
             },
+            "air_quality_index": {
+                "state": {
+                    "level_1": "N\u00edvel 1",
+                    "level_2": "N\u00edvel 2",
+                    "level_3": "N\u00edvel 3",
+                    "level_4": "N\u00edvel 4",
+                    "level_5": "N\u00edvel 5",
+                    "level_6": "N\u00edvel 6"
+                }
+            },
             "battery": {
                 "name": "Bateria"
             },
@@ -495,6 +495,9 @@
             },
             "duster_cloth_life": {
                 "name": "Vida \u00fatil do pano espanador"
+            },
+            "filter_duration": {
+                "name": "Filtrar dura\u00e7\u00e3o"
             },
             "filter_life": {
                 "name": "Vida \u00fatil do filtro"
@@ -592,21 +595,13 @@
                 }
             },
             "status": {
-                "name": "Status",
-                "state": {
-                    "boiling_temp": "Temperatura de ebuli\u00e7\u00e3o",
-                    "cooling": "Resfriamento",
-                    "heating": "Aquecimento",
-                    "heating_temp": "Temperatura de aquecimento",
-                    "reserve_1": "Reserva 1",
-                    "reserve_2": "Reserva 2",
-                    "reserve_3": "Reserva 3",
-                    "standby": "Em espera",
-                    "warm": "Preserva\u00e7\u00e3o do calor"
-                }
+                "name": "Status"
             },
             "temperature": {
                 "name": "Temperatura"
+            },
+            "temperature_external": {
+                "name": "Temperatura da sonda"
             },
             "total_absorption_particles": {
                 "name": "Absor\u00e7\u00e3o total de part\u00edculas"
@@ -847,32 +842,6 @@
             "wide_dynamic_range": {
                 "name": "Ampla faixa din\u00e2mica"
             }
-        }
-    },
-    "issues": {
-        "service_deprecation_turn_off": {
-            "description": "O suporte a aspirador Tuya para o servi\u00e7o `vacuum.turn_off` est\u00e1 obsoleto e ser\u00e1 removido no Home Assistant 2024.2; Por favor, ajuste qualquer automa\u00e7\u00e3o ou script que use o servi\u00e7o para chamar `vacuum.stop` e selecione enviar abaixo para marcar o problema como resolvido.",
-            "fix_flow": {
-                "step": {
-                    "confirm": {
-                        "description": "O suporte do aspirador Tuya para o servi\u00e7o `vacuum.turn_off` est\u00e1 obsoleto e ser\u00e1 removido no Home Assistant 2024.2; Por favor, ajuste qualquer automa\u00e7\u00e3o ou script que use o servi\u00e7o para chamar `vacuum.stop` e selecione enviar abaixo para marcar esse problema como resolvido.",
-                        "title": "O suporte de aspirador Tuya para `vacuum.turn_off` est\u00e1 sendo removido"
-                    }
-                }
-            },
-            "title": "O suporte de aspirador Tuya para `vacuum.turn_off` est\u00e1 sendo removido"
-        },
-        "service_deprecation_turn_on": {
-            "description": "O suporte a aspirador Tuya para o servi\u00e7o `vacuum.turn_on` foi descontinuado e ser\u00e1 removido no Home Assistant 2024.2; Por favor, ajuste qualquer automa\u00e7\u00e3o ou script que use o servi\u00e7o para chamar `vacuum.start` e selecione enviar abaixo para marcar o problema como resolvido.",
-            "fix_flow": {
-                "step": {
-                    "confirm": {
-                        "description": "O suporte do aspirador Tuya para o servi\u00e7o `vacuum.turn_on` est\u00e1 obsoleto e ser\u00e1 removido no Home Assistant 2024.2; Por favor, ajuste qualquer automa\u00e7\u00e3o ou script que use o servi\u00e7o para chamar `vacuum.start` e selecione enviar abaixo para marcar esse problema como resolvido.",
-                        "title": "O suporte de aspirador Tuya para `vacuum.turn_on` est\u00e1 sendo removido"
-                    }
-                }
-            },
-            "title": "O suporte de aspirador Tuya para `vacuum.turn_on` est\u00e1 sendo removido"
         }
     }
 }

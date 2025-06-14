@@ -36,7 +36,7 @@
         "tuya__humidifier_spray_mode": {
             "auto": "Automatinis",
             "health": "Sveikata",
-            "humidity": "Dr\u0117gm\u0117",
+            "humidity": "Oro dr\u0117gm\u0117",
             "sleep": "Miegas",
             "work": "Darbas"
         },
@@ -71,23 +71,23 @@
         },
         "tuya__vacuum_mode": {
             "bow": "Lankas",
-            "chargego": "Gr\u012f\u017ekite \u012f dok\u0105",
-            "left_bow": "Lankas Kair\u0117n",
-            "left_spiral": "Spiral\u0117 kair\u0117je",
-            "mop": "\u0160luost\u0117",
+            "chargego": "Gr\u012f\u017ekite \u012f stotel\u0119",
+            "left_bow": "Lankas \u012f kair\u0119",
+            "left_spiral": "Kairin\u0117 spiral\u0117",
+            "mop": "Plauna",
             "part": "Dalis",
             "partial_bow": "Lankas i\u0161 dalies",
             "pick_zone": "Pasirinkite zon\u0105",
             "point": "Ta\u0161kas",
             "pose": "Poza",
             "random": "Atsitiktinis",
-            "right_bow": "Nusilenkti \u012f de\u0161in\u0119",
-            "right_spiral": "Spiralin\u0117 de\u0161in\u0117",
+            "right_bow": "Lankas \u012f de\u0161in\u0119",
+            "right_spiral": "De\u0161inin\u0117 spiral\u0117",
             "single": "Vienas",
             "smart": "I\u0161manusis",
             "spiral": "Spiral\u0117",
             "standby": "Bud\u0117jimo re\u017eimas",
-            "wall_follow": "Sekite sien\u0105",
+            "wall_follow": "Sekti sien\u0105",
             "zone": "Zona"
         }
     }

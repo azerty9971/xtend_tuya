@@ -1,7 +1,18 @@
 {
     "state": {
+        "tuya__countdown": {
+            "2h": "2 oeren",
+            "3h": "3 oeren",
+            "4h": "4 oeren",
+            "5h": "5 oeren",
+            "6h": "6 oeren"
+        },
         "tuya__humidifier_spray_mode": {
             "humidity": "Fochtichheid"
+        },
+        "tuya__vacuum_cistern": {
+            "high": "Heech",
+            "low": "Leech"
         }
     }
 }

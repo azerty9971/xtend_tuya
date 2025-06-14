@@ -48,7 +48,7 @@
         "tuya__light_mode": {
             "none": "Av",
             "pos": "Indikera brytarens plats",
-            "relay": "Indikera p\u00e5/av-l\u00e4ge"
+            "relay": "Indikera brytarens p\u00e5/av-l\u00e4ge"
         },
         "tuya__relay_status": {
             "last": "Kom ih\u00e5g senaste tillst\u00e5ndet",
@@ -86,7 +86,7 @@
             "single": "Enkel",
             "smart": "Smart",
             "spiral": "Spiral",
-            "standby": "Standby",
+            "standby": "Vilol\u00e4ge",
             "wall_follow": "F\u00f6lj v\u00e4ggen",
             "zone": "Zon"
         }

@@ -8,7 +8,7 @@
         },
         "tuya__status": {
             "boiling_temp": "Virimo temperat\u016bra",
-            "cooling": "Au\u0161inimas",
+            "cooling": "V\u0117sinimas",
             "heating": "\u0160ildoma",
             "heating_temp": "\u0160ildymo temperat\u016bra",
             "reserve_1": "Rezervas 1",
