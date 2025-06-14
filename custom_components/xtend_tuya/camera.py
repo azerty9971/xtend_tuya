@@ -68,7 +68,7 @@ async def async_setup_entry(
     extra_entities: list[XTCameraEntity] = []
 
     @callback
-    def async_discover_device(device_map) -> None:
+    def async_discover_device(device_map, restrict_dpcode: str | None = None) -> None:
         """Discover and add a discovered Tuya camera."""
         if hass_data.manager is None:
             return
