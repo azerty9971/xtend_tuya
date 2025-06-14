@@ -5,8 +5,7 @@
         },
         "error": {
             "invalid_auth": "Ogiltig autentisering",
-            "login_error": "Inloggningsfel ({code}): {msg}",
-            "reauth_successful": "\u00c5terautentisering lyckades"
+            "login_error": "Inloggningsfel ({code}): {msg}"
         },
         "step": {
             "reauth_user_code": {
@@ -15,14 +14,12 @@
                 },
                 "description": "Tuya-integrationen anv\u00e4nder nu en f\u00f6rb\u00e4ttrad inloggningsmetod. F\u00f6r att \u00e5terautentisera dig med ditt Smart Life- eller Tuya Smart-konto m\u00e5ste du ange din anv\u00e4ndarkod.\n\nDu hittar den h\u00e4r koden i Smart Life-appen eller Tuya Smart-appen under **Inst\u00e4llningar** > **Konto och s\u00e4kerhet** och anger koden som visas i f\u00e4ltet **Anv\u00e4ndarkod**. Anv\u00e4ndarkoden \u00e4r skiftl\u00e4gesk\u00e4nslig, s\u00e5 var noga med att ange den exakt som den visas i appen."
             },
+            "scan": {
+                "description": "Anv\u00e4nd Smart Life-appen eller Tuya Smart-appen f\u00f6r att skanna f\u00f6ljande QR-kod f\u00f6r att slutf\u00f6ra inloggningen.\n\nForts\u00e4tt till n\u00e4sta steg n\u00e4r du har slutf\u00f6rt detta steg i appen."
+            },
             "user": {
                 "data": {
-                    "access_id": "Tuya IoT Access ID",
-                    "access_secret": "Tuya IoT Access Secret",
-                    "country_code": "Land",
-                    "password": "L\u00f6senord",
-                    "user_code": "Anv\u00e4ndarkod",
-                    "username": "Anv\u00e4ndarnamn"
+                    "user_code": "Anv\u00e4ndarkod"
                 },
                 "description": "Ange din Smart Life- eller Tuya Smart-anv\u00e4ndarkod.\n\nDu hittar den h\u00e4r koden i Smart Life-appen eller Tuya Smart-appen under **Inst\u00e4llningar** > **Konto och s\u00e4kerhet** och anger koden som visas i f\u00e4ltet **Anv\u00e4ndarkod**. Anv\u00e4ndarkoden \u00e4r skiftl\u00e4gesk\u00e4nslig, s\u00e5 var noga med att ange den exakt som den visas i appen."
             }
@@ -49,7 +46,7 @@
                 "name": "Metan"
             },
             "pm25": {
-                "name": "PM2.5"
+                "name": "PM2,5"
             },
             "pressure": {
                 "name": "Tryck"
@@ -104,6 +101,20 @@
                 "name": "D\u00f6rr 3"
             }
         },
+        "event": {
+            "numbered_button": {
+                "name": "Knapp {button_number}",
+                "state_attributes": {
+                    "event_type": {
+                        "state": {
+                            "click": "Klickad",
+                            "double_click": "Dubbelklickad",
+                            "press": "L\u00e5ngtryckt"
+                        }
+                    }
+                }
+            }
+        },
         "light": {
             "backlight": {
                 "name": "Bakgrundsbelysning"
@@ -122,6 +133,9 @@
             }
         },
         "number": {
+            "alarm_duration": {
+                "name": "Larmets varaktighet"
+            },
             "cloud_recipe": {
                 "name": "Moln recept"
             },
@@ -176,6 +190,9 @@
             "sensitivity": {
                 "name": "K\u00e4nslighet"
             },
+            "target_dis_closest": {
+                "name": "N\u00e4rmaste avst\u00e5nd till m\u00e5l"
+            },
             "temperature": {
                 "name": "Temperatur"
             },
@@ -210,6 +227,20 @@
                     "0": "Automatisk",
                     "1": "Av",
                     "2": "P\u00e5"
+                }
+            },
+            "blanket_level": {
+                "state": {
+                    "level_1": "L\u00e5g",
+                    "level_10": "H\u00f6g",
+                    "level_2": "Niv\u00e5 2",
+                    "level_3": "Niv\u00e5 3",
+                    "level_4": "Niv\u00e5 4",
+                    "level_5": "Niv\u00e5 5",
+                    "level_6": "Niv\u00e5 6",
+                    "level_7": "Niv\u00e5 7",
+                    "level_8": "Niv\u00e5 8",
+                    "level_9": "Niv\u00e5 9"
                 }
             },
             "brightness": {
@@ -252,13 +283,6 @@
                 "state": {
                     "0": "L\u00e5g k\u00e4nslighet",
                     "1": "H\u00f6g k\u00e4nslighet"
-                }
-            },
-            "fan_angle": {
-                "state": {
-                    "30": "30\u00b0",
-                    "60": "60\u00b0",
-                    "90": "90\u00b0"
                 }
             },
             "fingerbot_mode": {
@@ -346,6 +370,7 @@
                 "name": "L\u00e4ge f\u00f6r indikeringsljus",
                 "state": {
                     "none": "Av",
+                    "pos": "Indikera inverterat brytarl\u00e4ge",
                     "relay": "Indikera p\u00e5/av-l\u00e4ge"
                 }
             },
@@ -358,16 +383,16 @@
             "motion_sensitivity": {
                 "name": "K\u00e4nslighet f\u00f6r r\u00f6relsedetektering",
                 "state": {
-                    "0": "L\u00e5g k\u00e4nslighet",
-                    "1": "Medel k\u00e4nslighet",
-                    "2": "H\u00f6g k\u00e4nslighet"
+                    "0": "L\u00e5g",
+                    "1": "Medel",
+                    "2": "H\u00f6g"
                 }
             },
             "record_mode": {
                 "name": "Inspelningsl\u00e4ge",
                 "state": {
-                    "1": "Inspelning av h\u00e4ndelser ",
-                    "2": "L\u00f6pande inspelning "
+                    "1": "Spela endast in h\u00e4ndelser",
+                    "2": "Kontinuerlig inspelning"
                 }
             },
             "relay_status": {
@@ -438,6 +463,19 @@
             },
             "volume": {
                 "name": "Volym"
+            },
+            "weather_delay": {
+                "name": "V\u00e4derf\u00f6rsening",
+                "state": {
+                    "120h": "120h",
+                    "144h": "144h",
+                    "168h": "168h",
+                    "24h": "24h",
+                    "48h": "48h",
+                    "72h": "72h",
+                    "96h": "96h",
+                    "cancel": "Avbryt"
+                }
             }
         },
         "sensor": {
@@ -448,6 +486,17 @@
                     "great": "Mycket bra",
                     "mild": "Mild",
                     "severe": "Sv\u00e5r"
+                }
+            },
+            "air_quality_index": {
+                "name": "Luftkvalitetsindex",
+                "state": {
+                    "level_1": "Niv\u00e5 1",
+                    "level_2": "Niv\u00e5 2",
+                    "level_3": "Niv\u00e5 3",
+                    "level_4": "Niv\u00e5 4",
+                    "level_5": "Niv\u00e5 5",
+                    "level_6": "Niv\u00e5 6"
                 }
             },
             "battery": {
@@ -480,11 +529,14 @@
             "duster_cloth_life": {
                 "name": "Dammduk livsl\u00e4ngd"
             },
+            "filter_duration": {
+                "name": "Filtertid"
+            },
             "filter_life": {
                 "name": "Filtrets livsl\u00e4ngd"
             },
             "filter_utilization": {
-                "name": "Filter anv\u00e4ndning"
+                "name": "Filteranv\u00e4ndning"
             },
             "formaldehyde": {
                 "name": "Formaldehyd"
@@ -496,7 +548,7 @@
                 "name": "Luftfuktighet"
             },
             "illuminance": {
-                "name": "Ljusstyrka"
+                "name": "Belysningsstyrka"
             },
             "last_amount": {
                 "name": "Senaste m\u00e4ngd"
@@ -544,10 +596,13 @@
                 "name": "PM10"
             },
             "pm25": {
-                "name": "PM2.5"
+                "name": "PM2,5"
             },
             "power": {
                 "name": "Effekt"
+            },
+            "pump_time": {
+                "name": "Vattenpumpens varaktighet"
             },
             "remaining_time": {
                 "name": "\u00c5terst\u00e5ende tid"
@@ -576,21 +631,13 @@
                 }
             },
             "status": {
-                "name": "Status",
-                "state": {
-                    "boiling_temp": "Koktemperatur",
-                    "cooling": "Kyler",
-                    "heating": "V\u00e4rmer",
-                    "heating_temp": "Uppv\u00e4rmningstemperatur",
-                    "reserve_1": "Reserv 1",
-                    "reserve_2": "Reserv 2",
-                    "reserve_3": "Reserv 3",
-                    "standby": "Vilol\u00e4ge",
-                    "warm": "Varmh\u00e5llning"
-                }
+                "name": "Status"
             },
             "temperature": {
                 "name": "Temperatur"
+            },
+            "temperature_external": {
+                "name": "Sondtemperatur"
             },
             "total_absorption_particles": {
                 "name": "Total absorption av partiklar"
@@ -616,14 +663,23 @@
             "total_volatile_organic_compound": {
                 "name": "Total m\u00e4ngd flyktiga organiska f\u00f6reningar (VOC)"
             },
+            "total_watering_time": {
+                "name": "Total bevattningstid"
+            },
+            "uv_runtime": {
+                "name": "UV-k\u00f6rtid"
+            },
             "voc": {
-                "name": "VOC"
+                "name": "Flyktiga organiska f\u00f6reningar (VOC)"
             },
             "voltage": {
                 "name": "Sp\u00e4nning"
             },
             "water_level": {
                 "name": "Vattenniv\u00e5"
+            },
+            "water_time": {
+                "name": "Vattenf\u00f6rbrukningstid"
             }
         },
         "switch": {
@@ -834,32 +890,6 @@
             "wide_dynamic_range": {
                 "name": "Brett dynamiskt omf\u00e5ng (WDR)"
             }
-        }
-    },
-    "issues": {
-        "service_deprecation_turn_off": {
-            "description": "Tuyas st\u00f6d f\u00f6r tj\u00e4nsten vacuum.turn_off \u00e4r f\u00f6r\u00e5ldrad och kommer att tas bort i Home Assistant 2024.2; V\u00e4nligen justera alla automatiseringar eller skript som anv\u00e4nder tj\u00e4nsten f\u00f6r att ist\u00e4llet anropa vacuum.stop och v\u00e4lj skicka nedan f\u00f6r att markera detta problem som l\u00f6st.",
-            "fix_flow": {
-                "step": {
-                    "confirm": {
-                        "description": "Tuyas st\u00f6d f\u00f6r tj\u00e4nsten vacuum.turn_off \u00e4r f\u00f6r\u00e5ldrad och kommer att tas bort i Home Assistant 2024.2; V\u00e4nligen justera alla automatiseringar eller skript som anv\u00e4nder tj\u00e4nsten f\u00f6r att ist\u00e4llet anropa vacuum.stop och v\u00e4lj skicka nedan f\u00f6r att markera detta problem som l\u00f6st.",
-                        "title": "Tuyas st\u00f6d f\u00f6r vacuum.turn_off kommer tas bort"
-                    }
-                }
-            },
-            "title": "Tuyas st\u00f6d f\u00f6r vacuum.turn_off kommer tas bort"
-        },
-        "service_deprecation_turn_on": {
-            "description": "Tuyas st\u00f6d f\u00f6r tj\u00e4nsten vacuum.turn_on \u00e4r f\u00f6r\u00e5ldrad och kommer att tas bort i Home Assistant 2024.2; V\u00e4nligen justera alla automatiseringar eller skript som anv\u00e4nder tj\u00e4nsten f\u00f6r att ist\u00e4llet anropa vacuum.start och v\u00e4lj skicka nedan f\u00f6r att markera detta problem som l\u00f6st.",
-            "fix_flow": {
-                "step": {
-                    "confirm": {
-                        "description": "Tuyas st\u00f6d f\u00f6r tj\u00e4nsten vacuum.turn_on \u00e4r f\u00f6r\u00e5ldrad och kommer att tas bort i Home Assistant 2024.2; V\u00e4nligen justera alla automatiseringar eller skript som anv\u00e4nder tj\u00e4nsten f\u00f6r att ist\u00e4llet anropa vacuum.start och v\u00e4lj skicka nedan f\u00f6r att markera detta problem som l\u00f6st.",
-                        "title": "Tuyas st\u00f6d f\u00f6r vacuum.turn_on kommer tas bort"
-                    }
-                }
-            },
-            "title": "Tuyas st\u00f6d f\u00f6r vacuum.turn_on kommer tas bort"
         }
     }
 }

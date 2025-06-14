@@ -2,14 +2,6 @@
     "config": {
         "error": {
             "login_error": "Erro de inicio de sesi\u00f3n ({code}): {msg}"
-        },
-        "step": {
-            "user": {
-                "data": {
-                    "access_id": "ID de acceso Tuya IoT",
-                    "access_secret": "Segredo de acceso Tuya IoT"
-                }
-            }
         }
     },
     "entity": {
@@ -160,12 +152,7 @@
                 "name": "Modo"
             },
             "motion_sensitivity": {
-                "name": "Sensibilidade \u00e1 detecci\u00f3n de movemento",
-                "state": {
-                    "0": "Baixa sensibilidade",
-                    "1": "Sensibilidade media",
-                    "2": "Alta sensibilidade"
-                }
+                "name": "Sensibilidade \u00e1 detecci\u00f3n de movemento"
             },
             "record_mode": {
                 "name": "Modo de gravaci\u00f3n"
@@ -213,9 +200,12 @@
                 "name": "Estado",
                 "state": {
                     "boiling_temp": "Temperatura de ebullici\u00f3n",
+                    "heating": "Quecemento",
+                    "heating_temp": "Temperatura de quecemento",
                     "reserve_1": "Reserva 1",
                     "reserve_2": "Reserva 2",
                     "reserve_3": "Reserva 3",
+                    "standby": "Agardando",
                     "warm": "Conservaci\u00f3n do calor"
                 }
             },
@@ -262,6 +252,9 @@
             },
             "battery_lock": {
                 "name": "Bloqueo da bater\u00eda"
+            },
+            "heat_preservation": {
+                "name": "Conservaci\u00f3n do calor"
             },
             "motion_alarm": {
                 "name": "Alarma de movemento"
@@ -341,11 +334,6 @@
             "start": {
                 "name": "Comezar"
             }
-        }
-    },
-    "issues": {
-        "service_deprecation_turn_on": {
-            "title": "O soporte do aspirador Tuya para vacuum.turn_on est\u00e1 a ser eliminado"
         }
     }
 }

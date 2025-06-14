@@ -5,22 +5,12 @@
         },
         "error": {
             "invalid_auth": "Autenticaci\u00f3 inv\u00e0lida",
-            "login_error": "Error d'inici de sessi\u00f3 ({code}): {msg}",
-            "reauth_successful": "Re-autenticaci\u00f3 realitzada correctament"
+            "login_error": "Error d'inici de sessi\u00f3 ({code}): {msg}"
         },
         "step": {
             "reauth_user_code": {
                 "data": {
                     "user_code": "Codi d'usuari"
-                }
-            },
-            "user": {
-                "data": {
-                    "access_id": "ID d'acc\u00e9s de Tuya IoT",
-                    "access_secret": "Secret d'acc\u00e9s de Tuya IoT",
-                    "country_code": "Pa\u00eds",
-                    "password": "Contrasenya",
-                    "username": "Compte"
                 }
             }
         }
@@ -212,13 +202,6 @@
                     "1": "Sensibilitat alta"
                 }
             },
-            "fan_angle": {
-                "state": {
-                    "30": "30\u00b0",
-                    "60": "60\u00b0",
-                    "90": "90\u00b0"
-                }
-            },
             "fingerbot_mode": {
                 "name": "Mode",
                 "state": {
@@ -262,7 +245,6 @@
             "humidifier_spray_mode": {
                 "name": "Mode de polvoritzaci\u00f3",
                 "state": {
-                    "auto": "Autom\u00e0tic",
                     "health": "Salut",
                     "humidity": "Humitat",
                     "sleep": "Dormint",
@@ -315,12 +297,7 @@
                 "name": "Mode"
             },
             "motion_sensitivity": {
-                "name": "Sensibilitat de detecci\u00f3 de moviment",
-                "state": {
-                    "0": "Sensibilitat baixa",
-                    "1": "Sensibilitat mitjana",
-                    "2": "Sensibilitat alta"
-                }
+                "name": "Sensibilitat de detecci\u00f3 de moviment"
             },
             "record_mode": {
                 "state": {
@@ -348,8 +325,6 @@
                 "name": "Ajust del dip\u00f2sit d'aigua",
                 "state": {
                     "closed": "Tancat/ada",
-                    "high": "Alt",
-                    "low": "Baix",
                     "middle": "Mitj\u00e0"
                 }
             },
@@ -409,6 +384,17 @@
                     "great": "Genial",
                     "mild": "Mitj\u00e0",
                     "severe": "Sever"
+                }
+            },
+            "air_quality_index": {
+                "name": "\u00cdndex de qualitat de l'aire",
+                "state": {
+                    "level_1": "Nivell 1",
+                    "level_2": "Nivell 2",
+                    "level_3": "Nivell 3",
+                    "level_4": "Nivell 4",
+                    "level_5": "Nivell 5",
+                    "level_6": "Nivell 6"
                 }
             },
             "battery": {
@@ -514,18 +500,7 @@
                 }
             },
             "status": {
-                "name": "Estat",
-                "state": {
-                    "boiling_temp": "Temperatura d'ebullici\u00f3",
-                    "cooling": "Refredant",
-                    "heating": "Escalfant",
-                    "heating_temp": "Temperatura d'escalfament",
-                    "reserve_1": "Reserva 1",
-                    "reserve_2": "Reserva 2",
-                    "reserve_3": "Reserva 3",
-                    "standby": "En espera",
-                    "warm": "Conservaci\u00f3 de calor"
-                }
+                "name": "Estat"
             },
             "temperature": {
                 "name": "Temperatura"
@@ -748,32 +723,6 @@
             "wide_dynamic_range": {
                 "name": "Ampli rang din\u00e0mic"
             }
-        }
-    },
-    "issues": {
-        "service_deprecation_turn_off": {
-            "description": "El servei vacuum.turn_off est\u00e0 obsolet i s'eliminar\u00e0 de Home Assistant a partir de la versi\u00f3 2024.2. Modifica les automatitzacions i/o scripts que utilitzin el servei perqu\u00e8 utilitzin els serveis vacuum.stop, a continuaci\u00f3, selecciona Envia per marcar aquest problema com a resolt.",
-            "fix_flow": {
-                "step": {
-                    "confirm": {
-                        "description": "El servei vacuum.turn_off est\u00e0 obsolet i s'eliminar\u00e0 de Home Assistant a partir de la versi\u00f3 2024.2. Modifica les automatitzacions i/o scripts que utilitzin el servei perqu\u00e8 utilitzin els serveis vacuum.stop, a continuaci\u00f3, selecciona Envia per marcar aquest problema com a resolt.",
-                        "title": "S'est\u00e0 eliminant el suport del servei vacuum.turn_off de Tuya"
-                    }
-                }
-            },
-            "title": "S'est\u00e0 eliminant el suport del servei vacuum.turn_off de Tuya"
-        },
-        "service_deprecation_turn_on": {
-            "description": "El servei vacuum.turn_on est\u00e0 obsolet i s'eliminar\u00e0 de Home Assistant a partir de la versi\u00f3 2024.2. Modifica les automatitzacions i/o scripts que utilitzin el servei perqu\u00e8 utilitzin els serveis vacuum.start, a continuaci\u00f3, selecciona Envia per marcar aquest problema com a resolt.",
-            "fix_flow": {
-                "step": {
-                    "confirm": {
-                        "description": "El servei vacuum.turn_on est\u00e0 obsolet i s'eliminar\u00e0 de Home Assistant a partir de la versi\u00f3 2024.2. Modifica les automatitzacions i/o scripts que utilitzin el servei perqu\u00e8 utilitzin els serveis vacuum.start, a continuaci\u00f3, selecciona Envia per marcar aquest problema com a resolt.",
-                        "title": "S'est\u00e0 eliminant el suport del servei vacuum.turn_on de Tuya"
-                    }
-                }
-            },
-            "title": "S'est\u00e0 eliminant el suport del servei vacuum.turn_on de Tuya"
         }
     }
 }

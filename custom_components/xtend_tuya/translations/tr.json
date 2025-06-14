@@ -5,27 +5,18 @@
         },
         "error": {
             "invalid_auth": "Ge\u00e7ersiz kimlik do\u011frulama",
-            "login_error": "Giri\u015f hatas\u0131 ( {code} ): {msg}",
-            "reauth_successful": "Yeniden kimlik do\u011frulama ba\u015far\u0131l\u0131 oldu"
+            "login_error": "Giri\u015f hatas\u0131 ( {code} ): {msg}"
         },
         "step": {
             "reauth_user_code": {
                 "data": {
                     "user_code": "Kullan\u0131c\u0131 kodu"
                 },
-                "description": "Tuya entegrasyonu art\u0131k geli\u015ftirilmi\u015f bir oturum a\u00e7ma y\u00f6ntemi kullan\u0131yor. Smart Life veya Tuya Smart hesab\u0131n\u0131zla yeniden kimlik do\u011frulamas\u0131 yapmak i\u00e7in kullan\u0131c\u0131 kodunuzu girmeniz gerekir. \n\n Bu kodu Smart Life uygulamas\u0131nda veya Tuya Smart uygulamas\u0131nda **Ayarlar** > **Hesap ve G\u00fcvenlik** ekran\u0131nda bulabilir ve **Kullan\u0131c\u0131 Kodu** alan\u0131na g\u00f6sterilen kodu girebilirsiniz. Kullan\u0131c\u0131 kodu b\u00fcy\u00fck/k\u00fc\u00e7\u00fck harfe duyarl\u0131d\u0131r; l\u00fctfen tam olarak uygulamada g\u00f6sterildi\u011fi gibi girdi\u011finizden emin olun."
-            },
-            "scan": {
-                "description": "Giri\u015f i\u015flemini tamamlamak i\u00e7in Smart Life uygulamas\u0131n\u0131 veya Tuya Smart uygulamas\u0131n\u0131 kullanarak a\u015fa\u011f\u0131daki QR kodunu taray\u0131n.\n\nUygulamada bu ad\u0131m\u0131 tamamlad\u0131ktan sonra bir sonraki ad\u0131ma ge\u00e7in."
+                "description": "Tuya entegrasyonu art\u0131k geli\u015ftirilmi\u015f bir oturum a\u00e7ma y\u00f6ntemi kullan\u0131yor. Smart Life veya Tuya Smart hesab\u0131n\u0131zla yeniden kimlik do\u011frulamas\u0131 yapmak i\u00e7in kullan\u0131c\u0131 kodunuzu girmeniz gerekiyor. \n \n Bu kodu Smart Life uygulamas\u0131nda veya Tuya Smart uygulamas\u0131nda **Ayarlar** > **Hesap ve G\u00fcvenlik** ekran\u0131nda bulabilir ve **Kullan\u0131c\u0131 Kodu** alan\u0131nda g\u00f6sterilen kodu girebilirsiniz. Kullan\u0131c\u0131 kodu b\u00fcy\u00fck/k\u00fc\u00e7\u00fck harfe duyarl\u0131d\u0131r, l\u00fctfen uygulamada g\u00f6sterildi\u011fi \u015fekilde tam olarak girdi\u011finizden emin olun."
             },
             "user": {
                 "data": {
-                    "access_id": "Tuya IoT Eri\u015fim Kimli\u011fi",
-                    "access_secret": "Tuya IoT Eri\u015fim Anahtar\u0131",
-                    "country_code": "\u00dclke",
-                    "password": "\u015eifre",
-                    "user_code": "Kullan\u0131c\u0131 kodu",
-                    "username": "Hesap"
+                    "user_code": "Kullan\u0131c\u0131 kodu"
                 },
                 "description": "Smart Life veya Tuya Smart kullan\u0131c\u0131 kodunuzu girin. \n\n Bu kodu Smart Life uygulamas\u0131nda veya Tuya Smart uygulamas\u0131nda **Ayarlar** > **Hesap ve G\u00fcvenlik** ekran\u0131nda bulabilir ve **Kullan\u0131c\u0131 Kodu** alan\u0131na g\u00f6sterilen kodu girebilirsiniz. Kullan\u0131c\u0131 kodu b\u00fcy\u00fck/k\u00fc\u00e7\u00fck harfe duyarl\u0131d\u0131r; l\u00fctfen tam olarak uygulamada g\u00f6sterildi\u011fi gibi girdi\u011finizden emin olun."
             }
@@ -125,6 +116,9 @@
             }
         },
         "number": {
+            "alarm_duration": {
+                "name": "Alarm s\u00fcresi"
+            },
             "cloud_recipe": {
                 "name": "Bulut tarifi"
             },
@@ -178,6 +172,9 @@
             },
             "sensitivity": {
                 "name": "Hassasiyet"
+            },
+            "target_dis_closest": {
+                "name": "En yak\u0131n hedef mesafesi"
             },
             "temperature": {
                 "name": "S\u0131cakl\u0131k"
@@ -257,13 +254,6 @@
                     "1": "Y\u00fcksek hassasiyet"
                 }
             },
-            "fan_angle": {
-                "state": {
-                    "30": "30\u00b0",
-                    "60": "60\u00b0",
-                    "90": "90\u00b0"
-                }
-            },
             "fingerbot_mode": {
                 "name": "Mod",
                 "state": {
@@ -307,7 +297,6 @@
             "humidifier_spray_mode": {
                 "name": "P\u00fcsk\u00fcrtme modu",
                 "state": {
-                    "auto": "Otomatik",
                     "health": "Sa\u011fl\u0131k",
                     "humidity": "Nem",
                     "sleep": "Uyku",
@@ -360,12 +349,7 @@
                 "name": "Mod"
             },
             "motion_sensitivity": {
-                "name": "Hareket alg\u0131lama hassasiyeti",
-                "state": {
-                    "0": "D\u00fc\u015f\u00fck hassasiyet",
-                    "1": "Orta hassasiyet",
-                    "2": "Y\u00fcksek hassasiyet"
-                }
+                "name": "Hareket alg\u0131lama hassasiyeti"
             },
             "record_mode": {
                 "name": "Kay\u0131t modu",
@@ -395,8 +379,6 @@
                 "name": "Su tank\u0131 ayar\u0131",
                 "state": {
                     "closed": "Kapal\u0131",
-                    "high": "Y\u00fcksek",
-                    "low": "D\u00fc\u015f\u00fck",
                     "middle": "Orta"
                 }
             },
@@ -465,6 +447,17 @@
                     "great": "B\u00fcy\u00fck",
                     "mild": "Hafif",
                     "severe": "\u015eiddetli"
+                }
+            },
+            "air_quality_index": {
+                "name": "Hava kalitesi endeksi",
+                "state": {
+                    "level_1": "Seviye 1",
+                    "level_2": "Seviye 2",
+                    "level_3": "Seviye 3",
+                    "level_4": "Seviye 4",
+                    "level_5": "Seviye 5",
+                    "level_6": "Seviye 6"
                 }
             },
             "battery": {
@@ -593,21 +586,13 @@
                 }
             },
             "status": {
-                "name": "Durum",
-                "state": {
-                    "boiling_temp": "Kaynama s\u0131cakl\u0131\u011f\u0131",
-                    "cooling": "So\u011futuluyor",
-                    "heating": "Is\u0131t\u0131l\u0131yor",
-                    "heating_temp": "Is\u0131tma s\u0131cakl\u0131\u011f\u0131",
-                    "reserve_1": "Rezerv 1",
-                    "reserve_2": "Rezerv 2",
-                    "reserve_3": "Rezerv 3",
-                    "standby": "Bekleme modu",
-                    "warm": "Is\u0131 korumas\u0131"
-                }
+                "name": "Durum"
             },
             "temperature": {
                 "name": "S\u0131cakl\u0131k"
+            },
+            "temperature_external": {
+                "name": "Prob s\u0131cakl\u0131\u011f\u0131"
             },
             "total_absorption_particles": {
                 "name": "Par\u00e7ac\u0131klar\u0131n toplam emilimi"
@@ -854,32 +839,6 @@
             "wide_dynamic_range": {
                 "name": "Geni\u015f dinamik aral\u0131k"
             }
-        }
-    },
-    "issues": {
-        "service_deprecation_turn_off": {
-            "description": "vacuum.turn_off hizmeti i\u00e7in Tuya robot s\u00fcp\u00fcrge deste\u011fi kullan\u0131mdan kald\u0131r\u0131lm\u0131\u015ft\u0131r ve Home Assistant 2024.2'de kald\u0131r\u0131lacakt\u0131r; L\u00fctfen hizmeti kullanan herhangi bir otomasyonu veya komut dosyas\u0131n\u0131, bunun yerine vakum.dur'u \u00e7a\u011f\u0131racak \u015fekilde ayarlay\u0131n ve bu sorunu \u00e7\u00f6z\u00fclm\u00fc\u015f olarak i\u015faretlemek i\u00e7in a\u015fa\u011f\u0131dan g\u00f6nder'i se\u00e7in.",
-            "fix_flow": {
-                "step": {
-                    "confirm": {
-                        "description": "vacuum.turn_off hizmeti i\u00e7in Tuya robot s\u00fcp\u00fcrge deste\u011fi kullan\u0131mdan kald\u0131r\u0131lm\u0131\u015ft\u0131r ve Home Assistant 2024.2'de kald\u0131r\u0131lacakt\u0131r; L\u00fctfen hizmeti kullanan herhangi bir otomasyonu veya komut dosyas\u0131n\u0131, bunun yerine vakum.dur'u \u00e7a\u011f\u0131racak \u015fekilde ayarlay\u0131n ve bu sorunu \u00e7\u00f6z\u00fclm\u00fc\u015f olarak i\u015faretlemek i\u00e7in a\u015fa\u011f\u0131dan g\u00f6nder'i se\u00e7in.",
-                        "title": "vacuum.turn_off i\u00e7in Tuya robot s\u00fcp\u00fcrge deste\u011fi kald\u0131r\u0131l\u0131yor"
-                    }
-                }
-            },
-            "title": "vacuum.turn_off i\u00e7in Tuya robot s\u00fcp\u00fcrge deste\u011fi kald\u0131r\u0131l\u0131yor"
-        },
-        "service_deprecation_turn_on": {
-            "description": "vacuum.turn_on hizmeti i\u00e7in Tuya robot s\u00fcp\u00fcrge deste\u011fi kullan\u0131mdan kald\u0131r\u0131lm\u0131\u015ft\u0131r ve Home Assistant 2024.2'de kald\u0131r\u0131lacakt\u0131r; L\u00fctfen hizmeti kullanan herhangi bir otomasyonu veya komut dosyas\u0131n\u0131, bunun yerine vakum.start'\u0131 \u00e7a\u011f\u0131racak \u015fekilde ayarlay\u0131n ve bu sorunu \u00e7\u00f6z\u00fclm\u00fc\u015f olarak i\u015faretlemek i\u00e7in a\u015fa\u011f\u0131dan g\u00f6nder'i se\u00e7in.",
-            "fix_flow": {
-                "step": {
-                    "confirm": {
-                        "description": "vacuum.turn_on hizmeti i\u00e7in Tuya robot s\u00fcp\u00fcrge deste\u011fi kullan\u0131mdan kald\u0131r\u0131lm\u0131\u015ft\u0131r ve Home Assistant 2024.2'de kald\u0131r\u0131lacakt\u0131r; L\u00fctfen hizmeti kullanan herhangi bir otomasyonu veya komut dosyas\u0131n\u0131, bunun yerine vakum.start'\u0131 \u00e7a\u011f\u0131racak \u015fekilde ayarlay\u0131n ve bu sorunu \u00e7\u00f6z\u00fclm\u00fc\u015f olarak i\u015faretlemek i\u00e7in a\u015fa\u011f\u0131dan g\u00f6nder'i se\u00e7in.",
-                        "title": "vacuum.turn_on i\u00e7in Tuya robot s\u00fcp\u00fcrge deste\u011fi kald\u0131r\u0131l\u0131yor"
-                    }
-                }
-            },
-            "title": "vacuum.turn_on i\u00e7in Tuya robot s\u00fcp\u00fcrge deste\u011fi kald\u0131r\u0131l\u0131yor"
         }
     }
 }

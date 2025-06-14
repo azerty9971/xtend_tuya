@@ -34,7 +34,7 @@
             "level_9": "Stufe 9"
         },
         "tuya__humidifier_spray_mode": {
-            "auto": "Automatisch",
+            "auto": "Auto",
             "health": "Gesundheit",
             "humidity": "Luftfeuchtigkeit",
             "sleep": "Schlafen",
@@ -54,9 +54,9 @@
             "last": "Letzten Zustand merken",
             "memory": "Letzten Zustand merken",
             "off": "Aus",
-            "on": "An",
+            "on": "Ein",
             "power_off": "Aus",
-            "power_on": "An"
+            "power_on": "Ein"
         },
         "tuya__vacuum_cistern": {
             "closed": "Geschlossen",
@@ -76,7 +76,7 @@
             "left_spiral": "Spirale links",
             "mop": "Mopp",
             "part": "Teil",
-            "partial_bow": "Bogen Teilweise",
+            "partial_bow": "Bogen teilweise",
             "pick_zone": "Zone ausw\u00e4hlen",
             "point": "Punkt",
             "pose": "Pose",

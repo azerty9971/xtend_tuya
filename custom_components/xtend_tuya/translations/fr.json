@@ -5,8 +5,7 @@
         },
         "error": {
             "invalid_auth": "Authentification non valide",
-            "login_error": "Erreur de connexion ({code})\u00a0: {msg}",
-            "reauth_successful": "La r\u00e9-authentification a r\u00e9ussi"
+            "login_error": "Erreur de connexion ({code})\u00a0: {msg}"
         },
         "step": {
             "reauth_user_code": {
@@ -15,17 +14,9 @@
                 },
                 "description": "L'int\u00e9gration Tuya utilise d\u00e9sormais une m\u00e9thode de connexion am\u00e9lior\u00e9e. Pour vous r\u00e9authentifier avec votre compte Smart Life ou Tuya Smart, vous devez saisir votre code utilisateur.\n\nVous pouvez trouver ce code dans l'application Smart Life ou Tuya Smart dans **R\u00e9glages** > **Compte et s\u00e9curit\u00e9**, et entrer le code indiqu\u00e9 dans le champ **Code utilisateur**. Le code utilisateur est sensible \u00e0 la casse, veillez \u00e0 le saisir exactement comme indiqu\u00e9 dans l'application."
             },
-            "scan": {
-                "description": "Utilisez l'application Smart Life ou l'application Tuya Smart pour scanner le QR-code suivant afin de compl\u00e9ter la connexion.\n\nPassez \u00e0 l'\u00e9tape suivante une fois que vous avez termin\u00e9 cette \u00e9tape dans l'application."
-            },
             "user": {
                 "data": {
-                    "access_id": "Identifiant d'acc\u00e8s Tuya IoT",
-                    "access_secret": "Tuya IoT Access Secret",
-                    "country_code": "Pays",
-                    "password": "Mot de passe",
-                    "user_code": "Code d'utilisateur",
-                    "username": "Compte"
+                    "user_code": "Code d'utilisateur"
                 },
                 "description": "Entrez votre code utilisateur Smart Life ou Tuya Smart.\n\nVous pouvez trouver ce code dans l'application Smart Life ou l'application Tuya Smart dans l'\u00e9cran **Param\u00e8tres** > **Compte et s\u00e9curit\u00e9**, et saisir le code affich\u00e9 dans le champ **Code utilisateur**. Le code utilisateur est sensible \u00e0 la casse, assurez-vous de le saisir exactement comme indiqu\u00e9 dans l'application."
             }
@@ -105,6 +96,20 @@
             },
             "door_3": {
                 "name": "Porte 3"
+            }
+        },
+        "event": {
+            "numbered_button": {
+                "name": "Bouton {button_number}",
+                "state_attributes": {
+                    "event_type": {
+                        "state": {
+                            "click": "Cliqu\u00e9",
+                            "double_click": "Double-cliqu\u00e9",
+                            "press": "Appuis long"
+                        }
+                    }
+                }
             }
         },
         "light": {
@@ -257,13 +262,6 @@
                     "1": "Haute sensibilit\u00e9"
                 }
             },
-            "fan_angle": {
-                "state": {
-                    "30": "30\u00b0",
-                    "60": "60\u00b0",
-                    "90": "90\u00b0"
-                }
-            },
             "fingerbot_mode": {
                 "name": "Mode",
                 "state": {
@@ -307,7 +305,7 @@
             "humidifier_spray_mode": {
                 "name": "Mode de pulv\u00e9risation",
                 "state": {
-                    "auto": "Automatique",
+                    "auto": "Auto",
                     "health": "Sant\u00e9",
                     "humidity": "Humidit\u00e9",
                     "sleep": "Sommeil",
@@ -362,9 +360,9 @@
             "motion_sensitivity": {
                 "name": "Sensibilit\u00e9 de d\u00e9tection de mouvement",
                 "state": {
-                    "0": "Faible sensibilit\u00e9",
-                    "1": "Sensibilit\u00e9 moyenne",
-                    "2": "Haute sensibilit\u00e9"
+                    "0": "Faible",
+                    "1": "Moyenne",
+                    "2": "\u00c9lev\u00e9e"
                 }
             },
             "record_mode": {
@@ -395,13 +393,13 @@
                 "name": "R\u00e9glage du r\u00e9servoir d'eau",
                 "state": {
                     "closed": "Ferm\u00e9",
-                    "high": "Haut",
-                    "low": "Bas",
+                    "high": "\u00c9lev\u00e9",
+                    "low": "Faible",
                     "middle": "Moyen"
                 }
             },
             "vacuum_collection": {
-                "name": "Mode de d\u00e9poussi\u00e9rage",
+                "name": "Mode d'aspiration",
                 "state": {
                     "large": "Large",
                     "middle": "Moyen",
@@ -497,6 +495,9 @@
             "duster_cloth_life": {
                 "name": "Dur\u00e9e de vie du chiffon anti-poussi\u00e8re"
             },
+            "filter_duration": {
+                "name": "Dur\u00e9e du filtre"
+            },
             "filter_life": {
                 "name": "Dur\u00e9e de vie filtre"
             },
@@ -566,6 +567,9 @@
             "power": {
                 "name": "Puissance"
             },
+            "pump_time": {
+                "name": "Dur\u00e9e de la pompe \u00e0 eau"
+            },
             "remaining_time": {
                 "name": "Temps restant"
             },
@@ -593,18 +597,7 @@
                 }
             },
             "status": {
-                "name": "Statut",
-                "state": {
-                    "boiling_temp": "Temp\u00e9rature d'\u00e9bullition",
-                    "cooling": "Refroidissement",
-                    "heating": "En chauffe",
-                    "heating_temp": "Temp\u00e9rature de chauffage",
-                    "reserve_1": "R\u00e9serve 1",
-                    "reserve_2": "R\u00e9serve 2",
-                    "reserve_3": "R\u00e9serve 3",
-                    "standby": "En veille",
-                    "warm": "Pr\u00e9servation de la chaleur"
-                }
+                "name": "Statut"
             },
             "temperature": {
                 "name": "Temp\u00e9rature"
@@ -636,14 +629,20 @@
             "total_watering_time": {
                 "name": "Temps d'arrosage total"
             },
+            "uv_runtime": {
+                "name": "Dur\u00e9e des UV"
+            },
             "voc": {
-                "name": "COV"
+                "name": "Compos\u00e9s organiques volatils"
             },
             "voltage": {
                 "name": "Tension"
             },
             "water_level": {
                 "name": "Niveau d'eau"
+            },
+            "water_time": {
+                "name": "Dur\u00e9e de la consommation d'eau"
             }
         },
         "switch": {
@@ -851,32 +850,6 @@
             "wide_dynamic_range": {
                 "name": "Large plage dynamique"
             }
-        }
-    },
-    "issues": {
-        "service_deprecation_turn_off": {
-            "description": "La prise en charge par Tuya du service vacuum.turn_off est obsol\u00e8te et sera supprim\u00e9e dans Home Assistant 2024.2 ; Veuillez ajuster tout automatisation ou script qui utilise le service pour appeler \u00e0 la place vacuum.stop et s\u00e9lectionnez soumettre ci-dessous pour marquer ce probl\u00e8me comme r\u00e9solu.",
-            "fix_flow": {
-                "step": {
-                    "confirm": {
-                        "description": "La prise en charge par Tuya du service vacuum.turn_off est obsol\u00e8te et sera supprim\u00e9e dans Home Assistant 2024.2 ; Veuillez ajuster tout automatisation ou script qui utilise le service pour appeler \u00e0 la place vacuum.stop et s\u00e9lectionnez soumettre ci-dessous pour marquer ce probl\u00e8me comme r\u00e9solu.",
-                        "title": "Tuya : Le support pour le service vacuum.turn_off est en cous de suppression"
-                    }
-                }
-            },
-            "title": "Tuya : Le support pour le service vacuum.turn_off est en cous de suppression"
-        },
-        "service_deprecation_turn_on": {
-            "description": "La prise en charge par Tuya du service vacuum.turn_on est obsol\u00e8te et sera supprim\u00e9e dans Home Assistant 2024.2 ; Veuillez ajuster tout automatisation ou script qui utilise le service pour appeler \u00e0 la place vacuum.start et s\u00e9lectionnez soumettre ci-dessous pour marquer ce probl\u00e8me comme r\u00e9solu.",
-            "fix_flow": {
-                "step": {
-                    "confirm": {
-                        "description": "La prise en charge par Tuya du service vacuum.turn_on est obsol\u00e8te et sera supprim\u00e9e dans Home Assistant 2024.2 ; Veuillez ajuster tout automatisation ou script qui utilise le service pour appeler \u00e0 la place vacuum.start et s\u00e9lectionnez soumettre ci-dessous pour marquer ce probl\u00e8me comme r\u00e9solu.",
-                        "title": "Tuya : Le support pour le service vacuum.turn_on est en cous de suppression"
-                    }
-                }
-            },
-            "title": "Tuya : Le support pour le service vacuum.turn_on est en cous de suppression"
         }
     }
 }

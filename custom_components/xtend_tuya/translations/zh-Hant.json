@@ -5,8 +5,7 @@
         },
         "error": {
             "invalid_auth": "\u8eab\u4efd\u9a57\u8b49\u7121\u6548",
-            "login_error": "\u767b\u5165\u932f\u8aa4 ({code})\uff1a{msg}",
-            "reauth_successful": "\u91cd\u65b0\u8a8d\u8b49\u6210\u529f"
+            "login_error": "\u767b\u5165\u932f\u8aa4 ({code})\uff1a{msg}"
         },
         "step": {
             "reauth_user_code": {
@@ -20,12 +19,7 @@
             },
             "user": {
                 "data": {
-                    "access_id": "Tuya IoT Access ID",
-                    "access_secret": "Tuya IoT \u5b58\u53d6\u79c1\u9470",
-                    "country_code": "\u570b\u5bb6",
-                    "password": "\u5bc6\u78bc",
-                    "user_code": "User Code",
-                    "username": "\u5e33\u865f"
+                    "user_code": "User Code"
                 },
                 "description": "\u8f38\u5165\u60a8\u7684 Smart Life \u6216 Tuya Smart \u4f7f\u7528\u8005\u4ee3\u78bc\u3002\n\n\u53ef\u4ee5\u65bc Smart Life \u61c9\u7528\u7a0b\u5f0f\u6216 Tuya Smart \u61c9\u7528\u7a0b\u5f0f\u7684 **\u8a2d\u5b9a** > **\u5e33\u865f\u8207\u5b89\u5168** \u756b\u9762\u4e2d\u627e\u5230\u6b64\u4ee3\u78bc\uff0c\u4e26\u5728 **\u4f7f\u7528\u8005\u4ee3\u78bc** \u6b04\u4f4d\u4e2d\u8f38\u5165\u6240\u986f\u793a\u7684\u4ee3\u78bc\u3002\u4f7f\u7528\u8005\u4ee3\u78bc\u5340\u5206\u5927\u5c0f\u5beb\uff0c\u8acb\u78ba\u8a8d\u5b8c\u5168\u6309\u7167\u61c9\u7528\u7a0b\u5f0f\u4e2d\u6240\u986f\u793a\u7684\u5167\u5bb9\u9032\u884c\u8f38\u5165\u3002"
             }
@@ -107,6 +101,20 @@
                 "name": "\u9580 3"
             }
         },
+        "event": {
+            "numbered_button": {
+                "name": "\u6309\u9215 {button_number}",
+                "state_attributes": {
+                    "event_type": {
+                        "state": {
+                            "click": "\u55ae\u6309",
+                            "double_click": "\u96d9\u6309",
+                            "press": "\u9577\u6309"
+                        }
+                    }
+                }
+            }
+        },
         "light": {
             "backlight": {
                 "name": "\u80cc\u5149"
@@ -125,6 +133,9 @@
             }
         },
         "number": {
+            "alarm_duration": {
+                "name": "\u8b66\u5831\u6301\u7e8c\u6642\u9593"
+            },
             "cloud_recipe": {
                 "name": "\u96f2\u7aef\u98df\u8b5c"
             },
@@ -179,6 +190,9 @@
             "sensitivity": {
                 "name": "\u9748\u654f\u5ea6"
             },
+            "target_dis_closest": {
+                "name": "\u6700\u8fd1\u76ee\u6a19\u8ddd\u96e2"
+            },
             "temperature": {
                 "name": "\u6eab\u5ea6"
             },
@@ -213,6 +227,20 @@
                     "0": "\u81ea\u52d5",
                     "1": "\u95dc\u9589",
                     "2": "\u958b\u555f"
+                }
+            },
+            "blanket_level": {
+                "state": {
+                    "level_1": "\u4f4e",
+                    "level_10": "\u9ad8",
+                    "level_2": "\u7b49\u7d1a 2",
+                    "level_3": "\u7b49\u7d1a 3",
+                    "level_4": "\u7b49\u7d1a 4",
+                    "level_5": "\u7b49\u7d1a 5",
+                    "level_6": "\u7b49\u7d1a 6",
+                    "level_7": "\u7b49\u7d1a 7",
+                    "level_8": "\u7b49\u7d1a 8",
+                    "level_9": "\u7b49\u7d1a 9"
                 }
             },
             "brightness": {
@@ -255,13 +283,6 @@
                 "state": {
                     "0": "\u4f4e\u654f\u611f\u5ea6",
                     "1": "\u9ad8\u654f\u611f\u5ea6"
-                }
-            },
-            "fan_angle": {
-                "state": {
-                    "30": "30\u00b0",
-                    "60": "60\u00b0",
-                    "90": "90\u00b0"
                 }
             },
             "fingerbot_mode": {
@@ -362,9 +383,9 @@
             "motion_sensitivity": {
                 "name": "\u52d5\u4f5c\u611f\u6e2c\u9748\u654f\u5ea6",
                 "state": {
-                    "0": "\u4f4e\u654f\u611f\u5ea6",
-                    "1": "\u4e2d\u654f\u611f\u5ea6",
-                    "2": "\u9ad8\u654f\u611f\u5ea6"
+                    "0": "\u4f4e",
+                    "1": "\u4e2d",
+                    "2": "\u9ad8"
                 }
             },
             "record_mode": {
@@ -467,6 +488,17 @@
                     "severe": "\u56b4\u91cd"
                 }
             },
+            "air_quality_index": {
+                "name": "\u7a7a\u6c23\u8cea\u91cf\u6307\u6578",
+                "state": {
+                    "level_1": "\u7b49\u7d1a 1",
+                    "level_2": "\u7b49\u7d1a 2",
+                    "level_3": "\u7b49\u7d1a 3",
+                    "level_4": "\u7b49\u7d1a 4",
+                    "level_5": "\u7b49\u7d1a 5",
+                    "level_6": "\u7b49\u7d1a 6"
+                }
+            },
             "battery": {
                 "name": "\u96fb\u91cf"
             },
@@ -496,6 +528,9 @@
             },
             "duster_cloth_life": {
                 "name": "\u9664\u5875\u5e03\u58fd\u547d"
+            },
+            "filter_duration": {
+                "name": "\u904e\u6ffe\u6301\u7e8c\u6642\u9593"
             },
             "filter_life": {
                 "name": "\u904e\u6ffe\u5668\u58fd\u547d"
@@ -566,6 +601,9 @@
             "power": {
                 "name": "\u96fb\u529b"
             },
+            "pump_time": {
+                "name": "\u6c34\u6cf5\u6301\u7e8c\u6642\u9593"
+            },
             "remaining_time": {
                 "name": "\u5269\u9918\u6642\u9593"
             },
@@ -593,21 +631,13 @@
                 }
             },
             "status": {
-                "name": "\u72c0\u614b",
-                "state": {
-                    "boiling_temp": "\u6cb8\u9a30\u6eab\u5ea6",
-                    "cooling": "\u51b7\u6c23",
-                    "heating": "\u6696\u6c23",
-                    "heating_temp": "\u52a0\u71b1\u6eab\u5ea6",
-                    "reserve_1": "\u9810\u7559 1",
-                    "reserve_2": "\u9810\u7559 2",
-                    "reserve_3": "\u9810\u7559 3",
-                    "standby": "\u5f85\u547d",
-                    "warm": "\u4fdd\u6eab"
-                }
+                "name": "\u72c0\u614b"
             },
             "temperature": {
                 "name": "\u6eab\u5ea6"
+            },
+            "temperature_external": {
+                "name": "\u63a2\u982d\u6eab\u5ea6"
             },
             "total_absorption_particles": {
                 "name": "\u9846\u7c92\u7269\u7e3d\u5438\u6536\u91cf"
@@ -636,14 +666,20 @@
             "total_watering_time": {
                 "name": "\u7e3d\u6f86\u6c34\u6642\u9593"
             },
+            "uv_runtime": {
+                "name": "UV \u904b\u4f5c\u6642\u9593"
+            },
             "voc": {
-                "name": "VOC"
+                "name": "\u63ee\u767c\u6027\u6709\u6a5f\u5316\u5408\u7269"
             },
             "voltage": {
                 "name": "\u96fb\u58d3"
             },
             "water_level": {
                 "name": "\u6c34\u4f4d"
+            },
+            "water_time": {
+                "name": "\u7528\u6c34\u6301\u7e8c\u6642\u9593"
             }
         },
         "switch": {
@@ -696,7 +732,7 @@
                 "name": "\u52a0\u6fd5"
             },
             "ionizer": {
-                "name": "\u975c\u96fb\u6d88\u9664"
+                "name": "\u8ca0\u96e2\u5b50"
             },
             "motion_alarm": {
                 "name": "\u52d5\u614b\u8b66\u5831"
@@ -854,32 +890,6 @@
             "wide_dynamic_range": {
                 "name": "\u5bec\u52d5\u614b\u7bc4\u570d"
             }
-        }
-    },
-    "issues": {
-        "service_deprecation_turn_off": {
-            "description": "Tuya \u6383\u5730\u6a5f\u5668\u4eba\u7684 vacuum.turn_off \u670d\u52d9\u5df2\u7d93\u505c\u6b62\u4f7f\u7528\uff0c\u5c07\u65bc Home Assistant 2024.2 \u7248\u4e2d\u9032\u884c\u79fb\u9664\uff1b\u8acb\u8abf\u6574\u4f7f\u7528\u8a72\u670d\u52d9\u7684\u81ea\u52d5\u5316\u6216\u8173\u672c\uff0c\u4e26\u9078\u64c7\u4e0b\u65b9\u7684\u50b3\u9001\u4ee5\u6a19\u793a\u554f\u984c\u5df2\u7372\u89e3\u6c7a\u3002",
-            "fix_flow": {
-                "step": {
-                    "confirm": {
-                        "description": "Tuya \u6383\u5730\u6a5f\u5668\u4eba\u7684 vacuum.turn_off \u670d\u52d9\u5df2\u7d93\u505c\u6b62\u4f7f\u7528\uff0c\u5c07\u65bc Home Assistant 2024.2 \u7248\u4e2d\u9032\u884c\u79fb\u9664\uff1b\u8acb\u8abf\u6574\u4f7f\u7528\u8a72\u670d\u52d9\u7684\u81ea\u52d5\u5316\u6216\u8173\u672c\uff0c\u4e26\u9078\u64c7\u4e0b\u65b9\u7684\u50b3\u9001\u4ee5\u6a19\u793a\u554f\u984c\u5df2\u7372\u89e3\u6c7a\u3002",
-                        "title": "Tuya \u6383\u5730\u6a5f\u5668\u4eba\u7684 vacuum.turn_off \u529f\u80fd\u5df2\u79fb\u9664"
-                    }
-                }
-            },
-            "title": "Tuya \u6383\u5730\u6a5f\u5668\u4eba\u7684 vacuum.turn_off \u529f\u80fd\u5df2\u79fb\u9664"
-        },
-        "service_deprecation_turn_on": {
-            "description": "Tuya \u6383\u5730\u6a5f\u5668\u4eba\u7684 vacuum.turn_on \u670d\u52d9\u5df2\u7d93\u505c\u6b62\u4f7f\u7528\uff0c\u5c07\u65bc Home Assistant 2024.2 \u7248\u4e2d\u9032\u884c\u79fb\u9664\uff1b\u8acb\u8abf\u6574\u4f7f\u7528\u8a72\u670d\u52d9\u7684\u81ea\u52d5\u5316\u6216\u8173\u672c\uff0c\u4e26\u9078\u64c7\u4e0b\u65b9\u7684\u50b3\u9001\u4ee5\u6a19\u793a\u554f\u984c\u5df2\u7372\u89e3\u6c7a\u3002",
-            "fix_flow": {
-                "step": {
-                    "confirm": {
-                        "description": "Tuya \u6383\u5730\u6a5f\u5668\u4eba\u7684 vacuum.turn_on \u670d\u52d9\u5df2\u7d93\u505c\u6b62\u4f7f\u7528\uff0c\u5c07\u65bc Home Assistant 2024.2 \u7248\u4e2d\u9032\u884c\u79fb\u9664\uff1b\u8acb\u8abf\u6574\u4f7f\u7528\u8a72\u670d\u52d9\u7684\u81ea\u52d5\u5316\u6216\u8173\u672c\uff0c\u4e26\u9078\u64c7\u4e0b\u65b9\u7684\u50b3\u9001\u4ee5\u6a19\u793a\u554f\u984c\u5df2\u7372\u89e3\u6c7a\u3002",
-                        "title": "Tuya \u6383\u5730\u6a5f\u5668\u4eba\u7684 vacuum.turn_on \u529f\u80fd\u5df2\u79fb\u9664"
-                    }
-                }
-            },
-            "title": "Tuya \u6383\u5730\u6a5f\u5668\u4eba\u7684 vacuum.turn_on \u529f\u80fd\u5df2\u79fb\u9664"
         }
     }
 }
