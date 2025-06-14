@@ -31,6 +31,15 @@ class XTAlarmEntityDescription(TuyaAlarmControlPanelEntityDescription):
     def __init__(self, *args, **kwargs):
         super(XTAlarmEntityDescription, self).__init__(*args, **kwargs)
 
+    def get_entity_instance(self, 
+                            device: XTDevice, 
+                            device_manager: MultiManager, 
+                            description: XTAlarmEntityDescription
+                            ) -> XTAlarmEntity:
+        return XTAlarmEntity(device=device, 
+                              device_manager=device_manager, 
+                              description=description)
+
 # All descriptions can be found here:
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
 ALARM: dict[str, tuple[XTAlarmEntityDescription, ...]] = {
@@ -60,7 +69,7 @@ async def async_setup_entry(
             if device := hass_data.manager.device_map.get(device_id, None):
                 if descriptions := merged_descriptors.get(device.category):
                     entities.extend(
-                        XTAlarmEntity(device, hass_data.manager, XTAlarmEntityDescription(**description.__dict__))
+                        XTAlarmEntity.get_entity_instance(description, device, hass_data.manager)
                         for description in descriptions
                         if description.key in device.status
                     )
@@ -83,3 +92,9 @@ class XTAlarmEntity(XTEntity, TuyaAlarmEntity):
     ) -> None:
         super(XTAlarmEntity, self).__init__(device, device_manager, description)
         super(XTEntity, self).__init__(device, device_manager, description) # type: ignore
+    
+    @staticmethod
+    def get_entity_instance(description: XTAlarmEntityDescription, device: XTDevice, device_manager: MultiManager) -> XTAlarmEntity:
+        if hasattr(description, "get_entity_instance") and callable(getattr(description, "get_entity_instance")):
+            return description.get_entity_instance(device, device_manager, description)
+        return XTAlarmEntity(device, device_manager, XTAlarmEntityDescription(**description.__dict__))

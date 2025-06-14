@@ -36,8 +36,14 @@ class XTBinarySensorEntityDescription(TuyaBinarySensorEntityDescription):
     # This DPCode represent the online status of a device
     device_online: bool = False
 
-    """ def __init__(self, *args, **kwargs):
-        super(XTBinarySensorEntityDescription, self).__init__(*args, **kwargs) """
+    def get_entity_instance(self, 
+                            device: XTDevice, 
+                            device_manager: MultiManager, 
+                            description: XTBinarySensorEntityDescription
+                            ) -> XTBinarySensorEntity:
+        return XTBinarySensorEntity(device=device, 
+                              device_manager=device_manager, 
+                              description=description)
 
 
 # Commonly used sensors
@@ -166,9 +172,7 @@ async def async_setup_entry(
                         dpcode = description.dpcode or description.key
                         if dpcode in device.status:
                             entities.append(
-                                XTBinarySensorEntity(
-                                    device, hass_data.manager, XTBinarySensorEntityDescription(**description.__dict__)
-                                )
+                                XTBinarySensorEntity.get_entity_instance(description, device, hass_data.manager)
                             )
 
         async_add_entities(entities)
@@ -213,3 +217,9 @@ class XTBinarySensorEntity(XTEntity, TuyaBinarySensorEntity):
         """Call when entity about to be added to hass."""
         await super().async_added_to_hass()
         self.is_on #Update the online status if needed
+    
+    @staticmethod
+    def get_entity_instance(description: XTBinarySensorEntityDescription, device: XTDevice, device_manager: MultiManager) -> XTBinarySensorEntity:
+        if hasattr(description, "get_entity_instance") and callable(getattr(description, "get_entity_instance")):
+            return description.get_entity_instance(device, device_manager, description)
+        return XTBinarySensorEntity(device, device_manager, XTBinarySensorEntityDescription(**description.__dict__))

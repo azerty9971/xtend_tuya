@@ -44,6 +44,15 @@ class XTCoverEntityDescription(TuyaCoverEntityDescription):
     # Additional attributes for XT specific functionality
     control_back_mode: str | None = None
 
+    def get_entity_instance(self, 
+                            device: XTDevice, 
+                            device_manager: MultiManager, 
+                            description: XTCoverEntityDescription
+                            ) -> XTCoverEntity:
+        return XTCoverEntity(device=device, 
+                              device_manager=device_manager, 
+                              description=description)
+
 COVERS: dict[str, tuple[XTCoverEntityDescription, ...]] = {
     # Curtain
     # Note: Multiple curtains isn't documented
@@ -132,7 +141,7 @@ async def async_setup_entry(
             if device := hass_data.manager.device_map.get(device_id):
                 if descriptions := merged_descriptors.get(device.category):
                     entities.extend(
-                        XTCoverEntity(device, hass_data.manager, XTCoverEntityDescription(**description.__dict__))
+                        XTCoverEntity.get_entity_instance(description, device, hass_data.manager)
                         for description in descriptions
                         if (
                             description.key in device.function
@@ -313,3 +322,8 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
             # Fall back to parent implementation if our approach doesn't work
             await super().async_stop_cover(**kwargs)
 
+    @staticmethod
+    def get_entity_instance(description: XTCoverEntityDescription, device: XTDevice, device_manager: MultiManager) -> XTCoverEntity:
+        if hasattr(description, "get_entity_instance") and callable(getattr(description, "get_entity_instance")):
+            return description.get_entity_instance(device, device_manager, description)
+        return XTCoverEntity(device, device_manager, XTCoverEntityDescription(**description.__dict__))

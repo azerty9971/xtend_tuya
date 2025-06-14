@@ -30,7 +30,15 @@ from .entity import (
 @dataclass(frozen=True)
 class XTTimeEntityDescription(TimeEntityDescription):
     """Describes a Tuya time."""
-    pass
+
+    def get_entity_instance(self, 
+                            device: XTDevice, 
+                            device_manager: MultiManager, 
+                            description: XTTimeEntityDescription
+                            ) -> XTTimeEntity:
+        return XTTimeEntity(device=device, 
+                              device_manager=device_manager, 
+                              description=description)
 
 TIMES: dict[str, tuple[XTTimeEntityDescription, ...]] = {
     
@@ -60,7 +68,7 @@ async def async_setup_entry(
             if device := hass_data.manager.device_map.get(device_id):
                 if descriptions := merged_descriptors.get(device.category):
                     entities.extend(
-                        XTTimeEntity(device, hass_data.manager, description)
+                        XTTimeEntity.get_entity_instance(description, device, hass_data.manager)
                         for description in descriptions
                         if description.key in device.status
                     )
@@ -101,3 +109,8 @@ class XTTimeEntity(XTEntity, TimeEntity): # type: ignore
         """Change the time."""
         raise NotImplementedError
     
+    @staticmethod
+    def get_entity_instance(description: XTTimeEntityDescription, device: XTDevice, device_manager: MultiManager) -> XTTimeEntity:
+        if hasattr(description, "get_entity_instance") and callable(getattr(description, "get_entity_instance")):
+            return description.get_entity_instance(device, device_manager, description)
+        return XTTimeEntity(device, device_manager, XTTimeEntityDescription(**description.__dict__))
