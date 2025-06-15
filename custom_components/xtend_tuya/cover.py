@@ -4,9 +4,11 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import asyncio
+from typing import Any
 
 from homeassistant.components.cover import (
     CoverDeviceClass,
+    ATTR_POSITION,
 )
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant, callback
@@ -36,6 +38,7 @@ from .ha_tuya_integration.tuya_integration_imports import (
 )
 from .entity import (
     XTEntity,
+    DPType,
 )
 
 @dataclass(frozen=True)
@@ -191,10 +194,14 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         device_manager.post_setup_callbacks.append(self.add_cover_open_close_option)
 
     @property
-    def is_cover_position_reversed(self) -> bool:
-        control_back_mode_dpcode = self.entity_description.control_back_mode
-        control_back_mode = self.device.status.get(control_back_mode_dpcode, "forward") if control_back_mode_dpcode else "forward"
-        return control_back_mode != "forward"
+    def is_cover_open_close_inverted(self) -> bool | None:
+        if is_reversed := self.device.status.get(XTDPCode.COVER_OPEN_CLOSE_IS_INVERTED):
+            if is_reversed == "no":
+                return False
+            elif is_reversed == "yes":
+                return True
+        return None
+        
 
     def add_cover_open_close_option(self) -> None:
         if self.device.get_preference(f"{XTDevice.XTDevicePreference.IS_A_COVER_DEVICE}") is None:
@@ -207,6 +214,96 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
                                                                                                       dp_id=0)
                 dispatcher_send(self.hass, TUYA_DISCOVERY_NEW, [self.device.id], XTDPCode.COVER_OPEN_CLOSE_IS_INVERTED)
 
+    @property
+    def current_cover_position(self) -> int | None:
+        if current_cover_position := super().current_cover_position:
+            if self.is_cover_open_close_inverted and self._current_position is not None:
+                return round( self._current_position.remap_value_to(current_cover_position, 0, 100, reverse=True))
+        return current_cover_position
+
+    @property
+    def is_closed(self) -> bool | None:
+        is_closed = super().is_closed
+        if self.is_cover_open_close_inverted:
+            return is_closed == False   #Invert the is_closed call
+        return is_closed
+    
+    def open_cover(self, **kwargs: Any) -> None:
+        """Open the cover."""
+        value: bool | str = True
+        computed_position = 100
+        if self.is_cover_open_close_inverted:
+            computed_position = 0
+        if self.find_dpcode(
+            self.entity_description.key, dptype=DPType.ENUM, prefer_function=True
+        ):
+            value = self.entity_description.open_instruction_value
+
+        commands: list[dict[str, str | int]] = [
+            {"code": self.entity_description.key, "value": value}
+        ]
+
+        if self._set_position is not None:
+            commands.append(
+                {
+                    "code": self._set_position.dpcode,
+                    "value": round(
+                        self._set_position.remap_value_from(computed_position, 0, 100, reverse=True),
+                    ),
+                }
+            )
+
+        self._send_command(commands)
+
+    def close_cover(self, **kwargs: Any) -> None:
+        """Close cover."""
+        value: bool | str = False
+        computed_position = 0
+        if self.is_cover_open_close_inverted:
+            computed_position = 100
+        if self.find_dpcode(
+            self.entity_description.key, dptype=DPType.ENUM, prefer_function=True
+        ):
+            value = self.entity_description.close_instruction_value
+
+        commands: list[dict[str, str | int]] = [
+            {"code": self.entity_description.key, "value": value}
+        ]
+
+        if self._set_position is not None:
+            commands.append(
+                {
+                    "code": self._set_position.dpcode,
+                    "value": round(
+                        self._set_position.remap_value_from(computed_position, 0, 100, reverse=True),
+                    ),
+                }
+            )
+
+        self._send_command(commands)
+    
+    def set_cover_position(self, **kwargs: Any) -> None:
+        """Move the cover to a specific position."""
+        computed_position = kwargs[ATTR_POSITION]
+        if self.is_cover_open_close_inverted:
+            computed_position = 100 - computed_position
+        if self._set_position is None:
+            raise RuntimeError(
+                "Cannot set position, device doesn't provide methods to set it"
+            )
+
+        self._send_command(
+            [
+                {
+                    "code": self._set_position.dpcode,
+                    "value": round(
+                        self._set_position.remap_value_from(
+                            computed_position, 0, 100, reverse=True
+                        )
+                    ),
+                }
+            ]
+        )
 
     @staticmethod
     def get_entity_instance(description: XTCoverEntityDescription, device: XTDevice, device_manager: MultiManager) -> XTCoverEntity:
