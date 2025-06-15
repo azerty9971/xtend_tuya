@@ -281,6 +281,7 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         ]
 
         if self._set_position is not None:
+            LOGGER.warning(f"Sending cover open: {self._set_position.remap_value_from(computed_position, 0, 100, reverse=True)}")
             commands.append(
                 {
                     "code": self._set_position.dpcode,
@@ -308,6 +309,7 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         ]
 
         if self._set_position is not None:
+            LOGGER.warning(f"Sending cover close: {self._set_position.remap_value_from(computed_position, 0, 100, reverse=True)}")
             commands.append(
                 {
                     "code": self._set_position.dpcode,
