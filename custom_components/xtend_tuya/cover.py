@@ -221,13 +221,6 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
             if self.is_cover_open_close_inverted and self._current_position is not None:
                 return round( self._current_position.remap_value_to(current_cover_position, 0, 100, reverse=True))
         return current_cover_position
-
-    @property
-    def is_closed(self) -> bool | None:
-        is_closed = super().is_closed
-        if self.is_cover_open_close_inverted:
-            return is_closed == False   #Invert the is_closed call
-        return is_closed
     
     def open_cover(self, **kwargs: Any) -> None:
         """Open the cover."""
