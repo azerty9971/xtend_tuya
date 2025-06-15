@@ -25,6 +25,9 @@ from .multi_manager.multi_manager import (
     MultiManager,
     XTDevice,
 )
+from .multi_manager.shared.shared_classes import (
+    XTDeviceStatusRange,
+)
 from .const import TUYA_DISCOVERY_NEW, XTDPCode, CROSS_CATEGORY_DEVICE_DESCRIPTOR
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaCoverEntity,
@@ -198,6 +201,10 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
             self.device.set_preference(f"{XTDevice.XTDevicePreference.IS_A_COVER_DEVICE}", True)
             if XTDPCode.COVER_OPEN_CLOSE_IS_INVERTED not in self.device.status:
                 self.device.status[XTDPCode.COVER_OPEN_CLOSE_IS_INVERTED] = "no"
+                self.device.status_range[XTDPCode.COVER_OPEN_CLOSE_IS_INVERTED] = XTDeviceStatusRange(code = XTDPCode.COVER_OPEN_CLOSE_IS_INVERTED,
+                                                                                                      type="String",
+                                                                                                      values="{}",
+                                                                                                      dp_id=0)
                 dispatcher_send(self.hass, TUYA_DISCOVERY_NEW, [self.device.id], XTDPCode.COVER_OPEN_CLOSE_IS_INVERTED)
 
 
