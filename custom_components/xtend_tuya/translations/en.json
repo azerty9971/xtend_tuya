@@ -1189,7 +1189,7 @@
         },
         "sensor": {
             "cover_open_close_is_inverted": {
-                "name": "Cover status inverted"
+                "name": "Cover controls inverted"
             },
             "air_quality_index": {
                 "name": "Air quality index",
@@ -2104,7 +2104,7 @@
         },
         "switch": {
             "cover_open_close_is_inverted": {
-                "name": "Invert cover status"
+                "name": "Invert cover controls"
             },
             "key_rec": {
                 "name": "Key tone"
