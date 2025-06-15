@@ -17,7 +17,7 @@ from .multi_manager.multi_manager import (
     MultiManager,
     XTDevice,
 )
-from .const import TUYA_DISCOVERY_NEW, XTDPCode
+from .const import TUYA_DISCOVERY_NEW, XTDPCode, CROSS_CATEGORY_DEVICE_DESCRIPTOR
 from .entity import (
     XTEntity,
 )
@@ -248,7 +248,7 @@ async def async_setup_entry(
         merged_descriptors = merge_device_descriptors(merged_descriptors, new_descriptor)
 
     @callback
-    def async_discover_device(device_map) -> None:
+    def async_discover_device(device_map, restrict_dpcode: str | None = None) -> None:
         """Discover and add a discovered Tuya select."""
         if hass_data.manager is None:
             return
@@ -260,7 +260,13 @@ async def async_setup_entry(
                     entities.extend(
                         XTSelectEntity.get_entity_instance(description, device, hass_data.manager)
                         for description in descriptions
-                        if description.key in device.status
+                        if description.key in device.status and (restrict_dpcode is None or restrict_dpcode == description.key)
+                    )
+                if descriptions := merged_descriptors.get(CROSS_CATEGORY_DEVICE_DESCRIPTOR):
+                    entities.extend(
+                        XTSelectEntity.get_entity_instance(description, device, hass_data.manager)
+                        for description in descriptions
+                        if description.key in device.status and (restrict_dpcode is None or restrict_dpcode == description.key)
                     )
 
         async_add_entities(entities)

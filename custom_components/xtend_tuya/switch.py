@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 from homeassistant.const import EntityCategory, Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
@@ -16,7 +18,7 @@ from .multi_manager.multi_manager import (
     MultiManager,
     XTDevice,
 )
-from .const import TUYA_DISCOVERY_NEW, XTDPCode
+from .const import TUYA_DISCOVERY_NEW, XTDPCode, CROSS_CATEGORY_DEVICE_DESCRIPTOR
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaSwitchEntity,
     TuyaSwitchEntityDescription,
@@ -27,6 +29,9 @@ from .entity import (
 
 class XTSwitchEntityDescription(TuyaSwitchEntityDescription, frozen_or_thawed=True):
     override_tuya: bool = False
+    dont_send_to_cloud: bool = False
+    on_value: Any = None
+    off_value: Any = None
 
     def get_entity_instance(self, 
                             device: XTDevice, 
@@ -41,6 +46,26 @@ class XTSwitchEntityDescription(TuyaSwitchEntityDescription, frozen_or_thawed=Tr
 # default instruction set of each category end up being a Switch.
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
 SWITCHES: dict[str, tuple[XTSwitchEntityDescription, ...]] = {
+    CROSS_CATEGORY_DEVICE_DESCRIPTOR: (
+        XTSwitchEntityDescription(
+            key=XTDPCode.XT_COVER_INVERT_CONTROL,
+            translation_key="xt_cover_invert_control",
+            entity_category=EntityCategory.CONFIG,
+            dont_send_to_cloud=True,
+            on_value="yes",
+            off_value="no",
+            entity_registry_visible_default=False,
+        ),
+        XTSwitchEntityDescription(
+            key=XTDPCode.XT_COVER_INVERT_STATUS,
+            translation_key="xt_cover_invert_status",
+            entity_category=EntityCategory.CONFIG,
+            dont_send_to_cloud=True,
+            on_value="yes",
+            off_value="no",
+            entity_registry_visible_default=False,
+        ),
+    ),
     "cwwsq": (
         XTSwitchEntityDescription(
             key=XTDPCode.KEY_REC,
@@ -394,7 +419,7 @@ async def async_setup_entry(
         merged_descriptors = merge_device_descriptors(merged_descriptors, new_descriptor)
 
     @callback
-    def async_discover_device(device_map) -> None:
+    def async_discover_device(device_map, restrict_dpcode: str | None = None) -> None:
         """Discover and add a discovered tuya sensor."""
         if hass_data.manager is None:
             return
@@ -406,7 +431,13 @@ async def async_setup_entry(
                     entities.extend(
                         XTSwitchEntity.get_entity_instance(description, device, hass_data.manager)
                         for description in descriptions
-                        if description.key in device.status
+                        if description.key in device.status and (restrict_dpcode is None or restrict_dpcode == description.key)
+                    )
+                if descriptions := merged_descriptors.get(CROSS_CATEGORY_DEVICE_DESCRIPTOR):
+                    entities.extend(
+                        XTSwitchEntity.get_entity_instance(description, device, hass_data.manager)
+                        for description in descriptions
+                        if description.key in device.status and (restrict_dpcode is None or restrict_dpcode == description.key)
                     )
 
         async_add_entities(entities)
@@ -421,6 +452,7 @@ async def async_setup_entry(
 
 class XTSwitchEntity(XTEntity, TuyaSwitchEntity):
     """XT Switch Device."""
+    entity_description: XTSwitchEntityDescription
 
     def __init__(
         self,
@@ -433,8 +465,54 @@ class XTSwitchEntity(XTEntity, TuyaSwitchEntity):
         super(XTEntity, self).__init__(device, device_manager, description) # type: ignore
         self.device = device
         self.device_manager = device_manager
-        self.entity_description = description
+        self.entity_description = description # type: ignore
     
+    @property
+    def is_on(self) -> bool:
+        """Return true if switch is on."""
+        current_value = self.device.status.get(self.entity_description.key, False)
+        if self.entity_description.on_value is not None and self.entity_description.off_value is not None:
+            if self.entity_description.on_value == current_value:
+                return True
+            if self.entity_description.off_value == current_value:
+                return False
+        elif self.entity_description.on_value is not None:
+            if self.entity_description.on_value == current_value:
+                return True
+            else:
+                return False
+        elif self.entity_description.off_value is not None:
+            if self.entity_description.off_value == current_value:
+                return False
+            else:
+                return True
+        
+        return super().is_on
+        
+
+    def turn_on(self, **kwargs: Any) -> None:
+        """Turn the switch on."""
+        if self.entity_description.dont_send_to_cloud:
+            if self.entity_description.on_value is not None:
+                self.device.status[self.entity_description.key] = self.entity_description.on_value
+            else:
+                self.device.status[self.entity_description.key] = True
+            self.device_manager.multi_device_listener.update_device(self.device, [self.entity_description.key])
+        else:
+            super().turn_on(**kwargs)
+
+
+    def turn_off(self, **kwargs: Any) -> None:
+        """Turn the switch off."""
+        if self.entity_description.dont_send_to_cloud:
+            if self.entity_description.off_value is not None:
+                self.device.status[self.entity_description.key] = self.entity_description.off_value
+            else:
+                self.device.status[self.entity_description.key] = False
+            self.device_manager.multi_device_listener.update_device(self.device, [self.entity_description.key])
+        else:
+            super().turn_off(**kwargs)
+
     @staticmethod
     def get_entity_instance(description: XTSwitchEntityDescription, device: XTDevice, device_manager: MultiManager) -> XTSwitchEntity:
         if hasattr(description, "get_entity_instance") and callable(getattr(description, "get_entity_instance")):

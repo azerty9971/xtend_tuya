@@ -328,7 +328,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                 #Unlocking of the door
                 if self.call_door_open(device, api):
                     return True
-        if manual_unlock_code := cast(list[XTDPCode], device.get_preference(f"manual_unlock_command")):
+        if manual_unlock_code := cast(list[XTDPCode], device.get_preference(f"{XTDevice.XTDevicePreference.LOCK_MANUAL_UNLOCK_COMMAND}")):
             commands: list[dict[str, Any]] = []
             for dpcode in manual_unlock_code:
                 commands.append({"code": dpcode, "value": device.status.get(dpcode, True)})
@@ -350,11 +350,11 @@ class XTIOTDeviceManager(TuyaDeviceManager):
     
     def get_supported_unlock_types(self, device: XTDevice, api: XTIOTOpenAPI) -> list[str]:
         supported_unlock_types: list[str] = []
-        api_to_use = cast(XTIOTOpenAPI, device.get_preference(f"{MESSAGE_SOURCE_TUYA_IOT}.XTIOTDeviceManager.get_supported_unlock_types", api))
+        api_to_use = cast(XTIOTOpenAPI, device.get_preference(f"{MESSAGE_SOURCE_TUYA_IOT}{XTDevice.XTDevicePreference.LOCK_GET_SUPPORTED_UNLOCK_TYPES}", api))
         remote_unlock_types = api_to_use.get(f"/v1.0/devices/{device.id}/door-lock/remote-unlocks")
         self.multi_manager.device_watcher.report_message(device.id, f"API remote unlock types: {remote_unlock_types}")
         if remote_unlock_types.get("success", False):
-            device.set_preference(f"{MESSAGE_SOURCE_TUYA_IOT}.XTIOTDeviceManager.get_supported_unlock_types", api_to_use)
+            device.set_preference(f"{MESSAGE_SOURCE_TUYA_IOT}{XTDevice.XTDevicePreference.LOCK_GET_SUPPORTED_UNLOCK_TYPES}", api_to_use)
             results: list[dict] = remote_unlock_types.get("result", [])
             for result in results:
                 if result.get("open", False):
@@ -363,11 +363,11 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         return supported_unlock_types
 
     def get_door_lock_password_ticket(self, device: XTDevice, api: XTIOTOpenAPI) -> str | None:
-        api_to_use = cast(XTIOTOpenAPI, device.get_preference(f"{MESSAGE_SOURCE_TUYA_IOT}.XTIOTDeviceManager.get_door_lock_password_ticket", api))
+        api_to_use = cast(XTIOTOpenAPI, device.get_preference(f"{MESSAGE_SOURCE_TUYA_IOT}{XTDevice.XTDevicePreference.LOCK_GET_DOOR_LOCK_PASSWORD_TICKET}", api))
         ticket = api_to_use.post(f"/v1.0/devices/{device.id}/door-lock/password-ticket")
         self.multi_manager.device_watcher.report_message(device.id, f"API remote unlock ticket: {ticket}")
         if ticket.get("success", False):
-            device.set_preference(f"{MESSAGE_SOURCE_TUYA_IOT}.XTIOTDeviceManager.get_door_lock_password_ticket", api_to_use)
+            device.set_preference(f"{MESSAGE_SOURCE_TUYA_IOT}{XTDevice.XTDevicePreference.LOCK_GET_DOOR_LOCK_PASSWORD_TICKET}", api_to_use)
             result: dict[str, Any] = ticket.get("result", {})
             if ticket_id := result.get("ticket_id", None):
                 return ticket_id
@@ -375,20 +375,20 @@ class XTIOTDeviceManager(TuyaDeviceManager):
     
     def call_door_operate(self, device: XTDevice, open: str, api: XTIOTOpenAPI) -> bool:
         if ticket_id := self.get_door_lock_password_ticket(device, api):
-            api_to_use = cast(XTIOTOpenAPI, device.get_preference(f"{MESSAGE_SOURCE_TUYA_IOT}.XTIOTDeviceManager.call_door_operate", api))
+            api_to_use = cast(XTIOTOpenAPI, device.get_preference(f"{MESSAGE_SOURCE_TUYA_IOT}{XTDevice.XTDevicePreference.LOCK_CALL_DOOR_OPERATE}", api))
             lock_operation = api_to_use.post(f"/v1.0/smart-lock/devices/{device.id}/password-free/door-operate", {"ticket_id": ticket_id, "open": open})
             self.multi_manager.device_watcher.report_message(device.id, f"API call_door_operate result: {lock_operation}")
             if lock_operation.get("success", False):
-                device.set_preference(f"{MESSAGE_SOURCE_TUYA_IOT}.XTIOTDeviceManager.call_door_operate", api_to_use)
+                device.set_preference(f"{MESSAGE_SOURCE_TUYA_IOT}{XTDevice.XTDevicePreference.LOCK_CALL_DOOR_OPERATE}", api_to_use)
                 return True
         return False
     
     def call_door_open(self, device: XTDevice, api: XTIOTOpenAPI) -> bool:
         if ticket_id := self.get_door_lock_password_ticket(device, api):
-            api_to_use = cast(XTIOTOpenAPI, device.get_preference(f"{MESSAGE_SOURCE_TUYA_IOT}.XTIOTDeviceManager.call_door_open", api))
+            api_to_use = cast(XTIOTOpenAPI, device.get_preference(f"{MESSAGE_SOURCE_TUYA_IOT}{XTDevice.XTDevicePreference.LOCK_CALL_DOOR_OPEN}", api))
             lock_operation = api.post(f"/v1.0/devices/{device.id}/door-lock/password-free/open-door", {"ticket_id": ticket_id})
             self.multi_manager.device_watcher.report_message(device.id, f"API call_door_open result: {lock_operation}")
             if lock_operation.get("success", False):
-                device.set_preference(f"{MESSAGE_SOURCE_TUYA_IOT}.XTIOTDeviceManager.call_door_open", api_to_use)
+                device.set_preference(f"{MESSAGE_SOURCE_TUYA_IOT}{XTDevice.XTDevicePreference.LOCK_CALL_DOOR_OPEN}", api_to_use)
                 return True
         return False
