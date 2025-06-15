@@ -242,25 +242,27 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         return current_cover_position
     
     @property
+    def real_current_cover_position(self) -> int | None:
+        """Return cover current position."""
+        if self._current_position is None:
+            return None
+
+        if (position := self.device.status.get(self._current_position.dpcode)) is None:
+            return None
+
+        return round(
+            self._current_position.remap_value_to(position, 0, 100, reverse=True)
+        )
+    
+    @property
     def is_closed(self) -> bool | None:
         """Return true if cover is closed."""
         computed_position = 0
-        if self.is_cover_control_inverted:
+        if self.is_cover_status_inverted:
             computed_position = 100
-        if (
-            self.entity_description.current_state is not None
-            and (
-                current_state := self.device.status.get(
-                    self.entity_description.current_state
-                )
-            )
-            is not None
-        ):
-            return self.entity_description.current_state_inverse is not (
-                current_state in (True, "fully_close")
-            )
 
-        if (position := self.current_cover_position) is not None:
+        position = self.real_current_cover_position
+        if position is not None:
             return position == computed_position
 
         return None
@@ -281,6 +283,7 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         ]
 
         if self._set_position is not None:
+            LOGGER.warning(f"Sending cover open: {self._set_position.remap_value_from(computed_position, 0, 100, reverse=True)}")
             commands.append(
                 {
                     "code": self._set_position.dpcode,
@@ -308,6 +311,7 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         ]
 
         if self._set_position is not None:
+            LOGGER.warning(f"Sending cover close: {self._set_position.remap_value_from(computed_position, 0, 100, reverse=True)}")
             commands.append(
                 {
                     "code": self._set_position.dpcode,
