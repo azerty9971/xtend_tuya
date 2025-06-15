@@ -287,7 +287,6 @@ class XTDPCode(StrEnum):
     COUNTDOWN_8 = "countdown_8"
     COUNTDOWN_LEFT = "countdown_left"
     COUNTDOWN_SET = "countdown_set"  # Countdown setting
-    COVER_OPEN_CLOSE_IS_INVERTED = "cover_open_close_is_inverted"
     CRY_DETECTION_SWITCH = "cry_detection_switch"
     CTIME = "Ctime"
     CTIME2 = "CTime2"
@@ -729,6 +728,8 @@ class XTDPCode(StrEnum):
     WORK_STAT = "work_stat"
     WORK_STATE = "work_state"
     WORK_STATUS = "WorkStatus"
+    XT_COVER_INVERT_CONTROL = "XT_COVER_INVERT_CONTROL"
+    XT_COVER_INVERT_STATUS = "xt_cover_invert_status"
 
 @dataclass
 class Country:

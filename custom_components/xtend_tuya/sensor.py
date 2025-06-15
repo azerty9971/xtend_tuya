@@ -802,8 +802,15 @@ LOCK_SENSORS: tuple[XTSensorEntityDescription, ...] = (
 SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
     CROSS_CATEGORY_DEVICE_DESCRIPTOR: (
         XTSensorEntityDescription(
-            key=XTDPCode.COVER_OPEN_CLOSE_IS_INVERTED,
-            translation_key="cover_open_close_is_inverted",
+            key=XTDPCode.XT_COVER_INVERT_CONTROL,
+            translation_key="xt_cover_invert_control",
+            entity_registry_enabled_default=True,
+            entity_registry_visible_default=True,
+            restoredata=True,
+        ),
+        XTSensorEntityDescription(
+            key=XTDPCode.XT_COVER_INVERT_STATUS,
+            translation_key="xt_cover_invert_status",
             entity_registry_enabled_default=True,
             entity_registry_visible_default=True,
             restoredata=True,

@@ -194,63 +194,65 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         device_manager.post_setup_callbacks.append(self.add_cover_open_close_option)
 
     @property
-    def is_cover_open_close_inverted(self) -> bool | None:
-        if is_reversed := self.device.status.get(XTDPCode.COVER_OPEN_CLOSE_IS_INVERTED):
+    def is_cover_control_inverted(self) -> bool | None:
+        if is_reversed := self.device.status.get(XTDPCode.XT_COVER_INVERT_CONTROL):
             if is_reversed == "no":
                 return False
             elif is_reversed == "yes":
                 return True
         return None
         
+    @property
+    def is_cover_status_inverted(self) -> bool | None:
+        if is_reversed := self.device.status.get(XTDPCode.XT_COVER_INVERT_STATUS):
+            if is_reversed == "no":
+                return False
+            elif is_reversed == "yes":
+                return True
+        return None
 
     def add_cover_open_close_option(self) -> None:
         if self.device.get_preference(f"{XTDevice.XTDevicePreference.IS_A_COVER_DEVICE}") is None:
             self.device.set_preference(f"{XTDevice.XTDevicePreference.IS_A_COVER_DEVICE}", True)
-            if XTDPCode.COVER_OPEN_CLOSE_IS_INVERTED not in self.device.status:
-                self.device.status[XTDPCode.COVER_OPEN_CLOSE_IS_INVERTED] = "no"
-                self.device.status_range[XTDPCode.COVER_OPEN_CLOSE_IS_INVERTED] = XTDeviceStatusRange(code = XTDPCode.COVER_OPEN_CLOSE_IS_INVERTED,
+            send_update = False
+            if XTDPCode.XT_COVER_INVERT_CONTROL not in self.device.status:
+                self.device.status[XTDPCode.XT_COVER_INVERT_CONTROL] = "no"
+                self.device.status_range[XTDPCode.XT_COVER_INVERT_CONTROL] = XTDeviceStatusRange(code = XTDPCode.XT_COVER_INVERT_CONTROL,
                                                                                                       type=DPType.STRING,
                                                                                                       values="{}",
                                                                                                       dp_id=0)
-                dispatcher_send(self.hass, TUYA_DISCOVERY_NEW, [self.device.id], XTDPCode.COVER_OPEN_CLOSE_IS_INVERTED)
+                send_update = True
+            if XTDPCode.XT_COVER_INVERT_STATUS not in self.device.status:
+                self.device.status[XTDPCode.XT_COVER_INVERT_STATUS] = "no"
+                self.device.status_range[XTDPCode.XT_COVER_INVERT_STATUS] = XTDeviceStatusRange(code = XTDPCode.XT_COVER_INVERT_STATUS,
+                                                                                                      type=DPType.STRING,
+                                                                                                      values="{}",
+                                                                                                      dp_id=0)
+                send_update = True
+            if send_update:
+                dispatcher_send(self.hass, TUYA_DISCOVERY_NEW, [self.device.id], XTDPCode.XT_COVER_INVERT_CONTROL)
+                dispatcher_send(self.hass, TUYA_DISCOVERY_NEW, [self.device.id], XTDPCode.XT_COVER_INVERT_STATUS)
 
     @property
     def current_cover_position(self) -> int | None:
         current_cover_position = super().current_cover_position
         if current_cover_position is not None:
-            if self.is_cover_open_close_inverted and self._current_position is not None:
+            if self.is_cover_control_inverted and self._current_position is not None:
                 return round( self._current_position.remap_value_to(current_cover_position, 0, 100, reverse=True))
         return current_cover_position
     
-    # @property
-    # def is_closed(self) -> bool | None:
-    #     """Return true if cover is closed."""
-    #     computed_position = 0
-    #     if self.is_cover_open_close_inverted:
-    #         computed_position = 100
-    #     if (
-    #         self.entity_description.current_state is not None
-    #         and (
-    #             current_state := self.device.status.get(
-    #                 self.entity_description.current_state
-    #             )
-    #         )
-    #         is not None
-    #     ):
-    #         return self.entity_description.current_state_inverse is not (
-    #             current_state in (True, "fully_close")
-    #         )
-
-    #     if (position := self.current_cover_position) is not None:
-    #         return position == computed_position
-
-    #     return None
+    @property
+    def is_closed(self) -> bool | None:
+        is_closed = super().is_closed
+        if is_closed is not None and self.is_cover_status_inverted:
+            return is_closed is False
+        return is_closed
 
     def open_cover(self, **kwargs: Any) -> None:
         """Open the cover."""
         value: bool | str = True
         computed_position = 100
-        if self.is_cover_open_close_inverted:
+        if self.is_cover_control_inverted:
             computed_position = 0
         if self.find_dpcode(
             self.entity_description.key, dptype=DPType.ENUM, prefer_function=True
@@ -277,7 +279,7 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         """Close cover."""
         value: bool | str = False
         computed_position = 0
-        if self.is_cover_open_close_inverted:
+        if self.is_cover_control_inverted:
             computed_position = 100
         if self.find_dpcode(
             self.entity_description.key, dptype=DPType.ENUM, prefer_function=True
@@ -303,7 +305,7 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
     def set_cover_position(self, **kwargs: Any) -> None:
         """Move the cover to a specific position."""
         computed_position = kwargs[ATTR_POSITION]
-        if self.is_cover_open_close_inverted:
+        if self.is_cover_control_inverted:
             computed_position = 100 - computed_position
         if self._set_position is None:
             raise RuntimeError(
