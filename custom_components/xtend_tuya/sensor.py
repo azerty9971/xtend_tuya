@@ -1454,6 +1454,8 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor): # type: ignore
 
     async def async_added_to_hass(self) -> None:
         """Call when entity about to be added to hass."""
+        await super().async_added_to_hass()
+        
         async def reset_status_daily(now: datetime.datetime) -> None:
             should_reset = False
             if self.entity_description.reset_daily:
@@ -1491,15 +1493,9 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor): # type: ignore
                 )
             )
         
-        if self.entity_description.key == XTDPCode.COVER_OPEN_CLOSE_IS_INVERTED:
-            LOGGER.warning(f"Checking restoredata: {self.entity_description.restoredata}")
         if self.entity_description.restoredata:
             self._restored_data = await self.async_get_last_sensor_data()
-            if self.entity_description.key == XTDPCode.COVER_OPEN_CLOSE_IS_INVERTED:
-                LOGGER.warning(f"self._restored_data: {self._restored_data.as_dict() if self._restored_data is not None else "NONE"}")
             if self._restored_data is not None and self._restored_data.native_value is not None:
-                if self.entity_description.key == XTDPCode.COVER_OPEN_CLOSE_IS_INVERTED:
-                    LOGGER.warning(f"Restoring XTDPCode.COVER_OPEN_CLOSE_IS_INVERTED: {self._restored_data.native_value}")
                 # Scale integer/float value
                 if isinstance(self._type_data, TuyaIntegerTypeData):
                     scaled_value_back = self._type_data.scale_value_back(self._restored_data.native_value) # type: ignore
@@ -1507,7 +1503,6 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor): # type: ignore
 
                 if device := self.device_manager.device_map.get(self.device.id, None):
                     device.status[self.entity_description.key] = self._restored_data.native_value
-        await super().async_added_to_hass()
     
     @callback
     async def _on_state_change_event(self, event: Event[EventStateChangedData]):
