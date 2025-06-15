@@ -804,15 +804,13 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
         XTSensorEntityDescription(
             key=XTDPCode.XT_COVER_INVERT_CONTROL,
             translation_key="xt_cover_invert_control",
-            entity_registry_enabled_default=True,
-            entity_registry_visible_default=True,
+            entity_registry_visible_default=False,
             restoredata=True,
         ),
         XTSensorEntityDescription(
             key=XTDPCode.XT_COVER_INVERT_STATUS,
             translation_key="xt_cover_invert_status",
-            entity_registry_enabled_default=True,
-            entity_registry_visible_default=True,
+            entity_registry_visible_default=False,
             restoredata=True,
         ),
     ),

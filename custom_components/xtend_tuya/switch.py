@@ -54,6 +54,7 @@ SWITCHES: dict[str, tuple[XTSwitchEntityDescription, ...]] = {
             dont_send_to_cloud=True,
             on_value="yes",
             off_value="no",
+            entity_registry_visible_default=False,
         ),
         XTSwitchEntityDescription(
             key=XTDPCode.XT_COVER_INVERT_STATUS,
@@ -62,6 +63,7 @@ SWITCHES: dict[str, tuple[XTSwitchEntityDescription, ...]] = {
             dont_send_to_cloud=True,
             on_value="yes",
             off_value="no",
+            entity_registry_visible_default=False,
         ),
     ),
     "cwwsq": (
