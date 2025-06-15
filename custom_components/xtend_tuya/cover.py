@@ -237,7 +237,7 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
     def current_cover_position(self) -> int | None:
         current_cover_position = super().current_cover_position
         if current_cover_position is not None:
-            if self.is_cover_control_inverted and self._current_position is not None:
+            if self.is_cover_status_inverted and self._current_position is not None:
                 return round( self._current_position.remap_value_to(current_cover_position, 0, 100, reverse=True))
         return current_cover_position
     
