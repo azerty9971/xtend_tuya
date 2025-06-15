@@ -235,8 +235,6 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
 
     @property
     def current_cover_position(self) -> int | None:
-        if self.device.id == "bf9c368e75667d66fdc7at":
-            return 25
         current_cover_position = super().current_cover_position
         if current_cover_position is not None:
             if self.is_cover_status_inverted and self._current_position is not None:
@@ -245,10 +243,34 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
     
     @property
     def is_closed(self) -> bool | None:
-        is_closed = super().is_closed
-        if is_closed is not None and self.is_cover_status_inverted:
-            return is_closed is False
-        return is_closed
+        """Return true if cover is closed."""
+        computed_position = 0
+        if self.is_cover_control_inverted:
+            computed_position = 100
+        if (
+            self.entity_description.current_state is not None
+            and (
+                current_state := self.device.status.get(
+                    self.entity_description.current_state
+                )
+            )
+            is not None
+        ):
+            return self.entity_description.current_state_inverse is not (
+                current_state in (True, "fully_close")
+            )
+
+        if (position := self.current_cover_position) is not None:
+            return position == computed_position
+
+        return None
+
+    # @property
+    # def is_closed(self) -> bool | None:
+    #     is_closed = super().is_closed
+    #     if is_closed is not None and self.is_cover_status_inverted:
+    #         return is_closed is False
+    #     return is_closed
 
     def open_cover(self, **kwargs: Any) -> None:
         """Open the cover."""
