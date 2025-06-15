@@ -728,7 +728,7 @@ class XTDPCode(StrEnum):
     WORK_STAT = "work_stat"
     WORK_STATE = "work_state"
     WORK_STATUS = "WorkStatus"
-    XT_COVER_INVERT_CONTROL = "XT_COVER_INVERT_CONTROL"
+    XT_COVER_INVERT_CONTROL = "xt_cover_invert_control"
     XT_COVER_INVERT_STATUS = "xt_cover_invert_status"
 
 @dataclass
