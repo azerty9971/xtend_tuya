@@ -42,6 +42,7 @@ from .const import (
     DPType,
     VirtualStates,  # noqa: F401
     XTDeviceEntityFunctions,
+    CROSS_CATEGORY_DEVICE_DESCRIPTOR,
 )
 from .entity import (
     XTEntity,
@@ -68,6 +69,7 @@ class XTSensorEntityDescription(TuyaSensorEntityDescription):
     reset_yearly: bool = False
     reset_after_x_seconds: int = 0
     restoredata: bool = False
+    refresh_device_after_load: bool = False
     recalculate_scale_for_percentage: bool = False
     recalculate_scale_for_percentage_threshold: int = 100 #Maximum percentage that the sensor can display (default = 100%)
 
@@ -799,6 +801,21 @@ LOCK_SENSORS: tuple[XTSensorEntityDescription, ...] = (
 # end up being a sensor.
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
 SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
+    CROSS_CATEGORY_DEVICE_DESCRIPTOR: (
+        XTSensorEntityDescription(
+            key=XTDPCode.XT_COVER_INVERT_CONTROL,
+            translation_key="xt_cover_invert_control",
+            entity_registry_visible_default=False,
+            restoredata=True,
+        ),
+        XTSensorEntityDescription(
+            key=XTDPCode.XT_COVER_INVERT_STATUS,
+            translation_key="xt_cover_invert_status",
+            entity_registry_visible_default=False,
+            restoredata=True,
+            refresh_device_after_load=True,
+        ),
+    ),
     "cl": (
         *BATTERY_SENSORS,
     ),
@@ -1315,7 +1332,7 @@ async def async_setup_entry(
         merged_descriptors = merge_device_descriptors(merged_descriptors, new_descriptor)
 
     @callback
-    def async_discover_device(device_map) -> None:
+    def async_discover_device(device_map, restrict_dpcode: str | None = None) -> None:
         """Discover and add a discovered Tuya sensor."""
         if hass_data.manager is None:
             return
@@ -1327,7 +1344,13 @@ async def async_setup_entry(
                     entities.extend(
                         XTSensorEntity.get_entity_instance(description, device, hass_data.manager)
                         for description in descriptions
-                        if description.key in device.status
+                        if description.key in device.status and (restrict_dpcode is None or restrict_dpcode == description.key)
+                    )
+                if descriptions := merged_descriptors.get(CROSS_CATEGORY_DEVICE_DESCRIPTOR):
+                    entities.extend(
+                        XTSensorEntity.get_entity_instance(description, device, hass_data.manager)
+                        for description in descriptions
+                        if description.key in device.status and (restrict_dpcode is None or restrict_dpcode == description.key)
                     )
 
         async_add_entities(entities)
@@ -1439,7 +1462,7 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor): # type: ignore
     async def async_added_to_hass(self) -> None:
         """Call when entity about to be added to hass."""
         await super().async_added_to_hass()
-
+        
         async def reset_status_daily(now: datetime.datetime) -> None:
             should_reset = False
             if self.entity_description.reset_daily:
@@ -1487,6 +1510,10 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor): # type: ignore
 
                 if device := self.device_manager.device_map.get(self.device.id, None):
                     device.status[self.entity_description.key] = self._restored_data.native_value
+                    self.async_write_ha_state()
+        
+        if self.entity_description.refresh_device_after_load:
+            self.device_manager.multi_device_listener.update_device(self.device, [self.entity_description.key])
     
     @callback
     async def _on_state_change_event(self, event: Event[EventStateChangedData]):

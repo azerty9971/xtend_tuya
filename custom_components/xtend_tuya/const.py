@@ -57,6 +57,8 @@ SMARTLIFE_APP = "smartlife"
 MESSAGE_SOURCE_TUYA_IOT = "tuya_iot"
 MESSAGE_SOURCE_TUYA_SHARING = "tuya_sharing"
 
+CROSS_CATEGORY_DEVICE_DESCRIPTOR: str = "cross_category_device_descriptor"
+
 PLATFORMS = [
     Platform.ALARM_CONTROL_PANEL,
     Platform.BINARY_SENSOR,
@@ -726,6 +728,8 @@ class XTDPCode(StrEnum):
     WORK_STAT = "work_stat"
     WORK_STATE = "work_state"
     WORK_STATUS = "WorkStatus"
+    XT_COVER_INVERT_CONTROL = "XT_COVER_INVERT_CONTROL"
+    XT_COVER_INVERT_STATUS = "xt_cover_invert_status"
 
 @dataclass
 class Country:

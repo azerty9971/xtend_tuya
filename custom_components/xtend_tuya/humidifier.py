@@ -18,7 +18,7 @@ from .multi_manager.multi_manager import (
     MultiManager,
     XTDevice,
 )
-from .const import TUYA_DISCOVERY_NEW
+from .const import TUYA_DISCOVERY_NEW, CROSS_CATEGORY_DEVICE_DESCRIPTOR
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaHumidifierEntity,
     TuyaHumidifierEntityDescription,
@@ -59,10 +59,12 @@ async def async_setup_entry(
         merged_categories = append_dictionnaries(merged_categories, new_descriptor)
 
     @callback
-    def async_discover_device(device_map) -> None:
+    def async_discover_device(device_map, restrict_dpcode: str | None = None) -> None:
         """Discover and add a discovered Tuya (de)humidifier."""
         if hass_data.manager is None:
             return
+        if restrict_dpcode is not None:
+            return None
         entities: list[XTHumidifierEntity] = []
         device_ids = [*device_map]
         for device_id in device_ids:

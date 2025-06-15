@@ -37,10 +37,12 @@ async def async_setup_entry(
         category_list = append_lists(category_list, new_descriptor)
     
     @callback
-    def async_discover_device(device_map) -> None:
+    def async_discover_device(device_map, restrict_dpcode: str | None = None) -> None:
         """Discover and add a discovered Tuya vacuum."""
         if hass_data.manager is None:
             return
+        if restrict_dpcode is not None:
+            return None
         entities: list[XTVacuumEntity] = []
         device_ids = [*device_map]
         for device_id in device_ids:

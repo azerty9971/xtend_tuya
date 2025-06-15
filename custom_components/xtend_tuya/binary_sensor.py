@@ -20,7 +20,7 @@ from .multi_manager.multi_manager import (
     MultiManager,
     XTDevice,
 )
-from .const import TUYA_DISCOVERY_NEW, XTDPCode, LOGGER
+from .const import TUYA_DISCOVERY_NEW, XTDPCode, LOGGER, CROSS_CATEGORY_DEVICE_DESCRIPTOR
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaBinarySensorEntity,
     TuyaBinarySensorEntityDescription,
@@ -159,7 +159,7 @@ async def async_setup_entry(
         merged_descriptors = merge_device_descriptors(merged_descriptors, new_descriptor)
 
     @callback
-    def async_discover_device(device_map) -> None:
+    def async_discover_device(device_map, restrict_dpcode: str | None = None) -> None:
         """Discover and add a discovered Tuya binary sensor."""
         entities: list[XTBinarySensorEntity] = []
         device_ids = [*device_map]
@@ -170,7 +170,14 @@ async def async_setup_entry(
                 if descriptions := merged_descriptors.get(device.category):
                     for description in descriptions:
                         dpcode = description.dpcode or description.key
-                        if dpcode in device.status:
+                        if dpcode in device.status and (restrict_dpcode is None or restrict_dpcode == description.key):
+                            entities.append(
+                                XTBinarySensorEntity.get_entity_instance(description, device, hass_data.manager)
+                            )
+                if descriptions := merged_descriptors.get(CROSS_CATEGORY_DEVICE_DESCRIPTOR):
+                    for description in descriptions:
+                        dpcode = description.dpcode or description.key
+                        if dpcode in device.status and (restrict_dpcode is None or restrict_dpcode == description.key):
                             entities.append(
                                 XTBinarySensorEntity.get_entity_instance(description, device, hass_data.manager)
                             )

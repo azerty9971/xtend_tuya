@@ -22,7 +22,7 @@ from .multi_manager.multi_manager import (
     MultiManager,
     XTDevice,
 )
-from .const import TUYA_DISCOVERY_NEW, XTDPCode, DPType
+from .const import TUYA_DISCOVERY_NEW, XTDPCode, DPType, CROSS_CATEGORY_DEVICE_DESCRIPTOR
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaClimateEntity,
     TuyaClimateEntityDescription,
@@ -67,10 +67,12 @@ async def async_setup_entry(
         merged_descriptions = append_dictionnaries(merged_descriptions, new_descriptor)
 
     @callback
-    def async_discover_device(device_map) -> None:
+    def async_discover_device(device_map, restrict_dpcode: str | None = None) -> None:
         """Discover and add a discovered Tuya climate."""
         if hass_data.manager is None:
             return
+        if restrict_dpcode is not None:
+            return None
         entities: list[XTClimateEntity] = []
         device_ids = [*device_map]
         for device_id in device_ids:

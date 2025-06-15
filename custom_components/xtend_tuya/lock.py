@@ -17,6 +17,7 @@ from .const import (
     TUYA_DISCOVERY_NEW,
     XTDPCode,
     XTMultiManagerProperties,
+    CROSS_CATEGORY_DEVICE_DESCRIPTOR,
 )
 from .util import (
     append_dictionnaries,
@@ -89,10 +90,12 @@ async def async_setup_entry(
         merged_descriptors = append_dictionnaries(merged_descriptors, new_descriptor)
 
     @callback
-    def async_discover_device(device_map) -> None:
+    def async_discover_device(device_map, restrict_dpcode: str | None = None) -> None:
         """Discover and add a discovered Tuya binary sensor."""
         if hass_data.manager is None:
             return
+        if restrict_dpcode is not None:
+            return None
         entities: list[XTLockEntity] = []
         device_ids = [*device_map]
         for device_id in device_ids:
@@ -132,7 +135,7 @@ class XTLockEntity(XTEntity, LockEntity): # type: ignore
             self.temporary_unlock = True
         device_manager.set_general_property(XTMultiManagerProperties.LOCK_DEVICE_ID, device.id)
         if len(description.manual_unlock_command) > 0:
-            device.set_preference(f"manual_unlock_command", description.manual_unlock_command)
+            device.set_preference(f"{XTDevice.XTDevicePreference.LOCK_MANUAL_UNLOCK_COMMAND}", description.manual_unlock_command)
 
     @property
     def is_locked(self) -> bool | None: # type: ignore
