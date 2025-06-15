@@ -49,7 +49,15 @@ SWITCHES: dict[str, tuple[XTSwitchEntityDescription, ...]] = {
     CROSS_CATEGORY_DEVICE_DESCRIPTOR: (
         XTSwitchEntityDescription(
             key=XTDPCode.XT_COVER_INVERT_CONTROL,
-            translation_key="cover_open_close_is_inverted",
+            translation_key="xt_cover_invert_control",
+            entity_category=EntityCategory.CONFIG,
+            dont_send_to_cloud=True,
+            on_value="yes",
+            off_value="no",
+        ),
+        XTSwitchEntityDescription(
+            key=XTDPCode.XT_COVER_INVERT_STATUS,
+            translation_key="xt_cover_invert_status",
             entity_category=EntityCategory.CONFIG,
             dont_send_to_cloud=True,
             on_value="yes",
