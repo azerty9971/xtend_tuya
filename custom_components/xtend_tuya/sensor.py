@@ -69,6 +69,7 @@ class XTSensorEntityDescription(TuyaSensorEntityDescription):
     reset_yearly: bool = False
     reset_after_x_seconds: int = 0
     restoredata: bool = False
+    refresh_device_after_load: bool = False
     recalculate_scale_for_percentage: bool = False
     recalculate_scale_for_percentage_threshold: int = 100 #Maximum percentage that the sensor can display (default = 100%)
 
@@ -812,6 +813,7 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
             translation_key="xt_cover_invert_status",
             entity_registry_visible_default=False,
             restoredata=True,
+            refresh_device_after_load=True,
         ),
     ),
     "cl": (
@@ -1509,6 +1511,9 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor): # type: ignore
                 if device := self.device_manager.device_map.get(self.device.id, None):
                     device.status[self.entity_description.key] = self._restored_data.native_value
                     self.async_write_ha_state()
+        
+        if self.entity_description.refresh_device_after_load:
+            self.device_manager.multi_device_listener.update_device(self.device, [self.entity_description.key])
     
     @callback
     async def _on_state_change_event(self, event: Event[EventStateChangedData]):
