@@ -197,7 +197,7 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         if self.device.get_preference(f"{XTDevice.XTDevicePreference.IS_A_COVER_DEVICE}") is None:
             self.device.set_preference(f"{XTDevice.XTDevicePreference.IS_A_COVER_DEVICE}", True)
             if XTDPCode.COVER_OPEN_CLOSE_IS_INVERTED not in self.device.status:
-                self.device.status[XTDPCode.COVER_OPEN_CLOSE_IS_INVERTED] = False
+                self.device.status[XTDPCode.COVER_OPEN_CLOSE_IS_INVERTED] = "no"
                 dispatcher_send(self.hass, TUYA_DISCOVERY_NEW, [self.device.id], XTDPCode.COVER_OPEN_CLOSE_IS_INVERTED)
 
 

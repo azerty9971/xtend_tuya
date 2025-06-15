@@ -30,6 +30,8 @@ from .entity import (
 class XTSwitchEntityDescription(TuyaSwitchEntityDescription, frozen_or_thawed=True):
     override_tuya: bool = False
     dont_send_to_cloud: bool = False
+    on_value: Any = None
+    off_value: Any = None
 
     def get_entity_instance(self, 
                             device: XTDevice, 
@@ -49,7 +51,9 @@ SWITCHES: dict[str, tuple[XTSwitchEntityDescription, ...]] = {
             key=XTDPCode.COVER_OPEN_CLOSE_IS_INVERTED,
             translation_key="cover_open_close_is_inverted",
             entity_category=EntityCategory.CONFIG,
-            dont_send_to_cloud=True
+            dont_send_to_cloud=True,
+            on_value="yes",
+            off_value="no",
         ),
     ),
     "cwwsq": (
@@ -453,10 +457,36 @@ class XTSwitchEntity(XTEntity, TuyaSwitchEntity):
         self.device_manager = device_manager
         self.entity_description = description # type: ignore
     
+    @property
+    def is_on(self) -> bool:
+        """Return true if switch is on."""
+        current_value = self.device.status.get(self.entity_description.key, False)
+        if self.entity_description.on_value is not None and self.entity_description.off_value is not None:
+            if self.entity_description.on_value == current_value:
+                return True
+            if self.entity_description.off_value == current_value:
+                return False
+        elif self.entity_description.on_value is not None:
+            if self.entity_description.on_value == current_value:
+                return True
+            else:
+                return False
+        elif self.entity_description.off_value is not None:
+            if self.entity_description.off_value == current_value:
+                return False
+            else:
+                return True
+        
+        return super().is_on
+        
+
     def turn_on(self, **kwargs: Any) -> None:
         """Turn the switch on."""
         if self.entity_description.dont_send_to_cloud:
-            self.device.status[self.entity_description.key] = True
+            if self.entity_description.on_value is not None:
+                self.device.status[self.entity_description.key] = self.entity_description.on_value
+            else:
+                self.device.status[self.entity_description.key] = True
             self.device_manager.multi_device_listener.update_device(self.device, [self.entity_description.key])
         else:
             super().turn_on(**kwargs)
@@ -465,7 +495,10 @@ class XTSwitchEntity(XTEntity, TuyaSwitchEntity):
     def turn_off(self, **kwargs: Any) -> None:
         """Turn the switch off."""
         if self.entity_description.dont_send_to_cloud:
-            self.device.status[self.entity_description.key] = False
+            if self.entity_description.off_value is not None:
+                self.device.status[self.entity_description.key] = self.entity_description.off_value
+            else:
+                self.device.status[self.entity_description.key] = False
             self.device_manager.multi_device_listener.update_device(self.device, [self.entity_description.key])
         else:
             super().turn_off(**kwargs)
