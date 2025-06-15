@@ -209,7 +209,7 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
             if XTDPCode.COVER_OPEN_CLOSE_IS_INVERTED not in self.device.status:
                 self.device.status[XTDPCode.COVER_OPEN_CLOSE_IS_INVERTED] = "no"
                 self.device.status_range[XTDPCode.COVER_OPEN_CLOSE_IS_INVERTED] = XTDeviceStatusRange(code = XTDPCode.COVER_OPEN_CLOSE_IS_INVERTED,
-                                                                                                      type="String",
+                                                                                                      type=DPType.STRING,
                                                                                                       values="{}",
                                                                                                       dp_id=0)
                 dispatcher_send(self.hass, TUYA_DISCOVERY_NEW, [self.device.id], XTDPCode.COVER_OPEN_CLOSE_IS_INVERTED)
