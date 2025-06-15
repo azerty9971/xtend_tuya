@@ -258,7 +258,7 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
     def is_closed(self) -> bool | None:
         """Return true if cover is closed."""
         computed_position = 0
-        if self.is_cover_control_inverted:
+        if self.is_cover_status_inverted:
             computed_position = 100
 
         position = self.real_current_cover_position
