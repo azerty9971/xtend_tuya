@@ -11,7 +11,6 @@ from .const import (
 
 from .multi_manager.multi_manager import (
     MultiManager,
-    XTDevice,
 )
 
 from .ha_tuya_integration.tuya_integration_imports import (
