@@ -7,11 +7,24 @@ from ...const import (
 )
 
 class XTThreadingManager:
+
+    class XTThreadWrapper:
+        def __init__(self, callback, manager: XTThreadingManager) -> None:
+            self.callback = callback
+            self.manager = manager
+
+        def start(self, *args, **kwargs):
+            try:
+                self.callback(*args, **kwargs)
+            except Exception as e:
+                self.manager.report_exception(exception=e)
+
     def __init__(self) -> None:
         self.thread_queue: list[Thread] = []
   
     def add_thread(self, callable, immediate_start: bool = False, *args, **kwargs):
-        thread = Thread(target=callable, args=args, kwargs=kwargs)
+        wrapper = XTThreadingManager.XTThreadWrapper(callback=callable, manager=self)
+        thread = Thread(target=wrapper.start, args=args, kwargs=kwargs)
         self.thread_queue.append(thread)
         if immediate_start:
             thread.start()
@@ -42,6 +55,9 @@ class XTThreadingManager:
             except Exception:
                 #Thread is not yet started, ignore
                 pass
+
+    def report_exception(self, exception: Exception):
+        raise exception
 
 # class XTThreadingManager:
 #     join_timeout: float = 0.05
