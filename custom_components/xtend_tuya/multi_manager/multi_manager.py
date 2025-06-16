@@ -106,7 +106,7 @@ class MultiManager:  # noqa: F811
         for manager in self.accounts.values():
             thread_manager.add_thread(update_device_cache_thread, manager=manager)
         
-        thread_manager.start_and_wait()
+        thread_manager.start_and_wait(max_concurrency=9)
 
         #Register all devices in the master device map
         self._update_master_device_map()
