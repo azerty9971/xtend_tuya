@@ -63,6 +63,8 @@ class XTThreadingManager:
 
     def raise_exception(self):
         for exception in self.thread_exception:
+            LOGGER.warning(f"Thread exception: {exception}")
+        for exception in self.thread_exception:
             raise exception
 
 # class XTThreadingManager:
