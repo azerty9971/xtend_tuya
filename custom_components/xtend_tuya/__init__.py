@@ -91,7 +91,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
     await cleanup_duplicated_devices(hass, entry)
     LOGGER.debug(f"Xtended Tuya {entry.title} loaded")
     await multi_manager.on_loading_finalized(hass, entry)
-    LOGGER.warning(f"Finished async_setup_entry for {entry.title} in {(time.time() - start_time)}")
+    end_time = time.time()
+    LOGGER.warning(f"Finished async_setup_entry for {entry.title} in {end_time - start_time}")
     return True
 
 
