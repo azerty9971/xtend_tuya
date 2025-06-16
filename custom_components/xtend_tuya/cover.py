@@ -261,6 +261,11 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         if self.is_cover_status_inverted:
             computed_position = 100
 
+        if self.entity_description.current_state is not None:
+            current_state = self.device.status.get(self.entity_description.current_state)
+            if current_state is not None:
+                return current_state in (True, "fully_close") is not self.is_cover_status_inverted
+
         position = self.real_current_cover_position
         if position is not None:
             return position == computed_position
