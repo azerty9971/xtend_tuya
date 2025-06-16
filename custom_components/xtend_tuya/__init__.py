@@ -92,7 +92,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
     LOGGER.debug(f"Xtended Tuya {entry.title} loaded")
     await multi_manager.on_loading_finalized(hass, entry)
     end_time = time.time()
-    LOGGER.warning(f"Finished async_setup_entry for {entry.title} in {end_time - start_time}")
+    time_diff = float(end_time) - float(start_time)
+    LOGGER.warning(f"Finished async_setup_entry for {entry.title} in {time_diff}")
     return True
 
 
