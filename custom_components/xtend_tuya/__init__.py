@@ -5,6 +5,7 @@ import logging
 
 import asyncio
 from typing import Any
+import time
 
 from homeassistant.config_entries import ConfigEntry, ConfigEntryState
 from homeassistant.core import HomeAssistant
@@ -43,7 +44,7 @@ async def update_listener(hass: HomeAssistant, entry: XTConfigEntry):
 
 async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
     """Async setup hass config entry.""" 
-    LOGGER.warning(f"Start of async_setup_entry for {entry.title}")
+    start_time = time.time()
     multi_manager = MultiManager(hass)
     service_manager = ServiceManager(multi_manager=multi_manager)
     await multi_manager.setup_entry(hass, entry)
@@ -90,7 +91,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
     await cleanup_duplicated_devices(hass, entry)
     LOGGER.debug(f"Xtended Tuya {entry.title} loaded")
     await multi_manager.on_loading_finalized(hass, entry)
-    LOGGER.warning(f"Finished async_setup_entry for {entry.title}")
+    LOGGER.warning(f"Finished async_setup_entry for {entry.title} in {(time.time() - start_time)}")
     return True
 
 
