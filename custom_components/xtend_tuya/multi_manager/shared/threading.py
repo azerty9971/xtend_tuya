@@ -21,6 +21,7 @@ class XTThreadingManager:
 
     def __init__(self) -> None:
         self.thread_queue: list[Thread] = []
+        self.thread_exception: list[Exception] = []
   
     def add_thread(self, callable, immediate_start: bool = False, *args, **kwargs):
         wrapper = XTThreadingManager.XTThreadWrapper(callback=callable, manager=self)
@@ -32,6 +33,7 @@ class XTThreadingManager:
     def start_and_wait(self, max_concurrency: int | None = None) -> None:
         self.start_all_threads(max_concurrency)
         self.wait_for_all_threads()
+        self.raise_exception()
     def start_all_threads(self, max_concurrency: int | None = None) -> None:
         thread_list = self.thread_queue
         if max_concurrency is not None:
@@ -57,7 +59,11 @@ class XTThreadingManager:
                 pass
 
     def report_exception(self, exception: Exception):
-        raise exception
+        self.thread_exception.append(exception)
+
+    def raise_exception(self):
+        for exception in self.thread_exception:
+            raise exception
 
 # class XTThreadingManager:
 #     join_timeout: float = 0.05
