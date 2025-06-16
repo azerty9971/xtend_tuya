@@ -140,7 +140,7 @@ async def cleanup_device_registry(hass: HomeAssistant, multi_manager: MultiManag
         await asyncio.sleep(1)
     while not are_all_domain_config_loaded(hass, DOMAIN, current_entry):
         if is_config_entry_master(hass, DOMAIN, current_entry):
-            await asyncio.sleep(1)
+            await asyncio.sleep(.1)
         else:
             return
     device_registry = dr.async_get(hass)
