@@ -2,6 +2,10 @@ from __future__ import annotations
 
 from threading import Thread
 
+from ...const import (
+    LOGGER,
+)
+
 class XTThreadingManagerBase:
     def __init__(self) -> None:
         self.thread_list: list[Thread] = []
@@ -52,18 +56,22 @@ class XTThreadingManager(XTThreadingManagerBase):
         if max_concurrency is None:
             return super().start_all_threads(max_concurrency=max_concurrency)
         
+        LOGGER.warning(f"Starting all threads: active: {len(self.thread_active_list)}, queued: {len(self.thread_list)}, concurrency: {max_concurrency}")
+
         self.max_concurrency = max_concurrency
         while len(self.thread_active_list) < max_concurrency and len(self.thread_list) > 0:
+            LOGGER.warning(f"Starting thread")
             added_thread = self.thread_list[0]
+            added_thread.start()
             self.thread_list.remove(added_thread)
             self.thread_active_list.append(added_thread)
-            added_thread.start()
 
     def clean_finished_threads(self):
         thread_active_list = list(self.thread_active_list)
         at_least_one_thread_removed: bool = False
         for thread in thread_active_list:
             if thread.is_alive() is False:
+                LOGGER.warning(f"Cleaning finished thread")
                 self.thread_active_list.remove(thread)
                 at_least_one_thread_removed = True
         if at_least_one_thread_removed:
