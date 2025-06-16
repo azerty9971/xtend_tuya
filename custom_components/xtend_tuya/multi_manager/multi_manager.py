@@ -95,17 +95,15 @@ class MultiManager:  # noqa: F811
     def update_device_cache(self):
         self.is_ready_for_messages = False
         thread_manager: XTThreadingManager = XTThreadingManager()
+        def update_device_cache_thread(manager: XTDeviceManagerInterface) -> None:
+            manager.update_device_cache()
+
+            #New devices have been created in their own device maps
+            #let's convert them to XTDevice
+            for device_map in manager.get_available_device_maps():
+                for device_id in device_map:
+                    device_map[device_id] = manager.convert_to_xt_device(device_map[device_id], device_map.device_source_priority)
         for manager in self.accounts.values():
-
-            def update_device_cache_thread(manager: XTDeviceManagerInterface) -> None:
-                manager.update_device_cache()
-
-                #New devices have been created in their own device maps
-                #let's convert them to XTDevice
-                for device_map in manager.get_available_device_maps():
-                    for device_id in device_map:
-                        device_map[device_id] = manager.convert_to_xt_device(device_map[device_id], device_map.device_source_priority)
-        
             thread_manager.add_thread(update_device_cache_thread, manager=manager)
         
         thread_manager.start_and_wait()
