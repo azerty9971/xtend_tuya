@@ -159,7 +159,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         thread_manager: XTThreadingManager = XTThreadingManager()
         for device_id in self.device_map:
             thread_manager.add_thread(update_device_function_cache_threading, device_id=device_id)
-        thread_manager.start_and_wait(max_concurrency=10)
+        thread_manager.start_and_wait(max_concurrency=9)
 
     def on_message(self, msg: str):
         super().on_message(msg)
