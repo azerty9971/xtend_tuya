@@ -17,7 +17,6 @@ class XTThreadingManager:
         self.wait_for_all_threads()
 
     def start_all_threads(self, max_concurrency: int | None = None):
-        max_concurrency = 1
         thread_list = self.thread_list
         if max_concurrency is not None:
             thread_list = thread_list[:max_concurrency]
@@ -30,7 +29,7 @@ class XTThreadingManager:
         if max_concurrency is not None:
             self.wait_for_all_threads()
             if len(thread_list) > max_concurrency:
-                self.thread_list = thread_list[max_concurrency:]
+                self.thread_list = self.thread_list[max_concurrency:]
                 self.start_all_threads(max_concurrency=max_concurrency)
     
     def wait_for_all_threads(self):

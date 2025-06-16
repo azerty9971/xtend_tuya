@@ -3,6 +3,8 @@
 from __future__ import annotations
 import logging
 
+
+
 import asyncio
 from typing import Any
 from datetime import datetime
@@ -34,6 +36,9 @@ from .util import (
 from .multi_manager.shared.services.services import (
     ServiceManager,
 )
+from .multi_manager.shared.debug.profiler import (
+    profile_async_method,
+)
 
 # Suppress logs from the library, it logs unneeded on error
 logging.getLogger("tuya_sharing").setLevel(logging.CRITICAL)
@@ -43,6 +48,9 @@ async def update_listener(hass: HomeAssistant, entry: XTConfigEntry):
     hass.config_entries.async_schedule_reload(entry.entry_id)
 
 async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
+    return await profile_async_method(async_setup_entry2(hass=hass, entry=entry))
+
+async def async_setup_entry2(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
     """Async setup hass config entry.""" 
     start_time = datetime.now()
     multi_manager = MultiManager(hass)
