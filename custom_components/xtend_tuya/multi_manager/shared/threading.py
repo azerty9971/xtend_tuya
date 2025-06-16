@@ -63,7 +63,7 @@ class XTThreadingManager(XTThreadingManagerBase):
             self.thread_active_list.append(added_thread)
 
     def clean_finished_threads(self):
-        thread_active_list = list(self.thread_active_list)
+        thread_active_list = self.thread_active_list
         at_least_one_thread_removed: bool = False
         for thread in thread_active_list:
             if thread.is_alive() is False:
