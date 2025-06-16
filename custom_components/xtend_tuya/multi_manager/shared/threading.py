@@ -6,7 +6,7 @@ from ...const import (
     LOGGER,
 )
 
-class XTThreadingManager:
+class XTThreadingManagerBase:
     def __init__(self) -> None:
         self.thread_queue: list[Thread] = []
     
@@ -44,7 +44,7 @@ class XTThreadingManager:
                 #Thread is not yet started, ignore
                 pass
 
-class XTThreadingManager2(XTThreadingManager):
+class XTThreadingManager(XTThreadingManagerBase):
     join_timeout: float = 0.05
 
     def __init__(self) -> None:
@@ -67,6 +67,7 @@ class XTThreadingManager2(XTThreadingManager):
         at_least_one_thread_removed: bool = False
         for thread in thread_active_list:
             if thread.is_alive() is False:
+                thread.join()
                 self.thread_active_list.remove(thread)
                 at_least_one_thread_removed = True
         if at_least_one_thread_removed:
