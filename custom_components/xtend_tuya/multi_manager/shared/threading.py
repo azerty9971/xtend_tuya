@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from threading import Thread
 
-class XTThreadingManager:
+class XTThreadingManagerBase:
     def __init__(self) -> None:
         self.thread_list: list[Thread] = []
     
@@ -12,11 +12,11 @@ class XTThreadingManager:
         if immediate_start:
             thread.start()
     
-    def start_and_wait(self, max_concurrency: int | None = None):
+    def start_and_wait(self, max_concurrency: int | None = None) -> None:
         self.start_all_threads(max_concurrency)
         self.wait_for_all_threads()
 
-    def start_all_threads(self, max_concurrency: int | None = None):
+    def start_all_threads(self, max_concurrency: int | None = None) -> None:
         thread_list = self.thread_list
         if max_concurrency is not None:
             thread_list = thread_list[:max_concurrency]
@@ -32,10 +32,45 @@ class XTThreadingManager:
                 self.thread_list = self.thread_list[max_concurrency:]
                 self.start_all_threads(max_concurrency=max_concurrency)
     
-    def wait_for_all_threads(self):
+    def wait_for_all_threads(self) -> None:
         for thread in self.thread_list:
             try:
                 thread.join()
             except Exception:
                 #Thread is not yet started, ignore
                 pass
+
+class XTThreadingManager(XTThreadingManagerBase):
+    join_timeout: float = 0.05
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.thread_active_list: list[Thread] = []
+        self.max_concurrency: int | None = None
+
+    def start_all_threads(self, max_concurrency: int | None = None) -> None:
+        if max_concurrency is None:
+            return super().start_all_threads(max_concurrency=max_concurrency)
+        
+        self.max_concurrency = max_concurrency
+        while len(self.thread_active_list) < max_concurrency and len(self.thread_list) > 0:
+            added_thread = self.thread_list[0]
+            self.thread_list.remove(added_thread)
+            self.thread_active_list.append(added_thread)
+            added_thread.start()
+
+    def clean_finished_threads(self):
+        thread_active_list = list(self.thread_active_list)
+        at_least_one_thread_removed: bool = False
+        for thread in thread_active_list:
+            if thread.is_alive() is False:
+                self.thread_active_list.remove(thread)
+                at_least_one_thread_removed = True
+        if at_least_one_thread_removed:
+            self.start_all_threads(max_concurrency=self.max_concurrency)
+
+    def wait_for_all_threads(self) -> None:
+        while len(self.thread_active_list) > 0:
+            self.clean_finished_threads()
+            if len(self.thread_active_list) > 0:
+                self.thread_active_list[0].join(self.join_timeout)
