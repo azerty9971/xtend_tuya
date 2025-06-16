@@ -24,6 +24,9 @@ from ..shared.shared_classes import (
     XTDeviceFunction,
     XTDeviceStatusRange,
 )
+from ..shared.threading import (
+    XTThreadingManager,
+)
 
 from ..shared.merging_manager import (
     XTMergingManager,
@@ -145,13 +148,18 @@ class XTIOTDeviceManager(TuyaDeviceManager):
     
     def update_device_function_cache(self, devIds: list = []):
         super().update_device_function_cache(devIds)
-        for device_id in self.device_map:
+        def update_device_function_cache_threading(device_id: str) -> None:
             device = self.device_map[device_id]
             device_open_api = self.get_open_api_device(device)
             #self.multi_manager.device_watcher.report_message(device_id, f"About to merge {device}\r\n\r\nand\r\n\r\n{device_open_api}", device)
             XTMergingManager.merge_devices(device, device_open_api, self.multi_manager)
             self.multi_manager.virtual_state_handler.apply_init_virtual_states(device)
             #self.multi_manager.device_watcher.report_message(device_id, f"Merged into \n\r{device}", device)
+        
+        thread_manager: XTThreadingManager = XTThreadingManager()
+        for device_id in self.device_map:
+            thread_manager.add_thread(update_device_function_cache_threading, device_id=device_id)
+        thread_manager.start_and_wait()
 
     def on_message(self, msg: str):
         super().on_message(msg)

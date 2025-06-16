@@ -6,7 +6,7 @@ import os
 from typing import Any, Literal, Optional
 
 from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
 
 from tuya_iot.device import (
     PROTOCOL_DEVICE_REPORT,
@@ -94,15 +94,22 @@ class MultiManager:  # noqa: F811
     
     def update_device_cache(self):
         self.is_ready_for_messages = False
-        for key, manager in self.accounts.items():
-            manager.update_device_cache()
+        thread_manager: XTThreadingManager = XTThreadingManager()
+        for manager in self.accounts.values():
 
-            #New devices have been created in their own device maps
-            #let's convert them to XTDevice
-            for device_map in manager.get_available_device_maps():
-                for device_id in device_map:
-                    device_map[device_id] = manager.convert_to_xt_device(device_map[device_id], device_map.device_source_priority)
+            def update_device_cache_thread(manager: XTDeviceManagerInterface) -> None:
+                manager.update_device_cache()
+
+                #New devices have been created in their own device maps
+                #let's convert them to XTDevice
+                for device_map in manager.get_available_device_maps():
+                    for device_id in device_map:
+                        device_map[device_id] = manager.convert_to_xt_device(device_map[device_id], device_map.device_source_priority)
         
+            thread_manager.add_thread(update_device_cache_thread, manager=manager)
+        
+        thread_manager.start_and_wait()
+
         #Register all devices in the master device map
         self._update_master_device_map()
 
@@ -413,6 +420,9 @@ from .shared.shared_classes import (
     XTConfigEntry,  # noqa: F811
     XTDeviceMap,
     XTDevice,
+)
+from .shared.threading import (
+    XTThreadingManager,
 )
 
 from .shared.debug.debug_helper import (
