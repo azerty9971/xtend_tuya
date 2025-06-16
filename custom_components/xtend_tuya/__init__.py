@@ -43,6 +43,7 @@ async def update_listener(hass: HomeAssistant, entry: XTConfigEntry):
 
 async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
     """Async setup hass config entry.""" 
+    LOGGER.warning(f"Start of async_setup_entry for {entry.title}")
     multi_manager = MultiManager(hass)
     service_manager = ServiceManager(multi_manager=multi_manager)
     await multi_manager.setup_entry(hass, entry)
@@ -89,6 +90,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
     await cleanup_duplicated_devices(hass, entry)
     LOGGER.debug(f"Xtended Tuya {entry.title} loaded")
     await multi_manager.on_loading_finalized(hass, entry)
+    LOGGER.warning(f"Finished async_setup_entry for {entry.title}")
     return True
 
 
