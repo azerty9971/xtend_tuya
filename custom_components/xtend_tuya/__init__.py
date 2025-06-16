@@ -47,10 +47,10 @@ async def update_listener(hass: HomeAssistant, entry: XTConfigEntry):
     """Handle options update."""
     hass.config_entries.async_schedule_reload(entry.entry_id)
 
-async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
-    return await profile_async_method(async_setup_entry2(hass=hass, entry=entry))
+# async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
+    # return await profile_async_method(async_setup_entry2(hass=hass, entry=entry))
 
-async def async_setup_entry2(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
+async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
     """Async setup hass config entry.""" 
     start_time = datetime.now()
     multi_manager = MultiManager(hass)
