@@ -6,13 +6,13 @@ from ...const import (
     LOGGER,
 )
 
-class XTThreadingManagerBase:
+class XTThreadingManager:
     def __init__(self) -> None:
-        self.thread_list: list[Thread] = []
+        self.thread_queue: list[Thread] = []
     
     def add_thread(self, callable, immediate_start: bool = False, *args, **kwargs):
         thread = Thread(target=callable, args=args, kwargs=kwargs)
-        self.thread_list.append(thread)
+        self.thread_queue.append(thread)
         if immediate_start:
             thread.start()
     
@@ -21,7 +21,7 @@ class XTThreadingManagerBase:
         self.wait_for_all_threads()
 
     def start_all_threads(self, max_concurrency: int | None = None) -> None:
-        thread_list = self.thread_list
+        thread_list = self.thread_queue
         if max_concurrency is not None:
             thread_list = thread_list[:max_concurrency]
         for thread in thread_list:
@@ -33,18 +33,18 @@ class XTThreadingManagerBase:
         if max_concurrency is not None:
             self.wait_for_all_threads()
             if len(thread_list) > max_concurrency:
-                self.thread_list = self.thread_list[max_concurrency:]
+                self.thread_queue = self.thread_queue[max_concurrency:]
                 self.start_all_threads(max_concurrency=max_concurrency)
     
     def wait_for_all_threads(self) -> None:
-        for thread in self.thread_list:
+        for thread in self.thread_queue:
             try:
                 thread.join()
             except Exception:
                 #Thread is not yet started, ignore
                 pass
 
-class XTThreadingManager(XTThreadingManagerBase):
+class XTThreadingManager2(XTThreadingManager):
     join_timeout: float = 0.05
 
     def __init__(self) -> None:
@@ -56,11 +56,9 @@ class XTThreadingManager(XTThreadingManagerBase):
         if max_concurrency is None:
             return super().start_all_threads(max_concurrency=max_concurrency)
         
-        LOGGER.warning(f"Starting all threads: active: {len(self.thread_active_list)}, queued: {len(self.thread_list)}, concurrency: {max_concurrency}")
-
         self.max_concurrency = max_concurrency
-        while len(self.thread_active_list) < max_concurrency and len(self.thread_list) > 0:
-            added_thread = self.thread_list.pop(0)
+        while len(self.thread_active_list) < max_concurrency and len(self.thread_queue) > 0:
+            added_thread = self.thread_queue.pop(0)
             added_thread.start()
             self.thread_active_list.append(added_thread)
 
@@ -78,4 +76,4 @@ class XTThreadingManager(XTThreadingManagerBase):
         while len(self.thread_active_list) > 0:
             self.clean_finished_threads()
             if len(self.thread_active_list) > 0:
-                self.thread_active_list[0].join(self.join_timeout)
+                self.thread_active_list[0].join(timeout=self.join_timeout)
