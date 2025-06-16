@@ -147,7 +147,18 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         self.update_device_list_in_smart_home_mod()
     
     def update_device_function_cache(self, devIds: list = []):
-        super().update_device_function_cache(devIds)
+        thread_manager: XTThreadingManager = XTThreadingManager()
+
+        device_map = (
+            filter(lambda d: d.id in devIds, self.device_map.values())
+            if devIds
+            else self.device_map.values()
+        )
+
+        for device in device_map:
+            thread_manager.add_thread(super().update_device_function_cache, devIds=[device.id])
+        thread_manager.start_and_wait(max_concurrency=9)
+        # super().update_device_function_cache(devIds)
         def update_device_function_cache_threading(device_id: str) -> None:
             device = self.device_map[device_id]
             device_open_api = self.get_open_api_device(device)
