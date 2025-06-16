@@ -25,6 +25,9 @@ from ..shared.shared_classes import (
     XTDeviceFunction,
     XTDeviceStatusRange,
 )
+from ..shared.threading import (
+    XTThreadingManager,
+)
 
 class XTSharingDeviceRepository(DeviceRepository):
     def __init__(self, customer_api: CustomerApi, manager: XTSharingDeviceManager, multi_manager: MultiManager):
@@ -47,19 +50,25 @@ class XTSharingDeviceRepository(DeviceRepository):
     
     def _query_devices(self, response) -> list[CustomerDevice]:
         _devices = []
+
+        def _query_devices_thread(item) -> None:
+            device = CustomerDevice(**item)
+            status = {}
+            for item_status in device.status:
+                if "code" in item_status and "value" in item_status:
+                    code = item_status["code"] # type: ignore
+                    value = item_status["value"] # type: ignore
+                    status[code] = value
+            device.status = status
+            self.update_device_specification(device)
+            self.update_device_strategy_info(device)
+            _devices.append(device)
+
+        thread_manager: XTThreadingManager = XTThreadingManager()
         if response["success"]:
             for item in response["result"]:
-                device = CustomerDevice(**item)
-                status = {}
-                for item_status in device.status:
-                    if "code" in item_status and "value" in item_status:
-                        code = item_status["code"] # type: ignore
-                        value = item_status["value"] # type: ignore
-                        status[code] = value
-                device.status = status
-                self.update_device_specification(device)
-                self.update_device_strategy_info(device)
-                _devices.append(device)
+                thread_manager.add_thread(_query_devices_thread, item=item)
+        thread_manager.start_and_wait(max_concurrency=9)
         return _devices
 
     def _update_device_strategy_info_mod(self, device: CustomerDevice):
