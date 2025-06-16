@@ -60,10 +60,8 @@ class XTThreadingManager(XTThreadingManagerBase):
 
         self.max_concurrency = max_concurrency
         while len(self.thread_active_list) < max_concurrency and len(self.thread_list) > 0:
-            LOGGER.warning(f"Starting thread")
-            added_thread = self.thread_list[0]
+            added_thread = self.thread_list.pop(0)
             added_thread.start()
-            self.thread_list.remove(added_thread)
             self.thread_active_list.append(added_thread)
 
     def clean_finished_threads(self):
@@ -71,7 +69,6 @@ class XTThreadingManager(XTThreadingManagerBase):
         at_least_one_thread_removed: bool = False
         for thread in thread_active_list:
             if thread.is_alive() is False:
-                LOGGER.warning(f"Cleaning finished thread")
                 self.thread_active_list.remove(thread)
                 at_least_one_thread_removed = True
         if at_least_one_thread_removed:
