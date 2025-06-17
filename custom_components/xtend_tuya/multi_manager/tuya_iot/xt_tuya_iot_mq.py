@@ -80,9 +80,9 @@ class XTIOTOpenMQ(TuyaOpenMQ):
             time.sleep(self.mq_config.expire_time - 60)
 
     def _get_mqtt_config(self, first_pass = True) -> Optional[XTIOTTuyaMQConfig]:
-        LOGGER.debug(f"[{self.class_id}]Calling _get_mqtt_config")
+        #LOGGER.debug(f"[{self.class_id}]Calling _get_mqtt_config")
         if self.api.is_connect() is False and self.api.reconnect() is False:
-            LOGGER.debug(f"_get_mqtt_config failed: not connected", stack_info=True)
+            #LOGGER.debug(f"_get_mqtt_config failed: not connected", stack_info=True)
             return None
         if self.api.token_info is None:
             return None
@@ -149,7 +149,7 @@ class XTIOTOpenMQ(TuyaOpenMQ):
         return mqttc
     
     def _on_connect(self, mqttc: mqtt.Client, user_data: Any, flags, rc):
-        LOGGER.debug(f"connect flags->{flags}, rc->{rc}")
+        #LOGGER.debug(f"connect flags->{flags}, rc->{rc}")
         if rc == 0:
             if self.mq_config.source_topic is not None:
                 for (key, value) in self.mq_config.source_topic.items():
@@ -165,7 +165,7 @@ class XTIOTOpenMQ(TuyaOpenMQ):
 
         self.mq_config = mq_config
 
-        LOGGER.debug(f"connecting {mq_config.url}")
+        #LOGGER.debug(f"connecting {mq_config.url}")
         mqttc = self._start(mq_config)
 
         if self.client:
