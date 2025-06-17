@@ -111,6 +111,7 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description
+        self._attr_preset_modes = None
 
         # Determine HVAC modes
         self._attr_hvac_modes: list[HVACMode] = []
@@ -153,7 +154,7 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
                 HVACMode.OFF,
                 description.switch_only_hvac_mode,
             ]
-        self.device_manager.device_watcher.report_message(self.device.id, f"_hvac_to_tuya: {self._hvac_to_tuya} <=> _attr_hvac_modes: {self._attr_hvac_modes} <=> _attr_preset_modes: {self._attr_preset_modes}")
+        self.device_manager.device_watcher.report_message(self.device.id, f"_hvac_to_tuya: {self._hvac_to_tuya if hasattr(self, "_hvac_to_tuya") else "NONE"} <=> _attr_hvac_modes: {self._attr_hvac_modes if hasattr(self, "_attr_hvac_modes") else "NONE"} <=> _attr_preset_modes: {self._attr_preset_modes if hasattr(self, "_attr_preset_modes") else "NONE"}")
 
     @staticmethod
     def get_entity_instance(description: XTClimateEntityDescription, device: XTDevice, device_manager: MultiManager, system_temperature_unit: UnitOfTemperature) -> XTClimateEntity:

@@ -3,8 +3,11 @@
 from __future__ import annotations
 import logging
 
+
+
 import asyncio
 from typing import Any
+from datetime import datetime
 
 from homeassistant.config_entries import ConfigEntry, ConfigEntryState
 from homeassistant.core import HomeAssistant
@@ -33,6 +36,9 @@ from .util import (
 from .multi_manager.shared.services.services import (
     ServiceManager,
 )
+from .multi_manager.shared.debug.profiler import (
+    profile_async_method,
+)
 
 # Suppress logs from the library, it logs unneeded on error
 logging.getLogger("tuya_sharing").setLevel(logging.CRITICAL)
@@ -41,8 +47,12 @@ async def update_listener(hass: HomeAssistant, entry: XTConfigEntry):
     """Handle options update."""
     hass.config_entries.async_schedule_reload(entry.entry_id)
 
+# async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
+    # return await profile_async_method(async_setup_entry2(hass=hass, entry=entry))
+
 async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
     """Async setup hass config entry.""" 
+    start_time = datetime.now()
     multi_manager = MultiManager(hass)
     service_manager = ServiceManager(multi_manager=multi_manager)
     await multi_manager.setup_entry(hass, entry)
@@ -87,8 +97,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
     await hass.async_add_executor_job(multi_manager.refresh_mq)
     service_manager.register_services()
     await cleanup_duplicated_devices(hass, entry)
-    LOGGER.debug(f"Xtended Tuya {entry.title} loaded")
     await multi_manager.on_loading_finalized(hass, entry)
+    LOGGER.debug(f"Xtended Tuya {entry.title} loaded in {datetime.now() - start_time}")
     return True
 
 
@@ -138,7 +148,7 @@ async def cleanup_device_registry(hass: HomeAssistant, multi_manager: MultiManag
         await asyncio.sleep(1)
     while not are_all_domain_config_loaded(hass, DOMAIN, current_entry):
         if is_config_entry_master(hass, DOMAIN, current_entry):
-            await asyncio.sleep(1)
+            await asyncio.sleep(.1)
         else:
             return
     device_registry = dr.async_get(hass)
