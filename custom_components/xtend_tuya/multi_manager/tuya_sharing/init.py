@@ -68,6 +68,9 @@ from .ha_tuya_integration.platform_descriptors import (
 from ..multi_manager import (
     MultiManager,
 )
+from .xt_tuya_sharing_api import (
+    XTSharingAPI,
+)
 from ...const import (
     DOMAIN,
     MESSAGE_SOURCE_TUYA_SHARING,
@@ -120,7 +123,7 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
             sharing_device_manager = XTSharingDeviceManager(multi_manager=self.multi_manager, other_device_manager=None)
             token_listener = XTSharingTokenListener(hass, config_entry)
             sharing_device_manager.terminal_id = config_entry.data[CONF_TERMINAL_ID]
-            sharing_device_manager.customer_api = CustomerApi(
+            sharing_device_manager.customer_api = XTSharingAPI(
                 CustomerTokenInfo(config_entry.data[CONF_TOKEN_INFO]),
                 TUYA_CLIENT_ID,
                 config_entry.data[CONF_USER_CODE],
