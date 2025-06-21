@@ -456,6 +456,33 @@
             }
         },
         "sensor": {
+            "power_a":{
+                "name": "Puissance voie A"
+            },
+            "power_b":{
+                "name": "Puissance voie B"
+            },
+            "direction_a":{
+                "name": "Direction puissance voie A"
+            },
+            "direction_b":{
+                "name": "Direction puissance voie A B"
+            },  
+            "VOLTAGE_A": {
+                "name": "Tension"
+            },
+            "current_a": {
+                "name": "Courant voie A"
+            },
+            "current_b": {
+                "name": "Courant voie B"
+            },
+            "power_factor": {
+                "name": "Facteur de puissance voie A"
+            },
+            "power_factor_b": {
+                "name": "Facteur de puissance voie B"
+            },
             "air_quality": {
                 "name": "Qualit\u00e9 de l'air",
                 "state": {

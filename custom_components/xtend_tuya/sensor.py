@@ -489,6 +489,44 @@ HUMIDITY_SENSORS: tuple[XTSensorEntityDescription, ...] = (
 
 ELECTRICITY_SENSORS: tuple[XTSensorEntityDescription, ...] = (
     XTSensorEntityDescription(
+        key=XTDPCode.POWER_A,
+        translation_key="power_a",
+        device_class=SensorDeviceClass.POWER,
+        state_class=SensorStateClass.MEASUREMENT,
+    ),
+    XTSensorEntityDescription(
+        key=XTDPCode.POWER_B,
+        translation_key="power_b",
+        device_class=SensorDeviceClass.POWER,
+        state_class=SensorStateClass.MEASUREMENT,
+    ),
+    XTSensorEntityDescription(
+        key=XTDPCode.CURRENT_A,
+        translation_key="current_a",
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.CURRENT,
+    ),
+    XTSensorEntityDescription(
+        key=XTDPCode.CURRENT_B,
+        translation_key="current_b",
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.CURRENT,
+    ),
+    XTSensorEntityDescription(
+        key=XTDPCode.VOLTAGE_A,
+        translation_key="voltage_a",
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.VOLTAGE,
+    ),
+    XTSensorEntityDescription(
+        key=XTDPCode.DIRECTION_A,
+        translation_key="direction_a",
+    ),
+    XTSensorEntityDescription(
+        key=XTDPCode.DIRECTION_B,
+        translation_key="direction_b",
+    ),
+    XTSensorEntityDescription(
         key=XTDPCode.ACHZ,
         translation_key="achz",
         state_class=SensorStateClass.MEASUREMENT,
