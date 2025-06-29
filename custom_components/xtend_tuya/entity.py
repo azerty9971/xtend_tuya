@@ -1,16 +1,11 @@
 from __future__ import annotations
 
 from typing import overload, Literal
-from dataclasses import dataclass
 
 from .const import (
     XTDPCode,
     DPType,
-    LOGGER,
-)
-
-from .multi_manager.multi_manager import (
-    MultiManager,
+    LOGGER,  # noqa: F401
 )
 
 from .ha_tuya_integration.tuya_integration_imports import (
