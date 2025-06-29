@@ -9,13 +9,11 @@ from ...const import (
     LOGGER,  # noqa: F401
 )
 
-from ..multi_manager import (
-    MultiManager,
-    XTDevice,
-)
+import custom_components.xtend_tuya.multi_manager.multi_manager as mm
+import custom_components.xtend_tuya.multi_manager.shared.shared_classes as shared
 
 class XTVirtualStateHandler:
-    def __init__(self, multi_manager: MultiManager) -> None:
+    def __init__(self, multi_manager: mm.MultiManager) -> None:
         self.descriptors_with_virtual_state = {}
         self.multi_manager = multi_manager
 
@@ -55,7 +53,7 @@ class XTVirtualStateHandler:
                             to_return.append(found_virtual_state)
         return to_return
 
-    def apply_init_virtual_states(self, device: XTDevice):
+    def apply_init_virtual_states(self, device: shared.XTDevice):
         #WARNING, this method might be called multiple times for the same device, make sure it doesn't
         #fail upon multiple successive calls
         virtual_states = self.get_category_virtual_states(device.category)
@@ -115,7 +113,7 @@ class XTVirtualStateHandler:
                                         device.local_strategy[new_dp_id] = new_local_strategy
                                         device.function[new_code].dp_id = new_dp_id
 
-    def apply_virtual_states_to_status_list(self, device: XTDevice, status_in: list[dict[str, Any]], source: str | None = None) -> list:
+    def apply_virtual_states_to_status_list(self, device: shared.XTDevice, status_in: list[dict[str, Any]], source: str | None = None) -> list:
         status = copy.deepcopy(status_in)
         virtual_states = self.get_category_virtual_states(device.category)
         debug: bool = False
@@ -162,7 +160,7 @@ class XTVirtualStateHandler:
             self.multi_manager.device_watcher.report_message(device.id, f"[{source}]Status Out: {status}", device)
         return status
     
-    def _get_empty_local_strategy_dp_id(self, device: XTDevice) -> int | None:
+    def _get_empty_local_strategy_dp_id(self, device: shared.XTDevice) -> int | None:
         if not hasattr(device, "local_strategy"):
             return None
         base_id = 10000
