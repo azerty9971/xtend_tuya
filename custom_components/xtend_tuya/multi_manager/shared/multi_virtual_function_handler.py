@@ -7,13 +7,11 @@ from ...const import (
     DescriptionVirtualFunction,
 )
 
-from ..multi_manager import (
-    MultiManager,
-    XTDevice,
-)
+import custom_components.xtend_tuya.multi_manager.multi_manager as mm
+import custom_components.xtend_tuya.multi_manager.shared.shared_classes as shared
 
 class XTVirtualFunctionHandler:
-    def __init__(self, multi_manager: MultiManager) -> None:
+    def __init__(self, multi_manager: mm.MultiManager) -> None:
         self.descriptors_with_virtual_function = {}
         self.multi_manager = multi_manager
     
@@ -56,7 +54,7 @@ class XTVirtualFunctionHandler:
         return to_return
     
     def process_virtual_function(self, device_id: str, commands: list[dict[str, Any]]):
-        device: XTDevice | None = self.multi_manager.device_map.get(device_id, None)
+        device: shared.XTDevice | None = self.multi_manager.device_map.get(device_id, None)
         if not device:
             return
         for command in commands:
