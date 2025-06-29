@@ -12,10 +12,6 @@ from homeassistant.const import (
     Platform,
 )
 
-from .ha_tuya_integration.tuya_integration_imports import (
-    TuyaDPType as DPType
-)
-
 DOMAIN = "xtend_tuya"
 DOMAIN_ORIG = "tuya"
 LOGGER = logging.getLogger(__package__)

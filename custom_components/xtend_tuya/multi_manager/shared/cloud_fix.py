@@ -12,7 +12,9 @@ from .shared_classes import (
 )
 from ...const import (
     LOGGER,  # noqa: F401
-    DPType,
+)
+from ...ha_tuya_integration.tuya_integration_imports import (
+    TuyaDPType,
 )
 import custom_components.xtend_tuya.entity as entity
 
@@ -539,17 +541,17 @@ class CloudFixes:
                 return 2
             if not value2[key]:
                 return 1
-            if value1[key] == DPType.RAW and entity.XTEntity.determine_dptype(value2[key]) is not None and isinstance(value1[key], DPType):
+            if value1[key] == TuyaDPType.RAW and entity.XTEntity.determine_dptype(value2[key]) is not None and isinstance(value1[key], TuyaDPType):
                 return 2
-            if value2[key] == DPType.RAW and entity.XTEntity.determine_dptype(value1[key]) is not None and isinstance(value2[key], DPType):
+            if value2[key] == TuyaDPType.RAW and entity.XTEntity.determine_dptype(value1[key]) is not None and isinstance(value2[key], TuyaDPType):
                 return 1
-            if value1[key] == DPType.STRING and value2[key] == DPType.JSON and isinstance(value1[key], DPType) and isinstance(value2[key], DPType):
+            if value1[key] == TuyaDPType.STRING and value2[key] == TuyaDPType.JSON and isinstance(value1[key], TuyaDPType) and isinstance(value2[key], TuyaDPType):
                 return 2
-            if value2[key] == DPType.STRING and value1[key] == DPType.JSON and isinstance(value1[key], DPType) and isinstance(value2[key], DPType):
+            if value2[key] == TuyaDPType.STRING and value1[key] == TuyaDPType.JSON and isinstance(value1[key], TuyaDPType) and isinstance(value2[key], TuyaDPType):
                 return 1
-            if value1[key] == DPType.BOOLEAN and state_value in ["True", "False", "true", "false", True, False] and isinstance(value1[key], DPType):
+            if value1[key] == TuyaDPType.BOOLEAN and state_value in ["True", "False", "true", "false", True, False] and isinstance(value1[key], TuyaDPType):
                 return 1
-            if value2[key] == DPType.BOOLEAN and state_value in ["True", "False", "true", "false", True, False] and isinstance(value2[key], DPType):
+            if value2[key] == TuyaDPType.BOOLEAN and state_value in ["True", "False", "true", "false", True, False] and isinstance(value2[key], TuyaDPType):
                 return 2
             return None
 

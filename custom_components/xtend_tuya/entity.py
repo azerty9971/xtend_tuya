@@ -4,7 +4,6 @@ from typing import overload, Literal
 
 from .const import (
     XTDPCode,
-    DPType,
     LOGGER,  # noqa: F401
 )
 
@@ -14,6 +13,7 @@ from .ha_tuya_integration.tuya_integration_imports import (
     TUYA_DPTYPE_MAPPING,
     TuyaEntity,
     TuyaDPCode,
+    TuyaDPType,
 )
 
 class XTEntity(TuyaEntity):
@@ -35,7 +35,7 @@ class XTEntity(TuyaEntity):
         dpcodes: str | XTDPCode | tuple[XTDPCode, ...] | TuyaDPCode | tuple[TuyaDPCode, ...] | None,
         *,
         prefer_function: bool = False,
-        dptype: Literal[DPType.ENUM],
+        dptype: Literal[TuyaDPType.ENUM],
     ) -> TuyaEnumTypeData | None: ...
 
     @overload
@@ -44,7 +44,7 @@ class XTEntity(TuyaEntity):
         dpcodes: str | XTDPCode | tuple[XTDPCode, ...] | TuyaDPCode | tuple[TuyaDPCode, ...] | None,
         *,
         prefer_function: bool = False,
-        dptype: Literal[DPType.INTEGER],
+        dptype: Literal[TuyaDPType.INTEGER],
     ) -> TuyaIntegerTypeData | None: ...
 
     @overload
@@ -61,7 +61,7 @@ class XTEntity(TuyaEntity):
         dpcodes: str | XTDPCode | tuple[XTDPCode, ...] | TuyaDPCode | tuple[TuyaDPCode, ...] | None,
         *,
         prefer_function: bool = False,
-        dptype: DPType | None = None,
+        dptype: TuyaDPType | None = None,
     ) -> TuyaDPCode | TuyaEnumTypeData | TuyaIntegerTypeData | None: ...
         
     def find_dpcode(
@@ -69,7 +69,7 @@ class XTEntity(TuyaEntity):
         dpcodes: str | XTDPCode | tuple[XTDPCode, ...] | TuyaDPCode | tuple[TuyaDPCode, ...] | None,
         *,
         prefer_function: bool = False,
-        dptype: DPType | None = None,
+        dptype: TuyaDPType | None = None,
     ) -> XTDPCode | TuyaDPCode | TuyaEnumTypeData | TuyaIntegerTypeData | None:
         try:
             if dpcodes is None:
@@ -78,9 +78,9 @@ class XTEntity(TuyaEntity):
                 dpcodes = (TuyaDPCode(dpcodes),)
             else:
                 dpcodes = (TuyaDPCode(dpcodes),)
-            if dptype is DPType.ENUM:
+            if dptype is TuyaDPType.ENUM:
                 return super(XTEntity, self).find_dpcode(dpcodes=dpcodes, prefer_function=prefer_function, dptype=dptype)
-            elif dptype is DPType.INTEGER:
+            elif dptype is TuyaDPType.INTEGER:
                 return super(XTEntity, self).find_dpcode(dpcodes=dpcodes, prefer_function=prefer_function, dptype=dptype)
             else:
                 return dpcodes[0]
@@ -108,8 +108,8 @@ class XTEntity(TuyaEntity):
                     if dpcode not in getattr(self.device, key):
                         continue
                     if (
-                        dptype == DPType.ENUM
-                        and getattr(self.device, key)[dpcode].type == DPType.ENUM
+                        dptype == TuyaDPType.ENUM
+                        and getattr(self.device, key)[dpcode].type == TuyaDPType.ENUM
                     ):
                         if not (
                             enum_type := TuyaEnumTypeData.from_json(
@@ -120,8 +120,8 @@ class XTEntity(TuyaEntity):
                         return enum_type
 
                     if (
-                        dptype == DPType.INTEGER
-                        and getattr(self.device, key)[dpcode].type == DPType.INTEGER
+                        dptype == TuyaDPType.INTEGER
+                        and getattr(self.device, key)[dpcode].type == TuyaDPType.INTEGER
                     ):
                         if not (
                             integer_type := TuyaIntegerTypeData.from_json(
@@ -131,19 +131,19 @@ class XTEntity(TuyaEntity):
                             continue
                         return integer_type
 
-                    if dptype not in (DPType.ENUM, DPType.INTEGER):
+                    if dptype not in (TuyaDPType.ENUM, TuyaDPType.INTEGER):
                         return dpcode
 
             return None
     
     @staticmethod
-    def determine_dptype(type) -> DPType | None:
+    def determine_dptype(type) -> TuyaDPType | None:
         """Determine the DPType.
 
         Sometimes, we get ill-formed DPTypes from the cloud,
         this fixes them and maps them to the correct DPType.
         """
         try:
-            return DPType(type)
+            return TuyaDPType(type)
         except ValueError:
             return TUYA_DPTYPE_MAPPING.get(type)

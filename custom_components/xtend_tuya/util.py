@@ -8,13 +8,15 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.entity import EntityDescription
 from .const import (
     LOGGER,
-    DPType,
     DOMAIN,
 )
 
 from tuya_sharing.manager import (
     Manager,
     SharingDeviceListener,
+)
+from .ha_tuya_integration.tuya_integration_imports import (
+    TuyaDPType,
 )
 
 import custom_components.xtend_tuya.multi_manager.multi_manager as mm
@@ -23,21 +25,21 @@ import custom_components.xtend_tuya.multi_manager.shared.shared_classes as share
 def log_stack(message: str):
     LOGGER.debug(message, stack_info=True)
 
-def get_default_value(dp_type: DPType | None) -> Any:
+def get_default_value(dp_type: TuyaDPType | None) -> Any:
     if dp_type is None:
         return None
     match dp_type:
-        case DPType.BOOLEAN:
+        case TuyaDPType.BOOLEAN:
             return False
-        case DPType.ENUM:
+        case TuyaDPType.ENUM:
             return None
-        case DPType.INTEGER:
+        case TuyaDPType.INTEGER:
             return 0
-        case DPType.JSON:
+        case TuyaDPType.JSON:
             return "{}"
-        case DPType.RAW:
+        case TuyaDPType.RAW:
             return None
-        case DPType.STRING:
+        case TuyaDPType.STRING:
             return ""
     return None
         
