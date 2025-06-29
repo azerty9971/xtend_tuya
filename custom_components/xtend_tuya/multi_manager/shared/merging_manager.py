@@ -10,16 +10,12 @@ from .shared_classes import (
     XTDeviceStatusRange,
     XTDeviceFunction,
 )
-from .cloud_fix import (
-    CloudFixes,
-)
 
 from ...const import (
     LOGGER,  # noqa: F401
 )
-from ..multi_manager import (
-    MultiManager,
-)
+import custom_components.xtend_tuya.multi_manager.shared.cloud_fix as cf
+import custom_components.xtend_tuya.multi_manager.multi_manager as mm
 
 class XTMergingManager:
 
@@ -27,7 +23,7 @@ class XTMergingManager:
 
 
     @staticmethod
-    def merge_devices(device1: XTDevice, device2: XTDevice | None, multi_manager: MultiManager | None = None):
+    def merge_devices(device1: XTDevice, device2: XTDevice | None, multi_manager: mm.MultiManager | None = None):
         msg_queue: list[str] = []
         if device2 is None:
             return None
@@ -48,8 +44,8 @@ class XTMergingManager:
         #Make both devices compliant
         XTMergingManager._fix_incorrect_valuedescr(higher_priority, lower_priority)
         XTMergingManager._fix_incorrect_valuedescr(lower_priority, higher_priority)
-        CloudFixes.apply_fixes(higher_priority)
-        CloudFixes.apply_fixes(lower_priority)
+        cf.CloudFixes.apply_fixes(higher_priority)
+        cf.CloudFixes.apply_fixes(lower_priority)
 
         #Now decide between each device which on has "the truth" and set it in both
         XTMergingManager._align_device_properties(higher_priority, lower_priority, msg_queue)
@@ -172,8 +168,8 @@ class XTMergingManager:
     def _fix_incorrect_valuedescr(device1: XTDevice, device2: XTDevice):
         for code in device1.function:
             if code in device2.function:
-                value1_dict, value1_raw = CloudFixes.get_value_descr_dict(device1.function[code].values)
-                value2_dict, value2_raw = CloudFixes.get_value_descr_dict(device2.function[code].values)
+                value1_dict, value1_raw = cf.CloudFixes.get_value_descr_dict(device1.function[code].values)
+                value2_dict, value2_raw = cf.CloudFixes.get_value_descr_dict(device2.function[code].values)
             else:
                 continue
             if value1_dict is None or value2_dict is None:
@@ -182,13 +178,13 @@ class XTMergingManager:
                 elif value2_dict is not None:
                     device1.function[code].values = device2.function[code].values
                 else:
-                    device1.function[code].values = CloudFixes.get_fixed_value_descr(value1_raw, value2_raw)
+                    device1.function[code].values = cf.CloudFixes.get_fixed_value_descr(value1_raw, value2_raw)
                     device2.function[code].values = device1.function[code].values
         
         for code in device1.status_range:
             if code in device2.status_range:
-                value1_dict, value1_raw = CloudFixes.get_value_descr_dict(device1.status_range[code].values)
-                value2_dict, value2_raw = CloudFixes.get_value_descr_dict(device2.status_range[code].values)
+                value1_dict, value1_raw = cf.CloudFixes.get_value_descr_dict(device1.status_range[code].values)
+                value2_dict, value2_raw = cf.CloudFixes.get_value_descr_dict(device2.status_range[code].values)
             else:
                 continue
             if value1_dict is None or value2_dict is None:
@@ -197,7 +193,7 @@ class XTMergingManager:
                 elif value2_dict is not None:
                     device1.status_range[code].values = device2.status_range[code].values
                 else:
-                    device1.status_range[code].values = CloudFixes.get_fixed_value_descr(value1_raw, value2_raw)
+                    device1.status_range[code].values = cf.CloudFixes.get_fixed_value_descr(value1_raw, value2_raw)
                     device2.status_range[code].values = device1.status_range[code].values
         
         for dpId in device1.local_strategy:
@@ -207,9 +203,9 @@ class XTMergingManager:
             value2_raw = None
             if dpId in device2.local_strategy:
                 if config_item1 := device1.local_strategy[dpId].get("config_item"):
-                    value1_dict, value1_raw = CloudFixes.get_value_descr_dict(config_item1.get("valueDesc"))
+                    value1_dict, value1_raw = cf.CloudFixes.get_value_descr_dict(config_item1.get("valueDesc"))
                 if config_item2 := device2.local_strategy[dpId].get("config_item"):
-                    value2_dict, value2_raw = CloudFixes.get_value_descr_dict(config_item2.get("valueDesc"))
+                    value2_dict, value2_raw = cf.CloudFixes.get_value_descr_dict(config_item2.get("valueDesc"))
             else:
                 continue
             if value1_raw is not None or value2_raw is not None:
@@ -221,7 +217,7 @@ class XTMergingManager:
                         elif value2_dict is not None:
                             config_item1["valueDesc"] = config_item2["valueDesc"]
                         else:
-                            config_item1["valueDesc"] = CloudFixes.get_fixed_value_descr(value1_raw, value2_raw)
+                            config_item1["valueDesc"] = cf.CloudFixes.get_fixed_value_descr(value1_raw, value2_raw)
                             config_item2["valueDesc"] = config_item1["valueDesc"]
 
     @staticmethod
@@ -230,7 +226,7 @@ class XTMergingManager:
             if code in device2.status_range and device1.status_range[code].values != device2.status_range[code].values:
                 value1 = json.loads(device1.status_range[code].values)
                 value2 = json.loads(device2.status_range[code].values)
-                computed_diff = CloudFixes.compute_aligned_valuedescr(value1, value2, None)
+                computed_diff = cf.CloudFixes.compute_aligned_valuedescr(value1, value2, None)
                 for fix_code in computed_diff:
                     value1[fix_code] = computed_diff[fix_code]
                     value2[fix_code] = computed_diff[fix_code]
@@ -240,7 +236,7 @@ class XTMergingManager:
             if code in device2.function and device1.function[code].values != device2.function[code].values:
                 value1 = json.loads(device1.function[code].values)
                 value2 = json.loads(device2.function[code].values)
-                computed_diff = CloudFixes.compute_aligned_valuedescr(value1, value2, None)
+                computed_diff = cf.CloudFixes.compute_aligned_valuedescr(value1, value2, None)
                 for fix_code in computed_diff:
                     value1[fix_code] = computed_diff[fix_code]
                     value2[fix_code] = computed_diff[fix_code]
@@ -256,7 +252,7 @@ class XTMergingManager:
                     if value_descr1 is not None and value_descr2 is not None:
                         value1 = json.loads(value_descr1)
                         value2 = json.loads(value_descr2)
-                        computed_diff = CloudFixes.compute_aligned_valuedescr(value1, value2, None)
+                        computed_diff = cf.CloudFixes.compute_aligned_valuedescr(value1, value2, None)
                         for fix_code in computed_diff:
                             value1[fix_code] = computed_diff[fix_code]
                             value2[fix_code] = computed_diff[fix_code]
@@ -298,7 +294,7 @@ class XTMergingManager:
                 state_value = device1.status.get(key)
                 if state_value is None:
                     state_value = device2.status.get(key)
-                match CloudFixes.determine_most_plausible({"type": device1.status_range[key].type}, {"type": device2.status_range[key].type}, "type", state_value):
+                match cf.CloudFixes.determine_most_plausible({"type": device1.status_range[key].type}, {"type": device2.status_range[key].type}, "type", state_value):
                     case 1:
                         device2.status_range[key].type = device1.status_range[key].type
                         device2.status_range[key].values = device1.status_range[key].values
@@ -310,7 +306,7 @@ class XTMergingManager:
                 state_value = device1.status.get(key)
                 if state_value is None:
                     state_value = device2.status.get(key)
-                match CloudFixes.determine_most_plausible({"type": device1.function[key].type}, {"type": device2.function[key].type}, "type", state_value):
+                match cf.CloudFixes.determine_most_plausible({"type": device1.function[key].type}, {"type": device2.function[key].type}, "type", state_value):
                     case 1:
                         device2.function[key].type = device1.function[key].type
                         device2.function[key].values = device1.function[key].values
@@ -339,7 +335,7 @@ class XTMergingManager:
                         continue
                 else:
                     continue
-                match CloudFixes.determine_most_plausible(config_item1, config_item2, "valueType", state_value):
+                match cf.CloudFixes.determine_most_plausible(config_item1, config_item2, "valueType", state_value):
                     case 1:
                         config_item2["valueType"] = config_item1["valueType"]
                         config_item2["valueDesc"] = config_item1["valueDesc"]
