@@ -9,10 +9,10 @@ from homeassistant.core import HomeAssistant
 from tuya_sharing import (
     CustomerDevice as TuyaDevice,
 )
-import xtend_tuya.multi_manager.multi_manager as mm
+import custom_components.xtend_tuya.multi_manager.multi_manager as mm
 
 class DeviceWatcher:
-    def __init__(self, multi_manager: MultiManager) -> None:
+    def __init__(self, multi_manager: mm.MultiManager) -> None:
         self.watched_dev_id: list[str] = []
         self.multi_manager = multi_manager
 
@@ -32,12 +32,12 @@ class DeviceWatcher:
 class HomeAssistantXTData(NamedTuple):
     """Tuya data stored in the Home Assistant data object."""
 
-    multi_manager: MultiManager | None = None
+    multi_manager: mm.MultiManager | None = None
     listener: MultiDeviceListener | None = None
     service_manager: ServiceManager | None = None
 
     @property
-    def manager(self) -> MultiManager | None:
+    def manager(self) -> mm.MultiManager | None:
         return self.multi_manager
 
 type XTConfigEntry = ConfigEntry[HomeAssistantXTData]
@@ -233,7 +233,7 @@ class XTDevice(TuyaDevice):
     def get_copy(self) -> XTDevice:
         return copy.deepcopy(self)
     
-    def get_multi_manager(self, hass: HomeAssistant) -> MultiManager | None:
+    def get_multi_manager(self, hass: HomeAssistant) -> mm.MultiManager | None:
         return get_device_multi_manager(hass=hass, device=self)
     
     def get_preference(self, pref_id: str, ret_val_if_missing: Any | None = None) -> Any | None:
@@ -261,9 +261,9 @@ class XTDeviceMap(UserDict[str, XTDevice]):
 
 
 
-from ..multi_manager import (
-    MultiManager,
-)
+#from ..multi_manager import (
+#    MultiManager,
+#)
 from .multi_device_listener import (
     MultiDeviceListener,
 )
