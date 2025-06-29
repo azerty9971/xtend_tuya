@@ -11,13 +11,8 @@ from ...const import (
 )
 
 import custom_components.xtend_tuya.multi_manager.multi_manager as mm
-from .shared_classes import (
-    XTDevice,
-)
-
-from ...util import (
-    append_lists
-)
+import custom_components.xtend_tuya.multi_manager.shared.shared_classes as sh
+import custom_components.xtend_tuya.util as util
 
 
 class MultiDeviceListener:
@@ -25,13 +20,13 @@ class MultiDeviceListener:
         self.multi_manager = multi_manager
         self.hass = hass
 
-    def update_device(self, device: XTDevice, updated_status_properties: list[str] | None = None):
+    def update_device(self, device: sh.XTDevice, updated_status_properties: list[str] | None = None):
         signal_list: list[str] = []
         for account in self.multi_manager.accounts.values():
-            signal_list = append_lists(signal_list, account.on_update_device(device))
+            signal_list = util.append_lists(signal_list, account.on_update_device(device))
         self.trigger_device_discovery(device, signal_list, updated_status_properties)
 
-    def trigger_device_discovery(self, device: XTDevice, signal_list: list[str], updated_status_properties: list[str] | None = None):
+    def trigger_device_discovery(self, device: sh.XTDevice, signal_list: list[str], updated_status_properties: list[str] | None = None):
         for signal in signal_list:
             try:
                 dispatcher_send(self.hass, f"{signal}_{device.id}", updated_status_properties)
@@ -39,11 +34,11 @@ class MultiDeviceListener:
                 #Could happen upon restart of HA
                 LOGGER.debug(f"Could not send {signal}_{device.id} (updated_status_properties = {updated_status_properties}) to dispatch: {e}")
 
-    def add_device(self, device: XTDevice):
+    def add_device(self, device: sh.XTDevice):
         self.hass.add_job(self.async_remove_device, device.id)
         signal_list: list[str] = []
         for account in self.multi_manager.accounts.values():
-            signal_list = append_lists(signal_list, account.on_add_device(device))
+            signal_list = util.append_lists(signal_list, account.on_add_device(device))
         for signal in signal_list:
             dispatcher_send(self.hass, signal, [device.id])
 
