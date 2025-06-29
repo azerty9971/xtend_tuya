@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 import copy
-import traceback
 from typing import NamedTuple, Any
 from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
@@ -19,10 +18,7 @@ from tuya_sharing.manager import (
 )
 
 import custom_components.xtend_tuya.multi_manager.multi_manager as mm
-from .multi_manager.shared.shared_classes import (
-    XTConfigEntry,
-    XTDevice,
-)
+import custom_components.xtend_tuya.multi_manager.shared.shared_classes as shared
 
 def log_stack(message: str):
     LOGGER.debug(message, stack_info=True)
@@ -100,7 +96,7 @@ def get_config_entry_runtime_data(hass: HomeAssistant, entry: ConfigEntry, domai
 def get_domain_config_entries(hass: HomeAssistant, domain: str) -> list[ConfigEntry]:
     return hass.config_entries.async_entries(domain, False, False)
 
-def get_overriden_config_entry(hass: HomeAssistant, entry: XTConfigEntry, other_domain: str) -> ConfigEntry | None:
+def get_overriden_config_entry(hass: HomeAssistant, entry: shared.XTConfigEntry, other_domain: str) -> ConfigEntry | None:
     other_domain_config_entries = get_domain_config_entries(hass, other_domain)
     for od_config_entry in other_domain_config_entries:
         if entry.title == od_config_entry.title:
@@ -167,7 +163,7 @@ def get_all_multi_managers(hass: HomeAssistant) -> list[mm.MultiManager]:
             return_list.append(runtime_data.device_manager) # type: ignore
     return return_list
 
-def get_device_multi_manager(hass: HomeAssistant, device: XTDevice) -> mm.MultiManager | None:
+def get_device_multi_manager(hass: HomeAssistant, device: shared.XTDevice) -> mm.MultiManager | None:
     all_multimanager = get_all_multi_managers(hass=hass)
     for multimanager in all_multimanager:
         if device.id in multimanager.device_map:
