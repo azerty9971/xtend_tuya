@@ -10,19 +10,12 @@ from tuya_sharing import (
     CustomerDevice as TuyaDevice,
 )
 import custom_components.xtend_tuya.multi_manager.multi_manager as mm
-
-from .multi_device_listener import (
-    MultiDeviceListener,
-)
+import custom_components.xtend_tuya.multi_manager.shared.multi_device_listener as mdl
+import custom_components.xtend_tuya.multi_manager.shared.services.services as services
+import custom_components.xtend_tuya.util as util
 from ...const import (
     LOGGER,
     XTDeviceSourcePriority,
-)
-from .services.services import (
-    ServiceManager,
-)
-from ...util import (
-    get_device_multi_manager,
 )
 
 class DeviceWatcher:
@@ -47,8 +40,8 @@ class HomeAssistantXTData(NamedTuple):
     """Tuya data stored in the Home Assistant data object."""
 
     multi_manager: mm.MultiManager | None = None
-    listener: MultiDeviceListener | None = None
-    service_manager: ServiceManager | None = None
+    listener: mdl.MultiDeviceListener | None = None
+    service_manager: services.ServiceManager | None = None
 
     @property
     def manager(self) -> mm.MultiManager | None:
@@ -248,7 +241,7 @@ class XTDevice(TuyaDevice):
         return copy.deepcopy(self)
     
     def get_multi_manager(self, hass: HomeAssistant) -> mm.MultiManager | None:
-        return get_device_multi_manager(hass=hass, device=self)
+        return util.get_device_multi_manager(hass=hass, device=self)
     
     def get_preference(self, pref_id: str, ret_val_if_missing: Any | None = None) -> Any | None:
         return self.device_preference.get(pref_id, ret_val_if_missing)

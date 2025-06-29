@@ -10,7 +10,9 @@ from ...const import (
     DOMAIN_ORIG,
 )
 
-import custom_components.xtend_tuya.multi_manager.multi_manager as mm
+from ..multi_manager import (
+    MultiManager,
+)
 from .shared_classes import (
     XTDevice,
 )
@@ -21,7 +23,7 @@ from ...util import (
 
 
 class MultiDeviceListener:
-    def __init__(self, hass: HomeAssistant, multi_manager: mm.MultiManager) -> None:
+    def __init__(self, hass: HomeAssistant, multi_manager: MultiManager) -> None:
         self.multi_manager = multi_manager
         self.hass = hass
 
