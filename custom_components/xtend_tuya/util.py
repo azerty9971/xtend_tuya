@@ -18,9 +18,7 @@ from tuya_sharing.manager import (
     SharingDeviceListener,
 )
 
-from .multi_manager.multi_manager import (
-    MultiManager,
-)
+import custom_components.xtend_tuya.multi_manager.multi_manager as mm
 from .multi_manager.shared.shared_classes import (
     XTConfigEntry,
     XTDevice,
@@ -161,17 +159,17 @@ def append_sets(set1: set, set2: set) -> set:
             return_set.add(copy.deepcopy(item))
     return return_set
 
-def get_all_multi_managers(hass: HomeAssistant) -> list[MultiManager]:
-    return_list: list[MultiManager] = []
+def get_all_multi_managers(hass: HomeAssistant) -> list[mm.MultiManager]:
+    return_list: list[mm.MultiManager] = []
     config_entries = get_domain_config_entries(hass, DOMAIN)
     for config_entry in config_entries:
         if runtime_data := get_config_entry_runtime_data(hass, config_entry, DOMAIN):
             return_list.append(runtime_data.device_manager) # type: ignore
     return return_list
 
-def get_device_multi_manager(hass: HomeAssistant, device: XTDevice) -> MultiManager | None:
-    all_mm = get_all_multi_managers(hass=hass)
-    for mm in all_mm:
-        if device.id in mm.device_map:
-            return mm
+def get_device_multi_manager(hass: HomeAssistant, device: XTDevice) -> mm.MultiManager | None:
+    all_multimanager = get_all_multi_managers(hass=hass)
+    for multimanager in all_multimanager:
+        if device.id in multimanager.device_map:
+            return multimanager
     return None

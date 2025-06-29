@@ -11,6 +11,20 @@ from tuya_sharing import (
 )
 import custom_components.xtend_tuya.multi_manager.multi_manager as mm
 
+from .multi_device_listener import (
+    MultiDeviceListener,
+)
+from ...const import (
+    LOGGER,
+    XTDeviceSourcePriority,
+)
+from .services.services import (
+    ServiceManager,
+)
+from ...util import (
+    get_device_multi_manager,
+)
+
 class DeviceWatcher:
     def __init__(self, multi_manager: mm.MultiManager) -> None:
         self.watched_dev_id: list[str] = []
@@ -256,24 +270,3 @@ class XTDeviceMap(UserDict[str, XTDevice]):
         super().__setitem__(key, item)
         if self._original_ref is not None:
             self._original_ref[key] = item
-
-
-
-
-
-#from ..multi_manager import (
-#    MultiManager,
-#)
-from .multi_device_listener import (
-    MultiDeviceListener,
-)
-from ...const import (
-    LOGGER,
-    XTDeviceSourcePriority,
-)
-from .services.services import (
-    ServiceManager,
-)
-from ...util import (
-    get_device_multi_manager,
-)
