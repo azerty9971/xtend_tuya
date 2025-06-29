@@ -141,6 +141,15 @@ class XTDPCode(StrEnum):
 
     https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
     """
+    POWER_A = "power_a"
+    POWER_B = "power_b"
+    DIRECTION_A="direction_a"
+    DIRECTION_B="direction_b"
+    VOLTAGE_A="voltage_a"
+    CURRENT_A="current_a"
+    CURRENT_B="current_b"
+    POWER_FACTOR="power_factor"
+    POWER_FACTOR_B="power_factor_b"
     ACHZ = "ACHZ"
     ACI = "ACI"
     ACTIVEPOWER = "ActivePower"
