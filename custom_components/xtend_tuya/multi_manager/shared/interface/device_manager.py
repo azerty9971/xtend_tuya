@@ -29,7 +29,6 @@ from ....const import (
 from homeassistant.helpers.issue_registry import (
     IssueSeverity,
     async_create_issue,
-    async_delete_issue,
 )
 
 class XTDeviceManagerInterface(ABC):

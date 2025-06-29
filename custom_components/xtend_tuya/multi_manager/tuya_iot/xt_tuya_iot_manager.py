@@ -7,10 +7,9 @@ from __future__ import annotations
 import json
 from tuya_iot import (
     TuyaDeviceManager,
-    TuyaOpenAPI,
     TuyaOpenMQ,
 )
-from typing import Any, overload, cast
+from typing import Any, cast
 
 from ...const import (
     LOGGER,

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-import json, copy
+import json
+import copy
 
 from typing import Any
 
@@ -479,7 +480,6 @@ class CloudFixes:
             if "unit" in value and "min" in value and "max" in value and "scale" in value:
                 unit = value["unit"]
                 try:
-                    min = int(value["min"])
                     max = int(value["max"])
                     if unit not in supported_units:
                         continue
@@ -498,7 +498,6 @@ class CloudFixes:
             if "unit" in value and "min" in value and "max" in value and "scale" in value:
                 unit = value["unit"]
                 try:
-                    min = int(value["min"])
                     max = int(value["max"])
                     if unit not in supported_units:
                         continue
@@ -519,7 +518,6 @@ class CloudFixes:
                     if "unit" in value and "min" in value and "max" in value and "scale" in value:
                         unit = value["unit"]
                         try:
-                            min = int(value["min"])
                             max = int(value["max"])
                             if unit not in supported_units:
                                 continue

@@ -3,8 +3,6 @@ from __future__ import annotations
 import copy
 from typing import Any
 
-from homeassistant.helpers.entity import EntityDescription
-
 from ...const import (
     VirtualStates,
     DescriptionVirtualState,

@@ -7,7 +7,6 @@ from tuya_sharing.customerapi import (
 from tuya_sharing.device import (
     CustomerDevice,
     DeviceRepository,
-    DeviceStatusRange,
 )
 
 from ...const import (

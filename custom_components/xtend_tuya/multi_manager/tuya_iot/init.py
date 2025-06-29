@@ -2,15 +2,13 @@ from __future__ import annotations
 
 import requests
 import json
-import asyncio
-from typing import Optional, Literal, Any, overload
+from typing import Optional, Literal, Any
 from webrtc_models import (
     RTCIceCandidateInit,
 )
 
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ConfigEntryNotReady
 
 from tuya_iot import (
     AuthType,
@@ -160,8 +158,7 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
                     api.test_validity)
             response4 = await hass.async_add_executor_job(
                     non_user_api.test_validity)
-        except requests.exceptions.RequestException as err:
-            #raise ConfigEntryNotReady(err) from err
+        except requests.exceptions.RequestException:
             await self.raise_issue(
                 hass=hass, 
                 config_entry=config_entry, 

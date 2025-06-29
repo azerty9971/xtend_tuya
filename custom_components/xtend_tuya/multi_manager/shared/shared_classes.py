@@ -9,6 +9,7 @@ from homeassistant.core import HomeAssistant
 from tuya_sharing import (
     CustomerDevice as TuyaDevice,
 )
+import xtend_tuya.multi_manager.multi_manager as mm
 
 class DeviceWatcher:
     def __init__(self, multi_manager: MultiManager) -> None:

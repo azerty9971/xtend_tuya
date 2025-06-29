@@ -6,10 +6,8 @@ import time
 import json
 
 from webrtc_models import (
-    RTCConfiguration,
     RTCIceCandidate,
     RTCIceCandidateInit,
-    RTCIceServer,
 )
 
 from homeassistant.core import HomeAssistant
@@ -490,7 +488,7 @@ class XTIOTWebRTCManager:
         candidate_str = candidate.candidate
         if candidate_str != "":
             candidate_str = f"a={candidate.candidate}"
-        if session_data.offer_sent == False:
+        if not session_data.offer_sent:
             session_data.offer_candidate.append(candidate_str)
         else:
             if payload := self.format_offer_candidate(session_id, candidate_str, device):
