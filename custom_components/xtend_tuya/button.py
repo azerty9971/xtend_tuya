@@ -116,9 +116,9 @@ async def async_setup_entry(
             if device := hass_data.manager.device_map.get(device_id):
                 if descriptions := merged_descriptors.get(device.category):
                     entities.extend(
-                        XTButtonEntity(device, hass_data.manager, description)
+                        XTButtonEntity.get_entity_instance(description, device, hass_data.manager)
                         for description in descriptions
-                        if description.key in device.status and (restrict_dpcode is None or restrict_dpcode == description.key)
+                        if XTEntity.supports_description(device, description) and (restrict_dpcode is None or restrict_dpcode == description.key)
                     )
                     for description in descriptions:
                         if description.vf_reset_state:
@@ -130,9 +130,9 @@ async def async_setup_entry(
                                 break
                 if descriptions := merged_descriptors.get(CROSS_CATEGORY_DEVICE_DESCRIPTOR):
                     entities.extend(
-                        XTButtonEntity(device, hass_data.manager, description)
+                        XTButtonEntity.get_entity_instance(description, device, hass_data.manager)
                         for description in descriptions
-                        if description.key in device.status and (restrict_dpcode is None or restrict_dpcode == description.key)
+                        if XTEntity.supports_description(device, description) and (restrict_dpcode is None or restrict_dpcode == description.key)
                     )
                     for description in descriptions:
                         if description.vf_reset_state:

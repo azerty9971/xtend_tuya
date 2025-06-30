@@ -22,14 +22,14 @@ from .multi_manager.multi_manager import (
 from .const import (
     TUYA_DISCOVERY_NEW, 
     XTDPCode,
-    DPType,
-    LOGGER,
+    LOGGER,  # noqa: F401
     CROSS_CATEGORY_DEVICE_DESCRIPTOR,
 )
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaLightEntity,
     TuyaLightEntityDescription,
     TuyaDPCode,
+    TuyaDPType,
 )
 from .entity import (
     XTEntity,
@@ -91,13 +91,13 @@ async def async_setup_entry(
                     entities.extend(
                         XTLightEntity.get_entity_instance(description, device, hass_data.manager)
                         for description in descriptions
-                        if description.key in device.status and (restrict_dpcode is None or restrict_dpcode == description.key)
+                        if XTEntity.supports_description(device, description) and (restrict_dpcode is None or restrict_dpcode == description.key)
                     )
                 if descriptions := merged_descriptors.get(CROSS_CATEGORY_DEVICE_DESCRIPTOR):
                     entities.extend(
                         XTLightEntity.get_entity_instance(description, device, hass_data.manager)
                         for description in descriptions
-                        if description.key in device.status and (restrict_dpcode is None or restrict_dpcode == description.key)
+                        if XTEntity.supports_description(device, description) and (restrict_dpcode is None or restrict_dpcode == description.key)
                     )
 
         async_add_entities(entities)
@@ -124,14 +124,14 @@ class XTLightEntity(XTEntity, TuyaLightEntity):
         except Exception as e:
             if (
                 dpcode := self.find_dpcode(description.color_data, prefer_function=True)
-            ) and self.get_dptype(dpcode) == DPType.JSON:
+            ) and self.get_dptype(dpcode) == TuyaDPType.JSON:
                 if dpcode in self.device.function:
                     values = self.device.function[dpcode].values
                 else:
                     values = self.device.status_range[dpcode].values
-                if function_data := json.loads(values):
-                    #LOGGER.warning(f"Failed light: {device}")
-                    pass
+                #if function_data := json.loads(values):
+                #   LOGGER.warning(f"Failed light: {device}")
+                #   pass
         super(XTEntity, self).__init__(device, device_manager, description) # type: ignore
         self.device = device
         self.device_manager = device_manager

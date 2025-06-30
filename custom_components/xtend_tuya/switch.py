@@ -431,13 +431,13 @@ async def async_setup_entry(
                     entities.extend(
                         XTSwitchEntity.get_entity_instance(description, device, hass_data.manager)
                         for description in descriptions
-                        if description.key in device.status and (restrict_dpcode is None or restrict_dpcode == description.key)
+                        if XTEntity.supports_description(device, description) and (restrict_dpcode is None or restrict_dpcode == description.key)
                     )
                 if descriptions := merged_descriptors.get(CROSS_CATEGORY_DEVICE_DESCRIPTOR):
                     entities.extend(
                         XTSwitchEntity.get_entity_instance(description, device, hass_data.manager)
                         for description in descriptions
-                        if description.key in device.status and (restrict_dpcode is None or restrict_dpcode == description.key)
+                        if XTEntity.supports_description(device, description) and (restrict_dpcode is None or restrict_dpcode == description.key)
                     )
 
         async_add_entities(entities)

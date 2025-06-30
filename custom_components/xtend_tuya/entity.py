@@ -2,9 +2,15 @@ from __future__ import annotations
 
 from typing import overload, Literal
 
+from homeassistant.helpers.entity import EntityDescription
+
 from .const import (
     XTDPCode,
     LOGGER,  # noqa: F401
+)
+
+from .multi_manager.shared.shared_classes import (
+    XTDevice,
 )
 
 from .ha_tuya_integration.tuya_integration_imports import (
@@ -147,3 +153,13 @@ class XTEntity(TuyaEntity):
             return TuyaDPType(type)
         except ValueError:
             return TUYA_DPTYPE_MAPPING.get(type)
+    
+    @staticmethod
+    def supports_description(device: XTDevice, description: EntityDescription) -> bool:
+        if description.key    in device.status:
+            return True
+        all_aliases = device.get_all_status_code_aliases()
+        if current_status := all_aliases.get(description.key):
+            device.replace_status_with_another(current_status, description.key)
+            return True
+        return False

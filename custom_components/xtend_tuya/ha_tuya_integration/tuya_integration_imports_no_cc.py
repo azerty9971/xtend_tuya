@@ -83,6 +83,12 @@ from homeassistant.components.tuya.vacuum import (
         TuyaVacuumEntity as TuyaVacuumEntity,
     )
 import homeassistant.components.tuya as tuya_integration  # noqa: F401
+#from homeassistant.components.tuya import (
+#    ManagerCompat as TuyaManager,
+#)
+from tuya_sharing.manager import (
+    Manager as TuyaManager,
+)
 from homeassistant.components.tuya.const import (
         DPCode as TuyaDPCode,
         DPType as TuyaDPType,

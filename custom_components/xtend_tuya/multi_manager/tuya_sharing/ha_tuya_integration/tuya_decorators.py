@@ -7,11 +7,8 @@ from .config_entry_handler import (
 )
 
 from ....ha_tuya_integration.tuya_integration_imports import (
-    tuya_integration
-)
-
-from tuya_sharing import (
-    Manager,
+    tuya_integration,
+    TuyaManager,
 )
 
 class XTDecorator:
@@ -60,7 +57,7 @@ class XTDecorator:
         new_func = decorator.wrapper(func, callback)
         return decorator, new_func
 
-def decorate_tuya_manager(tuya_manager: Manager, ha_tuya_integration_config_manager: XTHATuyaIntegrationConfigEntryManager) -> list[XTDecorator]:
+def decorate_tuya_manager(tuya_manager: TuyaManager, ha_tuya_integration_config_manager: XTHATuyaIntegrationConfigEntryManager) -> list[XTDecorator]:
     return_list : list[XTDecorator] = []
 
     decorator, tuya_manager.refresh_mq  = XTDecorator.get_decorator(tuya_manager.refresh_mq, ha_tuya_integration_config_manager.on_tuya_refresh_mq)

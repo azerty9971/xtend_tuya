@@ -3,6 +3,7 @@ from typing import NamedTuple, Any, Optional
 from collections import UserDict
 from dataclasses import dataclass
 import copy
+import json
 from enum import StrEnum
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
@@ -248,6 +249,47 @@ class XTDevice(TuyaDevice):
     
     def set_preference(self, pref_id: str, pref_val: Any):
         self.device_preference[pref_id] = pref_val
+
+    def get_all_status_code_aliases(self) -> dict[str, str]:
+        return_list: dict[str, str] = {}
+        for local_strategy in self.local_strategy.values():
+            if status_code := local_strategy.get("status_code", None):
+                for alias in local_strategy.get("status_code_alias", {}):
+                    return_list[alias] = status_code
+        return return_list
+    
+    def replace_status_with_another(self, orig_status: str, new_status:str):
+        #LOGGER.debug(f"Replacing {orig_status} with {new_status} in {device.name}")
+        if orig_status in self.status_range:
+            self.status_range[new_status] = self.status_range.pop(orig_status)
+            self.status_range[new_status].code = new_status
+        
+        if orig_status in self.function:
+            self.function[new_status] = self.function.pop(orig_status)
+            self.function[new_status].code = new_status
+        
+        if orig_status in self.status:
+            self.status[new_status] = self.status.pop(orig_status)
+        
+        for dpId in self.local_strategy:
+            status_code = self.local_strategy[dpId].get("status_code")
+            status_alias: list = self.local_strategy[dpId].get("status_code_alias", [])
+            if status_code == orig_status:
+                self.local_strategy[dpId]["status_code"] = new_status
+                if new_status in status_alias:
+                    status_alias.remove(new_status)
+                if orig_status not in status_alias:
+                    status_alias.append(orig_status)
+                self.local_strategy[dpId]["status_code_alias"] = status_alias
+                if config_item := self.local_strategy[dpId].get("config_item", None):
+                    if status_formats := config_item.get("statusFormat", None):
+                        status_formats_dict: dict = json.loads(status_formats)
+                        for first_key in status_formats_dict:
+                            status_formats_dict[new_status] = status_formats_dict.pop(first_key)
+                            break
+                        config_item["statusFormat"] = json.dumps(status_formats_dict)
+                break
+
 
 class XTDeviceMap(UserDict[str, XTDevice]):
 

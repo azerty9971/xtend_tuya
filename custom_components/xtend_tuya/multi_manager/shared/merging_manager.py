@@ -89,40 +89,7 @@ class XTMergingManager:
                     status_alias = device.local_strategy[dpId].get("status_code_alias", [])
                     if status in status_alias and status_code is not None:
                         #Replace status_code with status in the device
-                        XTMergingManager._replace_status_with_another(device, str(status_code), status)
-    
-    @staticmethod
-    def _replace_status_with_another(device: shared.XTDevice, orig_status: str, new_status:str):
-        #LOGGER.debug(f"Replacing {orig_status} with {new_status} in {device.name}")
-        if orig_status in device.status_range:
-            device.status_range[new_status] = device.status_range.pop(orig_status)
-            device.status_range[new_status].code = new_status
-        
-        if orig_status in device.function:
-            device.function[new_status] = device.function.pop(orig_status)
-            device.function[new_status].code = new_status
-        
-        if orig_status in device.status:
-            device.status[new_status] = device.status.pop(orig_status)
-        
-        for dpId in device.local_strategy:
-            status_code = device.local_strategy[dpId].get("status_code")
-            status_alias: list = device.local_strategy[dpId].get("status_code_alias", [])
-            if status_code == orig_status:
-                device.local_strategy[dpId]["status_code"] = new_status
-                if new_status in status_alias:
-                    status_alias.remove(new_status)
-                if orig_status not in status_alias:
-                    status_alias.append(orig_status)
-                device.local_strategy[dpId]["status_code_alias"] = status_alias
-                if config_item := device.local_strategy[dpId].get("config_item", None):
-                    if status_formats := config_item.get("statusFormat", None):
-                        status_formats_dict: dict = json.loads(status_formats)
-                        for first_key in status_formats_dict:
-                            status_formats_dict[new_status] = status_formats_dict.pop(first_key)
-                            break
-                        config_item["statusFormat"] = json.dumps(status_formats_dict)
-                break
+                        device.replace_status_with_another(str(status_code), status)
 
     @staticmethod
     def _align_device_properties(device1: shared.XTDevice, device2: shared.XTDevice, msg_queue: list[str] | None = None):
