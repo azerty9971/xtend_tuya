@@ -3,10 +3,9 @@
 from __future__ import annotations
 
 import datetime
-from typing import Any
 
 from dataclasses import dataclass, field
-from .const import LOGGER
+from .const import LOGGER  # noqa: F401
 
 from homeassistant.components.sensor import (
     SensorDeviceClass,
@@ -16,7 +15,6 @@ from homeassistant.components.sensor import (
 )
 from homeassistant.const import (
     UnitOfEnergy,
-    UnitOfTemperature,
     Platform,
     PERCENTAGE,
     EntityCategory,
@@ -49,7 +47,6 @@ from .entity import (
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaSensorEntity,
     TuyaSensorEntityDescription,
-    TuyaDPCode,
     TuyaIntegerTypeData,
     TuyaDOMAIN,
     TuyaDEVICE_CLASS_UNITS,

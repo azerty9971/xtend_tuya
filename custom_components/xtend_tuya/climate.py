@@ -25,7 +25,7 @@ from .multi_manager.multi_manager import (
 from .const import (
     TUYA_DISCOVERY_NEW, 
     XTDPCode, 
-    CROSS_CATEGORY_DEVICE_DESCRIPTOR,
+    CROSS_CATEGORY_DEVICE_DESCRIPTOR,  # noqa: F401
 )
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaClimateEntity,

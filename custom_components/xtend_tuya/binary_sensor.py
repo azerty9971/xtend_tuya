@@ -20,7 +20,12 @@ from .multi_manager.multi_manager import (
     MultiManager,
     XTDevice,
 )
-from .const import TUYA_DISCOVERY_NEW, XTDPCode, LOGGER, CROSS_CATEGORY_DEVICE_DESCRIPTOR
+from .const import (
+    TUYA_DISCOVERY_NEW, 
+    XTDPCode, 
+    LOGGER,  # noqa: F401
+    CROSS_CATEGORY_DEVICE_DESCRIPTOR,
+)
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaBinarySensorEntity,
     TuyaBinarySensorEntityDescription,

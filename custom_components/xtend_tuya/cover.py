@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-import asyncio
 from typing import Any
 
 from homeassistant.components.cover import (
