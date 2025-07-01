@@ -156,7 +156,7 @@ class XTEntity(TuyaEntity):
     
     @staticmethod
     def supports_description(device: XTDevice, description: EntityDescription) -> bool:
-        if description.key    in device.status:
+        if description.key in device.status:
             return True
         all_aliases = device.get_all_status_code_aliases()
         if current_status := all_aliases.get(description.key):
