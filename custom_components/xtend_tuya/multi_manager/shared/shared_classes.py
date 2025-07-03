@@ -150,6 +150,7 @@ class XTDevice(TuyaDevice):
     force_compatibility: bool = False   #Force the device functions/status_range/state to remain untouched after merging
     device_preference: dict[str, Any] = {}
     regular_tuya_device: TuyaDevice | None = None
+    enable_regular_device_replication: bool = False
 
     class XTDevicePreference(StrEnum):
         IS_A_COVER_DEVICE                   = "IS_A_COVER_DEVICE"
