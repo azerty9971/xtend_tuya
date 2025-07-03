@@ -127,8 +127,10 @@ class XTMergingManager:
             device2.support_local = True
         device1.data_model      = XTMergingManager.smart_merge(device1.data_model, device2.data_model, msg_queue, "device.data_model")
         if device1.regular_tuya_device is not None:
+            LOGGER.warning(f"Copying regular tuya device {device1.regular_tuya_device}")
             device2.regular_tuya_device = device1.regular_tuya_device
-        else:
+        elif device2.regular_tuya_device is not None:
+            LOGGER.warning(f"Copying regular tuya device {device2.regular_tuya_device}")
             device1.regular_tuya_device = device2.regular_tuya_device
 
     @staticmethod

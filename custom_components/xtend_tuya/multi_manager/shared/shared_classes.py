@@ -150,7 +150,7 @@ class XTDevice(TuyaDevice):
     force_compatibility: bool = False   #Force the device functions/status_range/state to remain untouched after merging
     device_preference: dict[str, Any] = {}
     regular_tuya_device: TuyaDevice | None = None
-    enable_regular_device_replication: bool = False
+    enable_regular_tuya_device_replication: bool = False
 
     class XTDevicePreference(StrEnum):
         IS_A_COVER_DEVICE                   = "IS_A_COVER_DEVICE"
@@ -191,7 +191,7 @@ class XTDevice(TuyaDevice):
         self.function = {} # type: ignore
         self.status_range = {} # type: ignore
         self.device_preference = {}
-        self.enable_regular_device_replication: bool = False
+        self.enable_regular_tuya_device_replication: bool = False
         super().__init__(**kwargs)
     
     def __repr__(self) -> str:
@@ -213,8 +213,8 @@ class XTDevice(TuyaDevice):
     
     def __setattr__(self, attr, value):
         if attr == "online":
-            LOGGER.warning(f"Setting device online: {value} => {self.regular_tuya_device} <=> {self.enable_regular_device_replication} <=> {hasattr(self.regular_tuya_device, attr)}")
-        if self.enable_regular_device_replication is True and self.regular_tuya_device is not None and hasattr(self.regular_tuya_device, attr):
+            LOGGER.warning(f"Setting device online: {value} => {self.regular_tuya_device} <=> {self.enable_regular_tuya_device_replication} <=> {hasattr(self.regular_tuya_device, attr)}")
+        if self.enable_regular_tuya_device_replication is True and self.regular_tuya_device is not None and hasattr(self.regular_tuya_device, attr):
             self.regular_tuya_device.__setattr__(attr, value)
         super().__setattr__(attr, value)
 
