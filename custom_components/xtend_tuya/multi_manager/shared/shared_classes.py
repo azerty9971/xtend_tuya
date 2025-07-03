@@ -212,8 +212,8 @@ class XTDevice(TuyaDevice):
         #return f"Device {self.name}:\r\n{self.source}"
     
     def __setattr__(self, attr, value):
-        if attr == "online" and self.enable_regular_tuya_device_replication is True:
-            LOGGER.warning(f"Setting device online: {value} => {self.regular_tuya_device} <=> {self.enable_regular_tuya_device_replication} <=> {hasattr(self.regular_tuya_device, attr)}")
+        if attr == "online" and self.enable_regular_tuya_device_replication is True and self.regular_tuya_device is not None:
+            LOGGER.warning(f"Setting device online: {value} => {self.regular_tuya_device.name} <=> {self.enable_regular_tuya_device_replication} <=> {hasattr(self.regular_tuya_device, attr)}")
         if self.enable_regular_tuya_device_replication is True and self.regular_tuya_device is not None and hasattr(self.regular_tuya_device, attr):
             self.regular_tuya_device.__setattr__(attr, value)
         super().__setattr__(attr, value)
