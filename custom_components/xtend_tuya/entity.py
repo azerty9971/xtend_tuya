@@ -22,8 +22,6 @@ from .ha_tuya_integration.tuya_integration_imports import (
     TuyaDPType,
 )
 
-import custom_components.xtend_tuya.binary_sensor as XTBinarySensor
-
 class XTEntity(TuyaEntity):
     def __init__(
         self,
@@ -169,6 +167,8 @@ class XTEntity(TuyaEntity):
 
     @staticmethod
     def _supports_description(device: XTDevice, description: EntityDescription, first_pass: bool) -> tuple[bool, str]:
+        import custom_components.xtend_tuya.binary_sensor as XTBinarySensor
+
         dpcode = description.key
         if isinstance(description, XTBinarySensor.XTBinarySensorEntityDescription):
             if description.dpcode is not None:
