@@ -171,7 +171,7 @@ class MultiManager:  # noqa: F811
             #Applied twice because some parts at the end of apply_fix would change values of previous calls
             CloudFixes.apply_fixes(device)
             CloudFixes.apply_fixes(device)
-            device.enable_regular_tuya_device_replication = True
+        self._enable_regular_tuya_device_replication()
         self._process_pending_messages()
 
     def _process_pending_messages(self):
@@ -203,6 +203,12 @@ class MultiManager:  # noqa: F811
                 for prev_device in to_be_merged:
                     XTMergingManager.merge_devices(prev_device, current_device, self)
                 to_be_merged.append(current_device)
+    
+    def _enable_regular_tuya_device_replication(self):
+        for device in self.device_map.values():
+            devices = self.__get_devices_from_device_id(device.id)
+            for current_device in devices:
+                current_device.enable_regular_tuya_device_replication = True
     
     def unload(self):
         for manager in self.accounts.values():
