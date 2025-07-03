@@ -76,8 +76,8 @@ class XTMergingManager:
             XTMergingManager._enforce_compatibility(higher_priority, lower_bak)
             higher_priority.force_compatibility = True
         if higher_bak.force_compatibility:
-            XTMergingManager._enforce_compatibility(higher_priority, higher_bak)
-            higher_priority.force_compatibility = True
+            XTMergingManager._enforce_compatibility(lower_priority, higher_bak)
+            lower_bak.force_compatibility = True
 
     @staticmethod
     def _enforce_compatibility(device: shared.XTDevice, enforcing_reference: shared.XTDevice):
@@ -90,6 +90,7 @@ class XTMergingManager:
                     if status in status_alias and status_code is not None:
                         #Replace status_code with status in the device
                         device.replace_status_with_another(str(status_code), status)
+        
 
     @staticmethod
     def _align_device_properties(device1: shared.XTDevice, device2: shared.XTDevice, msg_queue: list[str] | None = None):
@@ -125,6 +126,10 @@ class XTMergingManager:
             device1.support_local = True
             device2.support_local = True
         device1.data_model      = XTMergingManager.smart_merge(device1.data_model, device2.data_model, msg_queue, "device.data_model")
+        if device1.regular_tuya_device is not None:
+            device2.regular_tuya_device = device1.regular_tuya_device
+        else:
+            device1.regular_tuya_device = device2.regular_tuya_device
 
     @staticmethod
     def _fix_incorrect_valuedescr(device1: shared.XTDevice, device2: shared.XTDevice):

@@ -149,6 +149,7 @@ class XTDevice(TuyaDevice):
     device_source_priority: int | None = None
     force_compatibility: bool = False   #Force the device functions/status_range/state to remain untouched after merging
     device_preference: dict[str, Any] = {}
+    regular_tuya_device: TuyaDevice | None = None
 
     class XTDevicePreference(StrEnum):
         IS_A_COVER_DEVICE                   = "IS_A_COVER_DEVICE"
@@ -189,6 +190,7 @@ class XTDevice(TuyaDevice):
         self.function = {} # type: ignore
         self.status_range = {} # type: ignore
         self.device_preference = {}
+        self.enable_regular_device_replication: bool = False
         super().__init__(**kwargs)
     
     def __repr__(self) -> str:
@@ -207,6 +209,11 @@ class XTDevice(TuyaDevice):
         
         return f"Device {self.name}:\r\n{function_str}{status_range_str}{status_str}{local_strategy_str}"
         #return f"Device {self.name}:\r\n{self.source}"
+    
+    def __setattr__(self, attr, value):
+        if self.enable_regular_device_replication is True and self.regular_tuya_device is not None and hasattr(self.regular_tuya_device, attr):
+            self.regular_tuya_device.__setattr__(attr, value)
+        super().__setattr__(attr, value)
 
     @staticmethod
     def from_compatible_device(device: Any, source: str = "Compatible device", device_source_priority: int | None = None):

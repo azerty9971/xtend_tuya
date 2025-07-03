@@ -171,6 +171,7 @@ class MultiManager:  # noqa: F811
             #Applied twice because some parts at the end of apply_fix would change values of previous calls
             CloudFixes.apply_fixes(device)
             CloudFixes.apply_fixes(device)
+            device.enable_regular_device_replication = True
         self._process_pending_messages()
 
     def _process_pending_messages(self):
