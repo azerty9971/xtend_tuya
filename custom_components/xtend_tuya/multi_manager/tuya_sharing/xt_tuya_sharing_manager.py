@@ -116,8 +116,9 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
     def _on_device_other(self, device_id: str, biz_code: str, data: dict[str, Any]):
         self.multi_manager.device_watcher.report_message(device_id, f"[{MESSAGE_SOURCE_TUYA_SHARING}]On device other: {biz_code} <=> {data}")
         device = self.device_map.get(device_id, None)
-        LOGGER.warning(f"Device: {device.name if device is not None else "NONE"}: {device.online if device is not None else "/"} <=> {type(device)}")
+        LOGGER.warning(f"Device BEFORE: {device.name if device is not None else "NONE"}: {device.online if device is not None else "/"} <=> {type(device)} <=> {device.enable_regular_tuya_device_replication if device is not None else "/"} <=> {True if device is not None and device.regular_tuya_device is not None else False}")
         super()._on_device_other(device_id, biz_code, data)
+        LOGGER.warning(f"Device AFTER: {device.name if device is not None else "NONE"}: {device.online if device is not None else "/"} <=> {type(device)} <=> {device.enable_regular_tuya_device_replication if device is not None else "/"} <=> {True if device is not None and device.regular_tuya_device is not None else False}")
         if biz_code in [BIZCODE_ONLINE, BIZCODE_OFFLINE]:
             self.multi_manager.update_device_online_status(device_id)
 
