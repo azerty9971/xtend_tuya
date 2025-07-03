@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import cast
 
 from homeassistant.components.binary_sensor import (
     BinarySensorDeviceClass,
@@ -12,7 +13,9 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from .util import (
-    merge_device_descriptors
+    merge_device_descriptors,
+    merge_descriptor_category,
+    restrict_descriptor_category,
 )
 
 from .multi_manager.multi_manager import (
@@ -172,21 +175,22 @@ async def async_setup_entry(
             return
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id, None):
-                if descriptions := merged_descriptors.get(device.category):
-                    for description in descriptions:
-                        dpcode = description.dpcode or description.key
-                        if dpcode in device.status and (restrict_dpcode is None or restrict_dpcode == description.key):
-                            entities.append(
-                                XTBinarySensorEntity.get_entity_instance(description, device, hass_data.manager)
-                            )
-                if descriptions := merged_descriptors.get(CROSS_CATEGORY_DEVICE_DESCRIPTOR):
-                    for description in descriptions:
-                        dpcode = description.dpcode or description.key
-                        if dpcode in device.status and (restrict_dpcode is None or restrict_dpcode == description.key):
-                            entities.append(
-                                XTBinarySensorEntity.get_entity_instance(description, device, hass_data.manager)
-                            )
-
+                category_descriptions = merged_descriptors.get(device.category)
+                cross_category_descriptions = merged_descriptors.get(CROSS_CATEGORY_DEVICE_DESCRIPTOR)
+                descriptions = merge_descriptor_category(category_descriptions, cross_category_descriptions)
+                if restrict_dpcode is not None:
+                    descriptions = restrict_descriptor_category(descriptions, [restrict_dpcode])
+                descriptions = cast(tuple[XTBinarySensorEntityDescription, ...], descriptions)
+                entities.extend(
+                    XTBinarySensorEntity.get_entity_instance(description, device, hass_data.manager)
+                    for description in descriptions
+                    if XTEntity.supports_description(device, description, True)
+                )
+                entities.extend(
+                    XTBinarySensorEntity.get_entity_instance(description, device, hass_data.manager)
+                    for description in descriptions
+                    if XTEntity.supports_description(device, description, False)
+                )
         async_add_entities(entities)
 
     hass_data.manager.register_device_descriptors("binary_sensors", merged_descriptors)

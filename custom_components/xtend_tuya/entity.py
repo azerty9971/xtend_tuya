@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import overload, Literal
+from typing import overload, Literal, cast
 
 from homeassistant.helpers.entity import EntityDescription
 
@@ -21,6 +21,8 @@ from .ha_tuya_integration.tuya_integration_imports import (
     TuyaDPCode,
     TuyaDPType,
 )
+
+import custom_components.xtend_tuya.binary_sensor as XTBinarySensor
 
 class XTEntity(TuyaEntity):
     def __init__(
@@ -155,11 +157,34 @@ class XTEntity(TuyaEntity):
             return TUYA_DPTYPE_MAPPING.get(type)
     
     @staticmethod
-    def supports_description(device: XTDevice, description: EntityDescription) -> bool:
-        if description.key in device.status:
-            return True
-        all_aliases = device.get_all_status_code_aliases()
-        if current_status := all_aliases.get(description.key):
-            device.replace_status_with_another(current_status, description.key)
-            return True
-        return False
+    def supports_description(device: XTDevice, description: EntityDescription, first_pass: bool) -> bool:
+        result, dpcode = XTEntity._supports_description(device, description, first_pass)
+        if result is True:
+            #Register the code as being handled by the device
+            handled_dpcodes: list[str] = cast(list[str], device.get_preference(XTDevice.XTDevicePreference.HANDLED_DPCODES, []))
+            if dpcode not in handled_dpcodes:
+                handled_dpcodes.append(dpcode)
+                device.set_preference(XTDevice.XTDevicePreference.HANDLED_DPCODES, handled_dpcodes)
+        return result
+
+    @staticmethod
+    def _supports_description(device: XTDevice, description: EntityDescription, first_pass: bool) -> tuple[bool, str]:
+        dpcode = description.key
+        if isinstance(description, XTBinarySensor.XTBinarySensorEntityDescription):
+            if description.dpcode is not None:
+                dpcode = description.dpcode
+        if first_pass is True:
+            if dpcode in device.status:
+                return True, dpcode
+            return False, dpcode
+        else:
+            if device.force_compatibility is True:
+                return False, dpcode
+
+            all_aliases = device.get_all_status_code_aliases()
+            if current_status := all_aliases.get(dpcode):
+                handled_dpcodes: list[str] = cast(list[str], device.get_preference(XTDevice.XTDevicePreference.HANDLED_DPCODES, []))
+                if current_status not in handled_dpcodes:
+                    device.replace_status_with_another(current_status, dpcode)
+                    return True, dpcode
+        return False, dpcode

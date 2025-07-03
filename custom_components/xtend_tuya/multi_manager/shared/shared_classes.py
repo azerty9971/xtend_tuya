@@ -153,10 +153,11 @@ class XTDevice(TuyaDevice):
     class XTDevicePreference(StrEnum):
         IS_A_COVER_DEVICE                   = "IS_A_COVER_DEVICE"
         LOCK_MANUAL_UNLOCK_COMMAND          = "LOCK_MANUAL_UNLOCK_COMMAND"
-        LOCK_GET_SUPPORTED_UNLOCK_TYPES     = "_LOCK_GET_SUPPORTED_UNLOCK_TYPES"
-        LOCK_GET_DOOR_LOCK_PASSWORD_TICKET  = "_LOCK_GET_DOOR_LOCK_PASSWORD_TICKET"
-        LOCK_CALL_DOOR_OPERATE              = "_LOCK_CALL_DOOR_OPERATE"
-        LOCK_CALL_DOOR_OPEN                 = "_LOCK_CALL_DOOR_OPEN"
+        LOCK_GET_SUPPORTED_UNLOCK_TYPES     = "LOCK_GET_SUPPORTED_UNLOCK_TYPES"
+        LOCK_GET_DOOR_LOCK_PASSWORD_TICKET  = "LOCK_GET_DOOR_LOCK_PASSWORD_TICKET"
+        LOCK_CALL_DOOR_OPERATE              = "LOCK_CALL_DOOR_OPERATE"
+        LOCK_CALL_DOOR_OPEN                 = "LOCK_CALL_DOOR_OPEN"
+        HANDLED_DPCODES                     = "HANDLED_DPCODES"
 
     def __init__(self, **kwargs: Any) -> None:
         self.source = ""

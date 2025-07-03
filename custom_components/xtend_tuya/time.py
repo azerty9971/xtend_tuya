@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from typing import cast
 from dataclasses import dataclass
 from datetime import time, datetime
 
@@ -18,6 +19,8 @@ from .const import (
 )
 from .util import (
     merge_device_descriptors,
+    merge_descriptor_category,
+    restrict_descriptor_category,
 )
 from .multi_manager.multi_manager import (
     MultiManager,
@@ -67,18 +70,22 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if descriptions := merged_descriptors.get(device.category):
-                    entities.extend(
-                        XTTimeEntity.get_entity_instance(description, device, hass_data.manager)
-                        for description in descriptions
-                        if XTEntity.supports_description(device, description) and (restrict_dpcode is None or restrict_dpcode == description.key)
-                    )
-                if descriptions := merged_descriptors.get(CROSS_CATEGORY_DEVICE_DESCRIPTOR):
-                    entities.extend(
-                        XTTimeEntity.get_entity_instance(description, device, hass_data.manager)
-                        for description in descriptions
-                        if XTEntity.supports_description(device, description) and (restrict_dpcode is None or restrict_dpcode == description.key)
-                    )
+                category_descriptions = merged_descriptors.get(device.category)
+                cross_category_descriptions = merged_descriptors.get(CROSS_CATEGORY_DEVICE_DESCRIPTOR)
+                descriptions = merge_descriptor_category(category_descriptions, cross_category_descriptions)
+                if restrict_dpcode is not None:
+                    descriptions = restrict_descriptor_category(descriptions, [restrict_dpcode])
+                descriptions = cast(tuple[XTTimeEntityDescription, ...], descriptions)
+                entities.extend(
+                    XTTimeEntity.get_entity_instance(description, device, hass_data.manager)
+                    for description in descriptions
+                    if XTEntity.supports_description(device, description, True)
+                )
+                entities.extend(
+                    XTTimeEntity.get_entity_instance(description, device, hass_data.manager)
+                    for description in descriptions
+                    if XTEntity.supports_description(device, description, False)
+                )
         
         async_add_entities(entities)
     

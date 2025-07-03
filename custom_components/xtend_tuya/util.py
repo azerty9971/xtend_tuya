@@ -124,16 +124,31 @@ def merge_device_descriptors(descriptors1, descriptors2):
             return_descriptors[category] = merge_descriptor_category(return_descriptors[category], descriptors2[category])
     return return_descriptors
 
-def merge_descriptor_category(category1: tuple[EntityDescription, ...], category2: tuple[EntityDescription, ...]):
-    descriptor1_key_list = []
-    return_category = copy.deepcopy(list(category1))
-    for descriptor in category1:
-        if descriptor.key not in descriptor1_key_list:
-            descriptor1_key_list.append(descriptor.key)
-    for descriptor in category2:
-        if descriptor.key not in descriptor1_key_list:
-            return_category.append(copy.deepcopy(descriptor))
-    return tuple(return_category)
+def merge_descriptor_category(category1: tuple[EntityDescription, ...] | None, category2: tuple[EntityDescription, ...] | None) -> tuple[EntityDescription, ...]:
+    if   category1 is None      and category2 is None:
+        return tuple()
+    elif category1 is None      and category2 is not None:
+        return category2
+    elif category1 is not None  and category2 is None:
+        return category1
+    elif category1 is not None and category2 is not None:
+        descriptor1_key_list = []
+        return_category = copy.deepcopy(list(category1))
+        for descriptor in category1:
+            if descriptor.key not in descriptor1_key_list:
+                descriptor1_key_list.append(descriptor.key)
+        for descriptor in category2:
+            if descriptor.key not in descriptor1_key_list:
+                return_category.append(copy.deepcopy(descriptor))
+        return tuple(return_category)
+    return tuple()
+
+def restrict_descriptor_category(category: tuple[EntityDescription, ...], restrict_to_keys: list[str]) -> tuple[EntityDescription, ...]:
+    return_list: list[EntityDescription] = []
+    for descriptor in category:
+        if descriptor.key in restrict_to_keys:
+            return_list.append(descriptor)
+    return tuple(return_list)
 
 def append_dictionnaries(dict1: dict, dict2: dict) -> dict:
     return_dict = copy.deepcopy(dict1)

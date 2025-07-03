@@ -75,7 +75,7 @@ async def async_setup_entry(
     def async_discover_device(device_map, restrict_dpcode: str | None = None) -> None:
         """Discover and add a discovered Tuya climate."""
         if hass_data.manager is None:
-            return
+            return None
         if restrict_dpcode is not None:
             return None
         entities: list[XTClimateEntity] = []
