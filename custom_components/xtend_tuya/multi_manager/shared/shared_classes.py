@@ -21,7 +21,7 @@ from ...const import (
 
 class DeviceWatcher:
     def __init__(self, multi_manager: mm.MultiManager) -> None:
-        self.watched_dev_id: list[str] = ["bf615b97b0d088e11ee38v"]
+        self.watched_dev_id: list[str] = []
         self.multi_manager = multi_manager
 
     def is_watched(self, dev_id: str) -> bool:
@@ -212,8 +212,6 @@ class XTDevice(TuyaDevice):
         #return f"Device {self.name}:\r\n{self.source}"
     
     def __setattr__(self, attr, value):
-        if attr == "online" and self.enable_regular_tuya_device_replication is True and self.regular_tuya_device is not None:
-            LOGGER.warning(f"Setting device online: {value} => {self.regular_tuya_device.name} <=> {self.enable_regular_tuya_device_replication} <=> {hasattr(self.regular_tuya_device, attr)}")
         if self.enable_regular_tuya_device_replication is True and self.regular_tuya_device is not None and hasattr(self.regular_tuya_device, attr):
             self.regular_tuya_device.__setattr__(attr, value)
         super().__setattr__(attr, value)
