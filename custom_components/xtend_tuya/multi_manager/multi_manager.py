@@ -316,10 +316,9 @@ class MultiManager:  # noqa: F811
         if not dev_id:
             LOGGER.warning(f"dev_id {dev_id} not found!")
             return
-        
-        self.device_watcher.report_message(dev_id, f"on_message ({source}) => {msg}")
 
         new_message = self._convert_message_for_all_accounts(msg)
+        self.device_watcher.report_message(dev_id, f"on_message ({source}) => {msg} <=> {new_message}")
         if status_list := self._get_status_list_from_message(msg):
             self.device_watcher.report_message(dev_id, f"On Message reporting ({source}): {msg}")
             self.multi_source_handler.register_status_list_from_source(dev_id, source, status_list)
