@@ -466,10 +466,10 @@
                 "name": "Direction puissance voie A"
             },
             "direction_b":{
-                "name": "Direction puissance voie A B"
+                "name": "Direction puissance voie B"
             },  
-            "VOLTAGE_A": {
-                "name": "Tension"
+            "voltage_a": {
+                "name": "Tension A"
             },
             "current_a": {
                 "name": "Courant voie A"

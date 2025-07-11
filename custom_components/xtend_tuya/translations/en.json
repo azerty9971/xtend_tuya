@@ -1188,6 +1188,33 @@
             }
         },
         "sensor": {
+            "power_a":{
+                "name": "Power A"
+            },
+            "power_b":{
+                "name": "Power B"
+            },
+            "direction_a":{
+                "name": "Power direction A"
+            },
+            "direction_b":{
+                "name": "Power direction B"
+            },  
+            "voltage_a": {
+                "name": "Voltage A"
+            },
+            "current_a": {
+                "name": "Current A"
+            },
+            "current_b": {
+                "name": "Current B"
+            },
+            "power_factor": {
+                "name": "Power factor"
+            },
+            "power_factor_b": {
+                "name": "Power factor B"
+            },
             "xt_cover_invert_control": {
                 "name": "Cover controls inverted"
             },
