@@ -303,13 +303,13 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
     def get_platform_descriptors_to_merge(self, platform: Platform) -> Any:
         pass
     
-    def send_commands(self, device_id: str, commands: list[dict[str, Any]]):
+    def send_commands(self, device_id: str, commands: list[dict[str, Any]]) -> bool:
         open_api_regular_commands: list[dict[str, Any]] = []
         property_commands: list[dict[str, Any]] = []
         devices = self.get_devices_from_device_id(device_id)
         dpId: int | None = None
         if devices is None or self.iot_account is None:
-            return None
+            return False
         for command in commands:
             command_code  = command["code"]
             command_value = command["value"]
@@ -339,13 +339,17 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
                         command_value = prepare_value_for_property_update(device.local_strategy[dpId], command_value)
                         property_dict = {str(command_code): command_value}
                         property_commands.append(property_dict)
-        
-        if open_api_regular_commands:
-            LOGGER.debug(f"Sending Open API regular command : {open_api_regular_commands}")
-            self.iot_account.device_manager.send_commands(device_id, open_api_regular_commands)
-        if property_commands:
-            LOGGER.debug(f"Sending property command : {property_commands}")
-            self.iot_account.device_manager.send_property_update(device_id, property_commands)
+        try:
+            if open_api_regular_commands:
+                LOGGER.debug(f"Sending Open API regular command : {open_api_regular_commands}")
+                self.iot_account.device_manager.send_commands(device_id, open_api_regular_commands)
+            if property_commands:
+                LOGGER.debug(f"Sending property command : {property_commands}")
+                self.iot_account.device_manager.send_property_update(device_id, property_commands)
+        except Exception as e:
+            LOGGER.warning(f"[IOT]Send command failed, device id: {device_id}, commands: {commands}, exception: {e}")
+            return False
+        return True
 
     def convert_to_xt_device(self, device: Any, device_source_priority: XTDeviceSourcePriority | None = None) -> XTDevice:
         #Nothing to do, tuya_iot initializes XTDevice by default...

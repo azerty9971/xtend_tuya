@@ -73,6 +73,7 @@ from ...const import (
     TUYA_DISCOVERY_NEW_ORIG,
     TUYA_HA_SIGNAL_UPDATE_ENTITY,
     XTDeviceSourcePriority,
+    LOGGER,
 )
 
 def get_plugin_instance() -> XTTuyaSharingDeviceManagerInterface | None:
@@ -269,9 +270,9 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
             return None
         return get_tuya_platform_descriptors(platform)
     
-    def send_commands(self, device_id: str, commands: list[dict[str, Any]]):
+    def send_commands(self, device_id: str, commands: list[dict[str, Any]]) -> bool:
         if self.sharing_account is None:
-            return None
+            return False
         regular_commands: list[dict[str, Any]] = []
         devices = self.get_devices_from_device_id(device_id)
         for command in commands:
@@ -289,8 +290,13 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
             if not skip_command:
                 regular_commands.append(command)
         
-        if regular_commands:
-            self.sharing_account.device_manager.send_commands(device_id, regular_commands)
+        try:
+            if regular_commands:
+                self.sharing_account.device_manager.send_commands(device_id, regular_commands)
+        except Exception as e:
+            LOGGER.warning(f"[Sharing]Send command failed, device id: {device_id}, commands: {commands}, exception: {e}")
+            return False
+        return True
     
     def convert_to_xt_device(self, device: Any, device_source_priority: XTDeviceSourcePriority | None = None) -> XTDevice:
         device_new: XTDevice = XTDevice.from_compatible_device(device, device_source_priority=device_source_priority)

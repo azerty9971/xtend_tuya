@@ -102,8 +102,8 @@ class XTDeviceManagerInterface(ABC):
     def get_platform_descriptors_to_merge(self, platform: Platform) -> Any:
         pass
 
-    def send_commands(self, device_id: str, commands: list[dict[str, Any]]):
-        pass
+    def send_commands(self, device_id: str, commands: list[dict[str, Any]]) -> bool:
+        return False
 
     def get_devices_from_device_id(self, device_id: str) -> list[shared.XTDevice] | None:
         return_list = []
