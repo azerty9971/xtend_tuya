@@ -1,4 +1,4 @@
-from .tuya_integration_imports_no_cc import *
+from .tuya_integration_imports_no_cc import *  # noqa: F403
 """ try:
     from custom_components.tuya.alarm_control_panel import ( # type: ignore
         ALARM as ALARM_TUYA,
