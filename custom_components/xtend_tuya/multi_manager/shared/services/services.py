@@ -4,9 +4,7 @@ import voluptuous as vol
 import homeassistant.helpers.config_validation as cv
 from aiohttp import web
 from typing import Any
-from ...multi_manager import (
-    MultiManager,
-)
+import custom_components.xtend_tuya.multi_manager.multi_manager as mm
 
 from .views import (
     XTGeneralView,
@@ -84,7 +82,7 @@ SERVICE_WEBRTC_DEBUG_SCHEMA = vol.Schema(
 )
 
 class ServiceManager:
-    def __init__(self, multi_manager: MultiManager) -> None:
+    def __init__(self, multi_manager: mm.MultiManager) -> None:
         self.multi_manager = multi_manager
         self.hass = multi_manager.hass
         
@@ -142,7 +140,7 @@ class ServiceManager:
         if allow_from_api:
             self.hass.http.register_view(XTGeneralView(name, callback, requires_auth, use_cache))
     
-    def _get_correct_multi_manager(self, source: str, device_id: str) -> MultiManager | None:
+    def _get_correct_multi_manager(self, source: str, device_id: str) -> mm.MultiManager | None:
         multi_manager_list = get_all_multi_managers(self.hass)
         for multi_manager in multi_manager_list:
             if account := multi_manager.get_account_by_name(source):

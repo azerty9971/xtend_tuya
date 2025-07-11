@@ -7,16 +7,13 @@ from tuya_sharing.customerapi import (
 from tuya_sharing.device import (
     CustomerDevice,
     DeviceRepository,
-    DeviceStatusRange,
 )
 
 from ...const import (
     LOGGER,  # noqa: F401
 )
 
-from .xt_tuya_sharing_manager import (
-    XTSharingDeviceManager,
-)
+import custom_components.xtend_tuya.multi_manager.tuya_sharing.xt_tuya_sharing_manager as sm
 
 from ..multi_manager import (
     MultiManager,
@@ -30,7 +27,7 @@ from ..shared.threading import (
 )
 
 class XTSharingDeviceRepository(DeviceRepository):
-    def __init__(self, customer_api: CustomerApi, manager: XTSharingDeviceManager, multi_manager: MultiManager):
+    def __init__(self, customer_api: CustomerApi, manager: sm.XTSharingDeviceManager, multi_manager: MultiManager):
         super().__init__(customer_api)
         self.manager = manager
         self.multi_manager = multi_manager

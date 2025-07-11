@@ -3,15 +3,24 @@ from typing import NamedTuple, Any, Optional
 from collections import UserDict
 from dataclasses import dataclass
 import copy
+import json
 from enum import StrEnum
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from tuya_sharing import (
     CustomerDevice as TuyaDevice,
 )
+import custom_components.xtend_tuya.multi_manager.multi_manager as mm
+import custom_components.xtend_tuya.multi_manager.shared.multi_device_listener as mdl
+import custom_components.xtend_tuya.multi_manager.shared.services.services as services
+import custom_components.xtend_tuya.util as util
+from ...const import (
+    LOGGER,
+    XTDeviceSourcePriority,
+)
 
 class DeviceWatcher:
-    def __init__(self, multi_manager: MultiManager) -> None:
+    def __init__(self, multi_manager: mm.MultiManager) -> None:
         self.watched_dev_id: list[str] = []
         self.multi_manager = multi_manager
 
@@ -31,12 +40,12 @@ class DeviceWatcher:
 class HomeAssistantXTData(NamedTuple):
     """Tuya data stored in the Home Assistant data object."""
 
-    multi_manager: MultiManager | None = None
-    listener: MultiDeviceListener | None = None
-    service_manager: ServiceManager | None = None
+    multi_manager: mm.MultiManager | None = None
+    listener: mdl.MultiDeviceListener | None = None
+    service_manager: services.ServiceManager | None = None
 
     @property
-    def manager(self) -> MultiManager | None:
+    def manager(self) -> mm.MultiManager | None:
         return self.multi_manager
 
 type XTConfigEntry = ConfigEntry[HomeAssistantXTData]
@@ -140,14 +149,17 @@ class XTDevice(TuyaDevice):
     device_source_priority: int | None = None
     force_compatibility: bool = False   #Force the device functions/status_range/state to remain untouched after merging
     device_preference: dict[str, Any] = {}
+    regular_tuya_device: TuyaDevice | None = None
+    enable_regular_tuya_device_replication: bool = False
 
     class XTDevicePreference(StrEnum):
         IS_A_COVER_DEVICE                   = "IS_A_COVER_DEVICE"
         LOCK_MANUAL_UNLOCK_COMMAND          = "LOCK_MANUAL_UNLOCK_COMMAND"
-        LOCK_GET_SUPPORTED_UNLOCK_TYPES     = "_LOCK_GET_SUPPORTED_UNLOCK_TYPES"
-        LOCK_GET_DOOR_LOCK_PASSWORD_TICKET  = "_LOCK_GET_DOOR_LOCK_PASSWORD_TICKET"
-        LOCK_CALL_DOOR_OPERATE              = "_LOCK_CALL_DOOR_OPERATE"
-        LOCK_CALL_DOOR_OPEN                 = "_LOCK_CALL_DOOR_OPEN"
+        LOCK_GET_SUPPORTED_UNLOCK_TYPES     = "LOCK_GET_SUPPORTED_UNLOCK_TYPES"
+        LOCK_GET_DOOR_LOCK_PASSWORD_TICKET  = "LOCK_GET_DOOR_LOCK_PASSWORD_TICKET"
+        LOCK_CALL_DOOR_OPERATE              = "LOCK_CALL_DOOR_OPERATE"
+        LOCK_CALL_DOOR_OPEN                 = "LOCK_CALL_DOOR_OPEN"
+        HANDLED_DPCODES                     = "HANDLED_DPCODES"
 
     def __init__(self, **kwargs: Any) -> None:
         self.source = ""
@@ -179,6 +191,7 @@ class XTDevice(TuyaDevice):
         self.function = {} # type: ignore
         self.status_range = {} # type: ignore
         self.device_preference = {}
+        self.enable_regular_tuya_device_replication: bool = False
         super().__init__(**kwargs)
     
     def __repr__(self) -> str:
@@ -197,6 +210,11 @@ class XTDevice(TuyaDevice):
         
         return f"Device {self.name}:\r\n{function_str}{status_range_str}{status_str}{local_strategy_str}"
         #return f"Device {self.name}:\r\n{self.source}"
+    
+    def __setattr__(self, attr, value):
+        if self.enable_regular_tuya_device_replication is True and self.regular_tuya_device is not None and hasattr(self.regular_tuya_device, attr):
+            self.regular_tuya_device.__setattr__(attr, value)
+        super().__setattr__(attr, value)
 
     @staticmethod
     def from_compatible_device(device: Any, source: str = "Compatible device", device_source_priority: int | None = None):
@@ -232,14 +250,55 @@ class XTDevice(TuyaDevice):
     def get_copy(self) -> XTDevice:
         return copy.deepcopy(self)
     
-    def get_multi_manager(self, hass: HomeAssistant) -> MultiManager | None:
-        return get_device_multi_manager(hass=hass, device=self)
+    def get_multi_manager(self, hass: HomeAssistant) -> mm.MultiManager | None:
+        return util.get_device_multi_manager(hass=hass, device=self)
     
     def get_preference(self, pref_id: str, ret_val_if_missing: Any | None = None) -> Any | None:
         return self.device_preference.get(pref_id, ret_val_if_missing)
     
     def set_preference(self, pref_id: str, pref_val: Any):
         self.device_preference[pref_id] = pref_val
+
+    def get_all_status_code_aliases(self) -> dict[str, str]:
+        return_list: dict[str, str] = {}
+        for local_strategy in self.local_strategy.values():
+            if status_code := local_strategy.get("status_code", None):
+                for alias in local_strategy.get("status_code_alias", {}):
+                    return_list[alias] = status_code
+        return return_list
+    
+    def replace_status_with_another(self, orig_status: str, new_status:str):
+        #LOGGER.debug(f"Replacing {orig_status} with {new_status} in {device.name}")
+        if orig_status in self.status_range:
+            self.status_range[new_status] = self.status_range.pop(orig_status)
+            self.status_range[new_status].code = new_status
+        
+        if orig_status in self.function:
+            self.function[new_status] = self.function.pop(orig_status)
+            self.function[new_status].code = new_status
+        
+        if orig_status in self.status:
+            self.status[new_status] = self.status.pop(orig_status)
+        
+        for dpId in self.local_strategy:
+            status_code = self.local_strategy[dpId].get("status_code")
+            status_alias: list = self.local_strategy[dpId].get("status_code_alias", [])
+            if status_code == orig_status:
+                self.local_strategy[dpId]["status_code"] = new_status
+                if new_status in status_alias:
+                    status_alias.remove(new_status)
+                if orig_status not in status_alias:
+                    status_alias.append(orig_status)
+                self.local_strategy[dpId]["status_code_alias"] = status_alias
+                if config_item := self.local_strategy[dpId].get("config_item", None):
+                    if status_formats := config_item.get("statusFormat", None):
+                        status_formats_dict: dict = json.loads(status_formats)
+                        for first_key in status_formats_dict:
+                            status_formats_dict[new_status] = status_formats_dict.pop(first_key)
+                            break
+                        config_item["statusFormat"] = json.dumps(status_formats_dict)
+                break
+
 
 class XTDeviceMap(UserDict[str, XTDevice]):
 
@@ -255,24 +314,3 @@ class XTDeviceMap(UserDict[str, XTDevice]):
         super().__setitem__(key, item)
         if self._original_ref is not None:
             self._original_ref[key] = item
-
-
-
-
-
-from ..multi_manager import (
-    MultiManager,
-)
-from .multi_device_listener import (
-    MultiDeviceListener,
-)
-from ...const import (
-    LOGGER,
-    XTDeviceSourcePriority,
-)
-from .services.services import (
-    ServiceManager,
-)
-from ...util import (
-    get_device_multi_manager,
-)

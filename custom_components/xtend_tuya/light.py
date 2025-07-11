@@ -1,6 +1,7 @@
 """Support for the XT lights."""
 from __future__ import annotations
 
+from typing import cast
 import json
 
 from dataclasses import dataclass
@@ -11,7 +12,9 @@ from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .util import (
-    merge_device_descriptors
+    merge_device_descriptors,
+    merge_descriptor_category,
+    restrict_descriptor_category,
 )
 
 from .multi_manager.multi_manager import (
@@ -22,14 +25,14 @@ from .multi_manager.multi_manager import (
 from .const import (
     TUYA_DISCOVERY_NEW, 
     XTDPCode,
-    DPType,
-    LOGGER,
+    LOGGER,  # noqa: F401
     CROSS_CATEGORY_DEVICE_DESCRIPTOR,
 )
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaLightEntity,
     TuyaLightEntityDescription,
     TuyaDPCode,
+    TuyaDPType,
 )
 from .entity import (
     XTEntity,
@@ -87,18 +90,22 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if descriptions := merged_descriptors.get(device.category):
-                    entities.extend(
-                        XTLightEntity.get_entity_instance(description, device, hass_data.manager)
-                        for description in descriptions
-                        if description.key in device.status and (restrict_dpcode is None or restrict_dpcode == description.key)
-                    )
-                if descriptions := merged_descriptors.get(CROSS_CATEGORY_DEVICE_DESCRIPTOR):
-                    entities.extend(
-                        XTLightEntity.get_entity_instance(description, device, hass_data.manager)
-                        for description in descriptions
-                        if description.key in device.status and (restrict_dpcode is None or restrict_dpcode == description.key)
-                    )
+                category_descriptions = merged_descriptors.get(device.category)
+                cross_category_descriptions = merged_descriptors.get(CROSS_CATEGORY_DEVICE_DESCRIPTOR)
+                descriptions = merge_descriptor_category(category_descriptions, cross_category_descriptions)
+                if restrict_dpcode is not None:
+                    descriptions = restrict_descriptor_category(descriptions, [restrict_dpcode])
+                descriptions = cast(tuple[XTLightEntityDescription, ...], descriptions)
+                entities.extend(
+                    XTLightEntity.get_entity_instance(description, device, hass_data.manager)
+                    for description in descriptions
+                    if XTEntity.supports_description(device, description, True)
+                )
+                entities.extend(
+                    XTLightEntity.get_entity_instance(description, device, hass_data.manager)
+                    for description in descriptions
+                    if XTEntity.supports_description(device, description, False)
+                )
 
         async_add_entities(entities)
 
@@ -124,14 +131,13 @@ class XTLightEntity(XTEntity, TuyaLightEntity):
         except Exception as e:
             if (
                 dpcode := self.find_dpcode(description.color_data, prefer_function=True)
-            ) and self.get_dptype(dpcode) == DPType.JSON:
+            ) and self.get_dptype(dpcode) == TuyaDPType.JSON:
                 if dpcode in self.device.function:
                     values = self.device.function[dpcode].values
                 else:
                     values = self.device.status_range[dpcode].values
                 if function_data := json.loads(values):
-                    #LOGGER.warning(f"Failed light: {device}")
-                    pass
+                    LOGGER.warning(f"Failed light: {device.name} => {function_data} <=> {e}")
         super(XTEntity, self).__init__(device, device_manager, description) # type: ignore
         self.device = device
         self.device_manager = device_manager

@@ -18,7 +18,6 @@ from homeassistant.helpers.event import async_call_later
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.components.camera.webrtc import WebRTCSendMessage, WebRTCClientConfiguration
-from homeassistant.components.stream import Stream
 from .util import (
     append_lists
 )
@@ -30,7 +29,12 @@ from .multi_manager.multi_manager import (
     XTDeviceManagerInterface,
 )
 
-from .const import TUYA_DISCOVERY_NEW, LOGGER, XTDPCode, MESSAGE_SOURCE_TUYA_IOT
+from .const import (
+    TUYA_DISCOVERY_NEW, 
+    LOGGER,  # noqa: F401
+    XTDPCode, 
+    MESSAGE_SOURCE_TUYA_IOT,
+)
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaCameraEntity,
 )
@@ -127,7 +131,12 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
     
     @staticmethod
     def should_entity_be_added(hass: HomeAssistant, device: XTDevice, multi_manager: MultiManager) -> bool:
-        camera_status: list[XTDPCode] = [XTDPCode.RECORD_MODE, XTDPCode.IPC_WORK_MODE, XTDPCode.PHOTO_AGAIN]
+        camera_status: list[XTDPCode] = [
+            XTDPCode.RECORD_MODE, 
+            XTDPCode.IPC_WORK_MODE, 
+            XTDPCode.PHOTO_AGAIN,
+            XTDPCode.MOVEMENT_DETECT_PIC,
+            ]
         for test_status in camera_status:
             if test_status in device.status:
                 return True

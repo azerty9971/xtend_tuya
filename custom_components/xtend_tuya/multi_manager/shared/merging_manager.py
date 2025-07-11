@@ -5,21 +5,12 @@ import copy
 
 from typing import Any
 
-from .shared_classes import (
-    XTDevice,
-    XTDeviceStatusRange,
-    XTDeviceFunction,
-)
-from .cloud_fix import (
-    CloudFixes,
-)
-
 from ...const import (
     LOGGER,  # noqa: F401
 )
-from ..multi_manager import (
-    MultiManager,
-)
+import custom_components.xtend_tuya.multi_manager.shared.cloud_fix as cf
+import custom_components.xtend_tuya.multi_manager.multi_manager as mm
+import custom_components.xtend_tuya.multi_manager.shared.shared_classes as shared
 
 class XTMergingManager:
 
@@ -27,7 +18,7 @@ class XTMergingManager:
 
 
     @staticmethod
-    def merge_devices(device1: XTDevice, device2: XTDevice | None, multi_manager: MultiManager | None = None):
+    def merge_devices(device1: shared.XTDevice, device2: shared.XTDevice | None, multi_manager: mm.MultiManager | None = None):
         msg_queue: list[str] = []
         if device2 is None:
             return None
@@ -48,8 +39,8 @@ class XTMergingManager:
         #Make both devices compliant
         XTMergingManager._fix_incorrect_valuedescr(higher_priority, lower_priority)
         XTMergingManager._fix_incorrect_valuedescr(lower_priority, higher_priority)
-        CloudFixes.apply_fixes(higher_priority)
-        CloudFixes.apply_fixes(lower_priority)
+        cf.CloudFixes.apply_fixes(higher_priority)
+        cf.CloudFixes.apply_fixes(lower_priority)
 
         #Now decide between each device which on has "the truth" and set it in both
         XTMergingManager._align_device_properties(higher_priority, lower_priority, msg_queue)
@@ -85,11 +76,11 @@ class XTMergingManager:
             XTMergingManager._enforce_compatibility(higher_priority, lower_bak)
             higher_priority.force_compatibility = True
         if higher_bak.force_compatibility:
-            XTMergingManager._enforce_compatibility(higher_priority, higher_bak)
-            higher_priority.force_compatibility = True
+            XTMergingManager._enforce_compatibility(lower_priority, higher_bak)
+            lower_bak.force_compatibility = True
 
     @staticmethod
-    def _enforce_compatibility(device: XTDevice, enforcing_reference: XTDevice):
+    def _enforce_compatibility(device: shared.XTDevice, enforcing_reference: shared.XTDevice):
         for status in enforcing_reference.status:
             if status not in device.status:
                 #Find the original status that has been masked as a status_alias and make it the reference
@@ -98,43 +89,11 @@ class XTMergingManager:
                     status_alias = device.local_strategy[dpId].get("status_code_alias", [])
                     if status in status_alias and status_code is not None:
                         #Replace status_code with status in the device
-                        XTMergingManager._replace_status_with_another(device, str(status_code), status)
-    
-    @staticmethod
-    def _replace_status_with_another(device: XTDevice, orig_status: str, new_status:str):
-        #LOGGER.debug(f"Replacing {orig_status} with {new_status} in {device.name}")
-        if orig_status in device.status_range:
-            device.status_range[new_status] = device.status_range.pop(orig_status)
-            device.status_range[new_status].code = new_status
+                        device.replace_status_with_another(str(status_code), status)
         
-        if orig_status in device.function:
-            device.function[new_status] = device.function.pop(orig_status)
-            device.function[new_status].code = new_status
-        
-        if orig_status in device.status:
-            device.status[new_status] = device.status.pop(orig_status)
-        
-        for dpId in device.local_strategy:
-            status_code = device.local_strategy[dpId].get("status_code")
-            status_alias: list = device.local_strategy[dpId].get("status_code_alias", [])
-            if status_code == orig_status:
-                device.local_strategy[dpId]["status_code"] = new_status
-                if new_status in status_alias:
-                    status_alias.remove(new_status)
-                if orig_status not in status_alias:
-                    status_alias.append(orig_status)
-                device.local_strategy[dpId]["status_code_alias"] = status_alias
-                if config_item := device.local_strategy[dpId].get("config_item", None):
-                    if status_formats := config_item.get("statusFormat", None):
-                        status_formats_dict: dict = json.loads(status_formats)
-                        for first_key in status_formats_dict:
-                            status_formats_dict[new_status] = status_formats_dict.pop(first_key)
-                            break
-                        config_item["statusFormat"] = json.dumps(status_formats_dict)
-                break
 
     @staticmethod
-    def _align_device_properties(device1: XTDevice, device2: XTDevice, msg_queue: list[str] | None = None):
+    def _align_device_properties(device1: shared.XTDevice, device2: shared.XTDevice, msg_queue: list[str] | None = None):
         device1.name            = XTMergingManager.smart_merge(device1.name, device2.name, msg_queue, "device.name")
         device1.local_key       = XTMergingManager.smart_merge(device1.local_key, device2.local_key, msg_queue, "device.local_key")
         device1.category        = XTMergingManager.smart_merge(device1.category, device2.category, msg_queue, "device.category")
@@ -167,13 +126,17 @@ class XTMergingManager:
             device1.support_local = True
             device2.support_local = True
         device1.data_model      = XTMergingManager.smart_merge(device1.data_model, device2.data_model, msg_queue, "device.data_model")
+        if device1.regular_tuya_device is not None:
+            device2.regular_tuya_device = device1.regular_tuya_device
+        elif device2.regular_tuya_device is not None:
+            device1.regular_tuya_device = device2.regular_tuya_device
 
     @staticmethod
-    def _fix_incorrect_valuedescr(device1: XTDevice, device2: XTDevice):
+    def _fix_incorrect_valuedescr(device1: shared.XTDevice, device2: shared.XTDevice):
         for code in device1.function:
             if code in device2.function:
-                value1_dict, value1_raw = CloudFixes.get_value_descr_dict(device1.function[code].values)
-                value2_dict, value2_raw = CloudFixes.get_value_descr_dict(device2.function[code].values)
+                value1_dict, value1_raw = cf.CloudFixes.get_value_descr_dict(device1.function[code].values)
+                value2_dict, value2_raw = cf.CloudFixes.get_value_descr_dict(device2.function[code].values)
             else:
                 continue
             if value1_dict is None or value2_dict is None:
@@ -182,13 +145,13 @@ class XTMergingManager:
                 elif value2_dict is not None:
                     device1.function[code].values = device2.function[code].values
                 else:
-                    device1.function[code].values = CloudFixes.get_fixed_value_descr(value1_raw, value2_raw)
+                    device1.function[code].values = cf.CloudFixes.get_fixed_value_descr(value1_raw, value2_raw)
                     device2.function[code].values = device1.function[code].values
         
         for code in device1.status_range:
             if code in device2.status_range:
-                value1_dict, value1_raw = CloudFixes.get_value_descr_dict(device1.status_range[code].values)
-                value2_dict, value2_raw = CloudFixes.get_value_descr_dict(device2.status_range[code].values)
+                value1_dict, value1_raw = cf.CloudFixes.get_value_descr_dict(device1.status_range[code].values)
+                value2_dict, value2_raw = cf.CloudFixes.get_value_descr_dict(device2.status_range[code].values)
             else:
                 continue
             if value1_dict is None or value2_dict is None:
@@ -197,7 +160,7 @@ class XTMergingManager:
                 elif value2_dict is not None:
                     device1.status_range[code].values = device2.status_range[code].values
                 else:
-                    device1.status_range[code].values = CloudFixes.get_fixed_value_descr(value1_raw, value2_raw)
+                    device1.status_range[code].values = cf.CloudFixes.get_fixed_value_descr(value1_raw, value2_raw)
                     device2.status_range[code].values = device1.status_range[code].values
         
         for dpId in device1.local_strategy:
@@ -207,9 +170,9 @@ class XTMergingManager:
             value2_raw = None
             if dpId in device2.local_strategy:
                 if config_item1 := device1.local_strategy[dpId].get("config_item"):
-                    value1_dict, value1_raw = CloudFixes.get_value_descr_dict(config_item1.get("valueDesc"))
+                    value1_dict, value1_raw = cf.CloudFixes.get_value_descr_dict(config_item1.get("valueDesc"))
                 if config_item2 := device2.local_strategy[dpId].get("config_item"):
-                    value2_dict, value2_raw = CloudFixes.get_value_descr_dict(config_item2.get("valueDesc"))
+                    value2_dict, value2_raw = cf.CloudFixes.get_value_descr_dict(config_item2.get("valueDesc"))
             else:
                 continue
             if value1_raw is not None or value2_raw is not None:
@@ -221,16 +184,16 @@ class XTMergingManager:
                         elif value2_dict is not None:
                             config_item1["valueDesc"] = config_item2["valueDesc"]
                         else:
-                            config_item1["valueDesc"] = CloudFixes.get_fixed_value_descr(value1_raw, value2_raw)
+                            config_item1["valueDesc"] = cf.CloudFixes.get_fixed_value_descr(value1_raw, value2_raw)
                             config_item2["valueDesc"] = config_item1["valueDesc"]
 
     @staticmethod
-    def _align_valuedescr(device1: XTDevice, device2: XTDevice):
+    def _align_valuedescr(device1: shared.XTDevice, device2: shared.XTDevice):
         for code in device1.status_range:
             if code in device2.status_range and device1.status_range[code].values != device2.status_range[code].values:
                 value1 = json.loads(device1.status_range[code].values)
                 value2 = json.loads(device2.status_range[code].values)
-                computed_diff = CloudFixes.compute_aligned_valuedescr(value1, value2, None)
+                computed_diff = cf.CloudFixes.compute_aligned_valuedescr(value1, value2, None)
                 for fix_code in computed_diff:
                     value1[fix_code] = computed_diff[fix_code]
                     value2[fix_code] = computed_diff[fix_code]
@@ -240,7 +203,7 @@ class XTMergingManager:
             if code in device2.function and device1.function[code].values != device2.function[code].values:
                 value1 = json.loads(device1.function[code].values)
                 value2 = json.loads(device2.function[code].values)
-                computed_diff = CloudFixes.compute_aligned_valuedescr(value1, value2, None)
+                computed_diff = cf.CloudFixes.compute_aligned_valuedescr(value1, value2, None)
                 for fix_code in computed_diff:
                     value1[fix_code] = computed_diff[fix_code]
                     value2[fix_code] = computed_diff[fix_code]
@@ -256,7 +219,7 @@ class XTMergingManager:
                     if value_descr1 is not None and value_descr2 is not None:
                         value1 = json.loads(value_descr1)
                         value2 = json.loads(value_descr2)
-                        computed_diff = CloudFixes.compute_aligned_valuedescr(value1, value2, None)
+                        computed_diff = cf.CloudFixes.compute_aligned_valuedescr(value1, value2, None)
                         for fix_code in computed_diff:
                             value1[fix_code] = computed_diff[fix_code]
                             value2[fix_code] = computed_diff[fix_code]
@@ -264,7 +227,7 @@ class XTMergingManager:
                         config_item2["valueDesc"] = json.dumps(value2)
 
     @staticmethod
-    def _align_api_usage(device1: XTDevice, device2: XTDevice):
+    def _align_api_usage(device1: shared.XTDevice, device2: shared.XTDevice):
         for dpId in device1.local_strategy:
             if dpId in device2.local_strategy:
                 use_oapi1 = device1.local_strategy[dpId].get("use_open_api")
@@ -292,13 +255,13 @@ class XTMergingManager:
                         device1.local_strategy[dpId]["status_code"] = device2.local_strategy[dpId]["status_code"]
     
     @staticmethod
-    def _align_DPTypes(device1: XTDevice, device2: XTDevice):
+    def _align_DPTypes(device1: shared.XTDevice, device2: shared.XTDevice):
         for key in device1.status_range:
             if key in device2.status_range:
                 state_value = device1.status.get(key)
                 if state_value is None:
                     state_value = device2.status.get(key)
-                match CloudFixes.determine_most_plausible({"type": device1.status_range[key].type}, {"type": device2.status_range[key].type}, "type", state_value):
+                match cf.CloudFixes.determine_most_plausible({"type": device1.status_range[key].type}, {"type": device2.status_range[key].type}, "type", state_value):
                     case 1:
                         device2.status_range[key].type = device1.status_range[key].type
                         device2.status_range[key].values = device1.status_range[key].values
@@ -310,7 +273,7 @@ class XTMergingManager:
                 state_value = device1.status.get(key)
                 if state_value is None:
                     state_value = device2.status.get(key)
-                match CloudFixes.determine_most_plausible({"type": device1.function[key].type}, {"type": device2.function[key].type}, "type", state_value):
+                match cf.CloudFixes.determine_most_plausible({"type": device1.function[key].type}, {"type": device2.function[key].type}, "type", state_value):
                     case 1:
                         device2.function[key].type = device1.function[key].type
                         device2.function[key].values = device1.function[key].values
@@ -339,7 +302,7 @@ class XTMergingManager:
                         continue
                 else:
                     continue
-                match CloudFixes.determine_most_plausible(config_item1, config_item2, "valueType", state_value):
+                match cf.CloudFixes.determine_most_plausible(config_item1, config_item2, "valueType", state_value):
                     case 1:
                         config_item2["valueType"] = config_item1["valueType"]
                         config_item2["valueDesc"] = config_item1["valueDesc"]
@@ -348,7 +311,7 @@ class XTMergingManager:
                         config_item1["valueDesc"] = config_item2["valueDesc"]
     
     @staticmethod
-    def _prefer_non_default_value_convert(device1: XTDevice, device2: XTDevice):
+    def _prefer_non_default_value_convert(device1: shared.XTDevice, device2: shared.XTDevice):
         for dpId in device1.local_strategy:
             if dpId in device2.local_strategy:
                 valConv1 = device1.local_strategy[dpId].get("value_convert")
@@ -372,13 +335,13 @@ class XTMergingManager:
             if msg_queue is not None:
                 msg_queue.append(f"Merging tried to merge objects of different types: {type(left)} and {type(right)}, returning left ({path})")
             return left
-        if isinstance(left, XTDeviceStatusRange) and isinstance(right, XTDeviceStatusRange):
+        if isinstance(left, shared.XTDeviceStatusRange) and isinstance(right, shared.XTDeviceStatusRange):
             left.code = XTMergingManager.smart_merge(left.code, right.code, msg_queue, f"{path}.code")
             left.type = XTMergingManager.smart_merge(left.type, right.type, msg_queue, f"{path}.type")
             left.values = XTMergingManager.smart_merge(left.values, right.values, msg_queue, f"{path}.values")
             left.dp_id = XTMergingManager.smart_merge(left.dp_id, right.dp_id, msg_queue, f"{path}.dp_id")
             return left
-        elif isinstance(left, XTDeviceFunction) and isinstance(right, XTDeviceFunction):
+        elif isinstance(left, shared.XTDeviceFunction) and isinstance(right, shared.XTDeviceFunction):
             left.code = XTMergingManager.smart_merge(left.code, right.code, msg_queue, f"{path}.code")
             left.type = XTMergingManager.smart_merge(left.type, right.type, msg_queue, f"{path}.type")
             left.desc = XTMergingManager.smart_merge(left.desc, right.desc, msg_queue, f"{path}.desc")

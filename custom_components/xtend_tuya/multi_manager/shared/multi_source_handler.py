@@ -2,7 +2,7 @@ from __future__ import annotations
 import copy
 from typing import Any
 
-from ..multi_manager import MultiManager
+import custom_components.xtend_tuya.multi_manager.multi_manager as mm
 from ...const import LOGGER  # noqa: F401
 
 class SourceCodeCounter:
@@ -49,7 +49,7 @@ class MultiSourceCodeCounter:
 
 
 class MultiSourceHandler:
-    def __init__(self, multi_manager: MultiManager) -> None:
+    def __init__(self, multi_manager: mm.MultiManager) -> None:
         self.multi_manager = multi_manager
         self.device_map: dict[str, dict[str, MultiSourceCodeCounter]] = {}
     

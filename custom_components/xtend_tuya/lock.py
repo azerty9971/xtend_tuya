@@ -17,7 +17,6 @@ from .const import (
     TUYA_DISCOVERY_NEW,
     XTDPCode,
     XTMultiManagerProperties,
-    CROSS_CATEGORY_DEVICE_DESCRIPTOR,
 )
 from .util import (
     append_dictionnaries,
