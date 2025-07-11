@@ -55,6 +55,14 @@ class XTClimateEntityDescription(TuyaClimateEntityDescription):
 
 
 CLIMATE_DESCRIPTIONS: dict[str, XTClimateEntityDescription] = {
+    "xfj": XTClimateEntityDescription(
+        key="xfj",
+        switch_only_hvac_mode=HVACMode.AUTO,
+    ),
+    "ydkt": XTClimateEntityDescription(
+        key="ydkt",
+        switch_only_hvac_mode=HVACMode.COOL,
+    ),
 }
 
 
