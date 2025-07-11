@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
+from typing import cast
 from dataclasses import dataclass
-import asyncio
 from typing import Any
 
 from homeassistant.components.cover import (
@@ -19,7 +19,9 @@ from .const import (
     LOGGER,
 )
 from .util import (
-    merge_device_descriptors
+    merge_device_descriptors,
+    merge_descriptor_category,
+    restrict_descriptor_category,
 )
 
 from .multi_manager.multi_manager import (
@@ -35,10 +37,10 @@ from .ha_tuya_integration.tuya_integration_imports import (
     TuyaCoverEntity,
     TuyaCoverEntityDescription,
     TuyaDPCode,
+    TuyaDPType,
 )
 from .entity import (
     XTEntity,
-    DPType,
 )
 
 @dataclass(frozen=True)
@@ -146,24 +148,22 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if descriptions := merged_descriptors.get(device.category):
-                    entities.extend(
-                        XTCoverEntity.get_entity_instance(description, device, hass_data.manager)
-                        for description in descriptions
-                        if (
-                            description.key in device.function
-                            or description.key in device.status_range
-                        ) and (restrict_dpcode is None or restrict_dpcode == description.key)
-                    )
-                if descriptions := merged_descriptors.get(CROSS_CATEGORY_DEVICE_DESCRIPTOR):
-                    entities.extend(
-                        XTCoverEntity.get_entity_instance(description, device, hass_data.manager)
-                        for description in descriptions
-                        if (
-                            description.key in device.function
-                            or description.key in device.status_range
-                        ) and (restrict_dpcode is None or restrict_dpcode == description.key)
-                    )
+                category_descriptions = merged_descriptors.get(device.category)
+                cross_category_descriptions = merged_descriptors.get(CROSS_CATEGORY_DEVICE_DESCRIPTOR)
+                descriptions = merge_descriptor_category(category_descriptions, cross_category_descriptions)
+                if restrict_dpcode is not None:
+                    descriptions = restrict_descriptor_category(descriptions, [restrict_dpcode])
+                descriptions = cast(tuple[XTCoverEntityDescription, ...], descriptions)
+                entities.extend(
+                    XTCoverEntity.get_entity_instance(description, device, hass_data.manager)
+                    for description in descriptions
+                    if XTEntity.supports_description(device, description, True)
+                )
+                entities.extend(
+                    XTCoverEntity.get_entity_instance(description, device, hass_data.manager)
+                    for description in descriptions
+                    if XTEntity.supports_description(device, description, False)
+                )
 
         async_add_entities(entities)
 
@@ -218,14 +218,14 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
             if XTDPCode.XT_COVER_INVERT_CONTROL not in self.device.status:
                 self.device.status[XTDPCode.XT_COVER_INVERT_CONTROL] = "no"
                 self.device.status_range[XTDPCode.XT_COVER_INVERT_CONTROL] = XTDeviceStatusRange(code = XTDPCode.XT_COVER_INVERT_CONTROL,
-                                                                                                      type=DPType.STRING,
+                                                                                                      type=TuyaDPType.STRING,
                                                                                                       values="{}",
                                                                                                       dp_id=0)
                 send_update = True
             if XTDPCode.XT_COVER_INVERT_STATUS not in self.device.status:
                 self.device.status[XTDPCode.XT_COVER_INVERT_STATUS] = "no"
                 self.device.status_range[XTDPCode.XT_COVER_INVERT_STATUS] = XTDeviceStatusRange(code = XTDPCode.XT_COVER_INVERT_STATUS,
-                                                                                                      type=DPType.STRING,
+                                                                                                      type=TuyaDPType.STRING,
                                                                                                       values="{}",
                                                                                                       dp_id=0)
                 send_update = True
@@ -279,7 +279,7 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         if self.is_cover_control_inverted:
             computed_position = 0
         if self.find_dpcode(
-            self.entity_description.key, dptype=DPType.ENUM, prefer_function=True
+            self.entity_description.key, dptype=TuyaDPType.ENUM, prefer_function=True
         ):
             value = self.entity_description.open_instruction_value
 
@@ -307,7 +307,7 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         if self.is_cover_control_inverted:
             computed_position = 100
         if self.find_dpcode(
-            self.entity_description.key, dptype=DPType.ENUM, prefer_function=True
+            self.entity_description.key, dptype=TuyaDPType.ENUM, prefer_function=True
         ):
             value = self.entity_description.close_instruction_value
 

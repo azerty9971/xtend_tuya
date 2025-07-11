@@ -1,16 +1,16 @@
 from __future__ import annotations
 
-from typing import overload, Literal
-from dataclasses import dataclass
+from typing import overload, Literal, cast
+
+from homeassistant.helpers.entity import EntityDescription
 
 from .const import (
     XTDPCode,
-    DPType,
-    LOGGER,
+    LOGGER,  # noqa: F401
 )
 
-from .multi_manager.multi_manager import (
-    MultiManager,
+from .multi_manager.shared.shared_classes import (
+    XTDevice,
 )
 
 from .ha_tuya_integration.tuya_integration_imports import (
@@ -19,6 +19,7 @@ from .ha_tuya_integration.tuya_integration_imports import (
     TUYA_DPTYPE_MAPPING,
     TuyaEntity,
     TuyaDPCode,
+    TuyaDPType,
 )
 
 class XTEntity(TuyaEntity):
@@ -40,7 +41,7 @@ class XTEntity(TuyaEntity):
         dpcodes: str | XTDPCode | tuple[XTDPCode, ...] | TuyaDPCode | tuple[TuyaDPCode, ...] | None,
         *,
         prefer_function: bool = False,
-        dptype: Literal[DPType.ENUM],
+        dptype: Literal[TuyaDPType.ENUM],
     ) -> TuyaEnumTypeData | None: ...
 
     @overload
@@ -49,7 +50,7 @@ class XTEntity(TuyaEntity):
         dpcodes: str | XTDPCode | tuple[XTDPCode, ...] | TuyaDPCode | tuple[TuyaDPCode, ...] | None,
         *,
         prefer_function: bool = False,
-        dptype: Literal[DPType.INTEGER],
+        dptype: Literal[TuyaDPType.INTEGER],
     ) -> TuyaIntegerTypeData | None: ...
 
     @overload
@@ -66,7 +67,7 @@ class XTEntity(TuyaEntity):
         dpcodes: str | XTDPCode | tuple[XTDPCode, ...] | TuyaDPCode | tuple[TuyaDPCode, ...] | None,
         *,
         prefer_function: bool = False,
-        dptype: DPType | None = None,
+        dptype: TuyaDPType | None = None,
     ) -> TuyaDPCode | TuyaEnumTypeData | TuyaIntegerTypeData | None: ...
         
     def find_dpcode(
@@ -74,7 +75,7 @@ class XTEntity(TuyaEntity):
         dpcodes: str | XTDPCode | tuple[XTDPCode, ...] | TuyaDPCode | tuple[TuyaDPCode, ...] | None,
         *,
         prefer_function: bool = False,
-        dptype: DPType | None = None,
+        dptype: TuyaDPType | None = None,
     ) -> XTDPCode | TuyaDPCode | TuyaEnumTypeData | TuyaIntegerTypeData | None:
         try:
             if dpcodes is None:
@@ -83,9 +84,9 @@ class XTEntity(TuyaEntity):
                 dpcodes = (TuyaDPCode(dpcodes),)
             else:
                 dpcodes = (TuyaDPCode(dpcodes),)
-            if dptype is DPType.ENUM:
+            if dptype is TuyaDPType.ENUM:
                 return super(XTEntity, self).find_dpcode(dpcodes=dpcodes, prefer_function=prefer_function, dptype=dptype)
-            elif dptype is DPType.INTEGER:
+            elif dptype is TuyaDPType.INTEGER:
                 return super(XTEntity, self).find_dpcode(dpcodes=dpcodes, prefer_function=prefer_function, dptype=dptype)
             else:
                 return dpcodes[0]
@@ -113,8 +114,8 @@ class XTEntity(TuyaEntity):
                     if dpcode not in getattr(self.device, key):
                         continue
                     if (
-                        dptype == DPType.ENUM
-                        and getattr(self.device, key)[dpcode].type == DPType.ENUM
+                        dptype == TuyaDPType.ENUM
+                        and getattr(self.device, key)[dpcode].type == TuyaDPType.ENUM
                     ):
                         if not (
                             enum_type := TuyaEnumTypeData.from_json(
@@ -125,8 +126,8 @@ class XTEntity(TuyaEntity):
                         return enum_type
 
                     if (
-                        dptype == DPType.INTEGER
-                        and getattr(self.device, key)[dpcode].type == DPType.INTEGER
+                        dptype == TuyaDPType.INTEGER
+                        and getattr(self.device, key)[dpcode].type == TuyaDPType.INTEGER
                     ):
                         if not (
                             integer_type := TuyaIntegerTypeData.from_json(
@@ -136,19 +137,54 @@ class XTEntity(TuyaEntity):
                             continue
                         return integer_type
 
-                    if dptype not in (DPType.ENUM, DPType.INTEGER):
+                    if dptype not in (TuyaDPType.ENUM, TuyaDPType.INTEGER):
                         return dpcode
 
             return None
     
     @staticmethod
-    def determine_dptype(type) -> DPType | None:
+    def determine_dptype(type) -> TuyaDPType | None:
         """Determine the DPType.
 
         Sometimes, we get ill-formed DPTypes from the cloud,
         this fixes them and maps them to the correct DPType.
         """
         try:
-            return DPType(type)
+            return TuyaDPType(type)
         except ValueError:
             return TUYA_DPTYPE_MAPPING.get(type)
+    
+    @staticmethod
+    def supports_description(device: XTDevice, description: EntityDescription, first_pass: bool) -> bool:
+        result, dpcode = XTEntity._supports_description(device, description, first_pass)
+        if result is True:
+            #Register the code as being handled by the device
+            handled_dpcodes: list[str] = cast(list[str], device.get_preference(XTDevice.XTDevicePreference.HANDLED_DPCODES, []))
+            if dpcode not in handled_dpcodes:
+                handled_dpcodes.append(dpcode)
+                device.set_preference(XTDevice.XTDevicePreference.HANDLED_DPCODES, handled_dpcodes)
+        return result
+
+    @staticmethod
+    def _supports_description(device: XTDevice, description: EntityDescription, first_pass: bool) -> tuple[bool, str]:
+        import custom_components.xtend_tuya.binary_sensor as XTBinarySensor
+
+        dpcode = description.key
+        if isinstance(description, XTBinarySensor.XTBinarySensorEntityDescription):
+            if description.dpcode is not None:
+                dpcode = description.dpcode
+        if first_pass is True:
+            if dpcode in device.status:
+                return True, dpcode
+            return False, dpcode
+        else:
+            if device.force_compatibility is True:
+                return False, dpcode
+
+            all_aliases = device.get_all_status_code_aliases()
+            if current_status := all_aliases.get(dpcode):
+                handled_dpcodes: list[str] = cast(list[str], device.get_preference(XTDevice.XTDevicePreference.HANDLED_DPCODES, []))
+                if current_status not in handled_dpcodes:
+                    device.replace_status_with_another(current_status, dpcode)
+                    return True, dpcode
+        return False, dpcode

@@ -1,9 +1,8 @@
 from __future__ import annotations
-from ...multi_manager import MultiManager
-
+import custom_components.xtend_tuya.multi_manager.multi_manager as mm
 
 class StatusHelper:
-    def __init__(self, multi_manager: MultiManager):
+    def __init__(self, multi_manager: mm.MultiManager):
         self.multi_manager = multi_manager
 
     def is_status_in_status_list(self, device_id: str, status: str, status_list: list) -> bool:

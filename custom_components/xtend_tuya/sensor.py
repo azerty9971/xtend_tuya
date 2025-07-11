@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
+from typing import cast
 import datetime
-from typing import Any
 
 from dataclasses import dataclass, field
-from .const import LOGGER
+from .const import LOGGER  # noqa: F401
 
 from homeassistant.components.sensor import (
     SensorDeviceClass,
@@ -16,7 +16,6 @@ from homeassistant.components.sensor import (
 )
 from homeassistant.const import (
     UnitOfEnergy,
-    UnitOfTemperature,
     Platform,
     PERCENTAGE,
     EntityCategory,
@@ -28,7 +27,9 @@ from homeassistant.helpers.event import async_track_time_change, async_call_late
 
 from .util import (
     merge_device_descriptors,
-    get_default_value
+    get_default_value,
+    merge_descriptor_category,
+    restrict_descriptor_category,
 )
 
 from .multi_manager.multi_manager import (
@@ -39,7 +40,6 @@ from .multi_manager.multi_manager import (
 from .const import (
     TUYA_DISCOVERY_NEW,
     XTDPCode,
-    DPType,
     VirtualStates,  # noqa: F401
     XTDeviceEntityFunctions,
     CROSS_CATEGORY_DEVICE_DESCRIPTOR,
@@ -50,10 +50,10 @@ from .entity import (
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaSensorEntity,
     TuyaSensorEntityDescription,
-    TuyaDPCode,
     TuyaIntegerTypeData,
     TuyaDOMAIN,
     TuyaDEVICE_CLASS_UNITS,
+    TuyaDPType,
 )
 
 @dataclass(frozen=True)
@@ -1378,18 +1378,22 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if descriptions := merged_descriptors.get(device.category):
-                    entities.extend(
-                        XTSensorEntity.get_entity_instance(description, device, hass_data.manager)
-                        for description in descriptions
-                        if description.key in device.status and (restrict_dpcode is None or restrict_dpcode == description.key)
-                    )
-                if descriptions := merged_descriptors.get(CROSS_CATEGORY_DEVICE_DESCRIPTOR):
-                    entities.extend(
-                        XTSensorEntity.get_entity_instance(description, device, hass_data.manager)
-                        for description in descriptions
-                        if description.key in device.status and (restrict_dpcode is None or restrict_dpcode == description.key)
-                    )
+                category_descriptions = merged_descriptors.get(device.category)
+                cross_category_descriptions = merged_descriptors.get(CROSS_CATEGORY_DEVICE_DESCRIPTOR)
+                descriptions = merge_descriptor_category(category_descriptions, cross_category_descriptions)
+                if restrict_dpcode is not None:
+                    descriptions = restrict_descriptor_category(descriptions, [restrict_dpcode])
+                descriptions = cast(tuple[XTSensorEntityDescription, ...], descriptions)
+                entities.extend(
+                    XTSensorEntity.get_entity_instance(description, device, hass_data.manager)
+                    for description in descriptions
+                    if XTEntity.supports_description(device, description, True)
+                )
+                entities.extend(
+                    XTSensorEntity.get_entity_instance(description, device, hass_data.manager)
+                    for description in descriptions
+                    if XTEntity.supports_description(device, description, False)
+                )
 
         async_add_entities(entities)
 
@@ -1419,16 +1423,16 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor): # type: ignore
             f"{super().unique_id}{description.key}{description.subkey or ''}"
         )
 
-        if int_type := self.find_dpcode(description.key, dptype=DPType.INTEGER):
+        if int_type := self.find_dpcode(description.key, dptype=TuyaDPType.INTEGER):
             self._type_data = int_type
-            self._type = DPType.INTEGER
+            self._type = TuyaDPType.INTEGER
             if description.native_unit_of_measurement is None:
                 self._attr_native_unit_of_measurement = int_type.unit
         elif enum_type := self.find_dpcode(
-            description.key, dptype=DPType.ENUM, prefer_function=True
+            description.key, dptype=TuyaDPType.ENUM, prefer_function=True
         ):
             self._type_data = enum_type
-            self._type = DPType.ENUM
+            self._type = TuyaDPType.ENUM
         else:
             self._type = self.get_dptype(description.key)   # type: ignore #This is modified from TuyaSensorEntity's constructor
 
@@ -1514,7 +1518,7 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor): # type: ignore
             
             if should_reset:
                 if device := self.device_manager.device_map.get(self.device.id, None):
-                    if self.entity_description.key in device.status:
+                    if self.entity_description.key  in device.status:
                         device.status[self.entity_description.key] = float(0)
                         self.async_write_ha_state()
 

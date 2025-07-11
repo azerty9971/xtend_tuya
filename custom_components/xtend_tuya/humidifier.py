@@ -18,7 +18,7 @@ from .multi_manager.multi_manager import (
     MultiManager,
     XTDevice,
 )
-from .const import TUYA_DISCOVERY_NEW, CROSS_CATEGORY_DEVICE_DESCRIPTOR
+from .const import TUYA_DISCOVERY_NEW
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaHumidifierEntity,
     TuyaHumidifierEntityDescription,

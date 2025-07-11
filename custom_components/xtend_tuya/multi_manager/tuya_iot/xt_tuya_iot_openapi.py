@@ -1,9 +1,6 @@
 """Tuya Open API."""
 from __future__ import annotations
 
-import hashlib
-import hmac
-import json
 import time
 from typing import Any
 
@@ -172,10 +169,9 @@ class XTIOTOpenAPI(TuyaOpenAPI):
             and self.__country_code
         ):
             self.token_info = None # type: ignore
-            connect_result = self.connect(
+            self.connect(
                 self.__username, self.__password, self.__country_code, self.__schema
             )
-            # LOGGER.debug(f"Trying to reconnect: {connect_result}")
         return self.is_connect()
 
     def is_connect(self) -> bool:
@@ -287,8 +283,8 @@ class XTIOTOpenAPI(TuyaOpenAPI):
                     method, self.endpoint + path, params=params, json=body, headers=headers
                 )
                 break
-            except Exception:
-                LOGGER.debug(f"[API]Exception in request, waiting for 2 seconds and retrying")
+            except Exception as e:
+                LOGGER.debug(f"[API]Exception in request, waiting for 2 seconds and retrying {e}")
                 time.sleep(2)
 
         if response.ok is False:

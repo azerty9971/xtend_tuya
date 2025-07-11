@@ -20,7 +20,6 @@ from urllib.parse import urlsplit
 
 from tuya_iot import (
     TuyaOpenMQ,
-    TuyaOpenAPI,
 )
 from tuya_iot.openmq import (
     TuyaMQConfig,

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from typing import cast
 from dataclasses import dataclass, field
 
 from homeassistant.const import EntityCategory, Platform
@@ -10,7 +11,9 @@ from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .util import (
-    merge_device_descriptors
+    merge_device_descriptors,
+    merge_descriptor_category,
+    restrict_descriptor_category,
 )
 
 from .multi_manager.multi_manager import (
@@ -114,34 +117,30 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if descriptions := merged_descriptors.get(device.category):
-                    entities.extend(
-                        XTButtonEntity(device, hass_data.manager, description)
-                        for description in descriptions
-                        if description.key in device.status and (restrict_dpcode is None or restrict_dpcode == description.key)
-                    )
-                    for description in descriptions:
-                        if description.vf_reset_state:
-                            for reset_state in description.vf_reset_state:
-                                if reset_state in device.status and (restrict_dpcode is None or restrict_dpcode == reset_state):
-                                    entities.append(
-                                        XTButtonEntity.get_entity_instance(description, device, hass_data.manager)
-                                    )
-                                break
-                if descriptions := merged_descriptors.get(CROSS_CATEGORY_DEVICE_DESCRIPTOR):
-                    entities.extend(
-                        XTButtonEntity(device, hass_data.manager, description)
-                        for description in descriptions
-                        if description.key in device.status and (restrict_dpcode is None or restrict_dpcode == description.key)
-                    )
-                    for description in descriptions:
-                        if description.vf_reset_state:
-                            for reset_state in description.vf_reset_state:
-                                if reset_state in device.status and (restrict_dpcode is None or restrict_dpcode == reset_state):
-                                    entities.append(
-                                        XTButtonEntity.get_entity_instance(description, device, hass_data.manager)
-                                    )
-                                break
+                category_descriptions = merged_descriptors.get(device.category)
+                cross_category_descriptions = merged_descriptors.get(CROSS_CATEGORY_DEVICE_DESCRIPTOR)
+                descriptions = merge_descriptor_category(category_descriptions, cross_category_descriptions)
+                if restrict_dpcode is not None:
+                    descriptions = restrict_descriptor_category(descriptions, [restrict_dpcode])
+                descriptions = cast(tuple[XTButtonEntityDescription, ...], descriptions)
+                entities.extend(
+                    XTButtonEntity.get_entity_instance(description, device, hass_data.manager)
+                    for description in descriptions
+                    if XTEntity.supports_description(device, description, True)
+                )
+                entities.extend(
+                    XTButtonEntity.get_entity_instance(description, device, hass_data.manager)
+                    for description in descriptions
+                    if XTEntity.supports_description(device, description, False)
+                )
+                for description in descriptions:
+                    if description.vf_reset_state:
+                        for reset_state in description.vf_reset_state:
+                            if reset_state in device.status:
+                                entities.append(
+                                    XTButtonEntity.get_entity_instance(description, device, hass_data.manager)
+                                )
+                            break
 
         async_add_entities(entities)
 

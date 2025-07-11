@@ -1,15 +1,12 @@
 from __future__ import annotations
 
-from typing import Optional, Literal, Any, overload
+from typing import Optional, Literal, Any
 import json
 
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady
 
-from tuya_sharing import (
-    CustomerDevice,
-)
 from tuya_sharing.home import (
     HomeRepository,
 )
@@ -299,6 +296,7 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
         device_new: XTDevice = XTDevice.from_compatible_device(device, device_source_priority=device_source_priority)
         if device_source_priority == XTDeviceSourcePriority.REGULAR_TUYA:
             device_new.force_compatibility = True
+            device_new.regular_tuya_device = device
         return device_new
     
     def send_lock_unlock_command(

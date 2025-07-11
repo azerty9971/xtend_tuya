@@ -2,14 +2,12 @@
 
 from __future__ import annotations
 import copy
-import traceback
 from typing import NamedTuple, Any
 from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.entity import EntityDescription
 from .const import (
     LOGGER,
-    DPType,
     DOMAIN,
 )
 
@@ -17,33 +15,31 @@ from tuya_sharing.manager import (
     Manager,
     SharingDeviceListener,
 )
+from .ha_tuya_integration.tuya_integration_imports import (
+    TuyaDPType,
+)
 
-from .multi_manager.multi_manager import (
-    MultiManager,
-)
-from .multi_manager.shared.shared_classes import (
-    XTConfigEntry,
-    XTDevice,
-)
+import custom_components.xtend_tuya.multi_manager.multi_manager as mm
+import custom_components.xtend_tuya.multi_manager.shared.shared_classes as shared
 
 def log_stack(message: str):
     LOGGER.debug(message, stack_info=True)
 
-def get_default_value(dp_type: DPType | None) -> Any:
+def get_default_value(dp_type: TuyaDPType | None) -> Any:
     if dp_type is None:
         return None
     match dp_type:
-        case DPType.BOOLEAN:
+        case TuyaDPType.BOOLEAN:
             return False
-        case DPType.ENUM:
+        case TuyaDPType.ENUM:
             return None
-        case DPType.INTEGER:
+        case TuyaDPType.INTEGER:
             return 0
-        case DPType.JSON:
+        case TuyaDPType.JSON:
             return "{}"
-        case DPType.RAW:
+        case TuyaDPType.RAW:
             return None
-        case DPType.STRING:
+        case TuyaDPType.STRING:
             return ""
     return None
         
@@ -102,7 +98,7 @@ def get_config_entry_runtime_data(hass: HomeAssistant, entry: ConfigEntry, domai
 def get_domain_config_entries(hass: HomeAssistant, domain: str) -> list[ConfigEntry]:
     return hass.config_entries.async_entries(domain, False, False)
 
-def get_overriden_config_entry(hass: HomeAssistant, entry: XTConfigEntry, other_domain: str) -> ConfigEntry | None:
+def get_overriden_config_entry(hass: HomeAssistant, entry: shared.XTConfigEntry, other_domain: str) -> ConfigEntry | None:
     other_domain_config_entries = get_domain_config_entries(hass, other_domain)
     for od_config_entry in other_domain_config_entries:
         if entry.title == od_config_entry.title:
@@ -128,16 +124,31 @@ def merge_device_descriptors(descriptors1, descriptors2):
             return_descriptors[category] = merge_descriptor_category(return_descriptors[category], descriptors2[category])
     return return_descriptors
 
-def merge_descriptor_category(category1: tuple[EntityDescription, ...], category2: tuple[EntityDescription, ...]):
-    descriptor1_key_list = []
-    return_category = copy.deepcopy(list(category1))
-    for descriptor in category1:
-        if descriptor.key not in descriptor1_key_list:
-            descriptor1_key_list.append(descriptor.key)
-    for descriptor in category2:
-        if descriptor.key not in descriptor1_key_list:
-            return_category.append(copy.deepcopy(descriptor))
-    return tuple(return_category)
+def merge_descriptor_category(category1: tuple[EntityDescription, ...] | None, category2: tuple[EntityDescription, ...] | None) -> tuple[EntityDescription, ...]:
+    if   category1 is None      and category2 is None:
+        return tuple()
+    elif category1 is None      and category2 is not None:
+        return category2
+    elif category1 is not None  and category2 is None:
+        return category1
+    elif category1 is not None and category2 is not None:
+        descriptor1_key_list = []
+        return_category = copy.deepcopy(list(category1))
+        for descriptor in category1:
+            if descriptor.key not in descriptor1_key_list:
+                descriptor1_key_list.append(descriptor.key)
+        for descriptor in category2:
+            if descriptor.key not in descriptor1_key_list:
+                return_category.append(copy.deepcopy(descriptor))
+        return tuple(return_category)
+    return tuple()
+
+def restrict_descriptor_category(category: tuple[EntityDescription, ...], restrict_to_keys: list[str]) -> tuple[EntityDescription, ...]:
+    return_list: list[EntityDescription] = []
+    for descriptor in category:
+        if descriptor.key in restrict_to_keys:
+            return_list.append(descriptor)
+    return tuple(return_list)
 
 def append_dictionnaries(dict1: dict, dict2: dict) -> dict:
     return_dict = copy.deepcopy(dict1)
@@ -161,17 +172,17 @@ def append_sets(set1: set, set2: set) -> set:
             return_set.add(copy.deepcopy(item))
     return return_set
 
-def get_all_multi_managers(hass: HomeAssistant) -> list[MultiManager]:
-    return_list: list[MultiManager] = []
+def get_all_multi_managers(hass: HomeAssistant) -> list[mm.MultiManager]:
+    return_list: list[mm.MultiManager] = []
     config_entries = get_domain_config_entries(hass, DOMAIN)
     for config_entry in config_entries:
         if runtime_data := get_config_entry_runtime_data(hass, config_entry, DOMAIN):
             return_list.append(runtime_data.device_manager) # type: ignore
     return return_list
 
-def get_device_multi_manager(hass: HomeAssistant, device: XTDevice) -> MultiManager | None:
-    all_mm = get_all_multi_managers(hass=hass)
-    for mm in all_mm:
-        if device.id in mm.device_map:
-            return mm
+def get_device_multi_manager(hass: HomeAssistant, device: shared.XTDevice) -> mm.MultiManager | None:
+    all_multimanager = get_all_multi_managers(hass=hass)
+    for multimanager in all_multimanager:
+        if device.id in multimanager.device_map:
+            return multimanager
     return None

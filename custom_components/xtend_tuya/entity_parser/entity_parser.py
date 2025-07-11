@@ -14,9 +14,7 @@ from homeassistant.core import (
 )
 
 from ..const import LOGGER
-from ..multi_manager.multi_manager import (
-    MultiManager,
-)
+import custom_components.xtend_tuya.multi_manager.multi_manager as mm
 
 class XTCustomEntityParser:
     def __init__(self) -> None:
@@ -27,7 +25,7 @@ class XTCustomEntityParser:
         pass
 
     @staticmethod
-    async def setup_entity_parsers(hass: HomeAssistant, multi_manager: MultiManager) -> None:
+    async def setup_entity_parsers(hass: HomeAssistant, multi_manager: mm.MultiManager) -> None:
         #Load all the plugins
         #subdirs = await self.hass.async_add_executor_job(os.listdir, os.path.dirname(__file__))
         subdirs = await hass.async_add_executor_job(partial(os.listdir, path=os.path.dirname(__file__)))

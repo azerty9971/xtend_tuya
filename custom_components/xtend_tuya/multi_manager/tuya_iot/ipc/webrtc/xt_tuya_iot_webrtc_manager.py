@@ -6,10 +6,8 @@ import time
 import json
 
 from webrtc_models import (
-    RTCConfiguration,
     RTCIceCandidate,
     RTCIceCandidateInit,
-    RTCIceServer,
 )
 
 from homeassistant.core import HomeAssistant
@@ -469,11 +467,11 @@ class XTIOTWebRTCManager:
         offer_changed = self.get_candidates_from_offer(session_id, offer_sdp)
         offer_changed = self.fix_offer(offer_changed, session_id)
         self.set_sdp_offer(session_id, offer_changed)
-        sdp_offer_payload = self.format_offer_payload(session_id, offer_changed, device)
+        sdp_offer_payload = await hass.async_add_executor_job(self.format_offer_payload, session_id, offer_changed, device)
         self.send_to_ipc_mqtt(session_id, device, json.dumps(sdp_offer_payload))
         session_data.offer_sent = True
         for candidate in session_data.offer_candidate:
-            if candidate_payload := self.format_offer_candidate(session_id, candidate, device):
+            if candidate_payload := await hass.async_add_executor_job(self.format_offer_candidate, session_id, candidate, device):
                 self.send_to_ipc_mqtt(session_id, device, json.dumps(candidate_payload))
 
     async def async_on_webrtc_candidate(
@@ -490,7 +488,7 @@ class XTIOTWebRTCManager:
         candidate_str = candidate.candidate
         if candidate_str != "":
             candidate_str = f"a={candidate.candidate}"
-        if session_data.offer_sent == False:
+        if not session_data.offer_sent:
             session_data.offer_candidate.append(candidate_str)
         else:
             if payload := self.format_offer_candidate(session_id, candidate_str, device):

@@ -29,6 +29,9 @@ from ..multi_manager import (
     XTDevice,
 )
 
+import custom_components.xtend_tuya.multi_manager.tuya_sharing.xt_tuya_sharing_device_repository as dr
+import custom_components.xtend_tuya.multi_manager.tuya_sharing.xt_tuya_sharing_mq as mq
+
 class XTSharingDeviceManager(Manager):  # noqa: F811
     def __init__(
         self,
@@ -40,7 +43,7 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
         self.mq = None
         self.customer_api: CustomerApi | None = None
         self.home_repository: HomeRepository | None = None
-        self.device_repository: XTSharingDeviceRepository | None = None
+        self.device_repository: dr.XTSharingDeviceRepository | None = None
         self.scene_repository: SceneRepository | None = None
         self.user_repository: UserRepository | None = None
         self.device_map: dict[str, XTDevice] = {} # type: ignore
@@ -79,7 +82,7 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
                   hasattr(device, "id") and getattr(device, "set_up", False)]
 
         if self.customer_api is not None:
-            self.mq = XTSharingMQ(self.customer_api, home_ids, device) # type: ignore
+            self.mq = mq.XTSharingMQ(self.customer_api, home_ids, device) # type: ignore
             self.mq.start()
             self.mq.add_message_listener(self.forward_message_to_multi_manager)
 
@@ -143,15 +146,3 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
     ) -> bool:
         #I didn't find a way to implement this using the Sharing SDK...
         return False
-
-
-
-
-
-
-from .xt_tuya_sharing_device_repository import (
-    XTSharingDeviceRepository
-)
-from .xt_tuya_sharing_mq import (
-    XTSharingMQ,
-)

@@ -6,7 +6,7 @@ import os
 from typing import Any, Literal, Optional
 
 from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant, callback
+from homeassistant.core import HomeAssistant
 
 from tuya_iot.device import (
     PROTOCOL_DEVICE_REPORT,
@@ -17,8 +17,61 @@ from ..const import (
     LOGGER,
     AllowedPlugins,
     XTDeviceEntityFunctions,
-    XTDeviceSourcePriority,
     XTMultiManagerProperties,
+)
+
+from .shared.shared_classes import (
+    DeviceWatcher,
+    XTConfigEntry,  # noqa: F811
+    XTDeviceMap,
+    XTDevice,
+)
+from .shared.threading import (
+    XTThreadingManager,
+)
+
+from .shared.debug.debug_helper import (
+    DebugHelper,
+)
+
+from .shared.merging_manager import (
+    XTMergingManager,
+)
+
+from .shared.cloud_fix import (
+    CloudFixes,
+)
+
+from .shared.multi_source_handler import (
+    MultiSourceHandler,
+)
+
+from .shared.multi_mq import (
+    MultiMQTTQueue,
+)
+
+from .shared.multi_device_listener import (
+    MultiDeviceListener,
+)
+
+from .shared.multi_virtual_state_handler import (
+    XTVirtualStateHandler,
+)
+
+from .shared.multi_virtual_function_handler import (
+    XTVirtualFunctionHandler,
+)
+
+from ..util import (
+    append_lists,
+)
+
+from .shared.interface.device_manager import (
+    XTDeviceManagerInterface,
+)
+
+from ..entity_parser.entity_parser import (
+    XTCustomEntityParser,
 )
     
 class MultiManager:  # noqa: F811
@@ -118,6 +171,7 @@ class MultiManager:  # noqa: F811
             #Applied twice because some parts at the end of apply_fix would change values of previous calls
             CloudFixes.apply_fixes(device)
             CloudFixes.apply_fixes(device)
+        self._enable_regular_tuya_device_replication()
         self._process_pending_messages()
 
     def _process_pending_messages(self):
@@ -149,6 +203,12 @@ class MultiManager:  # noqa: F811
                 for prev_device in to_be_merged:
                     XTMergingManager.merge_devices(prev_device, current_device, self)
                 to_be_merged.append(current_device)
+    
+    def _enable_regular_tuya_device_replication(self):
+        for device in self.device_map.values():
+            devices = self.__get_devices_from_device_id(device.id)
+            for current_device in devices:
+                current_device.enable_regular_tuya_device_replication = True
     
     def unload(self):
         for manager in self.accounts.values():
@@ -263,10 +323,9 @@ class MultiManager:  # noqa: F811
         if not dev_id:
             LOGGER.warning(f"dev_id {dev_id} not found!")
             return
-        
-        #self.device_watcher.report_message(dev_id, f"on_message ({source}) => {msg}")
 
         new_message = self._convert_message_for_all_accounts(msg)
+        self.device_watcher.report_message(dev_id, f"on_message ({source}) => {msg} <=> {new_message}")
         if status_list := self._get_status_list_from_message(msg):
             self.device_watcher.report_message(dev_id, f"On Message reporting ({source}): {msg}")
             self.multi_source_handler.register_status_list_from_source(dev_id, source, status_list)
@@ -402,67 +461,3 @@ class MultiManager:  # noqa: F811
     
     def get_general_property(self, property_id: XTMultiManagerProperties, default: Any | None = None) -> Any | None:
         return self.general_properties.get(property_id, default)
-
-
-
-
-
-
-
-
-
-
-
-from .shared.shared_classes import (
-    DeviceWatcher,
-    XTConfigEntry,  # noqa: F811
-    XTDeviceMap,
-    XTDevice,
-)
-from .shared.threading import (
-    XTThreadingManager,
-)
-
-from .shared.debug.debug_helper import (
-    DebugHelper,
-)
-
-from .shared.merging_manager import (
-    XTMergingManager,
-)
-
-from .shared.cloud_fix import (
-    CloudFixes,
-)
-
-from .shared.multi_source_handler import (
-    MultiSourceHandler,
-)
-
-from .shared.multi_mq import (
-    MultiMQTTQueue,
-)
-
-from .shared.multi_device_listener import (
-    MultiDeviceListener,
-)
-
-from .shared.multi_virtual_state_handler import (
-    XTVirtualStateHandler,
-)
-
-from .shared.multi_virtual_function_handler import (
-    XTVirtualFunctionHandler,
-)
-
-from ..util import (
-    append_lists,
-)
-
-from .shared.interface.device_manager import (
-    XTDeviceManagerInterface,
-)
-
-from ..entity_parser.entity_parser import (
-    XTCustomEntityParser,
-)

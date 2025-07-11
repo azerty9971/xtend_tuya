@@ -12,10 +12,6 @@ from homeassistant.const import (
     Platform,
 )
 
-from .ha_tuya_integration.tuya_integration_imports import (
-    TuyaDPType as DPType
-)
-
 DOMAIN = "xtend_tuya"
 DOMAIN_ORIG = "tuya"
 LOGGER = logging.getLogger(__package__)
@@ -141,15 +137,6 @@ class XTDPCode(StrEnum):
 
     https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
     """
-    POWER_A = "power_a"
-    POWER_B = "power_b"
-    DIRECTION_A="direction_a"
-    DIRECTION_B="direction_b"
-    VOLTAGE_A="voltage_a"
-    CURRENT_A="current_a"
-    CURRENT_B="current_b"
-    POWER_FACTOR="power_factor"
-    POWER_FACTOR_B="power_factor_b"
     ACHZ = "ACHZ"
     ACI = "ACI"
     ACTIVEPOWER = "ActivePower"
@@ -304,6 +291,8 @@ class XTDPCode(StrEnum):
     CURRENTA = "CurrentA"
     CURRENTB = "CurrentB"
     CURRENTC = "CurrentC"
+    CURRENT_A = "current_a"
+    CURRENT_B = "current_b"
     CURRENT_YD = "current_yd"
     CUR_CURRENT = "cur_current"  # Actual current
     CUR_NEUTRAL = "cur_neutral"  # Total reverse energy
@@ -331,6 +320,8 @@ class XTDPCode(StrEnum):
     DEVICETEMP = "DeviceTemp"
     DEVICETEMP2 = "DeviceTemp2"
     DEVICE_MODE = "device_mode"
+    DIRECTION_A = "direction_a"
+    DIRECTION_B = "direction_b"
     DISINFECTION = "disinfection"
     DO_NOT_DISTURB = "do_not_disturb"
     DOORBELL_VOLUME = "doorbell_volume"
@@ -495,12 +486,16 @@ class XTDPCode(StrEnum):
     POWDER_SET = "powder_set"  # Powder
     POWER = "power"
     POWER2 = "Power"
+    POWER_A = "power_a"
+    POWER_B = "power_b"
     POWERFACTORA = "PowerFactorA"
     POWERFACTORB = "PowerFactorB"
     POWERFACTORC = "PowerFactorC"
     POWERON = "poweron"
     POWERONOFF = "PowerOnOff"
     POWER_CONSUMPTION = "power_consumption"
+    POWER_FACTOR = "power_factor"
+    POWER_FACTOR_B = "power_factor_b"
     POWER_GO = "power_go"
     POWER_SET = "power_set"
     POWER_TOTAL = "power_total"
@@ -712,6 +707,7 @@ class XTDPCode(StrEnum):
     VOLTAGEA = "VoltageA"
     VOLTAGEB = "VoltageB"
     VOLTAGEC = "VoltageC"
+    VOLTAGE_A = "voltage_a"
     VOLTAGE_CURRENT = "voltage_current"
     WAKEUP = "wakeup"
     WARM = "warm"  # Heat preservation
