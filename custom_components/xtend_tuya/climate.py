@@ -34,6 +34,7 @@ from .const import (
     TUYA_DISCOVERY_NEW, 
     XTDPCode,
     CROSS_CATEGORY_DEVICE_DESCRIPTOR,  # noqa: F401
+    LOGGER,
 )
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaClimateEntity,
@@ -485,6 +486,11 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
         """Turn the device on, retaining current HVAC (if supported)."""
         if dpcode_switch := self.control_dp_codes.get(XTClimateEntity.ControlDPCode.SWITCH_ON):
             self._send_command([{"code": dpcode_switch, "value": False}])
+    
+    def _send_command(self, commands: list[dict[str, Any]]) -> None:
+        """Send command to the device."""
+        LOGGER.debug("Sending commands for device %s: %s", self.device.id, commands)
+        self.device_manager.send_commands(self.device.id, commands)
 
     @staticmethod
     def get_entity_instance(description: XTClimateEntityDescription, device: XTDevice, device_manager: MultiManager, system_temperature_unit: UnitOfTemperature) -> XTClimateEntity:
