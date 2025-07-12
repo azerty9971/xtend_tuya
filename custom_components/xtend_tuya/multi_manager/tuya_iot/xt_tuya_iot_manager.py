@@ -312,7 +312,10 @@ class XTIOTDeviceManager(TuyaDeviceManager):
     ):
         for property in properties:
             for prop_key in property:
-                property_str = f"{{\"{prop_key}\":{property[prop_key]}}}"
+                if isinstance(property[prop_key], str):
+                    property_str = f"{{\"{prop_key}\":\"{property[prop_key]}\"}}"
+                else:
+                    property_str = f"{{\"{prop_key}\":{property[prop_key]}}}"
                 self.api.post(f"/v2.0/cloud/thing/{device_id}/shadow/properties/issue", {"properties": property_str}
         )
     
