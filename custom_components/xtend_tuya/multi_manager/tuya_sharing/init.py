@@ -273,7 +273,9 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
         return get_tuya_platform_descriptors(platform)
     
     def send_commands(self, device_id: str, commands: list[dict[str, Any]]) -> bool:
+        LOGGER.warning(f"[Sharing]Sending command, device id: {device_id}, commands: {commands} 1")
         if self.sharing_account is None:
+            LOGGER.warning(f"[Sharing]Sending command, device id: {device_id}, commands: {commands} 2")
             return False
         regular_commands: list[dict[str, Any]] = []
         devices = self.get_devices_from_device_id(device_id)
@@ -288,6 +290,7 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
                     if dpId := self.multi_manager._read_dpId_from_code(command_code, device):
                         if device.local_strategy[dpId].get("use_open_api", False):
                             skip_command = True
+                            LOGGER.warning(f"[Sharing]Sending command, device id: {device_id}, source: {device.source} 3")
                             break
             if not skip_command:
                 regular_commands.append(command)
