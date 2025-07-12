@@ -723,6 +723,8 @@ class XTDPCode(StrEnum):
     WEATHER_DELAY = "weather_delay"
     WEATHER_SWITCH = "weather_switch"
     WET = "wet"  # Humidification
+    WINDSHAKE = "windshake"
+    WINDSHAKEH = "windshakeH"
     WINDOW_CHECK = "window_check"
     WINDOW_STATE = "window_state"
     WINDSPEED = "windspeed"
