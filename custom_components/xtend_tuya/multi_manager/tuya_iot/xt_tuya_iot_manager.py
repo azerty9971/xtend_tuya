@@ -311,7 +311,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
             self, device_id: str, properties: list[dict[str, Any]]
     ):
         properties_value = json.dumps(properties).replace("\"", "\\\"")
-        LOGGER.warning(f"Property value: {properties_value}")
+        LOGGER.warning(f"Property value: { {"properties": properties_value} }")
         self.api.post(f"/v2.0/cloud/thing/{device_id}/shadow/properties/issue", {"properties": properties_value})
         # for property in properties:
         #     for prop_key in property:
