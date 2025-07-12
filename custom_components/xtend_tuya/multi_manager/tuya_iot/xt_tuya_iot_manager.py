@@ -310,16 +310,15 @@ class XTIOTDeviceManager(TuyaDeviceManager):
     def send_property_update(
             self, device_id: str, properties: list[dict[str, Any]]
     ):
-        properties_value = json.dumps(properties).replace("'", "\"")
-        LOGGER.warning(f"Property value: { {"properties": properties_value} }")
-        self.api.post(f"/v2.0/cloud/thing/{device_id}/shadow/properties/issue", {"properties": properties_value})
-        # for property in properties:
-        #     for prop_key in property:
-        #         if isinstance(property[prop_key], str):
-        #             property_str = f"{{\"{prop_key}\":\"{property[prop_key]}\"}}"
-        #         else:
-        #             property_str = f"{{\"{prop_key}\":{property[prop_key]}}}"
-        #         self.api.post(f"/v2.0/cloud/thing/{device_id}/shadow/properties/issue", {"properties": property_str})
+        for property in properties:
+            for prop_key in property:
+                #if isinstance(property[prop_key], str):
+                #    property_str = f"{{\"{prop_key}\":\"{property[prop_key]}\"}}"
+                #else:
+                #    property_str = f"{{\"{prop_key}\":{property[prop_key]}}}"
+                property_str = json.dumps({prop_key: property[prop_key]})
+                LOGGER.warning(f"Property value: { json.dumps({"properties": property_str}) }")
+                self.api.post(f"/v2.0/cloud/thing/{device_id}/shadow/properties/issue", {"properties": property_str})
     
     def send_lock_unlock_command(
             self, device: XTDevice, lock: bool
