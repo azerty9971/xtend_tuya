@@ -396,8 +396,7 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
     def set_preset_mode(self, preset_mode: str) -> None:
         """Set new target preset mode."""
         if dpcode_hvac_mode := self.control_dp_codes.get(XTClimateEntity.ControlDPCode.HVAC_MODE):
-            commands = [{"code": dpcode_hvac_mode, "value": preset_mode}]
-            self._send_command(commands)
+            self._send_command([{"code": dpcode_hvac_mode, "value": preset_mode}])
     
     def set_fan_mode(self, fan_mode: str) -> None:
         """Set new target fan mode."""
@@ -419,6 +418,8 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
             commands.append(
                 {"code": dpcode_swing_vertical, "value": swing_mode in (SWING_BOTH, SWING_VERTICAL)}
             )
+        if len(commands) > 0:
+            self._send_command(commands)
     
     @property
     def hvac_mode(self) -> HVACMode:
