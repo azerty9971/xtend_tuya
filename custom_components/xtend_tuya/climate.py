@@ -34,7 +34,7 @@ from .const import (
     TUYA_DISCOVERY_NEW, 
     XTDPCode,
     CROSS_CATEGORY_DEVICE_DESCRIPTOR,  # noqa: F401
-    LOGGER,
+    LOGGER,  # noqa: F401
 )
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaClimateEntity,
@@ -490,7 +490,6 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
     
     def _send_command(self, commands: list[dict[str, Any]]) -> None:
         """Send command to the device."""
-        LOGGER.debug("Sending commands for device %s: %s", self.device.id, commands)
         self.device_manager.send_commands(self.device.id, commands)
 
     @staticmethod

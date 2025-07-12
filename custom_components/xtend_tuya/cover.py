@@ -16,7 +16,7 @@ from homeassistant.helpers.dispatcher import async_dispatcher_connect, dispatche
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .const import (
-    LOGGER,
+    LOGGER,  # noqa: F401
 )
 from .util import (
     merge_device_descriptors,
