@@ -306,9 +306,9 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
     def send_commands(self, device_id: str, commands: list[dict[str, Any]]) -> bool:
         open_api_regular_commands: list[dict[str, Any]] = []
         property_commands: list[dict[str, Any]] = []
-        devices = self.get_devices_from_device_id(device_id)
+        device = self.multi_manager.device_map.get(device_id)
         dpId: int | None = None
-        if devices is None or self.iot_account is None:
+        if device is None or self.iot_account is None:
             return False
         for command in commands:
             command_code  = command["code"]
@@ -318,19 +318,17 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
             skip_command = False
             prop_command = False
             regular_command = False
-            device: XTDevice | None = None
-            for device in devices:
-                if dpId := self.multi_manager._read_dpId_from_code(command_code, device):
-                    if not device.local_strategy[dpId].get("use_open_api", False):
-                        skip_command = True
-                        break
-                    if device.local_strategy[dpId].get("property_update", False):
-                        prop_command = True
-                    else:
-                        regular_command = True
-                else:
+            if dpId := self.multi_manager._read_dpId_from_code(command_code, device):
+                if not device.local_strategy[dpId].get("use_open_api", False):
                     skip_command = True
-            if not skip_command and device is not None:
+                    break
+                if device.local_strategy[dpId].get("property_update", False):
+                    prop_command = True
+                else:
+                    regular_command = True
+            else:
+                skip_command = True
+            if not skip_command:
                 if regular_command:
                     command_dict = {"code": command_code, "value": command_value}
                     open_api_regular_commands.append(command_dict)

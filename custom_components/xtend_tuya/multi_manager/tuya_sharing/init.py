@@ -273,31 +273,24 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
         return get_tuya_platform_descriptors(platform)
     
     def send_commands(self, device_id: str, commands: list[dict[str, Any]]) -> bool:
-        LOGGER.warning(f"[Sharing]Sending command, device id: {device_id}, commands: {commands} 1")
         if self.sharing_account is None:
-            LOGGER.warning(f"[Sharing]Sending command, device id: {device_id}, commands: {commands} 2")
             return False
         regular_commands: list[dict[str, Any]] = []
-        devices = self.get_devices_from_device_id(device_id)
+        device = self.multi_manager.device_map.get(device_id)
+        if device is None:
+            return False
         for command in commands:
             command_code: str  = command["code"]
             """command_value: str = command["value"]"""
 
             #Filter commands that require the use of OpenAPI
-            skip_command = False
-            if devices is not None:
-                for device in devices:
-                    if dpId := self.multi_manager._read_dpId_from_code(command_code, device):
-                        if device.local_strategy[dpId].get("use_open_api", False):
-                            skip_command = True
-                            LOGGER.warning(f"[Sharing]Sending command, device id: {device_id}, source: {device.source} 3")
-                            break
-            if not skip_command:
-                regular_commands.append(command)
+            if dpId := self.multi_manager._read_dpId_from_code(command_code, device):
+                if device.local_strategy[dpId].get("use_open_api", False):
+                    continue
+            regular_commands.append(command)
         
         try:
             if regular_commands:
-                LOGGER.warning(f"[Sharing]Sending command, device id: {device_id}, commands: {regular_commands}")
                 self.sharing_account.device_manager.send_commands(device_id, regular_commands)
         except Exception as e:
             LOGGER.warning(f"[Sharing]Send command failed, device id: {device_id}, commands: {commands}, exception: {e}")
