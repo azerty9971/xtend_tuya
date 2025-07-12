@@ -435,7 +435,7 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
             return HVACMode.OFF
 
         if (
-            mode := self.device.status.get(self.control_dp_codes.get(XTClimateEntity.ControlDPCode.SWITCH_ON, ""))
+            mode := self.device.status.get(self.control_dp_codes.get(XTClimateEntity.ControlDPCode.HVAC_MODE, ""))
         ) is not None and mode in MERGED_HVAC_TO_HA:
             LOGGER.warning(f"Updating HVAC mode to {MERGED_HVAC_TO_HA[mode]} 4")
             return MERGED_HVAC_TO_HA[mode]
