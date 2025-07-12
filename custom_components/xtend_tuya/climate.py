@@ -201,7 +201,7 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
         self.device_manager = device_manager
         self.entity_description = description
         self._attr_preset_modes = None
-        self.control_dp_codes: dict[XTClimateEntity.ControlDPCode, XTDPCode]
+        self.control_dp_codes: dict[XTClimateEntity.ControlDPCode, XTDPCode] = {}
 
         # If both temperature values for celsius and fahrenheit are present,
         # use whatever the device is set to, with a fallback to celsius.
