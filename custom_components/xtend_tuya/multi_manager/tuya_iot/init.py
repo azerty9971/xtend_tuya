@@ -310,6 +310,7 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
         dpId: int | None = None
         if device is None or self.iot_account is None:
             return False
+        return_result = True
         for command in commands:
             command_code  = command["code"]
             command_value = command["value"]
@@ -321,12 +322,14 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
             if dpId := self.multi_manager._read_dpId_from_code(command_code, device):
                 if not device.local_strategy[dpId].get("use_open_api", False):
                     skip_command = True
+                    return_result = False
                     break
                 if device.local_strategy[dpId].get("property_update", False):
                     prop_command = True
                 else:
                     regular_command = True
             else:
+                return_result = False
                 skip_command = True
             if not skip_command:
                 if regular_command:
@@ -347,7 +350,7 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
         except Exception as e:
             LOGGER.warning(f"[IOT]Send command failed, device id: {device_id}, commands: {commands}, exception: {e}")
             return False
-        return True
+        return return_result
 
     def convert_to_xt_device(self, device: Any, device_source_priority: XTDeviceSourcePriority | None = None) -> XTDevice:
         #Nothing to do, tuya_iot initializes XTDevice by default...

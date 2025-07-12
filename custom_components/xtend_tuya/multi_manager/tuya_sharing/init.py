@@ -277,6 +277,7 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
             return False
         regular_commands: list[dict[str, Any]] = []
         device = self.multi_manager.device_map.get(device_id)
+        return_result = True
         if device is None:
             return False
         for command in commands:
@@ -286,16 +287,17 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
             #Filter commands that require the use of OpenAPI
             if dpId := self.multi_manager._read_dpId_from_code(command_code, device):
                 if device.local_strategy[dpId].get("use_open_api", False):
+                    return_result = False   #Part of the commands have not been issues, forward to other managers
                     continue
             regular_commands.append(command)
         
         try:
             if regular_commands:
                 self.sharing_account.device_manager.send_commands(device_id, regular_commands)
+            return return_result
         except Exception as e:
             LOGGER.warning(f"[Sharing]Send command failed, device id: {device_id}, commands: {commands}, exception: {e}")
             return False
-        return True
     
     def convert_to_xt_device(self, device: Any, device_source_priority: XTDeviceSourcePriority | None = None) -> XTDevice:
         device_new: XTDevice = XTDevice.from_compatible_device(device, device_source_priority=device_source_priority)
