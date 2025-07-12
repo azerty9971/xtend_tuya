@@ -316,7 +316,6 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                     property_str = f"{{\"{prop_key}\":\"{property[prop_key]}\"}}"
                 else:
                     property_str = f"{{\"{prop_key}\":{property[prop_key]}}}"
-                LOGGER.warning(f"Sending IOT Prop command: device: {device_id} <=> { {"properties": property_str} }")
                 self.api.post(f"/v2.0/cloud/thing/{device_id}/shadow/properties/issue", {"properties": property_str}
         )
     
