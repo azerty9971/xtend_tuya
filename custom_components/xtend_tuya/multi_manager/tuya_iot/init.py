@@ -337,7 +337,7 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
                     open_api_regular_commands.append(command_dict)
                 elif prop_command:
                     if dpId is not None:
-                        command_value = prepare_value_for_property_update(device.local_strategy[dpId], command_value)
+                        #command_value = prepare_value_for_property_update(device.local_strategy[dpId], command_value)
                         property_dict = {str(command_code): command_value}
                         property_commands.append(property_dict)
         try:
