@@ -389,7 +389,6 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
                     {"code": dpcode_hvac_mode, "value": self._hvac_to_tuya[hvac_mode]}
                 )
             if len(commands) > 0:
-                LOGGER.warning(f"set_hvac_mode: {commands}")
                 self._send_command(commands)
     
     def set_preset_mode(self, preset_mode: str) -> None:

@@ -18,7 +18,6 @@ from tuya_sharing.user import (
 )
 from tuya_sharing.customerapi import (
     CustomerTokenInfo,
-    CustomerApi,
 )
 
 from .xt_tuya_sharing_manager import (
@@ -295,6 +294,7 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
         
         try:
             if regular_commands:
+                LOGGER.warning(f"[Sharing]Sending command, device id: {device_id}, commands: {regular_commands}")
                 self.sharing_account.device_manager.send_commands(device_id, regular_commands)
         except Exception as e:
             LOGGER.warning(f"[Sharing]Send command failed, device id: {device_id}, commands: {commands}, exception: {e}")
