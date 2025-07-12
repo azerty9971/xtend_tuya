@@ -172,6 +172,9 @@ def append_sets(set1: set, set2: set) -> set:
             return_set.add(copy.deepcopy(item))
     return return_set
 
+def append_tuples(tuple1: tuple, tuple2: tuple) -> tuple:
+    return tuple(append_lists(list(tuple1), list(tuple2)))
+
 def get_all_multi_managers(hass: HomeAssistant) -> list[mm.MultiManager]:
     return_list: list[mm.MultiManager] = []
     config_entries = get_domain_config_entries(hass, DOMAIN)
