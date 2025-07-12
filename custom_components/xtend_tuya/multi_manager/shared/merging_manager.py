@@ -248,11 +248,11 @@ class XTMergingManager:
                     case 1:
                         device2.local_strategy[dpId]["use_open_api"] = device1.local_strategy[dpId]["use_open_api"]
                         device2.local_strategy[dpId]["property_update"] = device1.local_strategy[dpId]["property_update"]
-                        device2.local_strategy[dpId]["status_code"] = device1.local_strategy[dpId]["status_code"]
+                        #device2.local_strategy[dpId]["status_code"] = device1.local_strategy[dpId]["status_code"]
                     case 2:
                         device1.local_strategy[dpId]["use_open_api"] = device2.local_strategy[dpId]["use_open_api"]
                         device1.local_strategy[dpId]["property_update"] = device2.local_strategy[dpId]["property_update"]
-                        device1.local_strategy[dpId]["status_code"] = device2.local_strategy[dpId]["status_code"]
+                        #device1.local_strategy[dpId]["status_code"] = device2.local_strategy[dpId]["status_code"]
     
     @staticmethod
     def _align_DPTypes(device1: shared.XTDevice, device2: shared.XTDevice):
