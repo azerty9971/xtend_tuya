@@ -13,11 +13,11 @@ class XTSharingAPI(CustomerApi):
     
     def get(self, path: str, params: dict[str, Any] | None = None) -> dict[str, Any]:
         return_value = super().get(path=path, params=params)
-        LOGGER.warning(f"Result of {path} => {return_value}")
+        LOGGER.warning(f"GET: {path} => {params} => {return_value}")
         return return_value
     
     def post(self, path: str, params: dict[str, Any] | None = None, body: dict[str, Any] | None = None) -> dict[
         str, Any]:
         return_value = super().post(path=path, params=params, body=body)
-        LOGGER.warning(f"Result of {path} => {return_value}")
+        LOGGER.warning(f"POST: {path} => {params} <=> {body} => {return_value}")
         return return_value
