@@ -388,7 +388,9 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
                 commands.append(
                     {"code": dpcode_hvac_mode, "value": self._hvac_to_tuya[hvac_mode]}
                 )
-            self._send_command(commands)
+            if len(commands) > 0:
+                LOGGER.warning(f"set_hvac_mode: {commands}")
+                self._send_command(commands)
     
     def set_preset_mode(self, preset_mode: str) -> None:
         """Set new target preset mode."""
@@ -422,30 +424,23 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
         """Return hvac mode."""
         # If the switch off, hvac mode is off as well. Unless the switch
         # the switch is on or doesn't exists of course...
-        LOGGER.warning(f"Calling hvac_mode: {self.control_dp_codes}")
         if not self.device.status.get(self.control_dp_codes.get(XTClimateEntity.ControlDPCode.SWITCH_ON, ""), True):
-            LOGGER.warning("Updating HVAC mode to OFF 1")
             return HVACMode.OFF
 
         if self.control_dp_codes.get(XTClimateEntity.ControlDPCode.HVAC_MODE, "") not in self.device.function:
             if self.device.status.get(self.control_dp_codes.get(XTClimateEntity.ControlDPCode.SWITCH_ON, ""), False):
-                LOGGER.warning(f"Updating HVAC mode to {self.entity_description.switch_only_hvac_mode} 2")
                 return self.entity_description.switch_only_hvac_mode
-            LOGGER.warning("Updating HVAC mode to OFF 3")
             return HVACMode.OFF
 
         if (
             mode := self.device.status.get(self.control_dp_codes.get(XTClimateEntity.ControlDPCode.HVAC_MODE, ""))
         ) is not None and mode in MERGED_HVAC_TO_HA:
-            LOGGER.warning(f"Updating HVAC mode to {MERGED_HVAC_TO_HA[mode]} 4")
             return MERGED_HVAC_TO_HA[mode]
 
         # If the switch is on, and the mode does not match any hvac mode.
         if self.device.status.get(self.control_dp_codes.get(XTClimateEntity.ControlDPCode.SWITCH_ON, ""), False):
-            LOGGER.warning(f"Updating HVAC mode to {self.entity_description.switch_only_hvac_mode} 5")
             return self.entity_description.switch_only_hvac_mode
 
-        LOGGER.warning("Updating HVAC mode to OFF 6")
         return HVACMode.OFF
 
     @property
