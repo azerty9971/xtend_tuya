@@ -281,10 +281,10 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
 
         # Figure out setting temperature, use preferred unit or what is available
         celsius_type = self.find_dpcode(
-            XT_CLIMATE_SET_CELSIUS_TEMPERATURE_DPCODES, dptype=TuyaDPType.INTEGER, prefer_function=True
+            XT_CLIMATE_SET_CELSIUS_TEMPERATURE_DPCODES, dptype=TuyaDPType.INTEGER, prefer_function=True, only_function=True
         )
         fahrenheit_type = self.find_dpcode(
-            XT_CLIMATE_SET_FAHRENHEIT_TEMPERATURE_DPCODES, dptype=TuyaDPType.INTEGER, prefer_function=True
+            XT_CLIMATE_SET_FAHRENHEIT_TEMPERATURE_DPCODES, dptype=TuyaDPType.INTEGER, prefer_function=True, only_function=True
         )
         if fahrenheit_type and (
             prefered_temperature_unit == UnitOfTemperature.FAHRENHEIT
@@ -310,7 +310,7 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
         self._attr_hvac_modes: list[HVACMode] = []
         self._hvac_to_tuya = {}
         if enum_type := self.find_dpcode(
-            XT_CLIMATE_MODE_DPCODES, dptype=TuyaDPType.ENUM, prefer_function=True
+            XT_CLIMATE_MODE_DPCODES, dptype=TuyaDPType.ENUM, prefer_function=True, only_function=True
         ):
             self.control_dp_codes[XTClimateEntity.ControlDPCode.HVAC_MODE] = XTDPCode(enum_type.dpcode)
             self._attr_hvac_modes = [HVACMode.OFF]
@@ -343,7 +343,7 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
                     self._attr_hvac_modes.append(description.switch_only_hvac_mode)
                 self._attr_preset_modes = unknown_hvac_modes
                 self._attr_supported_features |= ClimateEntityFeature.PRESET_MODE
-        elif self.find_dpcode(XT_CLIMATE_SWITCH_DPCODES, prefer_function=True):
+        elif self.find_dpcode(XT_CLIMATE_SWITCH_DPCODES, prefer_function=True, only_function=True):
             self._attr_hvac_modes = [
                 HVACMode.OFF,
                 description.switch_only_hvac_mode,
@@ -351,7 +351,7 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
 
         # Determine dpcode to use for setting the humidity
         if int_type := self.find_dpcode(
-            XT_CLIMATE_SET_HUMIDITY_DPCODES, dptype=TuyaDPType.INTEGER, prefer_function=True
+            XT_CLIMATE_SET_HUMIDITY_DPCODES, dptype=TuyaDPType.INTEGER, prefer_function=True, only_function=True
         ):
             self.control_dp_codes[XTClimateEntity.ControlDPCode.SET_HUMIDITY] = XTDPCode(int_type.dpcode)
             self._attr_supported_features |= ClimateEntityFeature.TARGET_HUMIDITY
@@ -371,6 +371,7 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
             XT_CLIMATE_FAN_SPEED_DPCODES,
             dptype=TuyaDPType.ENUM,
             prefer_function=True,
+            only_function=True,
         ):
             self.control_dp_codes[XTClimateEntity.ControlDPCode.FAN_SPEED] = XTDPCode(enum_type.dpcode)
             self._attr_supported_features |= ClimateEntityFeature.FAN_MODE
@@ -380,19 +381,20 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
         if self.find_dpcode(
             XT_CLIMATE_SWING_MODE_DPCODES,
             prefer_function=True,
+            only_function=True,
         ):
             self._attr_supported_features |= ClimateEntityFeature.SWING_MODE
             self._attr_swing_modes = [SWING_OFF]
-            if dpcode := self.find_dpcode(XT_CLIMATE_SWING_MODE_ON_DPCODES, prefer_function=True):
+            if dpcode := self.find_dpcode(XT_CLIMATE_SWING_MODE_ON_DPCODES, prefer_function=True, only_function=True):
                 self.control_dp_codes[XTClimateEntity.ControlDPCode.SWING_MODE_ON] = XTDPCode(dpcode)
                 self.swing_mode_enum_type = self.find_dpcode(dpcodes=dpcode, dptype=TuyaDPType.ENUM, prefer_function=True)
                 self._attr_swing_modes.append(SWING_ON)
 
-            if dpcode := self.find_dpcode(XT_CLIMATE_SWING_MODE_HORIZONTAL_DPCODES, prefer_function=True):
+            if dpcode := self.find_dpcode(XT_CLIMATE_SWING_MODE_HORIZONTAL_DPCODES, prefer_function=True, only_function=True):
                 self.control_dp_codes[XTClimateEntity.ControlDPCode.SWING_MODE_HORIZONTAL] = XTDPCode(dpcode)
                 self._attr_swing_modes.append(SWING_HORIZONTAL)
 
-            if dpcode := self.find_dpcode(XT_CLIMATE_SWING_MODE_VERTICAL_DPCODES, prefer_function=True):
+            if dpcode := self.find_dpcode(XT_CLIMATE_SWING_MODE_VERTICAL_DPCODES, prefer_function=True, only_function=True):
                 self.control_dp_codes[XTClimateEntity.ControlDPCode.SWING_MODE_VERTICAL] = XTDPCode(dpcode)
                 self._attr_swing_modes.append(SWING_VERTICAL)
 
