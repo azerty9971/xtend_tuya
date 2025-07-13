@@ -398,8 +398,8 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
 
     def set_hvac_mode(self, hvac_mode: HVACMode) -> None:
         """Set new target hvac mode."""
+        commands = []
         if dpcode_hvac_mode := self.control_dp_codes.get(XTClimateEntity.ControlDPCode.HVAC_MODE):
-            commands = []
             if dpcode_switch := self.control_dp_codes.get(XTClimateEntity.ControlDPCode.SWITCH_ON):
                 commands.append(
                     {"code": dpcode_switch, "value": hvac_mode != HVACMode.OFF}
@@ -408,8 +408,15 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
                 commands.append(
                     {"code": dpcode_hvac_mode, "value": self._hvac_to_tuya[hvac_mode]}
                 )
-            if len(commands) > 0:
-                self._send_command(commands)
+        else:
+            #This is a switch only HVAC (no selection of cool/heat/dry)
+            if dpcode_switch := self.control_dp_codes.get(XTClimateEntity.ControlDPCode.SWITCH_ON):
+                commands.append(
+                    {"code": dpcode_switch, "value": hvac_mode != HVACMode.OFF}
+                )
+        if len(commands) > 0:
+            self._send_command(commands)
+
     
     def set_preset_mode(self, preset_mode: str) -> None:
         """Set new target preset mode."""
@@ -466,7 +473,7 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
             return HVACMode.OFF
 
         if (
-            mode := self.device.status.get(self.control_dp_codes.get(XTClimateEntity.ControlDPCode.HVAC_MODE, ""))
+            ( mode := self.device.status.get(self.control_dp_codes.get(XTClimateEntity.ControlDPCode.HVAC_MODE, "")) ) is not None
         ) is not None and mode in MERGED_HVAC_TO_HA:
             return MERGED_HVAC_TO_HA[mode]
 
