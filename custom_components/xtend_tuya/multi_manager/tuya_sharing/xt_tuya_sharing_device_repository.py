@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from typing import Any
 from tuya_sharing.customerapi import (
     CustomerApi,
 )
@@ -125,3 +126,7 @@ class XTSharingDeviceRepository(DeviceRepository):
         #         device.status_range[code].values = loc_strat["valueDesc"]
 
         self.multi_manager.virtual_state_handler.apply_init_virtual_states(device) # type: ignore
+    
+    def send_commands(self, device_id: str, commands: list[dict[str, Any]]):
+        #LOGGER.warning(f"Calling send_command DR: {device_id} <=> {commands}")
+        return super().send_commands(device_id, commands)

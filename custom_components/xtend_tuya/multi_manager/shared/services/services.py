@@ -143,9 +143,8 @@ class ServiceManager:
     def _get_correct_multi_manager(self, source: str, device_id: str) -> mm.MultiManager | None:
         multi_manager_list = get_all_multi_managers(self.hass)
         for multi_manager in multi_manager_list:
-            if account := multi_manager.get_account_by_name(source):
-                if account.get_devices_from_device_id(device_id):
-                    return multi_manager
+            if multi_manager.device_map.get(device_id):
+                return multi_manager
         return None
     
     async def _handle_get_camera_stream_url(self, event: XTEventData) -> web.Response | str | None:

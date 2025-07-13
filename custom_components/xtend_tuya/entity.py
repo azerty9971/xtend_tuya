@@ -42,6 +42,7 @@ class XTEntity(TuyaEntity):
         *,
         prefer_function: bool = False,
         dptype: Literal[TuyaDPType.ENUM],
+        only_function: bool = False,
     ) -> TuyaEnumTypeData | None: ...
 
     @overload
@@ -51,6 +52,7 @@ class XTEntity(TuyaEntity):
         *,
         prefer_function: bool = False,
         dptype: Literal[TuyaDPType.INTEGER],
+        only_function: bool = False,
     ) -> TuyaIntegerTypeData | None: ...
 
     @overload
@@ -59,6 +61,7 @@ class XTEntity(TuyaEntity):
         dpcodes: str | XTDPCode | tuple[XTDPCode, ...] | TuyaDPCode | tuple[TuyaDPCode, ...] | None,
         *,
         prefer_function: bool = False,
+        only_function: bool = False,
     ) -> TuyaDPCode | None: ...
 
     @overload
@@ -68,6 +71,7 @@ class XTEntity(TuyaEntity):
         *,
         prefer_function: bool = False,
         dptype: TuyaDPType | None = None,
+        only_function: bool = False,
     ) -> TuyaDPCode | TuyaEnumTypeData | TuyaIntegerTypeData | None: ...
         
     def find_dpcode(
@@ -76,7 +80,10 @@ class XTEntity(TuyaEntity):
         *,
         prefer_function: bool = False,
         dptype: TuyaDPType | None = None,
+        only_function: bool = False,
     ) -> XTDPCode | TuyaDPCode | TuyaEnumTypeData | TuyaIntegerTypeData | None:
+        if only_function:
+            return self._find_dpcode(dpcodes=dpcodes, prefer_function=prefer_function, dptype=dptype, only_function=only_function)
         try:
             if dpcodes is None:
                 return None
@@ -92,56 +99,68 @@ class XTEntity(TuyaEntity):
                 return dpcodes[0]
         except Exception:
             """Find a matching DP code available on for this device."""
-            if dpcodes is None:
-                return None
-
-            if isinstance(dpcodes, str):
-                dpcodes = (XTDPCode(dpcodes),)
-            elif not isinstance(dpcodes, tuple):
-                dpcodes = (dpcodes,)
-
-            order = ["status_range", "function"]
-            if prefer_function:
-                order = ["function", "status_range"]
-
-            # When we are not looking for a specific datatype, we can append status for
-            # searching
-            if not dptype:
-                order.append("status")
-
-            for dpcode in dpcodes:
-                for key in order:
-                    if dpcode not in getattr(self.device, key):
-                        continue
-                    if (
-                        dptype == TuyaDPType.ENUM
-                        and getattr(self.device, key)[dpcode].type == TuyaDPType.ENUM
-                    ):
-                        if not (
-                            enum_type := TuyaEnumTypeData.from_json(
-                                dpcode, getattr(self.device, key)[dpcode].values # type: ignore
-                            )
-                        ):
-                            continue
-                        return enum_type
-
-                    if (
-                        dptype == TuyaDPType.INTEGER
-                        and getattr(self.device, key)[dpcode].type == TuyaDPType.INTEGER
-                    ):
-                        if not (
-                            integer_type := TuyaIntegerTypeData.from_json(
-                                dpcode, getattr(self.device, key)[dpcode].values # type: ignore
-                            )
-                        ):
-                            continue
-                        return integer_type
-
-                    if dptype not in (TuyaDPType.ENUM, TuyaDPType.INTEGER):
-                        return dpcode
-
-            return None
+            return self._find_dpcode(dpcodes=dpcodes, prefer_function=prefer_function, dptype=dptype, only_function=only_function)
     
+    def _find_dpcode(
+        self,
+        dpcodes: str | XTDPCode | tuple[XTDPCode, ...] | TuyaDPCode | tuple[TuyaDPCode, ...] | None,
+        *,
+        prefer_function: bool = False,
+        dptype: TuyaDPType | None = None,
+        only_function: bool = False,
+    ) -> XTDPCode | TuyaDPCode | TuyaEnumTypeData | TuyaIntegerTypeData | None:
+        if dpcodes is None:
+            return None
+
+        if isinstance(dpcodes, str):
+            dpcodes = (XTDPCode(dpcodes),)
+        elif not isinstance(dpcodes, tuple):
+            dpcodes = (dpcodes,)
+
+        order = ["status_range", "function"]
+        if prefer_function:
+            order = ["function", "status_range"]
+        if only_function:
+            order = ["function"]
+
+        # When we are not looking for a specific datatype, we can append status for
+        # searching
+        if not dptype:
+            order.append("status")
+
+        for dpcode in dpcodes:
+            for key in order:
+                if dpcode not in getattr(self.device, key):
+                    continue
+                if (
+                    dptype == TuyaDPType.ENUM
+                    and getattr(self.device, key)[dpcode].type == TuyaDPType.ENUM
+                ):
+                    if not (
+                        enum_type := TuyaEnumTypeData.from_json(
+                            dpcode, getattr(self.device, key)[dpcode].values # type: ignore
+                        )
+                    ):
+                        continue
+                    return enum_type
+
+                if (
+                    dptype == TuyaDPType.INTEGER
+                    and getattr(self.device, key)[dpcode].type == TuyaDPType.INTEGER
+                ):
+                    if not (
+                        integer_type := TuyaIntegerTypeData.from_json(
+                            dpcode, getattr(self.device, key)[dpcode].values # type: ignore
+                        )
+                    ):
+                        continue
+                    return integer_type
+
+                if dptype not in (TuyaDPType.ENUM, TuyaDPType.INTEGER):
+                    return dpcode
+
+        return None
+
     @staticmethod
     def determine_dptype(type) -> TuyaDPType | None:
         """Determine the DPType.
