@@ -63,6 +63,9 @@ MERGED_HVAC_TO_HA: dict[str, HVACMode] = append_dictionnaries(XT_HVAC_TO_HA, Tuy
 XT_CLIMATE_MODE_DPCODES: tuple[XTDPCode, ...] = (
     XTDPCode.MODE,
 )
+XT_CLIMATE_CURRENT_NON_UNIT_TEMPERATURE_DPCODES: tuple[XTDPCode, ...] = (
+    XTDPCode.GET_TEMP,
+)
 XT_CLIMATE_CURRENT_CELSIUS_TEMPERATURE_DPCODES: tuple[XTDPCode, ...] = (
     XTDPCode.TEMP_CURRENT,
     XTDPCode.UPPER_TEMP,
@@ -71,7 +74,7 @@ XT_CLIMATE_CURRENT_FAHRENHEIT_TEMPERATURE_DPCODES: tuple[XTDPCode, ...] = (
     XTDPCode.TEMP_CURRENT_F, 
     XTDPCode.UPPER_TEMP_F,
 )
-XT_CLIMATE_CURRENT_TEMPERATURE_DPCODES: tuple[XTDPCode, ...] = append_tuples(XT_CLIMATE_CURRENT_CELSIUS_TEMPERATURE_DPCODES, XT_CLIMATE_CURRENT_FAHRENHEIT_TEMPERATURE_DPCODES)
+XT_CLIMATE_CURRENT_TEMPERATURE_DPCODES: tuple[XTDPCode, ...] = append_tuples(append_tuples(XT_CLIMATE_CURRENT_CELSIUS_TEMPERATURE_DPCODES, XT_CLIMATE_CURRENT_FAHRENHEIT_TEMPERATURE_DPCODES), XT_CLIMATE_CURRENT_NON_UNIT_TEMPERATURE_DPCODES)
 XT_CLIMATE_SET_CELSIUS_TEMPERATURE_DPCODES: tuple[XTDPCode, ...] = (
     XTDPCode.TEMP_SET, 
 )
@@ -86,6 +89,7 @@ XT_CLIMATE_TEMPERATURE_UNIT_DPCODES: tuple[XTDPCode, ...] = (
 )
 XT_CLIMATE_CURRENT_HUMIDITY_DPCODES: tuple[XTDPCode, ...] = (
     XTDPCode.HUMIDITY_CURRENT,
+    XTDPCode.GET_HUM,
 )
 XT_CLIMATE_SET_HUMIDITY_DPCODES: tuple[XTDPCode, ...] = (
     XTDPCode.HUMIDITY_SET,
@@ -137,6 +141,10 @@ class XTClimateEntityDescription(TuyaClimateEntityDescription):
 
 
 CLIMATE_DESCRIPTIONS: dict[str, XTClimateEntityDescription] = {
+    "cs": XTClimateEntityDescription(
+        key="cs",
+        switch_only_hvac_mode=HVACMode.DRY,
+    ),
     "xfjDISABLED": XTClimateEntityDescription(
         key="xfj",
         switch_only_hvac_mode=HVACMode.AUTO,

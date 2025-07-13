@@ -372,6 +372,8 @@ class XTDPCode(StrEnum):
     GAS_SENSOR_STATE = "gas_sensor_state"
     GAS_SENSOR_STATUS = "gas_sensor_status"
     GAS_SENSOR_VALUE = "gas_sensor_value"
+    GET_HUM = "get_hum"
+    GET_TEMP = "get_temp"
     HEART_RATE = "heart_rate"
     HISTORY = "History"
     HOLD_SENSITIVITY = "hold_sensitivity"
