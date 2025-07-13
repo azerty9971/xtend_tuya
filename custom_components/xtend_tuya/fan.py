@@ -25,7 +25,6 @@ from .entity import (
 )
 
 XT_SUPPORT_TYPE = {
-    "ydkt",
     "xfj",
 }
 
