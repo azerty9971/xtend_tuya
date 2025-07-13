@@ -91,6 +91,10 @@ XT_CLIMATE_SWING_MODE_ON_DPCODES: tuple[XTDPCode, ...] = (
     XTDPCode.SWING,
     XTDPCode.WINDSHAKE,
 )
+XT_CLIMATE_SWING_MODE_ENUM_VALUE_MAPPING: dict[str, bool] = {
+    "off": False,
+    "on": True,
+}
 XT_CLIMATE_SWING_MODE_HORIZONTAL_DPCODES: tuple[XTDPCode, ...] = (
     XTDPCode.SWITCH_HORIZONTAL,
     XTDPCode.WINDSHAKEH,
@@ -405,17 +409,25 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
         if dpcode_fan_mode := self.control_dp_codes.get(XTClimateEntity.ControlDPCode.FAN_SPEED):
             self._send_command([{"code": dpcode_fan_mode, "value": fan_mode}])
     
-    def get_swing_mode_value(self, bool_swing: bool) -> bool | str:
+    def get_swing_mode_on_value(self, bool_swing: bool) -> bool | str:
         if self.swing_mode_enum_type is not None:
-            LOGGER.warning(f"Swing mode enum range: {self.swing_mode_enum_type.range}")
+            for allowed_value in self.swing_mode_enum_type.range:
+                if XT_CLIMATE_SWING_MODE_ENUM_VALUE_MAPPING.get(allowed_value.lower()) is bool_swing:
+                    return allowed_value
         return bool_swing
+    
+    def is_swing_mode_on(self) -> bool:
+        swing_mode_status_value = self.device.status.get(self.control_dp_codes.get(XTClimateEntity.ControlDPCode.SWING_MODE_ON, ""))
+        if self.swing_mode_enum_type is not None:
+            return XT_CLIMATE_SWING_MODE_ENUM_VALUE_MAPPING.get(str(swing_mode_status_value).lower(), bool(swing_mode_status_value))
+        return bool(swing_mode_status_value)
 
     def set_swing_mode(self, swing_mode: str) -> None:
         """Set new target swing operation."""
         commands: list[dict[str, Any]] = []
         if dpcode_swing := self.control_dp_codes.get(XTClimateEntity.ControlDPCode.SWING_MODE_ON):
             commands.append(
-                {"code": dpcode_swing, "value": self.get_swing_mode_value(swing_mode != SWING_OFF)}
+                {"code": dpcode_swing, "value": self.get_swing_mode_on_value(swing_mode != SWING_OFF)}
             )
         if dpcode_swing_horizontal := self.control_dp_codes.get(XTClimateEntity.ControlDPCode.SWING_MODE_HORIZONTAL):
             commands.append(
@@ -481,9 +493,7 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
         if vertical:
             return SWING_VERTICAL
 
-        if any(
-            self.device.status.get(dpcode) for dpcode in XT_CLIMATE_SWING_MODE_ON_DPCODES
-        ):
+        if self.is_swing_mode_on():
             return SWING_ON
 
         return SWING_OFF
