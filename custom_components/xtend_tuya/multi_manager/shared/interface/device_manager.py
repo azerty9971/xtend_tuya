@@ -102,16 +102,8 @@ class XTDeviceManagerInterface(ABC):
     def get_platform_descriptors_to_merge(self, platform: Platform) -> Any:
         pass
 
-    def send_commands(self, device_id: str, commands: list[dict[str, Any]]):
-        pass
-
-    def get_devices_from_device_id(self, device_id: str) -> list[shared.XTDevice] | None:
-        return_list = []
-        device_maps = self.get_available_device_maps()
-        for device_map in device_maps:
-            if device_id in device_map:
-                return_list.append(device_map[device_id])
-        return return_list
+    def send_commands(self, device_id: str, commands: list[dict[str, Any]]) -> bool:
+        return False
     
     @abstractmethod
     def convert_to_xt_device(self, device: Any, device_source_priority: XTDeviceSourcePriority | None = None) -> shared.XTDevice:

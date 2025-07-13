@@ -134,7 +134,12 @@ class XTLockEntity(XTEntity, LockEntity): # type: ignore
             self.temporary_unlock = True
         device_manager.set_general_property(XTMultiManagerProperties.LOCK_DEVICE_ID, device.id)
         if len(description.manual_unlock_command) > 0:
-            device.set_preference(f"{XTDevice.XTDevicePreference.LOCK_MANUAL_UNLOCK_COMMAND}", description.manual_unlock_command)
+            manual_unlock_commands: list[XTDPCode] = []
+            for unlock_command in description.manual_unlock_command:
+                if unlock_command in device.status:
+                    manual_unlock_commands.append(unlock_command)
+            if len(manual_unlock_commands) > 0:
+                device.set_preference(f"{XTDevice.XTDevicePreference.LOCK_MANUAL_UNLOCK_COMMAND}", manual_unlock_commands)
 
     @property
     def is_locked(self) -> bool | None: # type: ignore

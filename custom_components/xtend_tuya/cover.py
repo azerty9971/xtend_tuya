@@ -16,7 +16,7 @@ from homeassistant.helpers.dispatcher import async_dispatcher_connect, dispatche
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .const import (
-    LOGGER,
+    LOGGER,  # noqa: F401
 )
 from .util import (
     merge_device_descriptors,
@@ -288,7 +288,7 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         ]
 
         if self._set_position is not None:
-            LOGGER.warning(f"Sending cover open: {self._set_position.remap_value_from(computed_position, 0, 100, reverse=True)}")
+            #LOGGER.warning(f"Sending cover open: {self._set_position.remap_value_from(computed_position, 0, 100, reverse=True)}")
             commands.append(
                 {
                     "code": self._set_position.dpcode,
@@ -316,7 +316,7 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         ]
 
         if self._set_position is not None:
-            LOGGER.warning(f"Sending cover close: {self._set_position.remap_value_from(computed_position, 0, 100, reverse=True)}")
+            #LOGGER.warning(f"Sending cover close: {self._set_position.remap_value_from(computed_position, 0, 100, reverse=True)}")
             commands.append(
                 {
                     "code": self._set_position.dpcode,

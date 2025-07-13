@@ -312,9 +312,8 @@ class XTIOTDeviceManager(TuyaDeviceManager):
     ):
         for property in properties:
             for prop_key in property:
-                property_str = f"{{\"{prop_key}\":{property[prop_key]}}}"
-                self.api.post(f"/v2.0/cloud/thing/{device_id}/shadow/properties/issue", {"properties": property_str}
-        )
+                property_str = json.dumps({prop_key: property[prop_key]})
+                self.api.post(f"/v2.0/cloud/thing/{device_id}/shadow/properties/issue", {"properties": property_str})
     
     def send_lock_unlock_command(
             self, device: XTDevice, lock: bool
@@ -346,7 +345,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                 #Unlocking of the door
                 if self.call_door_open(device, api):
                     return True
-        if manual_unlock_code := cast(list[XTDPCode], device.get_preference(f"{XTDevice.XTDevicePreference.LOCK_MANUAL_UNLOCK_COMMAND}")):
+        if manual_unlock_code := cast(list[XTDPCode], device.get_preference(XTDevice.XTDevicePreference.LOCK_MANUAL_UNLOCK_COMMAND)):
             commands: list[dict[str, Any]] = []
             for dpcode in manual_unlock_code:
                 commands.append({"code": dpcode, "value": device.status.get(dpcode, True)})

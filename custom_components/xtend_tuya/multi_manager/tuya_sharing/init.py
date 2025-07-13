@@ -18,7 +18,6 @@ from tuya_sharing.user import (
 )
 from tuya_sharing.customerapi import (
     CustomerTokenInfo,
-    CustomerApi,
 )
 
 from .xt_tuya_sharing_manager import (
@@ -40,6 +39,9 @@ from .xt_tuya_sharing_token_listener import (
 )
 from .xt_tuya_sharing_device_repository import (
     XTSharingDeviceRepository,
+)
+from .xt_tuya_sharing_api import (
+    XTSharingAPI,
 )
 from .ha_tuya_integration.config_entry_handler import (
     XTHATuyaIntegrationConfigEntryManager
@@ -73,6 +75,7 @@ from ...const import (
     TUYA_DISCOVERY_NEW_ORIG,
     TUYA_HA_SIGNAL_UPDATE_ENTITY,
     XTDeviceSourcePriority,
+    LOGGER,
 )
 
 def get_plugin_instance() -> XTTuyaSharingDeviceManagerInterface | None:
@@ -117,7 +120,7 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
             sharing_device_manager = XTSharingDeviceManager(multi_manager=self.multi_manager, other_device_manager=None)
             token_listener = XTSharingTokenListener(hass, config_entry)
             sharing_device_manager.terminal_id = config_entry.data[CONF_TERMINAL_ID]
-            sharing_device_manager.customer_api = CustomerApi(
+            sharing_device_manager.customer_api = XTSharingAPI(
                 CustomerTokenInfo(config_entry.data[CONF_TOKEN_INFO]),
                 TUYA_CLIENT_ID,
                 config_entry.data[CONF_USER_CODE],
@@ -269,28 +272,32 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
             return None
         return get_tuya_platform_descriptors(platform)
     
-    def send_commands(self, device_id: str, commands: list[dict[str, Any]]):
+    def send_commands(self, device_id: str, commands: list[dict[str, Any]]) -> bool:
         if self.sharing_account is None:
-            return None
+            return False
         regular_commands: list[dict[str, Any]] = []
-        devices = self.get_devices_from_device_id(device_id)
+        device = self.multi_manager.device_map.get(device_id)
+        return_result = True
+        if device is None:
+            return False
         for command in commands:
             command_code: str  = command["code"]
             """command_value: str = command["value"]"""
 
             #Filter commands that require the use of OpenAPI
-            skip_command = False
-            if devices is not None:
-                for device in devices:
-                    if dpId := self.multi_manager._read_dpId_from_code(command_code, device):
-                        if device.local_strategy[dpId].get("use_open_api", False):
-                            skip_command = True
-                            break
-            if not skip_command:
-                regular_commands.append(command)
+            if dpId := self.multi_manager._read_dpId_from_code(command_code, device):
+                if device.local_strategy[dpId].get("use_open_api", False):
+                    return_result = False   #Part of the commands have not been issues, forward to other managers
+                    continue
+            regular_commands.append(command)
         
-        if regular_commands:
-            self.sharing_account.device_manager.send_commands(device_id, regular_commands)
+        try:
+            if regular_commands:
+                self.sharing_account.device_manager.send_commands(device_id, regular_commands)
+            return return_result
+        except Exception as e:
+            LOGGER.warning(f"[Sharing]Send command failed, device id: {device_id}, commands: {commands}, exception: {e}")
+            return False
     
     def convert_to_xt_device(self, device: Any, device_source_priority: XTDeviceSourcePriority | None = None) -> XTDevice:
         device_new: XTDevice = XTDevice.from_compatible_device(device, device_source_priority=device_source_priority)
