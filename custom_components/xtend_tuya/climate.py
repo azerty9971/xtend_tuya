@@ -50,10 +50,13 @@ from .entity import (
 XT_HVAC_TO_HA = {
     "auto": HVACMode.HEAT_COOL,
     "cold": HVACMode.COOL,
+    "cool": HVACMode.COOL,
+    "dehumidify": HVACMode.DRY,
     "freeze": HVACMode.COOL,
     "heat": HVACMode.HEAT,
     "hot": HVACMode.HEAT,
     "manual": HVACMode.HEAT_COOL,
+    "smartcool": HVACMode.HEAT_COOL,
     "wet": HVACMode.DRY,
     "wind": HVACMode.FAN_ONLY,
 }
