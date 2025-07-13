@@ -62,6 +62,7 @@ MERGED_HVAC_TO_HA: dict[str, HVACMode] = append_dictionnaries(XT_HVAC_TO_HA, Tuy
 
 XT_CLIMATE_MODE_DPCODES: tuple[XTDPCode, ...] = (
     XTDPCode.MODE,
+    XTDPCode.MODE1,
 )
 XT_CLIMATE_CURRENT_NON_UNIT_TEMPERATURE_DPCODES: tuple[XTDPCode, ...] = (
     XTDPCode.GET_TEMP,

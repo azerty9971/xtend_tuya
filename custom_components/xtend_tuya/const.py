@@ -430,6 +430,7 @@ class XTDPCode(StrEnum):
     MINI_SET = "mini_set"
     MONITORING = "monitoring"
     MODE = "mode"  # Working mode / Mode
+    MODE1 = "mode1"  # Working mode / Mode
     MODE2 = "Mode"
     MOODLIGHTING = "moodlighting"  # Mood light
     MOTION_RECORD = "motion_record"
