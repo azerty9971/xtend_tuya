@@ -209,6 +209,7 @@ class XTDPCode(StrEnum):
     B_VOLTAGE = "B_Voltage"
     B_SENSITIVITY = "b_sensitivity"
     C_F = "c_f"  # Temperature unit switching
+    C_F_ = "C_F_"  # Temperature unit switching
     CALIBRATION = "calibration"
     CAPACITY_CALIBRATION = "capacity_calibration"
     CAT_WEIGHT = "cat_weight"
@@ -724,10 +725,12 @@ class XTDPCode(StrEnum):
     WEATHER_SWITCH = "weather_switch"
     WET = "wet"  # Humidification
     WINDSHAKE = "windshake"
+    WINDSHAKE1 = "windshake1"
     WINDSHAKEH = "windshakeH"
     WINDOW_CHECK = "window_check"
     WINDOW_STATE = "window_state"
     WINDSPEED = "windspeed"
+    WINDSPEED1 = "windspeed1"
     WIRELESS_BATTERYLOCK = "wireless_batterylock"
     WIRELESS_ELECTRICITY = "wireless_electricity"
     WORK_MODE = "work_mode"  # Working mode
