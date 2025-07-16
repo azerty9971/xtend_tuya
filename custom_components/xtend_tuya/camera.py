@@ -66,7 +66,7 @@ async def async_setup_entry(
 
     merged_categories = CAMERAS
     for new_descriptor in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(Platform.CAMERA):
-        merged_categories = tuple(append_lists(list(merged_categories), new_descriptor))
+        merged_categories = cast(tuple[str, ...], tuple(append_lists(list(merged_categories), new_descriptor)))
 
     entities: list[XTCameraEntity] = []
     extra_entities: list[XTCameraEntity] = []
@@ -81,9 +81,8 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if device.category in merged_categories:
-                    if XTCameraEntity.should_entity_be_added(hass, device, hass_data.manager):
-                        entities.append(XTCameraEntity(device, hass_data.manager, hass))
+                if XTCameraEntity.should_entity_be_added(hass, device, hass_data.manager, merged_categories):
+                    entities.append(XTCameraEntity(device, hass_data.manager, hass))
 
     async_discover_device([*hass_data.manager.device_map])
     for entity in entities:
@@ -130,7 +129,7 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
 
     
     @staticmethod
-    def should_entity_be_added(hass: HomeAssistant, device: XTDevice, multi_manager: MultiManager) -> bool:
+    def should_entity_be_added(hass: HomeAssistant, device: XTDevice, multi_manager: MultiManager, merged_categories: tuple[str, ...]) -> bool:
         camera_status: list[XTDPCode] = [
             XTDPCode.RECORD_MODE, 
             XTDPCode.IPC_WORK_MODE, 
@@ -140,7 +139,7 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         for test_status in camera_status:
             if test_status in device.status:
                 return True
-        if device.category in ["videolock"]:
+        if device.category in merged_categories:
             return True
         return False
     
