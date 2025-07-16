@@ -54,6 +54,7 @@ LOCKS: dict[str, XTLockEntityDescription] = {
 
 LOCK_UNLOCK_STATUS_LIST: list[XTDPCode] = [
     XTDPCode.LOCK_MOTOR_STATE,
+    XTDPCode.ACCESSORY_LOCK,
 ]
 LOCK_ADDING_STATUS_LIST: list[XTDPCode] = [
     XTDPCode.ACCESSORY_LOCK,
