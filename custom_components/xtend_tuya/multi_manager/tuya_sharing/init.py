@@ -47,6 +47,7 @@ from .ha_tuya_integration.config_entry_handler import (
     XTHATuyaIntegrationConfigEntryManager
 )
 from .ha_tuya_integration.tuya_decorators import (
+    XTDecorator,
     decorate_tuya_manager,
     decorate_tuya_integration,
 )
@@ -86,6 +87,8 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
         super().__init__()
         self.sharing_account: TuyaSharingData | None = None
         self.hass: HomeAssistant | None = None
+        self.tuya_manager_decorator: list[XTDecorator] = []
+        self.tuya_integration_decorator: list[XTDecorator] = []
 
     def get_type_name(self) -> str:
         return MESSAGE_SOURCE_TUYA_SHARING
@@ -109,7 +112,7 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
             #We are using an override of the Tuya integration
             sharing_device_manager = XTSharingDeviceManager(multi_manager=self.multi_manager, other_device_manager=tuya_integration_runtime_data.device_manager)
             ha_tuya_integration_config_manager = XTHATuyaIntegrationConfigEntryManager(sharing_device_manager, config_entry)
-            decorate_tuya_manager(tuya_integration_runtime_data.device_manager, ha_tuya_integration_config_manager)
+            self.tuya_manager_decorator = decorate_tuya_manager(tuya_integration_runtime_data.device_manager, ha_tuya_integration_config_manager)
             sharing_device_manager.terminal_id      = tuya_integration_runtime_data.device_manager.terminal_id
             sharing_device_manager.mq               = tuya_integration_runtime_data.device_manager.mq
             sharing_device_manager.customer_api     = tuya_integration_runtime_data.device_manager.customer_api
@@ -181,8 +184,12 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
         self.sharing_account.device_manager.remove_device_listener(self.multi_manager.multi_device_listener) # type: ignore
     
     def unload(self):
+        for decorator in self.tuya_integration_decorator:
+            decorator.unwrap()
+        for decorator in self.tuya_manager_decorator:
+            decorator.unwrap()
         if (
-            self.sharing_account is None or 
+            self.sharing_account is None or
             self.sharing_account.device_manager.user_repository is None or
             self.sharing_account.device_manager.terminal_id is None
         ):
@@ -256,7 +263,7 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
             return None
         
         if self.sharing_account.ha_tuya_integration_config_manager is not None:
-            decorate_tuya_integration(self.sharing_account.ha_tuya_integration_config_manager)
+            self.tuya_integration_decorator = decorate_tuya_integration(self.sharing_account.ha_tuya_integration_config_manager)
 
         for device in self.sharing_account.device_manager.device_map.values():
             #This should in theory already be done, I kept it here just to be safe...

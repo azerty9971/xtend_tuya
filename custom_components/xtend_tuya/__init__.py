@@ -27,7 +27,6 @@ from .multi_manager.multi_manager import (
 
 from .multi_manager.shared.shared_classes import (
     HomeAssistantXTData,
-    XTDevice,
 )
 
 from .util import (
@@ -35,9 +34,6 @@ from .util import (
 )
 from .multi_manager.shared.services.services import (
     ServiceManager,
-)
-from .multi_manager.shared.debug.profiler import (
-    profile_async_method,
 )
 
 # Suppress logs from the library, it logs unneeded on error
@@ -213,6 +209,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
             if tuya.manager.mq is not None:
                 tuya.manager.mq.stop()
             tuya.manager.remove_device_listeners()
+            tuya.manager.unload()
     return unload_ok
 
 
