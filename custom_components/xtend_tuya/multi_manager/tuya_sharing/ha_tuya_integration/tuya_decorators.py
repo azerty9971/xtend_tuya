@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import functools
+import asyncio
 
 from .config_entry_handler import (
     XTHATuyaIntegrationConfigEntryManager,
@@ -25,7 +26,7 @@ class XTDecorator:
             if self.orig_func is None or self.callback is None:
                 return None
             await callback(True, *args, **kwargs)
-            return_val = await self.orig_func(*args, **kwargs)
+            return_val = asyncio.run(self.orig_func(*args, **kwargs))
             await callback(False, *args, **kwargs)
             return return_val
         self.func = wrapped
