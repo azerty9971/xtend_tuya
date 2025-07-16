@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any
+from typing import Any, cast
 
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.components.lock import (
@@ -86,7 +86,7 @@ async def async_setup_entry(
 
     merged_descriptors = LOCKS
     for new_descriptor in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(Platform.LOCK):
-        merged_descriptors = append_dictionnaries(merged_descriptors, new_descriptor)
+        merged_descriptors = cast(dict[str, XTLockEntityDescription], append_dictionnaries(merged_descriptors, new_descriptor))
 
     @callback
     def async_discover_device(device_map, restrict_dpcode: str | None = None) -> None:
@@ -99,7 +99,7 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if device.category in merged_descriptors:
+                if XTLockEntity.should_entity_be_added(hass, device, hass_data.manager, merged_descriptors):
                     entities.append(XTLockEntity.get_entity_instance(merged_descriptors[device.category], device, hass_data.manager))
         async_add_entities(entities)
 
@@ -140,6 +140,18 @@ class XTLockEntity(XTEntity, LockEntity): # type: ignore
                     manual_unlock_commands.append(unlock_command)
             if len(manual_unlock_commands) > 0:
                 device.set_preference(f"{XTDevice.XTDevicePreference.LOCK_MANUAL_UNLOCK_COMMAND}", manual_unlock_commands)
+
+    @staticmethod
+    def should_entity_be_added(hass: HomeAssistant, device: XTDevice, multi_manager: MultiManager, merged_descriptors: dict[str, XTLockEntityDescription]) -> bool:
+        if device.category in merged_descriptors:
+            return True
+        lock_status_list: list[XTDPCode] = [
+            XTDPCode.ACCESSORY_LOCK,
+            ]
+        for test_status in lock_status_list:
+            if test_status in device.status:
+                return True
+        return False
 
     @property
     def is_locked(self) -> bool | None: # type: ignore
