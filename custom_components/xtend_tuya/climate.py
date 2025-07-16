@@ -48,7 +48,7 @@ from .entity import (
 )
 
 XT_HVAC_TO_HA = {
-    "auto": HVACMode.HEAT_COOL,
+    "auto": HVACMode.AUTO,
     "cold": HVACMode.COOL,
     "cool": HVACMode.COOL,
     "dehumidify": HVACMode.DRY,

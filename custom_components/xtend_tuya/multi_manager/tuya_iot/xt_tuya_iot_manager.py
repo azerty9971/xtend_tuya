@@ -313,6 +313,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         for property in properties:
             for prop_key in property:
                 property_str = json.dumps({prop_key: property[prop_key]})
+                self.multi_manager.device_watcher.report_message(device_id, f"Sending property update, payload: {json.dumps({"properties": property_str})}")
                 self.api.post(f"/v2.0/cloud/thing/{device_id}/shadow/properties/issue", {"properties": property_str})
     
     def send_lock_unlock_command(
@@ -348,7 +349,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         if manual_unlock_code := cast(list[XTDPCode], device.get_preference(XTDevice.XTDevicePreference.LOCK_MANUAL_UNLOCK_COMMAND)):
             commands: list[dict[str, Any]] = []
             for dpcode in manual_unlock_code:
-                commands.append({"code": dpcode, "value": device.status.get(dpcode, True)})
+                commands.append({"code": dpcode, "value": not lock})
             self.multi_manager.send_commands(device_id=device.id, commands=commands)
             return True #Assume that the command worked...
         return False
