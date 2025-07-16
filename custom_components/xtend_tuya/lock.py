@@ -46,34 +46,19 @@ class XTLockEntityDescription(LockEntityDescription):
                               device_manager=device_manager, 
                               description=description)
 
+#LOCKS are now dynamically added
+#if you want a specific translation key or something
+#non-generic then add the category and descriptor in the list
 LOCKS: dict[str, XTLockEntityDescription] = {
-    "jtmsbh": XTLockEntityDescription(
-            key="",
-            translation_key="operate_lock",
-            unlock_status_list=[XTDPCode.LOCK_MOTOR_STATE],
-        ),
-    "jtmspro": XTLockEntityDescription(
-            key="",
-            translation_key="operate_lock",
-            unlock_status_list=[XTDPCode.LOCK_MOTOR_STATE],
-        ),
-    "mk": XTLockEntityDescription(
-            key="",
-            translation_key="operate_lock",
-            temporary_unlock = True,
-        ),
-    "ms": XTLockEntityDescription(
-            key="",
-            translation_key="operate_lock",
-            unlock_status_list=[XTDPCode.LOCK_MOTOR_STATE],
-            manual_unlock_command=[XTDPCode.BLUETOOTH_UNLOCK]
-        ),
-    "videolock": XTLockEntityDescription(
-            key="",
-            translation_key="operate_lock",
-            unlock_status_list=[XTDPCode.LOCK_MOTOR_STATE],
-        ),
 }
+
+LOCK_UNLOCK_STATUS_LIST: list[XTDPCode] = [
+    XTDPCode.LOCK_MOTOR_STATE,
+]
+LOCK_ADDING_STATUS_LIST: list[XTDPCode] = [
+    XTDPCode.ACCESSORY_LOCK,
+    XTDPCode.BLUETOOTH_UNLOCK,
+]
 
 async def async_setup_entry(
     hass: HomeAssistant, entry: XTConfigEntry, async_add_entities: AddEntitiesCallback
@@ -99,12 +84,11 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if XTLockEntity.should_entity_be_added(hass, device, hass_data.manager, merged_descriptors):
-                    entities.append(XTLockEntity.get_entity_instance(merged_descriptors[device.category], device, hass_data.manager))
+                if description := XTLockEntity.get_entity_description(hass, device, hass_data.manager, merged_descriptors):
+                    entities.append(XTLockEntity.get_entity_instance(description, device, hass_data.manager))
         async_add_entities(entities)
 
     async_discover_device([*hass_data.manager.device_map])
-    #async_discover_device(hass_data.manager, hass_data.manager.open_api_device_map)
 
     entry.async_on_unload(
         async_dispatcher_connect(hass, TUYA_DISCOVERY_NEW, async_discover_device)
@@ -145,13 +129,36 @@ class XTLockEntity(XTEntity, LockEntity): # type: ignore
     def should_entity_be_added(hass: HomeAssistant, device: XTDevice, multi_manager: MultiManager, merged_descriptors: dict[str, XTLockEntityDescription]) -> bool:
         if device.category in merged_descriptors:
             return True
-        lock_status_list: list[XTDPCode] = [
-            XTDPCode.ACCESSORY_LOCK,
-            ]
-        for test_status in lock_status_list:
+        for test_status in LOCK_ADDING_STATUS_LIST:
             if test_status in device.status:
                 return True
         return False
+    
+    @staticmethod
+    def get_entity_description(hass: HomeAssistant, device: XTDevice, multi_manager: MultiManager, merged_descriptors: dict[str, XTLockEntityDescription]) -> XTLockEntityDescription | None:
+        if XTLockEntity.should_entity_be_added(hass, device, multi_manager, merged_descriptors):
+            if entity_description := merged_descriptors.get(device.category):
+                return entity_description
+            unlock_status_list: list[XTDPCode] = []
+            manual_unlock_command_list: list[XTDPCode] = []
+            temporary_unlock: bool = True
+            for dpcode in LOCK_UNLOCK_STATUS_LIST:
+                if dpcode in device.status:
+                    unlock_status_list.append(dpcode)
+            if unlock_status_list:
+                temporary_unlock = False
+            for dpcode in LOCK_ADDING_STATUS_LIST:
+                if dpcode in device.status:
+                    manual_unlock_command_list.append(dpcode)
+            if unlock_status_list or manual_unlock_command_list:
+                return XTLockEntityDescription(
+                            key="",
+                            translation_key="operate_lock",
+                            unlock_status_list=unlock_status_list,
+                            manual_unlock_command=manual_unlock_command_list,
+                            temporary_unlock=temporary_unlock,
+                        )
+        return None
 
     @property
     def is_locked(self) -> bool | None: # type: ignore
