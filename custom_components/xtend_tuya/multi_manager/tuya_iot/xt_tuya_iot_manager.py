@@ -313,6 +313,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         for property in properties:
             for prop_key in property:
                 property_str = json.dumps({prop_key: property[prop_key]})
+                LOGGER.warning(f"Sending property update, payload: {json.dumps({"properties": property_str})}")
                 self.api.post(f"/v2.0/cloud/thing/{device_id}/shadow/properties/issue", {"properties": property_str})
     
     def send_lock_unlock_command(
