@@ -21,9 +21,7 @@ from homeassistant.components.camera.webrtc import (
 from .....const import (
     LOGGER,  # noqa: F401
 )
-from ..xt_tuya_iot_ipc_manager import (
-    XTIOTIPCManager,
-)
+import custom_components.xtend_tuya.multi_manager.tuya_iot.ipc.xt_tuya_iot_ipc_manager as ipc_man
 
 from ....shared.shared_classes import (
     XTDevice,
@@ -79,7 +77,7 @@ class XTIOTWebRTCSession:
             )
 
 class XTIOTWebRTCManager:
-    def __init__(self, ipc_manager: XTIOTIPCManager) -> None:
+    def __init__(self, ipc_manager: ipc_man.XTIOTIPCManager) -> None:
         self.sdp_exchange: dict[str, XTIOTWebRTCSession] = {}
         self.ipc_manager = ipc_manager
     
