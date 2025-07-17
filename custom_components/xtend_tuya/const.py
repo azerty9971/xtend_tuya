@@ -51,12 +51,13 @@ MESSAGE_SOURCE_TUYA_SHARING = "tuya_sharing"
 
 CROSS_CATEGORY_DEVICE_DESCRIPTOR: str = "cross_category_device_descriptor"
 
+
 class TuyaCloudOpenAPIEndpoint(StrEnum):
     """Tuya Cloud Open API Endpoint."""
 
-    CHINA = "https://openapi.tuyacn.com"
     AMERICA = "https://openapi.tuyaus.com"
     AMERICA_AZURE = "https://openapi-ueaz.tuyaus.com"
+    CHINA = "https://openapi.tuyacn.com"
     EUROPE = "https://openapi.tuyaeu.com"
     EUROPE_MS = "https://openapi-weaz.tuyaeu.com"
     INDIA = "https://openapi.tuyain.com"
@@ -65,19 +66,20 @@ class TuyaCloudOpenAPIEndpoint(StrEnum):
     def get_human_name(self, value: str) -> str:
         match value:
             case TuyaCloudOpenAPIEndpoint.CHINA:
-                return "China (mainland)"
+                return "China"
             case TuyaCloudOpenAPIEndpoint.AMERICA_AZURE:
-                return "Eastern America"
+                return "America (Eastern)"
             case TuyaCloudOpenAPIEndpoint.EUROPE:
-                return "Eastern Europe"
+                return "Europe (Eastern)"
             case TuyaCloudOpenAPIEndpoint.EUROPE_MS:
-                return "Western Europe"
+                return "Europe (Western)"
             case TuyaCloudOpenAPIEndpoint.INDIA:
                 return "India"
             case TuyaCloudOpenAPIEndpoint.SINGAPORE:
                 return "Singapore"
             case _:
-                return "Western America"
+                return "America (Western)"
+
 
 PLATFORMS = [
     Platform.ALARM_CONTROL_PANEL,
