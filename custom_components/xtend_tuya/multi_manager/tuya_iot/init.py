@@ -42,9 +42,6 @@ from .const import (
     CONF_COUNTRY_CODE,
     CONF_APP_TYPE,
 )
-from .util import (
-    prepare_value_for_property_update,
-)
 
 from .xt_tuya_iot_data import (
     TuyaIOTData,

@@ -9,6 +9,15 @@ from ....const import (
 from ..xt_tuya_iot_openapi import (
     XTIOTOpenAPI,
 )
+from .xt_tuya_iot_ipc_listener import (
+    XTIOTIPCListener,
+)
+from .xt_tuya_iot_ipc_mq import (
+    XTIOTOpenMQIPC,
+)
+from .webrtc.xt_tuya_iot_webrtc_manager import (
+    XTIOTWebRTCManager,
+)
 
 class XTIOTIPCManager:  # noqa: F811
     def __init__(self, api: XTIOTOpenAPI, multi_manager: MultiManager) -> None:
@@ -28,14 +37,3 @@ class XTIOTIPCManager:  # noqa: F811
     def publish_to_ipc_mqtt(self, topic: str, msg: str):
         publish_result = self.ipc_mq.client.publish(topic=topic, payload=msg)
         publish_result.wait_for_publish(10)
-
-
-from .xt_tuya_iot_ipc_listener import (
-    XTIOTIPCListener,
-)
-from .xt_tuya_iot_ipc_mq import (
-    XTIOTOpenMQIPC,
-)
-from .webrtc.xt_tuya_iot_webrtc_manager import (
-    XTIOTWebRTCManager,
-)

@@ -14,7 +14,6 @@ from homeassistant.util import dt as dt_util
 
 from .multi_manager.multi_manager import (
     XTConfigEntry, 
-    MultiManager,
     XTDevice,
 )
 from .const import DOMAIN, DOMAIN_ORIG, XTDPCode
