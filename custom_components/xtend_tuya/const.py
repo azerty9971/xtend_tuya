@@ -4,7 +4,6 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from enum import StrEnum, IntFlag, IntEnum
 import logging
-from tuya_iot import TuyaCloudOpenAPIEndpoint
 from homeassistant.const import (
     Platform,
 )
@@ -51,6 +50,36 @@ MESSAGE_SOURCE_TUYA_IOT = "tuya_iot"
 MESSAGE_SOURCE_TUYA_SHARING = "tuya_sharing"
 
 CROSS_CATEGORY_DEVICE_DESCRIPTOR: str = "cross_category_device_descriptor"
+
+
+class TuyaCloudOpenAPIEndpoint(StrEnum):
+    """Tuya Cloud Open API Endpoint."""
+
+    AMERICA = "https://openapi.tuyaus.com"
+    CHINA = "https://openapi.tuyacn.com"
+    EUROPE = "https://openapi.tuyaeu.com"
+    INDIA = "https://openapi.tuyain.com"
+    SINGAPORE = "https://openapi-sg.iotbing.com"
+    AMERICA_AZURE = "https://openapi-ueaz.tuyaus.com"
+    EUROPE_MS = "https://openapi-weaz.tuyaeu.com"
+
+    def get_human_name(self, value: str) -> str:
+        match value:
+            case TuyaCloudOpenAPIEndpoint.CHINA:
+                return "China"
+            case TuyaCloudOpenAPIEndpoint.AMERICA_AZURE:
+                return "America (Business)"
+            case TuyaCloudOpenAPIEndpoint.EUROPE:
+                return "Europe"
+            case TuyaCloudOpenAPIEndpoint.EUROPE_MS:
+                return "Europe (Business)"
+            case TuyaCloudOpenAPIEndpoint.INDIA:
+                return "India"
+            case TuyaCloudOpenAPIEndpoint.SINGAPORE:
+                return "Singapore"
+            case _:
+                return "America"
+
 
 PLATFORMS = [
     Platform.ALARM_CONTROL_PANEL,
@@ -427,6 +456,7 @@ class XTDPCode(StrEnum):
     LIQUID_STATE = "liquid_state"
     LOCK = "lock"  # Lock / Child lock
     LOCK_MOTOR_STATE = "lock_motor_state"
+    LOCK_RECORD = "lock_record"
     MASTER_MODE = "master_mode"  # alarm mode
     MACH_OPERATE = "mach_operate"
     MAGNETNUM = "magnetNum"
@@ -691,12 +721,19 @@ class XTDPCode(StrEnum):
     TVOC = "tvoc"
     UNIT = "unit"
     UNIT2 = "Unit"
+    UNLOCK_BLE = "unlock_ble"
     UNLOCK_CARD = "unlock_card"
+    UNLOCK_KEY = "unlock_key"
     UNLOCK_FACE = "unlock_face"
     UNLOCK_FINGERPRINT = "unlock_fingerprint"
     UNLOCK_FINGER_VEIN = "unlock_finger_vein"
     UNLOCK_HAND = "unlock_hand"
+    UNLOCK_METHOD_CREATE = "unlock_method_create"
+    UNLOCK_METHOD_DELETE = "unlock_method_delete"
+    UNLOCK_METHOD_MODIFY = "unlock_method_modify"
     UNLOCK_PASSWORD = "unlock_password"
+    UNLOCK_PHONE_REMOTE = "unlock_phone_remote"
+    UNLOCK_VOICE_REMOTE = "unlock_voice_remote"
     UPPER_TEMP = "upper_temp"
     UPPER_TEMP_F = "upper_temp_f"
     USAGE_TIMES = "usage_times"
@@ -800,11 +837,11 @@ TUYA_COUNTRIES = [
     Country("Brazil", "55", TuyaCloudOpenAPIEndpoint.AMERICA),
     Country("British Indian Ocean Territory", "246", TuyaCloudOpenAPIEndpoint.AMERICA),
     Country("British Virgin Islands", "1-284", TuyaCloudOpenAPIEndpoint.EUROPE),
-    Country("Brunei", "673", TuyaCloudOpenAPIEndpoint.EUROPE),
+    Country("Brunei", "673", TuyaCloudOpenAPIEndpoint.SINGAPORE),
     Country("Bulgaria", "359", TuyaCloudOpenAPIEndpoint.EUROPE),
     Country("Burkina Faso", "226", TuyaCloudOpenAPIEndpoint.EUROPE),
     Country("Burundi", "257", TuyaCloudOpenAPIEndpoint.EUROPE),
-    Country("Cambodia", "855", TuyaCloudOpenAPIEndpoint.EUROPE),
+    Country("Cambodia", "855", TuyaCloudOpenAPIEndpoint.SINGAPORE),
     Country("Cameroon", "237", TuyaCloudOpenAPIEndpoint.EUROPE),
     Country("Canada", "1", TuyaCloudOpenAPIEndpoint.AMERICA),
     Country("Capo Verde", "238", TuyaCloudOpenAPIEndpoint.EUROPE),
@@ -829,7 +866,7 @@ TUYA_COUNTRIES = [
     Country("Djibouti", "253", TuyaCloudOpenAPIEndpoint.EUROPE),
     Country("Dominica", "1-767", TuyaCloudOpenAPIEndpoint.EUROPE),
     Country("Dominican Republic", "1-809", TuyaCloudOpenAPIEndpoint.AMERICA),
-    Country("East Timor", "670", TuyaCloudOpenAPIEndpoint.AMERICA),
+    Country("East Timor", "670", TuyaCloudOpenAPIEndpoint.SINGAPORE),
     Country("Ecuador", "593", TuyaCloudOpenAPIEndpoint.AMERICA),
     Country("Egypt", "20", TuyaCloudOpenAPIEndpoint.EUROPE),
     Country("El Salvador", "503", TuyaCloudOpenAPIEndpoint.EUROPE),
@@ -860,11 +897,11 @@ TUYA_COUNTRIES = [
     Country("Guyana", "592", TuyaCloudOpenAPIEndpoint.EUROPE),
     Country("Haiti", "509", TuyaCloudOpenAPIEndpoint.EUROPE),
     Country("Honduras", "504", TuyaCloudOpenAPIEndpoint.EUROPE),
-    Country("Hong Kong", "852", TuyaCloudOpenAPIEndpoint.AMERICA),
+    Country("Hong Kong", "852", TuyaCloudOpenAPIEndpoint.SINGAPORE),
     Country("Hungary", "36", TuyaCloudOpenAPIEndpoint.EUROPE),
     Country("Iceland", "354", TuyaCloudOpenAPIEndpoint.EUROPE),
     Country("India", "91", TuyaCloudOpenAPIEndpoint.INDIA),
-    Country("Indonesia", "62", TuyaCloudOpenAPIEndpoint.AMERICA),
+    Country("Indonesia", "62", TuyaCloudOpenAPIEndpoint.SINGAPORE),
     Country("Iran", "98"),
     Country("Iraq", "964", TuyaCloudOpenAPIEndpoint.EUROPE),
     Country("Ireland", "353", TuyaCloudOpenAPIEndpoint.EUROPE),
@@ -882,7 +919,7 @@ TUYA_COUNTRIES = [
     Country("Kosovo", "383"),
     Country("Kuwait", "965", TuyaCloudOpenAPIEndpoint.EUROPE),
     Country("Kyrgyzstan", "996", TuyaCloudOpenAPIEndpoint.EUROPE),
-    Country("Laos", "856", TuyaCloudOpenAPIEndpoint.EUROPE),
+    Country("Laos", "856", TuyaCloudOpenAPIEndpoint.SINGAPORE),
     Country("Latvia", "371", TuyaCloudOpenAPIEndpoint.EUROPE),
     Country("Lebanon", "961", TuyaCloudOpenAPIEndpoint.EUROPE),
     Country("Lesotho", "266", TuyaCloudOpenAPIEndpoint.EUROPE),
@@ -891,11 +928,11 @@ TUYA_COUNTRIES = [
     Country("Liechtenstein", "423", TuyaCloudOpenAPIEndpoint.EUROPE),
     Country("Lithuania", "370", TuyaCloudOpenAPIEndpoint.EUROPE),
     Country("Luxembourg", "352", TuyaCloudOpenAPIEndpoint.EUROPE),
-    Country("Macao", "853", TuyaCloudOpenAPIEndpoint.AMERICA),
+    Country("Macao", "853", TuyaCloudOpenAPIEndpoint.SINGAPORE),
     Country("Macedonia", "389", TuyaCloudOpenAPIEndpoint.EUROPE),
     Country("Madagascar", "261", TuyaCloudOpenAPIEndpoint.EUROPE),
     Country("Malawi", "265", TuyaCloudOpenAPIEndpoint.EUROPE),
-    Country("Malaysia", "60", TuyaCloudOpenAPIEndpoint.AMERICA),
+    Country("Malaysia", "60", TuyaCloudOpenAPIEndpoint.SINGAPORE),
     Country("Maldives", "960", TuyaCloudOpenAPIEndpoint.EUROPE),
     Country("Mali", "223", TuyaCloudOpenAPIEndpoint.EUROPE),
     Country("Malta", "356", TuyaCloudOpenAPIEndpoint.EUROPE),
@@ -912,7 +949,7 @@ TUYA_COUNTRIES = [
     Country("Montserrat", "1-664", TuyaCloudOpenAPIEndpoint.EUROPE),
     Country("Morocco", "212", TuyaCloudOpenAPIEndpoint.EUROPE),
     Country("Mozambique", "258", TuyaCloudOpenAPIEndpoint.EUROPE),
-    Country("Myanmar", "95", TuyaCloudOpenAPIEndpoint.AMERICA),
+    Country("Myanmar", "95", TuyaCloudOpenAPIEndpoint.SINGAPORE),
     Country("Namibia", "264", TuyaCloudOpenAPIEndpoint.EUROPE),
     Country("Nauru", "674", TuyaCloudOpenAPIEndpoint.AMERICA),
     Country("Nepal", "977", TuyaCloudOpenAPIEndpoint.EUROPE),
@@ -932,10 +969,10 @@ TUYA_COUNTRIES = [
     Country("Palau", "680", TuyaCloudOpenAPIEndpoint.EUROPE),
     Country("Palestine", "970", TuyaCloudOpenAPIEndpoint.AMERICA),
     Country("Panama", "507", TuyaCloudOpenAPIEndpoint.EUROPE),
-    Country("Papua New Guinea", "675", TuyaCloudOpenAPIEndpoint.AMERICA),
+    Country("Papua New Guinea", "675", TuyaCloudOpenAPIEndpoint.SINGAPORE),
     Country("Paraguay", "595", TuyaCloudOpenAPIEndpoint.AMERICA),
     Country("Peru", "51", TuyaCloudOpenAPIEndpoint.AMERICA),
-    Country("Philippines", "63", TuyaCloudOpenAPIEndpoint.AMERICA),
+    Country("Philippines", "63", TuyaCloudOpenAPIEndpoint.SINGAPORE),
     Country("Pitcairn", "64"),
     Country("Poland", "48", TuyaCloudOpenAPIEndpoint.EUROPE),
     Country("Portugal", "351", TuyaCloudOpenAPIEndpoint.EUROPE),
@@ -963,11 +1000,11 @@ TUYA_COUNTRIES = [
     Country("Serbia", "381", TuyaCloudOpenAPIEndpoint.EUROPE),
     Country("Seychelles", "248", TuyaCloudOpenAPIEndpoint.EUROPE),
     Country("Sierra Leone", "232", TuyaCloudOpenAPIEndpoint.EUROPE),
-    Country("Singapore", "65", TuyaCloudOpenAPIEndpoint.EUROPE),
+    Country("Singapore", "65", TuyaCloudOpenAPIEndpoint.SINGAPORE),
     Country("Sint Maarten", "1-721", TuyaCloudOpenAPIEndpoint.AMERICA),
     Country("Slovakia", "421", TuyaCloudOpenAPIEndpoint.EUROPE),
     Country("Slovenia", "386", TuyaCloudOpenAPIEndpoint.EUROPE),
-    Country("Solomon Islands", "677", TuyaCloudOpenAPIEndpoint.AMERICA),
+    Country("Solomon Islands", "677", TuyaCloudOpenAPIEndpoint.SINGAPORE),
     Country("Somalia", "252", TuyaCloudOpenAPIEndpoint.EUROPE),
     Country("South Africa", "27", TuyaCloudOpenAPIEndpoint.EUROPE),
     Country("South Korea", "82", TuyaCloudOpenAPIEndpoint.AMERICA),
@@ -981,10 +1018,10 @@ TUYA_COUNTRIES = [
     Country("Sweden", "46", TuyaCloudOpenAPIEndpoint.EUROPE),
     Country("Switzerland", "41", TuyaCloudOpenAPIEndpoint.EUROPE),
     Country("Syria", "963"),
-    Country("Taiwan", "886", TuyaCloudOpenAPIEndpoint.AMERICA),
+    Country("Taiwan", "886", TuyaCloudOpenAPIEndpoint.SINGAPORE),
     Country("Tajikistan", "992", TuyaCloudOpenAPIEndpoint.EUROPE),
     Country("Tanzania", "255", TuyaCloudOpenAPIEndpoint.EUROPE),
-    Country("Thailand", "66", TuyaCloudOpenAPIEndpoint.AMERICA),
+    Country("Thailand", "66", TuyaCloudOpenAPIEndpoint.SINGAPORE),
     Country("Togo", "228", TuyaCloudOpenAPIEndpoint.EUROPE),
     Country("Tokelau", "690", TuyaCloudOpenAPIEndpoint.AMERICA),
     Country("Tonga", "676", TuyaCloudOpenAPIEndpoint.EUROPE),
@@ -1005,7 +1042,7 @@ TUYA_COUNTRIES = [
     Country("Vanuatu", "678", TuyaCloudOpenAPIEndpoint.AMERICA),
     Country("Vatican", "379", TuyaCloudOpenAPIEndpoint.EUROPE),
     Country("Venezuela", "58", TuyaCloudOpenAPIEndpoint.AMERICA),
-    Country("Vietnam", "84", TuyaCloudOpenAPIEndpoint.AMERICA),
+    Country("Vietnam", "84", TuyaCloudOpenAPIEndpoint.SINGAPORE),
     Country("Wallis and Futuna", "681", TuyaCloudOpenAPIEndpoint.EUROPE),
     Country("Western Sahara", "212", TuyaCloudOpenAPIEndpoint.EUROPE),
     Country("Yemen", "967", TuyaCloudOpenAPIEndpoint.EUROPE),

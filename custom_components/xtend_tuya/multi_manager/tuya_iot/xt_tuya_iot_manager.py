@@ -403,7 +403,13 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         ):
             commands: list[dict[str, Any]] = []
             for dpcode in manual_unlock_code:
-                commands.append({"code": dpcode, "value": not lock})
+                if status_value := device.status.get(dpcode):
+                    if not isinstance(status_value, bool):
+                        commands.append({"code": dpcode, "value": status_value})
+                    else:
+                        commands.append({"code": dpcode, "value": not lock})
+                else:
+                    commands.append({"code": dpcode, "value": not lock})
             self.multi_manager.send_commands(device_id=device.id, commands=commands)
             return True  # Assume that the command worked...
         return False

@@ -11,6 +11,7 @@ from homeassistant.config_entries import ConfigEntry, ConfigFlow, OptionsFlow
 from homeassistant.config_entries import ConfigFlowResult
 from homeassistant.helpers import selector
 from .const import (
+    TuyaCloudOpenAPIEndpoint,
     CONF_ENDPOINT,
     CONF_TERMINAL_ID,
     CONF_TOKEN_INFO,
@@ -64,7 +65,7 @@ class TuyaOptionFlow(OptionsFlow):
 
         data = {
             CONF_NO_OPENAPI: user_input[CONF_NO_OPENAPI],
-            CONF_ENDPOINT_OT: country.endpoint,
+            CONF_ENDPOINT_OT: user_input[CONF_ENDPOINT_OT],
             CONF_AUTH_TYPE: AuthType.CUSTOM,
             CONF_ACCESS_ID_OT: user_input[CONF_ACCESS_ID_OT],
             CONF_ACCESS_SECRET_OT: user_input[CONF_ACCESS_SECRET_OT],
@@ -140,12 +141,19 @@ class TuyaOptionFlow(OptionsFlow):
             user_input = {}
 
         default_country = "United States"
+        default_endpoint = TuyaCloudOpenAPIEndpoint.AMERICA
         if self.options is not None:
             country_code = self.options.get(CONF_COUNTRY_CODE, "")
             if country_code != "":
                 for country in TUYA_COUNTRIES:
                     if country.country_code == country_code:
                         default_country = country.name
+                        break
+            default_endpoint = self.options.get(CONF_ENDPOINT_OT, "")
+            if default_endpoint == "" and country_code != "":
+                for country in TUYA_COUNTRIES:
+                    if country.country_code == country_code:
+                        default_endpoint = country.endpoint
                         break
 
         return self.async_show_form(
@@ -166,6 +174,12 @@ class TuyaOptionFlow(OptionsFlow):
                     ): vol.In(
                         # We don't pass a dict {code:name} because country codes can be duplicate.
                         [country.name for country in TUYA_COUNTRIES]
+                    ),
+                    vol.Optional(
+                        CONF_ENDPOINT_OT,
+                        default=user_input.get(CONF_ENDPOINT_OT, default_endpoint),
+                    ): vol.In(
+                        {endpoint.value: endpoint.get_human_name(endpoint.value) for endpoint in TuyaCloudOpenAPIEndpoint}
                     ),
                     vol.Optional(
                         CONF_ACCESS_ID_OT,
