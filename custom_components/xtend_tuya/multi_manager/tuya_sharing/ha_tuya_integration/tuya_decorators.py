@@ -34,7 +34,7 @@ class XTDecorator:
             if self.orig_method is None or self.callback is None:
                 return None
             await callback(True, *args, **kwargs)
-            LOGGER.warning(f"Calling async wrapper: {self.method_name}")
+            #LOGGER.warning(f"Calling async wrapper: {self.method_name}")
             return_val = await self.orig_method(*args, **kwargs)
             await callback(False, *args, **kwargs)
             return return_val
@@ -52,7 +52,7 @@ class XTDecorator:
             if self.orig_method is None or self.callback is None:
                 return None
             self.callback(True, *args, **kwargs)
-            LOGGER.warning(f"Calling wrapper: {self.method_name}")
+            #LOGGER.warning(f"Calling wrapper: {self.method_name}")
             return_val = self.orig_method(*args, **kwargs)
             self.callback(False, *args, **kwargs)
             return return_val
