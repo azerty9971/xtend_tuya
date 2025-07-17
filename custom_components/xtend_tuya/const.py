@@ -56,12 +56,12 @@ class TuyaCloudOpenAPIEndpoint(StrEnum):
     """Tuya Cloud Open API Endpoint."""
 
     AMERICA = "https://openapi.tuyaus.com"
-    AMERICA_AZURE = "https://openapi-ueaz.tuyaus.com"
     CHINA = "https://openapi.tuyacn.com"
     EUROPE = "https://openapi.tuyaeu.com"
-    EUROPE_MS = "https://openapi-weaz.tuyaeu.com"
     INDIA = "https://openapi.tuyain.com"
     SINGAPORE = "https://openapi-sg.iotbing.com"
+    AMERICA_AZURE = "https://openapi-ueaz.tuyaus.com"
+    EUROPE_MS = "https://openapi-weaz.tuyaeu.com"
 
     def get_human_name(self, value: str) -> str:
         match value:
