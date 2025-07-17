@@ -52,13 +52,35 @@ class XTLockEntityDescription(LockEntityDescription):
 # non-generic then add the category and descriptor in the list
 LOCKS: dict[str, XTLockEntityDescription] = {}
 
-LOCK_UNLOCK_STATUS_LIST: list[XTDPCode] = [
+#Statuses that tell if the lock is currently locked or not
+LOCK_LOCKED_UNLOCKED_STATUS_DPCODES: list[XTDPCode] = [
     XTDPCode.LOCK_MOTOR_STATE,
     XTDPCode.ACCESSORY_LOCK,
 ]
-LOCK_ADDING_STATUS_LIST: list[XTDPCode] = [
+
+#Statuses that can be sent to lock/unlock the lock
+LOCK_MANUAL_COMMAND_DPCODES: list[XTDPCode] = [
     XTDPCode.ACCESSORY_LOCK,
     XTDPCode.BLUETOOTH_UNLOCK,
+]
+
+#Statuses that are used to determine if the device is a lock or not
+LOCK_IS_LOCK_DPCODES: list[XTDPCode] = [
+    XTDPCode.UNLOCK_METHOD_CREATE,
+    XTDPCode.UNLOCK_METHOD_DELETE,
+    XTDPCode.UNLOCK_METHOD_MODIFY,
+    XTDPCode.MANUAL_LOCK,
+    XTDPCode.LOCK_RECORD,
+    XTDPCode.UNLOCK_BLE,
+    XTDPCode.UNLOCK_CARD,
+    XTDPCode.UNLOCK_FACE,
+    XTDPCode.UNLOCK_FINGER_VEIN,
+    XTDPCode.UNLOCK_FINGERPRINT,
+    XTDPCode.UNLOCK_HAND,
+    XTDPCode.UNLOCK_KEY,
+    XTDPCode.UNLOCK_PASSWORD,
+    XTDPCode.UNLOCK_PHONE_REMOTE,
+    XTDPCode.UNLOCK_VOICE_REMOTE,
 ]
 
 
@@ -155,7 +177,13 @@ class XTLockEntity(XTEntity, LockEntity):  # type: ignore
     ) -> bool:
         if device.category in merged_descriptors:
             return True
-        for test_status in LOCK_ADDING_STATUS_LIST:
+        for test_status in LOCK_IS_LOCK_DPCODES:
+            if test_status in device.status:
+                return True
+        for test_status in LOCK_LOCKED_UNLOCKED_STATUS_DPCODES:
+            if test_status in device.status:
+                return True
+        for test_status in LOCK_MANUAL_COMMAND_DPCODES:
             if test_status in device.status:
                 return True
         return False
@@ -175,12 +203,12 @@ class XTLockEntity(XTEntity, LockEntity):  # type: ignore
             unlock_status_list: list[XTDPCode] = []
             manual_unlock_command_list: list[XTDPCode] = []
             temporary_unlock: bool = True
-            for dpcode in LOCK_UNLOCK_STATUS_LIST:
+            for dpcode in LOCK_LOCKED_UNLOCKED_STATUS_DPCODES:
                 if dpcode in device.status:
                     unlock_status_list.append(dpcode)
             if unlock_status_list:
                 temporary_unlock = False
-            for dpcode in LOCK_ADDING_STATUS_LIST:
+            for dpcode in LOCK_MANUAL_COMMAND_DPCODES:
                 if dpcode in device.status:
                     manual_unlock_command_list.append(dpcode)
             if unlock_status_list or manual_unlock_command_list:
