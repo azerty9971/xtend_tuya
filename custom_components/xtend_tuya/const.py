@@ -62,6 +62,23 @@ class TuyaCloudOpenAPIEndpoint(StrEnum):
     INDIA = "https://openapi.tuyain.com"
     SINGAPORE = "https://openapi-sg.iotbing.com"
 
+    def get_human_name(self, value: str) -> str:
+        match value:
+            case TuyaCloudOpenAPIEndpoint.CHINA:
+                return "China (mainland)"
+            case TuyaCloudOpenAPIEndpoint.AMERICA_AZURE:
+                return "Eastern America"
+            case TuyaCloudOpenAPIEndpoint.EUROPE:
+                return "Eastern Europe"
+            case TuyaCloudOpenAPIEndpoint.EUROPE_MS:
+                return "Western Europe"
+            case TuyaCloudOpenAPIEndpoint.INDIA:
+                return "India"
+            case TuyaCloudOpenAPIEndpoint.SINGAPORE:
+                return "Singapore"
+            case _:
+                return "Western America"
+
 PLATFORMS = [
     Platform.ALARM_CONTROL_PANEL,
     Platform.BINARY_SENSOR,
