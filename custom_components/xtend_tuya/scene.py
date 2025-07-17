@@ -1,10 +1,8 @@
 """Support for XT scenes."""
 
 from __future__ import annotations
-
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-
 from .multi_manager.multi_manager import (
     XTConfigEntry,
     MultiManager,
@@ -14,8 +12,10 @@ from .ha_tuya_integration.tuya_integration_imports import (
     TuyaScene,
 )
 
+
 class XTScene(TuyaScene):
     pass
+
 
 async def async_setup_entry(
     hass: HomeAssistant, entry: XTConfigEntry, async_add_entities: AddEntitiesCallback
@@ -27,7 +27,9 @@ async def async_setup_entry(
         return
 
     scenes = await hass.async_add_executor_job(hass_data.manager.query_scenes)
-    async_add_entities(XTSceneEntity(hass_data.manager, XTScene(**scene.__dict__)) for scene in scenes)
+    async_add_entities(
+        XTSceneEntity(hass_data.manager, XTScene(**scene.__dict__)) for scene in scenes
+    )
 
 
 class XTSceneEntity(TuyaSceneEntity):
@@ -35,8 +37,11 @@ class XTSceneEntity(TuyaSceneEntity):
 
     def __init__(self, multi_manager: MultiManager, scene: XTScene) -> None:
         """Init Tuya Scene."""
-        super(XTSceneEntity, self).__init__(multi_manager, scene) # type: ignore
+        super(XTSceneEntity, self).__init__(multi_manager, scene)  # type: ignore
         self.home_manager = multi_manager
         self.scene = scene
-        if self._attr_unique_id is not None and self._attr_unique_id not in multi_manager.scene_id:
+        if (
+            self._attr_unique_id is not None
+            and self._attr_unique_id not in multi_manager.scene_id
+        ):
             multi_manager.scene_id.append(self._attr_unique_id)

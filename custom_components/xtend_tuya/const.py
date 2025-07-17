@@ -1,13 +1,10 @@
 """Constants for the Tuya integration."""
 
 from __future__ import annotations
-
 from dataclasses import dataclass, field
 from enum import StrEnum, IntFlag, IntEnum
 import logging
-
 from tuya_iot import TuyaCloudOpenAPIEndpoint
-
 from homeassistant.const import (
     Platform,
 )
@@ -22,7 +19,7 @@ CONF_TERMINAL_ID = "terminal_id"
 CONF_TOKEN_INFO = "token_info"
 CONF_USER_CODE = "user_code"
 CONF_USERNAME = "username"
-#OpenTuya specific conf
+# OpenTuya specific conf
 CONF_NO_OPENAPI = "no_openapi"
 CONF_ENDPOINT_OT = "endpoint"
 CONF_AUTH_TYPE = "auth_type"
@@ -45,7 +42,7 @@ TUYA_RESPONSE_MSG = "msg"
 TUYA_RESPONSE_QR_CODE = "qrcode"
 TUYA_RESPONSE_RESULT = "result"
 TUYA_RESPONSE_SUCCESS = "success"
-#OpenTuya specific
+# OpenTuya specific
 TUYA_RESPONSE_PLATFORM_URL = "platform_url"
 TUYA_SMART_APP = "tuyaSmart"
 SMARTLIFE_APP = "smartlife"
@@ -76,52 +73,66 @@ PLATFORMS = [
     Platform.VACUUM,
 ]
 
+
 class AllowedPlugins:
     @staticmethod
     def get_plugins_to_load() -> list[str]:
         return [MESSAGE_SOURCE_TUYA_SHARING, MESSAGE_SOURCE_TUYA_IOT]
 
+
 class VirtualStates(IntFlag):
     """Virtual states"""
-    STATE_COPY_TO_MULTIPLE_STATE_NAME           = 0X0001   #Copy the state so that it can be used with other virtual states
-    STATE_SUMMED_IN_REPORTING_PAYLOAD           = 0X0002   #Spoof the state value to make it a total instead of an incremental value
+
+    STATE_COPY_TO_MULTIPLE_STATE_NAME = (
+        0x0001  # Copy the state so that it can be used with other virtual states
+    )
+    STATE_SUMMED_IN_REPORTING_PAYLOAD = 0x0002  # Spoof the state value to make it a total instead of an incremental value
+
 
 class VirtualFunctions(IntFlag):
     """Virtual functions"""
-    FUNCTION_RESET_STATE                        = 0X0001   #Reset the specified states
+
+    FUNCTION_RESET_STATE = 0x0001  # Reset the specified states
+
 
 class XTDeviceEntityFunctions(StrEnum):
-    """ Functions that can be called from the device entity to alter the state of the device """
-    RECALCULATE_PERCENT_SCALE                   = "recalculate_percent_scale"
+    """Functions that can be called from the device entity to alter the state of the device"""
+
+    RECALCULATE_PERCENT_SCALE = "recalculate_percent_scale"
+
 
 class XTMultiManagerProperties(StrEnum):
-    LOCK_DEVICE_ID                              = "lock_device_id"
+    LOCK_DEVICE_ID = "lock_device_id"
 
-#Defines the priority of the sources for the merging process
-#In case of conflict take the data from the lowest priority
+
+# Defines the priority of the sources for the merging process
+# In case of conflict take the data from the lowest priority
 class XTDeviceSourcePriority(IntEnum):
-    REGULAR_TUYA    = 10
-    TUYA_SHARED     = 20
-    TUYA_IOT        = 30
+    REGULAR_TUYA = 10
+    TUYA_SHARED = 20
+    TUYA_IOT = 30
+
 
 @dataclass
 class DescriptionVirtualState:
     """Describes the VirtualStates linked to a specific Description Key."""
-    
+
     key: str
     virtual_state_name: str
     virtual_state_value: VirtualStates | None = None
     vs_copy_to_state: list[XTDPCode] = field(default_factory=list)
     vs_copy_delta_to_state: list[XTDPCode] = field(default_factory=list)
 
+
 @dataclass
 class DescriptionVirtualFunction:
     """Describes the VirtualFunctions linked to a specific Description Key."""
-    
+
     key: str
     virtual_function_name: str
     virtual_function_value: VirtualFunctions | None = None
     vf_reset_state: list[XTDPCode] = field(default_factory=list)
+
 
 class WorkMode(StrEnum):
     """Work modes."""
@@ -137,6 +148,7 @@ class XTDPCode(StrEnum):
 
     https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
     """
+
     ACCESSORY_LOCK = "accessory_lock"
     ACHZ = "ACHZ"
     ACI = "ACI"
@@ -145,11 +157,11 @@ class XTDPCode(StrEnum):
     ACTIVEPOWERB = "ActivePowerB"
     ACTIVEPOWERC = "ActivePowerC"
     ACV = "ACV"
-    ADD_ELE = "add_ele" #Added watt since last heartbeat
+    ADD_ELE = "add_ele"  # Added watt since last heartbeat
     ADD_ELE_THIS_MONTH = "add_ele_this_month"
     ADD_ELE_THIS_YEAR = "add_ele_this_year"
     ADD_ELE_TODAY = "add_ele_today"
-    ADD_ELE2 = "add_ele2" #Added watt since last heartbeat
+    ADD_ELE2 = "add_ele2"  # Added watt since last heartbeat
     ADD_ELE2_THIS_MONTH = "add_ele2_this_month"
     ADD_ELE2_THIS_YEAR = "add_ele2_this_year"
     ADD_ELE2_TODAY = "add_ele2_today"
@@ -220,18 +232,18 @@ class XTDPCode(StrEnum):
     CH4_SENSOR_STATE = "ch4_sensor_state"
     CH4_SENSOR_VALUE = "ch4_sensor_value"
     # Channel data points for multi-sensor devices
-    CH_0 = "ch_0"           # Channel 0 sensor data
-    CH_1 = "ch_1"           # Channel 1 sensor data
-    CH_2 = "ch_2"           # Channel 2 sensor data
-    CH_3 = "ch_3"           # Channel 3 sensor data
-    CH_4 = "ch_4"           # Channel 4 sensor data
-    CH_5 = "ch_5"           # Channel 5 sensor data
-    CH_6 = "ch_6"           # Channel 6 sensor data
-    CH_7 = "ch_7"           # Channel 7 sensor data
-    CH_8 = "ch_8"           # Channel 8 sensor data
-    CH_9 = "ch_9"           # Channel 9 sensor data
-    CH_PARA = "ch_para"     # Channel parameters
-    CH_CFG = "ch_cfg"       # Channel configuration
+    CH_0 = "ch_0"  # Channel 0 sensor data
+    CH_1 = "ch_1"  # Channel 1 sensor data
+    CH_2 = "ch_2"  # Channel 2 sensor data
+    CH_3 = "ch_3"  # Channel 3 sensor data
+    CH_4 = "ch_4"  # Channel 4 sensor data
+    CH_5 = "ch_5"  # Channel 5 sensor data
+    CH_6 = "ch_6"  # Channel 6 sensor data
+    CH_7 = "ch_7"  # Channel 7 sensor data
+    CH_8 = "ch_8"  # Channel 8 sensor data
+    CH_9 = "ch_9"  # Channel 9 sensor data
+    CH_PARA = "ch_para"  # Channel parameters
+    CH_CFG = "ch_cfg"  # Channel configuration
     CHARGE_CUR_SET = "charge_cur_set"
     CHARGE_ENERGY = "charge_energy"
     CHARGE_ENERGY_ONCE = "charge_energy_once"
@@ -744,6 +756,7 @@ class XTDPCode(StrEnum):
     WORK_STATUS = "WorkStatus"
     XT_COVER_INVERT_CONTROL = "xt_cover_invert_control"
     XT_COVER_INVERT_STATUS = "xt_cover_invert_status"
+
 
 @dataclass
 class Country:

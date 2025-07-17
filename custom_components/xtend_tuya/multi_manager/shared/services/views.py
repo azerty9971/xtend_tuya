@@ -1,24 +1,19 @@
 from __future__ import annotations
-
 from datetime import datetime, timedelta
-
 from multidict import (
     MultiMapping,
 )
 import string
 import random
-
 from typing import Any
-
 from homeassistant.helpers.http import KEY_AUTHENTICATED, HomeAssistantView
 from homeassistant.helpers.entity_component import EntityComponent, entity
-
 from aiohttp import hdrs, web
-
 from ....const import (
     LOGGER,  # noqa: F401
     DOMAIN,
 )
+
 
 class XTEventDataResultCache:
     def __init__(self, event_data, result, ttl: int = 60) -> None:
@@ -26,11 +21,12 @@ class XTEventDataResultCache:
         self.result = result
         self.valid_until = datetime.now() + timedelta(0, ttl)
 
+
 class XTRequestCacheResult:
     def __init__(self, service_name: str) -> None:
         self.service_name = service_name
         self.cached_result: list[XTEventDataResultCache] = []
-    
+
     def _clean_cache(self):
         current_time = datetime.now()
         for cache_entry in self.cached_result:
@@ -43,9 +39,10 @@ class XTRequestCacheResult:
             if cache_entry.event_data == event_data:
                 return cache_entry.result
         return None
-    
+
     def append_to_cache(self, event_data, result, ttl: int = 60) -> None:
         self.cached_result.append(XTEventDataResultCache(event_data, result, ttl))
+
 
 class XTEventData:
     @property
@@ -64,28 +61,39 @@ class XTEventData:
         self.query_params = {}
         self.headers = {}
         self.session_id = self._id_generator()
-    
+
     def __eq__(self, other: object) -> bool:
-        return isinstance(other, XTEventData) and self.query_params == other.query_params and self.method == other.method and self.payload == other.payload
+        return (
+            isinstance(other, XTEventData)
+            and self.query_params == other.query_params
+            and self.method == other.method
+            and self.payload == other.payload
+        )
 
     def __repr__(self) -> str:
         return f"Method: {self.method} <=> Headers: {self.headers} <=> Content-Type: {self.content_type} <=> Query parameters: {self.query_params} <=> Payload: {self.payload}"
 
-    def _id_generator(self, size=20, chars=string.ascii_lowercase + string.ascii_uppercase + string.digits):
-        return ''.join(random.choice(chars) for _ in range(size))
+    def _id_generator(
+        self,
+        size=20,
+        chars=string.ascii_lowercase + string.ascii_uppercase + string.digits,
+    ):
+        return "".join(random.choice(chars) for _ in range(size))
+
 
 class XTEntityView(HomeAssistantView):
     """Base EntityView."""
 
     requires_auth = True
 
-    def __init__(self, component: EntityComponent, name: str, requires_auth: bool = True) -> None:
+    def __init__(
+        self, component: EntityComponent, name: str, requires_auth: bool = True
+    ) -> None:
         """Initialize a basic camera view."""
         self.component = component
         self.name = "api:" + DOMAIN + ":" + name
         self.url = "/api/" + DOMAIN + "/" + name + "/{entity_id}"
         self.requires_auth = requires_auth
-
 
     async def get(self, request: web.Request, entity_id: str) -> web.StreamResponse:
         """Start a GET request."""
@@ -93,9 +101,7 @@ class XTEntityView(HomeAssistantView):
         if entity is None:
             raise web.HTTPNotFound
 
-        authenticated = (
-            request[KEY_AUTHENTICATED]
-        )
+        authenticated = request[KEY_AUTHENTICATED]
 
         if self.requires_auth and not authenticated:
             # Attempt with invalid bearer token, raise unauthorized
@@ -107,26 +113,35 @@ class XTEntityView(HomeAssistantView):
 
         return await self.handle(request, entity)
 
-    async def handle(self, request: web.Request, entity: entity.Entity) -> web.StreamResponse:
+    async def handle(
+        self, request: web.Request, entity: entity.Entity
+    ) -> web.StreamResponse:
         """Handle the entity request."""
         raise NotImplementedError
+
 
 class XTGeneralView(HomeAssistantView):
     requires_auth = True
 
-    def __init__(self, name: str, callback, requires_auth: bool = True, use_cache: bool = True, cache_ttl: int = 60) -> None:
+    def __init__(
+        self,
+        name: str,
+        callback,
+        requires_auth: bool = True,
+        use_cache: bool = True,
+        cache_ttl: int = 60,
+    ) -> None:
         """Initialize a basic camera view."""
         self.name = "api:" + DOMAIN + ":" + name
         self.url = "/api/" + DOMAIN + "/" + name
-        #TEMPORARY FOR GO2RTC DEBUGGING
+        # TEMPORARY FOR GO2RTC DEBUGGING
         self.requires_auth = False
         self.debug_requires_auth = requires_auth
-        #END TEMPORARY FOR GO2RTC DEBUGGING
+        # END TEMPORARY FOR GO2RTC DEBUGGING
         self.callback = callback
         self.use_cache = use_cache
         self.cache: XTRequestCacheResult = XTRequestCacheResult(name)
         self.cache_ttl = cache_ttl
-
 
     async def get(self, request: web.Request) -> web.StreamResponse:
         """Start a GET request."""
@@ -143,20 +158,18 @@ class XTGeneralView(HomeAssistantView):
     async def put(self, request: web.Request) -> web.StreamResponse:
         """Start a PUT request."""
         return await self.handle(request)
-    
+
     async def patch(self, request: web.Request) -> web.StreamResponse:
         """Start a PATCH request."""
         return await self.handle(request)
-    
+
     async def head(self, request: web.Request) -> web.StreamResponse:
         """Start a HEAD request."""
         return await self.handle(request)
 
     async def handle(self, request: web.Request) -> web.StreamResponse:
         """Verify authentication"""
-        authenticated = (
-            request[KEY_AUTHENTICATED]
-        )
+        authenticated = request[KEY_AUTHENTICATED]
 
         if self.debug_requires_auth and not authenticated:
             # Attempt with invalid bearer token, raise unauthorized
@@ -177,7 +190,7 @@ class XTGeneralView(HomeAssistantView):
         for header in request.headers:
             event_data.headers[header] = request.headers[header]
         event_data.location = str(request.url)
-        #event_data.headers = request.headers.__dict__
+        # event_data.headers = request.headers.__dict__
         query_use_cache = bool(event_data.query_params.get("use_cache", self.use_cache))
         query_cache_ttl = int(event_data.query_params.get("cache_ttl", self.cache_ttl))
         if query_use_cache:
