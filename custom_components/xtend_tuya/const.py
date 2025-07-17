@@ -68,17 +68,17 @@ class TuyaCloudOpenAPIEndpoint(StrEnum):
             case TuyaCloudOpenAPIEndpoint.CHINA:
                 return "China"
             case TuyaCloudOpenAPIEndpoint.AMERICA_AZURE:
-                return "America (Eastern)"
+                return "America (Business)"
             case TuyaCloudOpenAPIEndpoint.EUROPE:
-                return "Europe (Eastern)"
+                return "Europe"
             case TuyaCloudOpenAPIEndpoint.EUROPE_MS:
-                return "Europe (Western)"
+                return "Europe (Business)"
             case TuyaCloudOpenAPIEndpoint.INDIA:
                 return "India"
             case TuyaCloudOpenAPIEndpoint.SINGAPORE:
                 return "Singapore"
             case _:
-                return "America (Western)"
+                return "America"
 
 
 PLATFORMS = [
