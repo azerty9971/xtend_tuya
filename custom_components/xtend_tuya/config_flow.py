@@ -179,7 +179,7 @@ class TuyaOptionFlow(OptionsFlow):
                         CONF_ENDPOINT_OT,
                         default=user_input.get(CONF_ENDPOINT_OT, default_endpoint),
                     ): vol.In(
-                        [endpoint.value for endpoint in TuyaCloudOpenAPIEndpoint]
+                        {endpoint.value: endpoint.name for endpoint in TuyaCloudOpenAPIEndpoint}
                     ),
                     vol.Optional(
                         CONF_ACCESS_ID_OT,
