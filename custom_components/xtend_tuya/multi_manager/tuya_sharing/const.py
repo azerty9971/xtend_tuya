@@ -2,7 +2,6 @@ from __future__ import annotations
 
 DOMAIN_ORIG = "tuya"
 TUYA_DISCOVERY_NEW_ORIG = "tuya_discovery_new"
-
 CONF_TERMINAL_ID = "terminal_id"
 CONF_TOKEN_INFO = "token_info"
 CONF_ENDPOINT = "endpoint"

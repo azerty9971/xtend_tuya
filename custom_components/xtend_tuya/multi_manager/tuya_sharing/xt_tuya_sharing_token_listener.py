@@ -1,17 +1,14 @@
 from __future__ import annotations
-
 from typing import Any
-
 from tuya_sharing.customerapi import (
     SharingTokenListener,
 )
-
 from ...const import (
     CONF_TOKEN_INFO,
     LOGGER,  # noqa: F401
 )
-
 from homeassistant.core import HomeAssistant, callback
+
 
 class XTSharingTokenListener(SharingTokenListener):
     """Token listener for upstream token updates."""
@@ -19,7 +16,7 @@ class XTSharingTokenListener(SharingTokenListener):
     def __init__(
         self,
         hass: HomeAssistant,
-        entry, #: XTConfigEntry,
+        entry,  #: XTConfigEntry,
     ) -> None:
         """Init TokenListener."""
         self.hass = hass

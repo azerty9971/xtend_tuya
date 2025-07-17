@@ -1,7 +1,6 @@
 """Support for Tuya Vacuums."""
 
 from __future__ import annotations
-
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
@@ -13,15 +12,14 @@ from .multi_manager.multi_manager import (
     XTDevice,
 )
 from .const import TUYA_DISCOVERY_NEW
-from .util import (
-    append_lists
-)
+from .util import append_lists
 from .entity import (
     XTEntity,
 )
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaVacuumEntity,
 )
+
 
 async def async_setup_entry(
     hass: HomeAssistant, entry: XTConfigEntry, async_add_entities: AddEntitiesCallback
@@ -31,11 +29,15 @@ async def async_setup_entry(
 
     if entry.runtime_data.multi_manager is None or hass_data.manager is None:
         return
-    
+
     category_list: list[str] = []
-    for new_descriptor in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(Platform.VACUUM):
+    for (
+        new_descriptor
+    ) in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(
+        Platform.VACUUM
+    ):
         category_list = append_lists(category_list, new_descriptor)
-    
+
     @callback
     def async_discover_device(device_map, restrict_dpcode: str | None = None) -> None:
         """Discover and add a discovered Tuya vacuum."""
@@ -64,6 +66,6 @@ class XTVacuumEntity(XTEntity, TuyaVacuumEntity):
     def __init__(self, device: XTDevice, device_manager: MultiManager) -> None:
         """Init Tuya vacuum."""
         super(XTVacuumEntity, self).__init__(device, device_manager)
-        super(XTEntity, self).__init__(device, device_manager) # type: ignore
+        super(XTEntity, self).__init__(device, device_manager)  # type: ignore
         self.device = device
         self.device_manager = device_manager

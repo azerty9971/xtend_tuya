@@ -1,29 +1,25 @@
 """Support for the XT lights."""
-from __future__ import annotations
 
+from __future__ import annotations
 from typing import cast
 import json
-
 from dataclasses import dataclass
-
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-
 from .util import (
     merge_device_descriptors,
     merge_descriptor_category,
     restrict_descriptor_category,
 )
-
 from .multi_manager.multi_manager import (
     XTConfigEntry,
     MultiManager,
     XTDevice,
 )
 from .const import (
-    TUYA_DISCOVERY_NEW, 
+    TUYA_DISCOVERY_NEW,
     XTDPCode,
     LOGGER,  # noqa: F401
     CROSS_CATEGORY_DEVICE_DESCRIPTOR,
@@ -38,24 +34,28 @@ from .entity import (
     XTEntity,
 )
 
+
 @dataclass(frozen=True)
 class XTLightEntityDescription(TuyaLightEntityDescription):
     """Describe an Tuya light entity."""
-    brightness_max: TuyaDPCode | XTDPCode | None = None # type: ignore
-    brightness_min: TuyaDPCode | XTDPCode | None = None # type: ignore
-    brightness: TuyaDPCode | tuple[TuyaDPCode, ...] | XTDPCode | tuple[XTDPCode, ...] | None = None # type: ignore
-    color_data: TuyaDPCode | tuple[TuyaDPCode, ...] | XTDPCode | tuple[XTDPCode, ...] | None = None # type: ignore
-    color_mode: TuyaDPCode | XTDPCode | None = None # type: ignore
-    color_temp: TuyaDPCode | tuple[TuyaDPCode, ...] | XTDPCode | tuple[XTDPCode, ...] | None = None # type: ignore
 
-    def get_entity_instance(self, 
-                            device: XTDevice, 
-                            device_manager: MultiManager, 
-                            description: XTLightEntityDescription
-                            ) -> XTLightEntity:
-        return XTLightEntity(device=device, 
-                              device_manager=device_manager, 
-                              description=description)
+    brightness_max: TuyaDPCode | XTDPCode | None = None  # type: ignore
+    brightness_min: TuyaDPCode | XTDPCode | None = None  # type: ignore
+    brightness: TuyaDPCode | tuple[TuyaDPCode, ...] | XTDPCode | tuple[XTDPCode, ...] | None = None  # type: ignore
+    color_data: TuyaDPCode | tuple[TuyaDPCode, ...] | XTDPCode | tuple[XTDPCode, ...] | None = None  # type: ignore
+    color_mode: TuyaDPCode | XTDPCode | None = None  # type: ignore
+    color_temp: TuyaDPCode | tuple[TuyaDPCode, ...] | XTDPCode | tuple[XTDPCode, ...] | None = None  # type: ignore
+
+    def get_entity_instance(
+        self,
+        device: XTDevice,
+        device_manager: MultiManager,
+        description: XTLightEntityDescription,
+    ) -> XTLightEntity:
+        return XTLightEntity(
+            device=device, device_manager=device_manager, description=description
+        )
+
 
 LIGHTS: dict[str, tuple[XTLightEntityDescription, ...]] = {
     "dbl": (
@@ -78,8 +78,14 @@ async def async_setup_entry(
         return
 
     merged_descriptors = LIGHTS
-    for new_descriptor in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(Platform.LIGHT):
-        merged_descriptors = merge_device_descriptors(merged_descriptors, new_descriptor)
+    for (
+        new_descriptor
+    ) in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(
+        Platform.LIGHT
+    ):
+        merged_descriptors = merge_device_descriptors(
+            merged_descriptors, new_descriptor
+        )
 
     @callback
     def async_discover_device(device_map, restrict_dpcode: str | None = None) -> None:
@@ -91,18 +97,28 @@ async def async_setup_entry(
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
                 category_descriptions = merged_descriptors.get(device.category)
-                cross_category_descriptions = merged_descriptors.get(CROSS_CATEGORY_DEVICE_DESCRIPTOR)
-                descriptions = merge_descriptor_category(category_descriptions, cross_category_descriptions)
+                cross_category_descriptions = merged_descriptors.get(
+                    CROSS_CATEGORY_DEVICE_DESCRIPTOR
+                )
+                descriptions = merge_descriptor_category(
+                    category_descriptions, cross_category_descriptions
+                )
                 if restrict_dpcode is not None:
-                    descriptions = restrict_descriptor_category(descriptions, [restrict_dpcode])
+                    descriptions = restrict_descriptor_category(
+                        descriptions, [restrict_dpcode]
+                    )
                 descriptions = cast(tuple[XTLightEntityDescription, ...], descriptions)
                 entities.extend(
-                    XTLightEntity.get_entity_instance(description, device, hass_data.manager)
+                    XTLightEntity.get_entity_instance(
+                        description, device, hass_data.manager
+                    )
                     for description in descriptions
                     if XTEntity.supports_description(device, description, True)
                 )
                 entities.extend(
-                    XTLightEntity.get_entity_instance(description, device, hass_data.manager)
+                    XTLightEntity.get_entity_instance(
+                        description, device, hass_data.manager
+                    )
                     for description in descriptions
                     if XTEntity.supports_description(device, description, False)
                 )
@@ -137,14 +153,24 @@ class XTLightEntity(XTEntity, TuyaLightEntity):
                 else:
                     values = self.device.status_range[dpcode].values
                 if function_data := json.loads(values):
-                    LOGGER.warning(f"Failed light: {device.name} => {function_data} <=> {e}")
-        super(XTEntity, self).__init__(device, device_manager, description) # type: ignore
+                    LOGGER.warning(
+                        f"Failed light: {device.name} => {function_data} <=> {e}"
+                    )
+        super(XTEntity, self).__init__(device, device_manager, description)  # type: ignore
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description
-    
+
     @staticmethod
-    def get_entity_instance(description: XTLightEntityDescription, device: XTDevice, device_manager: MultiManager) -> XTLightEntity:
-        if hasattr(description, "get_entity_instance") and callable(getattr(description, "get_entity_instance")):
+    def get_entity_instance(
+        description: XTLightEntityDescription,
+        device: XTDevice,
+        device_manager: MultiManager,
+    ) -> XTLightEntity:
+        if hasattr(description, "get_entity_instance") and callable(
+            getattr(description, "get_entity_instance")
+        ):
             return description.get_entity_instance(device, device_manager, description)
-        return XTLightEntity(device, device_manager, XTLightEntityDescription(**description.__dict__))
+        return XTLightEntity(
+            device, device_manager, XTLightEntityDescription(**description.__dict__)
+        )

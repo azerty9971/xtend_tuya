@@ -19,6 +19,7 @@ from ...const import (
     XTDeviceSourcePriority,
 )
 
+
 class DeviceWatcher:
     def __init__(self, multi_manager: mm.MultiManager) -> None:
         self.watched_dev_id: list[str] = []
@@ -26,16 +27,19 @@ class DeviceWatcher:
 
     def is_watched(self, dev_id: str) -> bool:
         return dev_id in self.watched_dev_id
-    
+
     def report_message(self, dev_id: str, message: str, device: XTDevice | None = None):
         if self.is_watched(dev_id):
             if dev_id in self.multi_manager.device_map:
                 managed_device = self.multi_manager.device_map[dev_id]
-                LOGGER.warning(f"DeviceWatcher for {managed_device.name} ({dev_id}): {message}")
+                LOGGER.warning(
+                    f"DeviceWatcher for {managed_device.name} ({dev_id}): {message}"
+                )
             elif device:
                 LOGGER.warning(f"DeviceWatcher for {device.name} ({dev_id}): {message}")
             else:
                 LOGGER.warning(f"DeviceWatcher for {dev_id}: {message}")
+
 
 class HomeAssistantXTData(NamedTuple):
     """Tuya data stored in the Home Assistant data object."""
@@ -48,7 +52,9 @@ class HomeAssistantXTData(NamedTuple):
     def manager(self) -> mm.MultiManager | None:
         return self.multi_manager
 
+
 type XTConfigEntry = ConfigEntry[HomeAssistantXTData]
+
 
 @dataclass
 class XTDeviceStatusRange:
@@ -80,6 +86,7 @@ class XTDeviceStatusRange:
             dp_id = 0
         return XTDeviceStatusRange(code=code, type=type, values=values, dp_id=dp_id)
 
+
 @dataclass
 class XTDeviceFunction:
     code: str = ""
@@ -88,7 +95,7 @@ class XTDeviceFunction:
     name: str = ""
     values: str = "{}"
     dp_id: int = 0
-    
+
     def __repr__(self) -> str:
         return f"Function(code={self.code}, type={self.type}, desc={self.desc}, name={self.name}, values={self.values}, dp_id={self.dp_id})"
 
@@ -118,7 +125,10 @@ class XTDeviceFunction:
             dp_id = function.dp_id
         else:
             dp_id = 0
-        return XTDeviceFunction(code=code, type=type, desc=desc, name=name, values=values, dp_id=dp_id)
+        return XTDeviceFunction(
+            code=code, type=type, desc=desc, name=name, values=values, dp_id=dp_id
+        )
+
 
 class XTDevice(TuyaDevice):
     id: str
@@ -147,19 +157,21 @@ class XTDevice(TuyaDevice):
     status_range: dict[str, XTDeviceStatusRange]
     force_open_api: Optional[bool] = False
     device_source_priority: int | None = None
-    force_compatibility: bool = False   #Force the device functions/status_range/state to remain untouched after merging
+    force_compatibility: bool = (
+        False  # Force the device functions/status_range/state to remain untouched after merging
+    )
     device_preference: dict[str, Any] = {}
     regular_tuya_device: TuyaDevice | None = None
     enable_regular_tuya_device_replication: bool = False
 
     class XTDevicePreference(StrEnum):
-        IS_A_COVER_DEVICE                   = "IS_A_COVER_DEVICE"
-        LOCK_MANUAL_UNLOCK_COMMAND          = "LOCK_MANUAL_UNLOCK_COMMAND"
-        LOCK_GET_SUPPORTED_UNLOCK_TYPES     = "LOCK_GET_SUPPORTED_UNLOCK_TYPES"
-        LOCK_GET_DOOR_LOCK_PASSWORD_TICKET  = "LOCK_GET_DOOR_LOCK_PASSWORD_TICKET"
-        LOCK_CALL_DOOR_OPERATE              = "LOCK_CALL_DOOR_OPERATE"
-        LOCK_CALL_DOOR_OPEN                 = "LOCK_CALL_DOOR_OPEN"
-        HANDLED_DPCODES                     = "HANDLED_DPCODES"
+        IS_A_COVER_DEVICE = "IS_A_COVER_DEVICE"
+        LOCK_MANUAL_UNLOCK_COMMAND = "LOCK_MANUAL_UNLOCK_COMMAND"
+        LOCK_GET_SUPPORTED_UNLOCK_TYPES = "LOCK_GET_SUPPORTED_UNLOCK_TYPES"
+        LOCK_GET_DOOR_LOCK_PASSWORD_TICKET = "LOCK_GET_DOOR_LOCK_PASSWORD_TICKET"
+        LOCK_CALL_DOOR_OPERATE = "LOCK_CALL_DOOR_OPERATE"
+        LOCK_CALL_DOOR_OPEN = "LOCK_CALL_DOOR_OPEN"
+        HANDLED_DPCODES = "HANDLED_DPCODES"
 
     def __init__(self, **kwargs: Any) -> None:
         self.source = ""
@@ -188,12 +200,12 @@ class XTDevice(TuyaDevice):
 
         self.local_strategy = {}
         self.status = {}
-        self.function = {} # type: ignore
-        self.status_range = {} # type: ignore
+        self.function = {}  # type: ignore
+        self.status_range = {}  # type: ignore
         self.device_preference = {}
         self.enable_regular_tuya_device_replication: bool = False
         super().__init__(**kwargs)
-    
+
     def __repr__(self) -> str:
         function_str = "Functions:\r\n"
         for function in self.function.values():
@@ -207,26 +219,34 @@ class XTDevice(TuyaDevice):
         local_strategy_str = "LocalStrategy:\r\n"
         for dpId in self.local_strategy:
             local_strategy_str += f"{dpId}\r\n{self.local_strategy[dpId]}\r\n"
-        
+
         return f"Device {self.name}:\r\n{function_str}{status_range_str}{status_str}{local_strategy_str}"
-        #return f"Device {self.name}:\r\n{self.source}"
-    
+        # return f"Device {self.name}:\r\n{self.source}"
+
     def __setattr__(self, attr, value):
-        if self.enable_regular_tuya_device_replication is True and self.regular_tuya_device is not None and hasattr(self.regular_tuya_device, attr):
+        if (
+            self.enable_regular_tuya_device_replication is True
+            and self.regular_tuya_device is not None
+            and hasattr(self.regular_tuya_device, attr)
+        ):
             self.regular_tuya_device.__setattr__(attr, value)
         super().__setattr__(attr, value)
 
     @staticmethod
-    def from_compatible_device(device: Any, source: str = "Compatible device", device_source_priority: int | None = None):
-        #If the device is already an XT device return it right away
+    def from_compatible_device(
+        device: Any,
+        source: str = "Compatible device",
+        device_source_priority: int | None = None,
+    ):
+        # If the device is already an XT device return it right away
         if isinstance(device, XTDevice):
             return device
-        
+
         new_device = XTDevice(**device.__dict__)
         new_device.source = source
         new_device.device_source_priority = device_source_priority
 
-        #Reuse the references from the original device
+        # Reuse the references from the original device
         if hasattr(device, "local_strategy"):
             new_device.local_strategy = device.local_strategy
         if hasattr(device, "status"):
@@ -237,7 +257,7 @@ class XTDevice(TuyaDevice):
             new_device.status_range = device.status_range
 
         return new_device
-    
+
     """def copy_data_from_device(source_device, dest_device) -> None:
         if hasattr(source_device, "online") and hasattr(dest_device, "online"):
             dest_device.online = source_device.online
@@ -249,13 +269,15 @@ class XTDevice(TuyaDevice):
 
     def get_copy(self) -> XTDevice:
         return copy.deepcopy(self)
-    
+
     def get_multi_manager(self, hass: HomeAssistant) -> mm.MultiManager | None:
         return util.get_device_multi_manager(hass=hass, device=self)
-    
-    def get_preference(self, pref_id: str, ret_val_if_missing: Any | None = None) -> Any | None:
+
+    def get_preference(
+        self, pref_id: str, ret_val_if_missing: Any | None = None
+    ) -> Any | None:
         return self.device_preference.get(pref_id, ret_val_if_missing)
-    
+
     def set_preference(self, pref_id: str, pref_val: Any):
         self.device_preference[pref_id] = pref_val
 
@@ -266,20 +288,20 @@ class XTDevice(TuyaDevice):
                 for alias in local_strategy.get("status_code_alias", {}):
                     return_list[alias] = status_code
         return return_list
-    
-    def replace_status_with_another(self, orig_status: str, new_status:str):
-        #LOGGER.debug(f"Replacing {orig_status} with {new_status} in {device.name}")
+
+    def replace_status_with_another(self, orig_status: str, new_status: str):
+        # LOGGER.debug(f"Replacing {orig_status} with {new_status} in {device.name}")
         if orig_status in self.status_range:
             self.status_range[new_status] = self.status_range.pop(orig_status)
             self.status_range[new_status].code = new_status
-        
+
         if orig_status in self.function:
             self.function[new_status] = self.function.pop(orig_status)
             self.function[new_status].code = new_status
-        
+
         if orig_status in self.status:
             self.status[new_status] = self.status.pop(orig_status)
-        
+
         for dpId in self.local_strategy:
             status_code = self.local_strategy[dpId].get("status_code")
             status_alias: list = self.local_strategy[dpId].get("status_code_alias", [])
@@ -294,7 +316,9 @@ class XTDevice(TuyaDevice):
                     if status_formats := config_item.get("statusFormat", None):
                         status_formats_dict: dict = json.loads(status_formats)
                         for first_key in status_formats_dict:
-                            status_formats_dict[new_status] = status_formats_dict.pop(first_key)
+                            status_formats_dict[new_status] = status_formats_dict.pop(
+                                first_key
+                            )
                             break
                         config_item["statusFormat"] = json.dumps(status_formats_dict)
                 break
@@ -305,11 +329,13 @@ class XTDeviceMap(UserDict[str, XTDevice]):
     device_source_priority: XTDeviceSourcePriority | None = None
     _original_ref: Any | None = None
 
-    def __init__(self, iterable, device_source_priority: XTDeviceSourcePriority | None = None):
+    def __init__(
+        self, iterable, device_source_priority: XTDeviceSourcePriority | None = None
+    ):
         super().__init__(**iterable)
         self._original_ref = iterable
         self.device_source_priority = device_source_priority
-    
+
     def __setitem__(self, key, item):
         super().__setitem__(key, item)
         if self._original_ref is not None:

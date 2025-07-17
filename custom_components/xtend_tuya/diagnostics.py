@@ -1,19 +1,16 @@
 """Diagnostics support for Tuya."""
 
 from __future__ import annotations
-
 from contextlib import suppress
 import json
 from typing import Any, cast
-
 from homeassistant.components.diagnostics import REDACTED
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import device_registry as dr, entity_registry as er
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.util import dt as dt_util
-
 from .multi_manager.multi_manager import (
-    XTConfigEntry, 
+    XTConfigEntry,
     XTDevice,
 )
 from .const import DOMAIN, DOMAIN_ORIG, XTDPCode
@@ -47,8 +44,8 @@ def _async_get_diagnostics(
         mqtt_connected = hass_data.manager.mq.client.is_connected()"""
 
     data = {
-        #"endpoint": hass_data.manager.customer_api.endpoint,
-        #"terminal_id": hass_data.manager.terminal_id,
+        # "endpoint": hass_data.manager.customer_api.endpoint,
+        # "terminal_id": hass_data.manager.terminal_id,
         "mqtt_connected": mqtt_connected,
         "disabled_by": entry.disabled_by,
         "disabled_polling": entry.pref_disable_polling,
@@ -73,9 +70,7 @@ def _async_get_diagnostics(
 
 
 @callback
-def _async_device_as_dict(
-    hass: HomeAssistant, device: XTDevice
-) -> dict[str, Any]:
+def _async_device_as_dict(hass: HomeAssistant, device: XTDevice) -> dict[str, Any]:
     """Represent a Tuya device as a dictionary."""
 
     # Base device information, without sensitive information.
@@ -177,7 +172,9 @@ def _async_device_as_dict(
     # Gather information how this Tuya device is represented in Home Assistant
     device_registry = dr.async_get(hass)
     entity_registry = er.async_get(hass)
-    hass_device = device_registry.async_get_device(identifiers={(DOMAIN, device.id), (DOMAIN_ORIG, device.id)})
+    hass_device = device_registry.async_get_device(
+        identifiers={(DOMAIN, device.id), (DOMAIN_ORIG, device.id)}
+    )
     if hass_device:
         data["home_assistant"] = {
             "name": hass_device.name,

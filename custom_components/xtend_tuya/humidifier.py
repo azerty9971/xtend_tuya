@@ -1,18 +1,12 @@
 """Support for XT (de)humidifiers."""
 
 from __future__ import annotations
-
 from dataclasses import dataclass
-
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-
-from .util import (
-    append_dictionnaries
-)
-
+from .util import append_dictionnaries
 from .multi_manager.multi_manager import (
     XTConfigEntry,
     MultiManager,
@@ -27,22 +21,23 @@ from .entity import (
     XTEntity,
 )
 
+
 @dataclass(frozen=True)
 class XTHumidifierEntityDescription(TuyaHumidifierEntityDescription):
     """Describe an XT (de)humidifier entity."""
-    
-    def get_entity_instance(self, 
-                            device: XTDevice, 
-                            device_manager: MultiManager, 
-                            description: XTHumidifierEntityDescription
-                            ) -> XTHumidifierEntity:
-        return XTHumidifierEntity(device=device, 
-                              device_manager=device_manager, 
-                              description=description)
+
+    def get_entity_instance(
+        self,
+        device: XTDevice,
+        device_manager: MultiManager,
+        description: XTHumidifierEntityDescription,
+    ) -> XTHumidifierEntity:
+        return XTHumidifierEntity(
+            device=device, device_manager=device_manager, description=description
+        )
 
 
-HUMIDIFIERS: dict[str, XTHumidifierEntityDescription] = {
-}
+HUMIDIFIERS: dict[str, XTHumidifierEntityDescription] = {}
 
 
 async def async_setup_entry(
@@ -55,7 +50,11 @@ async def async_setup_entry(
         return
 
     merged_categories = HUMIDIFIERS
-    for new_descriptor in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(Platform.HUMIDIFIER):
+    for (
+        new_descriptor
+    ) in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(
+        Platform.HUMIDIFIER
+    ):
         merged_categories = append_dictionnaries(merged_categories, new_descriptor)
 
     @callback
@@ -71,7 +70,9 @@ async def async_setup_entry(
             if device := hass_data.manager.device_map.get(device_id):
                 if description := merged_categories.get(device.category):
                     entities.append(
-                        XTHumidifierEntity.get_entity_instance(description, device, hass_data.manager)
+                        XTHumidifierEntity.get_entity_instance(
+                            description, device, hass_data.manager
+                        )
                     )
         async_add_entities(entities)
 
@@ -93,13 +94,23 @@ class XTHumidifierEntity(XTEntity, TuyaHumidifierEntity):
         description: XTHumidifierEntityDescription,
     ) -> None:
         super(XTHumidifierEntity, self).__init__(device, device_manager, description)
-        super(XTEntity, self).__init__(device, device_manager, description) # type: ignore
+        super(XTEntity, self).__init__(device, device_manager, description)  # type: ignore
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description
 
     @staticmethod
-    def get_entity_instance(description: XTHumidifierEntityDescription, device: XTDevice, device_manager: MultiManager) -> XTHumidifierEntity:
-        if hasattr(description, "get_entity_instance") and callable(getattr(description, "get_entity_instance")):
+    def get_entity_instance(
+        description: XTHumidifierEntityDescription,
+        device: XTDevice,
+        device_manager: MultiManager,
+    ) -> XTHumidifierEntity:
+        if hasattr(description, "get_entity_instance") and callable(
+            getattr(description, "get_entity_instance")
+        ):
             return description.get_entity_instance(device, device_manager, description)
-        return XTHumidifierEntity(device, device_manager, XTHumidifierEntityDescription(**description.__dict__))
+        return XTHumidifierEntity(
+            device,
+            device_manager,
+            XTHumidifierEntityDescription(**description.__dict__),
+        )

@@ -1,16 +1,11 @@
 """Support for XT Fan."""
 
 from __future__ import annotations
-
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-
-from .util import (
-    append_sets
-)
-
+from .util import append_sets
 from .multi_manager.multi_manager import (
     XTConfigEntry,
     MultiManager,
@@ -39,7 +34,11 @@ async def async_setup_entry(
         return
 
     merged_categories = XT_SUPPORT_TYPE
-    for new_descriptor in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(Platform.FAN):
+    for (
+        new_descriptor
+    ) in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(
+        Platform.FAN
+    ):
         merged_categories = append_sets(merged_categories, new_descriptor)
 
     @callback
@@ -74,6 +73,6 @@ class XTFanEntity(XTEntity, TuyaFanEntity):
     ) -> None:
         """Init XT Fan Device."""
         super(XTFanEntity, self).__init__(device, device_manager)
-        super(XTEntity, self).__init__(device, device_manager) # type: ignore
+        super(XTEntity, self).__init__(device, device_manager)  # type: ignore
         self.device = device
         self.device_manager = device_manager

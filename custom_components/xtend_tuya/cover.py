@@ -1,11 +1,9 @@
 """Support for XT Cover."""
 
 from __future__ import annotations
-
 from typing import cast
 from dataclasses import dataclass
 from typing import Any
-
 from homeassistant.components.cover import (
     CoverDeviceClass,
     ATTR_POSITION,
@@ -14,7 +12,6 @@ from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect, dispatcher_send
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-
 from .const import (
     LOGGER,  # noqa: F401
 )
@@ -23,7 +20,6 @@ from .util import (
     merge_descriptor_category,
     restrict_descriptor_category,
 )
-
 from .multi_manager.multi_manager import (
     XTConfigEntry,
     MultiManager,
@@ -43,38 +39,42 @@ from .entity import (
     XTEntity,
 )
 
+
 @dataclass(frozen=True)
 class XTCoverEntityDescription(TuyaCoverEntityDescription):
     """Describes XT cover entity."""
-    current_state: TuyaDPCode | XTDPCode | None = None # type: ignore
-    current_position: TuyaDPCode | tuple[TuyaDPCode, ...] | XTDPCode | tuple[XTDPCode, ...] | None = None # type: ignore
-    set_position: TuyaDPCode | XTDPCode | None = None # type: ignore
+
+    current_state: TuyaDPCode | XTDPCode | None = None  # type: ignore
+    current_position: TuyaDPCode | tuple[TuyaDPCode, ...] | XTDPCode | tuple[XTDPCode, ...] | None = None  # type: ignore
+    set_position: TuyaDPCode | XTDPCode | None = None  # type: ignore
 
     # Additional attributes for XT specific functionality
     control_back_mode: str | None = None
 
-    def get_entity_instance(self, 
-                            device: XTDevice, 
-                            device_manager: MultiManager, 
-                            description: XTCoverEntityDescription
-                            ) -> XTCoverEntity:
-        return XTCoverEntity(device=device, 
-                              device_manager=device_manager, 
-                              description=description)
+    def get_entity_instance(
+        self,
+        device: XTDevice,
+        device_manager: MultiManager,
+        description: XTCoverEntityDescription,
+    ) -> XTCoverEntity:
+        return XTCoverEntity(
+            device=device, device_manager=device_manager, description=description
+        )
+
 
 COVERS: dict[str, tuple[XTCoverEntityDescription, ...]] = {
     # Curtain
     # Note: Multiple curtains isn't documented
     # https://developer.tuya.com/en/docs/iot/categorycl?id=Kaiuz1hnpo7df
     "cl": (
-        #XTCoverEntityDescription(
+        # XTCoverEntityDescription(
         #    key=DPCode.CONTROL,
         #    translation_key="curtain",
         #    current_state=DPCode.SITUATION_SET,
         #    current_position=(DPCode.PERCENT_STATE, DPCode.PERCENT_CONTROL),
         #    set_position=DPCode.PERCENT_CONTROL,
         #    device_class=CoverDeviceClass.CURTAIN,
-        #),
+        # ),
         XTCoverEntityDescription(
             key=XTDPCode.CONTROL,
             translation_key="curtain",
@@ -100,7 +100,7 @@ COVERS: dict[str, tuple[XTCoverEntityDescription, ...]] = {
             set_position=XTDPCode.PERCENT_CONTROL_3,
             device_class=CoverDeviceClass.CURTAIN,
             control_back_mode=XTDPCode.CONTROL_BACK_MODE,
-       ),
+        ),
         XTCoverEntityDescription(
             key=XTDPCode.MACH_OPERATE,
             translation_key="curtain",
@@ -111,7 +111,7 @@ COVERS: dict[str, tuple[XTCoverEntityDescription, ...]] = {
             close_instruction_value="ZZ",
             stop_instruction_value="STOP",
             control_back_mode=XTDPCode.CONTROL_BACK_MODE,
-     ),
+        ),
         # switch_1 is an undocumented code that behaves identically to control
         # It is used by the Kogan Smart Blinds Driver
         XTCoverEntityDescription(
@@ -136,8 +136,14 @@ async def async_setup_entry(
         return
 
     merged_descriptors = COVERS
-    for new_descriptor in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(Platform.COVER):
-        merged_descriptors = merge_device_descriptors(merged_descriptors, new_descriptor)
+    for (
+        new_descriptor
+    ) in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(
+        Platform.COVER
+    ):
+        merged_descriptors = merge_device_descriptors(
+            merged_descriptors, new_descriptor
+        )
 
     @callback
     def async_discover_device(device_map, restrict_dpcode: str | None = None) -> None:
@@ -149,18 +155,28 @@ async def async_setup_entry(
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
                 category_descriptions = merged_descriptors.get(device.category)
-                cross_category_descriptions = merged_descriptors.get(CROSS_CATEGORY_DEVICE_DESCRIPTOR)
-                descriptions = merge_descriptor_category(category_descriptions, cross_category_descriptions)
+                cross_category_descriptions = merged_descriptors.get(
+                    CROSS_CATEGORY_DEVICE_DESCRIPTOR
+                )
+                descriptions = merge_descriptor_category(
+                    category_descriptions, cross_category_descriptions
+                )
                 if restrict_dpcode is not None:
-                    descriptions = restrict_descriptor_category(descriptions, [restrict_dpcode])
+                    descriptions = restrict_descriptor_category(
+                        descriptions, [restrict_dpcode]
+                    )
                 descriptions = cast(tuple[XTCoverEntityDescription, ...], descriptions)
                 entities.extend(
-                    XTCoverEntity.get_entity_instance(description, device, hass_data.manager)
+                    XTCoverEntity.get_entity_instance(
+                        description, device, hass_data.manager
+                    )
                     for description in descriptions
                     if XTEntity.supports_description(device, description, True)
                 )
                 entities.extend(
-                    XTCoverEntity.get_entity_instance(description, device, hass_data.manager)
+                    XTCoverEntity.get_entity_instance(
+                        description, device, hass_data.manager
+                    )
                     for description in descriptions
                     if XTEntity.supports_description(device, description, False)
                 )
@@ -178,7 +194,7 @@ async def async_setup_entry(
 class XTCoverEntity(XTEntity, TuyaCoverEntity):
     """XT Cover Device."""
 
-    entity_description: XTCoverEntityDescription # type: ignore
+    entity_description: XTCoverEntityDescription  # type: ignore
 
     def __init__(
         self,
@@ -187,9 +203,9 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         description: XTCoverEntityDescription,
     ) -> None:
         """Initialize the cover entity."""
-        
+
         super(XTCoverEntity, self).__init__(device, device_manager, description)
-        super(XTEntity, self).__init__(device, device_manager, description) # type: ignore
+        super(XTEntity, self).__init__(device, device_manager, description)  # type: ignore
         self.device = device
         device_manager.post_setup_callbacks.append(self.add_cover_open_close_option)
 
@@ -201,7 +217,7 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
             elif is_reversed == "yes":
                 return True
         return None
-        
+
     @property
     def is_cover_status_inverted(self) -> bool | None:
         if is_reversed := self.device.status.get(XTDPCode.XT_COVER_INVERT_STATUS):
@@ -212,35 +228,64 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         return None
 
     def add_cover_open_close_option(self) -> None:
-        if self.device.get_preference(f"{XTDevice.XTDevicePreference.IS_A_COVER_DEVICE}") is None:
-            self.device.set_preference(f"{XTDevice.XTDevicePreference.IS_A_COVER_DEVICE}", True)
+        if (
+            self.device.get_preference(
+                f"{XTDevice.XTDevicePreference.IS_A_COVER_DEVICE}"
+            )
+            is None
+        ):
+            self.device.set_preference(
+                f"{XTDevice.XTDevicePreference.IS_A_COVER_DEVICE}", True
+            )
             send_update = False
             if XTDPCode.XT_COVER_INVERT_CONTROL not in self.device.status:
                 self.device.status[XTDPCode.XT_COVER_INVERT_CONTROL] = "no"
-                self.device.status_range[XTDPCode.XT_COVER_INVERT_CONTROL] = XTDeviceStatusRange(code = XTDPCode.XT_COVER_INVERT_CONTROL,
-                                                                                                      type=TuyaDPType.STRING,
-                                                                                                      values="{}",
-                                                                                                      dp_id=0)
+                self.device.status_range[XTDPCode.XT_COVER_INVERT_CONTROL] = (
+                    XTDeviceStatusRange(
+                        code=XTDPCode.XT_COVER_INVERT_CONTROL,
+                        type=TuyaDPType.STRING,
+                        values="{}",
+                        dp_id=0,
+                    )
+                )
                 send_update = True
             if XTDPCode.XT_COVER_INVERT_STATUS not in self.device.status:
                 self.device.status[XTDPCode.XT_COVER_INVERT_STATUS] = "no"
-                self.device.status_range[XTDPCode.XT_COVER_INVERT_STATUS] = XTDeviceStatusRange(code = XTDPCode.XT_COVER_INVERT_STATUS,
-                                                                                                      type=TuyaDPType.STRING,
-                                                                                                      values="{}",
-                                                                                                      dp_id=0)
+                self.device.status_range[XTDPCode.XT_COVER_INVERT_STATUS] = (
+                    XTDeviceStatusRange(
+                        code=XTDPCode.XT_COVER_INVERT_STATUS,
+                        type=TuyaDPType.STRING,
+                        values="{}",
+                        dp_id=0,
+                    )
+                )
                 send_update = True
             if send_update:
-                dispatcher_send(self.hass, TUYA_DISCOVERY_NEW, [self.device.id], XTDPCode.XT_COVER_INVERT_CONTROL)
-                dispatcher_send(self.hass, TUYA_DISCOVERY_NEW, [self.device.id], XTDPCode.XT_COVER_INVERT_STATUS)
+                dispatcher_send(
+                    self.hass,
+                    TUYA_DISCOVERY_NEW,
+                    [self.device.id],
+                    XTDPCode.XT_COVER_INVERT_CONTROL,
+                )
+                dispatcher_send(
+                    self.hass,
+                    TUYA_DISCOVERY_NEW,
+                    [self.device.id],
+                    XTDPCode.XT_COVER_INVERT_STATUS,
+                )
 
     @property
     def current_cover_position(self) -> int | None:
         current_cover_position = super().current_cover_position
         if current_cover_position is not None:
             if self.is_cover_status_inverted and self._current_position is not None:
-                return round( self._current_position.remap_value_to(current_cover_position, 0, 100, reverse=True))
+                return round(
+                    self._current_position.remap_value_to(
+                        current_cover_position, 0, 100, reverse=True
+                    )
+                )
         return current_cover_position
-    
+
     @property
     def real_current_cover_position(self) -> int | None:
         """Return cover current position."""
@@ -253,7 +298,7 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         return round(
             self._current_position.remap_value_to(position, 0, 100, reverse=True)
         )
-    
+
     @property
     def is_closed(self) -> bool | None:
         """Return true if cover is closed."""
@@ -262,9 +307,13 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
             computed_position = 100
 
         if self.entity_description.current_state is not None:
-            current_state = self.device.status.get(self.entity_description.current_state)
+            current_state = self.device.status.get(
+                self.entity_description.current_state
+            )
             if current_state is not None:
-                return (current_state in (True, "fully_close")) is not self.is_cover_status_inverted
+                return (
+                    current_state in (True, "fully_close")
+                ) is not self.is_cover_status_inverted
 
         position = self.real_current_cover_position
         if position is not None:
@@ -288,12 +337,14 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         ]
 
         if self._set_position is not None:
-            #LOGGER.warning(f"Sending cover open: {self._set_position.remap_value_from(computed_position, 0, 100, reverse=True)}")
+            # LOGGER.warning(f"Sending cover open: {self._set_position.remap_value_from(computed_position, 0, 100, reverse=True)}")
             commands.append(
                 {
                     "code": self._set_position.dpcode,
                     "value": round(
-                        self._set_position.remap_value_from(computed_position, 0, 100, reverse=True),
+                        self._set_position.remap_value_from(
+                            computed_position, 0, 100, reverse=True
+                        ),
                     ),
                 }
             )
@@ -316,18 +367,20 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         ]
 
         if self._set_position is not None:
-            #LOGGER.warning(f"Sending cover close: {self._set_position.remap_value_from(computed_position, 0, 100, reverse=True)}")
+            # LOGGER.warning(f"Sending cover close: {self._set_position.remap_value_from(computed_position, 0, 100, reverse=True)}")
             commands.append(
                 {
                     "code": self._set_position.dpcode,
                     "value": round(
-                        self._set_position.remap_value_from(computed_position, 0, 100, reverse=True),
+                        self._set_position.remap_value_from(
+                            computed_position, 0, 100, reverse=True
+                        ),
                     ),
                 }
             )
 
         self._send_command(commands)
-    
+
     def set_cover_position(self, **kwargs: Any) -> None:
         """Move the cover to a specific position."""
         computed_position = kwargs[ATTR_POSITION]
@@ -352,7 +405,15 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         )
 
     @staticmethod
-    def get_entity_instance(description: XTCoverEntityDescription, device: XTDevice, device_manager: MultiManager) -> XTCoverEntity:
-        if hasattr(description, "get_entity_instance") and callable(getattr(description, "get_entity_instance")):
+    def get_entity_instance(
+        description: XTCoverEntityDescription,
+        device: XTDevice,
+        device_manager: MultiManager,
+    ) -> XTCoverEntity:
+        if hasattr(description, "get_entity_instance") and callable(
+            getattr(description, "get_entity_instance")
+        ):
             return description.get_entity_instance(device, device_manager, description)
-        return XTCoverEntity(device, device_manager, XTCoverEntityDescription(**description.__dict__))
+        return XTCoverEntity(
+            device, device_manager, XTCoverEntityDescription(**description.__dict__)
+        )

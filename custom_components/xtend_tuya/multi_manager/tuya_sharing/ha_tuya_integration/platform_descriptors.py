@@ -1,8 +1,6 @@
 from __future__ import annotations
-
 from typing import Any
 from homeassistant.const import Platform
-
 from ....ha_tuya_integration.tuya_integration_imports import (
     ALARM_TUYA,
     BINARY_SENSORS_TUYA,
@@ -17,8 +15,9 @@ from ....ha_tuya_integration.tuya_integration_imports import (
     SELECTS_TUYA,
     SENSORS_TUYA,
     SIRENS_TUYA,
-    SWITCHES_TUYA
+    SWITCHES_TUYA,
 )
+
 
 def get_tuya_platform_descriptors(platform: Platform) -> Any:
     match platform:
