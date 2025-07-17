@@ -1,15 +1,13 @@
 from __future__ import annotations
 
-from .xt_tuya_iot_ipc_manager import (
-    XTIOTIPCManager
-)
+import custom_components.xtend_tuya.multi_manager.tuya_iot.ipc.xt_tuya_iot_ipc_manager as ipc_man
 
 from ....const import (
     LOGGER,  # noqa: F401
 )
 
 class XTIOTIPCListener:
-    def __init__(self, ipc_manager: XTIOTIPCManager) -> None:
+    def __init__(self, ipc_manager: ipc_man.XTIOTIPCManager) -> None:
         self.ipc_manager = ipc_manager
     
     def handle_message(self, msg: dict):
