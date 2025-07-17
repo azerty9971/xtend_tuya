@@ -1,21 +1,17 @@
 from __future__ import annotations
-
 from typing import Any
-
 from homeassistant.const import (
     Platform,
 )
-
 from ..entity_parser import (
     XTCustomEntityParser,
 )
+from .sensor import InkbirdSensor
 
-from .sensor import (
-    InkbirdSensor
-)
 
 def get_plugin_instance() -> XTCustomEntityParser | None:
     return InkbirdEntityParser()
+
 
 class InkbirdEntityParser(XTCustomEntityParser):
     def __init__(self) -> None:

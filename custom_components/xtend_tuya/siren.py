@@ -1,19 +1,16 @@
 """Support for Tuya siren."""
 
 from __future__ import annotations
-
 from typing import cast
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-
 from .util import (
     merge_device_descriptors,
     merge_descriptor_category,
     restrict_descriptor_category,
 )
-
 from .multi_manager.multi_manager import (
     XTConfigEntry,
     MultiManager,
@@ -28,21 +25,23 @@ from .ha_tuya_integration.tuya_integration_imports import (
     TuyaSirenEntityDescription,
 )
 
+
 class XTSirenEntityDescription(TuyaSirenEntityDescription, frozen_or_thawed=True):
-    
-    def get_entity_instance(self, 
-                            device: XTDevice, 
-                            device_manager: MultiManager, 
-                            description: XTSirenEntityDescription
-                            ) -> XTSirenEntity:
-        return XTSirenEntity(device=device, 
-                              device_manager=device_manager, 
-                              description=description)
+
+    def get_entity_instance(
+        self,
+        device: XTDevice,
+        device_manager: MultiManager,
+        description: XTSirenEntityDescription,
+    ) -> XTSirenEntity:
+        return XTSirenEntity(
+            device=device, device_manager=device_manager, description=description
+        )
+
 
 # All descriptions can be found here:
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
-SIRENS: dict[str, tuple[XTSirenEntityDescription, ...]] = {
-}
+SIRENS: dict[str, tuple[XTSirenEntityDescription, ...]] = {}
 
 
 async def async_setup_entry(
@@ -55,8 +54,14 @@ async def async_setup_entry(
         return
 
     merged_descriptors = SIRENS
-    for new_descriptor in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(Platform.SIREN):
-        merged_descriptors = merge_device_descriptors(merged_descriptors, new_descriptor)
+    for (
+        new_descriptor
+    ) in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(
+        Platform.SIREN
+    ):
+        merged_descriptors = merge_device_descriptors(
+            merged_descriptors, new_descriptor
+        )
 
     @callback
     def async_discover_device(device_map, restrict_dpcode: str | None = None) -> None:
@@ -68,18 +73,28 @@ async def async_setup_entry(
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
                 category_descriptions = merged_descriptors.get(device.category)
-                cross_category_descriptions = merged_descriptors.get(CROSS_CATEGORY_DEVICE_DESCRIPTOR)
-                descriptions = merge_descriptor_category(category_descriptions, cross_category_descriptions)
+                cross_category_descriptions = merged_descriptors.get(
+                    CROSS_CATEGORY_DEVICE_DESCRIPTOR
+                )
+                descriptions = merge_descriptor_category(
+                    category_descriptions, cross_category_descriptions
+                )
                 if restrict_dpcode is not None:
-                    descriptions = restrict_descriptor_category(descriptions, [restrict_dpcode])
+                    descriptions = restrict_descriptor_category(
+                        descriptions, [restrict_dpcode]
+                    )
                 descriptions = cast(tuple[XTSirenEntityDescription, ...], descriptions)
                 entities.extend(
-                    XTSirenEntity.get_entity_instance(description, device, hass_data.manager)
+                    XTSirenEntity.get_entity_instance(
+                        description, device, hass_data.manager
+                    )
                     for description in descriptions
                     if XTEntity.supports_description(device, description, True)
                 )
                 entities.extend(
-                    XTSirenEntity.get_entity_instance(description, device, hass_data.manager)
+                    XTSirenEntity.get_entity_instance(
+                        description, device, hass_data.manager
+                    )
                     for description in descriptions
                     if XTEntity.supports_description(device, description, False)
                 )
@@ -104,13 +119,21 @@ class XTSirenEntity(XTEntity, TuyaSirenEntity):
     ) -> None:
         """Init XT Siren."""
         super(XTSirenEntity, self).__init__(device, device_manager, description)
-        super(XTEntity, self).__init__(device, device_manager, description) # type: ignore
+        super(XTEntity, self).__init__(device, device_manager, description)  # type: ignore
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description
 
     @staticmethod
-    def get_entity_instance(description: XTSirenEntityDescription, device: XTDevice, device_manager: MultiManager) -> XTSirenEntity:
-        if hasattr(description, "get_entity_instance") and callable(getattr(description, "get_entity_instance")):
+    def get_entity_instance(
+        description: XTSirenEntityDescription,
+        device: XTDevice,
+        device_manager: MultiManager,
+    ) -> XTSirenEntity:
+        if hasattr(description, "get_entity_instance") and callable(
+            getattr(description, "get_entity_instance")
+        ):
             return description.get_entity_instance(device, device_manager, description)
-        return XTSirenEntity(device, device_manager, XTSirenEntityDescription(**description.__dict__))
+        return XTSirenEntity(
+            device, device_manager, XTSirenEntityDescription(**description.__dict__)
+        )

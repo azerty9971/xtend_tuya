@@ -1,14 +1,12 @@
 """Tuya Open API."""
-from __future__ import annotations
 
+from __future__ import annotations
 import time
 from typing import Any
-
 import requests
 from tuya_iot import (
     TuyaOpenAPI,
 )
-
 from tuya_iot.tuya_enums import AuthType
 from tuya_iot.version import VERSION
 from ...const import (
@@ -71,12 +69,14 @@ class XTIOTOpenAPI(TuyaOpenAPI):
         non_user_specific_api: bool = False,
     ) -> None:
         """Init TuyaOpenAPI."""
-        super().__init__(endpoint=endpoint,
-                         access_id=access_id,
-                         access_secret=access_secret,
-                         auth_type=auth_type,
-                         lang=lang)
-        
+        super().__init__(
+            endpoint=endpoint,
+            access_id=access_id,
+            access_secret=access_secret,
+            auth_type=auth_type,
+            lang=lang,
+        )
+
         self.connecting = False
         self.non_user_specific_api = non_user_specific_api
         if self.auth_type == AuthType.CUSTOM:
@@ -94,9 +94,9 @@ class XTIOTOpenAPI(TuyaOpenAPI):
 
     def __refresh_access_token_if_need(self, path: str):
         # LOGGER.debug(f"[API]Calling __refresh_access_token_if_need")
-        if self.is_connect() is False: # and self.reconnect() is False:
+        if self.is_connect() is False:  # and self.reconnect() is False:
             return
-        
+
         if self.token_info is None:
             return
 
@@ -156,7 +156,12 @@ class XTIOTOpenAPI(TuyaOpenAPI):
         if self.non_user_specific_api:
             return_value = self.connect_non_user_specific()
         else:
-            return_value = super().connect(username=username, password=password, country_code=country_code, schema=schema)
+            return_value = super().connect(
+                username=username,
+                password=password,
+                country_code=country_code,
+                schema=schema,
+            )
         self.connecting = False
         return return_value
 
@@ -164,11 +169,11 @@ class XTIOTOpenAPI(TuyaOpenAPI):
         # LOGGER.debug(f"[API]Calling reconnect (connecting: {self.connecting})")
         if (
             not self.connecting
-            and self.__username 
+            and self.__username
             and self.__password
             and self.__country_code
         ):
-            self.token_info = None # type: ignore
+            self.token_info = None  # type: ignore
             self.connect(
                 self.__username, self.__password, self.__country_code, self.__schema
             )
@@ -177,12 +182,12 @@ class XTIOTOpenAPI(TuyaOpenAPI):
     def is_connect(self) -> bool:
         """Is connect to tuya cloud."""
         ret_val = super().is_connect()
-        #LOGGER.debug(f"[API]is_connect = {ret_val}")
+        # LOGGER.debug(f"[API]is_connect = {ret_val}")
         return ret_val
-    
+
     def test_validity(self) -> dict[str, Any]:
         return self.get("/v2.0/cloud/space/child")
-    
+
     def get(self, path: str, params: dict[str, Any] | None = None) -> dict[str, Any]:
         """Http Get.
 
@@ -245,11 +250,11 @@ class XTIOTOpenAPI(TuyaOpenAPI):
         path: str,
         params: dict[str, Any] | None = None,
         body: dict[str, Any] | None = None,
-        first_pass: bool = True
+        first_pass: bool = True,
     ) -> dict[str, Any]:
 
         self.__refresh_access_token_if_need(path)
-        #LOGGER.debug(f"[API]Requesting: {method} {path} (first_pass={first_pass})")
+        # LOGGER.debug(f"[API]Requesting: {method} {path} (first_pass={first_pass})")
         access_token = self.token_info.access_token if self.token_info else ""
         sign, t = self._calculate_sign(method, path, params, body)
         headers = {
@@ -261,9 +266,11 @@ class XTIOTOpenAPI(TuyaOpenAPI):
             "lang": self.lang,
         }
 
-        if path == self.__login_path or \
-            path.startswith(TO_C_CUSTOM_REFRESH_TOKEN_API) or\
-            path.startswith(TO_C_SMART_HOME_REFRESH_TOKEN_API):
+        if (
+            path == self.__login_path
+            or path.startswith(TO_C_CUSTOM_REFRESH_TOKEN_API)
+            or path.startswith(TO_C_SMART_HOME_REFRESH_TOKEN_API)
+        ):
             headers["dev_lang"] = "python"
             headers["dev_version"] = VERSION
             headers["dev_channel"] = self.dev_channel
@@ -280,11 +287,17 @@ class XTIOTOpenAPI(TuyaOpenAPI):
         for _ in range(10):
             try:
                 response = self.session.request(
-                    method, self.endpoint + path, params=params, json=body, headers=headers
+                    method,
+                    self.endpoint + path,
+                    params=params,
+                    json=body,
+                    headers=headers,
                 )
                 break
             except Exception as e:
-                LOGGER.debug(f"[API]Exception in request, waiting for 2 seconds and retrying {e}")
+                LOGGER.debug(
+                    f"[API]Exception in request, waiting for 2 seconds and retrying {e}"
+                )
                 time.sleep(2)
 
         if response.ok is False:

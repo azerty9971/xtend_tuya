@@ -1,19 +1,16 @@
 """Support for Tuya select."""
 
 from __future__ import annotations
-
 from typing import cast
 from homeassistant.const import EntityCategory, Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-
 from .util import (
     merge_device_descriptors,
     merge_descriptor_category,
     restrict_descriptor_category,
 )
-
 from .multi_manager.multi_manager import (
     XTConfigEntry,
     MultiManager,
@@ -28,17 +25,20 @@ from .ha_tuya_integration.tuya_integration_imports import (
     TuyaSelectEntityDescription,
 )
 
+
 class XTSelectEntityDescription(TuyaSelectEntityDescription):
     """Describe an Tuya select entity."""
 
-    def get_entity_instance(self, 
-                            device: XTDevice, 
-                            device_manager: MultiManager, 
-                            description: XTSelectEntityDescription
-                            ) -> XTSelectEntity:
-        return XTSelectEntity(device=device, 
-                              device_manager=device_manager, 
-                              description=description)
+    def get_entity_instance(
+        self,
+        device: XTDevice,
+        device_manager: MultiManager,
+        description: XTSelectEntityDescription,
+    ) -> XTSelectEntity:
+        return XTSelectEntity(
+            device=device, device_manager=device_manager, description=description
+        )
+
 
 TEMPERATURE_SELECTS: tuple[XTSelectEntityDescription, ...] = (
     XTSelectEntityDescription(
@@ -138,13 +138,13 @@ SELECTS: dict[str, tuple[XTSelectEntityDescription, ...]] = {
             key=XTDPCode.ALARM_VOLUME,
             translation_key="alarm_volume",
             entity_category=EntityCategory.CONFIG,
-            entity_registry_enabled_default=False
+            entity_registry_enabled_default=False,
         ),
         XTSelectEntityDescription(
             key=XTDPCode.SOUND_MODE,
             translation_key="sound_mode",
             entity_category=EntityCategory.CONFIG,
-            entity_registry_enabled_default=False
+            entity_registry_enabled_default=False,
         ),
     ),
     "mk": (
@@ -195,9 +195,7 @@ SELECTS: dict[str, tuple[XTSelectEntityDescription, ...]] = {
             entity_category=EntityCategory.CONFIG,
         ),
     ),
-    "mzj": (
-        *TEMPERATURE_SELECTS,
-    ),
+    "mzj": (*TEMPERATURE_SELECTS,),
     "qccdz": (
         XTSelectEntityDescription(
             key=XTDPCode.WORK_MODE,
@@ -217,9 +215,7 @@ SELECTS: dict[str, tuple[XTSelectEntityDescription, ...]] = {
             entity_category=EntityCategory.CONFIG,
         ),
     ),
-    "wk": (
-        *TEMPERATURE_SELECTS,
-    ),
+    "wk": (*TEMPERATURE_SELECTS,),
     "xfj": (
         XTSelectEntityDescription(
             key=XTDPCode.MODE,
@@ -227,14 +223,13 @@ SELECTS: dict[str, tuple[XTSelectEntityDescription, ...]] = {
             entity_category=EntityCategory.CONFIG,
         ),
     ),
-    "zwjcy": (
-        *TEMPERATURE_SELECTS,
-    ),
+    "zwjcy": (*TEMPERATURE_SELECTS,),
 }
 
-#Lock duplicates
+# Lock duplicates
 SELECTS["videolock"] = SELECTS["jtmspro"]
 SELECTS["jtmsbh"] = SELECTS["jtmspro"]
+
 
 async def async_setup_entry(
     hass: HomeAssistant, entry: XTConfigEntry, async_add_entities: AddEntitiesCallback
@@ -246,8 +241,14 @@ async def async_setup_entry(
         return
 
     merged_descriptors = SELECTS
-    for new_descriptor in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(Platform.SELECT):
-        merged_descriptors = merge_device_descriptors(merged_descriptors, new_descriptor)
+    for (
+        new_descriptor
+    ) in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(
+        Platform.SELECT
+    ):
+        merged_descriptors = merge_device_descriptors(
+            merged_descriptors, new_descriptor
+        )
 
     @callback
     def async_discover_device(device_map, restrict_dpcode: str | None = None) -> None:
@@ -259,18 +260,28 @@ async def async_setup_entry(
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
                 category_descriptions = merged_descriptors.get(device.category)
-                cross_category_descriptions = merged_descriptors.get(CROSS_CATEGORY_DEVICE_DESCRIPTOR)
-                descriptions = merge_descriptor_category(category_descriptions, cross_category_descriptions)
+                cross_category_descriptions = merged_descriptors.get(
+                    CROSS_CATEGORY_DEVICE_DESCRIPTOR
+                )
+                descriptions = merge_descriptor_category(
+                    category_descriptions, cross_category_descriptions
+                )
                 if restrict_dpcode is not None:
-                    descriptions = restrict_descriptor_category(descriptions, [restrict_dpcode])
+                    descriptions = restrict_descriptor_category(
+                        descriptions, [restrict_dpcode]
+                    )
                 descriptions = cast(tuple[XTSelectEntityDescription, ...], descriptions)
                 entities.extend(
-                    XTSelectEntity.get_entity_instance(description, device, hass_data.manager)
+                    XTSelectEntity.get_entity_instance(
+                        description, device, hass_data.manager
+                    )
                     for description in descriptions
                     if XTEntity.supports_description(device, description, True)
                 )
                 entities.extend(
-                    XTSelectEntity.get_entity_instance(description, device, hass_data.manager)
+                    XTSelectEntity.get_entity_instance(
+                        description, device, hass_data.manager
+                    )
                     for description in descriptions
                     if XTEntity.supports_description(device, description, False)
                 )
@@ -296,13 +307,21 @@ class XTSelectEntity(XTEntity, TuyaSelectEntity):
     ) -> None:
         """Init XT select."""
         super(XTSelectEntity, self).__init__(device, device_manager, description)
-        super(XTEntity, self).__init__(device, device_manager, description) # type: ignore
+        super(XTEntity, self).__init__(device, device_manager, description)  # type: ignore
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description
-    
+
     @staticmethod
-    def get_entity_instance(description: XTSelectEntityDescription, device: XTDevice, device_manager: MultiManager) -> XTSelectEntity:
-        if hasattr(description, "get_entity_instance") and callable(getattr(description, "get_entity_instance")):
+    def get_entity_instance(
+        description: XTSelectEntityDescription,
+        device: XTDevice,
+        device_manager: MultiManager,
+    ) -> XTSelectEntity:
+        if hasattr(description, "get_entity_instance") and callable(
+            getattr(description, "get_entity_instance")
+        ):
             return description.get_entity_instance(device, device_manager, description)
-        return XTSelectEntity(device, device_manager, XTSelectEntityDescription(**description.__dict__))
+        return XTSelectEntity(
+            device, device_manager, XTSelectEntityDescription(**description.__dict__)
+        )

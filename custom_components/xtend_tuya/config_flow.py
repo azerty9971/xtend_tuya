@@ -1,20 +1,17 @@
 """Config flow for Tuya."""
 
 from __future__ import annotations
-
 from collections.abc import Mapping
 from typing import Any
-
 from tuya_sharing import LoginControl
 from tuya_iot import AuthType, TuyaOpenAPI
 import voluptuous as vol
-
 from homeassistant.core import callback
 from homeassistant.config_entries import ConfigEntry, ConfigFlow, OptionsFlow
 from homeassistant.config_entries import ConfigFlowResult
 from homeassistant.helpers import selector
-
 from .const import (
+    TuyaCloudOpenAPIEndpoint,
     CONF_ENDPOINT,
     CONF_TERMINAL_ID,
     CONF_TOKEN_INFO,
@@ -68,7 +65,7 @@ class TuyaOptionFlow(OptionsFlow):
 
         data = {
             CONF_NO_OPENAPI: user_input[CONF_NO_OPENAPI],
-            CONF_ENDPOINT_OT: country.endpoint,
+            CONF_ENDPOINT_OT: user_input[CONF_ENDPOINT_OT],
             CONF_AUTH_TYPE: AuthType.CUSTOM,
             CONF_ACCESS_ID_OT: user_input[CONF_ACCESS_ID_OT],
             CONF_ACCESS_SECRET_OT: user_input[CONF_ACCESS_SECRET_OT],
@@ -144,6 +141,7 @@ class TuyaOptionFlow(OptionsFlow):
             user_input = {}
 
         default_country = "United States"
+        default_endpoint = TuyaCloudOpenAPIEndpoint.AMERICA
         if self.options is not None:
             country_code = self.options.get(CONF_COUNTRY_CODE, "")
             if country_code != "":
@@ -151,43 +149,69 @@ class TuyaOptionFlow(OptionsFlow):
                     if country.country_code == country_code:
                         default_country = country.name
                         break
+            default_endpoint = self.options.get(CONF_ENDPOINT_OT, "")
+            if default_endpoint == "" and country_code != "":
+                for country in TUYA_COUNTRIES:
+                    if country.country_code == country_code:
+                        default_endpoint = country.endpoint
+                        break
 
         return self.async_show_form(
             step_id="init",
             data_schema=vol.Schema(
                 {
                     vol.Optional(
-                        CONF_NO_OPENAPI, 
-                        default=bool(user_input.get(CONF_NO_OPENAPI, self.options.get(CONF_NO_OPENAPI, "")))
+                        CONF_NO_OPENAPI,
+                        default=bool(
+                            user_input.get(
+                                CONF_NO_OPENAPI, self.options.get(CONF_NO_OPENAPI, "")
+                            )
+                        ),
                     ): bool,
                     vol.Optional(
-                        CONF_COUNTRY_CODE, 
-                        default=user_input.get(CONF_COUNTRY_CODE, default_country)
+                        CONF_COUNTRY_CODE,
+                        default=user_input.get(CONF_COUNTRY_CODE, default_country),
                     ): vol.In(
                         # We don't pass a dict {code:name} because country codes can be duplicate.
                         [country.name for country in TUYA_COUNTRIES]
                     ),
                     vol.Optional(
-                        CONF_ACCESS_ID_OT, 
-                        default=user_input.get(CONF_ACCESS_ID_OT, self.options.get(CONF_ACCESS_ID_OT, ""))
+                        CONF_ENDPOINT_OT,
+                        default=user_input.get(CONF_ENDPOINT_OT, default_endpoint),
+                    ): vol.In(
+                        {endpoint.value: endpoint.get_human_name(endpoint.value) for endpoint in TuyaCloudOpenAPIEndpoint}
+                    ),
+                    vol.Optional(
+                        CONF_ACCESS_ID_OT,
+                        default=user_input.get(
+                            CONF_ACCESS_ID_OT, self.options.get(CONF_ACCESS_ID_OT, "")
+                        ),
                     ): str,
                     vol.Optional(
                         CONF_ACCESS_SECRET_OT,
-                        default=user_input.get(CONF_ACCESS_SECRET_OT, self.options.get(CONF_ACCESS_SECRET_OT, "")),
+                        default=user_input.get(
+                            CONF_ACCESS_SECRET_OT,
+                            self.options.get(CONF_ACCESS_SECRET_OT, ""),
+                        ),
                     ): str,
                     vol.Optional(
-                        CONF_USERNAME_OT, 
-                        default=user_input.get(CONF_USERNAME_OT, self.options.get(CONF_USERNAME_OT, ""))
+                        CONF_USERNAME_OT,
+                        default=user_input.get(
+                            CONF_USERNAME_OT, self.options.get(CONF_USERNAME_OT, "")
+                        ),
                     ): str,
                     vol.Optional(
-                        CONF_PASSWORD_OT, 
-                        default=user_input.get(CONF_PASSWORD_OT, self.options.get(CONF_PASSWORD_OT, ""))
+                        CONF_PASSWORD_OT,
+                        default=user_input.get(
+                            CONF_PASSWORD_OT, self.options.get(CONF_PASSWORD_OT, "")
+                        ),
                     ): str,
                 }
             ),
             errors=errors,
             description_placeholders=placeholders,
         )
+
 
 class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
     """Tuya config flow."""
@@ -199,19 +223,19 @@ class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
     def __init__(self) -> None:
         """Initialize the config flow."""
         self.__login_control = LoginControl()
-    
+
     @staticmethod
     @callback
     def async_get_options_flow(config_entry):
         """Get the options flow for this handler."""
         return TuyaOptionFlow(config_entry)
-    
+
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
         """Step user."""
-        tuya_data = self.hass.config_entries.async_entries(DOMAIN_ORIG,False,False)
-        xt_tuya_data = self.hass.config_entries.async_entries(DOMAIN,True,True)
+        tuya_data = self.hass.config_entries.async_entries(DOMAIN_ORIG, False, False)
+        xt_tuya_data = self.hass.config_entries.async_entries(DOMAIN, True, True)
         if tuya_data:
             for config_entry in tuya_data:
                 xt_tuya_config_already_exists = False
@@ -224,7 +248,7 @@ class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
                         title=config_entry.title,
                         data=config_entry.data,
                     )
-        
+
         errors = {}
         placeholders = {}
 
@@ -316,7 +340,7 @@ class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
             },
             CONF_TERMINAL_ID: info[CONF_TERMINAL_ID],
             CONF_ENDPOINT: info[CONF_ENDPOINT],
-            CONF_USERNAME: info.get("username", "")
+            CONF_USERNAME: info.get("username", ""),
         }
 
         if self.__reauth_entry:
@@ -333,9 +357,7 @@ class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
     async def async_step_reauth(self, _: Mapping[str, Any]) -> ConfigFlowResult:
         """Handle initiation of re-authentication with Tuya."""
         if entry_id := self.context.get("entry_id"):
-            self.__reauth_entry = self.hass.config_entries.async_get_entry(
-                entry_id
-            )
+            self.__reauth_entry = self.hass.config_entries.async_get_entry(entry_id)
 
         if self.__reauth_entry and CONF_USER_CODE in self.__reauth_entry.data:
             success, _ = await self.__async_get_qr_code(
