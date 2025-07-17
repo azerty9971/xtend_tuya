@@ -9,9 +9,7 @@ from ....const import (
 from ..xt_tuya_iot_openapi import (
     XTIOTOpenAPI,
 )
-from .xt_tuya_iot_ipc_listener import (
-    XTIOTIPCListener,
-)
+import custom_components.xtend_tuya.multi_manager.tuya_iot.ipc.xt_tuya_iot_ipc_listener as ipc
 from .xt_tuya_iot_ipc_mq import (
     XTIOTOpenMQIPC,
 )
@@ -23,7 +21,7 @@ class XTIOTIPCManager:  # noqa: F811
     def __init__(self, api: XTIOTOpenAPI, multi_manager: MultiManager) -> None:
         self.multi_manager = multi_manager
         self.ipc_mq: XTIOTOpenMQIPC = XTIOTOpenMQIPC(api)
-        self.ipc_listener: XTIOTIPCListener = XTIOTIPCListener(self)
+        self.ipc_listener: ipc.XTIOTIPCListener = ipc.XTIOTIPCListener(self)
         self.ipc_mq.start()
         self.ipc_mq.add_message_listener(self.ipc_listener.handle_message) # type: ignore
         self.api = api
