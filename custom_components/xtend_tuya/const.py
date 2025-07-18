@@ -201,6 +201,7 @@ class XTDPCode(StrEnum):
     ALARM_TIME = "alarm_time"  # Alarm time
     ALARM_VOLUME = "alarm_volume"  # Alarm volume
     ALARM_MESSAGE = "alarm_message"
+    ALARM_MSG = "alarm_msg"
     ANGLE_HORIZONTAL = "angle_horizontal"
     ANGLE_VERTICAL = "angle_vertical"
     ANION = "anion"  # Ionizer unit
@@ -448,6 +449,8 @@ class XTDPCode(StrEnum):
     LED_TYPE_2 = "led_type_2"
     LED_TYPE_3 = "led_type_3"
     LEVEL = "level"
+    LEVEL_1 = "level_1"
+    LEVEL_2 = "level_2"
     LEVEL_CURRENT = "level_current"
     LIGHT = "light"  # Light
     LIGHT_MODE = "light_mode"
@@ -464,6 +467,7 @@ class XTDPCode(StrEnum):
     MANUAL_CLEAN = "manual_clean"
     MANUAL_FEED = "manual_feed"
     MANUAL_LOCK = "manual_lock"
+    MASTER_STATE = "master_state"  # alarm state
     MATERIAL = "material"  # Material
     MAXHUM_SET = "maxhum_set"
     MAXTEMP_SET = "maxtemp_set"
@@ -660,6 +664,15 @@ class XTDPCode(StrEnum):
     SWITCH_LED_1 = "switch_led_1"
     SWITCH_LED_2 = "switch_led_2"
     SWITCH_LED_3 = "switch_led_3"
+    SWITCH_MODE1 = "switch_mode1"
+    SWITCH_MODE2 = "switch_mode2"
+    SWITCH_MODE3 = "switch_mode3"
+    SWITCH_MODE4 = "switch_mode4"
+    SWITCH_MODE5 = "switch_mode5"
+    SWITCH_MODE6 = "switch_mode6"
+    SWITCH_MODE7 = "switch_mode7"
+    SWITCH_MODE8 = "switch_mode8"
+    SWITCH_MODE9 = "switch_mode9"
     SWITCH_NIGHT_LIGHT = "switch_night_light"
     SWITCH_PIR = "switch_pir"
     SWITCH_SAVE_ENERGY = "switch_save_energy"
@@ -694,6 +707,12 @@ class XTDPCode(StrEnum):
     TEMP_CALIBRATION = "temp_calibration"
     TEMP_CONTROLLER = "temp_controller"
     TEMP_CURRENT = "temp_current"  # Current temperature in °C
+    TEMP_CURRENT_EXTERNAL = (
+        "temp_current_external"  # Current external temperature in Celsius
+    )
+    TEMP_CURRENT_EXTERNAL_F = (
+        "temp_current_external_f"  # Current external temperature in Fahrenheit
+    )
     TEMP_CURRENT_F = "temp_current_f"  # Current temperature in °F
     TEMP_INDOOR = "temp_indoor"  # Indoor temperature in °C
     TEMP_SENSITIVITY = "temp_sensitivity"
