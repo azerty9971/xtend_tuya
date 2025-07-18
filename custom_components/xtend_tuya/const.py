@@ -404,7 +404,8 @@ class XTDPCode(StrEnum):
     FEED_REPORT = "feed_report"
     FEED_STATE = "feed_state"
     FILTER = "filter"
-    FILTER_LIFE = "filter"
+    FILTER_DURATION = "filter_life"  # Filter duration (hours)
+    FILTER_LIFE = "filter"  # Filter life (percentage)
     FILTER_RESET = "filter_reset"  # Filter (cartridge) reset
     FLOODLIGHT_LIGHTNESS = "floodlight_lightness"
     FLOODLIGHT_SWITCH = "floodlight_switch"
