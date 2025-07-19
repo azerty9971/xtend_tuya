@@ -4,7 +4,7 @@ from __future__ import annotations
 from typing import Any, cast
 from homeassistant.components.event import (
     EventEntityDescription,
-    EventDeviceClass,
+    EventDeviceClass,  # noqa: F401
 )
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant, callback
@@ -20,7 +20,11 @@ from .multi_manager.multi_manager import (
     MultiManager,
     XTDevice,
 )
-from .const import TUYA_DISCOVERY_NEW, XTDPCode, CROSS_CATEGORY_DEVICE_DESCRIPTOR
+from .const import (
+    TUYA_DISCOVERY_NEW,
+    XTDPCode,  # noqa: F401
+    CROSS_CATEGORY_DEVICE_DESCRIPTOR,
+)
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaEventEntity,
     TuyaDPType,
@@ -51,8 +55,7 @@ class XTEventEntityDescription(EventEntityDescription, frozen_or_thawed=True):
 # default status set of each category (that don't have a set instruction)
 # end up being events.
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
-EVENTS: dict[str, tuple[EventEntityDescription, ...]] = {
-}
+EVENTS: dict[str, tuple[EventEntityDescription, ...]] = {}
 
 
 async def async_setup_entry(
