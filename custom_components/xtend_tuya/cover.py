@@ -56,9 +56,13 @@ class XTCoverEntityDescription(TuyaCoverEntityDescription):
         device: XTDevice,
         device_manager: MultiManager,
         description: XTCoverEntityDescription,
+        hass: HomeAssistant,
     ) -> XTCoverEntity:
         return XTCoverEntity(
-            device=device, device_manager=device_manager, description=description
+            device=device,
+            device_manager=device_manager,
+            description=description,
+            hass=hass,
         )
 
 
@@ -168,14 +172,14 @@ async def async_setup_entry(
                 descriptions = cast(tuple[XTCoverEntityDescription, ...], descriptions)
                 entities.extend(
                     XTCoverEntity.get_entity_instance(
-                        description, device, hass_data.manager
+                        description, device, hass_data.manager, hass
                     )
                     for description in descriptions
                     if XTEntity.supports_description(device, description, True)
                 )
                 entities.extend(
                     XTCoverEntity.get_entity_instance(
-                        description, device, hass_data.manager
+                        description, device, hass_data.manager, hass
                     )
                     for description in descriptions
                     if XTEntity.supports_description(device, description, False)
@@ -201,12 +205,14 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         device: XTDevice,
         device_manager: MultiManager,
         description: XTCoverEntityDescription,
+        hass: HomeAssistant,
     ) -> None:
         """Initialize the cover entity."""
 
         super(XTCoverEntity, self).__init__(device, device_manager, description)
         super(XTEntity, self).__init__(device, device_manager, description)  # type: ignore
         self.device = device
+        self.hass = hass
         device_manager.post_setup_callbacks.append(self.add_cover_open_close_option)
 
     @property
@@ -409,11 +415,17 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         description: XTCoverEntityDescription,
         device: XTDevice,
         device_manager: MultiManager,
+        hass: HomeAssistant,
     ) -> XTCoverEntity:
         if hasattr(description, "get_entity_instance") and callable(
             getattr(description, "get_entity_instance")
         ):
-            return description.get_entity_instance(device, device_manager, description)
+            return description.get_entity_instance(
+                device, device_manager, description, hass
+            )
         return XTCoverEntity(
-            device, device_manager, XTCoverEntityDescription(**description.__dict__)
+            device,
+            device_manager,
+            XTCoverEntityDescription(**description.__dict__),
+            hass,
         )
