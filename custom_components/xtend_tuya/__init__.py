@@ -241,7 +241,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
             if tuya.manager.mq is not None:
                 tuya.manager.mq.stop()
             tuya.manager.remove_device_listeners()
-            tuya.manager.unload()
+            await hass.async_add_executor_job(tuya.manager.unload)
     return unload_ok
 
 

@@ -32,6 +32,10 @@ from homeassistant.components.tuya.cover import (
     TuyaCoverEntity as TuyaCoverEntity,
     TuyaCoverEntityDescription as TuyaCoverEntityDescription,
 )
+from homeassistant.components.tuya.event import (
+    EVENTS as EVENTS_TUYA, # noqa: F401
+    TuyaEventEntity as TuyaEventEntity,
+)
 from homeassistant.components.tuya.fan import (
     TUYA_SUPPORT_TYPE as FANS_TUYA,  # noqa: F401
     TuyaFanEntity as TuyaFanEntity,

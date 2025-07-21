@@ -8,6 +8,7 @@ from ....ha_tuya_integration.tuya_integration_imports import (
     CAMERAS_TUYA,
     CLIMATE_DESCRIPTIONS_TUYA,
     COVERS_TUYA,
+    EVENTS_TUYA,
     FANS_TUYA,
     HUMIDIFIERS_TUYA,
     LIGHTS_TUYA,
@@ -33,6 +34,8 @@ def get_tuya_platform_descriptors(platform: Platform) -> Any:
             return CLIMATE_DESCRIPTIONS_TUYA
         case Platform.COVER:
             return COVERS_TUYA
+        case Platform.EVENT:
+            return EVENTS_TUYA
         case Platform.FAN:
             return FANS_TUYA
         case Platform.HUMIDIFIER:
