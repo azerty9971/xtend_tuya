@@ -675,6 +675,7 @@ class XTDPCode(StrEnum):
     SWITCH_MODE8 = "switch_mode8"
     SWITCH_MODE9 = "switch_mode9"
     SWITCH_NIGHT_LIGHT = "switch_night_light"
+    SWITCH_ON = "switch_on"
     SWITCH_PIR = "switch_pir"
     SWITCH_SAVE_ENERGY = "switch_save_energy"
     SWITCH_SOUND = "switch_sound"  # Voice switch

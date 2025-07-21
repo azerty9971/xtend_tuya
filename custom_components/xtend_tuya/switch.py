@@ -66,33 +66,11 @@ SWITCHES: dict[str, tuple[XTSwitchEntityDescription, ...]] = {
             off_value="no",
             entity_registry_visible_default=False,
         ),
-    ),
-    "cwwsq": (
-        XTSwitchEntityDescription(
-            key=XTDPCode.KEY_REC,
-            translation_key="key_rec",
-            entity_category=EntityCategory.CONFIG,
-        ),
-    ),
-    "dbl": (
         XTSwitchEntityDescription(
             key=XTDPCode.SWITCH,
             translation_key="switch",
             entity_category=EntityCategory.CONFIG,
         ),
-        XTSwitchEntityDescription(
-            key=XTDPCode.CHILD_LOCK,
-            translation_key="child_lock",
-            entity_category=EntityCategory.CONFIG,
-            icon="mdi:human-child",
-        ),
-        XTSwitchEntityDescription(
-            key=XTDPCode.SOUND,
-            translation_key="sound",
-            entity_category=EntityCategory.CONFIG,
-        ),
-    ),
-    "ggq": (
         XTSwitchEntityDescription(
             key=XTDPCode.SWITCH_1,
             translation_key="switch_1",
@@ -130,20 +108,57 @@ SWITCHES: dict[str, tuple[XTSwitchEntityDescription, ...]] = {
             translation_key="weather_switch",
         ),
         XTSwitchEntityDescription(
-            key=XTDPCode.CONTROL_SKIP,
-            translation_key="control_skip",
-        ),
-        XTSwitchEntityDescription(
             key=XTDPCode.SWITCH_ENABLED,
             translation_key="switch_enabled",
         ),
-    ),
-    "gyd": (
         XTSwitchEntityDescription(
             key=XTDPCode.SWITCH_PIR,
             translation_key="switch_pir",
             entity_category=EntityCategory.CONFIG,
         ),
+        XTSwitchEntityDescription(
+            key=XTDPCode.SWITCH_ON,
+            translation_key="switch",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        XTSwitchEntityDescription(
+            key=XTDPCode.CHILD_LOCK,
+            translation_key="child_lock",
+            entity_category=EntityCategory.CONFIG,
+            icon="mdi:human-child",
+        ),
+        XTSwitchEntityDescription(
+            key=XTDPCode.POWERONOFF,
+            translation_key="power",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        XTSwitchEntityDescription(
+            key=XTDPCode.POWERON,
+            translation_key="power",
+            entity_category=EntityCategory.CONFIG,
+        ),
+    ),
+    "cwwsq": (
+        XTSwitchEntityDescription(
+            key=XTDPCode.KEY_REC,
+            translation_key="key_rec",
+            entity_category=EntityCategory.CONFIG,
+        ),
+    ),
+    "dbl": (
+        XTSwitchEntityDescription(
+            key=XTDPCode.SOUND,
+            translation_key="sound",
+            entity_category=EntityCategory.CONFIG,
+        ),
+    ),
+    "ggq": (
+        XTSwitchEntityDescription(
+            key=XTDPCode.CONTROL_SKIP,
+            translation_key="control_skip",
+        ),
+    ),
+    "gyd": (
     ),
     "hps": (
         XTSwitchEntityDescription(
@@ -180,11 +195,6 @@ SWITCHES: dict[str, tuple[XTSwitchEntityDescription, ...]] = {
         ),
     ),
     "MPPT": (
-        XTSwitchEntityDescription(
-            key=XTDPCode.SWITCH,
-            translation_key="switch",
-            entity_category=EntityCategory.CONFIG,
-        ),
     ),
     # Automatic cat litter box
     # Note: Undocumented
@@ -323,11 +333,6 @@ SWITCHES: dict[str, tuple[XTSwitchEntityDescription, ...]] = {
             entity_registry_enabled_default=False,
         ),
         XTSwitchEntityDescription(
-            key=XTDPCode.SWITCH,
-            translation_key="switch",
-            entity_category=EntityCategory.CONFIG,
-        ),
-        XTSwitchEntityDescription(
             key=XTDPCode.TOILET_NOTICE,
             translation_key="toilet_notice",
             entity_category=EntityCategory.CONFIG,
@@ -346,18 +351,8 @@ SWITCHES: dict[str, tuple[XTSwitchEntityDescription, ...]] = {
         ),
     ),
     "mzj": (
-        XTSwitchEntityDescription(
-            key=XTDPCode.POWERONOFF,
-            translation_key="power",
-            entity_category=EntityCategory.CONFIG,
-        ),
     ),
     "qccdz": (
-        XTSwitchEntityDescription(
-            key=XTDPCode.SWITCH,
-            translation_key="switch",
-            entity_category=EntityCategory.CONFIG,
-        ),
         XTSwitchEntityDescription(
             key=XTDPCode.RFID,
             translation_key="rfid",
@@ -370,25 +365,10 @@ SWITCHES: dict[str, tuple[XTSwitchEntityDescription, ...]] = {
         ),
     ),
     "wk": (
-        XTSwitchEntityDescription(
-            key=XTDPCode.SWITCH,
-            translation_key="switch",
-            entity_category=EntityCategory.CONFIG,
-        ),
     ),
     "wnykq": (
-        XTSwitchEntityDescription(
-            key=XTDPCode.POWERON,
-            translation_key="power",
-            entity_category=EntityCategory.CONFIG,
-        ),
     ),
     "xfj": (
-        XTSwitchEntityDescription(
-            key=XTDPCode.SWITCH,
-            translation_key="switch",
-            entity_category=EntityCategory.CONFIG,
-        ),
         XTSwitchEntityDescription(
             key=XTDPCode.UV_LIGHT,
             translation_key="uv_light",
