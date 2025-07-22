@@ -49,8 +49,8 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         non_user_api: XTIOTOpenAPI,
         mq: TuyaOpenMQ,
     ) -> None:
-        self.device_map = XTDeviceMap({}, XTDeviceSourcePriority.TUYA_IOT)  # type: ignore
         super().__init__(api, mq)
+        self.device_map = XTDeviceMap({}, XTDeviceSourcePriority.TUYA_IOT)  # type: ignore
         mq.remove_message_listener(self.on_message)
         mq.add_message_listener(self.forward_message_to_multi_manager)  # type: ignore
         self.multi_manager = multi_manager
