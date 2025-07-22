@@ -211,7 +211,11 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
         if (
             other_device_map := self.sharing_account.device_manager.get_overriden_device_map()
         ):
+            if not isinstance(other_device_map, XTDeviceMap):
+                LOGGER.warning("RT returned a non XTMap")
             return_list.append(other_device_map)
+        if not isinstance(self.sharing_account.device_manager.device_map, XTDeviceMap):
+            LOGGER.warning("SHARING returned a non XTMap")
         return_list.append(self.sharing_account.device_manager.device_map)
         return return_list
 
