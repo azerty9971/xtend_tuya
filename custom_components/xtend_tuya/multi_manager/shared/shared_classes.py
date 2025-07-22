@@ -162,6 +162,7 @@ class XTDevice(TuyaDevice):
     )
     device_preference: dict[str, Any] = {}
     original_device: Any = None
+    device_map: XTDeviceMap | None = None
 
     class XTDevicePreference(StrEnum):
         IS_A_COVER_DEVICE = "IS_A_COVER_DEVICE"
