@@ -144,6 +144,7 @@ class XTLightEntity(XTEntity, TuyaLightEntity):
     ) -> None:
         try:
             super(XTLightEntity, self).__init__(device, device_manager, description)
+            super(XTEntity, self).__init__(device, device_manager, description)  # type: ignore
         except Exception as e:
             if (
                 dpcode := self.find_dpcode(description.color_data, prefer_function=True)
@@ -156,7 +157,6 @@ class XTLightEntity(XTEntity, TuyaLightEntity):
                     LOGGER.warning(
                         f"Failed light: {device.name} => {function_data} <=> {e}"
                     )
-        super(XTEntity, self).__init__(device, device_manager, description)  # type: ignore
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description
