@@ -161,6 +161,7 @@ class XTDevice(TuyaDevice):
         False  # Force the device functions/status_range/state to remain untouched after merging
     )
     device_preference: dict[str, Any] = {}
+    original_device: Any = None
 
     class XTDevicePreference(StrEnum):
         IS_A_COVER_DEVICE = "IS_A_COVER_DEVICE"
@@ -202,7 +203,6 @@ class XTDevice(TuyaDevice):
         self.status_range = {}  # type: ignore
         self.device_preference = {}
         self.device_map: XTDeviceMap | None = None
-        self.original_device: Any = None
         super().__init__(**kwargs)
 
     def __repr__(self) -> str:
