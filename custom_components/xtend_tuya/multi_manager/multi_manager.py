@@ -210,6 +210,7 @@ class MultiManager:  # noqa: F811
     def _enable_multi_map_device_alignment(self):
         for device_map in self.__get_available_device_maps():
             XTDeviceMap.register_device_map(device_map)
+        self._align_multi_map_devices()
     
     def _align_multi_map_devices(self):
         #Refresh all master device variables with themselves to trigger alignment
