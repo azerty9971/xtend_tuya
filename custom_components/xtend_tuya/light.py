@@ -144,8 +144,8 @@ class XTLightEntity(XTEntity, TuyaLightEntity):
     ) -> None:
 
         try:
-            self.fix_color_data(device, description)
             super(XTLightEntity, self).__init__(device, device_manager, description)
+            self.fix_color_data(device, description)
             super(XTEntity, self).__init__(device, device_manager, description)  # type: ignore
         except Exception as e:
             if (
