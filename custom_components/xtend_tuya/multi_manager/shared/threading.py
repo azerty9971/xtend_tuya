@@ -35,7 +35,7 @@ class XTThreadingManager:
         self.max_concurrency: int | None = None
 
     def add_thread(self, callable, immediate_start: bool = False, *args, **kwargs):
-        thread = XTThread(callable=callable, args=args, kwargs=kwargs)
+        thread = XTThread(callable=callable, *args, **kwargs)
         self.thread_queue.append(thread)
         if immediate_start:
             thread.start()
