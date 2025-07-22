@@ -209,19 +209,10 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
         if self.sharing_account is None or self.sharing_account.device_manager is None:
             return return_list
         if (
-            other_manager := self.sharing_account.device_manager.get_overriden_device_manager()
+            other_device_map := self.sharing_account.device_manager.get_overriden_device_map()
         ):
-            return_list.append(
-                XTDeviceMap(
-                    other_manager.device_map, XTDeviceSourcePriority.REGULAR_TUYA
-                )
-            )
-        return_list.append(
-            XTDeviceMap(
-                self.sharing_account.device_manager.device_map,
-                XTDeviceSourcePriority.TUYA_SHARED,
-            )
-        )
+            return_list.append(other_device_map)
+        return_list.append(self.sharing_account.device_manager.device_map)
         return return_list
 
     def refresh_mq(self):

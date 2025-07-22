@@ -19,10 +19,14 @@ from tuya_sharing.home import (
 from ...const import (
     LOGGER,  # noqa: F401
     MESSAGE_SOURCE_TUYA_SHARING,
+    XTDeviceSourcePriority,
 )
 from ..multi_manager import (
     MultiManager,
+)
+from ..shared.shared_classes import (
     XTDevice,
+    XTDeviceMap,
 )
 import custom_components.xtend_tuya.multi_manager.tuya_sharing.xt_tuya_sharing_device_repository as dr
 import custom_components.xtend_tuya.multi_manager.tuya_sharing.xt_tuya_sharing_mq as mq
@@ -40,14 +44,16 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
         self.device_repository: dr.XTSharingDeviceRepository | None = None
         self.scene_repository: SceneRepository | None = None
         self.user_repository: UserRepository | None = None
-        self.device_map: dict[str, XTDevice] = {}  # type: ignore
+        self.device_map: XTDeviceMap = XTDeviceMap({}, XTDeviceSourcePriority.TUYA_SHARED)  # type: ignore
         self.user_homes: list[SmartLifeHome] = []
         self.device_listeners = set()
-        self.other_device_manager = other_device_manager
+        self.__other_device_manager: Manager | None = None
+        self.__overriden_device_map: XTDeviceMap | None = None
+        self.set_overriden_device_manager(other_device_manager)
 
     @property
     def reuse_config(self) -> bool:
-        if self.other_device_manager:
+        if self.__other_device_manager:
             return True
         return False
 
@@ -55,17 +61,17 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
         self.multi_manager.on_message(MESSAGE_SOURCE_TUYA_SHARING, msg)
 
     def on_external_refresh_mq(self):
-        if self.other_device_manager is not None:
-            self.mq = self.other_device_manager.mq
+        if self.__other_device_manager is not None:
+            self.mq = self.__other_device_manager.mq
             if self.mq is not None:
                 self.mq.add_message_listener(self.forward_message_to_multi_manager)
-                self.mq.remove_message_listener(self.other_device_manager.on_message)
+                self.mq.remove_message_listener(self.__other_device_manager.on_message)
 
     def refresh_mq(self):
-        if self.other_device_manager:
-            if self.mq and self.mq != self.other_device_manager.mq:
+        if self.__other_device_manager:
+            if self.mq and self.mq != self.__other_device_manager.mq:
                 self.mq.stop()
-            self.other_device_manager.refresh_mq()
+            self.__other_device_manager.refresh_mq()
             return
         if self.mq is not None:
             self.mq.stop()
@@ -86,10 +92,15 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
     def set_overriden_device_manager(
         self, other_device_manager: Manager | None
     ) -> None:
-        self.other_device_manager = other_device_manager
+        self.__other_device_manager = other_device_manager
+        if self.__other_device_manager:
+            self.__overriden_device_map = XTDeviceMap(self.__other_device_manager.device_map, XTDeviceSourcePriority.REGULAR_TUYA)
 
     def get_overriden_device_manager(self) -> Manager | None:
-        return self.other_device_manager
+        return self.__other_device_manager
+    
+    def get_overriden_device_map(self) -> XTDeviceMap | None:
+        return self.__overriden_device_map
 
     def copy_statuses_to_tuya(self, device: XTDevice) -> bool:
         added_new_statuses: bool = False
