@@ -164,6 +164,13 @@ class XTDevice(TuyaDevice):
     original_device: Any = None
     device_map: XTDeviceMap | None = None
 
+    FIELDS_TO_EXCLUDE_FROM_SYNC: list[str] = [
+        "device_map",
+        "device_source_priority",
+        "original_device",
+        "source",
+    ]
+
     class XTDevicePreference(StrEnum):
         IS_A_COVER_DEVICE = "IS_A_COVER_DEVICE"
         LOCK_MANUAL_UNLOCK_COMMAND = "LOCK_MANUAL_UNLOCK_COMMAND"
@@ -228,10 +235,11 @@ class XTDevice(TuyaDevice):
 
     def __setattr__(self, attr, value):
         super().__setattr__(attr, value)
-        if self.original_device is not None and hasattr(self.original_device, attr) and getattr(self.original_device, attr) != value:
-            setattr(self.original_device, attr, value)
-        if self.device_map is not None:
-            self.device_map.set_device_key_value_multimap(self.id, attr, value)
+        if attr not in XTDevice.FIELDS_TO_EXCLUDE_FROM_SYNC:
+            if self.original_device is not None and hasattr(self.original_device, attr) and getattr(self.original_device, attr) != value:
+                setattr(self.original_device, attr, value)
+            if self.device_map is not None:
+                self.device_map.set_device_key_value_multimap(self.id, attr, value)
 
     @staticmethod
     def from_compatible_device(
