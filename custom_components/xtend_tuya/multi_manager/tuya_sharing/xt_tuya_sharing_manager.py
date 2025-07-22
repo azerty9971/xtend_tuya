@@ -36,6 +36,7 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
     def __init__(
         self, multi_manager: MultiManager, other_device_manager: Manager | None = None
     ) -> None:
+        super().__init__(client_id="", user_code="", terminal_id="", end_point="")
         self.multi_manager = multi_manager
         self.terminal_id: str | None = None
         self.mq = None
