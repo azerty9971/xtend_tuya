@@ -214,7 +214,7 @@ class MultiManager:  # noqa: F811
     
     def _align_multi_map_devices(self):
         #Refresh all master device variables with themselves to trigger alignment
-        for device in self.device_map:
+        for device in self.device_map.values():
             for key, value in vars(device).items():
                 setattr(device, key, value)
 
