@@ -94,7 +94,10 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
     ) -> None:
         self.__other_device_manager = other_device_manager
         if self.__other_device_manager:
-            self.__overriden_device_map = XTDeviceMap(self.__other_device_manager.device_map, XTDeviceSourcePriority.REGULAR_TUYA)
+            new_device_map: XTDeviceMap = XTDeviceMap({}, XTDeviceSourcePriority.REGULAR_TUYA)
+            for device in self.__other_device_manager.device_map.values():
+                new_device_map[device.id] = XTDevice.from_compatible_device(device, "RT", XTDeviceSourcePriority.REGULAR_TUYA, True)
+            self.__overriden_device_map = XTDeviceMap(new_device_map, XTDeviceSourcePriority.REGULAR_TUYA)
 
     def get_overriden_device_manager(self) -> Manager | None:
         return self.__other_device_manager

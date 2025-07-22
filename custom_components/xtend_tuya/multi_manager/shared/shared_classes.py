@@ -202,6 +202,7 @@ class XTDevice(TuyaDevice):
         self.status_range = {}  # type: ignore
         self.device_preference = {}
         self.device_map: XTDeviceMap | None = None
+        self.original_device: Any = None
         super().__init__(**kwargs)
 
     def __repr__(self) -> str:
@@ -226,6 +227,8 @@ class XTDevice(TuyaDevice):
 
     def __setattr__(self, attr, value):
         super().__setattr__(attr, value)
+        if self.original_device is not None and hasattr(self.original_device, attr) and getattr(self.original_device, attr) != value:
+            setattr(self.original_device, attr, value)
         if self.device_map is not None:
             self.device_map.set_device_key_value_multimap(self.id, attr, value)
 
@@ -234,6 +237,7 @@ class XTDevice(TuyaDevice):
         device: Any,
         source: str = "Compatible device",
         device_source_priority: int | None = None,
+        keep_synced_with_original: bool = False
     ):
         # If the device is already an XT device return it right away
         if isinstance(device, XTDevice):
@@ -242,6 +246,8 @@ class XTDevice(TuyaDevice):
         new_device = XTDevice(**device.__dict__)
         new_device.source = source
         new_device.device_source_priority = device_source_priority
+        if keep_synced_with_original:
+            new_device.original_device = device
 
         # Reuse the references from the original device
         if hasattr(device, "local_strategy"):
