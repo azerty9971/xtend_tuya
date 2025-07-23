@@ -372,7 +372,7 @@ class XTDeviceMap(UserDict[str, XTDevice]):
     def set_device_key_value(self, device_id: str, key: str, value: Any):
         if key in XTDevice.FIELDS_TO_EXCLUDE_FROM_SYNC:
             return None
-        LOGGER.warning(f"set_device_key_value: {device_id} <=> {key} <=> {value}")
         if device := self.get(device_id):
             if hasattr(device, key) and getattr(device, key) != value:
+                LOGGER.warning(f"set_device_key_value: {device_id} <=> {key} <=> {value}")
                 setattr(device, key, value)

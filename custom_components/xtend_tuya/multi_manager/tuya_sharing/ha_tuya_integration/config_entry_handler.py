@@ -36,6 +36,7 @@ class XTHATuyaIntegrationConfigEntryManager:
 
     def on_tuya_device_attribute_change(self, before_call: bool, base_object: TuyaCustomerDevice, attr, value):
         if not before_call:
+            LOGGER.warning(f"on_tuya_device_attribute_change: {base_object.id} <=> {attr} <=> {value}")
             XTDeviceMap.set_device_key_value_multimap(base_object.id, attr, value)
 
     async def on_tuya_setup_entry(
