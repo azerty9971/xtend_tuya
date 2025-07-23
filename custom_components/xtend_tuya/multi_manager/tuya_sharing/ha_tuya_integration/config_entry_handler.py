@@ -4,7 +4,7 @@ from ....ha_tuya_integration.tuya_integration_imports import (
     tuya_integration,
 )
 from ....const import (
-    DOMAIN_ORIG,
+    DOMAIN_ORIG,  # noqa: F401
     LOGGER,  # noqa: F401
 )
 from ...multi_manager import (
@@ -14,7 +14,7 @@ from ..xt_tuya_sharing_manager import (
     XTSharingDeviceManager,
 )
 from ..util import (
-    get_config_entry_runtime_data,
+    get_config_entry_runtime_data,  # noqa: F401
 )
 
 
@@ -46,11 +46,12 @@ class XTHATuyaIntegrationConfigEntryManager:
     ):
         if before_call:
             # If before the call, we need to add the regular device listener back
-            runtime_data = get_config_entry_runtime_data(hass, entry, DOMAIN_ORIG)
-            if runtime_data is not None:
-                runtime_data.device_manager.add_device_listener(
-                    runtime_data.device_listener
-                )
+            # runtime_data = get_config_entry_runtime_data(hass, entry, DOMAIN_ORIG)
+            # if runtime_data is not None:
+            #     runtime_data.device_manager.add_device_listener(
+            #         runtime_data.device_listener
+            #     )
+            pass
         else:
             if self.config_entry.title == entry.title:
                 self.manager.set_overriden_device_manager(None)

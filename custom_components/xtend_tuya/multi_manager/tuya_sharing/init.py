@@ -137,7 +137,7 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
             sharing_device_manager.customer_api = (
                 tuya_integration_runtime_data.device_manager.customer_api
             )
-            tuya_integration_runtime_data.device_manager.device_listeners.clear()
+            # tuya_integration_runtime_data.device_manager.device_listeners.clear()
             # self.convert_tuya_devices_to_xt(tuya_integration_runtime_data.device_manager)
         else:
             # We are using XT as a standalone integration
