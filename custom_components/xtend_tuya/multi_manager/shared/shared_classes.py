@@ -22,7 +22,7 @@ from ...const import (
 
 class DeviceWatcher:
     def __init__(self, multi_manager: mm.MultiManager) -> None:
-        self.watched_dev_id: list[str] = []
+        self.watched_dev_id: list[str] = ["bfd2bc6b252907fc0dnlao"]
         self.multi_manager = multi_manager
 
     def is_watched(self, dev_id: str) -> bool:
