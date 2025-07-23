@@ -1,10 +1,5 @@
 from __future__ import annotations
-from collections.abc import Callable
 from threading import Thread
-from typing import Any, Iterable, Mapping
-from ...const import (
-    LOGGER,  # noqa: F401
-)
 
 class XTThread(Thread):
     def __init__(self, callable, immediate_start: bool = False, *args, **kwargs):
