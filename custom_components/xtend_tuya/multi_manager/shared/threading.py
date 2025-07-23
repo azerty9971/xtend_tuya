@@ -9,15 +9,13 @@ from ...const import (
 class XTThread(Thread):
     def __init__(self, callable, immediate_start: bool = False, *args, **kwargs):
         self.callable = callable
-        self.args = args
-        self.kwargs = kwargs
         self.immediate_start = immediate_start
         self.exception: Exception | None = None
         super().__init__(target=self.call_thread, args=args, kwargs=kwargs)
 
-    def call_thread(self):
+    def call_thread(self, *args, **kwargs):
         try:
-            self.callable(*self.args, **self.kwargs)
+            self.callable(*args, **kwargs)
         except Exception as e:
             self.exception = e
     
