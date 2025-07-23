@@ -115,7 +115,7 @@ def decorate_tuya_manager(
     )
     return_list.append(decorator)
     for device in tuya_manager.device_map.values():
-        decorator, tuya_manager.__setattr__ = XTDecorator.get_decorator(
+        decorator, device.__setattr__ = XTDecorator.get_decorator(
             base_object=device,
             callback=ha_tuya_integration_config_manager.on_tuya_device_attribute_change,
             method_name="__setattr__",
