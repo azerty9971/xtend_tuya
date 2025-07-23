@@ -365,10 +365,14 @@ class XTDeviceMap(UserDict[str, XTDevice]):
     
     @staticmethod
     def set_device_key_value_multimap(device_id: str, key: str, value: Any):
+        if key in XTDevice.FIELDS_TO_EXCLUDE_FROM_SYNC:
+            return None
         for device_map in XTDeviceMap.master_device_map:
             device_map.set_device_key_value(device_id, key, value)
 
     def set_device_key_value(self, device_id: str, key: str, value: Any):
+        if key in XTDevice.FIELDS_TO_EXCLUDE_FROM_SYNC:
+            return None
         if device := self.get(device_id):
             if hasattr(device, key) and getattr(device, key) != value:
                 setattr(device, key, value)
