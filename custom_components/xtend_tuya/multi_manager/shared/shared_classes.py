@@ -22,7 +22,7 @@ from ...const import (
 
 class DeviceWatcher:
     def __init__(self, multi_manager: mm.MultiManager) -> None:
-        self.watched_dev_id: list[str] = ["bfd2bc6b252907fc0dnlao"]
+        self.watched_dev_id: list[str] = []
         self.multi_manager = multi_manager
 
     def is_watched(self, dev_id: str) -> bool:
@@ -372,6 +372,7 @@ class XTDeviceMap(UserDict[str, XTDevice]):
     def set_device_key_value(self, device_id: str, key: str, value: Any):
         if key in XTDevice.FIELDS_TO_EXCLUDE_FROM_SYNC:
             return None
+        LOGGER.warning(f"set_device_key_value: {device_id} <=> {key} <=> {value}")
         if device := self.get(device_id):
             if hasattr(device, key) and getattr(device, key) != value:
                 setattr(device, key, value)
