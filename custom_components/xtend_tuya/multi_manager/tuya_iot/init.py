@@ -221,8 +221,6 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
     def get_available_device_maps(self) -> list[XTDeviceMap]:
         if self.iot_account is None:
             return []
-        if not isinstance(self.iot_account.device_manager.device_map, XTDeviceMap):
-            LOGGER.warning("TUYA_IOT returned a non XTMap")
         return [self.iot_account.device_manager.device_map]
 
     def refresh_mq(self):

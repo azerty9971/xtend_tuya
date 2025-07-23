@@ -374,5 +374,4 @@ class XTDeviceMap(UserDict[str, XTDevice]):
             return None
         if device := self.get(device_id):
             if hasattr(device, key) and getattr(device, key) != value:
-                LOGGER.warning(f"set_device_key_value: {device_id} <=> {key} <=> {value}")
                 setattr(device, key, value)
