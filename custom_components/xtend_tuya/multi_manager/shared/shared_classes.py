@@ -165,6 +165,7 @@ class XTDevice(TuyaDevice):
     device_map: XTDeviceMap | None = None
 
     FIELDS_TO_EXCLUDE_FROM_SYNC: list[str] = [
+        "id",
         "device_map",
         "device_source_priority",
         "original_device",
@@ -181,12 +182,11 @@ class XTDevice(TuyaDevice):
         HANDLED_DPCODES = "HANDLED_DPCODES"
 
     def __init__(self, **kwargs: Any) -> None:
+        self.id: str = ""
         self.source = ""
         self.online_states = {}
         self.data_model = {}
         self.force_open_api = False
-
-        self.id: str = ""
         self.name: str = ""
         self.local_key: str = ""
         self.category: str = ""
