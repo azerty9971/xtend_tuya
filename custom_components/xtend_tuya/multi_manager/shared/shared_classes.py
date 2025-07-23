@@ -238,8 +238,7 @@ class XTDevice(TuyaDevice):
         if attr not in XTDevice.FIELDS_TO_EXCLUDE_FROM_SYNC:
             if self.original_device is not None and hasattr(self.original_device, attr) and getattr(self.original_device, attr) != value:
                 setattr(self.original_device, attr, value)
-            if self.device_map is not None:
-                self.device_map.set_device_key_value_multimap(self.id, attr, value)
+            XTDeviceMap.set_device_key_value_multimap(self.id, attr, value)
 
     @staticmethod
     def from_compatible_device(
