@@ -72,7 +72,7 @@ class MultiManager:  # noqa: F811
         self.multi_source_handler = MultiSourceHandler(self)
         self.device_watcher = DeviceWatcher(self)
         self.accounts: dict[str, XTDeviceManagerInterface] = {}
-        self.master_device_map: dict[str, XTDevice] = {}
+        self.master_device_map: XTDeviceMap = XTDeviceMap({})
         self.is_ready_for_messages = False
         self.pending_messages: list[tuple[str, dict]] = []
         self.devices_shared: dict[str, XTDevice] = {}
@@ -145,6 +145,7 @@ class MultiManager:  # noqa: F811
 
     def update_device_cache(self):
         self.is_ready_for_messages = False
+        XTDeviceMap.clear_master_device_map()
         thread_manager: XTThreadingManager = XTThreadingManager()
 
         def update_device_cache_thread(manager: XTDeviceManagerInterface) -> None:
@@ -173,7 +174,7 @@ class MultiManager:  # noqa: F811
             # Applied twice because some parts at the end of apply_fix would change values of previous calls
             CloudFixes.apply_fixes(device)
             CloudFixes.apply_fixes(device)
-        self._enable_regular_tuya_device_replication()
+        self._enable_multi_map_device_alignment()
         self._process_pending_messages()
 
     def _process_pending_messages(self):
@@ -206,11 +207,17 @@ class MultiManager:  # noqa: F811
                     XTMergingManager.merge_devices(prev_device, current_device, self)
                 to_be_merged.append(current_device)
 
-    def _enable_regular_tuya_device_replication(self):
+    def _enable_multi_map_device_alignment(self):
+        for device_map in self.__get_available_device_maps():
+            XTDeviceMap.register_device_map(device_map)
+        XTDeviceMap.register_device_map(self.device_map)
+        self._align_multi_map_devices()
+    
+    def _align_multi_map_devices(self):
+        #Refresh all master device variables with themselves to trigger alignment
         for device in self.device_map.values():
-            devices = self.__get_devices_from_device_id(device.id)
-            for current_device in devices:
-                current_device.enable_regular_tuya_device_replication = True
+            for key, value in vars(device).items():
+                setattr(device, key, value)
 
     def unload(self):
         for manager in self.accounts.values():

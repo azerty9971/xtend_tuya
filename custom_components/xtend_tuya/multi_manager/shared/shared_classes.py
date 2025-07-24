@@ -161,8 +161,16 @@ class XTDevice(TuyaDevice):
         False  # Force the device functions/status_range/state to remain untouched after merging
     )
     device_preference: dict[str, Any] = {}
-    regular_tuya_device: TuyaDevice | None = None
-    enable_regular_tuya_device_replication: bool = False
+    original_device: Any = None
+    device_map: XTDeviceMap | None = None
+
+    FIELDS_TO_EXCLUDE_FROM_SYNC: list[str] = [
+        "id",
+        "device_map",
+        "device_source_priority",
+        "original_device",
+        "source",
+    ]
 
     class XTDevicePreference(StrEnum):
         IS_A_COVER_DEVICE = "IS_A_COVER_DEVICE"
@@ -174,12 +182,11 @@ class XTDevice(TuyaDevice):
         HANDLED_DPCODES = "HANDLED_DPCODES"
 
     def __init__(self, **kwargs: Any) -> None:
+        self.id: str = ""
         self.source = ""
         self.online_states = {}
         self.data_model = {}
         self.force_open_api = False
-
-        self.id: str = ""
         self.name: str = ""
         self.local_key: str = ""
         self.category: str = ""
@@ -203,7 +210,7 @@ class XTDevice(TuyaDevice):
         self.function = {}  # type: ignore
         self.status_range = {}  # type: ignore
         self.device_preference = {}
-        self.enable_regular_tuya_device_replication: bool = False
+        self.device_map: XTDeviceMap | None = None
         super().__init__(**kwargs)
 
     def __repr__(self) -> str:
@@ -222,21 +229,23 @@ class XTDevice(TuyaDevice):
 
         return f"Device {self.name}:\r\n{function_str}{status_range_str}{status_str}{local_strategy_str}"
         # return f"Device {self.name}:\r\n{self.source}"
+    
+    def set_device_map(self, device_map: XTDeviceMap):
+        self.device_map = device_map
 
     def __setattr__(self, attr, value):
-        if (
-            self.enable_regular_tuya_device_replication is True
-            and self.regular_tuya_device is not None
-            and hasattr(self.regular_tuya_device, attr)
-        ):
-            self.regular_tuya_device.__setattr__(attr, value)
         super().__setattr__(attr, value)
+        if attr not in XTDevice.FIELDS_TO_EXCLUDE_FROM_SYNC:
+            if self.original_device is not None and hasattr(self.original_device, attr) and getattr(self.original_device, attr) != value:
+                setattr(self.original_device, attr, value)
+            XTDeviceMap.set_device_key_value_multimap(self.id, attr, value)
 
     @staticmethod
     def from_compatible_device(
         device: Any,
         source: str = "Compatible device",
         device_source_priority: int | None = None,
+        keep_synced_with_original: bool = False
     ):
         # If the device is already an XT device return it right away
         if isinstance(device, XTDevice):
@@ -245,6 +254,8 @@ class XTDevice(TuyaDevice):
         new_device = XTDevice(**device.__dict__)
         new_device.source = source
         new_device.device_source_priority = device_source_priority
+        if keep_synced_with_original:
+            new_device.original_device = device
 
         # Reuse the references from the original device
         if hasattr(device, "local_strategy"):
@@ -327,16 +338,40 @@ class XTDevice(TuyaDevice):
 class XTDeviceMap(UserDict[str, XTDevice]):
 
     device_source_priority: XTDeviceSourcePriority | None = None
-    _original_ref: Any | None = None
+    master_device_map: list[XTDeviceMap] = []
 
     def __init__(
         self, iterable, device_source_priority: XTDeviceSourcePriority | None = None
     ):
         super().__init__(**iterable)
-        self._original_ref = iterable
         self.device_source_priority = device_source_priority
+        for device in self.values():
+            device.set_device_map(self)
 
-    def __setitem__(self, key, item):
-        super().__setitem__(key, item)
-        if self._original_ref is not None:
-            self._original_ref[key] = item
+    @staticmethod
+    def clear_master_device_map():
+        XTDeviceMap.master_device_map = []
+
+    @staticmethod
+    def register_device_map(device_map: XTDeviceMap):
+        if device_map not in XTDeviceMap.master_device_map:
+            XTDeviceMap.master_device_map.append(device_map)
+    
+    @staticmethod
+    def unregister_device_map(device_map: XTDeviceMap):
+        if device_map in XTDeviceMap.master_device_map:
+            XTDeviceMap.master_device_map.remove(device_map)
+    
+    @staticmethod
+    def set_device_key_value_multimap(device_id: str, key: str, value: Any):
+        if key in XTDevice.FIELDS_TO_EXCLUDE_FROM_SYNC:
+            return None
+        for device_map in XTDeviceMap.master_device_map:
+            device_map.set_device_key_value(device_id, key, value)
+
+    def set_device_key_value(self, device_id: str, key: str, value: Any):
+        if key in XTDevice.FIELDS_TO_EXCLUDE_FROM_SYNC:
+            return None
+        if device := self.get(device_id):
+            if hasattr(device, key) and getattr(device, key) != value:
+                setattr(device, key, value)

@@ -182,10 +182,6 @@ class XTMergingManager:
         device1.data_model = XTMergingManager.smart_merge(
             device1.data_model, device2.data_model, msg_queue, "device.data_model"
         )
-        if device1.regular_tuya_device is not None:
-            device2.regular_tuya_device = device1.regular_tuya_device
-        elif device2.regular_tuya_device is not None:
-            device1.regular_tuya_device = device2.regular_tuya_device
 
     @staticmethod
     def _fix_incorrect_valuedescr(device1: shared.XTDevice, device2: shared.XTDevice):
