@@ -1,7 +1,7 @@
 """Support for the XT lights."""
 
 from __future__ import annotations
-from typing import cast
+from typing import cast, Any
 import json
 from dataclasses import dataclass
 from homeassistant.const import Platform
@@ -142,8 +142,11 @@ class XTLightEntity(XTEntity, TuyaLightEntity):
         device_manager: MultiManager,
         description: XTLightEntityDescription,
     ) -> None:
+
         try:
             super(XTLightEntity, self).__init__(device, device_manager, description)
+            self.fix_color_data(device, description)
+            super(XTEntity, self).__init__(device, device_manager, description)  # type: ignore
         except Exception as e:
             if (
                 dpcode := self.find_dpcode(description.color_data, prefer_function=True)
@@ -152,15 +155,31 @@ class XTLightEntity(XTEntity, TuyaLightEntity):
                     values = self.device.function[dpcode].values
                 else:
                     values = self.device.status_range[dpcode].values
+                values_status = self.device.status.get(dpcode, "{}")
+                values_status_json = json.loads(values_status)
                 if function_data := json.loads(values):
                     LOGGER.warning(
-                        f"Failed light: {device.name} => {function_data} <=> {e}"
+                        f"Failed light: {device.name} => {function_data} <=> {values_status_json} <=> {e}"
                     )
-        super(XTEntity, self).__init__(device, device_manager, description)  # type: ignore
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description
 
+    def fix_color_data(self, device: XTDevice, description: XTLightEntityDescription):
+        if (
+            dpcode := self.find_dpcode(description.color_data, prefer_function=True)
+        ) and self.get_dptype(dpcode) == TuyaDPType.JSON:
+            values = "{}"
+            if dpcode in self.device.function:
+                values = self.device.function[dpcode].values
+            else:
+                values = self.device.status_range[dpcode].values
+            if function_data := cast(dict[str, Any], json.loads(values)):
+                if function_data.get("h") is None or function_data.get("s") is None or function_data.get("v") is None:
+                    if dpcode in self.device.function:
+                        self.device.function[dpcode].values = "{}"
+                    if dpcode in self.device.status_range:
+                        self.device.status_range[dpcode].values = "{}"
     @staticmethod
     def get_entity_instance(
         description: XTLightEntityDescription,

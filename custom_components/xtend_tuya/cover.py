@@ -212,7 +212,7 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         super(XTCoverEntity, self).__init__(device, device_manager, description)
         super(XTEntity, self).__init__(device, device_manager, description)  # type: ignore
         self.device = device
-        self.hass = hass
+        self.local_hass = hass
         device_manager.post_setup_callbacks.append(self.add_cover_open_close_option)
 
     @property
@@ -268,13 +268,13 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
                 send_update = True
             if send_update:
                 dispatcher_send(
-                    self.hass,
+                    self.local_hass,
                     TUYA_DISCOVERY_NEW,
                     [self.device.id],
                     XTDPCode.XT_COVER_INVERT_CONTROL,
                 )
                 dispatcher_send(
-                    self.hass,
+                    self.local_hass,
                     TUYA_DISCOVERY_NEW,
                     [self.device.id],
                     XTDPCode.XT_COVER_INVERT_STATUS,

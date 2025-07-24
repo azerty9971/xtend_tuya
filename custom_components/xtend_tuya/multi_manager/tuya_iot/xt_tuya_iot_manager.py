@@ -20,6 +20,7 @@ from ..shared.shared_classes import (
     XTDevice,
     XTDeviceFunction,
     XTDeviceStatusRange,
+    XTDeviceMap,
 )
 from ..shared.threading import (
     XTThreadingManager,
@@ -39,7 +40,7 @@ from .xt_tuya_iot_openapi import (
 
 class XTIOTDeviceManager(TuyaDeviceManager):
 
-    device_map: dict[str, XTDevice] = {}
+    device_map: XTDeviceMap = XTDeviceMap({}, XTDeviceSourcePriority.TUYA_IOT)
 
     def __init__(
         self,
@@ -48,8 +49,8 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         non_user_api: XTIOTOpenAPI,
         mq: TuyaOpenMQ,
     ) -> None:
-        self.device_map = {}  # type: ignore
         super().__init__(api, mq)
+        self.device_map = XTDeviceMap({}, XTDeviceSourcePriority.TUYA_IOT)  # type: ignore
         mq.remove_message_listener(self.on_message)
         mq.add_message_listener(self.forward_message_to_multi_manager)  # type: ignore
         self.multi_manager = multi_manager

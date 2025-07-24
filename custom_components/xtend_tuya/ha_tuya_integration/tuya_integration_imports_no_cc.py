@@ -93,6 +93,7 @@ import homeassistant.components.tuya as tuya_integration  # noqa: F401
 # )
 from tuya_sharing.manager import (
     Manager as TuyaManager,  # noqa: F401
+    CustomerDevice as TuyaCustomerDevice,  # noqa: F401
 )
 from homeassistant.components.tuya.const import (
     DPCode as TuyaDPCode,  # noqa: F401
