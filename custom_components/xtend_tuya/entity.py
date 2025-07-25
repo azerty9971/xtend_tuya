@@ -11,7 +11,7 @@ from .const import (
 from .multi_manager.shared.shared_classes import (
     XTDevice,
 )
-from .multi_manager.multi_manager import MultiManager
+import custom_components.xtend_tuya.multi_manager.multi_manager as mm
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaEnumTypeData,
     TuyaIntegerTypeData,
@@ -33,7 +33,7 @@ class XTEntityDescriptorManager:
 
     @staticmethod
     def get_platform_descriptos(
-        platform_descriptors: Any, multi_manager: MultiManager, platform: Platform
+        platform_descriptors: Any, multi_manager: mm.MultiManager, platform: Platform
     ) -> tuple[Any, Any]:
         include_descriptors = platform_descriptors
         exclude_descriptors = XTEntityDescriptorManager.get_empty_descriptor(
