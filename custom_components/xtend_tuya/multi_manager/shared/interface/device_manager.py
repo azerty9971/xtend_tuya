@@ -100,6 +100,9 @@ class XTDeviceManagerInterface(ABC):
     def get_platform_descriptors_to_merge(self, platform: Platform) -> Any:
         pass
 
+    def get_platform_descriptors_to_exclude(self, platform: Platform) -> Any:
+        pass
+
     def send_commands(self, device_id: str, commands: list[dict[str, Any]]) -> bool:
         return False
 

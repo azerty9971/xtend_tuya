@@ -142,6 +142,13 @@ class MultiManager:  # noqa: F811
             if new_descriptors := entity_parser.get_descriptors_to_merge(platform):
                 return_list.append(new_descriptors)
         return return_list
+    
+    def get_platform_descriptors_to_exclude(self, platform: Platform) -> list:
+        return_list: list = []
+        for account in self.accounts.values():
+            if new_descriptors := account.get_platform_descriptors_to_exclude(platform):
+                return_list.append(new_descriptors)
+        return return_list
 
     def update_device_cache(self):
         self.is_ready_for_messages = False
