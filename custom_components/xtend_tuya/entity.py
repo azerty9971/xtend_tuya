@@ -473,7 +473,7 @@ class XTEntity(TuyaEntity):
             if description.dpcode is not None:
                 dpcode = description.dpcode
         if first_pass is True:
-            if dpcode in device.status:
+            if dpcode in device.status and dpcode not in externally_managed_dpcodes:
                 return True, dpcode
             return False, dpcode
         else:
