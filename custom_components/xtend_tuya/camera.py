@@ -18,7 +18,6 @@ from homeassistant.components.camera.webrtc import (
     WebRTCSendMessage,
     WebRTCClientConfiguration,
 )
-from .util import append_lists
 from .multi_manager.multi_manager import (
     XTConfigEntry,
     MultiManager,
@@ -36,6 +35,7 @@ from .ha_tuya_integration.tuya_integration_imports import (
 )
 from .entity import (
     XTEntity,
+    XTEntityDescriptorManager,
 )
 
 
@@ -62,16 +62,12 @@ async def async_setup_entry(
     if entry.runtime_data.multi_manager is None or hass_data.manager is None:
         return
 
-    merged_categories = CAMERAS
-    for (
-        new_descriptor
-    ) in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(
-        Platform.CAMERA
-    ):
-        merged_categories = cast(
-            tuple[str, ...],
-            tuple(append_lists(list(merged_categories), new_descriptor)),
-        )
+    supported_descriptors, externally_managed_descriptors = cast(
+        tuple[tuple[str, ...], tuple[str, ...]],
+        XTEntityDescriptorManager.get_platform_descriptors(
+            CAMERAS, entry.runtime_data.multi_manager, Platform.CAMERA
+        ),
+    )
 
     entities: list[XTCameraEntity] = []
     extra_entities: list[XTCameraEntity] = []
@@ -87,7 +83,7 @@ async def async_setup_entry(
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
                 if XTCameraEntity.should_entity_be_added(
-                    hass, device, hass_data.manager, merged_categories
+                    hass, device, hass_data.manager, supported_descriptors
                 ):
                     entities.append(XTCameraEntity(device, hass_data.manager, hass))
 

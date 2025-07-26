@@ -32,10 +32,19 @@ from homeassistant.components.tuya.cover import (
     TuyaCoverEntity as TuyaCoverEntity,
     TuyaCoverEntityDescription as TuyaCoverEntityDescription,
 )
-from homeassistant.components.tuya.event import (
-    EVENTS as EVENTS_TUYA, # noqa: F401
-    TuyaEventEntity as TuyaEventEntity,
+from homeassistant.components.event import (
+    EventEntityDescription,
 )
+try:
+    from homeassistant.components.tuya.event import (
+        EVENTS as EVENTS_TUYA, # noqa: F401
+        TuyaEventEntity as TuyaEventEntity,
+    )
+except Exception:
+    EVENTS: dict[str, tuple[EventEntityDescription, ...]] = {}
+    from homeassistant.components.event import (
+        EventEntity as TuyaEventEntity,  # noqa: F401
+    )
 from homeassistant.components.tuya.fan import (
     TUYA_SUPPORT_TYPE as FANS_TUYA,  # noqa: F401
     TuyaFanEntity as TuyaFanEntity,
