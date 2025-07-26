@@ -99,7 +99,7 @@ class XTEntityDescriptorManager:
             or descr1_type == XTEntityDescriptorManager.XTEntityDescriptorType.UNKNOWN
         ):
             LOGGER.warning(
-                f"Merging of descriptors failed, non-matching include/exclude {descr1_type} VS {descr2_type}"
+                f"Merging of descriptors failed, non-matching include/exclude {descr1_type} VS {descr2_type}", stack_info=True
             )
             return descriptors1
         match descr1_type:
@@ -169,7 +169,7 @@ class XTEntityDescriptorManager:
             or base_type == XTEntityDescriptorManager.XTEntityDescriptorType.UNKNOWN
         ):
             LOGGER.warning(
-                f"Merging of descriptors failed, non-matching include/exclude {base_type} VS {exclude_type}"
+                f"Merging of descriptors failed, non-matching include/exclude {base_type} VS {exclude_type}", stack_info=True
             )
             return base_descriptors
         match base_type:
