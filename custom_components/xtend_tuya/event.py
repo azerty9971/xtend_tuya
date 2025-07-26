@@ -22,6 +22,7 @@ from .const import (
     TUYA_DISCOVERY_NEW,
     XTDPCode,  # noqa: F401
     CROSS_CATEGORY_DEVICE_DESCRIPTOR,  # noqa: F401
+    LOGGER,
 )
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaEventEntity,
@@ -139,8 +140,11 @@ class XTEventEntity(XTEntity, TuyaEventEntity):
         description: EventEntityDescription,
     ) -> None:
         """Init Tuya event entity."""
-        super(XTEventEntity, self).__init__(device, device_manager, description)
-        super(XTEntity, self).__init__(device, device_manager, description)  # type: ignore
+        try:
+            super(XTEventEntity, self).__init__(device, device_manager, description)
+            super(XTEntity, self).__init__(device, device_manager, description)  # type: ignore
+        except Exception as e:
+            LOGGER.warning(f"Events failed to initialize, is your HA up to date? ({e})")
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description  # type: ignore
