@@ -87,9 +87,6 @@ async def async_setup_entry(
                 ):
                     entities.append(XTCameraEntity(device, hass_data.manager, hass))
 
-    hass_data.manager.register_device_descriptors(
-        Platform.CAMERA, supported_descriptors
-    )
     async_discover_device([*hass_data.manager.device_map])
     for entity in entities:
         await entity.get_webrtc_config()
