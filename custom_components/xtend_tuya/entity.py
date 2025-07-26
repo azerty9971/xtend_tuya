@@ -27,6 +27,7 @@ class XTEntityDescriptorManager:
         DICT = "dict"
         LIST = "list"
         TUPLE = "tuple"
+        SET = "set"
         ENTITY = "entity"
         STRING = "string"
         UNKNOWN = "unknown"
@@ -63,9 +64,12 @@ class XTEntityDescriptorManager:
         if (
             ref_type is XTEntityDescriptorManager.XTEntityDescriptorType.LIST
             or ref_type is XTEntityDescriptorManager.XTEntityDescriptorType.TUPLE
+            or ref_type is XTEntityDescriptorManager.XTEntityDescriptorType.SET
         ):
             if category_content:
-                content_type = XTEntityDescriptorManager._get_param_type(category_content[0])
+                content_type = XTEntityDescriptorManager._get_param_type(
+                    category_content[0]
+                )
                 for descriptor in category_content:
                     match content_type:
                         case XTEntityDescriptorManager.XTEntityDescriptorType.ENTITY:
@@ -87,6 +91,8 @@ class XTEntityDescriptorManager:
                 return tuple()
             case XTEntityDescriptorManager.XTEntityDescriptorType.STRING:
                 return ""
+            case XTEntityDescriptorManager.XTEntityDescriptorType.SET:
+                return set()
             case _:
                 return None
 
@@ -99,7 +105,8 @@ class XTEntityDescriptorManager:
             or descr1_type == XTEntityDescriptorManager.XTEntityDescriptorType.UNKNOWN
         ):
             LOGGER.warning(
-                f"Merging of descriptors failed, non-matching include/exclude {descr1_type} VS {descr2_type}", stack_info=True
+                f"Merging of descriptors failed, non-matching include/exclude {descr1_type} VS {descr2_type}",
+                stack_info=True,
             )
             return descriptors1
         match descr1_type:
@@ -142,7 +149,9 @@ class XTEntityDescriptorManager:
                     var_type = XTEntityDescriptorManager._get_param_type(
                         descriptors1[0]
                     )
-                descr2_keys: list[str] = XTEntityDescriptorManager.get_category_keys(descriptors2)
+                descr2_keys: list[str] = XTEntityDescriptorManager.get_category_keys(
+                    descriptors2
+                )
                 for descriptor in descriptors1:
                     match var_type:
                         case XTEntityDescriptorManager.XTEntityDescriptorType.ENTITY:
@@ -159,6 +168,12 @@ class XTEntityDescriptorManager:
                         list(descriptors1), list(descriptors2)
                     )
                 )
+            case XTEntityDescriptorManager.XTEntityDescriptorType.SET:
+                return set(
+                    XTEntityDescriptorManager.merge_descriptors(
+                        list(descriptors1), list(descriptors2)
+                    )
+                )
 
     @staticmethod
     def exclude_descriptors(base_descriptors: Any, exclude_descriptors: Any) -> Any:
@@ -169,7 +184,8 @@ class XTEntityDescriptorManager:
             or base_type == XTEntityDescriptorManager.XTEntityDescriptorType.UNKNOWN
         ):
             LOGGER.warning(
-                f"Merging of descriptors failed, non-matching include/exclude {base_type} VS {exclude_type}", stack_info=True
+                f"Merging of descriptors failed, non-matching include/exclude {base_type} VS {exclude_type}",
+                stack_info=True,
             )
             return base_descriptors
         match base_type:
@@ -477,7 +493,7 @@ class XTEntity(TuyaEntity):
                 return True, dpcode
             return False, dpcode
         else:
-            #if device.force_compatibility is True:
+            # if device.force_compatibility is True:
             #    return False, dpcode
 
             all_aliases = device.get_all_status_code_aliases()
@@ -488,7 +504,10 @@ class XTEntity(TuyaEntity):
                         XTDevice.XTDevicePreference.HANDLED_DPCODES, []
                     ),
                 )
-                if current_status not in handled_dpcodes and current_status not in externally_managed_dpcodes:
+                if (
+                    current_status not in handled_dpcodes
+                    and current_status not in externally_managed_dpcodes
+                ):
                     device.replace_status_with_another(current_status, dpcode)
                     return True, dpcode
         return False, dpcode
