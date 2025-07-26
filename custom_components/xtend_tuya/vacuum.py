@@ -1,6 +1,7 @@
 """Support for Tuya Vacuums."""
 
 from __future__ import annotations
+from typing import cast
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
@@ -12,14 +13,15 @@ from .multi_manager.multi_manager import (
     XTDevice,
 )
 from .const import TUYA_DISCOVERY_NEW
-from .util import append_lists
 from .entity import (
     XTEntity,
+    XTEntityDescriptorManager,
 )
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaVacuumEntity,
 )
 
+VACUUMS: list[str] = []
 
 async def async_setup_entry(
     hass: HomeAssistant, entry: XTConfigEntry, async_add_entities: AddEntitiesCallback
@@ -30,13 +32,15 @@ async def async_setup_entry(
     if entry.runtime_data.multi_manager is None or hass_data.manager is None:
         return
 
-    category_list: list[str] = []
-    for (
-        new_descriptor
-    ) in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(
-        Platform.VACUUM
-    ):
-        category_list = append_lists(category_list, new_descriptor)
+    supported_descriptors, externally_managed_descriptors = cast(
+        tuple[
+            list[str],
+            list[str],
+        ],
+        XTEntityDescriptorManager.get_platform_descriptors(
+            VACUUMS, entry.runtime_data.multi_manager, Platform.VACUUM
+        ),
+    )
 
     @callback
     def async_discover_device(device_map, restrict_dpcode: str | None = None) -> None:
@@ -49,7 +53,7 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if device.category in category_list:
+                if device.category in supported_descriptors:
                     entities.append(XTVacuumEntity(device, hass_data.manager))
         async_add_entities(entities)
 

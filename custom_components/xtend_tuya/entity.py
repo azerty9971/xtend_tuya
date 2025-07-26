@@ -32,7 +32,7 @@ class XTEntityDescriptorManager:
         UNKNOWN = "unknown"
 
     @staticmethod
-    def get_platform_descriptos(
+    def get_platform_descriptors(
         platform_descriptors: Any, multi_manager: mm.MultiManager, platform: Platform
     ) -> tuple[Any, Any]:
         include_descriptors = platform_descriptors

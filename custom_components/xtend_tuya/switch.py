@@ -7,8 +7,6 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from .util import (
-    merge_device_descriptors,
-    merge_descriptor_category,
     restrict_descriptor_category,
 )
 from .multi_manager.multi_manager import (
@@ -393,8 +391,11 @@ async def async_setup_entry(
         return
 
     supported_descriptors, externally_managed_descriptors = cast(
-        tuple[dict[str, tuple[XTSwitchEntityDescription, ...]], dict[str, tuple[XTSwitchEntityDescription, ...]]],
-        XTEntityDescriptorManager.get_platform_descriptos(
+        tuple[
+            dict[str, tuple[XTSwitchEntityDescription, ...]],
+            dict[str, tuple[XTSwitchEntityDescription, ...]],
+        ],
+        XTEntityDescriptorManager.get_platform_descriptors(
             SWITCHES, entry.runtime_data.multi_manager, Platform.SWITCH
         ),
     )
@@ -409,7 +410,11 @@ async def async_setup_entry(
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
                 if category_descriptions := supported_descriptors.get(device.category):
-                    externally_managed_dpcodes = XTEntityDescriptorManager.get_category_keys(externally_managed_descriptors.get(device.category))
+                    externally_managed_dpcodes = (
+                        XTEntityDescriptorManager.get_category_keys(
+                            externally_managed_descriptors.get(device.category)
+                        )
+                    )
                     if restrict_dpcode is not None:
                         category_descriptions = cast(
                             tuple[XTSwitchEntityDescription, ...],
@@ -422,19 +427,25 @@ async def async_setup_entry(
                             description, device, hass_data.manager
                         )
                         for description in category_descriptions
-                        if XTEntity.supports_description(device, description, True, externally_managed_dpcodes)
+                        if XTEntity.supports_description(
+                            device, description, True, externally_managed_dpcodes
+                        )
                     )
                     entities.extend(
                         XTSwitchEntity.get_entity_instance(
                             description, device, hass_data.manager
                         )
                         for description in category_descriptions
-                        if XTEntity.supports_description(device, description, False, externally_managed_dpcodes)
+                        if XTEntity.supports_description(
+                            device, description, False, externally_managed_dpcodes
+                        )
                     )
 
         async_add_entities(entities)
 
-    hass_data.manager.register_device_descriptors("switches", supported_descriptors)
+    hass_data.manager.register_device_descriptors(
+        Platform.SWITCH, supported_descriptors
+    )
     async_discover_device([*hass_data.manager.device_map])
 
     entry.async_on_unload(
