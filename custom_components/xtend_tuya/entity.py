@@ -232,6 +232,12 @@ class XTEntityDescriptorManager:
                         list(base_descriptors), list(exclude_descriptors)
                     )
                 )
+            case XTEntityDescriptorManager.XTEntityDescriptorType.SET:
+                return set(
+                    XTEntityDescriptorManager.exclude_descriptors(
+                        list(base_descriptors), list(exclude_descriptors)
+                    )
+                )
 
     @staticmethod
     def _get_param_type(param) -> XTEntityDescriptorManager.XTEntityDescriptorType:
@@ -241,6 +247,8 @@ class XTEntityDescriptorManager:
             return XTEntityDescriptorManager.XTEntityDescriptorType.LIST
         elif isinstance(param, tuple):
             return XTEntityDescriptorManager.XTEntityDescriptorType.TUPLE
+        elif isinstance(param, set):
+            return XTEntityDescriptorManager.XTEntityDescriptorType.SET
         elif isinstance(param, EntityDescription):
             return XTEntityDescriptorManager.XTEntityDescriptorType.ENTITY
         elif isinstance(param, str):
