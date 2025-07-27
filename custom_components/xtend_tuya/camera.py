@@ -50,6 +50,7 @@ CAMERAS: tuple[str, ...] = (
     "jtmspro",
     "videolock",
     "sp",
+    "nvr",
 )
 
 
