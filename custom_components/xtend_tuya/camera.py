@@ -167,6 +167,8 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
     async def get_webrtc_config(self) -> None:
         if self.iot_manager is None:
             return None
+        self.device_manager.device_watcher.report_message(
+            self.device.id,"Getting WebRTC Config 1", self.device)
         return_tuple = await self.iot_manager.async_get_webrtc_ice_servers(
             self.device, "GO2RTC", self.hass
         )

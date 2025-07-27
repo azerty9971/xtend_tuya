@@ -185,6 +185,8 @@ class XTIOTWebRTCManager:
         webrtc_config = self.ipc_manager.api.get(
             f"/v1.0/devices/{device_id}/webrtc-configs"
         )
+        self.ipc_manager.multi_manager.device_watcher.report_message(
+            device_id, f"webrtc_config {webrtc_config}")
         if webrtc_config.get("success"):
             result = webrtc_config.get("result", {})
             if session_id is not None:
