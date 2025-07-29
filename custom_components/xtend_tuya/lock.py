@@ -205,14 +205,13 @@ class XTLockEntity(XTEntity, LockEntity):  # type: ignore
             for dpcode in LOCK_MANUAL_COMMAND_DPCODES:
                 if dpcode in device.status:
                     manual_unlock_command_list.append(dpcode)
-            if unlock_status_list or manual_unlock_command_list:
-                return XTLockEntityDescription(
-                    key="",
-                    translation_key="operate_lock",
-                    unlock_status_list=unlock_status_list,
-                    manual_unlock_command=manual_unlock_command_list,
-                    temporary_unlock=temporary_unlock,
-                )
+            return XTLockEntityDescription(
+                key="",
+                translation_key="operate_lock",
+                unlock_status_list=unlock_status_list,
+                manual_unlock_command=manual_unlock_command_list,
+                temporary_unlock=temporary_unlock,
+            )
         return None
 
     @property
