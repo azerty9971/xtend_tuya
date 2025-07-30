@@ -29,6 +29,7 @@ from .const import (
     LOGGER,  # noqa: F401
     XTDPCode,
     MESSAGE_SOURCE_TUYA_IOT,
+    XTMultiManagerProperties,
 )
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaCameraEntity,
@@ -138,6 +139,9 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
             self.iot_manager = iot_manager
         if self.iot_manager is None:
             self.disable_webrtc()
+        device_manager.set_general_property(
+            XTMultiManagerProperties.CAMERA_DEVICE_ID, device.id
+        )
 
     @staticmethod
     def should_entity_be_added(

@@ -133,6 +133,7 @@ class XTDeviceEntityFunctions(StrEnum):
 
 class XTMultiManagerProperties(StrEnum):
     LOCK_DEVICE_ID = "lock_device_id"
+    CAMERA_DEVICE_ID = "camera_device_id"
 
 
 # Defines the priority of the sources for the merging process
