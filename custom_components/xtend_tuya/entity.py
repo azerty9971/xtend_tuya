@@ -1,13 +1,17 @@
 from __future__ import annotations
-from typing import overload, Literal, cast
+from typing import overload, Literal, cast, Any
+from enum import StrEnum
 from homeassistant.helpers.entity import EntityDescription
+from homeassistant.const import Platform
 from .const import (
     XTDPCode,
     LOGGER,  # noqa: F401
+    CROSS_CATEGORY_DEVICE_DESCRIPTOR,
 )
 from .multi_manager.shared.shared_classes import (
     XTDevice,
 )
+import custom_components.xtend_tuya.multi_manager.multi_manager as mm
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaEnumTypeData,
     TuyaIntegerTypeData,
@@ -16,6 +20,241 @@ from .ha_tuya_integration.tuya_integration_imports import (
     TuyaDPCode,
     TuyaDPType,
 )
+
+
+class XTEntityDescriptorManager:
+    class XTEntityDescriptorType(StrEnum):
+        DICT = "dict"
+        LIST = "list"
+        TUPLE = "tuple"
+        SET = "set"
+        ENTITY = "entity"
+        STRING = "string"
+        UNKNOWN = "unknown"
+
+    @staticmethod
+    def get_platform_descriptors(
+        platform_descriptors: Any, multi_manager: mm.MultiManager, platform: Platform
+    ) -> tuple[Any, Any]:
+        include_descriptors = platform_descriptors
+        exclude_descriptors = XTEntityDescriptorManager.get_empty_descriptor(
+            platform_descriptors
+        )
+        for descriptors_to_add in multi_manager.get_platform_descriptors_to_merge(
+            platform
+        ):
+            include_descriptors = XTEntityDescriptorManager.merge_descriptors(
+                include_descriptors, descriptors_to_add
+            )
+        for descriptors_to_exclude in multi_manager.get_platform_descriptors_to_exclude(
+            platform
+        ):
+            exclude_descriptors = XTEntityDescriptorManager.merge_descriptors(
+                exclude_descriptors, descriptors_to_exclude
+            )
+        include_descriptors = XTEntityDescriptorManager.exclude_descriptors(
+            include_descriptors, exclude_descriptors
+        )
+        return include_descriptors, exclude_descriptors
+
+    @staticmethod
+    def get_category_keys(category_content: Any) -> list[str]:
+        return_list: list[str] = []
+        ref_type = XTEntityDescriptorManager._get_param_type(category_content)
+        if (
+            ref_type is XTEntityDescriptorManager.XTEntityDescriptorType.LIST
+            or ref_type is XTEntityDescriptorManager.XTEntityDescriptorType.TUPLE
+            or ref_type is XTEntityDescriptorManager.XTEntityDescriptorType.SET
+        ):
+            if category_content:
+                content_type = XTEntityDescriptorManager._get_param_type(
+                    category_content[0]
+                )
+                for descriptor in category_content:
+                    match content_type:
+                        case XTEntityDescriptorManager.XTEntityDescriptorType.ENTITY:
+                            entity = cast(EntityDescription, descriptor)
+                            return_list.append(entity.key)
+                        case XTEntityDescriptorManager.XTEntityDescriptorType.STRING:
+                            return_list.append(descriptor)
+        return return_list
+
+    @staticmethod
+    def get_empty_descriptor(reference_descriptor: Any) -> Any:
+        ref_type = XTEntityDescriptorManager._get_param_type(reference_descriptor)
+        match ref_type:
+            case XTEntityDescriptorManager.XTEntityDescriptorType.DICT:
+                return {}
+            case XTEntityDescriptorManager.XTEntityDescriptorType.LIST:
+                return []
+            case XTEntityDescriptorManager.XTEntityDescriptorType.TUPLE:
+                return tuple()
+            case XTEntityDescriptorManager.XTEntityDescriptorType.STRING:
+                return ""
+            case XTEntityDescriptorManager.XTEntityDescriptorType.SET:
+                return set()
+            case _:
+                return None
+
+    @staticmethod
+    def merge_descriptors(descriptors1: Any, descriptors2: Any) -> Any:
+        descr1_type = XTEntityDescriptorManager._get_param_type(descriptors1)
+        descr2_type = XTEntityDescriptorManager._get_param_type(descriptors2)
+        if (
+            descr1_type != descr2_type
+            or descr1_type == XTEntityDescriptorManager.XTEntityDescriptorType.UNKNOWN
+        ):
+            LOGGER.warning(
+                f"Merging of descriptors failed, non-matching include/exclude {descr1_type} VS {descr2_type}",
+                stack_info=True,
+            )
+            return descriptors1
+        match descr1_type:
+            case XTEntityDescriptorManager.XTEntityDescriptorType.DICT:
+                return_dict: dict[str, Any] = {}
+                cross1 = None
+                cross2 = None
+                cross_both = None
+                if CROSS_CATEGORY_DEVICE_DESCRIPTOR in descriptors1:
+                    cross1 = descriptors1[CROSS_CATEGORY_DEVICE_DESCRIPTOR]
+                if CROSS_CATEGORY_DEVICE_DESCRIPTOR in descriptors2:
+                    cross2 = descriptors1[CROSS_CATEGORY_DEVICE_DESCRIPTOR]
+                if cross1 is not None and cross2 is not None:
+                    cross_both = XTEntityDescriptorManager.merge_descriptors(
+                        cross1, cross2
+                    )
+                elif cross1 is not None:
+                    cross_both = cross1
+                elif cross2 is not None:
+                    cross_both = cross2
+                for key in descriptors1:
+                    merged_descriptors = descriptors1[key]
+                    if cross_both is not None:
+                        merged_descriptors = (
+                            XTEntityDescriptorManager.merge_descriptors(
+                                merged_descriptors, cross_both
+                            )
+                        )
+                    if key in descriptors2:
+                        return_dict[key] = XTEntityDescriptorManager.merge_descriptors(
+                            merged_descriptors, descriptors2[key]
+                        )
+                    else:
+                        return_dict[key] = merged_descriptors
+                return return_dict
+            case XTEntityDescriptorManager.XTEntityDescriptorType.LIST:
+                return_list: list = descriptors2
+                var_type = XTEntityDescriptorManager.XTEntityDescriptorType.UNKNOWN
+                if descriptors1:
+                    var_type = XTEntityDescriptorManager._get_param_type(
+                        descriptors1[0]
+                    )
+                descr2_keys: list[str] = XTEntityDescriptorManager.get_category_keys(
+                    descriptors2
+                )
+                for descriptor in descriptors1:
+                    match var_type:
+                        case XTEntityDescriptorManager.XTEntityDescriptorType.ENTITY:
+                            entity = cast(EntityDescription, descriptor)
+                            if entity.key not in descr2_keys:
+                                return_list.append(descriptor)
+                        case XTEntityDescriptorManager.XTEntityDescriptorType.STRING:
+                            if descriptor not in descr2_keys:
+                                return_list.append(descriptor)
+                return return_list
+            case XTEntityDescriptorManager.XTEntityDescriptorType.TUPLE:
+                return tuple(
+                    XTEntityDescriptorManager.merge_descriptors(
+                        list(descriptors1), list(descriptors2)
+                    )
+                )
+            case XTEntityDescriptorManager.XTEntityDescriptorType.SET:
+                return set(
+                    XTEntityDescriptorManager.merge_descriptors(
+                        list(descriptors1), list(descriptors2)
+                    )
+                )
+
+    @staticmethod
+    def exclude_descriptors(base_descriptors: Any, exclude_descriptors: Any) -> Any:
+        base_type = XTEntityDescriptorManager._get_param_type(base_descriptors)
+        exclude_type = XTEntityDescriptorManager._get_param_type(exclude_descriptors)
+        if (
+            base_type != exclude_type
+            or base_type == XTEntityDescriptorManager.XTEntityDescriptorType.UNKNOWN
+        ):
+            LOGGER.warning(
+                f"Merging of descriptors failed, non-matching include/exclude {base_type} VS {exclude_type}",
+                stack_info=True,
+            )
+            return base_descriptors
+        match base_type:
+            case XTEntityDescriptorManager.XTEntityDescriptorType.DICT:
+                return_dict: dict[str, Any] = {}
+                for key in base_descriptors:
+                    if key in exclude_descriptors:
+                        return_dict[key] = (
+                            XTEntityDescriptorManager.exclude_descriptors(
+                                base_descriptors[key], exclude_descriptors[key]
+                            )
+                        )
+                    else:
+                        return_dict[key] = base_descriptors[key]
+                return return_dict
+            case XTEntityDescriptorManager.XTEntityDescriptorType.LIST:
+                return_list: list = []
+                exclude_keys: list[str] = []
+                var_type = XTEntityDescriptorManager.XTEntityDescriptorType.UNKNOWN
+                if base_descriptors:
+                    var_type = XTEntityDescriptorManager._get_param_type(
+                        base_descriptors[0]
+                    )
+                for descriptor in exclude_descriptors:
+                    match var_type:
+                        case XTEntityDescriptorManager.XTEntityDescriptorType.ENTITY:
+                            entity = cast(EntityDescription, descriptor)
+                            exclude_keys.append(entity.key)
+                        case XTEntityDescriptorManager.XTEntityDescriptorType.STRING:
+                            exclude_keys.append(descriptor)
+                for descriptor in base_descriptors:
+                    match var_type:
+                        case XTEntityDescriptorManager.XTEntityDescriptorType.ENTITY:
+                            entity = cast(EntityDescription, descriptor)
+                            if entity.key not in exclude_keys:
+                                return_list.append(descriptor)
+                        case XTEntityDescriptorManager.XTEntityDescriptorType.STRING:
+                            if descriptor not in exclude_keys:
+                                return_list.append(descriptor)
+                return return_list
+            case XTEntityDescriptorManager.XTEntityDescriptorType.TUPLE:
+                return tuple(
+                    XTEntityDescriptorManager.exclude_descriptors(
+                        list(base_descriptors), list(exclude_descriptors)
+                    )
+                )
+            case XTEntityDescriptorManager.XTEntityDescriptorType.SET:
+                return set(
+                    XTEntityDescriptorManager.exclude_descriptors(
+                        list(base_descriptors), list(exclude_descriptors)
+                    )
+                )
+
+    @staticmethod
+    def _get_param_type(param) -> XTEntityDescriptorManager.XTEntityDescriptorType:
+        if isinstance(param, dict):
+            return XTEntityDescriptorManager.XTEntityDescriptorType.DICT
+        elif isinstance(param, list):
+            return XTEntityDescriptorManager.XTEntityDescriptorType.LIST
+        elif isinstance(param, tuple):
+            return XTEntityDescriptorManager.XTEntityDescriptorType.TUPLE
+        elif isinstance(param, set):
+            return XTEntityDescriptorManager.XTEntityDescriptorType.SET
+        elif isinstance(param, EntityDescription):
+            return XTEntityDescriptorManager.XTEntityDescriptorType.ENTITY
+        elif isinstance(param, str):
+            return XTEntityDescriptorManager.XTEntityDescriptorType.STRING
+        else:
+            return XTEntityDescriptorManager.XTEntityDescriptorType.UNKNOWN
 
 
 class XTEntity(TuyaEntity):
@@ -223,9 +462,14 @@ class XTEntity(TuyaEntity):
 
     @staticmethod
     def supports_description(
-        device: XTDevice, description: EntityDescription, first_pass: bool
+        device: XTDevice,
+        description: EntityDescription,
+        first_pass: bool,
+        externally_managed_dpcodes: list[str] = [],
     ) -> bool:
-        result, dpcode = XTEntity._supports_description(device, description, first_pass)
+        result, dpcode = XTEntity._supports_description(
+            device, description, first_pass, externally_managed_dpcodes
+        )
         if result is True:
             # Register the code as being handled by the device
             handled_dpcodes: list[str] = cast(
@@ -241,7 +485,10 @@ class XTEntity(TuyaEntity):
 
     @staticmethod
     def _supports_description(
-        device: XTDevice, description: EntityDescription, first_pass: bool
+        device: XTDevice,
+        description: EntityDescription,
+        first_pass: bool,
+        externally_managed_dpcodes: list[str],
     ) -> tuple[bool, str]:
         import custom_components.xtend_tuya.binary_sensor as XTBinarySensor
 
@@ -250,12 +497,12 @@ class XTEntity(TuyaEntity):
             if description.dpcode is not None:
                 dpcode = description.dpcode
         if first_pass is True:
-            if dpcode in device.status:
+            if dpcode in device.status and dpcode not in externally_managed_dpcodes:
                 return True, dpcode
             return False, dpcode
         else:
-            if device.force_compatibility is True:
-                return False, dpcode
+            # if device.force_compatibility is True:
+            #    return False, dpcode
 
             all_aliases = device.get_all_status_code_aliases()
             if current_status := all_aliases.get(dpcode):
@@ -265,7 +512,10 @@ class XTEntity(TuyaEntity):
                         XTDevice.XTDevicePreference.HANDLED_DPCODES, []
                     ),
                 )
-                if current_status not in handled_dpcodes:
+                if (
+                    current_status not in handled_dpcodes
+                    and current_status not in externally_managed_dpcodes
+                ):
                     device.replace_status_with_another(current_status, dpcode)
                     return True, dpcode
         return False, dpcode

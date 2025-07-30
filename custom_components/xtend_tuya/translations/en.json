@@ -2560,6 +2560,17 @@
                     }
                 }
             }
+        },
+        "tuya_iot_camera_not_subscribed": {
+            "title": "Tuya OpenAPI account badly configured (camera)",
+            "fix_flow": {
+                "step": {
+                    "confirm": {
+                        "description": "The integration \"{name}\" (`{config_entry_id}`) Does not have a Tuya OpenAPI account that is subscribed to the IoT Video Live Stream service\n\nWithout this, cameras will not function properly.\n\nTo fix this warning please follow the guide at [this URL](https://github.com/azerty9971/xtend_tuya/blob/main/docs/configure_cameras.md), then restart Home Assistant.",
+                        "title": "Tuya OpenAPI account badly configured (camera)"
+                    }
+                }
+            }
         }
     }
 }

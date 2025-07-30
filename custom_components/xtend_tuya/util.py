@@ -159,9 +159,11 @@ def merge_descriptor_category(
 
 
 def restrict_descriptor_category(
-    category: tuple[EntityDescription, ...], restrict_to_keys: list[str]
+    category: tuple[EntityDescription, ...] | None, restrict_to_keys: list[str]
 ) -> tuple[EntityDescription, ...]:
     return_list: list[EntityDescription] = []
+    if category is None:
+        return tuple(return_list)
     for descriptor in category:
         if descriptor.key in restrict_to_keys:
             return_list.append(descriptor)

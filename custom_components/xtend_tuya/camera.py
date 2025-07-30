@@ -18,7 +18,6 @@ from homeassistant.components.camera.webrtc import (
     WebRTCSendMessage,
     WebRTCClientConfiguration,
 )
-from .util import append_lists
 from .multi_manager.multi_manager import (
     XTConfigEntry,
     MultiManager,
@@ -30,12 +29,14 @@ from .const import (
     LOGGER,  # noqa: F401
     XTDPCode,
     MESSAGE_SOURCE_TUYA_IOT,
+    XTMultiManagerProperties,
 )
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaCameraEntity,
 )
 from .entity import (
     XTEntity,
+    XTEntityDescriptorManager,
 )
 
 
@@ -62,16 +63,12 @@ async def async_setup_entry(
     if entry.runtime_data.multi_manager is None or hass_data.manager is None:
         return
 
-    merged_categories = CAMERAS
-    for (
-        new_descriptor
-    ) in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(
-        Platform.CAMERA
-    ):
-        merged_categories = cast(
-            tuple[str, ...],
-            tuple(append_lists(list(merged_categories), new_descriptor)),
-        )
+    supported_descriptors, externally_managed_descriptors = cast(
+        tuple[tuple[str, ...], tuple[str, ...]],
+        XTEntityDescriptorManager.get_platform_descriptors(
+            CAMERAS, entry.runtime_data.multi_manager, Platform.CAMERA
+        ),
+    )
 
     entities: list[XTCameraEntity] = []
     extra_entities: list[XTCameraEntity] = []
@@ -87,7 +84,7 @@ async def async_setup_entry(
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
                 if XTCameraEntity.should_entity_be_added(
-                    hass, device, hass_data.manager, merged_categories
+                    hass, device, hass_data.manager, supported_descriptors
                 ):
                     entities.append(XTCameraEntity(device, hass_data.manager, hass))
 
@@ -142,6 +139,9 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
             self.iot_manager = iot_manager
         if self.iot_manager is None:
             self.disable_webrtc()
+        device_manager.set_general_property(
+            XTMultiManagerProperties.CAMERA_DEVICE_ID, device.id
+        )
 
     @staticmethod
     def should_entity_be_added(
@@ -170,6 +170,8 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
     async def get_webrtc_config(self) -> None:
         if self.iot_manager is None:
             return None
+        self.device_manager.device_watcher.report_message(
+            self.device.id,"Getting WebRTC Config 1", self.device)
         return_tuple = await self.iot_manager.async_get_webrtc_ice_servers(
             self.device, "GO2RTC", self.hass
         )
@@ -177,6 +179,8 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
             return None
         ice_servers = return_tuple[0]
         webrtc_config = return_tuple[1]
+        self.device_manager.device_watcher.report_message(
+            self.device.id,f"WebRTC Configuration: {ice_servers}, {webrtc_config}", self.device)
         if ice_servers:
             self.webrtc_configuration = WebRTCClientConfiguration()
             ice_servers_dict: list[dict[str, str]] = json.loads(ice_servers)

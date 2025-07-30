@@ -328,6 +328,10 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
         if self.sharing_account.device_manager.reuse_config:
             return None
         return get_tuya_platform_descriptors(platform)
+    
+    def get_platform_descriptors_to_exclude(self, platform: Platform) -> Any:
+        if self.sharing_account is not None and self.sharing_account.device_manager.reuse_config:
+            return get_tuya_platform_descriptors(platform)
 
     def send_commands(self, device_id: str, commands: list[dict[str, Any]]) -> bool:
         if self.sharing_account is None:

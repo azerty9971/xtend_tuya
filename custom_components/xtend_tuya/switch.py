@@ -7,8 +7,6 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from .util import (
-    merge_device_descriptors,
-    merge_descriptor_category,
     restrict_descriptor_category,
 )
 from .multi_manager.multi_manager import (
@@ -23,6 +21,7 @@ from .ha_tuya_integration.tuya_integration_imports import (
 )
 from .entity import (
     XTEntity,
+    XTEntityDescriptorManager,
 )
 
 
@@ -158,8 +157,7 @@ SWITCHES: dict[str, tuple[XTSwitchEntityDescription, ...]] = {
             translation_key="control_skip",
         ),
     ),
-    "gyd": (
-    ),
+    "gyd": (),
     "hps": (
         XTSwitchEntityDescription(
             key=XTDPCode.INDICATOR_LED,
@@ -194,8 +192,7 @@ SWITCHES: dict[str, tuple[XTSwitchEntityDescription, ...]] = {
             entity_registry_enabled_default=False,
         ),
     ),
-    "MPPT": (
-    ),
+    "MPPT": (),
     # Automatic cat litter box
     # Note: Undocumented
     "msp": (
@@ -350,8 +347,7 @@ SWITCHES: dict[str, tuple[XTSwitchEntityDescription, ...]] = {
             entity_category=EntityCategory.CONFIG,
         ),
     ),
-    "mzj": (
-    ),
+    "mzj": (),
     "qccdz": (
         XTSwitchEntityDescription(
             key=XTDPCode.RFID,
@@ -364,10 +360,8 @@ SWITCHES: dict[str, tuple[XTSwitchEntityDescription, ...]] = {
             entity_category=EntityCategory.CONFIG,
         ),
     ),
-    "wk": (
-    ),
-    "wnykq": (
-    ),
+    "wk": (),
+    "wnykq": (),
     "xfj": (
         XTSwitchEntityDescription(
             key=XTDPCode.UV_LIGHT,
@@ -396,15 +390,15 @@ async def async_setup_entry(
     if entry.runtime_data.multi_manager is None or hass_data.manager is None:
         return
 
-    merged_descriptors = SWITCHES
-    for (
-        new_descriptor
-    ) in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(
-        Platform.SWITCH
-    ):
-        merged_descriptors = merge_device_descriptors(
-            merged_descriptors, new_descriptor
-        )
+    supported_descriptors, externally_managed_descriptors = cast(
+        tuple[
+            dict[str, tuple[XTSwitchEntityDescription, ...]],
+            dict[str, tuple[XTSwitchEntityDescription, ...]],
+        ],
+        XTEntityDescriptorManager.get_platform_descriptors(
+            SWITCHES, entry.runtime_data.multi_manager, Platform.SWITCH
+        ),
+    )
 
     @callback
     def async_discover_device(device_map, restrict_dpcode: str | None = None) -> None:
@@ -415,36 +409,43 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                category_descriptions = merged_descriptors.get(device.category)
-                cross_category_descriptions = merged_descriptors.get(
-                    CROSS_CATEGORY_DEVICE_DESCRIPTOR
-                )
-                descriptions = merge_descriptor_category(
-                    category_descriptions, cross_category_descriptions
-                )
-                if restrict_dpcode is not None:
-                    descriptions = restrict_descriptor_category(
-                        descriptions, [restrict_dpcode]
+                if category_descriptions := supported_descriptors.get(device.category):
+                    externally_managed_dpcodes = (
+                        XTEntityDescriptorManager.get_category_keys(
+                            externally_managed_descriptors.get(device.category)
+                        )
                     )
-                descriptions = cast(tuple[XTSwitchEntityDescription, ...], descriptions)
-                entities.extend(
-                    XTSwitchEntity.get_entity_instance(
-                        description, device, hass_data.manager
+                    if restrict_dpcode is not None:
+                        category_descriptions = cast(
+                            tuple[XTSwitchEntityDescription, ...],
+                            restrict_descriptor_category(
+                                category_descriptions, [restrict_dpcode]
+                            ),
+                        )
+                    entities.extend(
+                        XTSwitchEntity.get_entity_instance(
+                            description, device, hass_data.manager
+                        )
+                        for description in category_descriptions
+                        if XTEntity.supports_description(
+                            device, description, True, externally_managed_dpcodes
+                        )
                     )
-                    for description in descriptions
-                    if XTEntity.supports_description(device, description, True)
-                )
-                entities.extend(
-                    XTSwitchEntity.get_entity_instance(
-                        description, device, hass_data.manager
+                    entities.extend(
+                        XTSwitchEntity.get_entity_instance(
+                            description, device, hass_data.manager
+                        )
+                        for description in category_descriptions
+                        if XTEntity.supports_description(
+                            device, description, False, externally_managed_dpcodes
+                        )
                     )
-                    for description in descriptions
-                    if XTEntity.supports_description(device, description, False)
-                )
 
         async_add_entities(entities)
 
-    hass_data.manager.register_device_descriptors("switches", merged_descriptors)
+    hass_data.manager.register_device_descriptors(
+        Platform.SWITCH, supported_descriptors
+    )
     async_discover_device([*hass_data.manager.device_map])
 
     entry.async_on_unload(
