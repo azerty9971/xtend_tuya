@@ -16,6 +16,8 @@ from .const import (
     LOGGER,  # noqa: F401
 )
 from .util import (
+    merge_device_descriptors,
+    merge_descriptor_category,
     restrict_descriptor_category,
 )
 from .multi_manager.multi_manager import (
@@ -26,11 +28,7 @@ from .multi_manager.multi_manager import (
 from .multi_manager.shared.shared_classes import (
     XTDeviceStatusRange,
 )
-from .const import (
-    TUYA_DISCOVERY_NEW,
-    XTDPCode,
-    CROSS_CATEGORY_DEVICE_DESCRIPTOR,  # noqa: F401
-)
+from .const import TUYA_DISCOVERY_NEW, XTDPCode, CROSS_CATEGORY_DEVICE_DESCRIPTOR
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaCoverEntity,
     TuyaCoverEntityDescription,
@@ -39,7 +37,6 @@ from .ha_tuya_integration.tuya_integration_imports import (
 )
 from .entity import (
     XTEntity,
-    XTEntityDescriptorManager,
 )
 
 
@@ -119,8 +116,51 @@ COVERS: dict[str, tuple[XTCoverEntityDescription, ...]] = {
             stop_instruction_value="STOP",
             control_back_mode=XTDPCode.CONTROL_BACK_MODE,
         ),
+    ),
+    # clkg category - same as cl but different device category  
+    "clkg": (
+        XTCoverEntityDescription(
+            key=XTDPCode.CONTROL,
+            translation_key="curtain",
+            current_state=XTDPCode.SITUATION_SET,
+            current_position=(XTDPCode.PERCENT_CONTROL, XTDPCode.PERCENT_STATE),
+            set_position=XTDPCode.PERCENT_CONTROL,
+            device_class=CoverDeviceClass.CURTAIN,
+            control_back_mode=XTDPCode.CONTROL_BACK_MODE,
+        ),
+        XTCoverEntityDescription(
+            key=XTDPCode.CONTROL_2,
+            translation_key="curtain_2",
+            current_position=XTDPCode.PERCENT_STATE_2,
+            set_position=XTDPCode.PERCENT_CONTROL_2,
+            control_back_mode=XTDPCode.CONTROL_BACK_MODE,
+            device_class=CoverDeviceClass.CURTAIN,
+        ),
+        XTCoverEntityDescription(
+            key=XTDPCode.CONTROL_3,
+            translation_key="curtain_3",
+            current_position=XTDPCode.PERCENT_STATE_3,
+            set_position=XTDPCode.PERCENT_CONTROL_3,
+            device_class=CoverDeviceClass.CURTAIN,
+            control_back_mode=XTDPCode.CONTROL_BACK_MODE,
+        ),
+        XTCoverEntityDescription(
+            key=XTDPCode.MACH_OPERATE,
+            translation_key="curtain",
+            current_position=XTDPCode.POSITION,
+            set_position=XTDPCode.POSITION,
+            device_class=CoverDeviceClass.CURTAIN,
+            open_instruction_value="FZ",
+            close_instruction_value="ZZ",
+            stop_instruction_value="STOP",
+            control_back_mode=XTDPCode.CONTROL_BACK_MODE,
+        ),
+    ),
+    # Cross-category descriptors for unsupported device categories
+    # These provide fallback support for devices that don't have category-specific descriptors
+    CROSS_CATEGORY_DEVICE_DESCRIPTOR: (
         # switch_1 is an undocumented code that behaves identically to control
-        # It is used by the Kogan Smart Blinds Driver
+        # It is used by the Kogan Smart Blinds Driver for unsupported categories
         XTCoverEntityDescription(
             key=XTDPCode.SWITCH_1,
             translation_key="blind",
@@ -142,15 +182,15 @@ async def async_setup_entry(
     if entry.runtime_data.multi_manager is None or hass_data.manager is None:
         return
 
-    supported_descriptors, externally_managed_descriptors = cast(
-        tuple[
-            dict[str, tuple[XTCoverEntityDescription, ...]],
-            dict[str, tuple[XTCoverEntityDescription, ...]],
-        ],
-        XTEntityDescriptorManager.get_platform_descriptors(
-            COVERS, entry.runtime_data.multi_manager, Platform.COVER
-        ),
-    )
+    merged_descriptors = COVERS
+    for (
+        new_descriptor
+    ) in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(
+        Platform.COVER
+    ):
+        merged_descriptors = merge_device_descriptors(
+            merged_descriptors, new_descriptor
+        )
 
     @callback
     def async_discover_device(device_map, restrict_dpcode: str | None = None) -> None:
@@ -161,41 +201,40 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if category_descriptions := supported_descriptors.get(device.category):
-                    externally_managed_dpcodes = (
-                        XTEntityDescriptorManager.get_category_keys(
-                            externally_managed_descriptors.get(device.category)
-                        )
+                category_descriptions = merged_descriptors.get(device.category)
+                
+                # Only use cross-category descriptors if no category-specific descriptors exist
+                if category_descriptions is not None:
+                    descriptions = category_descriptions
+                else:
+                    cross_category_descriptions = merged_descriptors.get(
+                        CROSS_CATEGORY_DEVICE_DESCRIPTOR
                     )
-                    if restrict_dpcode is not None:
-                        category_descriptions = cast(
-                            tuple[XTCoverEntityDescription, ...],
-                            restrict_descriptor_category(
-                                category_descriptions, [restrict_dpcode]
-                            ),
-                        )
-                    entities.extend(
-                        XTCoverEntity.get_entity_instance(
-                            description, device, hass_data.manager, hass
-                        )
-                        for description in category_descriptions
-                        if XTEntity.supports_description(
-                            device, description, True, externally_managed_dpcodes
-                        )
+                    descriptions = cross_category_descriptions or tuple()
+                
+                if restrict_dpcode is not None:
+                    descriptions = restrict_descriptor_category(
+                        descriptions, [restrict_dpcode]
                     )
-                    entities.extend(
-                        XTCoverEntity.get_entity_instance(
-                            description, device, hass_data.manager, hass
-                        )
-                        for description in category_descriptions
-                        if XTEntity.supports_description(
-                            device, description, False, externally_managed_dpcodes
-                        )
+                descriptions = cast(tuple[XTCoverEntityDescription, ...], descriptions)
+                entities.extend(
+                    XTCoverEntity.get_entity_instance(
+                        description, device, hass_data.manager, hass
                     )
+                    for description in descriptions
+                    if XTEntity.supports_description(device, description, True)
+                )
+                entities.extend(
+                    XTCoverEntity.get_entity_instance(
+                        description, device, hass_data.manager, hass
+                    )
+                    for description in descriptions
+                    if XTEntity.supports_description(device, description, False)
+                )
 
         async_add_entities(entities)
 
-    hass_data.manager.register_device_descriptors(Platform.COVER, supported_descriptors)
+    hass_data.manager.register_device_descriptors("covers", merged_descriptors)
     async_discover_device([*hass_data.manager.device_map])
 
     entry.async_on_unload(

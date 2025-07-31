@@ -1,11 +1,11 @@
 """Support for XT Fan."""
 
 from __future__ import annotations
-from typing import cast
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from .util import append_sets
 from .multi_manager.multi_manager import (
     XTConfigEntry,
     MultiManager,
@@ -17,7 +17,6 @@ from .ha_tuya_integration.tuya_integration_imports import (
 )
 from .entity import (
     XTEntity,
-    XTEntityDescriptorManager,
 )
 
 XT_SUPPORT_TYPE = {
@@ -34,12 +33,13 @@ async def async_setup_entry(
     if entry.runtime_data.multi_manager is None or hass_data.manager is None:
         return
 
-    supported_descriptors, externally_managed_descriptors = cast(
-        tuple[set[str], set[str]],
-        XTEntityDescriptorManager.get_platform_descriptors(
-            XT_SUPPORT_TYPE, entry.runtime_data.multi_manager, Platform.FAN
-        ),
-    )
+    merged_categories = XT_SUPPORT_TYPE
+    for (
+        new_descriptor
+    ) in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(
+        Platform.FAN
+    ):
+        merged_categories = append_sets(merged_categories, new_descriptor)
 
     @callback
     def async_discover_device(device_map, restrict_dpcode: str | None = None) -> None:
@@ -52,7 +52,7 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if device and device.category in supported_descriptors:
+                if device and device.category in merged_categories:
                     entities.append(XTFanEntity(device, hass_data.manager))
         async_add_entities(entities)
 

@@ -29,7 +29,7 @@ def get_tuya_platform_descriptors(platform: Platform) -> Any:
         case Platform.BUTTON:
             return BUTTONS_TUYA
         case Platform.CAMERA:
-            return CAMERAS_TUYA
+            return list(CAMERAS_TUYA)
         case Platform.CLIMATE:
             return CLIMATE_DESCRIPTIONS_TUYA
         case Platform.COVER:

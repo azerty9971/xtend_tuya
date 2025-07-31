@@ -15,6 +15,9 @@ from .const import (
     XTDPCode,
     XTMultiManagerProperties,
 )
+from .util import (
+    append_dictionnaries,
+)
 from .multi_manager.multi_manager import (
     XTConfigEntry,
     MultiManager,
@@ -22,7 +25,6 @@ from .multi_manager.multi_manager import (
 )
 from .entity import (
     XTEntity,
-    XTEntityDescriptorManager,
 )
 
 
@@ -50,19 +52,19 @@ class XTLockEntityDescription(LockEntityDescription):
 # non-generic then add the category and descriptor in the list
 LOCKS: dict[str, XTLockEntityDescription] = {}
 
-# Statuses that tell if the lock is currently locked or not
+#Statuses that tell if the lock is currently locked or not
 LOCK_LOCKED_UNLOCKED_STATUS_DPCODES: list[XTDPCode] = [
     XTDPCode.LOCK_MOTOR_STATE,
     XTDPCode.ACCESSORY_LOCK,
 ]
 
-# Statuses that can be sent to lock/unlock the lock
+#Statuses that can be sent to lock/unlock the lock
 LOCK_MANUAL_COMMAND_DPCODES: list[XTDPCode] = [
     XTDPCode.ACCESSORY_LOCK,
     XTDPCode.BLUETOOTH_UNLOCK,
 ]
 
-# Statuses that are used to determine if the device is a lock or not
+#Statuses that are used to determine if the device is a lock or not
 LOCK_IS_LOCK_DPCODES: list[XTDPCode] = [
     XTDPCode.UNLOCK_METHOD_CREATE,
     XTDPCode.UNLOCK_METHOD_DELETE,
@@ -91,12 +93,16 @@ async def async_setup_entry(
     if entry.runtime_data.multi_manager is None or hass_data.manager is None:
         return
 
-    supported_descriptors, externally_managed_descriptors = cast(
-        tuple[dict[str, XTLockEntityDescription], dict[str, XTLockEntityDescription]],
-        XTEntityDescriptorManager.get_platform_descriptors(
-            LOCKS, entry.runtime_data.multi_manager, Platform.LOCK
-        ),
-    )
+    merged_descriptors = LOCKS
+    for (
+        new_descriptor
+    ) in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(
+        Platform.LOCK
+    ):
+        merged_descriptors = cast(
+            dict[str, XTLockEntityDescription],
+            append_dictionnaries(merged_descriptors, new_descriptor),
+        )
 
     @callback
     def async_discover_device(device_map, restrict_dpcode: str | None = None) -> None:
@@ -110,7 +116,7 @@ async def async_setup_entry(
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
                 if description := XTLockEntity.get_entity_description(
-                    hass, device, hass_data.manager, supported_descriptors
+                    hass, device, hass_data.manager, merged_descriptors
                 ):
                     entities.append(
                         XTLockEntity.get_entity_instance(
@@ -205,13 +211,14 @@ class XTLockEntity(XTEntity, LockEntity):  # type: ignore
             for dpcode in LOCK_MANUAL_COMMAND_DPCODES:
                 if dpcode in device.status:
                     manual_unlock_command_list.append(dpcode)
-            return XTLockEntityDescription(
-                key="",
-                translation_key="operate_lock",
-                unlock_status_list=unlock_status_list,
-                manual_unlock_command=manual_unlock_command_list,
-                temporary_unlock=temporary_unlock,
-            )
+            if unlock_status_list or manual_unlock_command_list:
+                return XTLockEntityDescription(
+                    key="",
+                    translation_key="operate_lock",
+                    unlock_status_list=unlock_status_list,
+                    manual_unlock_command=manual_unlock_command_list,
+                    temporary_unlock=temporary_unlock,
+                )
         return None
 
     @property
