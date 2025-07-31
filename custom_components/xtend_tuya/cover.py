@@ -116,6 +116,17 @@ COVERS: dict[str, tuple[XTCoverEntityDescription, ...]] = {
             stop_instruction_value="STOP",
             control_back_mode=XTDPCode.CONTROL_BACK_MODE,
         ),
+        # switch_1 is an undocumented code that behaves identically to control
+        # It is used by the Kogan Smart Blinds Driver
+        # Commented out to prevent extra blind entities on curtain devices
+        # XTCoverEntityDescription(
+        #     key=XTDPCode.SWITCH_1,
+        #     translation_key="blind",
+        #     current_position=XTDPCode.PERCENT_CONTROL,
+        #     set_position=XTDPCode.PERCENT_CONTROL,
+        #     device_class=CoverDeviceClass.BLIND,
+        #     control_back_mode=XTDPCode.CONTROL_BACK_MODE,
+        # ),
     ),
     # clkg category - same as cl but different device category  
     "clkg": (
@@ -155,20 +166,17 @@ COVERS: dict[str, tuple[XTCoverEntityDescription, ...]] = {
             stop_instruction_value="STOP",
             control_back_mode=XTDPCode.CONTROL_BACK_MODE,
         ),
-    ),
-    # Cross-category descriptors for unsupported device categories
-    # These provide fallback support for devices that don't have category-specific descriptors
-    CROSS_CATEGORY_DEVICE_DESCRIPTOR: (
         # switch_1 is an undocumented code that behaves identically to control
-        # It is used by the Kogan Smart Blinds Driver for unsupported categories
-        XTCoverEntityDescription(
-            key=XTDPCode.SWITCH_1,
-            translation_key="blind",
-            current_position=XTDPCode.PERCENT_CONTROL,
-            set_position=XTDPCode.PERCENT_CONTROL,
-            device_class=CoverDeviceClass.BLIND,
-            control_back_mode=XTDPCode.CONTROL_BACK_MODE,
-        ),
+        # It is used by the Kogan Smart Blinds Driver
+        # Commented out to prevent extra blind entities on curtain devices
+        # XTCoverEntityDescription(
+        #     key=XTDPCode.SWITCH_1,
+        #     translation_key="blind",
+        #     current_position=XTDPCode.PERCENT_CONTROL,
+        #     set_position=XTDPCode.PERCENT_CONTROL,
+        #     device_class=CoverDeviceClass.BLIND,
+        #     control_back_mode=XTDPCode.CONTROL_BACK_MODE,
+        # ),
     ),
 }
 
@@ -202,16 +210,12 @@ async def async_setup_entry(
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
                 category_descriptions = merged_descriptors.get(device.category)
-                
-                # Only use cross-category descriptors if no category-specific descriptors exist
-                if category_descriptions is not None:
-                    descriptions = category_descriptions
-                else:
-                    cross_category_descriptions = merged_descriptors.get(
-                        CROSS_CATEGORY_DEVICE_DESCRIPTOR
-                    )
-                    descriptions = cross_category_descriptions or tuple()
-                
+                cross_category_descriptions = merged_descriptors.get(
+                    CROSS_CATEGORY_DEVICE_DESCRIPTOR
+                )
+                descriptions = merge_descriptor_category(
+                    category_descriptions, cross_category_descriptions
+                )
                 if restrict_dpcode is not None:
                     descriptions = restrict_descriptor_category(
                         descriptions, [restrict_dpcode]
