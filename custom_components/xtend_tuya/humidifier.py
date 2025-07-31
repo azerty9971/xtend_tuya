@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import cast
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from .util import append_dictionnaries
 from .multi_manager.multi_manager import (
     XTConfigEntry,
     MultiManager,
@@ -19,7 +19,6 @@ from .ha_tuya_integration.tuya_integration_imports import (
 )
 from .entity import (
     XTEntity,
-    XTEntityDescriptorManager,
 )
 
 
@@ -50,15 +49,13 @@ async def async_setup_entry(
     if entry.runtime_data.multi_manager is None or hass_data.manager is None:
         return
 
-    supported_descriptors, externally_managed_descriptors = cast(
-        tuple[
-            dict[str, XTHumidifierEntityDescription],
-            dict[str, XTHumidifierEntityDescription],
-        ],
-        XTEntityDescriptorManager.get_platform_descriptors(
-            HUMIDIFIERS, entry.runtime_data.multi_manager, Platform.HUMIDIFIER
-        ),
-    )
+    merged_categories = HUMIDIFIERS
+    for (
+        new_descriptor
+    ) in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(
+        Platform.HUMIDIFIER
+    ):
+        merged_categories = append_dictionnaries(merged_categories, new_descriptor)
 
     @callback
     def async_discover_device(device_map, restrict_dpcode: str | None = None) -> None:
@@ -71,7 +68,7 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if description := supported_descriptors.get(device.category):
+                if description := merged_categories.get(device.category):
                     entities.append(
                         XTHumidifierEntity.get_entity_instance(
                             description, device, hass_data.manager
@@ -79,9 +76,7 @@ async def async_setup_entry(
                     )
         async_add_entities(entities)
 
-    hass_data.manager.register_device_descriptors(
-        Platform.HUMIDIFIER, supported_descriptors
-    )
+    hass_data.manager.register_device_descriptors("humidifiers", merged_categories)
     async_discover_device([*hass_data.manager.device_map])
 
     entry.async_on_unload(

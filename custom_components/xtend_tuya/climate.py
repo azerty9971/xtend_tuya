@@ -3,7 +3,7 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Any, cast
+from typing import Any
 from homeassistant.components.climate.const import (
     ClimateEntityFeature,
     HVACMode,
@@ -41,7 +41,6 @@ from .ha_tuya_integration.tuya_integration_imports import (
 )
 from .entity import (
     XTEntity,
-    XTEntityDescriptorManager,
 )
 
 XT_HVAC_TO_HA = {
@@ -186,14 +185,13 @@ async def async_setup_entry(
     if entry.runtime_data.multi_manager is None or hass_data.manager is None:
         return
 
-    supported_descriptors, externally_managed_descriptors = cast(
-        tuple[
-            dict[str, XTClimateEntityDescription], dict[str, XTClimateEntityDescription]
-        ],
-        XTEntityDescriptorManager.get_platform_descriptors(
-            CLIMATE_DESCRIPTIONS, entry.runtime_data.multi_manager, Platform.CLIMATE
-        ),
-    )
+    merged_descriptions = CLIMATE_DESCRIPTIONS
+    for (
+        new_descriptor
+    ) in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(
+        Platform.CLIMATE
+    ):
+        merged_descriptions = append_dictionnaries(merged_descriptions, new_descriptor)
 
     @callback
     def async_discover_device(device_map, restrict_dpcode: str | None = None) -> None:
@@ -206,10 +204,10 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if device and device.category in supported_descriptors:
+                if device and device.category in merged_descriptions:
                     entities.append(
                         XTClimateEntity.get_entity_instance(
-                            supported_descriptors[device.category],
+                            merged_descriptions[device.category],
                             device,
                             hass_data.manager,
                             hass.config.units.temperature_unit,
@@ -218,7 +216,7 @@ async def async_setup_entry(
         async_add_entities(entities)
 
     hass_data.manager.register_device_descriptors(
-        Platform.CLIMATE, supported_descriptors
+        "climate_descriptions", merged_descriptions
     )
     async_discover_device([*hass_data.manager.device_map])
 

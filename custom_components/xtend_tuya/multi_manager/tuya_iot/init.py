@@ -294,7 +294,7 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
         hass: HomeAssistant,
         config_entry: XTConfigEntry,
         multi_manager: MultiManager,
-    ) -> None:
+    ):
         if self.iot_account is None:
             return None
         if lock_device_id := multi_manager.get_general_property(
@@ -303,7 +303,7 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
             # Verify if we are subscribed to the lock service
             if device := multi_manager.device_map.get(lock_device_id, None):
                 test_api = await hass.async_add_executor_job(
-                    self.iot_account.device_manager.test_lock_api_subscription, device
+                    self.iot_account.device_manager.test_api_subscription, device
                 )
                 if not test_api:
                     await self.raise_issue(
@@ -319,28 +319,7 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
                         },
                         learn_more_url="https://github.com/azerty9971/xtend_tuya/blob/main/docs/configure_locks.md",
                     )
-        if camera_device_id := multi_manager.get_general_property(
-            XTMultiManagerProperties.CAMERA_DEVICE_ID, None
-        ):
-            # Verify if we are subscribed to the lock service
-            if device := multi_manager.device_map.get(camera_device_id, None):
-                test_api = await hass.async_add_executor_job(
-                    self.iot_account.device_manager.test_camera_api_subscription, device
-                )
-                if not test_api:
-                    await self.raise_issue(
-                        hass=hass,
-                        config_entry=config_entry,
-                        is_fixable=True,
-                        severity=IssueSeverity.WARNING,
-                        translation_key="tuya_iot_camera_not_subscribed",
-                        translation_placeholders={
-                            "name": DOMAIN,
-                            "config_entry_id": config_entry.title
-                            or "Config entry not found",
-                        },
-                        learn_more_url="https://github.com/azerty9971/xtend_tuya/blob/main/docs/configure_cameras.md",
-                    )
+
     def get_platform_descriptors_to_merge(self, platform: Platform) -> Any:
         pass
 

@@ -12,9 +12,11 @@ from homeassistant.const import Platform
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from .const import (
     TUYA_DISCOVERY_NEW,
-    CROSS_CATEGORY_DEVICE_DESCRIPTOR,  # noqa: F401
+    CROSS_CATEGORY_DEVICE_DESCRIPTOR,
 )
 from .util import (
+    merge_device_descriptors,
+    merge_descriptor_category,
     restrict_descriptor_category,
 )
 from .multi_manager.multi_manager import (
@@ -24,7 +26,6 @@ from .multi_manager.multi_manager import (
 )
 from .entity import (
     XTEntity,
-    XTEntityDescriptorManager,
 )
 
 
@@ -55,15 +56,15 @@ async def async_setup_entry(
     if entry.runtime_data.multi_manager is None or hass_data.manager is None:
         return
 
-    supported_descriptors, externally_managed_descriptors = cast(
-        tuple[
-            dict[str, tuple[XTTimeEntityDescription, ...]],
-            dict[str, tuple[XTTimeEntityDescription, ...]],
-        ],
-        XTEntityDescriptorManager.get_platform_descriptors(
-            TIMES, entry.runtime_data.multi_manager, Platform.TIME
-        ),
-    )
+    merged_descriptors = TIMES
+    for (
+        new_descriptor
+    ) in entry.runtime_data.multi_manager.get_platform_descriptors_to_merge(
+        Platform.TIME
+    ):
+        merged_descriptors = merge_device_descriptors(
+            merged_descriptors, new_descriptor
+        )
 
     @callback
     def async_discover_device(device_map, restrict_dpcode: str | None = None) -> None:
@@ -74,41 +75,36 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if category_descriptions := supported_descriptors.get(device.category):
-                    externally_managed_dpcodes = (
-                        XTEntityDescriptorManager.get_category_keys(
-                            externally_managed_descriptors.get(device.category)
-                        )
+                category_descriptions = merged_descriptors.get(device.category)
+                cross_category_descriptions = merged_descriptors.get(
+                    CROSS_CATEGORY_DEVICE_DESCRIPTOR
+                )
+                descriptions = merge_descriptor_category(
+                    category_descriptions, cross_category_descriptions
+                )
+                if restrict_dpcode is not None:
+                    descriptions = restrict_descriptor_category(
+                        descriptions, [restrict_dpcode]
                     )
-                    if restrict_dpcode is not None:
-                        category_descriptions = cast(
-                            tuple[XTTimeEntityDescription, ...],
-                            restrict_descriptor_category(
-                                category_descriptions, [restrict_dpcode]
-                            ),
-                        )
-                    entities.extend(
-                        XTTimeEntity.get_entity_instance(
-                            description, device, hass_data.manager
-                        )
-                        for description in category_descriptions
-                        if XTEntity.supports_description(
-                            device, description, True, externally_managed_dpcodes
-                        )
+                descriptions = cast(tuple[XTTimeEntityDescription, ...], descriptions)
+                entities.extend(
+                    XTTimeEntity.get_entity_instance(
+                        description, device, hass_data.manager
                     )
-                    entities.extend(
-                        XTTimeEntity.get_entity_instance(
-                            description, device, hass_data.manager
-                        )
-                        for description in category_descriptions
-                        if XTEntity.supports_description(
-                            device, description, False, externally_managed_dpcodes
-                        )
+                    for description in descriptions
+                    if XTEntity.supports_description(device, description, True)
+                )
+                entities.extend(
+                    XTTimeEntity.get_entity_instance(
+                        description, device, hass_data.manager
                     )
+                    for description in descriptions
+                    if XTEntity.supports_description(device, description, False)
+                )
 
         async_add_entities(entities)
 
-    hass_data.manager.register_device_descriptors(Platform.TIME, supported_descriptors)
+    hass_data.manager.register_device_descriptors("times", merged_descriptors)
     async_discover_device([*hass_data.manager.device_map])
     # async_discover_device(hass_data.manager, hass_data.manager.open_api_device_map)
 

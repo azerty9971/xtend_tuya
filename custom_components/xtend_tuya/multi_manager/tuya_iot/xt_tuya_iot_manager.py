@@ -415,31 +415,17 @@ class XTIOTDeviceManager(TuyaDeviceManager):
             return True  # Assume that the command worked...
         return False
 
-    def test_lock_api_subscription(
+    def test_api_subscription(
         self, device: XTDevice, api: XTIOTOpenAPI | None = None
     ) -> bool:
         if api is None:
-            if self.test_lock_api_subscription(device, self.api):
-                if self.test_lock_api_subscription(device, self.non_user_api):
+            if self.test_api_subscription(device, self.api):
+                if self.test_api_subscription(device, self.non_user_api):
                     return True
             return False
         ticket = api.post(f"/v1.0/devices/{device.id}/door-lock/password-ticket")
         if code := ticket.get("code", None):
             if code == 28841101:
-                return False
-        return True
-    
-    def test_camera_api_subscription(
-        self, device: XTDevice, api: XTIOTOpenAPI | None = None
-    ) -> bool:
-        if api is None:
-            if self.test_camera_api_subscription(device, self.api):
-                if self.test_camera_api_subscription(device, self.non_user_api):
-                    return True
-            return False
-        ticket = api.get(f"/v1.0/devices/{device.id}/webrtc-configs")
-        if code := ticket.get("code", None):
-            if code == 28841106:
                 return False
         return True
 
