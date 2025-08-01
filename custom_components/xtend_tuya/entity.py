@@ -269,7 +269,9 @@ class XTEntityDescriptorManager:
 
     @staticmethod
     def _get_param_type(param) -> XTEntityDescriptorManager.XTEntityDescriptorType:
-        if isinstance(param, dict):
+        if param is None:
+            return XTEntityDescriptorManager.XTEntityDescriptorType.UNKNOWN 
+        elif isinstance(param, dict):
             return XTEntityDescriptorManager.XTEntityDescriptorType.DICT
         elif isinstance(param, list):
             return XTEntityDescriptorManager.XTEntityDescriptorType.LIST
@@ -282,7 +284,7 @@ class XTEntityDescriptorManager:
         elif isinstance(param, EntityDescription):
             return XTEntityDescriptorManager.XTEntityDescriptorType.ENTITY
         else:
-            LOGGER.warning(f"Type {type(param)} is not handled in _get_param_type")
+            LOGGER.warning(f"Type {type(param)} is not handled in _get_param_type (bases: {param.__bases__})")
             return XTEntityDescriptorManager.XTEntityDescriptorType.UNKNOWN
 
 
