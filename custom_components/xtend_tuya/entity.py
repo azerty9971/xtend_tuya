@@ -92,8 +92,8 @@ class XTEntityDescriptorManager:
                         return_list.append(entity.key)
                     case XTEntityDescriptorManager.XTEntityDescriptorType.STRING:
                         return_list.append(descriptor)
-                    case _:
-                        LOGGER.warning(f"Unknown content type in category keys: {ref_type} => {content_type}")
+                    #case _:
+                    #    LOGGER.warning(f"Unknown content type in category keys: {ref_type} => {content_type}")
         elif ref_type is XTEntityDescriptorManager.XTEntityDescriptorType.DICT:
             for category_key in category_content:
                 return_list.append(category_key)
@@ -281,7 +281,7 @@ class XTEntityDescriptorManager:
             return XTEntityDescriptorManager.XTEntityDescriptorType.SET
         elif isinstance(param, str):
             return XTEntityDescriptorManager.XTEntityDescriptorType.STRING
-        elif isinstance(param, (EntityDescription, EntityDescription)):
+        elif isinstance(param, EntityDescription):
             return XTEntityDescriptorManager.XTEntityDescriptorType.ENTITY
         else:
             LOGGER.warning(f"Type {type(param)} is not handled in _get_param_type (bases: {type(param).__mro__}) check: {type(EntityDescription)}")
