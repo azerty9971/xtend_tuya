@@ -48,6 +48,8 @@ class XTEntityDescriptorManager:
             include_descriptors = XTEntityDescriptorManager.merge_descriptors(
                 include_descriptors, descriptors_to_add
             )
+            if platform == Platform.SWITCH:
+                LOGGER.warning(f"Include result cat keys: {XTEntityDescriptorManager.get_category_keys(include_descriptors)}")
         for descriptors_to_exclude in multi_manager.get_platform_descriptors_to_exclude(
             platform
         ):
@@ -111,7 +113,7 @@ class XTEntityDescriptorManager:
                 return None
 
     @staticmethod
-    def merge_descriptors(descriptors1: Any, descriptors2: Any) -> Any:
+    def merge_descriptors(descriptors1: Any, descriptors2: Any, debug: bool = False) -> Any:
         descr1_type = XTEntityDescriptorManager._get_param_type(descriptors1)
         descr2_type = XTEntityDescriptorManager._get_param_type(descriptors2)
         if (
@@ -132,7 +134,7 @@ class XTEntityDescriptorManager:
                 if CROSS_CATEGORY_DEVICE_DESCRIPTOR in descriptors1:
                     cross1 = descriptors1[CROSS_CATEGORY_DEVICE_DESCRIPTOR]
                 if CROSS_CATEGORY_DEVICE_DESCRIPTOR in descriptors2:
-                    cross2 = descriptors1[CROSS_CATEGORY_DEVICE_DESCRIPTOR]
+                    cross2 = descriptors2[CROSS_CATEGORY_DEVICE_DESCRIPTOR]
                 if cross1 is not None and cross2 is not None:
                     cross_both = XTEntityDescriptorManager.merge_descriptors(
                         cross1, cross2
@@ -141,9 +143,11 @@ class XTEntityDescriptorManager:
                     cross_both = cross1
                 elif cross2 is not None:
                     cross_both = cross2
+                if debug and cross_both:
+                    LOGGER.warning(f"MERGE: Cross both keys: {XTEntityDescriptorManager.get_category_keys(cross_both)}")
                 for key in descriptors1:
                     merged_descriptors = descriptors1[key]
-                    if cross_both is not None:
+                    if cross_both is not None and key != CROSS_CATEGORY_DEVICE_DESCRIPTOR:
                         merged_descriptors = (
                             XTEntityDescriptorManager.merge_descriptors(
                                 merged_descriptors, cross_both
