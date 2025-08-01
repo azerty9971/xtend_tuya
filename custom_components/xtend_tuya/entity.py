@@ -279,7 +279,7 @@ class XTEntityDescriptorManager:
             return XTEntityDescriptorManager.XTEntityDescriptorType.SET
         elif isinstance(param, str):
             return XTEntityDescriptorManager.XTEntityDescriptorType.STRING
-        elif issubclass(param, EntityDescription):
+        elif issubclass(type(param), EntityDescription):
             return XTEntityDescriptorManager.XTEntityDescriptorType.ENTITY
         else:
             return XTEntityDescriptorManager.XTEntityDescriptorType.UNKNOWN
