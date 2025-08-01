@@ -92,6 +92,8 @@ class XTEntityDescriptorManager:
                         return_list.append(entity.key)
                     case XTEntityDescriptorManager.XTEntityDescriptorType.STRING:
                         return_list.append(descriptor)
+                    case _:
+                        LOGGER.warning(f"Unknown content type in category keys: {ref_type} => {content_type}")
         elif ref_type is XTEntityDescriptorManager.XTEntityDescriptorType.DICT:
             for category_key in category_content:
                 return_list.append(category_key)
