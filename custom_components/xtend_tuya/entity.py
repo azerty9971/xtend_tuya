@@ -43,18 +43,28 @@ class XTEntityDescriptorManager:
         for descriptors_to_add in multi_manager.get_platform_descriptors_to_merge(
             platform
         ):
+            if platform == Platform.SWITCH:
+                LOGGER.warning(f"Include merge cat keys: {XTEntityDescriptorManager.get_category_keys(descriptors_to_add)}")
             include_descriptors = XTEntityDescriptorManager.merge_descriptors(
                 include_descriptors, descriptors_to_add
             )
         for descriptors_to_exclude in multi_manager.get_platform_descriptors_to_exclude(
             platform
         ):
+            if platform == Platform.SWITCH:
+                LOGGER.warning(f"Exclude merge cat keys: {XTEntityDescriptorManager.get_category_keys(descriptors_to_exclude)}")
             exclude_descriptors = XTEntityDescriptorManager.merge_descriptors(
                 exclude_descriptors, descriptors_to_exclude
             )
+        if platform == Platform.SWITCH:
+            LOGGER.warning(f"Resulting include1: {XTEntityDescriptorManager.get_category_keys(include_descriptors)}")
+            LOGGER.warning(f"Resulting exclude1: {XTEntityDescriptorManager.get_category_keys(exclude_descriptors)}")
         include_descriptors = XTEntityDescriptorManager.exclude_descriptors(
             include_descriptors, exclude_descriptors
         )
+        if platform == Platform.SWITCH:
+            LOGGER.warning(f"Resulting include2: {XTEntityDescriptorManager.get_category_keys(include_descriptors)}")
+            LOGGER.warning(f"Resulting exclude2: {XTEntityDescriptorManager.get_category_keys(exclude_descriptors)}")
         return include_descriptors, exclude_descriptors
 
     @staticmethod
