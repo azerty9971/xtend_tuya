@@ -43,10 +43,12 @@ class XTEntityDescriptorManager:
         for descriptors_to_add in multi_manager.get_platform_descriptors_to_merge(
             platform
         ):
+            debug = False
             if platform == Platform.SWITCH:
                 LOGGER.warning(f"Include merge cat keys: {XTEntityDescriptorManager.get_category_keys(descriptors_to_add)}")
+                debug = True
             include_descriptors = XTEntityDescriptorManager.merge_descriptors(
-                include_descriptors, descriptors_to_add, True
+                include_descriptors, descriptors_to_add, debug
             )
             if platform == Platform.SWITCH:
                 LOGGER.warning(f"Include result cat keys: {XTEntityDescriptorManager.get_category_keys(include_descriptors)}")
