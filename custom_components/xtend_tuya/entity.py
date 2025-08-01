@@ -284,7 +284,7 @@ class XTEntityDescriptorManager:
         elif isinstance(param, type(EntityDescription( key="test"))):
             return XTEntityDescriptorManager.XTEntityDescriptorType.ENTITY
         else:
-            LOGGER.warning(f"Type {type(param)} is not handled in _get_param_type (bases: {type(param).__mro__}) check: {type(EntityDescription( key="test"))}")
+            LOGGER.warning(f"Type {type(param)} is not handled in _get_param_type (bases: {type(param).__mro__}) check: {type(EntityDescription)}")
             return XTEntityDescriptorManager.XTEntityDescriptorType.UNKNOWN
 
 
