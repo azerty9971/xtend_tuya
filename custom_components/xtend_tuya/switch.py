@@ -1,7 +1,6 @@
 """Support for XT switches."""
 
 from __future__ import annotations
-import json
 from typing import Any, cast
 from homeassistant.const import EntityCategory, Platform
 from homeassistant.core import HomeAssistant, callback
@@ -19,7 +18,7 @@ from .const import (
     TUYA_DISCOVERY_NEW,
     XTDPCode,
     CROSS_CATEGORY_DEVICE_DESCRIPTOR,
-    LOGGER,
+    LOGGER,  # noqa: F401
 )
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaSwitchEntity,
@@ -405,10 +404,6 @@ async def async_setup_entry(
             SWITCHES, entry.runtime_data.multi_manager, Platform.SWITCH
         ),
     )
-    supported_keys: list[str] = []
-    for category in supported_descriptors:
-        supported_keys.append(category)
-    LOGGER.warning(f"SWITCH supported: {supported_keys}")
 
     @callback
     def async_discover_device(device_map, restrict_dpcode: str | None = None) -> None:
@@ -420,8 +415,6 @@ async def async_setup_entry(
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
                 if category_descriptions := supported_descriptors.get(device.category):
-                    if device.category == "cz":
-                        LOGGER.warning(f"Device category: {XTEntityDescriptorManager.get_category_keys(category_descriptions)}")
                     externally_managed_dpcodes = (
                         XTEntityDescriptorManager.get_category_keys(
                             externally_managed_descriptors.get(device.category)
