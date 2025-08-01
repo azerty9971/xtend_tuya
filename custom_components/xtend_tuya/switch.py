@@ -404,7 +404,7 @@ async def async_setup_entry(
             SWITCHES, entry.runtime_data.multi_manager, Platform.SWITCH
         ),
     )
-    LOGGER.warning(f"SWITCH ecternal: {externally_managed_descriptors}")
+    LOGGER.warning(f"SWITCH supported: {supported_descriptors}")
 
     @callback
     def async_discover_device(device_map, restrict_dpcode: str | None = None) -> None:
