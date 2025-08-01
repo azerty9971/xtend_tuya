@@ -14,7 +14,12 @@ from .multi_manager.multi_manager import (
     MultiManager,
     XTDevice,
 )
-from .const import TUYA_DISCOVERY_NEW, XTDPCode, CROSS_CATEGORY_DEVICE_DESCRIPTOR
+from .const import (
+    TUYA_DISCOVERY_NEW,
+    XTDPCode,
+    CROSS_CATEGORY_DEVICE_DESCRIPTOR,
+    LOGGER,
+)
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaSwitchEntity,
     TuyaSwitchEntityDescription,
@@ -399,6 +404,7 @@ async def async_setup_entry(
             SWITCHES, entry.runtime_data.multi_manager, Platform.SWITCH
         ),
     )
+    LOGGER.warning(f"SWITCH ecternal: {externally_managed_descriptors}")
 
     @callback
     def async_discover_device(device_map, restrict_dpcode: str | None = None) -> None:
