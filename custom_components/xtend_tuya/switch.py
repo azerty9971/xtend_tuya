@@ -405,7 +405,10 @@ async def async_setup_entry(
             SWITCHES, entry.runtime_data.multi_manager, Platform.SWITCH
         ),
     )
-    LOGGER.warning(f"SWITCH supported: {json.dumps(supported_descriptors, default=vars)}")
+    supported_keys: list[str] = []
+    for category in supported_descriptors:
+        supported_keys.append(category)
+    LOGGER.warning(f"SWITCH supported: {supported_keys}")
 
     @callback
     def async_discover_device(device_map, restrict_dpcode: str | None = None) -> None:
