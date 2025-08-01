@@ -167,6 +167,16 @@ class XTEntityDescriptorManager:
                         )
                     else:
                         return_dict[key] = merged_descriptors
+                for key in descriptors2:
+                    merged_descriptors = descriptors2[key]
+                    if cross_both is not None and key != CROSS_CATEGORY_DEVICE_DESCRIPTOR:
+                        merged_descriptors = (
+                            XTEntityDescriptorManager.merge_descriptors(
+                                merged_descriptors, cross_both
+                            )
+                        )
+                    if key not in descriptors1:
+                        return_dict[key] = merged_descriptors
                 if debug:
                     LOGGER.warning(f"Merge DICT result keys: {XTEntityDescriptorManager.get_category_keys(return_dict)}")
                 return return_dict
