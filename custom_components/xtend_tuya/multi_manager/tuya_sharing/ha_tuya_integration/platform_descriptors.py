@@ -19,12 +19,12 @@ from ....ha_tuya_integration.tuya_integration_imports import (
     SWITCHES_TUYA,
 )
 from ....const import (
-    LOGGER,
+    LOGGER,  # noqa: F401
 )
 
 
 def get_tuya_platform_descriptors(platform: Platform) -> Any:
-    LOGGER.warning(f"Getting Tuya platform descriptor: {platform}", stack_info=True)
+    #LOGGER.warning(f"Getting Tuya platform descriptor: {platform}", stack_info=True)
     match platform:
         case Platform.ALARM_CONTROL_PANEL:
             return ALARM_TUYA
