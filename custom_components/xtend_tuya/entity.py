@@ -71,22 +71,26 @@ class XTEntityDescriptorManager:
     def get_category_keys(category_content: Any) -> list[str]:
         return_list: list[str] = []
         ref_type = XTEntityDescriptorManager._get_param_type(category_content)
+        if not category_content:
+            return return_list
         if (
             ref_type is XTEntityDescriptorManager.XTEntityDescriptorType.LIST
             or ref_type is XTEntityDescriptorManager.XTEntityDescriptorType.TUPLE
             or ref_type is XTEntityDescriptorManager.XTEntityDescriptorType.SET
         ):
-            if category_content:
-                content_type = XTEntityDescriptorManager._get_param_type(
-                    category_content[0]
-                )
-                for descriptor in category_content:
-                    match content_type:
-                        case XTEntityDescriptorManager.XTEntityDescriptorType.ENTITY:
-                            entity = cast(EntityDescription, descriptor)
-                            return_list.append(entity.key)
-                        case XTEntityDescriptorManager.XTEntityDescriptorType.STRING:
-                            return_list.append(descriptor)
+            content_type = XTEntityDescriptorManager._get_param_type(
+                category_content[0]
+            )
+            for descriptor in category_content:
+                match content_type:
+                    case XTEntityDescriptorManager.XTEntityDescriptorType.ENTITY:
+                        entity = cast(EntityDescription, descriptor)
+                        return_list.append(entity.key)
+                    case XTEntityDescriptorManager.XTEntityDescriptorType.STRING:
+                        return_list.append(descriptor)
+        elif ref_type is XTEntityDescriptorManager.XTEntityDescriptorType.DICT:
+            for category_key in category_content:
+                return_list.append(category_key)
         return return_list
 
     @staticmethod
