@@ -277,10 +277,10 @@ class XTEntityDescriptorManager:
             return XTEntityDescriptorManager.XTEntityDescriptorType.TUPLE
         elif isinstance(param, set):
             return XTEntityDescriptorManager.XTEntityDescriptorType.SET
-        elif isinstance(param, EntityDescription):
-            return XTEntityDescriptorManager.XTEntityDescriptorType.ENTITY
         elif isinstance(param, str):
             return XTEntityDescriptorManager.XTEntityDescriptorType.STRING
+        elif issubclass(param, EntityDescription):
+            return XTEntityDescriptorManager.XTEntityDescriptorType.ENTITY
         else:
             return XTEntityDescriptorManager.XTEntityDescriptorType.UNKNOWN
 
