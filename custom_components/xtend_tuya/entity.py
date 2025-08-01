@@ -32,6 +32,8 @@ class XTEntityDescriptorManager:
         STRING = "string"
         UNKNOWN = "unknown"
 
+    entity_type = type(EntityDescription(key=""))
+
     @staticmethod
     def get_platform_descriptors(
         platform_descriptors: Any, multi_manager: mm.MultiManager, platform: Platform
@@ -281,11 +283,9 @@ class XTEntityDescriptorManager:
             return XTEntityDescriptorManager.XTEntityDescriptorType.SET
         elif isinstance(param, str):
             return XTEntityDescriptorManager.XTEntityDescriptorType.STRING
-        elif EntityDescription in type(param).__mro__:
+        elif isinstance(param, XTEntityDescriptorManager.entity_type):
             return XTEntityDescriptorManager.XTEntityDescriptorType.ENTITY
         else:
-            if EntityDescription in type(param).__mro__:
-                LOGGER.warning("CHECK 1 PASS")
             LOGGER.warning(f"Type {type(param)} is not handled in _get_param_type (bases: {type(param).__mro__}) check: {type(EntityDescription(key=""))}")
             return XTEntityDescriptorManager.XTEntityDescriptorType.UNKNOWN
 
