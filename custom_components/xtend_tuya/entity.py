@@ -286,7 +286,7 @@ class XTEntityDescriptorManager:
         else:
             if EntityDescription in type(param).__mro__:
                 LOGGER.warning("CHECK 1 PASS")
-            LOGGER.warning(f"Type {type(param)} is not handled in _get_param_type (bases: {type(param).__mro__}) check: {EntityDescription}")
+            LOGGER.warning(f"Type {type(param)} is not handled in _get_param_type (bases: {type(param).__mro__}) check: {type(EntityDescription(key=""))}")
             return XTEntityDescriptorManager.XTEntityDescriptorType.UNKNOWN
 
 
