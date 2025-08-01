@@ -112,7 +112,6 @@ from homeassistant.components.tuya.const import (
 )
 from homeassistant.components.tuya.entity import (
     TuyaEntity as TuyaEntity,
-    ElectricityTypeData as TuyaElectricityTypeData,  # noqa: F401
     EnumTypeData as TuyaEnumTypeData,  # noqa: F401
     IntegerTypeData as TuyaIntegerTypeData,  # noqa: F401
     _DPTYPE_MAPPING as TUYA_DPTYPE_MAPPING,  # noqa: F401
