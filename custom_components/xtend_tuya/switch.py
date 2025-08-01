@@ -421,7 +421,7 @@ async def async_setup_entry(
             if device := hass_data.manager.device_map.get(device_id):
                 if category_descriptions := supported_descriptors.get(device.category):
                     if device.category == "cz":
-                        LOGGER.warning(f"Device category: {json.dumps(category_descriptions)}")
+                        LOGGER.warning(f"Device category: {XTEntityDescriptorManager.get_category_keys(category_descriptions)}")
                     externally_managed_dpcodes = (
                         XTEntityDescriptorManager.get_category_keys(
                             externally_managed_descriptors.get(device.category)
