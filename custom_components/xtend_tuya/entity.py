@@ -32,7 +32,7 @@ class XTEntityDescriptorManager:
         STRING = "string"
         UNKNOWN = "unknown"
 
-    entity_type = type(EntityDescription(key=""))
+    entity_type = (type(EntityDescription(key="")), EntityDescription)
 
     @staticmethod
     def get_platform_descriptors(
