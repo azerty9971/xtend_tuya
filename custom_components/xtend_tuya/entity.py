@@ -281,7 +281,7 @@ class XTEntityDescriptorManager:
             return XTEntityDescriptorManager.XTEntityDescriptorType.SET
         elif isinstance(param, str):
             return XTEntityDescriptorManager.XTEntityDescriptorType.STRING
-        elif isinstance(param, type(EntityDescription( key="test"))):
+        elif issubclass(type(param), EntityDescription):
             return XTEntityDescriptorManager.XTEntityDescriptorType.ENTITY
         else:
             LOGGER.warning(f"Type {type(param)} is not handled in _get_param_type (bases: {type(param).__mro__}) check: {EntityDescription}")
