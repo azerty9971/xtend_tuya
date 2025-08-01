@@ -63,7 +63,7 @@ from .ha_tuya_integration.tuya_integration_imports import (
 
 
 @dataclass(frozen=True)
-class XTSensorEntityDescription(TuyaSensorEntityDescription):
+class XTSensorEntityDescription(TuyaSensorEntityDescription, frozen_or_thawed=True):
     """Describes XT sensor entity."""
 
     virtual_state: VirtualStates | None = None
