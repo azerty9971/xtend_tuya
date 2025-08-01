@@ -46,7 +46,7 @@ class XTEntityDescriptorManager:
             if platform == Platform.SWITCH:
                 LOGGER.warning(f"Include merge cat keys: {XTEntityDescriptorManager.get_category_keys(descriptors_to_add)}")
             include_descriptors = XTEntityDescriptorManager.merge_descriptors(
-                include_descriptors, descriptors_to_add
+                include_descriptors, descriptors_to_add, True
             )
             if platform == Platform.SWITCH:
                 LOGGER.warning(f"Include result cat keys: {XTEntityDescriptorManager.get_category_keys(include_descriptors)}")
@@ -125,6 +125,8 @@ class XTEntityDescriptorManager:
                 stack_info=True,
             )
             return descriptors1
+        if debug:
+            LOGGER.warning(f"Merge type: {descr1_type}")
         match descr1_type:
             case XTEntityDescriptorManager.XTEntityDescriptorType.DICT:
                 return_dict: dict[str, Any] = {}
@@ -159,6 +161,8 @@ class XTEntityDescriptorManager:
                         )
                     else:
                         return_dict[key] = merged_descriptors
+                if debug:
+                    LOGGER.warning(f"Merge DICT result keys: {XTEntityDescriptorManager.get_category_keys(return_dict)}")
                 return return_dict
             case XTEntityDescriptorManager.XTEntityDescriptorType.LIST:
                 return_list: list = descriptors2
@@ -179,6 +183,8 @@ class XTEntityDescriptorManager:
                         case XTEntityDescriptorManager.XTEntityDescriptorType.STRING:
                             if descriptor not in descr2_keys:
                                 return_list.append(descriptor)
+                if debug:
+                    LOGGER.warning(f"Merge LIST result keys: {XTEntityDescriptorManager.get_category_keys(return_list)}")
                 return return_list
             case XTEntityDescriptorManager.XTEntityDescriptorType.TUPLE:
                 return tuple(
