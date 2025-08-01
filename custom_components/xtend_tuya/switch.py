@@ -14,7 +14,12 @@ from .multi_manager.multi_manager import (
     MultiManager,
     XTDevice,
 )
-from .const import TUYA_DISCOVERY_NEW, XTDPCode, CROSS_CATEGORY_DEVICE_DESCRIPTOR
+from .const import (
+    TUYA_DISCOVERY_NEW,
+    XTDPCode,
+    CROSS_CATEGORY_DEVICE_DESCRIPTOR,
+    LOGGER,  # noqa: F401
+)
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaSwitchEntity,
     TuyaSwitchEntityDescription,
