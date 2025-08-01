@@ -24,7 +24,7 @@ from ....const import (
 
 
 def get_tuya_platform_descriptors(platform: Platform) -> Any:
-    #LOGGER.warning(f"Getting Tuya platform descriptor: {platform}", stack_info=True)
+    LOGGER.warning(f"Getting Tuya platform descriptor: {platform}")
     match platform:
         case Platform.ALARM_CONTROL_PANEL:
             return ALARM_TUYA
