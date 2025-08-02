@@ -41,7 +41,7 @@ try:
         TuyaEventEntity as TuyaEventEntity,
     )
 except Exception:
-    EVENTS: dict[str, tuple[EventEntityDescription, ...]] = {}
+    EVENTS_TUYA: dict[str, tuple[EventEntityDescription, ...]] = {}
     from homeassistant.components.event import (
         EventEntity as TuyaEventEntity,  # noqa: F401
     )
