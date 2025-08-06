@@ -36,7 +36,7 @@ from .entity import (
 
 
 @dataclass(frozen=True)
-class XTBinarySensorEntityDescription(TuyaBinarySensorEntityDescription, XTSharedEntityFields):
+class XTBinarySensorEntityDescription(XTSharedEntityFields, TuyaBinarySensorEntityDescription):
     """Describes an XT binary sensor."""
 
     # This DPCode represent the online status of a device
