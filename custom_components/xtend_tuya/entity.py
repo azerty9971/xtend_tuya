@@ -32,6 +32,8 @@ class XTEntityDescriptorManager:
         STRING = "string"
         UNKNOWN = "unknown"
 
+    entity_type = (type(EntityDescription(key="")), EntityDescription)
+
     @staticmethod
     def get_platform_descriptors(
         platform_descriptors: Any, multi_manager: mm.MultiManager, platform: Platform
@@ -61,22 +63,26 @@ class XTEntityDescriptorManager:
     def get_category_keys(category_content: Any) -> list[str]:
         return_list: list[str] = []
         ref_type = XTEntityDescriptorManager._get_param_type(category_content)
+        if not category_content:
+            return return_list
         if (
             ref_type is XTEntityDescriptorManager.XTEntityDescriptorType.LIST
             or ref_type is XTEntityDescriptorManager.XTEntityDescriptorType.TUPLE
             or ref_type is XTEntityDescriptorManager.XTEntityDescriptorType.SET
         ):
-            if category_content:
-                content_type = XTEntityDescriptorManager._get_param_type(
-                    category_content[0]
-                )
-                for descriptor in category_content:
-                    match content_type:
-                        case XTEntityDescriptorManager.XTEntityDescriptorType.ENTITY:
-                            entity = cast(EntityDescription, descriptor)
-                            return_list.append(entity.key)
-                        case XTEntityDescriptorManager.XTEntityDescriptorType.STRING:
-                            return_list.append(descriptor)
+            content_type = XTEntityDescriptorManager._get_param_type(
+                category_content[0]
+            )
+            for descriptor in category_content:
+                match content_type:
+                    case XTEntityDescriptorManager.XTEntityDescriptorType.ENTITY:
+                        entity = cast(EntityDescription, descriptor)
+                        return_list.append(entity.key)
+                    case XTEntityDescriptorManager.XTEntityDescriptorType.STRING:
+                        return_list.append(descriptor)
+        elif ref_type is XTEntityDescriptorManager.XTEntityDescriptorType.DICT:
+            for category_key in category_content:
+                return_list.append(category_key)
         return return_list
 
     @staticmethod
@@ -118,7 +124,7 @@ class XTEntityDescriptorManager:
                 if CROSS_CATEGORY_DEVICE_DESCRIPTOR in descriptors1:
                     cross1 = descriptors1[CROSS_CATEGORY_DEVICE_DESCRIPTOR]
                 if CROSS_CATEGORY_DEVICE_DESCRIPTOR in descriptors2:
-                    cross2 = descriptors1[CROSS_CATEGORY_DEVICE_DESCRIPTOR]
+                    cross2 = descriptors2[CROSS_CATEGORY_DEVICE_DESCRIPTOR]
                 if cross1 is not None and cross2 is not None:
                     cross_both = XTEntityDescriptorManager.merge_descriptors(
                         cross1, cross2
@@ -129,7 +135,7 @@ class XTEntityDescriptorManager:
                     cross_both = cross2
                 for key in descriptors1:
                     merged_descriptors = descriptors1[key]
-                    if cross_both is not None:
+                    if cross_both is not None and key != CROSS_CATEGORY_DEVICE_DESCRIPTOR:
                         merged_descriptors = (
                             XTEntityDescriptorManager.merge_descriptors(
                                 merged_descriptors, cross_both
@@ -140,6 +146,16 @@ class XTEntityDescriptorManager:
                             merged_descriptors, descriptors2[key]
                         )
                     else:
+                        return_dict[key] = merged_descriptors
+                for key in descriptors2:
+                    merged_descriptors = descriptors2[key]
+                    if cross_both is not None and key != CROSS_CATEGORY_DEVICE_DESCRIPTOR:
+                        merged_descriptors = (
+                            XTEntityDescriptorManager.merge_descriptors(
+                                merged_descriptors, cross_both
+                            )
+                        )
+                    if key not in descriptors1:
                         return_dict[key] = merged_descriptors
                 return return_dict
             case XTEntityDescriptorManager.XTEntityDescriptorType.LIST:
@@ -241,7 +257,9 @@ class XTEntityDescriptorManager:
 
     @staticmethod
     def _get_param_type(param) -> XTEntityDescriptorManager.XTEntityDescriptorType:
-        if isinstance(param, dict):
+        if param is None:
+            return XTEntityDescriptorManager.XTEntityDescriptorType.UNKNOWN 
+        elif isinstance(param, dict):
             return XTEntityDescriptorManager.XTEntityDescriptorType.DICT
         elif isinstance(param, list):
             return XTEntityDescriptorManager.XTEntityDescriptorType.LIST
@@ -249,11 +267,12 @@ class XTEntityDescriptorManager:
             return XTEntityDescriptorManager.XTEntityDescriptorType.TUPLE
         elif isinstance(param, set):
             return XTEntityDescriptorManager.XTEntityDescriptorType.SET
-        elif isinstance(param, EntityDescription):
-            return XTEntityDescriptorManager.XTEntityDescriptorType.ENTITY
         elif isinstance(param, str):
             return XTEntityDescriptorManager.XTEntityDescriptorType.STRING
+        elif isinstance(param, XTEntityDescriptorManager.entity_type):
+            return XTEntityDescriptorManager.XTEntityDescriptorType.ENTITY
         else:
+            LOGGER.warning(f"Type {type(param)} is not handled in _get_param_type (bases: {type(param).__mro__}) check: {XTEntityDescriptorManager.entity_type}")
             return XTEntityDescriptorManager.XTEntityDescriptorType.UNKNOWN
 
 
