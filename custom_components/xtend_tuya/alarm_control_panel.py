@@ -24,10 +24,11 @@ from .const import TUYA_DISCOVERY_NEW
 from .entity import (
     XTEntity,
     XTEntityDescriptorManager,
+    XTSharedEntityFields,
 )
 
 
-class XTAlarmEntityDescription(TuyaAlarmControlPanelEntityDescription):
+class XTAlarmEntityDescription(TuyaAlarmControlPanelEntityDescription, XTSharedEntityFields):
     def __init__(self, *args, **kwargs):
         super(XTAlarmEntityDescription, self).__init__(*args, **kwargs)
 

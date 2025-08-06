@@ -31,10 +31,11 @@ from .ha_tuya_integration.tuya_integration_imports import (
 from .entity import (
     XTEntity,
     XTEntityDescriptorManager,
+    XTSharedEntityFields,
 )
 
 
-class XTEventEntityDescription(EventEntityDescription, frozen_or_thawed=True):
+class XTEventEntityDescription(XTSharedEntityFields, EventEntityDescription):
     override_tuya: bool = False
     dont_send_to_cloud: bool = False
     on_value: Any = None

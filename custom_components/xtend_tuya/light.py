@@ -3,7 +3,7 @@
 from __future__ import annotations
 from typing import cast, Any
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
@@ -25,17 +25,20 @@ from .const import (
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaLightEntity,
     TuyaLightEntityDescription,
+    TuyaColorTypeData,
     TuyaDPCode,
     TuyaDPType,
+    DEFAULT_COLOR_TYPE_DATA_TUYA,
 )
 from .entity import (
     XTEntity,
     XTEntityDescriptorManager,
+    XTSharedEntityFields,
 )
 
 
 @dataclass(frozen=True)
-class XTLightEntityDescription(TuyaLightEntityDescription):
+class XTLightEntityDescription(XTSharedEntityFields, TuyaLightEntityDescription):
     """Describe an Tuya light entity."""
 
     brightness_max: TuyaDPCode | XTDPCode | None = None  # type: ignore
@@ -44,6 +47,9 @@ class XTLightEntityDescription(TuyaLightEntityDescription):
     color_data: TuyaDPCode | tuple[TuyaDPCode, ...] | XTDPCode | tuple[XTDPCode, ...] | None = None  # type: ignore
     color_mode: TuyaDPCode | XTDPCode | None = None  # type: ignore
     color_temp: TuyaDPCode | tuple[TuyaDPCode, ...] | XTDPCode | tuple[XTDPCode, ...] | None = None  # type: ignore
+    default_color_type: TuyaColorTypeData = field(
+        default_factory=lambda: DEFAULT_COLOR_TYPE_DATA_TUYA
+    )
 
     def get_entity_instance(
         self,

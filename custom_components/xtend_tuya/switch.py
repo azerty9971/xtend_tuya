@@ -27,12 +27,11 @@ from .ha_tuya_integration.tuya_integration_imports import (
 from .entity import (
     XTEntity,
     XTEntityDescriptorManager,
+    XTSharedEntityFields,
 )
 
 
-class XTSwitchEntityDescription(TuyaSwitchEntityDescription, frozen_or_thawed=True):
-    override_tuya: bool = False
-    dont_send_to_cloud: bool = False
+class XTSwitchEntityDescription(XTSharedEntityFields, TuyaSwitchEntityDescription, frozen_or_thawed=True):
     on_value: Any = None
     off_value: Any = None
 
