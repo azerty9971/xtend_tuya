@@ -3,7 +3,6 @@ from typing import overload, Literal, cast, Any
 from enum import StrEnum
 from homeassistant.helpers.entity import EntityDescription
 from homeassistant.const import Platform
-from homeassistant.util.frozen_dataclass_compat import FrozenOrThawed
 from .const import (
     XTDPCode,
     LOGGER,  # noqa: F401
@@ -22,21 +21,6 @@ from .ha_tuya_integration.tuya_integration_imports import (
     TuyaDPType,
 )
 
-class XTSharedEntityFields:
-    def __init__(self, *args, **kwargs) -> None:
-        self_kwargs: dict[str, Any] = {}
-        super_kwargs: dict[str, Any] = {}
-        for key in vars(XTSharedEntityFields):
-            if key in kwargs:
-                self_kwargs[key] = kwargs[key]
-            else:
-                super_kwargs[key] = kwargs[key]
-        
-        super().__init__(*args, **self_kwargs)
-        super(XTSharedEntityFields).__init__(*args, **super_kwargs)
-
-    prevent_exclusion: bool = False
-    dont_send_to_cloud: bool = False
 
 class XTEntityDescriptorManager:
     class XTEntityDescriptorType(StrEnum):
@@ -158,24 +142,22 @@ class XTEntityDescriptorManager:
                                 merged_descriptors, cross_both
                             )
                         )
-                    if key != CROSS_CATEGORY_DEVICE_DESCRIPTOR:
-                        if key in descriptors2:
-                            return_dict[key] = XTEntityDescriptorManager.merge_descriptors(
-                                merged_descriptors, descriptors2[key]
-                            )
-                        else:
-                            return_dict[key] = merged_descriptors
+                    if key in descriptors2:
+                        return_dict[key] = XTEntityDescriptorManager.merge_descriptors(
+                            merged_descriptors, descriptors2[key]
+                        )
+                    else:
+                        return_dict[key] = merged_descriptors
                 for key in descriptors2:
                     merged_descriptors = descriptors2[key]
-                    if key not in descriptors1:
-                        if cross_both is not None and key != CROSS_CATEGORY_DEVICE_DESCRIPTOR:
-                            merged_descriptors = (
-                                XTEntityDescriptorManager.merge_descriptors(
-                                    merged_descriptors, cross_both
-                                )
+                    if cross_both is not None and key != CROSS_CATEGORY_DEVICE_DESCRIPTOR:
+                        merged_descriptors = (
+                            XTEntityDescriptorManager.merge_descriptors(
+                                merged_descriptors, cross_both
                             )
-                        if key != CROSS_CATEGORY_DEVICE_DESCRIPTOR:
-                            return_dict[key] = merged_descriptors
+                        )
+                    if key not in descriptors1:
+                        return_dict[key] = merged_descriptors
                 return return_dict
             case XTEntityDescriptorManager.XTEntityDescriptorType.LIST:
                 return_list: list = descriptors2

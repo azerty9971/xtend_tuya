@@ -21,7 +21,6 @@ from .const import (
 from .entity import (
     XTEntity,
     XTEntityDescriptorManager,
-    XTSharedEntityFields,
 )
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaSirenEntity,
@@ -29,7 +28,7 @@ from .ha_tuya_integration.tuya_integration_imports import (
 )
 
 
-class XTSirenEntityDescription(XTSharedEntityFields, TuyaSirenEntityDescription, frozen_or_thawed=True):
+class XTSirenEntityDescription(TuyaSirenEntityDescription, frozen_or_thawed=True):
 
     def get_entity_instance(
         self,

@@ -31,12 +31,11 @@ from .ha_tuya_integration.tuya_integration_imports import (
 from .entity import (
     XTEntity,
     XTEntityDescriptorManager,
-    XTSharedEntityFields,
 )
 
 
 @dataclass(frozen=True)
-class XTBinarySensorEntityDescription(XTSharedEntityFields, TuyaBinarySensorEntityDescription):
+class XTBinarySensorEntityDescription(TuyaBinarySensorEntityDescription):
     """Describes an XT binary sensor."""
 
     # This DPCode represent the online status of a device
