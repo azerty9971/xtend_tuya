@@ -32,8 +32,6 @@ from .entity import (
 
 
 class XTSwitchEntityDescription(XTSharedEntityFields, TuyaSwitchEntityDescription, frozen_or_thawed=True):
-    override_tuya: bool = False
-    dont_send_to_cloud: bool = False
     on_value: Any = None
     off_value: Any = None
 

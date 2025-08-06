@@ -3,6 +3,7 @@ from typing import overload, Literal, cast, Any
 from enum import StrEnum
 from homeassistant.helpers.entity import EntityDescription
 from homeassistant.const import Platform
+from homeassistant.util.frozen_dataclass_compat import FrozenOrThawed
 from .const import (
     XTDPCode,
     LOGGER,  # noqa: F401
@@ -21,8 +22,9 @@ from .ha_tuya_integration.tuya_integration_imports import (
     TuyaDPType,
 )
 
-class XTSharedEntityFields:
+class XTSharedEntityFields(metaclass=FrozenOrThawed, frozen_or_thawed=True):
     prevent_exclusion: bool = False
+    dont_send_to_cloud: bool = False
 
 class XTEntityDescriptorManager:
     class XTEntityDescriptorType(StrEnum):
