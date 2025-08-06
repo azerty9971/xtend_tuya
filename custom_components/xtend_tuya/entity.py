@@ -146,22 +146,24 @@ class XTEntityDescriptorManager:
                                 merged_descriptors, cross_both
                             )
                         )
-                    if key in descriptors2:
-                        return_dict[key] = XTEntityDescriptorManager.merge_descriptors(
-                            merged_descriptors, descriptors2[key]
-                        )
-                    else:
-                        return_dict[key] = merged_descriptors
+                    if key != CROSS_CATEGORY_DEVICE_DESCRIPTOR:
+                        if key in descriptors2:
+                            return_dict[key] = XTEntityDescriptorManager.merge_descriptors(
+                                merged_descriptors, descriptors2[key]
+                            )
+                        else:
+                            return_dict[key] = merged_descriptors
                 for key in descriptors2:
                     merged_descriptors = descriptors2[key]
-                    if cross_both is not None and key != CROSS_CATEGORY_DEVICE_DESCRIPTOR:
-                        merged_descriptors = (
-                            XTEntityDescriptorManager.merge_descriptors(
-                                merged_descriptors, cross_both
-                            )
-                        )
                     if key not in descriptors1:
-                        return_dict[key] = merged_descriptors
+                        if cross_both is not None and key != CROSS_CATEGORY_DEVICE_DESCRIPTOR:
+                            merged_descriptors = (
+                                XTEntityDescriptorManager.merge_descriptors(
+                                    merged_descriptors, cross_both
+                                )
+                            )
+                        if key != CROSS_CATEGORY_DEVICE_DESCRIPTOR:
+                            return_dict[key] = merged_descriptors
                 return return_dict
             case XTEntityDescriptorManager.XTEntityDescriptorType.LIST:
                 return_list: list = descriptors2
