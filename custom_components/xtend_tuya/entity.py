@@ -36,24 +36,25 @@ class XTEntityDescriptorManager:
 
     @staticmethod
     def get_platform_descriptors(
-        platform_descriptors: Any, multi_manager: mm.MultiManager, platform: Platform
+        platform_descriptors: Any, multi_manager: mm.MultiManager, platform: Platform | None
     ) -> tuple[Any, Any]:
         include_descriptors = platform_descriptors
         exclude_descriptors = XTEntityDescriptorManager.get_empty_descriptor(
             platform_descriptors
         )
-        for descriptors_to_add in multi_manager.get_platform_descriptors_to_merge(
-            platform
-        ):
-            include_descriptors = XTEntityDescriptorManager.merge_descriptors(
-                include_descriptors, descriptors_to_add
-            )
-        for descriptors_to_exclude in multi_manager.get_platform_descriptors_to_exclude(
-            platform
-        ):
-            exclude_descriptors = XTEntityDescriptorManager.merge_descriptors(
-                exclude_descriptors, descriptors_to_exclude
-            )
+        if platform is not None:
+            for descriptors_to_add in multi_manager.get_platform_descriptors_to_merge(
+                platform
+            ):
+                include_descriptors = XTEntityDescriptorManager.merge_descriptors(
+                    include_descriptors, descriptors_to_add
+                )
+            for descriptors_to_exclude in multi_manager.get_platform_descriptors_to_exclude(
+                platform
+            ):
+                exclude_descriptors = XTEntityDescriptorManager.merge_descriptors(
+                    exclude_descriptors, descriptors_to_exclude
+                )
         include_descriptors = XTEntityDescriptorManager.exclude_descriptors(
             include_descriptors, exclude_descriptors
         )
