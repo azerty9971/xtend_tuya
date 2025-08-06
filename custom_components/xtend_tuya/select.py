@@ -22,6 +22,7 @@ from .const import (
 from .entity import (
     XTEntity,
     XTEntityDescriptorManager,
+    XTSharedEntityFields,
 )
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaSelectEntity,
@@ -29,7 +30,7 @@ from .ha_tuya_integration.tuya_integration_imports import (
 )
 
 
-class XTSelectEntityDescription(TuyaSelectEntityDescription):
+class XTSelectEntityDescription(XTSharedEntityFields, TuyaSelectEntityDescription):
     """Describe an Tuya select entity."""
 
     def get_entity_instance(

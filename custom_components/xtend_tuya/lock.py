@@ -23,11 +23,12 @@ from .multi_manager.multi_manager import (
 from .entity import (
     XTEntity,
     XTEntityDescriptorManager,
+    XTSharedEntityFields,
 )
 
 
 @dataclass(frozen=True)
-class XTLockEntityDescription(LockEntityDescription):
+class XTLockEntityDescription(XTSharedEntityFields, LockEntityDescription):
     """Describes a Tuya lock."""
 
     unlock_status_list: list[XTDPCode] = field(default_factory=list)
