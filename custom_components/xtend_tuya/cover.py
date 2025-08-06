@@ -148,7 +148,7 @@ async def async_setup_entry(
             dict[str, tuple[XTCoverEntityDescription, ...]],
         ],
         XTEntityDescriptorManager.get_platform_descriptors(
-            COVERS, entry.runtime_data.multi_manager, None
+            COVERS, entry.runtime_data.multi_manager, Platform.COVER
         ),
     )
 
