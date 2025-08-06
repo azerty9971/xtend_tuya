@@ -24,8 +24,16 @@ from .ha_tuya_integration.tuya_integration_imports import (
 
 class XTSharedEntityFields(metaclass=FrozenOrThawed, frozen_or_thawed=True):
     def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-        super(XTSharedEntityFields).__init__(*args, **kwargs)
+        self_kwargs: dict[str, Any] = {}
+        super_kwargs: dict[str, Any] = {}
+        for key in vars(XTSharedEntityFields):
+            if key in kwargs:
+                self_kwargs[key] = kwargs[key]
+            else:
+                super_kwargs[key] = kwargs[key]
+        
+        super().__init__(*args, **self_kwargs)
+        super(XTSharedEntityFields).__init__(*args, **super_kwargs)
 
     prevent_exclusion: bool = False
     dont_send_to_cloud: bool = False
