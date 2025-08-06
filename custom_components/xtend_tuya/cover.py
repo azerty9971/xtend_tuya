@@ -252,7 +252,6 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
             self.device.set_preference(
                 f"{XTDevice.XTDevicePreference.IS_A_COVER_DEVICE}", True
             )
-            send_update = False
             if XTDPCode.XT_COVER_INVERT_CONTROL not in self.device.status:
                 self.device.status[XTDPCode.XT_COVER_INVERT_CONTROL] = "no"
                 self.device.status_range[XTDPCode.XT_COVER_INVERT_CONTROL] = (
@@ -263,7 +262,12 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
                         dp_id=0,
                     )
                 )
-                send_update = True
+                dispatcher_send(
+                    self.local_hass,
+                    TUYA_DISCOVERY_NEW,
+                    [self.device.id],
+                    XTDPCode.XT_COVER_INVERT_CONTROL,
+                )
             if XTDPCode.XT_COVER_INVERT_STATUS not in self.device.status:
                 self.device.status[XTDPCode.XT_COVER_INVERT_STATUS] = "no"
                 self.device.status_range[XTDPCode.XT_COVER_INVERT_STATUS] = (
@@ -274,20 +278,13 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
                         dp_id=0,
                     )
                 )
-                send_update = True
-            if send_update:
-                dispatcher_send(
-                    self.local_hass,
-                    TUYA_DISCOVERY_NEW,
-                    [self.device.id],
-                    XTDPCode.XT_COVER_INVERT_CONTROL,
-                )
                 dispatcher_send(
                     self.local_hass,
                     TUYA_DISCOVERY_NEW,
                     [self.device.id],
                     XTDPCode.XT_COVER_INVERT_STATUS,
                 )
+                
 
     @property
     def current_cover_position(self) -> int | None:
