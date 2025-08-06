@@ -45,7 +45,7 @@ from .entity import (
 
 
 @dataclass(frozen=True)
-class XTCoverEntityDescription(TuyaCoverEntityDescription, XTSharedEntityFields):
+class XTCoverEntityDescription(XTSharedEntityFields, TuyaCoverEntityDescription):
     """Describes XT cover entity."""
 
     current_state: TuyaDPCode | XTDPCode | None = None  # type: ignore

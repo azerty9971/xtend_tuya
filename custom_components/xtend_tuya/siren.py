@@ -29,7 +29,7 @@ from .ha_tuya_integration.tuya_integration_imports import (
 )
 
 
-class XTSirenEntityDescription(TuyaSirenEntityDescription, XTSharedEntityFields, frozen_or_thawed=True):
+class XTSirenEntityDescription(XTSharedEntityFields, TuyaSirenEntityDescription, frozen_or_thawed=True):
 
     def get_entity_instance(
         self,

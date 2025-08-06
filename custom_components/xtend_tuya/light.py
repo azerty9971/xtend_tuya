@@ -36,7 +36,7 @@ from .entity import (
 
 
 @dataclass(frozen=True)
-class XTLightEntityDescription(TuyaLightEntityDescription, XTSharedEntityFields):
+class XTLightEntityDescription(XTSharedEntityFields, TuyaLightEntityDescription):
     """Describe an Tuya light entity."""
 
     brightness_max: TuyaDPCode | XTDPCode | None = None  # type: ignore

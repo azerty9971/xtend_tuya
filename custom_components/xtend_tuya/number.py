@@ -36,7 +36,7 @@ from .entity import (
 )
 
 
-class XTNumberEntityDescription(TuyaNumberEntityDescription, XTSharedEntityFields):
+class XTNumberEntityDescription(XTSharedEntityFields, TuyaNumberEntityDescription):
     """Describe an Tuya number entity."""
 
     def get_entity_instance(

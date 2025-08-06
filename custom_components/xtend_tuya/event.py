@@ -35,7 +35,7 @@ from .entity import (
 )
 
 
-class XTEventEntityDescription(EventEntityDescription, XTSharedEntityFields):
+class XTEventEntityDescription(XTSharedEntityFields, EventEntityDescription):
     override_tuya: bool = False
     dont_send_to_cloud: bool = False
     on_value: Any = None

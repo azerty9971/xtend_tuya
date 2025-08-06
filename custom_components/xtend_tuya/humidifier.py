@@ -25,7 +25,7 @@ from .entity import (
 
 
 @dataclass(frozen=True)
-class XTHumidifierEntityDescription(TuyaHumidifierEntityDescription, XTSharedEntityFields):
+class XTHumidifierEntityDescription(XTSharedEntityFields, TuyaHumidifierEntityDescription):
     """Describe an XT (de)humidifier entity."""
 
     def get_entity_instance(

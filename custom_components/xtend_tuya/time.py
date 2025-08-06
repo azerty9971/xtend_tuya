@@ -30,7 +30,7 @@ from .entity import (
 
 
 @dataclass(frozen=True)
-class XTTimeEntityDescription(TimeEntityDescription, XTSharedEntityFields):
+class XTTimeEntityDescription(XTSharedEntityFields, TimeEntityDescription):
     """Describes a Tuya time."""
 
     def get_entity_instance(

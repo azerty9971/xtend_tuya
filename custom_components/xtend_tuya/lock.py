@@ -28,7 +28,7 @@ from .entity import (
 
 
 @dataclass(frozen=True)
-class XTLockEntityDescription(LockEntityDescription, XTSharedEntityFields):
+class XTLockEntityDescription(XTSharedEntityFields, LockEntityDescription):
     """Describes a Tuya lock."""
 
     unlock_status_list: list[XTDPCode] = field(default_factory=list)
