@@ -32,10 +32,11 @@ from .ha_tuya_integration.tuya_integration_imports import (
 from .entity import (
     XTEntity,
     XTEntityDescriptorManager,
+    XTSharedEntityFields,
 )
 
 
-class XTNumberEntityDescription(TuyaNumberEntityDescription):
+class XTNumberEntityDescription(TuyaNumberEntityDescription, XTSharedEntityFields):
     """Describe an Tuya number entity."""
 
     def get_entity_instance(

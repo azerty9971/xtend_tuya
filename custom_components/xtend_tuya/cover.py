@@ -40,11 +40,12 @@ from .ha_tuya_integration.tuya_integration_imports import (
 from .entity import (
     XTEntity,
     XTEntityDescriptorManager,
+    XTSharedEntityFields,
 )
 
 
 @dataclass(frozen=True)
-class XTCoverEntityDescription(TuyaCoverEntityDescription):
+class XTCoverEntityDescription(TuyaCoverEntityDescription, XTSharedEntityFields):
     """Describes XT cover entity."""
 
     current_state: TuyaDPCode | XTDPCode | None = None  # type: ignore
@@ -148,7 +149,7 @@ async def async_setup_entry(
             dict[str, tuple[XTCoverEntityDescription, ...]],
         ],
         XTEntityDescriptorManager.get_platform_descriptors(
-            COVERS, entry.runtime_data.multi_manager, None
+            COVERS, entry.runtime_data.multi_manager, Platform.COVER
         ),
     )
 

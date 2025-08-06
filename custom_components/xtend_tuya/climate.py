@@ -42,6 +42,7 @@ from .ha_tuya_integration.tuya_integration_imports import (
 from .entity import (
     XTEntity,
     XTEntityDescriptorManager,
+    XTSharedEntityFields,
 )
 
 XT_HVAC_TO_HA = {
@@ -141,7 +142,7 @@ XT_CLIMATE_SWITCH_DPCODES: tuple[XTDPCode, ...] = (
 
 
 @dataclass(frozen=True, kw_only=True)
-class XTClimateEntityDescription(TuyaClimateEntityDescription):
+class XTClimateEntityDescription(TuyaClimateEntityDescription, XTSharedEntityFields):
     """Describe an Tuya climate entity."""
 
     switch_only_hvac_mode: HVACMode

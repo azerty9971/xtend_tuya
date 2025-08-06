@@ -21,6 +21,8 @@ from .ha_tuya_integration.tuya_integration_imports import (
     TuyaDPType,
 )
 
+class XTSharedEntityFields:
+    prevent_exclusion: bool = False
 
 class XTEntityDescriptorManager:
     class XTEntityDescriptorType(StrEnum):

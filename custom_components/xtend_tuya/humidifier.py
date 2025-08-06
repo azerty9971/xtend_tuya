@@ -20,11 +20,12 @@ from .ha_tuya_integration.tuya_integration_imports import (
 from .entity import (
     XTEntity,
     XTEntityDescriptorManager,
+    XTSharedEntityFields,
 )
 
 
 @dataclass(frozen=True)
-class XTHumidifierEntityDescription(TuyaHumidifierEntityDescription):
+class XTHumidifierEntityDescription(TuyaHumidifierEntityDescription, XTSharedEntityFields):
     """Describe an XT (de)humidifier entity."""
 
     def get_entity_instance(

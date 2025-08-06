@@ -51,6 +51,7 @@ from .const import (
 from .entity import (
     XTEntity,
     XTEntityDescriptorManager,
+    XTSharedEntityFields,
 )
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaSensorEntity,
@@ -63,7 +64,7 @@ from .ha_tuya_integration.tuya_integration_imports import (
 
 
 @dataclass(frozen=True)
-class XTSensorEntityDescription(TuyaSensorEntityDescription, frozen=True):
+class XTSensorEntityDescription(TuyaSensorEntityDescription, XTSharedEntityFields, frozen=True):
     """Describes XT sensor entity."""
 
     virtual_state: VirtualStates | None = None

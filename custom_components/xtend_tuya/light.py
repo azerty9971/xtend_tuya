@@ -31,11 +31,12 @@ from .ha_tuya_integration.tuya_integration_imports import (
 from .entity import (
     XTEntity,
     XTEntityDescriptorManager,
+    XTSharedEntityFields,
 )
 
 
 @dataclass(frozen=True)
-class XTLightEntityDescription(TuyaLightEntityDescription):
+class XTLightEntityDescription(TuyaLightEntityDescription, XTSharedEntityFields):
     """Describe an Tuya light entity."""
 
     brightness_max: TuyaDPCode | XTDPCode | None = None  # type: ignore
