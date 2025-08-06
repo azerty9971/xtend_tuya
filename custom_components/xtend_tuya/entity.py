@@ -22,7 +22,7 @@ from .ha_tuya_integration.tuya_integration_imports import (
     TuyaDPType,
 )
 
-class XTSharedEntityFields(metaclass=FrozenOrThawed, frozen_or_thawed=True):
+class XTSharedEntityFields:
     def __init__(self, *args, **kwargs) -> None:
         self_kwargs: dict[str, Any] = {}
         super_kwargs: dict[str, Any] = {}
