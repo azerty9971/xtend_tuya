@@ -58,8 +58,6 @@ from homeassistant.components.tuya.light import (
     LIGHTS as LIGHTS_TUYA,  # noqa: F401
     TuyaLightEntity as TuyaLightEntity,
     TuyaLightEntityDescription as TuyaLightEntityDescription,
-    ColorTypeData as TuyaColorTypeData,  # noqa: F401
-    DEFAULT_COLOR_TYPE_DATA as DEFAULT_COLOR_TYPE_DATA_TUYA,  # noqa: F401
 )
 from homeassistant.components.number import (
     NumberEntityDescription as TuyaNumberEntityDescription,  # noqa: F401

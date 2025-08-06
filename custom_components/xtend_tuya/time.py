@@ -25,12 +25,11 @@ from .multi_manager.multi_manager import (
 from .entity import (
     XTEntity,
     XTEntityDescriptorManager,
-    XTSharedEntityFields,
 )
 
 
 @dataclass(frozen=True)
-class XTTimeEntityDescription(XTSharedEntityFields, TimeEntityDescription):
+class XTTimeEntityDescription(TimeEntityDescription):
     """Describes a Tuya time."""
 
     def get_entity_instance(

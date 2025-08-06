@@ -28,12 +28,11 @@ from .ha_tuya_integration.tuya_integration_imports import (
 from .entity import (
     XTEntity,
     XTEntityDescriptorManager,
-    XTSharedEntityFields,
 )
 
 
 @dataclass(frozen=True)
-class XTButtonEntityDescription(XTSharedEntityFields, TuyaButtonEntityDescription):
+class XTButtonEntityDescription(TuyaButtonEntityDescription):
     virtual_function: VirtualFunctions | None = None
     vf_reset_state: list[XTDPCode] | None = field(default_factory=list)
 
