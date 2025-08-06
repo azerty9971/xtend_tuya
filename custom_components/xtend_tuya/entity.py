@@ -23,6 +23,10 @@ from .ha_tuya_integration.tuya_integration_imports import (
 )
 
 class XTSharedEntityFields(metaclass=FrozenOrThawed, frozen_or_thawed=True):
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        super(XTSharedEntityFields).__init__(*args, **kwargs)
+
     prevent_exclusion: bool = False
     dont_send_to_cloud: bool = False
 
