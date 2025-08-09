@@ -222,6 +222,7 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         self.device = device
         self.local_hass = hass
         device_manager.post_setup_callbacks.append(self.add_cover_open_close_option)
+        LOGGER.warning(f"Adding cover {self.device.name}")
 
     @property
     def is_cover_control_inverted(self) -> bool | None:
