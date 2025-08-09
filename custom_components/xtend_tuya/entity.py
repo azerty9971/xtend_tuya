@@ -63,9 +63,9 @@ class XTEntityDescriptorManager:
     @staticmethod
     def get_category_keys(category_content: Any) -> list[str]:
         return_list: list[str] = []
-        ref_type = XTEntityDescriptorManager._get_param_type(category_content)
         if not category_content:
             return return_list
+        ref_type = XTEntityDescriptorManager._get_param_type(category_content)
         if (
             ref_type is XTEntityDescriptorManager.XTEntityDescriptorType.LIST
             or ref_type is XTEntityDescriptorManager.XTEntityDescriptorType.TUPLE
