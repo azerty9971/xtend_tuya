@@ -210,11 +210,13 @@ class XTEntityDescriptorManager:
                 return_dict: dict[str, Any] = {}
                 for key in base_descriptors:
                     if key in exclude_descriptors:
-                        return_dict[key] = (
+                        exclude_result = (
                             XTEntityDescriptorManager.exclude_descriptors(
                                 base_descriptors[key], exclude_descriptors[key]
                             )
                         )
+                        if exclude_result:
+                            return_dict[key] = exclude_result
                     else:
                         return_dict[key] = base_descriptors[key]
                 return return_dict
@@ -259,6 +261,7 @@ class XTEntityDescriptorManager:
     @staticmethod
     def _get_param_type(param) -> XTEntityDescriptorManager.XTEntityDescriptorType:
         if param is None:
+            LOGGER.warning("Returning UNKNOWN for because of None")
             return XTEntityDescriptorManager.XTEntityDescriptorType.UNKNOWN 
         elif isinstance(param, dict):
             return XTEntityDescriptorManager.XTEntityDescriptorType.DICT
