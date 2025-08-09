@@ -33,7 +33,11 @@ class XTDecorator:
         async def wrapped(*args, **kwargs):
             if self.callback is not None:
                 await callback(
-                    True, base_object, *args, **kwargs
+                    # before_call, base_object, args... (don't use kwargs here as it breaks the logic)
+                    True,
+                    base_object,
+                    *args,
+                    **kwargs,
                 )
             if self.orig_method is not None and self.skip_call is False:
                 return_val = await self.orig_method(*args, **kwargs)
@@ -41,7 +45,11 @@ class XTDecorator:
                 return_val = None
             if self.callback is not None:
                 await callback(
-                    False, base_object, *args, **kwargs
+                    # before_call, base_object, args... (don't use kwargs here as it breaks the logic)
+                    False,
+                    base_object,
+                    *args,
+                    **kwargs,
                 )
             return return_val
 
@@ -60,7 +68,11 @@ class XTDecorator:
         def wrapped(*args, **kwargs):
             if self.callback is not None:
                 self.callback(
-                    True, base_object, *args, **kwargs
+                    # before_call, base_object, args... (don't use kwargs here as it breaks the logic)
+                    True,
+                    base_object,
+                    *args,
+                    **kwargs,
                 )
             if self.orig_method is not None and self.skip_call is False:
                 return_val = self.orig_method(*args, **kwargs)
@@ -68,7 +80,11 @@ class XTDecorator:
                 return_val = None
             if self.callback is not None:
                 self.callback(
-                    False, base_object, *args, **kwargs
+                    # before_call, base_object, args... (don't use kwargs here as it breaks the logic)
+                    False,
+                    base_object,
+                    *args,
+                    **kwargs,
                 )
             return return_val
 
