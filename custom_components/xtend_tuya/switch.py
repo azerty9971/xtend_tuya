@@ -421,12 +421,14 @@ async def async_setup_entry(
                         )
                     )
                     if restrict_dpcode is not None:
+                        LOGGER.warning(f"Category before filter: {XTEntityDescriptorManager.get_category_keys(category_descriptions)}")
                         category_descriptions = cast(
                             tuple[XTSwitchEntityDescription, ...],
                             restrict_descriptor_category(
                                 category_descriptions, [restrict_dpcode]
                             ),
                         )
+                        LOGGER.warning(f"Category after filter: {XTEntityDescriptorManager.get_category_keys(category_descriptions)}")
                     entities.extend(
                         XTSwitchEntity.get_entity_instance(
                             description, device, hass_data.manager
