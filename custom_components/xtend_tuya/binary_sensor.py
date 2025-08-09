@@ -53,11 +53,13 @@ class XTBinarySensorEntityDescription(TuyaBinarySensorEntityDescription):
 
 
 # Commonly used sensors
-TAMPER_BINARY_SENSOR = XTBinarySensorEntityDescription(
-    key=XTDPCode.TEMPER_ALARM,
-    name="Tamper",
-    device_class=BinarySensorDeviceClass.TAMPER,
-    entity_category=EntityCategory.DIAGNOSTIC,
+TAMPER_BINARY_SENSOR: tuple[XTBinarySensorEntityDescription, ...] = (
+    XTBinarySensorEntityDescription(
+        key=XTDPCode.TEMPER_ALARM,
+        name="Tamper",
+        device_class=BinarySensorDeviceClass.TAMPER,
+        entity_category=EntityCategory.DIAGNOSTIC,
+    ),
 )
 
 PROXIMITY_BINARY_SENSOR: tuple[XTBinarySensorEntityDescription, ...] = (
@@ -80,11 +82,37 @@ PROXIMITY_BINARY_SENSOR: tuple[XTBinarySensorEntityDescription, ...] = (
     ),
 )
 
+CONTACT_BINARY_SENSOR: tuple[XTBinarySensorEntityDescription, ...] = (
+    XTBinarySensorEntityDescription(
+        key=XTDPCode.DOORCONTACT_STATE,
+        translation_key="door_contact_state",
+        device_class=BinarySensorDeviceClass.DOOR,
+        entity_registry_enabled_default=True,
+    ),
+    XTBinarySensorEntityDescription(
+        key=XTDPCode.DOORCONTACT_STATE_2,
+        translation_key="door_contact_state_2",
+        device_class=BinarySensorDeviceClass.DOOR,
+        entity_registry_enabled_default=True,
+    ),
+    XTBinarySensorEntityDescription(
+        key=XTDPCode.DOORCONTACT_STATE_3,
+        translation_key="door_contact_state_3",
+        device_class=BinarySensorDeviceClass.DOOR,
+        entity_registry_enabled_default=True,
+    ),
+)
+
 # All descriptions can be found here. Mostly the Boolean data types in the
 # default status set of each category (that don't have a set instruction)
 # end up being a binary sensor.
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
 BINARY_SENSORS: dict[str, tuple[XTBinarySensorEntityDescription, ...]] = {
+    CROSS_CATEGORY_DEVICE_DESCRIPTOR: (
+        *PROXIMITY_BINARY_SENSOR,
+        *TAMPER_BINARY_SENSOR,
+        *CONTACT_BINARY_SENSOR,
+    ),
     "jtmspro": (
         XTBinarySensorEntityDescription(
             key=XTDPCode.LOCK_MOTOR_STATE,
@@ -93,7 +121,6 @@ BINARY_SENSORS: dict[str, tuple[XTBinarySensorEntityDescription, ...]] = {
             on_value=True,
         ),
     ),
-    "kg": (*PROXIMITY_BINARY_SENSOR,),
     "msp": (
         # If 1 is reported, it will be counted once.
         # If 0 is reported, it will not be counted
@@ -114,17 +141,6 @@ BINARY_SENSORS: dict[str, tuple[XTBinarySensorEntityDescription, ...]] = {
             entity_registry_enabled_default=False,
         ),
     ),
-    "pir": (*PROXIMITY_BINARY_SENSOR,),
-    # "qccdz": (
-    #    XTBinarySensorEntityDescription(
-    #        key=DPCode.ONLINE_STATE,
-    #        translation_key="online",
-    #        device_class=BinarySensorDeviceClass.CONNECTIVITY,
-    #        entity_registry_visible_default=False,
-    #        device_online=True,
-    #        on_value="online",
-    #    ),
-    # ),
     "smd": (
         XTBinarySensorEntityDescription(
             key=XTDPCode.OFF_BED,
