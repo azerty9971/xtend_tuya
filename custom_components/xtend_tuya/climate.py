@@ -206,10 +206,10 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if device and device.category in supported_descriptors:
+                if device_descriptor := XTEntityDescriptorManager.get_category_descriptors(supported_descriptors, device.category):
                     entities.append(
                         XTClimateEntity.get_entity_instance(
-                            supported_descriptors[device.category],
+                            device_descriptor,
                             device,
                             hass_data.manager,
                             hass.config.units.temperature_unit,
