@@ -275,6 +275,7 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
                     )
                 )
                 send_update = True
+            LOGGER.warning(f"Device {self.device.name} => send_update: {send_update}")
             if send_update:
                 dispatcher_send(
                     self.local_hass,
