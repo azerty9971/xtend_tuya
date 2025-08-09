@@ -168,12 +168,16 @@ class XTEntityDescriptorManager:
                         return_dict[key] = merged_descriptors
                 return return_dict
             case XTEntityDescriptorManager.XTEntityDescriptorType.LIST:
-                return_list: list = descriptors2
+                return_list: list = []
                 added_keys: list[str] = []
                 var_type = XTEntityDescriptorManager.XTEntityDescriptorType.UNKNOWN
                 if descriptors1:
                     var_type = XTEntityDescriptorManager._get_param_type(
                         descriptors1[0]
+                    )
+                elif descriptors2:
+                    var_type = XTEntityDescriptorManager._get_param_type(
+                        descriptors2[0]
                     )
                 for descriptor in descriptors1:
                     match var_type:
