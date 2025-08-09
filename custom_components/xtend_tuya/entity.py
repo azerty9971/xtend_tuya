@@ -36,35 +36,46 @@ class XTEntityDescriptorManager:
 
     @staticmethod
     def get_platform_descriptors(
-        platform_descriptors: Any, multi_manager: mm.MultiManager, platform: Platform
+        platform_descriptors: Any, multi_manager: mm.MultiManager, platform: Platform | None
     ) -> tuple[Any, Any]:
         include_descriptors = platform_descriptors
         exclude_descriptors = XTEntityDescriptorManager.get_empty_descriptor(
             platform_descriptors
         )
-        for descriptors_to_add in multi_manager.get_platform_descriptors_to_merge(
-            platform
-        ):
-            include_descriptors = XTEntityDescriptorManager.merge_descriptors(
-                include_descriptors, descriptors_to_add
-            )
-        for descriptors_to_exclude in multi_manager.get_platform_descriptors_to_exclude(
-            platform
-        ):
-            exclude_descriptors = XTEntityDescriptorManager.merge_descriptors(
-                exclude_descriptors, descriptors_to_exclude
-            )
+        if platform is not None:
+            for descriptors_to_add in multi_manager.get_platform_descriptors_to_merge(
+                platform
+            ):
+                include_descriptors = XTEntityDescriptorManager.merge_descriptors(
+                    include_descriptors, descriptors_to_add
+                )
+            for descriptors_to_exclude in multi_manager.get_platform_descriptors_to_exclude(
+                platform
+            ):
+                exclude_descriptors = XTEntityDescriptorManager.merge_descriptors(
+                    exclude_descriptors, descriptors_to_exclude
+                )
         include_descriptors = XTEntityDescriptorManager.exclude_descriptors(
             include_descriptors, exclude_descriptors
         )
         return include_descriptors, exclude_descriptors
 
     @staticmethod
+    def get_category_descriptors(descriptor_dict: dict[str, Any], category: str) -> Any:
+        if not descriptor_dict:
+            return None
+
+        if category in descriptor_dict:
+            return descriptor_dict[category]
+        if CROSS_CATEGORY_DEVICE_DESCRIPTOR in descriptor_dict:
+            return descriptor_dict[CROSS_CATEGORY_DEVICE_DESCRIPTOR]
+
+    @staticmethod
     def get_category_keys(category_content: Any) -> list[str]:
         return_list: list[str] = []
-        ref_type = XTEntityDescriptorManager._get_param_type(category_content)
         if not category_content:
             return return_list
+        ref_type = XTEntityDescriptorManager._get_param_type(category_content)
         if (
             ref_type is XTEntityDescriptorManager.XTEntityDescriptorType.LIST
             or ref_type is XTEntityDescriptorManager.XTEntityDescriptorType.TUPLE
@@ -135,21 +146,20 @@ class XTEntityDescriptorManager:
                     cross_both = cross2
                 for key in descriptors1:
                     merged_descriptors = descriptors1[key]
-                    if cross_both is not None and key != CROSS_CATEGORY_DEVICE_DESCRIPTOR:
+                    if key in descriptors2:
+                        merged_descriptors = XTEntityDescriptorManager.merge_descriptors(
+                            merged_descriptors, descriptors2[key]
+                        )
+                    if cross_both is not None:
                         merged_descriptors = (
                             XTEntityDescriptorManager.merge_descriptors(
                                 merged_descriptors, cross_both
                             )
                         )
-                    if key in descriptors2:
-                        return_dict[key] = XTEntityDescriptorManager.merge_descriptors(
-                            merged_descriptors, descriptors2[key]
-                        )
-                    else:
-                        return_dict[key] = merged_descriptors
+                    return_dict[key] = merged_descriptors
                 for key in descriptors2:
                     merged_descriptors = descriptors2[key]
-                    if cross_both is not None and key != CROSS_CATEGORY_DEVICE_DESCRIPTOR:
+                    if cross_both is not None:
                         merged_descriptors = (
                             XTEntityDescriptorManager.merge_descriptors(
                                 merged_descriptors, cross_both
@@ -209,11 +219,13 @@ class XTEntityDescriptorManager:
                 return_dict: dict[str, Any] = {}
                 for key in base_descriptors:
                     if key in exclude_descriptors:
-                        return_dict[key] = (
+                        exclude_result = (
                             XTEntityDescriptorManager.exclude_descriptors(
                                 base_descriptors[key], exclude_descriptors[key]
                             )
                         )
+                        if exclude_result:
+                            return_dict[key] = exclude_result
                     else:
                         return_dict[key] = base_descriptors[key]
                 return return_dict
@@ -258,6 +270,7 @@ class XTEntityDescriptorManager:
     @staticmethod
     def _get_param_type(param) -> XTEntityDescriptorManager.XTEntityDescriptorType:
         if param is None:
+            LOGGER.warning("Returning UNKNOWN for because of None", stack_info=True)
             return XTEntityDescriptorManager.XTEntityDescriptorType.UNKNOWN 
         elif isinstance(param, dict):
             return XTEntityDescriptorManager.XTEntityDescriptorType.DICT
