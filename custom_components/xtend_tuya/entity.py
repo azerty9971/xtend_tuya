@@ -36,10 +36,8 @@ class XTEntityDescriptorManager:
 
     @staticmethod
     def get_platform_descriptors(
-        platform_descriptors: Any, multi_manager: mm.MultiManager, platform: Platform | None, debug: str | None = None
+        platform_descriptors: Any, multi_manager: mm.MultiManager, platform: Platform | None
     ) -> tuple[Any, Any]:
-        if debug:
-            LOGGER.warning(f"get_platform_descriptors 1 ({debug}): source: {XTEntityDescriptorManager.get_category_keys(platform_descriptors)}")
         include_descriptors = platform_descriptors
         exclude_descriptors = XTEntityDescriptorManager.get_empty_descriptor(
             platform_descriptors
@@ -51,21 +49,15 @@ class XTEntityDescriptorManager:
                 include_descriptors = XTEntityDescriptorManager.merge_descriptors(
                     include_descriptors, descriptors_to_add
                 )
-            if debug:
-                LOGGER.warning(f"get_platform_descriptors 2 ({debug}): merged source: {XTEntityDescriptorManager.get_category_keys(include_descriptors)}")
             for descriptors_to_exclude in multi_manager.get_platform_descriptors_to_exclude(
                 platform
             ):
                 exclude_descriptors = XTEntityDescriptorManager.merge_descriptors(
                     exclude_descriptors, descriptors_to_exclude
                 )
-            if debug:
-                LOGGER.warning(f"get_platform_descriptors 3 ({debug}): merged exclude: {XTEntityDescriptorManager.get_category_keys(exclude_descriptors)}")
         include_descriptors = XTEntityDescriptorManager.exclude_descriptors(
             include_descriptors, exclude_descriptors
         )
-        if debug:
-            LOGGER.warning(f"get_platform_descriptors 4 ({debug}): final include: {XTEntityDescriptorManager.get_category_keys(include_descriptors)}")
         return include_descriptors, exclude_descriptors
 
     @staticmethod
@@ -154,18 +146,17 @@ class XTEntityDescriptorManager:
                     cross_both = cross2
                 for key in descriptors1:
                     merged_descriptors = descriptors1[key]
+                    if key in descriptors2:
+                        merged_descriptors = XTEntityDescriptorManager.merge_descriptors(
+                            merged_descriptors, descriptors2[key]
+                        )
                     if cross_both is not None:
                         merged_descriptors = (
                             XTEntityDescriptorManager.merge_descriptors(
                                 merged_descriptors, cross_both
                             )
                         )
-                    if key in descriptors2:
-                        return_dict[key] = XTEntityDescriptorManager.merge_descriptors(
-                            merged_descriptors, descriptors2[key]
-                        )
-                    else:
-                        return_dict[key] = merged_descriptors
+                    return_dict[key] = merged_descriptors
                 for key in descriptors2:
                     merged_descriptors = descriptors2[key]
                     if cross_both is not None:
@@ -178,39 +169,24 @@ class XTEntityDescriptorManager:
                         return_dict[key] = merged_descriptors
                 return return_dict
             case XTEntityDescriptorManager.XTEntityDescriptorType.LIST:
-                return_list: list = []
-                added_keys: list[str] = []
+                return_list: list = descriptors2
                 var_type = XTEntityDescriptorManager.XTEntityDescriptorType.UNKNOWN
                 if descriptors1:
                     var_type = XTEntityDescriptorManager._get_param_type(
                         descriptors1[0]
                     )
-                elif descriptors2:
-                    var_type = XTEntityDescriptorManager._get_param_type(
-                        descriptors2[0]
-                    )
+                descr2_keys: list[str] = XTEntityDescriptorManager.get_category_keys(
+                    descriptors2
+                )
                 for descriptor in descriptors1:
                     match var_type:
                         case XTEntityDescriptorManager.XTEntityDescriptorType.ENTITY:
                             entity = cast(EntityDescription, descriptor)
-                            if entity.key not in added_keys:
+                            if entity.key not in descr2_keys:
                                 return_list.append(descriptor)
-                                added_keys.append(entity.key)
                         case XTEntityDescriptorManager.XTEntityDescriptorType.STRING:
-                            if descriptor not in added_keys:
+                            if descriptor not in descr2_keys:
                                 return_list.append(descriptor)
-                                added_keys.append(descriptor)
-                for descriptor in descriptors2:
-                    match var_type:
-                        case XTEntityDescriptorManager.XTEntityDescriptorType.ENTITY:
-                            entity = cast(EntityDescription, descriptor)
-                            if entity.key not in added_keys:
-                                return_list.append(descriptor)
-                                added_keys.append(entity.key)
-                        case XTEntityDescriptorManager.XTEntityDescriptorType.STRING:
-                            if descriptor not in added_keys:
-                                return_list.append(descriptor)
-                                added_keys.append(descriptor)
                 return return_list
             case XTEntityDescriptorManager.XTEntityDescriptorType.TUPLE:
                 return tuple(

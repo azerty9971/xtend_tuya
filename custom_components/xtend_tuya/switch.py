@@ -401,7 +401,7 @@ async def async_setup_entry(
             dict[str, tuple[XTSwitchEntityDescription, ...]],
         ],
         XTEntityDescriptorManager.get_platform_descriptors(
-            SWITCHES, entry.runtime_data.multi_manager, Platform.SWITCH, entry.title
+            SWITCHES, entry.runtime_data.multi_manager, Platform.SWITCH
         ),
     )
 
@@ -414,8 +414,6 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if restrict_dpcode is not None:
-                    LOGGER.warning(f"Calling with restriction: {restrict_dpcode} <=> {device.category} => {supported_descriptors.get(device.category)} => {XTEntityDescriptorManager.get_category_keys(supported_descriptors.get(device.category))}")
                 if category_descriptions := XTEntityDescriptorManager.get_category_descriptors(supported_descriptors, device.category):
                     externally_managed_dpcodes = (
                         XTEntityDescriptorManager.get_category_keys(
@@ -423,14 +421,12 @@ async def async_setup_entry(
                         )
                     )
                     if restrict_dpcode is not None:
-                        LOGGER.warning(f"Category before filter: {XTEntityDescriptorManager.get_category_keys(category_descriptions)}")
                         category_descriptions = cast(
                             tuple[XTSwitchEntityDescription, ...],
                             restrict_descriptor_category(
                                 category_descriptions, [restrict_dpcode]
                             ),
                         )
-                        LOGGER.warning(f"Category after filter: {XTEntityDescriptorManager.get_category_keys(category_descriptions)}")
                     entities.extend(
                         XTSwitchEntity.get_entity_instance(
                             description, device, hass_data.manager
