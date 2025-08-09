@@ -261,7 +261,7 @@ class XTEntityDescriptorManager:
     @staticmethod
     def _get_param_type(param) -> XTEntityDescriptorManager.XTEntityDescriptorType:
         if param is None:
-            LOGGER.warning("Returning UNKNOWN for because of None")
+            LOGGER.warning("Returning UNKNOWN for because of None", stack_info=True)
             return XTEntityDescriptorManager.XTEntityDescriptorType.UNKNOWN 
         elif isinstance(param, dict):
             return XTEntityDescriptorManager.XTEntityDescriptorType.DICT
