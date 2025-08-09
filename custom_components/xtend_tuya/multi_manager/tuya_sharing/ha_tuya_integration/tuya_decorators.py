@@ -33,7 +33,7 @@ class XTDecorator:
         async def wrapped(*args, **kwargs):
             if self.callback is not None:
                 await callback(
-                    before_call=True, base_object=base_object, *args, **kwargs
+                    True, base_object, *args, **kwargs
                 )
             if self.orig_method is not None and self.skip_call is False:
                 return_val = await self.orig_method(*args, **kwargs)
@@ -41,7 +41,7 @@ class XTDecorator:
                 return_val = None
             if self.callback is not None:
                 await callback(
-                    before_call=False, base_object=base_object, *args, **kwargs
+                    False, base_object, *args, **kwargs
                 )
             return return_val
 
@@ -60,7 +60,7 @@ class XTDecorator:
         def wrapped(*args, **kwargs):
             if self.callback is not None:
                 self.callback(
-                    before_call=True, base_object=base_object, *args, **kwargs
+                    True, base_object, *args, **kwargs
                 )
             if self.orig_method is not None and self.skip_call is False:
                 return_val = self.orig_method(*args, **kwargs)
@@ -68,7 +68,7 @@ class XTDecorator:
                 return_val = None
             if self.callback is not None:
                 self.callback(
-                    before_call=False, base_object=base_object, *args, **kwargs
+                    False, base_object, *args, **kwargs
                 )
             return return_val
 
