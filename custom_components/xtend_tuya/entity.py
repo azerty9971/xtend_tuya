@@ -36,8 +36,10 @@ class XTEntityDescriptorManager:
 
     @staticmethod
     def get_platform_descriptors(
-        platform_descriptors: Any, multi_manager: mm.MultiManager, platform: Platform | None
+        platform_descriptors: Any, multi_manager: mm.MultiManager, platform: Platform | None, debug: bool = False
     ) -> tuple[Any, Any]:
+        if debug:
+            LOGGER.warning(f"get_platform_descriptors 1: source: {XTEntityDescriptorManager.get_category_keys(platform_descriptors)}")
         include_descriptors = platform_descriptors
         exclude_descriptors = XTEntityDescriptorManager.get_empty_descriptor(
             platform_descriptors
@@ -49,15 +51,21 @@ class XTEntityDescriptorManager:
                 include_descriptors = XTEntityDescriptorManager.merge_descriptors(
                     include_descriptors, descriptors_to_add
                 )
+            if debug:
+                LOGGER.warning(f"get_platform_descriptors 2: merged source: {XTEntityDescriptorManager.get_category_keys(include_descriptors)}")
             for descriptors_to_exclude in multi_manager.get_platform_descriptors_to_exclude(
                 platform
             ):
                 exclude_descriptors = XTEntityDescriptorManager.merge_descriptors(
                     exclude_descriptors, descriptors_to_exclude
                 )
+            if debug:
+                LOGGER.warning(f"get_platform_descriptors 3: merged exclude: {XTEntityDescriptorManager.get_category_keys(exclude_descriptors)}")
         include_descriptors = XTEntityDescriptorManager.exclude_descriptors(
             include_descriptors, exclude_descriptors
         )
+        if debug:
+            LOGGER.warning(f"get_platform_descriptors 4: final include: {XTEntityDescriptorManager.get_category_keys(include_descriptors)}")
         return include_descriptors, exclude_descriptors
 
     @staticmethod

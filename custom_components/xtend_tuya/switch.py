@@ -401,7 +401,7 @@ async def async_setup_entry(
             dict[str, tuple[XTSwitchEntityDescription, ...]],
         ],
         XTEntityDescriptorManager.get_platform_descriptors(
-            SWITCHES, entry.runtime_data.multi_manager, Platform.SWITCH
+            SWITCHES, entry.runtime_data.multi_manager, Platform.SWITCH, True
         ),
     )
 
