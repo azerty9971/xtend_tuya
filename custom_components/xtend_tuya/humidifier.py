@@ -71,7 +71,7 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if description := supported_descriptors.get(device.category):
+                if description := XTEntityDescriptorManager.get_category_descriptors(supported_descriptors, device.category):
                     entities.append(
                         XTHumidifierEntity.get_entity_instance(
                             description, device, hass_data.manager

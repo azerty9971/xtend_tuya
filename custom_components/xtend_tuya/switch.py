@@ -416,7 +416,7 @@ async def async_setup_entry(
             if device := hass_data.manager.device_map.get(device_id):
                 if restrict_dpcode is not None:
                     LOGGER.warning(f"Calling with restriction: {restrict_dpcode} <=> {device.category} => {supported_descriptors.get(device.category)} => {XTEntityDescriptorManager.get_category_keys(supported_descriptors.get(device.category))}")
-                if category_descriptions := supported_descriptors.get(device.category):
+                if category_descriptions := XTEntityDescriptorManager.get_category_descriptors(supported_descriptors, device.category):
                     externally_managed_dpcodes = (
                         XTEntityDescriptorManager.get_category_keys(
                             externally_managed_descriptors.get(device.category)

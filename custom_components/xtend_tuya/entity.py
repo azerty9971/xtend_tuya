@@ -69,6 +69,16 @@ class XTEntityDescriptorManager:
         return include_descriptors, exclude_descriptors
 
     @staticmethod
+    def get_category_descriptors(descriptor_dict: dict[str, Any], category: str) -> Any:
+        if not descriptor_dict:
+            return None
+
+        if category in descriptor_dict:
+            return descriptor_dict[category]
+        if CROSS_CATEGORY_DEVICE_DESCRIPTOR in descriptor_dict:
+            return descriptor_dict[CROSS_CATEGORY_DEVICE_DESCRIPTOR]
+
+    @staticmethod
     def get_category_keys(category_content: Any) -> list[str]:
         return_list: list[str] = []
         if not category_content:
