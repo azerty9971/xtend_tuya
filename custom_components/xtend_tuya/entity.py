@@ -513,9 +513,9 @@ class XTEntity(TuyaEntity):
         )
         entity_platforms = async_get_platforms(hass, DOMAIN_ORIG)
         for plat in entity_platforms:
-            if plat.domain == platform:
-                if device.id == "bf54720cfa01cc4f7emewa":
-                    LOGGER.warning(f"Found entities: {plat.entities}")
+            #if plat.domain == platform:
+            if device.id == "bf54720cfa01cc4f7emewa":
+                LOGGER.warning(f"Found entities: {plat.entities}")
         if hass_device:
             hass_entities = er.async_entries_for_device(
                 entity_registry,
