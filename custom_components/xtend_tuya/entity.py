@@ -512,14 +512,18 @@ class XTEntity(TuyaEntity):
             identifiers={(DOMAIN, device.id), (DOMAIN_ORIG, device.id)}
         )
         entity_platforms = async_get_platforms(hass, DOMAIN_ORIG)
-        if device.id == "bf54720cfa01cc4f7emewa":
-            LOGGER.warning(f"Found entity platforms: {entity_platforms}")
+        for plat in entity_platforms:
+            if plat.domain == platform:
+                if device.id == "bf54720cfa01cc4f7emewa":
+                    LOGGER.warning(f"Found entities: {plat.entities}")
         if hass_device:
             hass_entities = er.async_entries_for_device(
                 entity_registry,
                 device_id=hass_device.id,
                 include_disabled_entities=True,
             )
+            if device.id == "bf54720cfa01cc4f7emewa":
+                LOGGER.warning(f"Found hass_entities: {hass_entities}")
             for entity_registration in hass_entities:
                 for entity_platform in entity_platforms:
                     if entity_registration.entity_id in entity_platform.entities:
