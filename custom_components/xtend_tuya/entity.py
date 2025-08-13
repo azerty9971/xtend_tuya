@@ -516,8 +516,8 @@ class XTEntity(TuyaEntity):
                 device_id=hass_device.id,
                 include_disabled_entities=True,
             )
-            if device.id == "bfbe89b668e9f44e20vbek":
-                LOGGER.warning(f"Out: {hass_entities}")
+            if device.id == "bf54720cfa01cc4f7emewa":
+                LOGGER.warning(f"{device.name}: {hass_entities}")
 
     @staticmethod
     def register_handled_dpcode(device: XTDevice, platform: Platform, dpcode: str):
