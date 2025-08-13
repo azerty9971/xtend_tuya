@@ -522,8 +522,8 @@ class XTEntity(TuyaEntity):
                 device_id=hass_device.id,
                 include_disabled_entities=True,
             )
-            if device.id == "bf54720cfa01cc4f7emewa":
-                LOGGER.warning(f"Found hass_entities: {hass_entities}")
+            #if device.id == "bf54720cfa01cc4f7emewa":
+            #    LOGGER.warning(f"Found hass_entities: {hass_entities}")
             for entity_registration in hass_entities:
                 for entity_platform in entity_platforms:
                     if entity_registration.entity_id in entity_platform.entities:
