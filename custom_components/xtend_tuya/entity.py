@@ -520,10 +520,14 @@ class XTEntity(TuyaEntity):
                 device_id=hass_device.id,
                 include_disabled_entities=True,
             )
-            #for entity_registration in hass_entities:
+            for entity_registration in hass_entities:
+                for entity_platform in entity_platforms:
+                    if entity_registration.entity_id in entity_platform.entities:
+                        entity_instance = entity_platform.entities[entity_registration.entity_id]
+
             #    entity_registration.
-            #if device.id == "bf54720cfa01cc4f7emewa":
-            #    LOGGER.warning(f"{device.name}: {hass_entities}")
+                        if device.id == "bf54720cfa01cc4f7emewa":
+                            LOGGER.warning(f"{device.name}: {type(entity_instance)}")
 
     @staticmethod
     def register_handled_dpcode(device: XTDevice, platform: Platform, dpcode: str):
