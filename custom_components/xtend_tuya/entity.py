@@ -511,7 +511,7 @@ class XTEntity(TuyaEntity):
         hass_device = device_registry.async_get_device(
             identifiers={(DOMAIN, device.id), (DOMAIN_ORIG, device.id)}
         )
-        entity_platforms = async_get_platforms(hass, DOMAIN_ORIG)
+        entity_platforms = async_get_platforms(hass, DOMAIN)
         for plat in entity_platforms:
             #if plat.domain == platform:
             if device.id == "bf54720cfa01cc4f7emewa":
