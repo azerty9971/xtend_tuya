@@ -3,6 +3,7 @@ from typing import overload, Literal, cast, Any
 from enum import StrEnum
 from homeassistant.helpers.entity import EntityDescription
 from homeassistant.helpers import entity_registry as er, device_registry as dr
+from homeassistant.helpers.entity_platform import async_get_platforms
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from .const import (
@@ -510,12 +511,17 @@ class XTEntity(TuyaEntity):
         hass_device = device_registry.async_get_device(
             identifiers={(DOMAIN, device.id), (DOMAIN_ORIG, device.id)}
         )
+        entity_platforms = async_get_platforms(hass, DOMAIN_ORIG)
+        if device.id == "bf54720cfa01cc4f7emewa":
+            LOGGER.warning(f"Found entity platforms: {entity_platforms}")
         if hass_device:
             hass_entities = er.async_entries_for_device(
                 entity_registry,
                 device_id=hass_device.id,
                 include_disabled_entities=True,
             )
+            #for entity_registration in hass_entities:
+            #    entity_registration.
             if device.id == "bf54720cfa01cc4f7emewa":
                 LOGGER.warning(f"{device.name}: {hass_entities}")
 
