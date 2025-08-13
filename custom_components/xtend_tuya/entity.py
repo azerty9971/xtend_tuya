@@ -502,6 +502,7 @@ class XTEntity(TuyaEntity):
         result, dpcode = XTEntity._supports_description(
             device, description, first_pass, externally_managed_dpcodes
         )
+        LOGGER.warning(f"Result for {description.key} => {result}")
         if result is True:
             # Register the code as being handled by the device
             handled_dpcodes: list[str] = cast(
@@ -526,7 +527,7 @@ class XTEntity(TuyaEntity):
 
         dpcode = description.key
         if isinstance(description, XTBinarySensor.XTBinarySensorEntityDescription):
-            if description.dpcode is not None:
+            if dpcode is None and description.dpcode is not None:
                 dpcode = description.dpcode
         if first_pass is True:
             if dpcode in device.status and dpcode not in externally_managed_dpcodes:
