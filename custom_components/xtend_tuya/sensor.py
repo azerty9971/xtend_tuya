@@ -1426,8 +1426,7 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if device.category == "wsdcg":
-                    LOGGER.warning(f"WSDCG: {XTEntityDescriptorManager.get_category_keys(XTEntityDescriptorManager.get_category_descriptors(supported_descriptors, device.category))}")
+                XTEntity.register_current_entities_as_handled_dpcode(hass, device, Platform.SENSOR)
                 if category_descriptions := XTEntityDescriptorManager.get_category_descriptors(supported_descriptors, device.category):
                     externally_managed_dpcodes = (
                         XTEntityDescriptorManager.get_category_keys(
@@ -1447,7 +1446,7 @@ async def async_setup_entry(
                         )
                         for description in category_descriptions
                         if XTEntity.supports_description(
-                            device, description, True, externally_managed_dpcodes
+                            device, Platform.SENSOR, description, True, externally_managed_dpcodes
                         )
                     )
                     entities.extend(
@@ -1456,7 +1455,7 @@ async def async_setup_entry(
                         )
                         for description in category_descriptions
                         if XTEntity.supports_description(
-                            device, description, False, externally_managed_dpcodes
+                            device, Platform.SENSOR, description, False, externally_managed_dpcodes
                         )
                     )
 
