@@ -531,7 +531,7 @@ class XTEntity(TuyaEntity):
 
             #    entity_registration.
                         if device.id == "bf54720cfa01cc4f7emewa":
-                            LOGGER.warning(f"{device.name}: {type(entity_instance)}")
+                            LOGGER.warning(f"{device.name}: {type(entity_instance)} <=> {entity_platform}")
 
     @staticmethod
     def register_handled_dpcode(device: XTDevice, platform: Platform, dpcode: str):
