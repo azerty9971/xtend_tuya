@@ -517,14 +517,20 @@ class XTEntity(TuyaEntity):
             for entity_registration in hass_entities:
                 for entity_platform in entity_platforms:
                     if entity_registration.entity_id in entity_platform.entities:
-                        entity_instance = entity_platform.entities[entity_registration.entity_id]
+                        entity_instance = entity_platform.entities[
+                            entity_registration.entity_id
+                        ]
                         entity_instance_platform = Platform(entity_platform.domain)
                         entity_description: EntityDescription | None = None
                         if hasattr(entity_instance, "entity_description"):
                             entity_description = entity_instance.entity_description
                         if entity_description is not None:
-                            dpcode = XTEntity._get_description_dpcode(entity_description)
-                            XTEntity.register_handled_dpcode(device, entity_instance_platform, dpcode)
+                            dpcode = XTEntity._get_description_dpcode(
+                                entity_description
+                            )
+                            XTEntity.register_handled_dpcode(
+                                device, entity_instance_platform, dpcode
+                            )
 
     @staticmethod
     def register_handled_dpcode(device: XTDevice, platform: Platform, dpcode: str):
@@ -571,6 +577,7 @@ class XTEntity(TuyaEntity):
     @staticmethod
     def _get_description_dpcode(description: EntityDescription) -> str:
         import custom_components.xtend_tuya.binary_sensor as XTBinarySensor
+
         dpcode = description.key
         if isinstance(description, XTBinarySensor.XTBinarySensorEntityDescription):
             if dpcode is None and description.dpcode is not None:
@@ -586,11 +593,10 @@ class XTEntity(TuyaEntity):
         externally_managed_dpcodes: list[str],
     ) -> tuple[bool, str]:
         dpcode = XTEntity._get_description_dpcode(description)
+        if XTEntity.is_dpcode_handled(device, platform, dpcode) is True:
+            return False, dpcode
         if first_pass is True:
-            if (
-                dpcode in device.status
-                and XTEntity.is_dpcode_handled(device, platform, dpcode) is False
-            ):
+            if dpcode in device.status:
                 return True, dpcode
             return False, dpcode
         else:
@@ -602,7 +608,6 @@ class XTEntity(TuyaEntity):
                 if (
                     XTEntity.is_dpcode_handled(device, platform, current_status)
                     is False
-                    # and current_status not in externally_managed_dpcodes
                 ):
                     device.replace_status_with_another(current_status, dpcode)
                     return True, dpcode
