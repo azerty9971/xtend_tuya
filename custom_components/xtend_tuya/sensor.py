@@ -1426,7 +1426,6 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                XTEntity.register_current_entities_as_handled_dpcode(hass, device, Platform.SENSOR)
                 if category_descriptions := XTEntityDescriptorManager.get_category_descriptors(supported_descriptors, device.category):
                     externally_managed_dpcodes = (
                         XTEntityDescriptorManager.get_category_keys(

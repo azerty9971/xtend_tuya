@@ -62,10 +62,6 @@ class XTEntityDescriptorManager:
                 exclude_descriptors = XTEntityDescriptorManager.merge_descriptors(
                     exclude_descriptors, descriptors_to_exclude
                 )
-        #TO BE DELETED!!!
-        include_descriptors = XTEntityDescriptorManager.exclude_descriptors(
-            include_descriptors, exclude_descriptors
-        )
         return include_descriptors, exclude_descriptors
 
     @staticmethod
@@ -504,7 +500,7 @@ class XTEntity(TuyaEntity):
 
     @staticmethod
     def register_current_entities_as_handled_dpcode(
-        hass: HomeAssistant, device: XTDevice, platform: Platform
+        hass: HomeAssistant, device: XTDevice
     ):
         device_registry = dr.async_get(hass)
         entity_registry = er.async_get(hass)
@@ -512,26 +508,23 @@ class XTEntity(TuyaEntity):
             identifiers={(DOMAIN, device.id), (DOMAIN_ORIG, device.id)}
         )
         entity_platforms = async_get_platforms(hass, DOMAIN_ORIG)
-        for plat in entity_platforms:
-            #if plat.domain == platform:
-            if device.id == "bf54720cfa01cc4f7emewa":
-                LOGGER.warning(f"Found entities: {plat} <=> {plat.domain_entities}")
         if hass_device:
             hass_entities = er.async_entries_for_device(
                 entity_registry,
                 device_id=hass_device.id,
-                include_disabled_entities=True,
+                include_disabled_entities=False,
             )
-            #if device.id == "bf54720cfa01cc4f7emewa":
-            #    LOGGER.warning(f"Found hass_entities: {hass_entities}")
             for entity_registration in hass_entities:
                 for entity_platform in entity_platforms:
                     if entity_registration.entity_id in entity_platform.entities:
                         entity_instance = entity_platform.entities[entity_registration.entity_id]
-
-            #    entity_registration.
-                        if device.id == "bf54720cfa01cc4f7emewa":
-                            LOGGER.warning(f"{device.name}: {type(entity_instance)} <=> {entity_platform}")
+                        entity_instance_platform = Platform(entity_platform.domain)
+                        entity_description: EntityDescription | None = None
+                        if hasattr(entity_instance, "entity_description"):
+                            entity_description = entity_instance.entity_description
+                        if entity_description is not None:
+                            dpcode = XTEntity._get_description_dpcode(entity_description)
+                            XTEntity.register_handled_dpcode(device, entity_instance_platform, dpcode)
 
     @staticmethod
     def register_handled_dpcode(device: XTDevice, platform: Platform, dpcode: str):
@@ -576,6 +569,15 @@ class XTEntity(TuyaEntity):
         return result
 
     @staticmethod
+    def _get_description_dpcode(description: EntityDescription) -> str:
+        import custom_components.xtend_tuya.binary_sensor as XTBinarySensor
+        dpcode = description.key
+        if isinstance(description, XTBinarySensor.XTBinarySensorEntityDescription):
+            if dpcode is None and description.dpcode is not None:
+                dpcode = description.dpcode
+        return dpcode
+
+    @staticmethod
     def _supports_description(
         device: XTDevice,
         platform: Platform,
@@ -583,12 +585,7 @@ class XTEntity(TuyaEntity):
         first_pass: bool,
         externally_managed_dpcodes: list[str],
     ) -> tuple[bool, str]:
-        import custom_components.xtend_tuya.binary_sensor as XTBinarySensor
-
-        dpcode = description.key
-        if isinstance(description, XTBinarySensor.XTBinarySensorEntityDescription):
-            if dpcode is None and description.dpcode is not None:
-                dpcode = description.dpcode
+        dpcode = XTEntity._get_description_dpcode(description)
         if first_pass is True:
             if (
                 dpcode in device.status
