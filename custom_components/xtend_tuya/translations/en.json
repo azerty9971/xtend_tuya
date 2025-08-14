@@ -161,6 +161,15 @@
     },
     "entity": {
         "binary_sensor": {
+            "door_contact_state": {
+                "name": "Door contact"
+            },
+            "door_contact_state_2": {
+                "name": "Door contact 2"
+            },
+            "door_contact_state_3": {
+                "name": "Door contact 3"
+            },
             "pir_state": {
                 "name": "Proximity sensor"
             },

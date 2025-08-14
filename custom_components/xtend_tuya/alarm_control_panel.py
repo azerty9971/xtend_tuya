@@ -94,7 +94,7 @@ async def async_setup_entry(
                         )
                         for description in category_descriptions
                         if XTEntity.supports_description(
-                            device, description, True, externally_managed_dpcodes
+                            device, Platform.ALARM_CONTROL_PANEL, description, True, externally_managed_dpcodes
                         )
                     )
                     entities.extend(
@@ -103,7 +103,7 @@ async def async_setup_entry(
                         )
                         for description in category_descriptions
                         if XTEntity.supports_description(
-                            device, description, False, externally_managed_dpcodes
+                            device, Platform.ALARM_CONTROL_PANEL, description, False, externally_managed_dpcodes
                         )
                     )
         async_add_entities(entities)

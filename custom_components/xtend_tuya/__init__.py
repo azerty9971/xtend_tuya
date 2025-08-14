@@ -25,6 +25,9 @@ from .util import get_config_entry_runtime_data
 from .multi_manager.shared.services.services import (
     ServiceManager,
 )
+from .entity import (
+    XTEntity,
+)
 
 # Suppress logs from the library, it logs unneeded on error
 logging.getLogger("tuya_sharing").setLevel(logging.CRITICAL)
@@ -63,6 +66,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
     device_registry = dr.async_get(hass)
     aggregated_device_map = multi_manager.device_map
     for device in aggregated_device_map.values():
+        XTEntity.register_current_entities_as_handled_dpcode(hass, device)
         multi_manager.virtual_state_handler.apply_init_virtual_states(device)
 
     for device in aggregated_device_map.values():
