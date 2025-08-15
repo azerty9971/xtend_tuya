@@ -322,6 +322,7 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         if self.is_cover_status_inverted:
             computed_position = 100
 
+        current_state = None
         if self.entity_description.current_state is not None:
             current_state = self.device.status.get(
                 self.entity_description.current_state
@@ -335,6 +336,7 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         if position is not None:
             return position == computed_position
 
+        LOGGER.warning(f"is_closed: {current_state} <=> {position} <=> {computed_position} ({self.device.name})")
         return None
 
     def open_cover(self, **kwargs: Any) -> None:
