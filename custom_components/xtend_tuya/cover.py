@@ -95,7 +95,7 @@ COVERS: dict[str, tuple[XTCoverEntityDescription, ...]] = {
         XTCoverEntityDescription(
             key=XTDPCode.CONTROL_2,
             translation_key="curtain_2",
-            current_position=XTDPCode.PERCENT_STATE_2,
+            current_position=(XTDPCode.PERCENT_CONTROL_2, XTDPCode.PERCENT_STATE_2),
             set_position=XTDPCode.PERCENT_CONTROL_2,
             control_back_mode=XTDPCode.CONTROL_BACK_MODE,
             device_class=CoverDeviceClass.CURTAIN,
@@ -103,7 +103,7 @@ COVERS: dict[str, tuple[XTCoverEntityDescription, ...]] = {
         XTCoverEntityDescription(
             key=XTDPCode.CONTROL_3,
             translation_key="curtain_3",
-            current_position=XTDPCode.PERCENT_STATE_3,
+            current_position=(XTDPCode.PERCENT_CONTROL_3, XTDPCode.PERCENT_STATE_3),
             set_position=XTDPCode.PERCENT_CONTROL_3,
             device_class=CoverDeviceClass.CURTAIN,
             control_back_mode=XTDPCode.CONTROL_BACK_MODE,
@@ -222,6 +222,7 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         self.device = device
         self.local_hass = hass
         device_manager.post_setup_callbacks.append(self.add_cover_open_close_option)
+        LOGGER.warning(f"Added {device.name} => current_position: {self._current_position}")
 
     @property
     def is_cover_control_inverted(self) -> bool | None:
