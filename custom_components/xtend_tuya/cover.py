@@ -292,6 +292,7 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
     @property
     def current_cover_position(self) -> int | None:
         current_cover_position = super().current_cover_position
+        LOGGER.warning(f"Current cover position: {current_cover_position} ({self.device.name})")
         if current_cover_position is not None:
             if self.is_cover_status_inverted and self._current_position is not None:
                 return round(
