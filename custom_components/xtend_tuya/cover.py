@@ -306,11 +306,14 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
     def real_current_cover_position(self) -> int | None:
         """Return cover current position."""
         if self._current_position is None:
+            LOGGER.warning(f"real_current_cover_position1: ({self.device.name})")
             return None
 
         if (position := self.device.status.get(self._current_position.dpcode)) is None:
+            LOGGER.warning(f"real_current_cover_position2: ({self.device.name})")
             return None
 
+        LOGGER.warning(f"real_current_cover_position3: {round(self._current_position.remap_value_to(position, 0, 100, reverse=True))} ({self.device.name})")
         return round(
             self._current_position.remap_value_to(position, 0, 100, reverse=True)
         )
@@ -328,15 +331,17 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
                 self.entity_description.current_state
             )
             if current_state is not None:
+                LOGGER.warning(f"is_closed1: {(current_state in (True, "fully_close")) is not self.is_cover_status_inverted} ({self.device.name})")
                 return (
                     current_state in (True, "fully_close")
                 ) is not self.is_cover_status_inverted
 
         position = self.real_current_cover_position
         if position is not None:
+            LOGGER.warning(f"is_closed2: {current_state} <=> {position} <=> {computed_position} ({self.device.name})")
             return position == computed_position
 
-        LOGGER.warning(f"is_closed: {current_state} <=> {position} <=> {computed_position} ({self.device.name})")
+        LOGGER.warning(f"is_closed3: {current_state} <=> {position} <=> {computed_position} ({self.device.name})")
         return None
 
     def open_cover(self, **kwargs: Any) -> None:
