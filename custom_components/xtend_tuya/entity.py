@@ -591,7 +591,7 @@ class XTEntity(TuyaEntity):
         description: EntityDescription,
         first_pass: bool,
         externally_managed_dpcodes: list[str],
-        debug: bool = False
+        debug: bool = False,
     ) -> tuple[bool, str]:
         dpcode = XTEntity._get_description_dpcode(description)
         if XTEntity.is_dpcode_handled(device, platform, dpcode) is True:

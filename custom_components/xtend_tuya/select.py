@@ -39,7 +39,9 @@ class XTSelectEntityDescription(TuyaSelectEntityDescription):
         description: XTSelectEntityDescription,
     ) -> XTSelectEntity:
         return XTSelectEntity(
-            device=device, device_manager=device_manager, description=description
+            device=device,
+            device_manager=device_manager,
+            description=XTSelectEntityDescription(**description.__dict__),
         )
 
 
@@ -262,7 +264,9 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if category_descriptions := XTEntityDescriptorManager.get_category_descriptors(supported_descriptors, device.category):
+                if category_descriptions := XTEntityDescriptorManager.get_category_descriptors(
+                    supported_descriptors, device.category
+                ):
                     externally_managed_dpcodes = (
                         XTEntityDescriptorManager.get_category_keys(
                             externally_managed_descriptors.get(device.category)
@@ -281,7 +285,11 @@ async def async_setup_entry(
                         )
                         for description in category_descriptions
                         if XTEntity.supports_description(
-                            device, Platform.SELECT, description, True, externally_managed_dpcodes
+                            device,
+                            Platform.SELECT,
+                            description,
+                            True,
+                            externally_managed_dpcodes,
                         )
                     )
                     entities.extend(
@@ -290,13 +298,19 @@ async def async_setup_entry(
                         )
                         for description in category_descriptions
                         if XTEntity.supports_description(
-                            device, Platform.SELECT, description, False, externally_managed_dpcodes
+                            device,
+                            Platform.SELECT,
+                            description,
+                            False,
+                            externally_managed_dpcodes,
                         )
                     )
 
         async_add_entities(entities)
 
-    hass_data.manager.register_device_descriptors(Platform.SELECT, supported_descriptors)
+    hass_data.manager.register_device_descriptors(
+        Platform.SELECT, supported_descriptors
+    )
     async_discover_device([*hass_data.manager.device_map])
 
     entry.async_on_unload(

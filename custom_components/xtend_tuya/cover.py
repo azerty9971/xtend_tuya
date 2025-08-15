@@ -64,7 +64,7 @@ class XTCoverEntityDescription(TuyaCoverEntityDescription):
         return XTCoverEntity(
             device=device,
             device_manager=device_manager,
-            description=description,
+            description=XTCoverEntityDescription(**description.__dict__),
             hass=hass,
         )
 
@@ -161,7 +161,9 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if category_descriptions := XTEntityDescriptorManager.get_category_descriptors(supported_descriptors, device.category):
+                if category_descriptions := XTEntityDescriptorManager.get_category_descriptors(
+                    supported_descriptors, device.category
+                ):
                     externally_managed_dpcodes = (
                         XTEntityDescriptorManager.get_category_keys(
                             externally_managed_descriptors.get(device.category)
@@ -180,7 +182,11 @@ async def async_setup_entry(
                         )
                         for description in category_descriptions
                         if XTEntity.supports_description(
-                            device, Platform.COVER, description, True, externally_managed_dpcodes
+                            device,
+                            Platform.COVER,
+                            description,
+                            True,
+                            externally_managed_dpcodes,
                         )
                     )
                     entities.extend(
@@ -189,7 +195,11 @@ async def async_setup_entry(
                         )
                         for description in category_descriptions
                         if XTEntity.supports_description(
-                            device, Platform.COVER, description, False, externally_managed_dpcodes
+                            device,
+                            Platform.COVER,
+                            description,
+                            False,
+                            externally_managed_dpcodes,
                         )
                     )
 
@@ -222,7 +232,9 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         self.device = device
         self.local_hass = hass
         device_manager.post_setup_callbacks.append(self.add_cover_open_close_option)
-        LOGGER.warning(f"Added {device.name} => current_position: {self._current_position} <=> state: {self.state}")
+        LOGGER.warning(
+            f"Added {device.name} => current_position: {self._current_position} <=> state: {self.state}"
+        )
 
     @property
     def is_cover_control_inverted(self) -> bool | None:
@@ -293,7 +305,10 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
     def current_cover_position(self) -> int | None:
         LOGGER.warning(f"Current cover position start ({self.device.name})")
         current_cover_position = super().current_cover_position
-        LOGGER.warning(f"Current cover position: {current_cover_position} ({self.device.name})", stack_info=True)
+        LOGGER.warning(
+            f"Current cover position: {current_cover_position} ({self.device.name})",
+            stack_info=True,
+        )
         if current_cover_position is not None:
             if self.is_cover_status_inverted and self._current_position is not None:
                 return round(
@@ -314,7 +329,9 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
             LOGGER.warning(f"real_current_cover_position2: ({self.device.name})")
             return None
 
-        LOGGER.warning(f"real_current_cover_position3: {round(self._current_position.remap_value_to(position, 0, 100, reverse=True))} ({self.device.name})")
+        LOGGER.warning(
+            f"real_current_cover_position3: {round(self._current_position.remap_value_to(position, 0, 100, reverse=True))} ({self.device.name})"
+        )
         return round(
             self._current_position.remap_value_to(position, 0, 100, reverse=True)
         )
@@ -332,17 +349,23 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
                 self.entity_description.current_state
             )
             if current_state is not None:
-                LOGGER.warning(f"is_closed1: {(current_state in (True, "fully_close")) is not self.is_cover_status_inverted} ({self.device.name})")
+                LOGGER.warning(
+                    f"is_closed1: {(current_state in (True, "fully_close")) is not self.is_cover_status_inverted} ({self.device.name})"
+                )
                 return (
                     current_state in (True, "fully_close")
                 ) is not self.is_cover_status_inverted
 
         position = self.real_current_cover_position
         if position is not None:
-            LOGGER.warning(f"is_closed2: {current_state} <=> {position} <=> {computed_position} ({self.device.name})")
+            LOGGER.warning(
+                f"is_closed2: {current_state} <=> {position} <=> {computed_position} ({self.device.name})"
+            )
             return position == computed_position
 
-        LOGGER.warning(f"is_closed3: {current_state} <=> {position} <=> {computed_position} ({self.device.name})")
+        LOGGER.warning(
+            f"is_closed3: {current_state} <=> {position} <=> {computed_position} ({self.device.name})"
+        )
         return None
 
     def open_cover(self, **kwargs: Any) -> None:

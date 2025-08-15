@@ -41,7 +41,9 @@ class XTLockEntityDescription(LockEntityDescription):
         description: XTLockEntityDescription,
     ) -> XTLockEntity:
         return XTLockEntity(
-            device=device, device_manager=device_manager, description=description
+            device=device,
+            device_manager=device_manager,
+            description=XTLockEntityDescription(**description.__dict__),
         )
 
 
