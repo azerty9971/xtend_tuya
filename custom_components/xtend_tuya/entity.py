@@ -567,7 +567,7 @@ class XTEntity(TuyaEntity):
         externally_managed_dpcodes: list[str] = [],
     ) -> bool:
         result, dpcode = XTEntity._supports_description(
-            device, platform, description, first_pass, externally_managed_dpcodes, device.id == "bf9c368e75667d66fdc7at"
+            device, platform, description, first_pass, externally_managed_dpcodes, device.id == "bf9c368e75667d66fdc7at" and platform == Platform.COVER
         )
         if result is True:
             # Register the code as being handled by the device
