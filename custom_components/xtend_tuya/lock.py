@@ -55,7 +55,6 @@ LOCKS: dict[str, XTLockEntityDescription] = {}
 # Statuses that tell if the lock is currently locked or not
 LOCK_LOCKED_UNLOCKED_STATUS_DPCODES: list[XTDPCode] = [
     XTDPCode.LOCK_MOTOR_STATE,
-    XTDPCode.ACCESSORY_LOCK,
 ]
 
 # Statuses that can be sent to lock/unlock the lock
