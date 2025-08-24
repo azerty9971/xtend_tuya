@@ -34,7 +34,9 @@ class XTHumidifierEntityDescription(TuyaHumidifierEntityDescription):
         description: XTHumidifierEntityDescription,
     ) -> XTHumidifierEntity:
         return XTHumidifierEntity(
-            device=device, device_manager=device_manager, description=description
+            device=device,
+            device_manager=device_manager,
+            description=XTHumidifierEntityDescription(**description.__dict__),
         )
 
 
@@ -71,7 +73,9 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if description := XTEntityDescriptorManager.get_category_descriptors(supported_descriptors, device.category):
+                if description := XTEntityDescriptorManager.get_category_descriptors(
+                    supported_descriptors, device.category
+                ):
                     entities.append(
                         XTHumidifierEntity.get_entity_instance(
                             description, device, hass_data.manager

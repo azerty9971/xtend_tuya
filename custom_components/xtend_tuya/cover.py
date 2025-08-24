@@ -64,7 +64,7 @@ class XTCoverEntityDescription(TuyaCoverEntityDescription):
         return XTCoverEntity(
             device=device,
             device_manager=device_manager,
-            description=description,
+            description=XTCoverEntityDescription(**description.__dict__),
             hass=hass,
         )
 
@@ -95,7 +95,7 @@ COVERS: dict[str, tuple[XTCoverEntityDescription, ...]] = {
         XTCoverEntityDescription(
             key=XTDPCode.CONTROL_2,
             translation_key="curtain_2",
-            current_position=XTDPCode.PERCENT_STATE_2,
+            current_position=(XTDPCode.PERCENT_CONTROL_2, XTDPCode.PERCENT_STATE_2),
             set_position=XTDPCode.PERCENT_CONTROL_2,
             control_back_mode=XTDPCode.CONTROL_BACK_MODE,
             device_class=CoverDeviceClass.CURTAIN,
@@ -103,7 +103,7 @@ COVERS: dict[str, tuple[XTCoverEntityDescription, ...]] = {
         XTCoverEntityDescription(
             key=XTDPCode.CONTROL_3,
             translation_key="curtain_3",
-            current_position=XTDPCode.PERCENT_STATE_3,
+            current_position=(XTDPCode.PERCENT_CONTROL_3, XTDPCode.PERCENT_STATE_3),
             set_position=XTDPCode.PERCENT_CONTROL_3,
             device_class=CoverDeviceClass.CURTAIN,
             control_back_mode=XTDPCode.CONTROL_BACK_MODE,
@@ -161,7 +161,9 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if category_descriptions := XTEntityDescriptorManager.get_category_descriptors(supported_descriptors, device.category):
+                if category_descriptions := XTEntityDescriptorManager.get_category_descriptors(
+                    supported_descriptors, device.category
+                ):
                     externally_managed_dpcodes = (
                         XTEntityDescriptorManager.get_category_keys(
                             externally_managed_descriptors.get(device.category)
@@ -180,7 +182,11 @@ async def async_setup_entry(
                         )
                         for description in category_descriptions
                         if XTEntity.supports_description(
-                            device, Platform.COVER, description, True, externally_managed_dpcodes
+                            device,
+                            Platform.COVER,
+                            description,
+                            True,
+                            externally_managed_dpcodes,
                         )
                     )
                     entities.extend(
@@ -189,7 +195,11 @@ async def async_setup_entry(
                         )
                         for description in category_descriptions
                         if XTEntity.supports_description(
-                            device, Platform.COVER, description, False, externally_managed_dpcodes
+                            device,
+                            Platform.COVER,
+                            description,
+                            False,
+                            externally_managed_dpcodes,
                         )
                     )
 
@@ -320,6 +330,7 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         if self.is_cover_status_inverted:
             computed_position = 100
 
+        current_state = None
         if self.entity_description.current_state is not None:
             current_state = self.device.status.get(
                 self.entity_description.current_state
@@ -332,7 +343,6 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         position = self.real_current_cover_position
         if position is not None:
             return position == computed_position
-
         return None
 
     def open_cover(self, **kwargs: Any) -> None:

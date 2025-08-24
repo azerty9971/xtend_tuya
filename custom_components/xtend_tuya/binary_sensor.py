@@ -48,7 +48,9 @@ class XTBinarySensorEntityDescription(TuyaBinarySensorEntityDescription):
         description: XTBinarySensorEntityDescription,
     ) -> XTBinarySensorEntity:
         return XTBinarySensorEntity(
-            device=device, device_manager=device_manager, description=description
+            device=device,
+            device_manager=device_manager,
+            description=XTBinarySensorEntityDescription(**description.__dict__),
         )
 
 
@@ -191,7 +193,9 @@ async def async_setup_entry(
             return
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id, None):
-                if category_descriptions := XTEntityDescriptorManager.get_category_descriptors(supported_descriptors, device.category):
+                if category_descriptions := XTEntityDescriptorManager.get_category_descriptors(
+                    supported_descriptors, device.category
+                ):
                     externally_managed_dpcodes = (
                         XTEntityDescriptorManager.get_category_keys(
                             externally_managed_descriptors.get(device.category)
@@ -210,7 +214,11 @@ async def async_setup_entry(
                         )
                         for description in category_descriptions
                         if XTEntity.supports_description(
-                            device, Platform.BINARY_SENSOR, description, True, externally_managed_dpcodes
+                            device,
+                            Platform.BINARY_SENSOR,
+                            description,
+                            True,
+                            externally_managed_dpcodes,
                         )
                     )
                     entities.extend(
@@ -219,7 +227,11 @@ async def async_setup_entry(
                         )
                         for description in category_descriptions
                         if XTEntity.supports_description(
-                            device, Platform.BINARY_SENSOR, description, False, externally_managed_dpcodes
+                            device,
+                            Platform.BINARY_SENSOR,
+                            description,
+                            False,
+                            externally_managed_dpcodes,
                         )
                     )
         async_add_entities(entities)

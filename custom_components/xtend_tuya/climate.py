@@ -156,7 +156,7 @@ class XTClimateEntityDescription(TuyaClimateEntityDescription):
         return XTClimateEntity(
             device=device,
             device_manager=device_manager,
-            description=description,
+            description=XTClimateEntityDescription(**description.__dict__),
             system_temperature_unit=system_temperature_unit,
         )
 
@@ -206,7 +206,9 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if device_descriptor := XTEntityDescriptorManager.get_category_descriptors(supported_descriptors, device.category):
+                if device_descriptor := XTEntityDescriptorManager.get_category_descriptors(
+                    supported_descriptors, device.category
+                ):
                     entities.append(
                         XTClimateEntity.get_entity_instance(
                             device_descriptor,

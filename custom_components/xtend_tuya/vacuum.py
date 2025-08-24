@@ -23,6 +23,7 @@ from .ha_tuya_integration.tuya_integration_imports import (
 
 VACUUMS: list[str] = []
 
+
 async def async_setup_entry(
     hass: HomeAssistant, entry: XTConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
