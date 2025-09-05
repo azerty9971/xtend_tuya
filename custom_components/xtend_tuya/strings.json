@@ -1155,6 +1155,25 @@
       }
     },
     "sensor": {
+      "temp_unit_convert": {
+        "name": "Temperature unit",
+        "state": {
+          "c": "Celsius",
+          "f": "Fahrenheit"
+        }
+      },
+      "eco": {
+        "name": "Eco"
+      },
+      "switch_alarm_sound": {
+        "name": "Switch Alarm Sound"
+      },
+      "time": {
+        "name": "Time"
+      },
+      "backlight_switch": {
+        "name": "Backlight Switch"
+      },
       "frequency": {
         "name": "Frequency"
       },

@@ -18,8 +18,8 @@ DO NOT USE THE WESTERN EUROPE OR EASTERN AMERICA DATA CENTERS, THEY ARE RESERVED
 1.3- Login to your newly created account<br/>
 
 2- Create a development project<br/>
-2.1- On the left, hover over Cloud then select Development:<br/>
-![image](https://github.com/user-attachments/assets/daab8f84-20d6-4acc-8809-feec9c63113a)<br/>
+2.1- On the left, hover over Cloud then select Project Management:<br/>
+![image](https://github.com/user-attachments/assets/8c62729b-2dc0-4b12-aadc-cb4c0b00b35a)<br/>
 2.2- Click "Create Cloud Project"<br/>
 2.3- Give any relevant name and description to your project<br/>
 2.4- Set "Smart home" in both "Industry" and "Development Method"<br/>
@@ -30,8 +30,8 @@ DO NOT USE THE WESTERN EUROPE OR EASTERN AMERICA DATA CENTERS, THEY ARE RESERVED
 ![image](https://github.com/user-attachments/assets/8908079f-13f1-4231-9af7-3def0633ef8a)<br/>
 
 3- Link you Tuya/SmartLife app to your cloud account<br/>
-3.1- On the left, hover over Cloud then select Development:<br/>
-![image](https://github.com/user-attachments/assets/daab8f84-20d6-4acc-8809-feec9c63113a)<br/>
+3.1- On the left, hover over Cloud then select Project Management:<br/>
+![image](https://github.com/user-attachments/assets/8c62729b-2dc0-4b12-aadc-cb4c0b00b35a)<br/>
 3.2- Open your cloud project created in step 2 by clicking the "Open Project" link<br/>
 ![image](https://github.com/user-attachments/assets/9d3abb65-392b-435a-a5cb-14afa15b4bba)<br/>
 3.3- Go to the "Devices" tab<br/>
