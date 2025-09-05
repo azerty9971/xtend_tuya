@@ -569,6 +569,7 @@ class XTDPCode(StrEnum):
     AUTOMATIC_LOCK = "automatic_lock"
     A_CURRENT = "A_Current"
     A_VOLTAGE = "A_Voltage"
+    BACKLIGHT_SWITCH = "backlight_switch"
     BALANCE_ENERGY = "balance_energy"
     BATTERY_POWER = "battery_power"
     BEEP = "beep"
@@ -647,6 +648,7 @@ class XTDPCode(StrEnum):
     DIRECTION_A = "direction_a"
     DIRECTION_B = "direction_b"
     DOORBELL_VOLUME = "doorbell_volume"
+    ECO = "eco"
     ELECTRIC = "electric"
     ELECTRIC_THIS_MONTH = "electric_this_month"
     ELECTRIC_THIS_YEAR = "electric_this_year"
@@ -812,6 +814,7 @@ class XTDPCode(StrEnum):
     TEMP_SENSITIVITY = "temp_sensitivity"
     TEMP_SET_1 = "temp_set_1"  # Set the warm temperature in °C
     TEMP_TOP = "temp_top"
+    TIME = "time"
     TOILET_NOTICE = "toilet_notice"
     TIME_GET_IN_BED = "time_get_in_bed"
     TIMER_ON = "timer_on"
