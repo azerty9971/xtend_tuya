@@ -992,6 +992,66 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
         *BATTERY_SENSORS,
         *LOCK_SENSORS,
     ),
+    # Formaldehyde Detector
+    # Note: Not documented
+    "jqbj": (
+        XTSensorEntityDescription(
+            key=XTDPCode.CH2O_STATE,
+            translation_key="air_quality",
+            entity_registry_enabled_default=True,
+        ),
+        # XTSensorEntityDescription(
+        #     key=XTDPCode.PM25_VALUE,
+        #     translation_key="pm25",
+        #     device_class=SensorDeviceClass.PM25,
+        #     state_class=SensorStateClass.MEASUREMENT,
+        #     entity_registry_enabled_default=True,
+        # ),
+        # XTSensorEntityDescription(
+        #     key=XTDPCode.CO2_VALUE,
+        #     translation_key="carbon_dioxide",
+        #     device_class=SensorDeviceClass.CO2,
+        #     state_class=SensorStateClass.MEASUREMENT,
+        #     entity_registry_enabled_default=True,
+        # ),
+        XTSensorEntityDescription(
+            key=XTDPCode.PM10,
+            translation_key="pm10",
+            device_class=SensorDeviceClass.PM10,
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_registry_enabled_default=True,
+        ),
+        XTSensorEntityDescription(
+            key=XTDPCode.TEMP_UNIT_CONVERT,
+            translation_key="temp_unit_convert",
+            entity_registry_enabled_default=True,
+            entity_registry_visible_default=False,
+        ),
+        XTSensorEntityDescription(
+            key=XTDPCode.ECO,
+            translation_key="eco_mode",
+            entity_registry_enabled_default=True,
+            entity_registry_visible_default=False,
+        ),
+        XTSensorEntityDescription(
+            key=XTDPCode.SWITCH_ALARM_SOUND,
+            translation_key="switch_alarm_sound",
+            entity_registry_enabled_default=True,
+            entity_registry_visible_default=False,
+        ),
+        XTSensorEntityDescription(
+            key=XTDPCode.TIME,
+            translation_key="time",
+            entity_registry_enabled_default=True,
+            entity_registry_visible_default=False,
+        ),
+        XTSensorEntityDescription(
+            key=XTDPCode.BACKLIGHT_SWITCH,
+            translation_key="backlight_switch",
+            entity_registry_enabled_default=True,
+            entity_registry_visible_default=False,
+        ),
+    ),
     # Automatic cat litter box
     # Note: Undocumented
     "msp": (
