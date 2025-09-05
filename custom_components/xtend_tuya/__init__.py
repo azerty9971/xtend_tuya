@@ -66,6 +66,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
     device_registry = dr.async_get(hass)
     aggregated_device_map = multi_manager.device_map
     for device in aggregated_device_map.values():
+        XTEntity.mark_overriden_entities_as_disables(hass, device)
         XTEntity.register_current_entities_as_handled_dpcode(hass, device)
         multi_manager.virtual_state_handler.apply_init_virtual_states(device)
 

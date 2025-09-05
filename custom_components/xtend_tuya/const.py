@@ -81,6 +81,10 @@ class TuyaCloudOpenAPIEndpoint(StrEnum):
                 return "America"
 
 
+FULLY_OVERRIDEN_PLATFORMS = [
+    Platform.COVER,
+]
+
 PLATFORMS = [
     Platform.ALARM_CONTROL_PANEL,
     Platform.BINARY_SENSOR,
