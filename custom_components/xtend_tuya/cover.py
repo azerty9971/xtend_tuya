@@ -119,46 +119,9 @@ COVERS: dict[str, tuple[XTCoverEntityDescription, ...]] = {
             control_back_mode=XTDPCode.CONTROL_BACK_MODE,
         ),
     ),
-    # clkg category - same as cl but different device category  
-    "clkg": (
-        XTCoverEntityDescription(
-            key=XTDPCode.CONTROL,
-            translation_key="curtain",
-            current_state=XTDPCode.SITUATION_SET,
-            current_position=(XTDPCode.PERCENT_CONTROL, XTDPCode.PERCENT_STATE),
-            set_position=XTDPCode.PERCENT_CONTROL,
-            device_class=CoverDeviceClass.CURTAIN,
-            control_back_mode=XTDPCode.CONTROL_BACK_MODE,
-        ),
-        XTCoverEntityDescription(
-            key=XTDPCode.CONTROL_2,
-            translation_key="curtain_2",
-            current_position=XTDPCode.PERCENT_STATE_2,
-            set_position=XTDPCode.PERCENT_CONTROL_2,
-            control_back_mode=XTDPCode.CONTROL_BACK_MODE,
-            device_class=CoverDeviceClass.CURTAIN,
-        ),
-        XTCoverEntityDescription(
-            key=XTDPCode.CONTROL_3,
-            translation_key="curtain_3",
-            current_position=XTDPCode.PERCENT_STATE_3,
-            set_position=XTDPCode.PERCENT_CONTROL_3,
-            device_class=CoverDeviceClass.CURTAIN,
-            control_back_mode=XTDPCode.CONTROL_BACK_MODE,
-        ),
-        XTCoverEntityDescription(
-            key=XTDPCode.MACH_OPERATE,
-            translation_key="curtain",
-            current_position=XTDPCode.POSITION,
-            set_position=XTDPCode.POSITION,
-            device_class=CoverDeviceClass.CURTAIN,
-            open_instruction_value="FZ",
-            close_instruction_value="ZZ",
-            stop_instruction_value="STOP",
-            control_back_mode=XTDPCode.CONTROL_BACK_MODE,
-        ),
-    ),
 }
+
+COVERS["clkg"] = COVERS["cl"]
 
 
 async def async_setup_entry(
