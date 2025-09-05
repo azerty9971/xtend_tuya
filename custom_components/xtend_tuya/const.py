@@ -82,6 +82,7 @@ class TuyaCloudOpenAPIEndpoint(StrEnum):
 
 
 FULLY_OVERRIDEN_PLATFORMS = [
+    Platform.CAMERA,
     Platform.COVER,
 ]
 
