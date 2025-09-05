@@ -521,11 +521,7 @@ class XTEntity(TuyaEntity):
             for entity_registration in hass_entities:
                 for entity_platform in entity_platforms:
                     if entity_registration.entity_id in entity_platform.entities:
-                        entity_instance = entity_platform.entities[
-                            entity_registration.entity_id
-                        ]
                         entity_instance_platform = Platform(entity_platform.domain)
-                        entity_description: EntityDescription | None = None
                         if entity_instance_platform in FULLY_OVERRIDEN_PLATFORMS:
                             entity_registry.async_update_entity(entity_id=entity_registration.entity_id, disabled_by=RegistryEntryDisabler.USER)
 
