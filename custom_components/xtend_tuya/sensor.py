@@ -11,6 +11,9 @@ from homeassistant.components.sensor import (
     SensorExtraStoredData,
     RestoreSensor,
 )
+from homeassistant.components.sensor.const import (
+    DEVICE_CLASS_UNITS as SENSOR_DEVICE_CLASS_UNITS,
+)
 from homeassistant.const import (
     UnitOfEnergy,
     Platform,
@@ -1495,6 +1498,7 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
         device_manager: MultiManager,
         description: XTSensorEntityDescription,
     ) -> None:
+        """Init Tuya sensor."""
         self.entity_description = description
         self._attr_unique_id = (
             f"{super().unique_id}{description.key}{description.subkey or ''}"
@@ -1519,6 +1523,9 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
             self.device_class is not None
             and not self.device_class.startswith(TuyaDOMAIN)
             and description.native_unit_of_measurement is None
+            # we do not need to check mappings if the API UOM is allowed
+            and self.native_unit_of_measurement
+            not in SENSOR_DEVICE_CLASS_UNITS[self.device_class]
         ):
             # We cannot have a device class, if the UOM isn't set or the
             # device class cannot be found in the validation mapping.
@@ -1526,24 +1533,30 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
                 self.native_unit_of_measurement is None
                 or self.device_class not in TuyaDEVICE_CLASS_UNITS
             ):
+                LOGGER.debug(
+                    "Device class %s ignored for incompatible unit %s in sensor entity %s",
+                    self.device_class,
+                    self.native_unit_of_measurement,
+                    self.unique_id,
+                )
                 self._attr_device_class = None
+                self._attr_suggested_unit_of_measurement = None
                 return
 
             uoms = TuyaDEVICE_CLASS_UNITS[self.device_class]
-            self._uom = uoms.get(self.native_unit_of_measurement) or uoms.get(
+            uom = uoms.get(self.native_unit_of_measurement) or uoms.get(
                 self.native_unit_of_measurement.lower()
             )
 
             # Unknown unit of measurement, device class should not be used.
-            if self._uom is None:
+            if uom is None:
                 self._attr_device_class = None
+                self._attr_suggested_unit_of_measurement = None
                 return
 
             # Found unit of measurement, use the standardized Unit
             # Use the target conversion unit (if set)
-            self._attr_native_unit_of_measurement = (
-                self._uom.conversion_unit or self._uom.unit
-            )
+            self._attr_native_unit_of_measurement = uom.unit
 
     def __init__(
         self,
