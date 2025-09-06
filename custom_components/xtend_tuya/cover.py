@@ -118,6 +118,16 @@ COVERS: dict[str, tuple[XTCoverEntityDescription, ...]] = {
             stop_instruction_value="STOP",
             control_back_mode=XTDPCode.CONTROL_BACK_MODE,
         ),
+        # switch_1 is an undocumented code that behaves identically to control
+        # It is used by the Kogan Smart Blinds Driver
+        XTCoverEntityDescription(
+            key=XTDPCode.SWITCH_1,
+            translation_key="blind",
+            current_position=XTDPCode.PERCENT_CONTROL,
+            set_position=XTDPCode.PERCENT_CONTROL,
+            device_class=CoverDeviceClass.BLIND,
+            control_back_mode=XTDPCode.CONTROL_BACK_MODE,
+        ),
     ),
 }
 
