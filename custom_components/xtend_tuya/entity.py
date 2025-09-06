@@ -3,6 +3,9 @@ from typing import overload, Literal, cast, Any
 from enum import StrEnum
 from homeassistant.helpers.entity import EntityDescription
 from homeassistant.helpers import entity_registry as er, device_registry as dr
+from homeassistant.helpers.entity_registry import (
+    RegistryEntryDisabler,
+)
 from homeassistant.helpers.entity_platform import async_get_platforms
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
@@ -12,6 +15,7 @@ from .const import (
     CROSS_CATEGORY_DEVICE_DESCRIPTOR,
     DOMAIN,
     DOMAIN_ORIG,
+    FULLY_OVERRIDEN_PLATFORMS,
 )
 from .multi_manager.shared.shared_classes import (
     XTDevice,
@@ -497,6 +501,30 @@ class XTEntity(TuyaEntity):
             return TuyaDPType(type)
         except ValueError:
             return TUYA_DPTYPE_MAPPING.get(type)
+
+    @staticmethod
+    def mark_overriden_entities_as_disables(
+        hass: HomeAssistant, device: XTDevice
+    ):
+        device_registry = dr.async_get(hass)
+        entity_registry = er.async_get(hass)
+        hass_device = device_registry.async_get_device(
+            identifiers={(DOMAIN, device.id), (DOMAIN_ORIG, device.id)}
+        )
+        entity_platforms = async_get_platforms(hass, DOMAIN_ORIG)
+        if hass_device:
+            hass_entities = er.async_entries_for_device(
+                entity_registry,
+                device_id=hass_device.id,
+                include_disabled_entities=False,
+            )
+            for entity_registration in hass_entities:
+                for entity_platform in entity_platforms:
+                    if entity_registration.entity_id in entity_platform.entities:
+                        entity_instance_platform = Platform(entity_platform.domain)
+                        if entity_instance_platform in FULLY_OVERRIDEN_PLATFORMS:
+                            entity_registry.async_update_entity(entity_id=entity_registration.entity_id, disabled_by=RegistryEntryDisabler.USER)
+
 
     @staticmethod
     def register_current_entities_as_handled_dpcode(

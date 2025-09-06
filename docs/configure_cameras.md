@@ -1,5 +1,5 @@
 # Purpose
-The purpose of this documentation is to correctly configure your locks (G30, any other lock) using the Tuya IOT Cloud platform
+The purpose of this documentation is to correctly configure your cameras using the Tuya IOT Cloud platform
 
 # Prerequisite
 For this, you will need a functionning Tuya IOT Cloud Platform account. If you don't have one already please follow the following guide:

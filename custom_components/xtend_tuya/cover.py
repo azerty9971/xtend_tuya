@@ -90,15 +90,14 @@ COVERS: dict[str, tuple[XTCoverEntityDescription, ...]] = {
             set_position=XTDPCode.PERCENT_CONTROL,
             device_class=CoverDeviceClass.CURTAIN,
             control_back_mode=XTDPCode.CONTROL_BACK_MODE,
-            ##override_tuya=True,
         ),
         XTCoverEntityDescription(
             key=XTDPCode.CONTROL_2,
             translation_key="curtain_2",
             current_position=(XTDPCode.PERCENT_CONTROL_2, XTDPCode.PERCENT_STATE_2),
             set_position=XTDPCode.PERCENT_CONTROL_2,
-            control_back_mode=XTDPCode.CONTROL_BACK_MODE,
             device_class=CoverDeviceClass.CURTAIN,
+            control_back_mode=XTDPCode.CONTROL_BACK_MODE,
         ),
         XTCoverEntityDescription(
             key=XTDPCode.CONTROL_3,
@@ -131,6 +130,8 @@ COVERS: dict[str, tuple[XTCoverEntityDescription, ...]] = {
         ),
     ),
 }
+
+COVERS["clkg"] = COVERS["cl"]
 
 
 async def async_setup_entry(

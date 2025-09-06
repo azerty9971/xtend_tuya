@@ -60,12 +60,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
     )
 
     # Cleanup device registry
-    await cleanup_device_registry(hass, multi_manager, entry)
+    hass.async_create_task(cleanup_device_registry(hass, multi_manager, entry))
 
     # Register known device IDs
     device_registry = dr.async_get(hass)
     aggregated_device_map = multi_manager.device_map
     for device in aggregated_device_map.values():
+        XTEntity.mark_overriden_entities_as_disables(hass, device)
         XTEntity.register_current_entities_as_handled_dpcode(hass, device)
         multi_manager.virtual_state_handler.apply_init_virtual_states(device)
 
@@ -95,7 +96,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
     # So the subscription is here
     await hass.async_add_executor_job(multi_manager.refresh_mq)
     service_manager.register_services()
-    await cleanup_duplicated_devices(hass, entry)
+    hass.async_create_task(cleanup_duplicated_devices(hass, entry))
     await multi_manager.on_loading_finalized(hass, entry)
     LOGGER.debug(f"Xtended Tuya {entry.title} loaded in {datetime.now() - start_time}")
     return True
