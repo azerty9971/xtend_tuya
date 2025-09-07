@@ -3,7 +3,7 @@ from functools import partial
 import copy
 import importlib
 import os
-from typing import Any, Literal, Optional
+from typing import Any, Literal, Optional, Callable
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from tuya_iot.device import (
@@ -81,7 +81,7 @@ class MultiManager:  # noqa: F811
         self.scene_id: list[str] = []
         self.general_properties: dict[str, Any] = {}
         self.entity_parsers: dict[str, XTCustomEntityParser] = {}
-        self.post_setup_callbacks: dict[XTMultiManagerPostSetupCallbackPriority, list[Any]] = {}
+        self.post_setup_callbacks: dict[XTMultiManagerPostSetupCallbackPriority, list[tuple[Callable, tuple | None, dict | None]]] = {}
 
     @property
     def device_map(self):
@@ -516,8 +516,12 @@ class MultiManager:  # noqa: F811
         for priority in XTMultiManagerPostSetupCallbackPriority:
             if priority not in self.post_setup_callbacks:
                 continue
-            for callback in self.post_setup_callbacks[priority]:
-                callback()
+            for callback, args, kwargs in self.post_setup_callbacks[priority]:
+                if args is None:
+                    args = tuple()
+                if kwargs is None:
+                    kwargs = {}
+                callback(*args, **kwargs)
 
     def set_general_property(
         self, property_id: XTMultiManagerProperties, property_value: Any

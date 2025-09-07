@@ -1532,8 +1532,8 @@ async def async_setup_entry(
                             externally_managed_dpcodes,
                         )
                     )
-
         async_add_entities(entities)
+        
 
     hass_data.manager.register_device_descriptors(
         this_platform, supported_descriptors
