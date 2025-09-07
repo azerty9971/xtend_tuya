@@ -82,6 +82,8 @@ class MultiManager:  # noqa: F811
         self.general_properties: dict[str, Any] = {}
         self.entity_parsers: dict[str, XTCustomEntityParser] = {}
         self.post_setup_callbacks: dict[XTMultiManagerPostSetupCallbackPriority, list[tuple[Callable, tuple | None, dict | None]]] = {}
+        for priority in XTMultiManagerPostSetupCallbackPriority:
+            self.post_setup_callbacks[priority] = []
 
     @property
     def device_map(self):
