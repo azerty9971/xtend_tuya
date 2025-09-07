@@ -1485,7 +1485,7 @@ async def async_setup_entry(
 
     @callback
     def async_add_generic_entities(device_map) -> None:
-        LOGGER.warning(f"Calling async_add_generic_entities: {device_map}")
+        #LOGGER.warning(f"Calling async_add_generic_entities: {device_map}")
         if hass_data.manager is None:
             return
         device_ids = [*device_map]
