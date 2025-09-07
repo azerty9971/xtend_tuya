@@ -105,7 +105,7 @@ async def async_setup_entry(
                 for dpcode in generic_dpcodes:
                     descriptor = XTLightEntityDescription(
                         key=dpcode,
-                        translation_key="xt_generic_sensor",
+                        translation_key="xt_generic_light",
                         translation_placeholders={"name": XTEntity.get_human_name_from_generic_dpcode(dpcode)},
                         entity_registry_enabled_default=False,
                         entity_registry_visible_default=False,
