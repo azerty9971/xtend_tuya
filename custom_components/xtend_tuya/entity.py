@@ -669,6 +669,7 @@ class XTEntity(TuyaEntity):
             if dp_id is not None:
                 dp_id = status_range.dp_id
         if dp_id is None:
+            LOGGER.warning(f"DP_ID is None ({device.name} => {dpcode})")
             return False
         if local_strategy := device.local_strategy.get(dp_id):
             if access_mode := local_strategy.get("access_mode"):
@@ -683,12 +684,14 @@ class XTEntity(TuyaEntity):
                         read_only = False
                         write_only = True
             else:
+                LOGGER.warning(f"Access mode not found or NULL ({device.name} => {dpcode})")
                 return False
             
             if config_item := local_strategy.get("config_item"):
                 if dptype := config_item.get("valueType"):
                     value_type = XTEntity.determine_dptype(dptype)
         if value_type is None:
+            LOGGER.warning(f"value_type is None ({device.name} => {dpcode})")
             return False
         match platform:
             case Platform.SENSOR:
