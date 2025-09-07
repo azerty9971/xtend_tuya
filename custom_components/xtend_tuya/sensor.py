@@ -50,6 +50,7 @@ from .const import (
     VirtualStates,  # noqa: F401
     XTDeviceEntityFunctions,
     CROSS_CATEGORY_DEVICE_DESCRIPTOR,
+    XTMultiManagerPostSetupCallbackPriority,
 )
 from .entity import (
     XTEntity,
@@ -1483,6 +1484,10 @@ async def async_setup_entry(
     )
 
     @callback
+    def async_add_generic_entities(device_map) -> None:
+        LOGGER.warning(f"Calling async_add_generic_entities: {device_map}")
+
+    @callback
     def async_discover_device(device_map, restrict_dpcode: str | None = None) -> None:
         """Discover and add a discovered Tuya sensor."""
         if hass_data.manager is None:
@@ -1533,6 +1538,8 @@ async def async_setup_entry(
                         )
                     )
         async_add_entities(entities)
+        if restrict_dpcode is None:
+            hass_data.manager.post_setup_callbacks[XTMultiManagerPostSetupCallbackPriority.PRIORITY_LAST].append((async_add_generic_entities, (device_map,), None))
         
 
     hass_data.manager.register_device_descriptors(
