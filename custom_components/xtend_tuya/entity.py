@@ -279,7 +279,7 @@ class XTEntityDescriptorManager:
     @staticmethod
     def _get_param_type(param) -> XTEntityDescriptorManager.XTEntityDescriptorType:
         if param is None:
-            LOGGER.warning("Returning UNKNOWN for because of None", stack_info=True)
+            LOGGER.warning("_get_param_type is returning UNKNOWN because of None input", stack_info=True)
             return XTEntityDescriptorManager.XTEntityDescriptorType.UNKNOWN
         elif isinstance(param, dict):
             return XTEntityDescriptorManager.XTEntityDescriptorType.DICT
@@ -694,9 +694,6 @@ class XTEntity(TuyaEntity):
                         read_only = False
                         write_only = True
             else:
-                LOGGER.warning(
-                    f"Access mode not found or NULL ({device.name} => {dpcode})"
-                )
                 return False
             if value_type is None:
                 if config_item := local_strategy.get("config_item"):
@@ -713,7 +710,6 @@ class XTEntity(TuyaEntity):
                         except Exception:
                             pass
         if value_type is None:
-            LOGGER.warning(f"value_type is None ({device.name} => {dpcode})")
             return False
         match platform:
             case Platform.BINARY_SENSOR:
@@ -785,8 +781,6 @@ class XTEntity(TuyaEntity):
             ):
                 continue
             return_list.append(dpcode)
-        if return_list and platform != Platform.SENSOR:
-            LOGGER.warning(f"Adding {return_list} ({device.name} ({platform}))")
         return return_list
 
     @staticmethod
