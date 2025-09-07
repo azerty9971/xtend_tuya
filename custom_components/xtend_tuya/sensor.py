@@ -1492,7 +1492,8 @@ async def async_setup_entry(
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
                 generic_dpcodes = XTEntity.get_generic_dpcodes_for_this_platform(device, this_platform)
-                LOGGER.warning(f"Would add the following entities for {device.name} ({this_platform}): {generic_dpcodes}")
+                if generic_dpcodes:
+                    LOGGER.warning(f"Would add the following entities for {device.name} ({this_platform}): {generic_dpcodes}")
 
     @callback
     def async_discover_device(device_map, restrict_dpcode: str | None = None) -> None:
