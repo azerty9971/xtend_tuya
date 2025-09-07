@@ -300,6 +300,11 @@ class XTEntityDescriptorManager:
 
 
 class XTEntity(TuyaEntity):
+    class XTEntityAccessMode(StrEnum):
+        READ_ONLY       = "ro"
+        READ_WRITE      = "rw"
+        WRITE_ONLY      = "wr"
+
     def __init__(self, *args, **kwargs) -> None:
         # This is to catch the super call in case the next class in parent's MRO doesn't have an init method
         try:
@@ -503,9 +508,7 @@ class XTEntity(TuyaEntity):
             return TUYA_DPTYPE_MAPPING.get(type)
 
     @staticmethod
-    def mark_overriden_entities_as_disables(
-        hass: HomeAssistant, device: XTDevice
-    ):
+    def mark_overriden_entities_as_disables(hass: HomeAssistant, device: XTDevice):
         device_registry = dr.async_get(hass)
         entity_registry = er.async_get(hass)
         hass_device = device_registry.async_get_device(
@@ -523,8 +526,10 @@ class XTEntity(TuyaEntity):
                     if entity_registration.entity_id in entity_platform.entities:
                         entity_instance_platform = Platform(entity_platform.domain)
                         if entity_instance_platform in FULLY_OVERRIDEN_PLATFORMS:
-                            entity_registry.async_update_entity(entity_id=entity_registration.entity_id, disabled_by=RegistryEntryDisabler.USER)
-
+                            entity_registry.async_update_entity(
+                                entity_id=entity_registration.entity_id,
+                                disabled_by=RegistryEntryDisabler.USER,
+                            )
 
     @staticmethod
     def register_current_entities_as_handled_dpcode(
@@ -651,3 +656,61 @@ class XTEntity(TuyaEntity):
         if debug:
             LOGGER.warning(f"_supports_description5 => False <=> {dpcode}")
         return False, dpcode
+
+    @staticmethod
+    def __is_dpcode_suitable_for_platform(device: XTDevice, dpcode: str, platform: Platform) -> bool:
+        read_only: bool = True
+        write_only: bool = False
+        dp_id: int | None = None
+        value_type: TuyaDPType | None = None
+        if function := device.function.get(dpcode):
+            dp_id = function.dp_id
+        if status_range := device.status_range.get(dpcode):
+            if dp_id is not None:
+                dp_id = status_range.dp_id
+        if dp_id is None:
+            return False
+        if local_strategy := device.local_strategy.get(dp_id):
+            if access_mode := local_strategy.get("access_mode"):
+                match access_mode:
+                    case XTEntity.XTEntityAccessMode.READ_ONLY:
+                        read_only = True
+                        write_only = False
+                    case XTEntity.XTEntityAccessMode.READ_WRITE:
+                        read_only = False
+                        write_only = False
+                    case XTEntity.XTEntityAccessMode.WRITE_ONLY:
+                        read_only = False
+                        write_only = True
+            else:
+                return False
+            
+            if config_item := local_strategy.get("config_item"):
+                if dptype := config_item.get("valueType"):
+                    value_type = XTEntity.determine_dptype(dptype)
+        if value_type is None:
+            return False
+        match platform:
+            case Platform.SENSOR:
+                if value_type not in [TuyaDPType.ENUM, TuyaDPType.INTEGER, TuyaDPType.STRING]:
+                    return False
+                if read_only is True:
+                    return True
+            
+        return False
+
+    @staticmethod
+    def get_generic_dpcodes_for_this_platform(
+        device: XTDevice, platform: Platform
+    ) -> list[str]:
+        return_list: list[str] = []
+        for dpcode in device.status:
+            #Don't add already handled DPCodes
+            if XTEntity.is_dpcode_handled(device, platform, dpcode) is True:
+                continue
+            
+            if XTEntity.__is_dpcode_suitable_for_platform(device, dpcode, platform) is False:
+                continue
+            
+            
+        return return_list
