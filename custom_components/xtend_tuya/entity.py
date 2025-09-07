@@ -716,6 +716,8 @@ class XTEntity(TuyaEntity):
             if XTEntity.__is_dpcode_suitable_for_platform(device, dpcode, platform) is False:
                 continue
             return_list.append(dpcode)
+        if return_list:
+            LOGGER.warning(f"Adding: {return_list} ({device.name} ({platform}))")
         return return_list
     
     @staticmethod
