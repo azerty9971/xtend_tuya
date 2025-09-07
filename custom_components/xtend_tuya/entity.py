@@ -708,9 +708,8 @@ class XTEntity(TuyaEntity):
             #Don't add already handled DPCodes
             if XTEntity.is_dpcode_handled(device, platform, dpcode) is True:
                 continue
-            LOGGER.warning(f"DPCode {dpcode} of {device.name} is not yet handled")
+            #LOGGER.warning(f"DPCode {dpcode} of {device.name} is not yet handled")
             if XTEntity.__is_dpcode_suitable_for_platform(device, dpcode, platform) is False:
                 continue
-            
-
+            return_list.append(dpcode)
         return return_list
