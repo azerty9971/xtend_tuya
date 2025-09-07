@@ -671,8 +671,7 @@ class XTEntity(TuyaEntity):
                 dp_id = status_range.dp_id
             if value_type is None:
                 value_type = status_range.type
-        if dp_id is None:
-            LOGGER.warning(f"DP_ID is None ({device.name} => {dpcode})")
+        if dp_id is None or dp_id == 0:
             return False
         if local_strategy := device.local_strategy.get(dp_id):
             if access_mode := local_strategy.get("access_mode"):
@@ -719,3 +718,10 @@ class XTEntity(TuyaEntity):
                 continue
             return_list.append(dpcode)
         return return_list
+    
+    @staticmethod
+    def get_human_name_from_generic_dpcode(dpcode: str) -> str:
+        human_name = dpcode
+        human_name = human_name.replace("_", " ")
+        human_name = human_name.capitalize()
+        return human_name

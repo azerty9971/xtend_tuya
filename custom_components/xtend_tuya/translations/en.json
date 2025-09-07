@@ -1197,6 +1197,9 @@
             }
         },
         "sensor": {
+            "xt_generic_sensor": {
+                "name": "{name}"
+            },
             "temp_unit_convert": {
                 "name": "Temperature unit",
                 "state": {
