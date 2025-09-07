@@ -394,7 +394,7 @@ class XTEntity(TuyaEntity):
         prefer_function: bool = False,
         dptype: TuyaDPType | None = None,
         only_function: bool = False,
-    ) -> XTDPCode | TuyaDPCode | TuyaEnumTypeData | TuyaIntegerTypeData | None:
+    ) -> str | XTDPCode | TuyaDPCode | TuyaEnumTypeData | TuyaIntegerTypeData | None:
         if only_function:
             return self._find_dpcode(
                 dpcodes=dpcodes,
@@ -432,6 +432,7 @@ class XTEntity(TuyaEntity):
         self,
         dpcodes: (
             str
+            | tuple[str, ...]
             | XTDPCode
             | tuple[XTDPCode, ...]
             | TuyaDPCode
@@ -442,13 +443,11 @@ class XTEntity(TuyaEntity):
         prefer_function: bool = False,
         dptype: TuyaDPType | None = None,
         only_function: bool = False,
-    ) -> XTDPCode | TuyaDPCode | TuyaEnumTypeData | TuyaIntegerTypeData | None:
+    ) -> str | XTDPCode | TuyaDPCode | TuyaEnumTypeData | TuyaIntegerTypeData | None:
         if dpcodes is None:
             return None
 
-        if isinstance(dpcodes, str):
-            dpcodes = (XTDPCode(dpcodes),)
-        elif not isinstance(dpcodes, tuple):
+        if not isinstance(dpcodes, tuple):
             dpcodes = (dpcodes,)
 
         order = ["status_range", "function"]
