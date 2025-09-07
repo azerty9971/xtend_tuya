@@ -59,6 +59,7 @@ async def async_setup_entry(
 ) -> None:
     """Set up Tuya cameras dynamically through Tuya discovery."""
     hass_data = entry.runtime_data
+    this_platform = Platform.CAMERA
 
     if entry.runtime_data.multi_manager is None or hass_data.manager is None:
         return
@@ -66,7 +67,7 @@ async def async_setup_entry(
     supported_descriptors, externally_managed_descriptors = cast(
         tuple[tuple[str, ...], tuple[str, ...]],
         XTEntityDescriptorManager.get_platform_descriptors(
-            CAMERAS, entry.runtime_data.multi_manager, Platform.CAMERA
+            CAMERAS, entry.runtime_data.multi_manager, this_platform
         ),
     )
 

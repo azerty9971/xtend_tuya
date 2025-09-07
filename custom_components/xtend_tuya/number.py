@@ -592,6 +592,7 @@ async def async_setup_entry(
 ) -> None:
     """Set up Tuya number dynamically through Tuya discovery."""
     hass_data = entry.runtime_data
+    this_platform = Platform.NUMBER
 
     if entry.runtime_data.multi_manager is None or hass_data.manager is None:
         return
@@ -602,7 +603,7 @@ async def async_setup_entry(
             dict[str, tuple[XTNumberEntityDescription, ...]],
         ],
         XTEntityDescriptorManager.get_platform_descriptors(
-            NUMBERS, entry.runtime_data.multi_manager, Platform.NUMBER
+            NUMBERS, entry.runtime_data.multi_manager, this_platform
         ),
     )
 
@@ -637,7 +638,7 @@ async def async_setup_entry(
                         for description in category_descriptions
                         if XTEntity.supports_description(
                             device,
-                            Platform.NUMBER,
+                            this_platform,
                             description,
                             True,
                             externally_managed_dpcodes,
@@ -650,7 +651,7 @@ async def async_setup_entry(
                         for description in category_descriptions
                         if XTEntity.supports_description(
                             device,
-                            Platform.NUMBER,
+                            this_platform,
                             description,
                             False,
                             externally_managed_dpcodes,
@@ -660,7 +661,7 @@ async def async_setup_entry(
         async_add_entities(entities)
 
     hass_data.manager.register_device_descriptors(
-        Platform.NUMBER, supported_descriptors
+        this_platform, supported_descriptors
     )
     async_discover_device([*hass_data.manager.device_map])
 

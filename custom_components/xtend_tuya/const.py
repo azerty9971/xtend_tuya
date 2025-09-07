@@ -144,13 +144,19 @@ class XTMultiManagerProperties(StrEnum):
     LOCK_DEVICE_ID = "lock_device_id"
     CAMERA_DEVICE_ID = "camera_device_id"
 
+class XTMultiManagerPostSetupCallbackPriority(IntEnum):
+    PRIORITY1       = 1
+    PRIORITY2       = 2
+    PRIORITY3       = 3
+    PRIORITY_LAST   = 999
+
 
 # Defines the priority of the sources for the merging process
 # In case of conflict take the data from the lowest priority
 class XTDeviceSourcePriority(IntEnum):
-    REGULAR_TUYA = 10
-    TUYA_SHARED = 20
-    TUYA_IOT = 30
+    REGULAR_TUYA    = 10
+    TUYA_SHARED     = 20
+    TUYA_IOT        = 30
 
 
 @dataclass

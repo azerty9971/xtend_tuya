@@ -65,6 +65,7 @@ async def async_setup_entry(
 ) -> None:
     """Set up tuya sensors dynamically through tuya discovery."""
     hass_data = entry.runtime_data
+    this_platform = Platform.EVENT
 
     if entry.runtime_data.multi_manager is None or hass_data.manager is None:
         return
@@ -75,7 +76,7 @@ async def async_setup_entry(
             dict[str, tuple[XTEventEntityDescription, ...]],
         ],
         XTEntityDescriptorManager.get_platform_descriptors(
-            EVENTS, entry.runtime_data.multi_manager, Platform.EVENT
+            EVENTS, entry.runtime_data.multi_manager, this_platform
         ),
     )
 
@@ -110,7 +111,7 @@ async def async_setup_entry(
                         for description in category_descriptions
                         if XTEntity.supports_description(
                             device,
-                            Platform.EVENT,
+                            this_platform,
                             description,
                             True,
                             externally_managed_dpcodes,
@@ -123,7 +124,7 @@ async def async_setup_entry(
                         for description in category_descriptions
                         if XTEntity.supports_description(
                             device,
-                            Platform.EVENT,
+                            this_platform,
                             description,
                             False,
                             externally_managed_dpcodes,
@@ -132,7 +133,7 @@ async def async_setup_entry(
 
         async_add_entities(entities)
 
-    hass_data.manager.register_device_descriptors(Platform.EVENT, supported_descriptors)
+    hass_data.manager.register_device_descriptors(this_platform, supported_descriptors)
     async_discover_device([*hass_data.manager.device_map])
 
     entry.async_on_unload(

@@ -15,6 +15,7 @@ from ..const import (
     AllowedPlugins,
     XTDeviceEntityFunctions,
     XTMultiManagerProperties,
+    XTMultiManagerPostSetupCallbackPriority,
 )
 from .shared.shared_classes import (
     DeviceWatcher,
@@ -80,7 +81,7 @@ class MultiManager:  # noqa: F811
         self.scene_id: list[str] = []
         self.general_properties: dict[str, Any] = {}
         self.entity_parsers: dict[str, XTCustomEntityParser] = {}
-        self.post_setup_callbacks: list = []
+        self.post_setup_callbacks: dict[XTMultiManagerPostSetupCallbackPriority, list[Any]] = {}
 
     @property
     def device_map(self):
@@ -512,8 +513,11 @@ class MultiManager:  # noqa: F811
     ):
         for account in self.accounts.values():
             await account.on_loading_finalized(hass, config_entry, self)
-        for callback in self.post_setup_callbacks:
-            callback()
+        for priority in XTMultiManagerPostSetupCallbackPriority:
+            if priority not in self.post_setup_callbacks:
+                continue
+            for callback in self.post_setup_callbacks[priority]:
+                callback()
 
     def set_general_property(
         self, property_id: XTMultiManagerProperties, property_value: Any

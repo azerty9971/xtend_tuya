@@ -88,6 +88,7 @@ async def async_setup_entry(
 ) -> None:
     """Set up Tuya binary sensor dynamically through Tuya discovery."""
     hass_data = entry.runtime_data
+    this_platform = Platform.LOCK
 
     if entry.runtime_data.multi_manager is None or hass_data.manager is None:
         return
@@ -95,7 +96,7 @@ async def async_setup_entry(
     supported_descriptors, externally_managed_descriptors = cast(
         tuple[dict[str, XTLockEntityDescription], dict[str, XTLockEntityDescription]],
         XTEntityDescriptorManager.get_platform_descriptors(
-            LOCKS, entry.runtime_data.multi_manager, Platform.LOCK
+            LOCKS, entry.runtime_data.multi_manager, this_platform
         ),
     )
 
