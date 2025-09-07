@@ -666,7 +666,7 @@ class XTEntity(TuyaEntity):
         if function := device.function.get(dpcode):
             dp_id = function.dp_id
         if status_range := device.status_range.get(dpcode):
-            if dp_id is not None:
+            if dp_id is None:
                 dp_id = status_range.dp_id
         if dp_id is None:
             LOGGER.warning(f"DP_ID is None ({device.name} => {dpcode})")
