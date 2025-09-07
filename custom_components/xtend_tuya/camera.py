@@ -82,12 +82,14 @@ async def async_setup_entry(
         if restrict_dpcode is not None:
             return None
         device_ids = [*device_map]
+        entities = []
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
                 if XTCameraEntity.should_entity_be_added(
                     hass, device, hass_data.manager, supported_descriptors
                 ):
                     entities.append(XTCameraEntity(device, hass_data.manager, hass))
+        async_add_entities(entities)
 
     async_discover_device([*hass_data.manager.device_map])
     for entity in entities:
@@ -101,9 +103,7 @@ async def async_setup_entry(
                     WebRTCStreamQuality.LOW_QUALITY,
                 )
             )
-    for entity in extra_entities:
-        entities.append(entity)
-    async_add_entities(entities)
+    async_add_entities(extra_entities)
 
     entry.async_on_unload(
         async_dispatcher_connect(hass, TUYA_DISCOVERY_NEW, async_discover_device)
