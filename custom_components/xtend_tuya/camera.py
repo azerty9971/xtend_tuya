@@ -82,7 +82,7 @@ async def async_setup_entry(
         if restrict_dpcode is not None:
             return None
         device_ids = [*device_map]
-        entities = []
+        entities.clear()
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
                 if XTCameraEntity.should_entity_be_added(
