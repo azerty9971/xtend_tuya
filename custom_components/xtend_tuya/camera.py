@@ -59,6 +59,7 @@ async def async_setup_entry(
 ) -> None:
     """Set up Tuya cameras dynamically through Tuya discovery."""
     hass_data = entry.runtime_data
+    this_platform = Platform.CAMERA
 
     if entry.runtime_data.multi_manager is None or hass_data.manager is None:
         return
@@ -66,7 +67,7 @@ async def async_setup_entry(
     supported_descriptors, externally_managed_descriptors = cast(
         tuple[tuple[str, ...], tuple[str, ...]],
         XTEntityDescriptorManager.get_platform_descriptors(
-            CAMERAS, entry.runtime_data.multi_manager, Platform.CAMERA
+            CAMERAS, entry.runtime_data.multi_manager, this_platform
         ),
     )
 
@@ -81,12 +82,14 @@ async def async_setup_entry(
         if restrict_dpcode is not None:
             return None
         device_ids = [*device_map]
+        entities.clear()
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
                 if XTCameraEntity.should_entity_be_added(
                     hass, device, hass_data.manager, supported_descriptors
                 ):
                     entities.append(XTCameraEntity(device, hass_data.manager, hass))
+        async_add_entities(entities)
 
     async_discover_device([*hass_data.manager.device_map])
     for entity in entities:
@@ -100,9 +103,7 @@ async def async_setup_entry(
                     WebRTCStreamQuality.LOW_QUALITY,
                 )
             )
-    for entity in extra_entities:
-        entities.append(entity)
-    async_add_entities(entities)
+    async_add_entities(extra_entities)
 
     entry.async_on_unload(
         async_dispatcher_connect(hass, TUYA_DISCOVERY_NEW, async_discover_device)
@@ -171,7 +172,8 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         if self.iot_manager is None:
             return None
         self.device_manager.device_watcher.report_message(
-            self.device.id,"Getting WebRTC Config 1", self.device)
+            self.device.id, "Getting WebRTC Config 1", self.device
+        )
         return_tuple = await self.iot_manager.async_get_webrtc_ice_servers(
             self.device, "GO2RTC", self.hass
         )
@@ -180,7 +182,10 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         ice_servers = return_tuple[0]
         webrtc_config = return_tuple[1]
         self.device_manager.device_watcher.report_message(
-            self.device.id,f"WebRTC Configuration: {ice_servers}, {webrtc_config}", self.device)
+            self.device.id,
+            f"WebRTC Configuration: {ice_servers}, {webrtc_config}",
+            self.device,
+        )
         if ice_servers:
             self.webrtc_configuration = WebRTCClientConfiguration()
             ice_servers_dict: list[dict[str, str]] = json.loads(ice_servers)

@@ -43,7 +43,9 @@ class XTButtonEntityDescription(TuyaButtonEntityDescription):
         description: XTButtonEntityDescription,
     ) -> XTButtonEntity:
         return XTButtonEntity(
-            device=device, device_manager=device_manager, description=description
+            device=device,
+            device_manager=device_manager,
+            description=XTButtonEntityDescription(**description.__dict__),
         )
 
 
@@ -101,6 +103,7 @@ async def async_setup_entry(
 ) -> None:
     """Set up Tuya buttons dynamically through Tuya discovery."""
     hass_data = entry.runtime_data
+    this_platform = Platform.BUTTON
 
     if entry.runtime_data.multi_manager is None or hass_data.manager is None:
         return
@@ -111,7 +114,7 @@ async def async_setup_entry(
             dict[str, tuple[XTButtonEntityDescription, ...]],
         ],
         XTEntityDescriptorManager.get_platform_descriptors(
-            BUTTONS, entry.runtime_data.multi_manager, Platform.BUTTON
+            BUTTONS, entry.runtime_data.multi_manager, this_platform
         ),
     )
 
@@ -124,7 +127,9 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if category_descriptions := XTEntityDescriptorManager.get_category_descriptors(supported_descriptors, device.category):
+                if category_descriptions := XTEntityDescriptorManager.get_category_descriptors(
+                    supported_descriptors, device.category
+                ):
                     externally_managed_dpcodes = (
                         XTEntityDescriptorManager.get_category_keys(
                             externally_managed_descriptors.get(device.category)
@@ -143,7 +148,11 @@ async def async_setup_entry(
                         )
                         for description in category_descriptions
                         if XTEntity.supports_description(
-                            device, description, True, externally_managed_dpcodes
+                            device,
+                            this_platform,
+                            description,
+                            True,
+                            externally_managed_dpcodes,
                         )
                     )
                     entities.extend(
@@ -152,7 +161,11 @@ async def async_setup_entry(
                         )
                         for description in category_descriptions
                         if XTEntity.supports_description(
-                            device, description, False, externally_managed_dpcodes
+                            device,
+                            this_platform,
+                            description,
+                            False,
+                            externally_managed_dpcodes,
                         )
                     )
                     for description in category_descriptions:
@@ -169,7 +182,7 @@ async def async_setup_entry(
         async_add_entities(entities)
 
     hass_data.manager.register_device_descriptors(
-        Platform.BUTTON, supported_descriptors
+        this_platform, supported_descriptors
     )
     async_discover_device([*hass_data.manager.device_map])
     # async_discover_device(hass_data.manager, hass_data.manager.open_api_device_map)

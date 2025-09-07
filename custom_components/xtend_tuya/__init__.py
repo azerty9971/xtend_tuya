@@ -25,6 +25,9 @@ from .util import get_config_entry_runtime_data
 from .multi_manager.shared.services.services import (
     ServiceManager,
 )
+from .entity import (
+    XTEntity,
+)
 
 # Suppress logs from the library, it logs unneeded on error
 logging.getLogger("tuya_sharing").setLevel(logging.CRITICAL)
@@ -57,12 +60,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
     )
 
     # Cleanup device registry
-    hass.async_create_task(cleanup_device_registry(hass, multi_manager, entry))
+    await cleanup_device_registry(hass, multi_manager, entry)
 
     # Register known device IDs
     device_registry = dr.async_get(hass)
     aggregated_device_map = multi_manager.device_map
     for device in aggregated_device_map.values():
+        XTEntity.mark_overriden_entities_as_disables(hass, device)
+        XTEntity.register_current_entities_as_handled_dpcode(hass, device)
         multi_manager.virtual_state_handler.apply_init_virtual_states(device)
 
     for device in aggregated_device_map.values():
@@ -91,8 +96,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
     # So the subscription is here
     await hass.async_add_executor_job(multi_manager.refresh_mq)
     service_manager.register_services()
-    hass.async_create_task(cleanup_duplicated_devices(hass, entry))
     await multi_manager.on_loading_finalized(hass, entry)
+    hass.async_create_task(cleanup_duplicated_devices(hass, entry))
     LOGGER.debug(f"Xtended Tuya {entry.title} loaded in {datetime.now() - start_time}")
     return True
 
@@ -102,6 +107,8 @@ async def cleanup_duplicated_devices(
 ) -> None:
     if not is_config_entry_master(hass, DOMAIN, current_entry):
         return
+    while not are_all_domain_config_loaded(hass, DOMAIN, current_entry):
+        await asyncio.sleep(0.1)
     device_registry = dr.async_get(hass)
     entity_registry = er.async_get(hass)
     duplicate_check_table: dict[str, list] = {}
@@ -143,13 +150,12 @@ async def cleanup_device_registry(
     hass: HomeAssistant, multi_manager: MultiManager, current_entry: ConfigEntry
 ) -> None:
     """Remove deleted device registry entry if there are no remaining entities."""
+    if not is_config_entry_master(hass, DOMAIN, current_entry):
+        return
     while not are_all_domain_config_loaded(hass, DOMAIN_ORIG, None):
-        await asyncio.sleep(1)
+        await asyncio.sleep(0.1)
     while not are_all_domain_config_loaded(hass, DOMAIN, current_entry):
-        if is_config_entry_master(hass, DOMAIN, current_entry):
-            await asyncio.sleep(0.1)
-        else:
-            return
+        await asyncio.sleep(0.1)
     device_registry = dr.async_get(hass)
     for dev_id, device_entry in list(device_registry.devices.items()):
         for item in device_entry.identifiers:

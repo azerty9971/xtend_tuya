@@ -112,10 +112,18 @@ from homeassistant.components.tuya.const import (
 )
 from homeassistant.components.tuya.entity import (
     TuyaEntity as TuyaEntity,
-    EnumTypeData as TuyaEnumTypeData,  # noqa: F401
-    IntegerTypeData as TuyaIntegerTypeData,  # noqa: F401
     _DPTYPE_MAPPING as TUYA_DPTYPE_MAPPING,  # noqa: F401
 )
+try:
+    from homeassistant.components.tuya.models import (
+        EnumTypeData as TuyaEnumTypeData,  # noqa: F401
+        IntegerTypeData as TuyaIntegerTypeData,  # noqa: F401
+    )
+except Exception:
+    from homeassistant.components.tuya.entity import (
+        EnumTypeData as TuyaEnumTypeData,  # noqa: F401 # type: ignore
+        IntegerTypeData as TuyaIntegerTypeData,  # noqa: F401 # type: ignore
+    )
 from tuya_sharing.scenes import (
     SharingScene as TuyaScene,  # noqa: F401
 )

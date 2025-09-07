@@ -1,12 +1,22 @@
 from __future__ import annotations
 from typing import overload, Literal, cast, Any
 from enum import StrEnum
+import json
 from homeassistant.helpers.entity import EntityDescription
+from homeassistant.helpers import entity_registry as er, device_registry as dr
+from homeassistant.helpers.entity_registry import (
+    RegistryEntryDisabler,
+)
+from homeassistant.helpers.entity_platform import async_get_platforms
 from homeassistant.const import Platform
+from homeassistant.core import HomeAssistant
 from .const import (
     XTDPCode,
     LOGGER,  # noqa: F401
     CROSS_CATEGORY_DEVICE_DESCRIPTOR,
+    DOMAIN,
+    DOMAIN_ORIG,
+    FULLY_OVERRIDEN_PLATFORMS,
 )
 from .multi_manager.shared.shared_classes import (
     XTDevice,
@@ -36,7 +46,9 @@ class XTEntityDescriptorManager:
 
     @staticmethod
     def get_platform_descriptors(
-        platform_descriptors: Any, multi_manager: mm.MultiManager, platform: Platform | None
+        platform_descriptors: Any,
+        multi_manager: mm.MultiManager,
+        platform: Platform | None,
     ) -> tuple[Any, Any]:
         include_descriptors = platform_descriptors
         exclude_descriptors = XTEntityDescriptorManager.get_empty_descriptor(
@@ -49,15 +61,12 @@ class XTEntityDescriptorManager:
                 include_descriptors = XTEntityDescriptorManager.merge_descriptors(
                     include_descriptors, descriptors_to_add
                 )
-            for descriptors_to_exclude in multi_manager.get_platform_descriptors_to_exclude(
-                platform
-            ):
+            for (
+                descriptors_to_exclude
+            ) in multi_manager.get_platform_descriptors_to_exclude(platform):
                 exclude_descriptors = XTEntityDescriptorManager.merge_descriptors(
                     exclude_descriptors, descriptors_to_exclude
                 )
-        include_descriptors = XTEntityDescriptorManager.exclude_descriptors(
-            include_descriptors, exclude_descriptors
-        )
         return include_descriptors, exclude_descriptors
 
     @staticmethod
@@ -147,8 +156,10 @@ class XTEntityDescriptorManager:
                 for key in descriptors1:
                     merged_descriptors = descriptors1[key]
                     if key in descriptors2:
-                        merged_descriptors = XTEntityDescriptorManager.merge_descriptors(
-                            merged_descriptors, descriptors2[key]
+                        merged_descriptors = (
+                            XTEntityDescriptorManager.merge_descriptors(
+                                merged_descriptors, descriptors2[key]
+                            )
                         )
                     if cross_both is not None:
                         merged_descriptors = (
@@ -219,10 +230,8 @@ class XTEntityDescriptorManager:
                 return_dict: dict[str, Any] = {}
                 for key in base_descriptors:
                     if key in exclude_descriptors:
-                        exclude_result = (
-                            XTEntityDescriptorManager.exclude_descriptors(
-                                base_descriptors[key], exclude_descriptors[key]
-                            )
+                        exclude_result = XTEntityDescriptorManager.exclude_descriptors(
+                            base_descriptors[key], exclude_descriptors[key]
                         )
                         if exclude_result:
                             return_dict[key] = exclude_result
@@ -270,8 +279,8 @@ class XTEntityDescriptorManager:
     @staticmethod
     def _get_param_type(param) -> XTEntityDescriptorManager.XTEntityDescriptorType:
         if param is None:
-            LOGGER.warning("Returning UNKNOWN for because of None", stack_info=True)
-            return XTEntityDescriptorManager.XTEntityDescriptorType.UNKNOWN 
+            LOGGER.warning("_get_param_type is returning UNKNOWN because of None input", stack_info=True)
+            return XTEntityDescriptorManager.XTEntityDescriptorType.UNKNOWN
         elif isinstance(param, dict):
             return XTEntityDescriptorManager.XTEntityDescriptorType.DICT
         elif isinstance(param, list):
@@ -285,11 +294,18 @@ class XTEntityDescriptorManager:
         elif isinstance(param, XTEntityDescriptorManager.entity_type):
             return XTEntityDescriptorManager.XTEntityDescriptorType.ENTITY
         else:
-            LOGGER.warning(f"Type {type(param)} is not handled in _get_param_type (bases: {type(param).__mro__}) check: {XTEntityDescriptorManager.entity_type}")
+            LOGGER.warning(
+                f"Type {type(param)} is not handled in _get_param_type (bases: {type(param).__mro__}) check: {XTEntityDescriptorManager.entity_type}"
+            )
             return XTEntityDescriptorManager.XTEntityDescriptorType.UNKNOWN
 
 
 class XTEntity(TuyaEntity):
+    class XTEntityAccessMode(StrEnum):
+        READ_ONLY = "ro"
+        READ_WRITE = "rw"
+        WRITE_ONLY = "wr"
+
     def __init__(self, *args, **kwargs) -> None:
         # This is to catch the super call in case the next class in parent's MRO doesn't have an init method
         try:
@@ -379,7 +395,7 @@ class XTEntity(TuyaEntity):
         prefer_function: bool = False,
         dptype: TuyaDPType | None = None,
         only_function: bool = False,
-    ) -> XTDPCode | TuyaDPCode | TuyaEnumTypeData | TuyaIntegerTypeData | None:
+    ) -> str | XTDPCode | TuyaDPCode | TuyaEnumTypeData | TuyaIntegerTypeData | None:
         if only_function:
             return self._find_dpcode(
                 dpcodes=dpcodes,
@@ -417,6 +433,7 @@ class XTEntity(TuyaEntity):
         self,
         dpcodes: (
             str
+            | tuple[str, ...]
             | XTDPCode
             | tuple[XTDPCode, ...]
             | TuyaDPCode
@@ -427,13 +444,11 @@ class XTEntity(TuyaEntity):
         prefer_function: bool = False,
         dptype: TuyaDPType | None = None,
         only_function: bool = False,
-    ) -> XTDPCode | TuyaDPCode | TuyaEnumTypeData | TuyaIntegerTypeData | None:
+    ) -> str | XTDPCode | TuyaDPCode | TuyaEnumTypeData | TuyaIntegerTypeData | None:
         if dpcodes is None:
             return None
 
-        if isinstance(dpcodes, str):
-            dpcodes = (XTDPCode(dpcodes),)
-        elif not isinstance(dpcodes, tuple):
+        if not isinstance(dpcodes, tuple):
             dpcodes = (dpcodes,)
 
         order = ["status_range", "function"]
@@ -493,44 +508,136 @@ class XTEntity(TuyaEntity):
             return TUYA_DPTYPE_MAPPING.get(type)
 
     @staticmethod
+    def mark_overriden_entities_as_disables(hass: HomeAssistant, device: XTDevice):
+        device_registry = dr.async_get(hass)
+        entity_registry = er.async_get(hass)
+        hass_device = device_registry.async_get_device(
+            identifiers={(DOMAIN, device.id), (DOMAIN_ORIG, device.id)}
+        )
+        entity_platforms = async_get_platforms(hass, DOMAIN_ORIG)
+        if hass_device:
+            hass_entities = er.async_entries_for_device(
+                entity_registry,
+                device_id=hass_device.id,
+                include_disabled_entities=False,
+            )
+            for entity_registration in hass_entities:
+                for entity_platform in entity_platforms:
+                    if entity_registration.entity_id in entity_platform.entities:
+                        entity_instance_platform = Platform(entity_platform.domain)
+                        if entity_instance_platform in FULLY_OVERRIDEN_PLATFORMS:
+                            entity_registry.async_update_entity(
+                                entity_id=entity_registration.entity_id,
+                                disabled_by=RegistryEntryDisabler.USER,
+                            )
+
+    @staticmethod
+    def register_current_entities_as_handled_dpcode(
+        hass: HomeAssistant, device: XTDevice
+    ):
+        device_registry = dr.async_get(hass)
+        entity_registry = er.async_get(hass)
+        hass_device = device_registry.async_get_device(
+            identifiers={(DOMAIN, device.id), (DOMAIN_ORIG, device.id)}
+        )
+        entity_platforms = async_get_platforms(hass, DOMAIN_ORIG)
+        if hass_device:
+            hass_entities = er.async_entries_for_device(
+                entity_registry,
+                device_id=hass_device.id,
+                include_disabled_entities=False,
+            )
+            for entity_registration in hass_entities:
+                for entity_platform in entity_platforms:
+                    if entity_registration.entity_id in entity_platform.entities:
+                        entity_instance = entity_platform.entities[
+                            entity_registration.entity_id
+                        ]
+                        entity_instance_platform = Platform(entity_platform.domain)
+                        entity_description: EntityDescription | None = None
+                        if hasattr(entity_instance, "entity_description"):
+                            entity_description = entity_instance.entity_description
+                        if entity_description is not None:
+                            dpcode = XTEntity._get_description_dpcode(
+                                entity_description
+                            )
+                            XTEntity.register_handled_dpcode(
+                                device, entity_instance_platform, dpcode
+                            )
+
+    @staticmethod
+    def register_handled_dpcode(device: XTDevice, platform: Platform, dpcode: str):
+        handled_dpcodes: dict[str, list[str]] = cast(
+            dict[str, list[str]],
+            device.get_preference(XTDevice.XTDevicePreference.HANDLED_DPCODES, {}),
+        )
+        if platform not in handled_dpcodes:
+            handled_dpcodes[platform] = []
+        if dpcode not in handled_dpcodes[platform]:
+            handled_dpcodes[platform].append(dpcode)
+        device.set_preference(
+            XTDevice.XTDevicePreference.HANDLED_DPCODES, handled_dpcodes
+        )
+
+    @staticmethod
+    def is_dpcode_handled(device: XTDevice, platform: Platform, dpcode: str) -> bool:
+        handled_dpcodes: dict[str, list[str]] = cast(
+            dict[str, list[str]],
+            device.get_preference(XTDevice.XTDevicePreference.HANDLED_DPCODES, {}),
+        )
+        if platform not in handled_dpcodes:
+            return False
+        if dpcode in handled_dpcodes[platform]:
+            return True
+        return False
+
+    @staticmethod
     def supports_description(
         device: XTDevice,
+        platform: Platform,
         description: EntityDescription,
         first_pass: bool,
         externally_managed_dpcodes: list[str] = [],
     ) -> bool:
         result, dpcode = XTEntity._supports_description(
-            device, description, first_pass, externally_managed_dpcodes
+            device, platform, description, first_pass, externally_managed_dpcodes
         )
         if result is True:
             # Register the code as being handled by the device
-            handled_dpcodes: list[str] = cast(
-                list[str],
-                device.get_preference(XTDevice.XTDevicePreference.HANDLED_DPCODES, []),
-            )
-            if dpcode not in handled_dpcodes:
-                handled_dpcodes.append(dpcode)
-                device.set_preference(
-                    XTDevice.XTDevicePreference.HANDLED_DPCODES, handled_dpcodes
-                )
+            XTEntity.register_handled_dpcode(device, platform, dpcode)
         return result
 
     @staticmethod
-    def _supports_description(
-        device: XTDevice,
-        description: EntityDescription,
-        first_pass: bool,
-        externally_managed_dpcodes: list[str],
-    ) -> tuple[bool, str]:
+    def _get_description_dpcode(description: EntityDescription) -> str:
         import custom_components.xtend_tuya.binary_sensor as XTBinarySensor
 
         dpcode = description.key
         if isinstance(description, XTBinarySensor.XTBinarySensorEntityDescription):
-            if description.dpcode is not None:
+            if dpcode is None and description.dpcode is not None:
                 dpcode = description.dpcode
+        return dpcode
+
+    @staticmethod
+    def _supports_description(
+        device: XTDevice,
+        platform: Platform,
+        description: EntityDescription,
+        first_pass: bool,
+        externally_managed_dpcodes: list[str],
+        debug: bool = False,
+    ) -> tuple[bool, str]:
+        dpcode = XTEntity._get_description_dpcode(description)
+        if XTEntity.is_dpcode_handled(device, platform, dpcode) is True:
+            if debug:
+                LOGGER.warning(f"_supports_description1 => False <=> {dpcode}")
+            return False, dpcode
         if first_pass is True:
-            if dpcode in device.status and dpcode not in externally_managed_dpcodes:
+            if dpcode in device.status:
+                if debug:
+                    LOGGER.warning(f"_supports_description2 => True <=> {dpcode}")
                 return True, dpcode
+            if debug:
+                LOGGER.warning(f"_supports_description3 => False <=> {dpcode}")
             return False, dpcode
         else:
             # if device.force_compatibility is True:
@@ -538,16 +645,147 @@ class XTEntity(TuyaEntity):
 
             all_aliases = device.get_all_status_code_aliases()
             if current_status := all_aliases.get(dpcode):
-                handled_dpcodes: list[str] = cast(
-                    list[str],
-                    device.get_preference(
-                        XTDevice.XTDevicePreference.HANDLED_DPCODES, []
-                    ),
-                )
                 if (
-                    current_status not in handled_dpcodes
-                    and current_status not in externally_managed_dpcodes
+                    XTEntity.is_dpcode_handled(device, platform, current_status)
+                    is False
                 ):
                     device.replace_status_with_another(current_status, dpcode)
+                    if debug:
+                        LOGGER.warning(f"_supports_description4 => True <=> {dpcode}")
                     return True, dpcode
+        if debug:
+            LOGGER.warning(f"_supports_description5 => False <=> {dpcode}")
         return False, dpcode
+
+    @staticmethod
+    def __is_dpcode_suitable_for_platform(
+        device: XTDevice, dpcode: str, platform: Platform
+    ) -> bool:
+        read_only: bool = True
+        write_only: bool = False
+        dp_id: int | None = None
+        value_type: TuyaDPType | None = None
+        min: int | None = None
+        max: int | None = None
+        scale: int | None = None
+        step: int | None = None
+        #unit: str | None = None
+        value_descr_dict: dict = {}
+        if function := device.function.get(dpcode):
+            dp_id = function.dp_id
+            value_type = function.type
+        if status_range := device.status_range.get(dpcode):
+            if dp_id is None:
+                dp_id = status_range.dp_id
+            if value_type is None:
+                value_type = status_range.type
+        if dp_id is None or dp_id == 0:
+            return False
+        if local_strategy := device.local_strategy.get(dp_id):
+            if access_mode := local_strategy.get("access_mode"):
+                match access_mode:
+                    case XTEntity.XTEntityAccessMode.READ_ONLY:
+                        read_only = True
+                        write_only = False
+                    case XTEntity.XTEntityAccessMode.READ_WRITE:
+                        read_only = False
+                        write_only = False
+                    case XTEntity.XTEntityAccessMode.WRITE_ONLY:
+                        read_only = False
+                        write_only = True
+            else:
+                return False
+            if value_type is None:
+                if config_item := local_strategy.get("config_item"):
+                    if ls_dptype := config_item.get("valueType"):
+                        value_type = XTEntity.determine_dptype(ls_dptype)
+                    if ls_value_descr := config_item.get("valueDesc"):
+                        try:
+                            value_descr_dict = json.loads(ls_value_descr)
+                            #unit = value_descr_dict.get("unit")
+                            min = value_descr_dict.get("min")
+                            max = value_descr_dict.get("max")
+                            scale = value_descr_dict.get("scale")
+                            step = value_descr_dict.get("step")
+                        except Exception:
+                            pass
+        if value_type is None:
+            return False
+        match platform:
+            case Platform.BINARY_SENSOR:
+                if value_type not in [TuyaDPType.BOOLEAN]:
+                    return False
+                if read_only is True:
+                    return True
+            case Platform.SENSOR:
+                if value_type not in [
+                    TuyaDPType.ENUM,
+                    TuyaDPType.INTEGER,
+                    TuyaDPType.STRING,
+                ]:
+                    return False
+                if read_only is True:
+                    return True
+            case Platform.NUMBER:
+                if value_type not in [TuyaDPType.INTEGER]:
+                    return False
+                if (
+                    read_only is False
+                    and write_only is False
+                    and min is not None
+                    and max is not None
+                    and scale is not None
+                    and step is not None
+                ):
+                    return True
+            case Platform.SELECT:
+                if value_type not in [TuyaDPType.ENUM]:
+                    return False
+                if (
+                    read_only is False
+                    and write_only is False
+                ):
+                    return True
+            case Platform.LIGHT:
+                if value_type not in [TuyaDPType.JSON, TuyaDPType.RAW]:
+                    return False
+                if (
+                    read_only is False
+                    and write_only is False
+                    and value_descr_dict.get("h") is not None
+                    and value_descr_dict.get("s") is not None
+                    and value_descr_dict.get("v") is not None
+                ):
+                    return True
+            case Platform.SWITCH:
+                if value_type not in [TuyaDPType.BOOLEAN]:
+                    return False
+                if read_only is False and write_only is False:
+                    return True
+        return False
+
+    @staticmethod
+    def get_generic_dpcodes_for_this_platform(
+        device: XTDevice, platform: Platform
+    ) -> list[str]:
+        return_list: list[str] = []
+        for dpcode in device.status:
+            # Don't add already handled DPCodes
+            if XTEntity.is_dpcode_handled(device, platform, dpcode) is True:
+                continue
+
+            # Filter DPCodes that are not for the current platform
+            if (
+                XTEntity.__is_dpcode_suitable_for_platform(device, dpcode, platform)
+                is False
+            ):
+                continue
+            return_list.append(dpcode)
+        return return_list
+
+    @staticmethod
+    def get_human_name_from_generic_dpcode(dpcode: str) -> str:
+        human_name = dpcode
+        human_name = human_name.replace("_", " ")
+        human_name = human_name.capitalize()
+        return human_name

@@ -34,7 +34,9 @@ class XTHumidifierEntityDescription(TuyaHumidifierEntityDescription):
         description: XTHumidifierEntityDescription,
     ) -> XTHumidifierEntity:
         return XTHumidifierEntity(
-            device=device, device_manager=device_manager, description=description
+            device=device,
+            device_manager=device_manager,
+            description=XTHumidifierEntityDescription(**description.__dict__),
         )
 
 
@@ -46,6 +48,7 @@ async def async_setup_entry(
 ) -> None:
     """Set up Tuya (de)humidifier dynamically through Tuya discovery."""
     hass_data = entry.runtime_data
+    this_platform = Platform.HUMIDIFIER
 
     if entry.runtime_data.multi_manager is None or hass_data.manager is None:
         return
@@ -56,7 +59,7 @@ async def async_setup_entry(
             dict[str, XTHumidifierEntityDescription],
         ],
         XTEntityDescriptorManager.get_platform_descriptors(
-            HUMIDIFIERS, entry.runtime_data.multi_manager, Platform.HUMIDIFIER
+            HUMIDIFIERS, entry.runtime_data.multi_manager, this_platform
         ),
     )
 
@@ -71,7 +74,9 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if description := XTEntityDescriptorManager.get_category_descriptors(supported_descriptors, device.category):
+                if description := XTEntityDescriptorManager.get_category_descriptors(
+                    supported_descriptors, device.category
+                ):
                     entities.append(
                         XTHumidifierEntity.get_entity_instance(
                             description, device, hass_data.manager
@@ -80,7 +85,7 @@ async def async_setup_entry(
         async_add_entities(entities)
 
     hass_data.manager.register_device_descriptors(
-        Platform.HUMIDIFIER, supported_descriptors
+        this_platform, supported_descriptors
     )
     async_discover_device([*hass_data.manager.device_map])
 

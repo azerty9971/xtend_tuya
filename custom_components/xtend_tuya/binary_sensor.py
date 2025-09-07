@@ -23,6 +23,7 @@ from .const import (
     XTDPCode,
     LOGGER,  # noqa: F401
     CROSS_CATEGORY_DEVICE_DESCRIPTOR,  # noqa: F401
+    XTMultiManagerPostSetupCallbackPriority,
 )
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaBinarySensorEntity,
@@ -48,16 +49,20 @@ class XTBinarySensorEntityDescription(TuyaBinarySensorEntityDescription):
         description: XTBinarySensorEntityDescription,
     ) -> XTBinarySensorEntity:
         return XTBinarySensorEntity(
-            device=device, device_manager=device_manager, description=description
+            device=device,
+            device_manager=device_manager,
+            description=XTBinarySensorEntityDescription(**description.__dict__),
         )
 
 
 # Commonly used sensors
-TAMPER_BINARY_SENSOR = XTBinarySensorEntityDescription(
-    key=XTDPCode.TEMPER_ALARM,
-    name="Tamper",
-    device_class=BinarySensorDeviceClass.TAMPER,
-    entity_category=EntityCategory.DIAGNOSTIC,
+TAMPER_BINARY_SENSOR: tuple[XTBinarySensorEntityDescription, ...] = (
+    XTBinarySensorEntityDescription(
+        key=XTDPCode.TEMPER_ALARM,
+        name="Tamper",
+        device_class=BinarySensorDeviceClass.TAMPER,
+        entity_category=EntityCategory.DIAGNOSTIC,
+    ),
 )
 
 PROXIMITY_BINARY_SENSOR: tuple[XTBinarySensorEntityDescription, ...] = (
@@ -80,11 +85,37 @@ PROXIMITY_BINARY_SENSOR: tuple[XTBinarySensorEntityDescription, ...] = (
     ),
 )
 
+CONTACT_BINARY_SENSOR: tuple[XTBinarySensorEntityDescription, ...] = (
+    XTBinarySensorEntityDescription(
+        key=XTDPCode.DOORCONTACT_STATE,
+        translation_key="door_contact_state",
+        device_class=BinarySensorDeviceClass.DOOR,
+        entity_registry_enabled_default=True,
+    ),
+    XTBinarySensorEntityDescription(
+        key=XTDPCode.DOORCONTACT_STATE_2,
+        translation_key="door_contact_state_2",
+        device_class=BinarySensorDeviceClass.DOOR,
+        entity_registry_enabled_default=True,
+    ),
+    XTBinarySensorEntityDescription(
+        key=XTDPCode.DOORCONTACT_STATE_3,
+        translation_key="door_contact_state_3",
+        device_class=BinarySensorDeviceClass.DOOR,
+        entity_registry_enabled_default=True,
+    ),
+)
+
 # All descriptions can be found here. Mostly the Boolean data types in the
 # default status set of each category (that don't have a set instruction)
 # end up being a binary sensor.
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
 BINARY_SENSORS: dict[str, tuple[XTBinarySensorEntityDescription, ...]] = {
+    CROSS_CATEGORY_DEVICE_DESCRIPTOR: (
+        *PROXIMITY_BINARY_SENSOR,
+        *TAMPER_BINARY_SENSOR,
+        *CONTACT_BINARY_SENSOR,
+    ),
     "jtmspro": (
         XTBinarySensorEntityDescription(
             key=XTDPCode.LOCK_MOTOR_STATE,
@@ -93,7 +124,6 @@ BINARY_SENSORS: dict[str, tuple[XTBinarySensorEntityDescription, ...]] = {
             on_value=True,
         ),
     ),
-    "kg": (*PROXIMITY_BINARY_SENSOR,),
     "msp": (
         # If 1 is reported, it will be counted once.
         # If 0 is reported, it will not be counted
@@ -114,17 +144,6 @@ BINARY_SENSORS: dict[str, tuple[XTBinarySensorEntityDescription, ...]] = {
             entity_registry_enabled_default=False,
         ),
     ),
-    "pir": (*PROXIMITY_BINARY_SENSOR,),
-    # "qccdz": (
-    #    XTBinarySensorEntityDescription(
-    #        key=DPCode.ONLINE_STATE,
-    #        translation_key="online",
-    #        device_class=BinarySensorDeviceClass.CONNECTIVITY,
-    #        entity_registry_visible_default=False,
-    #        device_online=True,
-    #        on_value="online",
-    #    ),
-    # ),
     "smd": (
         XTBinarySensorEntityDescription(
             key=XTDPCode.OFF_BED,
@@ -141,8 +160,6 @@ BINARY_SENSORS: dict[str, tuple[XTBinarySensorEntityDescription, ...]] = {
     ),
 }
 
-BINARY_SENSORS["tdq"] = BINARY_SENSORS["kg"]
-
 # Lock duplicates
 BINARY_SENSORS["videolock"] = BINARY_SENSORS["jtmspro"]
 BINARY_SENSORS["jtmsbh"] = BINARY_SENSORS["jtmspro"]
@@ -153,6 +170,8 @@ async def async_setup_entry(
 ) -> None:
     """Set up Tuya binary sensor dynamically through Tuya discovery."""
     hass_data = entry.runtime_data
+    this_platform = Platform.BINARY_SENSOR
+
     if hass_data.manager is None:
         return
     if entry.runtime_data.multi_manager is None:
@@ -164,9 +183,34 @@ async def async_setup_entry(
             dict[str, tuple[XTBinarySensorEntityDescription, ...]],
         ],
         XTEntityDescriptorManager.get_platform_descriptors(
-            BINARY_SENSORS, entry.runtime_data.multi_manager, Platform.BINARY_SENSOR
+            BINARY_SENSORS, entry.runtime_data.multi_manager, this_platform
         ),
     )
+
+    @callback
+    def async_add_generic_entities(device_map) -> None:
+        if hass_data.manager is None:
+            return
+        entities: list[XTBinarySensorEntity] = []
+        device_ids = [*device_map]
+        for device_id in device_ids:
+            if device := hass_data.manager.device_map.get(device_id):
+                generic_dpcodes = XTEntity.get_generic_dpcodes_for_this_platform(
+                    device, this_platform
+                )
+                for dpcode in generic_dpcodes:
+                    descriptor = XTBinarySensorEntityDescription(
+                        key=dpcode,
+                        translation_key="xt_generic_binary_sensor",
+                        translation_placeholders={"name": XTEntity.get_human_name_from_generic_dpcode(dpcode)},
+                        entity_registry_enabled_default=False,
+                        entity_registry_visible_default=False,
+                    )
+                    entities.append(
+                        XTBinarySensorEntity.get_entity_instance(
+                            descriptor, device, hass_data.manager
+                        ))
+        async_add_entities(entities)
 
     @callback
     def async_discover_device(device_map, restrict_dpcode: str | None = None) -> None:
@@ -177,7 +221,9 @@ async def async_setup_entry(
             return
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id, None):
-                if category_descriptions := XTEntityDescriptorManager.get_category_descriptors(supported_descriptors, device.category):
+                if category_descriptions := XTEntityDescriptorManager.get_category_descriptors(
+                    supported_descriptors, device.category
+                ):
                     externally_managed_dpcodes = (
                         XTEntityDescriptorManager.get_category_keys(
                             externally_managed_descriptors.get(device.category)
@@ -196,7 +242,11 @@ async def async_setup_entry(
                         )
                         for description in category_descriptions
                         if XTEntity.supports_description(
-                            device, description, True, externally_managed_dpcodes
+                            device,
+                            this_platform,
+                            description,
+                            True,
+                            externally_managed_dpcodes,
                         )
                     )
                     entities.extend(
@@ -205,13 +255,21 @@ async def async_setup_entry(
                         )
                         for description in category_descriptions
                         if XTEntity.supports_description(
-                            device, description, False, externally_managed_dpcodes
+                            device,
+                            this_platform,
+                            description,
+                            False,
+                            externally_managed_dpcodes,
                         )
                     )
         async_add_entities(entities)
+        if restrict_dpcode is None:
+            hass_data.manager.post_setup_callbacks[
+                XTMultiManagerPostSetupCallbackPriority.PRIORITY_LAST
+            ].append((async_add_generic_entities, (device_map,), None))
 
     hass_data.manager.register_device_descriptors(
-        Platform.BINARY_SENSOR, supported_descriptors
+        this_platform, supported_descriptors
     )
     async_discover_device([*hass_data.manager.device_map])
     # async_discover_device(hass_data.manager, hass_data.manager.open_api_device_map)

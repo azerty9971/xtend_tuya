@@ -325,8 +325,8 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
     def get_platform_descriptors_to_merge(self, platform: Platform) -> Any:
         if self.sharing_account is None:
             return None
-        if self.sharing_account.device_manager.reuse_config:
-            return None
+        #if self.sharing_account.device_manager.reuse_config:
+        #    return None
         return get_tuya_platform_descriptors(platform)
     
     def get_platform_descriptors_to_exclude(self, platform: Platform) -> Any:

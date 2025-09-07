@@ -11,6 +11,9 @@ from homeassistant.components.sensor import (
     SensorExtraStoredData,
     RestoreSensor,
 )
+from homeassistant.components.sensor.const import (
+    DEVICE_CLASS_UNITS as SENSOR_DEVICE_CLASS_UNITS,
+)
 from homeassistant.const import (
     UnitOfEnergy,
     Platform,
@@ -47,6 +50,7 @@ from .const import (
     VirtualStates,  # noqa: F401
     XTDeviceEntityFunctions,
     CROSS_CATEGORY_DEVICE_DESCRIPTOR,
+    XTMultiManagerPostSetupCallbackPriority,
 )
 from .entity import (
     XTEntity,
@@ -88,7 +92,9 @@ class XTSensorEntityDescription(TuyaSensorEntityDescription, frozen=True):
         description: XTSensorEntityDescription,
     ) -> XTSensorEntity:
         return XTSensorEntity(
-            device=device, device_manager=device_manager, description=description
+            device=device,
+            device_manager=device_manager,
+            description=XTSensorEntityDescription(**description.__dict__),
         )
 
 
@@ -1463,7 +1469,7 @@ async def async_setup_entry(
 ) -> None:
     """Set up Tuya sensor dynamically through Tuya discovery."""
     hass_data = entry.runtime_data
-
+    this_platform = Platform.SENSOR
     if entry.runtime_data.multi_manager is None or hass_data.manager is None:
         return
 
@@ -1473,9 +1479,35 @@ async def async_setup_entry(
             dict[str, tuple[XTSensorEntityDescription, ...]],
         ],
         XTEntityDescriptorManager.get_platform_descriptors(
-            SENSORS, entry.runtime_data.multi_manager, Platform.SENSOR
+            SENSORS, entry.runtime_data.multi_manager, this_platform
         ),
     )
+
+    @callback
+    def async_add_generic_entities(device_map) -> None:
+        if hass_data.manager is None:
+            return
+        entities: list[XTSensorEntity] = []
+        device_ids = [*device_map]
+        for device_id in device_ids:
+            if device := hass_data.manager.device_map.get(device_id):
+                generic_dpcodes = XTEntity.get_generic_dpcodes_for_this_platform(
+                    device, this_platform
+                )
+                for dpcode in generic_dpcodes:
+                    descriptor = XTSensorEntityDescription(
+                        key=dpcode,
+                        translation_key="xt_generic_sensor",
+                        translation_placeholders={"name": XTEntity.get_human_name_from_generic_dpcode(dpcode)},
+                        entity_registry_enabled_default=False,
+                        entity_registry_visible_default=False,
+                    )
+                    entities.append(
+                        XTSensorEntity.get_entity_instance(
+                            descriptor, device, hass_data.manager
+                        ))
+        async_add_entities(entities)
+
 
     @callback
     def async_discover_device(device_map, restrict_dpcode: str | None = None) -> None:
@@ -1486,7 +1518,9 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if category_descriptions := XTEntityDescriptorManager.get_category_descriptors(supported_descriptors, device.category):
+                if category_descriptions := XTEntityDescriptorManager.get_category_descriptors(
+                    supported_descriptors, device.category
+                ):
                     externally_managed_dpcodes = (
                         XTEntityDescriptorManager.get_category_keys(
                             externally_managed_descriptors.get(device.category)
@@ -1505,7 +1539,11 @@ async def async_setup_entry(
                         )
                         for description in category_descriptions
                         if XTEntity.supports_description(
-                            device, description, True, externally_managed_dpcodes
+                            device,
+                            this_platform,
+                            description,
+                            True,
+                            externally_managed_dpcodes,
                         )
                     )
                     entities.extend(
@@ -1514,13 +1552,20 @@ async def async_setup_entry(
                         )
                         for description in category_descriptions
                         if XTEntity.supports_description(
-                            device, description, False, externally_managed_dpcodes
+                            device,
+                            this_platform,
+                            description,
+                            False,
+                            externally_managed_dpcodes,
                         )
                     )
-
         async_add_entities(entities)
+        if restrict_dpcode is None:
+            hass_data.manager.post_setup_callbacks[
+                XTMultiManagerPostSetupCallbackPriority.PRIORITY_LAST
+            ].append((async_add_generic_entities, (device_map,), None))
 
-    hass_data.manager.register_device_descriptors(Platform.SENSOR, supported_descriptors)
+    hass_data.manager.register_device_descriptors(this_platform, supported_descriptors)
     async_discover_device([*hass_data.manager.device_map])
 
     entry.async_on_unload(
@@ -1541,6 +1586,7 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
         device_manager: MultiManager,
         description: XTSensorEntityDescription,
     ) -> None:
+        """Init Tuya sensor."""
         self.entity_description = description
         self._attr_unique_id = (
             f"{super().unique_id}{description.key}{description.subkey or ''}"
@@ -1565,6 +1611,9 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
             self.device_class is not None
             and not self.device_class.startswith(TuyaDOMAIN)
             and description.native_unit_of_measurement is None
+            # we do not need to check mappings if the API UOM is allowed
+            and self.native_unit_of_measurement
+            not in SENSOR_DEVICE_CLASS_UNITS[self.device_class]
         ):
             # We cannot have a device class, if the UOM isn't set or the
             # device class cannot be found in the validation mapping.
@@ -1572,24 +1621,30 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
                 self.native_unit_of_measurement is None
                 or self.device_class not in TuyaDEVICE_CLASS_UNITS
             ):
+                LOGGER.debug(
+                    "Device class %s ignored for incompatible unit %s in sensor entity %s",
+                    self.device_class,
+                    self.native_unit_of_measurement,
+                    self.unique_id,
+                )
                 self._attr_device_class = None
+                self._attr_suggested_unit_of_measurement = None
                 return
 
             uoms = TuyaDEVICE_CLASS_UNITS[self.device_class]
-            self._uom = uoms.get(self.native_unit_of_measurement) or uoms.get(
+            uom = uoms.get(self.native_unit_of_measurement) or uoms.get(
                 self.native_unit_of_measurement.lower()
             )
 
             # Unknown unit of measurement, device class should not be used.
-            if self._uom is None:
+            if uom is None:
                 self._attr_device_class = None
+                self._attr_suggested_unit_of_measurement = None
                 return
 
             # Found unit of measurement, use the standardized Unit
             # Use the target conversion unit (if set)
-            self._attr_native_unit_of_measurement = (
-                self._uom.conversion_unit or self._uom.unit
-            )
+            self._attr_native_unit_of_measurement = uom.unit
 
     def __init__(
         self,
