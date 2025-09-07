@@ -21,6 +21,7 @@ from .const import (
     XTDPCode,
     LOGGER,  # noqa: F401
     CROSS_CATEGORY_DEVICE_DESCRIPTOR,  # noqa: F401
+    XTMultiManagerPostSetupCallbackPriority,
 )
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaLightEntity,
@@ -90,6 +91,32 @@ async def async_setup_entry(
     )
 
     @callback
+    def async_add_generic_entities(device_map) -> None:
+        # LOGGER.warning(f"Calling async_add_generic_entities: {device_map}")
+        if hass_data.manager is None:
+            return
+        entities: list[XTLightEntity] = []
+        device_ids = [*device_map]
+        for device_id in device_ids:
+            if device := hass_data.manager.device_map.get(device_id):
+                generic_dpcodes = XTEntity.get_generic_dpcodes_for_this_platform(
+                    device, this_platform
+                )
+                for dpcode in generic_dpcodes:
+                    descriptor = XTLightEntityDescription(
+                        key=dpcode,
+                        translation_key="xt_generic_sensor",
+                        translation_placeholders={"name": XTEntity.get_human_name_from_generic_dpcode(dpcode)},
+                        entity_registry_enabled_default=False,
+                        entity_registry_visible_default=False,
+                    )
+                    entities.append(
+                        XTLightEntity.get_entity_instance(
+                            descriptor, device, hass_data.manager
+                        ))
+        async_add_entities(entities)
+
+    @callback
     def async_discover_device(device_map, restrict_dpcode: str | None = None) -> None:
         """Discover and add a discovered tuya light."""
         if hass_data.manager is None:
@@ -141,6 +168,10 @@ async def async_setup_entry(
                     )
 
         async_add_entities(entities)
+        if restrict_dpcode is None:
+            hass_data.manager.post_setup_callbacks[
+                XTMultiManagerPostSetupCallbackPriority.PRIORITY_LAST
+            ].append((async_add_generic_entities, (device_map,), None))
 
     hass_data.manager.register_device_descriptors(this_platform, supported_descriptors)
     async_discover_device([*hass_data.manager.device_map])

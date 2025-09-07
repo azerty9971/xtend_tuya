@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import overload, Literal, cast, Any
 from enum import StrEnum
+import json
 from homeassistant.helpers.entity import EntityDescription
 from homeassistant.helpers import entity_registry as er, device_registry as dr
 from homeassistant.helpers.entity_registry import (
@@ -301,9 +302,9 @@ class XTEntityDescriptorManager:
 
 class XTEntity(TuyaEntity):
     class XTEntityAccessMode(StrEnum):
-        READ_ONLY       = "ro"
-        READ_WRITE      = "rw"
-        WRITE_ONLY      = "wr"
+        READ_ONLY = "ro"
+        READ_WRITE = "rw"
+        WRITE_ONLY = "wr"
 
     def __init__(self, *args, **kwargs) -> None:
         # This is to catch the super call in case the next class in parent's MRO doesn't have an init method
@@ -657,11 +658,19 @@ class XTEntity(TuyaEntity):
         return False, dpcode
 
     @staticmethod
-    def __is_dpcode_suitable_for_platform(device: XTDevice, dpcode: str, platform: Platform) -> bool:
+    def __is_dpcode_suitable_for_platform(
+        device: XTDevice, dpcode: str, platform: Platform
+    ) -> bool:
         read_only: bool = True
         write_only: bool = False
         dp_id: int | None = None
         value_type: TuyaDPType | None = None
+        min: int | None = None
+        max: int | None = None
+        scale: int | None = None
+        step: int | None = None
+        #unit: str | None = None
+        value_descr_dict: dict = {}
         if function := device.function.get(dpcode):
             dp_id = function.dp_id
             value_type = function.type
@@ -685,22 +694,78 @@ class XTEntity(TuyaEntity):
                         read_only = False
                         write_only = True
             else:
-                LOGGER.warning(f"Access mode not found or NULL ({device.name} => {dpcode})")
+                LOGGER.warning(
+                    f"Access mode not found or NULL ({device.name} => {dpcode})"
+                )
                 return False
             if value_type is None:
                 if config_item := local_strategy.get("config_item"):
-                    if dptype := config_item.get("valueType"):
-                        value_type = XTEntity.determine_dptype(dptype)
+                    if ls_dptype := config_item.get("valueType"):
+                        value_type = XTEntity.determine_dptype(ls_dptype)
+                    if ls_value_descr := config_item.get("valueDesc"):
+                        try:
+                            value_descr_dict = json.loads(ls_value_descr)
+                            #unit = value_descr_dict.get("unit")
+                            min = value_descr_dict.get("min")
+                            max = value_descr_dict.get("max")
+                            scale = value_descr_dict.get("scale")
+                            step = value_descr_dict.get("step")
+                        except Exception:
+                            pass
         if value_type is None:
             LOGGER.warning(f"value_type is None ({device.name} => {dpcode})")
             return False
         match platform:
-            case Platform.SENSOR:
-                if value_type not in [TuyaDPType.ENUM, TuyaDPType.INTEGER, TuyaDPType.STRING]:
+            case Platform.BINARY_SENSOR:
+                if value_type not in [TuyaDPType.BOOLEAN]:
                     return False
                 if read_only is True:
                     return True
-            
+            case Platform.SENSOR:
+                if value_type not in [
+                    TuyaDPType.ENUM,
+                    TuyaDPType.INTEGER,
+                    TuyaDPType.STRING,
+                ]:
+                    return False
+                if read_only is True:
+                    return True
+            case Platform.NUMBER:
+                if value_type not in [TuyaDPType.INTEGER]:
+                    return False
+                if (
+                    read_only is False
+                    and write_only is False
+                    and min is not None
+                    and max is not None
+                    and scale is not None
+                    and step is not None
+                ):
+                    return True
+            case Platform.SELECT:
+                if value_type not in [TuyaDPType.ENUM]:
+                    return False
+                if (
+                    read_only is False
+                    and write_only is False
+                ):
+                    return True
+            case Platform.LIGHT:
+                if value_type not in [TuyaDPType.JSON, TuyaDPType.RAW]:
+                    return False
+                if (
+                    read_only is False
+                    and write_only is False
+                    and value_descr_dict.get("h") is not None
+                    and value_descr_dict.get("s") is not None
+                    and value_descr_dict.get("v") is not None
+                ):
+                    return True
+            case Platform.SWITCH:
+                if value_type not in [TuyaDPType.BOOLEAN]:
+                    return False
+                if read_only is False and write_only is False:
+                    return True
         return False
 
     @staticmethod
@@ -709,17 +774,21 @@ class XTEntity(TuyaEntity):
     ) -> list[str]:
         return_list: list[str] = []
         for dpcode in device.status:
-            #Don't add already handled DPCodes
+            # Don't add already handled DPCodes
             if XTEntity.is_dpcode_handled(device, platform, dpcode) is True:
                 continue
-            #LOGGER.warning(f"DPCode {dpcode} of {device.name} is not yet handled")
-            if XTEntity.__is_dpcode_suitable_for_platform(device, dpcode, platform) is False:
+
+            # Filter DPCodes that are not for the current platform
+            if (
+                XTEntity.__is_dpcode_suitable_for_platform(device, dpcode, platform)
+                is False
+            ):
                 continue
             return_list.append(dpcode)
-        if return_list:
-            LOGGER.warning(f"Adding: {return_list} ({device.name} ({platform}))")
+        if return_list and platform != Platform.SENSOR:
+            LOGGER.warning(f"Adding {return_list} ({device.name} ({platform}))")
         return return_list
-    
+
     @staticmethod
     def get_human_name_from_generic_dpcode(dpcode: str) -> str:
         human_name = dpcode
