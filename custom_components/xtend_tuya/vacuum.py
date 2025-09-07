@@ -29,6 +29,7 @@ async def async_setup_entry(
 ) -> None:
     """Set up Tuya vacuum dynamically through Tuya discovery."""
     hass_data = entry.runtime_data
+    this_platform = Platform.VACUUM
 
     if entry.runtime_data.multi_manager is None or hass_data.manager is None:
         return
@@ -39,7 +40,7 @@ async def async_setup_entry(
             list[str],
         ],
         XTEntityDescriptorManager.get_platform_descriptors(
-            VACUUMS, entry.runtime_data.multi_manager, Platform.VACUUM
+            VACUUMS, entry.runtime_data.multi_manager, this_platform
         ),
     )
 

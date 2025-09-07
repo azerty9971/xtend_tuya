@@ -161,6 +161,9 @@
     },
     "entity": {
         "binary_sensor": {
+            "xt_generic_binary_sensor": {
+                "name": "{name}"
+            },
             "door_contact_state": {
                 "name": "Door contact"
             },
@@ -318,6 +321,9 @@
             }
         },
         "light": {
+            "xt_generic_light": {
+                "name": "{name}"
+            },
             "backlight": {
                 "name": "Backlight"
             },
@@ -340,6 +346,9 @@
             }
         },
         "number": {
+            "xt_generic_number": {
+                "name": "{name}"
+            },
             "alarm_duration": {
                 "name": "Alarm duration"
             },
@@ -663,6 +672,9 @@
             }
         },
         "select": {
+            "xt_generic_select": {
+                "name": "{name}"
+            },
             "blanket_level": {
                 "state": {
                     "level_1": "Low",
@@ -1197,6 +1209,9 @@
             }
         },
         "sensor": {
+            "xt_generic_sensor": {
+                "name": "{name}"
+            },
             "temp_unit_convert": {
                 "name": "Temperature unit",
                 "state": {
@@ -2161,6 +2176,9 @@
             }
         },
         "switch": {
+            "xt_generic_switch": {
+                "name": "{name}"
+            },
             "xt_cover_invert_control": {
                 "name": "Invert cover controls"
             },

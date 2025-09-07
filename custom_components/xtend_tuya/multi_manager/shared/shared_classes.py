@@ -14,6 +14,9 @@ import custom_components.xtend_tuya.multi_manager.multi_manager as mm
 import custom_components.xtend_tuya.multi_manager.shared.multi_device_listener as mdl
 import custom_components.xtend_tuya.multi_manager.shared.services.services as services
 import custom_components.xtend_tuya.util as util
+from ...ha_tuya_integration.tuya_integration_imports import (
+    TuyaDPType,
+)
 from ...const import (
     LOGGER,
     XTDeviceSourcePriority,
@@ -59,7 +62,7 @@ type XTConfigEntry = ConfigEntry[HomeAssistantXTData]
 @dataclass
 class XTDeviceStatusRange:
     code: str = ""
-    type: str | None = None
+    type: TuyaDPType | None = None
     values: str = "{}"
     dp_id: int = 0
 
@@ -75,7 +78,7 @@ class XTDeviceStatusRange:
         if hasattr(status_range, "type"):
             type = status_range.type
         else:
-            type = ""
+            type = None
         if hasattr(status_range, "values"):
             values = status_range.values
         else:
@@ -90,7 +93,7 @@ class XTDeviceStatusRange:
 @dataclass
 class XTDeviceFunction:
     code: str = ""
-    type: str | None = None
+    type: TuyaDPType | None = None
     desc: str = ""
     name: str = ""
     values: str = "{}"
@@ -108,7 +111,7 @@ class XTDeviceFunction:
         if hasattr(function, "type"):
             type = function.type
         else:
-            type = ""
+            type = None
         if hasattr(function, "values"):
             values = function.values
         else:

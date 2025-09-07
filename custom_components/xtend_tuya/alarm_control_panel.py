@@ -54,6 +54,7 @@ async def async_setup_entry(
 ) -> None:
     """Set up Tuya alarm dynamically through Tuya discovery."""
     hass_data = entry.runtime_data
+    this_platform = Platform.ALARM_CONTROL_PANEL
 
     if entry.runtime_data.multi_manager is None or hass_data.manager is None:
         return
@@ -64,7 +65,7 @@ async def async_setup_entry(
             dict[str, tuple[XTAlarmEntityDescription, ...]],
         ],
         XTEntityDescriptorManager.get_platform_descriptors(
-            ALARM, entry.runtime_data.multi_manager, Platform.ALARM_CONTROL_PANEL
+            ALARM, entry.runtime_data.multi_manager, this_platform
         ),
     )
 
@@ -99,7 +100,7 @@ async def async_setup_entry(
                         for description in category_descriptions
                         if XTEntity.supports_description(
                             device,
-                            Platform.ALARM_CONTROL_PANEL,
+                            this_platform,
                             description,
                             True,
                             externally_managed_dpcodes,
@@ -112,7 +113,7 @@ async def async_setup_entry(
                         for description in category_descriptions
                         if XTEntity.supports_description(
                             device,
-                            Platform.ALARM_CONTROL_PANEL,
+                            this_platform,
                             description,
                             False,
                             externally_managed_dpcodes,
@@ -121,7 +122,7 @@ async def async_setup_entry(
         async_add_entities(entities)
 
     hass_data.manager.register_device_descriptors(
-        Platform.ALARM_CONTROL_PANEL, supported_descriptors
+        this_platform, supported_descriptors
     )
     async_discover_device([*hass_data.manager.device_map])
 

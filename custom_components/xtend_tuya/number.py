@@ -19,6 +19,7 @@ from .const import (
     TUYA_DISCOVERY_NEW,
     XTDPCode,
     CROSS_CATEGORY_DEVICE_DESCRIPTOR,  # noqa: F401
+    XTMultiManagerPostSetupCallbackPriority,
 )
 from .multi_manager.multi_manager import (
     XTConfigEntry,
@@ -592,6 +593,7 @@ async def async_setup_entry(
 ) -> None:
     """Set up Tuya number dynamically through Tuya discovery."""
     hass_data = entry.runtime_data
+    this_platform = Platform.NUMBER
 
     if entry.runtime_data.multi_manager is None or hass_data.manager is None:
         return
@@ -602,9 +604,34 @@ async def async_setup_entry(
             dict[str, tuple[XTNumberEntityDescription, ...]],
         ],
         XTEntityDescriptorManager.get_platform_descriptors(
-            NUMBERS, entry.runtime_data.multi_manager, Platform.NUMBER
+            NUMBERS, entry.runtime_data.multi_manager, this_platform
         ),
     )
+
+    @callback
+    def async_add_generic_entities(device_map) -> None:
+        if hass_data.manager is None:
+            return
+        entities: list[XTNumberEntity] = []
+        device_ids = [*device_map]
+        for device_id in device_ids:
+            if device := hass_data.manager.device_map.get(device_id):
+                generic_dpcodes = XTEntity.get_generic_dpcodes_for_this_platform(
+                    device, this_platform
+                )
+                for dpcode in generic_dpcodes:
+                    descriptor = XTNumberEntityDescription(
+                        key=dpcode,
+                        translation_key="xt_generic_number",
+                        translation_placeholders={"name": XTEntity.get_human_name_from_generic_dpcode(dpcode)},
+                        entity_registry_enabled_default=False,
+                        entity_registry_visible_default=False,
+                    )
+                    entities.append(
+                        XTNumberEntity.get_entity_instance(
+                            descriptor, device, hass_data.manager
+                        ))
+        async_add_entities(entities)
 
     @callback
     def async_discover_device(device_map, restrict_dpcode: str | None = None) -> None:
@@ -637,7 +664,7 @@ async def async_setup_entry(
                         for description in category_descriptions
                         if XTEntity.supports_description(
                             device,
-                            Platform.NUMBER,
+                            this_platform,
                             description,
                             True,
                             externally_managed_dpcodes,
@@ -650,7 +677,7 @@ async def async_setup_entry(
                         for description in category_descriptions
                         if XTEntity.supports_description(
                             device,
-                            Platform.NUMBER,
+                            this_platform,
                             description,
                             False,
                             externally_managed_dpcodes,
@@ -658,9 +685,13 @@ async def async_setup_entry(
                     )
 
         async_add_entities(entities)
+        if restrict_dpcode is None:
+            hass_data.manager.post_setup_callbacks[
+                XTMultiManagerPostSetupCallbackPriority.PRIORITY_LAST
+            ].append((async_add_generic_entities, (device_map,), None))
 
     hass_data.manager.register_device_descriptors(
-        Platform.NUMBER, supported_descriptors
+        this_platform, supported_descriptors
     )
     async_discover_device([*hass_data.manager.device_map])
 

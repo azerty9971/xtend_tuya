@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import overload, Literal, cast, Any
 from enum import StrEnum
+import json
 from homeassistant.helpers.entity import EntityDescription
 from homeassistant.helpers import entity_registry as er, device_registry as dr
 from homeassistant.helpers.entity_registry import (
@@ -278,7 +279,7 @@ class XTEntityDescriptorManager:
     @staticmethod
     def _get_param_type(param) -> XTEntityDescriptorManager.XTEntityDescriptorType:
         if param is None:
-            LOGGER.warning("Returning UNKNOWN for because of None", stack_info=True)
+            LOGGER.warning("_get_param_type is returning UNKNOWN because of None input", stack_info=True)
             return XTEntityDescriptorManager.XTEntityDescriptorType.UNKNOWN
         elif isinstance(param, dict):
             return XTEntityDescriptorManager.XTEntityDescriptorType.DICT
@@ -300,6 +301,11 @@ class XTEntityDescriptorManager:
 
 
 class XTEntity(TuyaEntity):
+    class XTEntityAccessMode(StrEnum):
+        READ_ONLY = "ro"
+        READ_WRITE = "rw"
+        WRITE_ONLY = "wr"
+
     def __init__(self, *args, **kwargs) -> None:
         # This is to catch the super call in case the next class in parent's MRO doesn't have an init method
         try:
@@ -389,7 +395,7 @@ class XTEntity(TuyaEntity):
         prefer_function: bool = False,
         dptype: TuyaDPType | None = None,
         only_function: bool = False,
-    ) -> XTDPCode | TuyaDPCode | TuyaEnumTypeData | TuyaIntegerTypeData | None:
+    ) -> str | XTDPCode | TuyaDPCode | TuyaEnumTypeData | TuyaIntegerTypeData | None:
         if only_function:
             return self._find_dpcode(
                 dpcodes=dpcodes,
@@ -427,6 +433,7 @@ class XTEntity(TuyaEntity):
         self,
         dpcodes: (
             str
+            | tuple[str, ...]
             | XTDPCode
             | tuple[XTDPCode, ...]
             | TuyaDPCode
@@ -437,13 +444,11 @@ class XTEntity(TuyaEntity):
         prefer_function: bool = False,
         dptype: TuyaDPType | None = None,
         only_function: bool = False,
-    ) -> XTDPCode | TuyaDPCode | TuyaEnumTypeData | TuyaIntegerTypeData | None:
+    ) -> str | XTDPCode | TuyaDPCode | TuyaEnumTypeData | TuyaIntegerTypeData | None:
         if dpcodes is None:
             return None
 
-        if isinstance(dpcodes, str):
-            dpcodes = (XTDPCode(dpcodes),)
-        elif not isinstance(dpcodes, tuple):
+        if not isinstance(dpcodes, tuple):
             dpcodes = (dpcodes,)
 
         order = ["status_range", "function"]
@@ -503,9 +508,7 @@ class XTEntity(TuyaEntity):
             return TUYA_DPTYPE_MAPPING.get(type)
 
     @staticmethod
-    def mark_overriden_entities_as_disables(
-        hass: HomeAssistant, device: XTDevice
-    ):
+    def mark_overriden_entities_as_disables(hass: HomeAssistant, device: XTDevice):
         device_registry = dr.async_get(hass)
         entity_registry = er.async_get(hass)
         hass_device = device_registry.async_get_device(
@@ -523,8 +526,10 @@ class XTEntity(TuyaEntity):
                     if entity_registration.entity_id in entity_platform.entities:
                         entity_instance_platform = Platform(entity_platform.domain)
                         if entity_instance_platform in FULLY_OVERRIDEN_PLATFORMS:
-                            entity_registry.async_update_entity(entity_id=entity_registration.entity_id, disabled_by=RegistryEntryDisabler.USER)
-
+                            entity_registry.async_update_entity(
+                                entity_id=entity_registration.entity_id,
+                                disabled_by=RegistryEntryDisabler.USER,
+                            )
 
     @staticmethod
     def register_current_entities_as_handled_dpcode(
@@ -651,3 +656,136 @@ class XTEntity(TuyaEntity):
         if debug:
             LOGGER.warning(f"_supports_description5 => False <=> {dpcode}")
         return False, dpcode
+
+    @staticmethod
+    def __is_dpcode_suitable_for_platform(
+        device: XTDevice, dpcode: str, platform: Platform
+    ) -> bool:
+        read_only: bool = True
+        write_only: bool = False
+        dp_id: int | None = None
+        value_type: TuyaDPType | None = None
+        min: int | None = None
+        max: int | None = None
+        scale: int | None = None
+        step: int | None = None
+        #unit: str | None = None
+        value_descr_dict: dict = {}
+        if function := device.function.get(dpcode):
+            dp_id = function.dp_id
+            value_type = function.type
+        if status_range := device.status_range.get(dpcode):
+            if dp_id is None:
+                dp_id = status_range.dp_id
+            if value_type is None:
+                value_type = status_range.type
+        if dp_id is None or dp_id == 0:
+            return False
+        if local_strategy := device.local_strategy.get(dp_id):
+            if access_mode := local_strategy.get("access_mode"):
+                match access_mode:
+                    case XTEntity.XTEntityAccessMode.READ_ONLY:
+                        read_only = True
+                        write_only = False
+                    case XTEntity.XTEntityAccessMode.READ_WRITE:
+                        read_only = False
+                        write_only = False
+                    case XTEntity.XTEntityAccessMode.WRITE_ONLY:
+                        read_only = False
+                        write_only = True
+            else:
+                return False
+            if value_type is None:
+                if config_item := local_strategy.get("config_item"):
+                    if ls_dptype := config_item.get("valueType"):
+                        value_type = XTEntity.determine_dptype(ls_dptype)
+                    if ls_value_descr := config_item.get("valueDesc"):
+                        try:
+                            value_descr_dict = json.loads(ls_value_descr)
+                            #unit = value_descr_dict.get("unit")
+                            min = value_descr_dict.get("min")
+                            max = value_descr_dict.get("max")
+                            scale = value_descr_dict.get("scale")
+                            step = value_descr_dict.get("step")
+                        except Exception:
+                            pass
+        if value_type is None:
+            return False
+        match platform:
+            case Platform.BINARY_SENSOR:
+                if value_type not in [TuyaDPType.BOOLEAN]:
+                    return False
+                if read_only is True:
+                    return True
+            case Platform.SENSOR:
+                if value_type not in [
+                    TuyaDPType.ENUM,
+                    TuyaDPType.INTEGER,
+                    TuyaDPType.STRING,
+                ]:
+                    return False
+                if read_only is True:
+                    return True
+            case Platform.NUMBER:
+                if value_type not in [TuyaDPType.INTEGER]:
+                    return False
+                if (
+                    read_only is False
+                    and write_only is False
+                    and min is not None
+                    and max is not None
+                    and scale is not None
+                    and step is not None
+                ):
+                    return True
+            case Platform.SELECT:
+                if value_type not in [TuyaDPType.ENUM]:
+                    return False
+                if (
+                    read_only is False
+                    and write_only is False
+                ):
+                    return True
+            case Platform.LIGHT:
+                if value_type not in [TuyaDPType.JSON, TuyaDPType.RAW]:
+                    return False
+                if (
+                    read_only is False
+                    and write_only is False
+                    and value_descr_dict.get("h") is not None
+                    and value_descr_dict.get("s") is not None
+                    and value_descr_dict.get("v") is not None
+                ):
+                    return True
+            case Platform.SWITCH:
+                if value_type not in [TuyaDPType.BOOLEAN]:
+                    return False
+                if read_only is False and write_only is False:
+                    return True
+        return False
+
+    @staticmethod
+    def get_generic_dpcodes_for_this_platform(
+        device: XTDevice, platform: Platform
+    ) -> list[str]:
+        return_list: list[str] = []
+        for dpcode in device.status:
+            # Don't add already handled DPCodes
+            if XTEntity.is_dpcode_handled(device, platform, dpcode) is True:
+                continue
+
+            # Filter DPCodes that are not for the current platform
+            if (
+                XTEntity.__is_dpcode_suitable_for_platform(device, dpcode, platform)
+                is False
+            ):
+                continue
+            return_list.append(dpcode)
+        return return_list
+
+    @staticmethod
+    def get_human_name_from_generic_dpcode(dpcode: str) -> str:
+        human_name = dpcode
+        human_name = human_name.replace("_", " ")
+        human_name = human_name.capitalize()
+        return human_name

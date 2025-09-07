@@ -30,6 +30,7 @@ async def async_setup_entry(
 ) -> None:
     """Set up tuya fan dynamically through tuya discovery."""
     hass_data = entry.runtime_data
+    this_platform = Platform.FAN
 
     if entry.runtime_data.multi_manager is None or hass_data.manager is None:
         return
@@ -37,7 +38,7 @@ async def async_setup_entry(
     supported_descriptors, externally_managed_descriptors = cast(
         tuple[set[str], set[str]],
         XTEntityDescriptorManager.get_platform_descriptors(
-            XT_SUPPORT_TYPE, entry.runtime_data.multi_manager, Platform.FAN
+            XT_SUPPORT_TYPE, entry.runtime_data.multi_manager, this_platform
         ),
     )
 
