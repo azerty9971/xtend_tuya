@@ -689,10 +689,10 @@ class XTEntity(TuyaEntity):
             else:
                 LOGGER.warning(f"Access mode not found or NULL ({device.name} => {dpcode})")
                 return False
-            
-            if config_item := local_strategy.get("config_item"):
-                if dptype := config_item.get("valueType"):
-                    value_type = XTEntity.determine_dptype(dptype)
+            if value_type is None:
+                if config_item := local_strategy.get("config_item"):
+                    if dptype := config_item.get("valueType"):
+                        value_type = XTEntity.determine_dptype(dptype)
         if value_type is None:
             LOGGER.warning(f"value_type is None ({device.name} => {dpcode})")
             return False
