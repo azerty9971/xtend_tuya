@@ -13,12 +13,14 @@ from homeassistant.components.sensor import (
 )
 from homeassistant.components.sensor.const import (
     DEVICE_CLASS_UNITS as SENSOR_DEVICE_CLASS_UNITS,
+    UNIT_CONVERTERS as SENSOR_UNIT_CONVERTERS,
 )
 from homeassistant.const import (
     UnitOfEnergy,
     Platform,
     PERCENTAGE,
     EntityCategory,
+    CONCENTRATION_PARTS_PER_MILLION,
 )
 from homeassistant.core import (
     HomeAssistant,
@@ -1666,14 +1668,44 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
         try:
             super(XTEntity, self).__init__(device, device_manager, description)  # type: ignore
         except Exception:
+            if description.key == XTDPCode.CO2_VALUE:
+                LOGGER.warning(f"Calling replaced constructor for {description.key}")
             self._replaced_constructor(
                 device=device, device_manager=device_manager, description=description
             )
-
+        if description.key == XTDPCode.CO2_VALUE:
+            LOGGER.warning(f"constructor for {description.key}: native UOM = {self._attr_native_unit_of_measurement}")
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description  # type: ignore
         self.cancel_reset_after_x_seconds = None
+
+    def _is_valid_suggested_unit(self, suggested_unit_of_measurement: str) -> bool:
+        """Validate the suggested unit.
+
+        Validate that a unit converter exists for the sensor's device class and that the
+        unit converter supports both the native and the suggested units of measurement.
+        """
+        # Make sure we can convert the units
+        if (
+            (unit_converter := SENSOR_UNIT_CONVERTERS.get(self.device_class)) is None
+            or self.__native_unit_of_measurement_compat
+            not in unit_converter.VALID_UNITS
+            or suggested_unit_of_measurement not in unit_converter.VALID_UNITS
+        ):
+            if suggested_unit_of_measurement == CONCENTRATION_PARTS_PER_MILLION and unit_converter is None:
+                LOGGER.warning("Unit converter is None")
+            if suggested_unit_of_measurement == CONCENTRATION_PARTS_PER_MILLION and unit_converter is not None:
+                LOGGER.warning(f"Unit converter valid units: {list(unit_converter.VALID_UNITS)}")
+            if not self._invalid_suggested_unit_of_measurement_reported:
+                self._invalid_suggested_unit_of_measurement_reported = True
+                raise ValueError(
+                    f"Entity {type(self)} suggest an incorrect "
+                    f"unit of measurement: {suggested_unit_of_measurement}."
+                )
+            return False
+
+        return True
 
     def reset_value(
         self, _: datetime.datetime | None, manual_call: bool = False
