@@ -624,20 +624,13 @@ class XTEntity(TuyaEntity):
         description: EntityDescription,
         first_pass: bool,
         externally_managed_dpcodes: list[str],
-        debug: bool = False,
     ) -> tuple[bool, str]:
         dpcode = XTEntity._get_description_dpcode(description)
         if XTEntity.is_dpcode_handled(device, platform, dpcode) is True:
-            if debug:
-                LOGGER.warning(f"_supports_description1 => False <=> {dpcode}")
             return False, dpcode
         if first_pass is True:
             if dpcode in device.status:
-                if debug:
-                    LOGGER.warning(f"_supports_description2 => True <=> {dpcode}")
                 return True, dpcode
-            if debug:
-                LOGGER.warning(f"_supports_description3 => False <=> {dpcode}")
             return False, dpcode
         else:
             # if device.force_compatibility is True:
@@ -650,11 +643,7 @@ class XTEntity(TuyaEntity):
                     is False
                 ):
                     device.replace_status_with_another(current_status, dpcode)
-                    if debug:
-                        LOGGER.warning(f"_supports_description4 => True <=> {dpcode}")
                     return True, dpcode
-        if debug:
-            LOGGER.warning(f"_supports_description5 => False <=> {dpcode}")
         return False, dpcode
 
     @staticmethod
