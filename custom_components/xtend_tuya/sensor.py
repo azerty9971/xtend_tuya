@@ -1,7 +1,7 @@
 """Support for Tuya sensors."""
 
 from __future__ import annotations
-from typing import cast
+from typing import cast, final
 import datetime
 from dataclasses import dataclass, field
 from .const import LOGGER  # noqa: F401
@@ -14,6 +14,7 @@ from homeassistant.components.sensor import (
 from homeassistant.components.sensor.const import (
     DEVICE_CLASS_UNITS as SENSOR_DEVICE_CLASS_UNITS,
     UNIT_CONVERTERS as SENSOR_UNIT_CONVERTERS,
+    AMBIGUOUS_UNITS as SENSOR_AMBIGUOUS_UNITS,
 )
 from homeassistant.const import (
     UnitOfEnergy,
@@ -1679,6 +1680,16 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
         self.device_manager = device_manager
         self.entity_description = description  # type: ignore
         self.cancel_reset_after_x_seconds = None
+
+    @final
+    @property
+    def __native_unit_of_measurement_compat(self) -> str | None:
+        """Process ambiguous units."""
+        native_unit_of_measurement = self.native_unit_of_measurement
+        return SENSOR_AMBIGUOUS_UNITS.get(
+            native_unit_of_measurement,
+            native_unit_of_measurement,
+        )
 
     def _is_valid_suggested_unit(self, suggested_unit_of_measurement: str) -> bool:
         """Validate the suggested unit.
