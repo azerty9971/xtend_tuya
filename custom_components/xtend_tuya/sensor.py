@@ -1617,8 +1617,8 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
             and description.native_unit_of_measurement is None
             # we do not need to check mappings if the API UOM is allowed
             and (
-                #self.device_class not in SENSOR_UNIT_CONVERTERS or
-                self.native_unit_of_measurement
+                self.device_class not in SENSOR_UNIT_CONVERTERS
+                or self.native_unit_of_measurement
                 not in SENSOR_DEVICE_CLASS_UNITS[self.device_class]
             )
         ):
