@@ -13,7 +13,6 @@ from homeassistant.components.sensor import (
 )
 from homeassistant.components.sensor.const import (
     DEVICE_CLASS_UNITS as SENSOR_DEVICE_CLASS_UNITS,
-    UNIT_CONVERTERS as SENSOR_UNIT_CONVERTERS,
 )
 from homeassistant.const import (
     UnitOfEnergy,
@@ -1499,18 +1498,16 @@ async def async_setup_entry(
                     descriptor = XTSensorEntityDescription(
                         key=dpcode,
                         translation_key="xt_generic_sensor",
-                        translation_placeholders={
-                            "name": XTEntity.get_human_name_from_generic_dpcode(dpcode)
-                        },
+                        translation_placeholders={"name": XTEntity.get_human_name_from_generic_dpcode(dpcode)},
                         entity_registry_enabled_default=False,
                         entity_registry_visible_default=False,
                     )
                     entities.append(
                         XTSensorEntity.get_entity_instance(
                             descriptor, device, hass_data.manager
-                        )
-                    )
+                        ))
         async_add_entities(entities)
+
 
     @callback
     def async_discover_device(device_map, restrict_dpcode: str | None = None) -> None:
@@ -1608,7 +1605,6 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
         else:
             self._type = self.get_dptype(description.key)  # type: ignore #This is modified from TuyaSensorEntity's constructor
 
-    def validate_instance_uom(self, description: XTSensorEntityDescription):
         # Logic to ensure the set device class and API received Unit Of Measurement
         # match Home Assistants requirements.
         if (
@@ -1616,18 +1612,14 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
             and not self.device_class.startswith(TuyaDOMAIN)
             and description.native_unit_of_measurement is None
             # we do not need to check mappings if the API UOM is allowed
-            and (
-                self.device_class not in SENSOR_UNIT_CONVERTERS
-                or self.native_unit_of_measurement
-                not in SENSOR_DEVICE_CLASS_UNITS[self.device_class]
-            )
+            and self.native_unit_of_measurement
+            not in SENSOR_DEVICE_CLASS_UNITS[self.device_class]
         ):
             # We cannot have a device class, if the UOM isn't set or the
             # device class cannot be found in the validation mapping.
             if (
                 self.native_unit_of_measurement is None
                 or self.device_class not in TuyaDEVICE_CLASS_UNITS
-                or self.device_class not in SENSOR_UNIT_CONVERTERS
             ):
                 LOGGER.debug(
                     "Device class %s ignored for incompatible unit %s in sensor entity %s",
@@ -1677,7 +1669,7 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
             self._replaced_constructor(
                 device=device, device_manager=device_manager, description=description
             )
-        self.validate_instance_uom(description)
+
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description  # type: ignore
