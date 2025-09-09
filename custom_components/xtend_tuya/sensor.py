@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 from typing import cast
-from enum import StrEnum
 import datetime
 from dataclasses import dataclass, field
 from .const import LOGGER  # noqa: F401
@@ -97,28 +96,6 @@ class XTSensorEntityDescription(TuyaSensorEntityDescription, frozen=True):
             device_manager=device_manager,
             description=XTSensorEntityDescription(**description.__dict__),
         )
-
-XT_UNIT_DEVICE_CLASSES: dict[str, list[SensorDeviceClass]] = {}
-for device_class in SENSOR_DEVICE_CLASS_UNITS:
-    for uom in SENSOR_DEVICE_CLASS_UNITS[device_class]:
-        if uom is None:
-            continue
-        if isinstance(uom, StrEnum):
-            for set_uom in uom:
-                if set_uom not in XT_UNIT_DEVICE_CLASSES:
-                    XT_UNIT_DEVICE_CLASSES[set_uom] = list()
-                if device_class not in XT_UNIT_DEVICE_CLASSES[set_uom]:
-                    XT_UNIT_DEVICE_CLASSES[set_uom].append(device_class)
-        elif isinstance(uom, str):
-            if uom not in XT_UNIT_DEVICE_CLASSES:
-                XT_UNIT_DEVICE_CLASSES[uom] = list()
-            if device_class not in XT_UNIT_DEVICE_CLASSES[uom]:
-                XT_UNIT_DEVICE_CLASSES[uom].append(device_class)
-unique_count: int = 0
-for units in XT_UNIT_DEVICE_CLASSES.items():
-    if len(units) == 1:
-        unique_count += 1
-LOGGER.warning(f"Sensor unique device classes unit: {unique_count}")
 
 # Commonly used battery sensors, that are re-used in the sensors down below.
 BATTERY_SENSORS: tuple[XTSensorEntityDescription, ...] = (
@@ -1521,7 +1498,6 @@ async def async_setup_entry(
                         key=dpcode,
                         translation_key="xt_generic_sensor",
                         translation_placeholders={"name": XTEntity.get_human_name_from_generic_dpcode(dpcode)},
-                        device_class=XTSensorEntity.get_device_class_from_uom(uom=XTEntity.get_unit_of_dpcode(device, dpcode)),
                         entity_registry_enabled_default=False,
                         entity_registry_visible_default=False,
                     )
@@ -1800,12 +1776,3 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
         return XTSensorEntity(
             device, device_manager, XTSensorEntityDescription(**description.__dict__)
         )
-
-    @staticmethod
-    def get_device_class_from_uom(uom: str | None) -> SensorDeviceClass | None:
-        if uom is None:
-            return None
-        if device_classes := XT_UNIT_DEVICE_CLASSES.get(uom):
-            if len(device_classes) == 1:
-                return device_classes[0]
-        return None

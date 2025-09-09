@@ -658,26 +658,6 @@ class XTEntity(TuyaEntity):
         return False, dpcode
 
     @staticmethod
-    def get_unit_of_dpcode(device: XTDevice, dpcode: str) -> str | None:
-        dp_id: int | None = None
-        if function := device.function.get(dpcode):
-            if function.dp_id is not None and function.dp_id != 0:
-                dp_id = function.dp_id
-        if status_range := device.status_range.get(dpcode):
-            if dp_id is None and status_range.dp_id is not None and status_range.dp_id != 0:
-                dp_id = status_range.dp_id
-        if dp_id is None or dp_id == 0:
-            return None
-        if local_strategy := device.local_strategy.get(dp_id):
-            if config_item := local_strategy.get("config_item"):
-                if ls_value_descr := config_item.get("valueDesc"):
-                    try:
-                        value_descr_dict = json.loads(ls_value_descr)
-                        return value_descr_dict.get("unit")
-                    except Exception:
-                        pass
-
-    @staticmethod
     def __is_dpcode_suitable_for_platform(
         device: XTDevice, dpcode: str, platform: Platform
     ) -> bool:
