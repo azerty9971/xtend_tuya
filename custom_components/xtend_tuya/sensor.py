@@ -1801,6 +1801,7 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
         if uom is None:
             return None
         if device_classes := XT_UNIT_DEVICE_CLASSES.get(uom):
+            LOGGER.warning(f"Device classes for unit {uom} => {device_classes}")
             if len(device_classes) == 1:
                 return device_classes[0]
         return None

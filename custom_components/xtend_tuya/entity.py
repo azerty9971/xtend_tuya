@@ -673,6 +673,7 @@ class XTEntity(TuyaEntity):
                 if ls_value_descr := config_item.get("valueDesc"):
                     try:
                         value_descr_dict = json.loads(ls_value_descr)
+                        LOGGER.warning(f"Returning unit: {value_descr_dict.get("unit")} for dpcode {dpcode}")
                         return value_descr_dict.get("unit")
                     except Exception:
                         pass
