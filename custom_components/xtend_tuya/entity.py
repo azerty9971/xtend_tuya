@@ -666,11 +666,15 @@ class XTEntity(TuyaEntity):
         if status_range := device.status_range.get(dpcode):
             if dp_id is None and status_range.dp_id is not None and status_range.dp_id != 0:
                 dp_id = status_range.dp_id
+        LOGGER.warning(f"Found DPID {dp_id} for dpcode {dpcode}")
         if dp_id is None or dp_id == 0:
             return None
         if local_strategy := device.local_strategy.get(dp_id):
+            LOGGER.warning(f"Local Strategy found for dpcode {dpcode}")
             if config_item := local_strategy.get("config_item"):
+                LOGGER.warning(f"Config item found for dpcode {dpcode}")
                 if ls_value_descr := config_item.get("valueDesc"):
+                    LOGGER.warning(f"Value descr found for dpcode {dpcode} => {ls_value_descr}")
                     try:
                         value_descr_dict = json.loads(ls_value_descr)
                         LOGGER.warning(f"Returning unit: {value_descr_dict.get("unit")} for dpcode {dpcode}")
