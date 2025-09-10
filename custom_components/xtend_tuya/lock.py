@@ -55,6 +55,7 @@ LOCKS: dict[str, XTLockEntityDescription] = {}
 # Statuses that tell if the lock is currently locked or not
 LOCK_LOCKED_UNLOCKED_STATUS_DPCODES: list[XTDPCode] = [
     XTDPCode.LOCK_MOTOR_STATE,
+    XTDPCode.OPEN_CLOSE,
 ]
 
 # Statuses that can be sent to lock/unlock the lock
@@ -147,6 +148,8 @@ class XTLockEntity(XTEntity, LockEntity):  # type: ignore
         self.last_action: str | None = None
         self.entity_description = description  # type: ignore
         self.temporary_unlock = description.temporary_unlock
+        self.status_initial_value: dict[str, Any] = {}
+        self.status_value_has_changed: dict[str, bool] = {}
         if self._get_state_value(self.entity_description.unlock_status_list) is None:
             # If we can't find the status of the lock then assume a temporary lock
             self.temporary_unlock = True
@@ -163,6 +166,11 @@ class XTLockEntity(XTEntity, LockEntity):  # type: ignore
                     f"{XTDevice.XTDevicePreference.LOCK_MANUAL_UNLOCK_COMMAND}",
                     manual_unlock_commands,
                 )
+        if len(description.unlock_status_list) > 1:
+            for dpcode in description.unlock_status_list:
+                if dpcode in device.status:
+                    self.status_initial_value[dpcode] = device.status[dpcode]
+                    self.status_value_has_changed[dpcode] = False
 
     @staticmethod
     def should_entity_be_added(
@@ -216,11 +224,18 @@ class XTLockEntity(XTEntity, LockEntity):  # type: ignore
             )
         return None
 
+    def update_changed_value_list(self) -> None:
+        for dpcode in self.status_value_has_changed:
+            if self.status_value_has_changed[dpcode] is False:
+                if self.status_initial_value[dpcode] != self.device.status[dpcode]:
+                    self.status_value_has_changed[dpcode] = True
+
     @property
     def is_locked(self) -> bool | None:  # type: ignore
         """Return true if the lock is locked."""
         if self.temporary_unlock:
             return True
+        
         is_unlocked = self._get_state_value(self.entity_description.unlock_status_list)
         if is_unlocked is not None:
             if not is_unlocked:
@@ -252,6 +267,10 @@ class XTLockEntity(XTEntity, LockEntity):  # type: ignore
         return self._attr_is_unlocking
 
     def _get_state_value(self, codes: list[XTDPCode]) -> Any | None:
+        self.update_changed_value_list()
+        for code in codes:
+            if code in self.status_value_has_changed and self.status_value_has_changed[code] is True:
+                return self.device.status[str(code)]
         for code in codes:
             if str(code) in self.device.status:
                 return self.device.status[str(code)]

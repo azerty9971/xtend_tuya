@@ -947,6 +947,7 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
             key=XTDPCode.ALARM_LOCK,
             translation_key="jtmspro_alarm_lock",
             entity_registry_enabled_default=False,
+            reset_after_x_seconds=2,
         ),
         *LOCK_SENSORS,
         *ELECTRICITY_SENSORS,
