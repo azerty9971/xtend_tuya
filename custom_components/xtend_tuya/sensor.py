@@ -65,6 +65,7 @@ from .ha_tuya_integration.tuya_integration_imports import (
     TuyaDPType,
 )
 
+COMPOUND_KEY: list[str] = ["key", "subkey"]
 
 @dataclass(frozen=True)
 class XTSensorEntityDescription(TuyaSensorEntityDescription, frozen=True):
@@ -1479,7 +1480,7 @@ async def async_setup_entry(
             dict[str, tuple[XTSensorEntityDescription, ...]],
         ],
         XTEntityDescriptorManager.get_platform_descriptors(
-            SENSORS, entry.runtime_data.multi_manager, this_platform, ["key", "subkey"]
+            SENSORS, entry.runtime_data.multi_manager, this_platform, COMPOUND_KEY
         ),
     )
 
@@ -1559,6 +1560,7 @@ async def async_setup_entry(
                             description,
                             False,
                             externally_managed_dpcodes,
+                            COMPOUND_KEY
                         )
                     )
         async_add_entities(entities)

@@ -119,7 +119,6 @@ class XTEntityDescriptorManager:
                         compound_key = key_part
                     else:
                         compound_key = f"{compound_key}|{key_part}"
-                        LOGGER.warning(f"new compound key: {compound_key}")
         return compound_key
 
     @staticmethod
@@ -616,9 +615,10 @@ class XTEntity(TuyaEntity):
         description: EntityDescription,
         first_pass: bool,
         externally_managed_dpcodes: list[str] = [],
+        key_fields: list[str] | None = None
     ) -> bool:
         result, dpcode = XTEntity._supports_description(
-            device, platform, description, first_pass, externally_managed_dpcodes
+            device, platform, description, first_pass, externally_managed_dpcodes, key_fields
         )
         if result is True:
             # Register the code as being handled by the device
@@ -642,10 +642,15 @@ class XTEntity(TuyaEntity):
         description: EntityDescription,
         first_pass: bool,
         externally_managed_dpcodes: list[str],
+        key_fields: list[str] | None = None
     ) -> tuple[bool, str]:
         dpcode = XTEntity._get_description_dpcode(description)
+        compound_key = None
+        if key_fields is not None:
+            compound_key = XTEntityDescriptorManager.get_compound_key(description, key_fields)
         if XTEntity.is_dpcode_handled(device, platform, dpcode) is True:
-            return False, dpcode
+            if compound_key is None or XTEntity.is_dpcode_handled(device, platform, compound_key) is True:
+                return False, dpcode
         if first_pass is True:
             if dpcode in device.status:
                 return True, dpcode
