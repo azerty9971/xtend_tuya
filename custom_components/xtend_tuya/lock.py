@@ -56,6 +56,9 @@ LOCKS: dict[str, XTLockEntityDescription] = {}
 LOCK_LOCKED_UNLOCKED_STATUS_DPCODES: list[XTDPCode] = [
     XTDPCode.LOCK_MOTOR_STATE,
     XTDPCode.OPEN_CLOSE,
+
+    #This one is a string value, keep it at the end of the enum
+    XTDPCode.CLOSED_OPENED,
 ]
 
 # Statuses that can be sent to lock/unlock the lock
@@ -229,7 +232,6 @@ class XTLockEntity(XTEntity, LockEntity):  # type: ignore
             if self.status_value_has_changed[dpcode] is False:
                 if self.status_initial_value[dpcode] != self.device.status[dpcode]:
                     self.status_value_has_changed[dpcode] = True
-            LOGGER.warning(f"LOCK value_has_changed {self.device.name} => {dpcode} => {self.status_value_has_changed[dpcode]}")
 
     @property
     def is_locked(self) -> bool | None:  # type: ignore
@@ -237,7 +239,16 @@ class XTLockEntity(XTEntity, LockEntity):  # type: ignore
         if self.temporary_unlock:
             return True
         
-        is_unlocked = self._get_state_value(self.entity_description.unlock_status_list)
+        is_unlocked_mixed = self._get_state_value(self.entity_description.unlock_status_list)
+        is_unlocked: bool | None = None
+        if isinstance(is_unlocked_mixed, bool):
+            is_unlocked = is_unlocked_mixed
+        elif isinstance(is_unlocked_mixed, str):
+            is_unlocked_mixed_lower = is_unlocked_mixed.lower()
+            if is_unlocked_mixed_lower in ["open", "opened"]:
+                is_unlocked = True
+            if is_unlocked_mixed_lower in ["close", "closed"]:
+                is_unlocked = False
         if is_unlocked is not None:
             if not is_unlocked:
                 self._attr_is_locked = True
