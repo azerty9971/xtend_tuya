@@ -1547,6 +1547,7 @@ async def async_setup_entry(
                             description,
                             True,
                             externally_managed_dpcodes,
+                            COMPOUND_KEY
                         )
                     )
                     entities.extend(
