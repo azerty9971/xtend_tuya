@@ -49,6 +49,7 @@ class XTEntityDescriptorManager:
         platform_descriptors: Any,
         multi_manager: mm.MultiManager,
         platform: Platform | None,
+        key_fields: list[str] = ["key"]
     ) -> tuple[Any, Any]:
         include_descriptors = platform_descriptors
         exclude_descriptors = XTEntityDescriptorManager.get_empty_descriptor(
@@ -59,13 +60,13 @@ class XTEntityDescriptorManager:
                 platform
             ):
                 include_descriptors = XTEntityDescriptorManager.merge_descriptors(
-                    include_descriptors, descriptors_to_add
+                    include_descriptors, descriptors_to_add, key_fields
                 )
             for (
                 descriptors_to_exclude
             ) in multi_manager.get_platform_descriptors_to_exclude(platform):
                 exclude_descriptors = XTEntityDescriptorManager.merge_descriptors(
-                    exclude_descriptors, descriptors_to_exclude
+                    exclude_descriptors, descriptors_to_exclude, key_fields
                 )
         return include_descriptors, exclude_descriptors
 
@@ -80,7 +81,7 @@ class XTEntityDescriptorManager:
             return descriptor_dict[CROSS_CATEGORY_DEVICE_DESCRIPTOR]
 
     @staticmethod
-    def get_category_keys(category_content: Any) -> list[str]:
+    def get_category_keys(category_content: Any, key_fields: list[str] = ["key"]) -> list[str]:
         return_list: list[str] = []
         if not category_content:
             return return_list
@@ -97,13 +98,28 @@ class XTEntityDescriptorManager:
                 match content_type:
                     case XTEntityDescriptorManager.XTEntityDescriptorType.ENTITY:
                         entity = cast(EntityDescription, descriptor)
-                        return_list.append(entity.key)
+                        compound_key: str | None = XTEntityDescriptorManager.get_compound_key(entity, key_fields)
+                        if compound_key is not None:
+                            return_list.append(compound_key)
                     case XTEntityDescriptorManager.XTEntityDescriptorType.STRING:
                         return_list.append(descriptor)
         elif ref_type is XTEntityDescriptorManager.XTEntityDescriptorType.DICT:
             for category_key in category_content:
                 return_list.append(category_key)
         return return_list
+    
+    @staticmethod
+    def get_compound_key(entity: EntityDescription, key_fields: list[str]) -> str | None:
+        compound_key: str | None = None
+        for key in key_fields:
+            if hasattr(entity, key):
+                key_part = getattr(entity, key)
+                if key_part is not None:
+                    if compound_key is None:
+                        compound_key = key_part
+                    else:
+                        compound_key = f"{compound_key}|{key_part}"
+        return compound_key
 
     @staticmethod
     def get_empty_descriptor(reference_descriptor: Any) -> Any:
@@ -123,7 +139,7 @@ class XTEntityDescriptorManager:
                 return None
 
     @staticmethod
-    def merge_descriptors(descriptors1: Any, descriptors2: Any) -> Any:
+    def merge_descriptors(descriptors1: Any, descriptors2: Any, key_fields: list[str]) -> Any:
         descr1_type = XTEntityDescriptorManager._get_param_type(descriptors1)
         descr2_type = XTEntityDescriptorManager._get_param_type(descriptors2)
         if (
@@ -147,7 +163,7 @@ class XTEntityDescriptorManager:
                     cross2 = descriptors2[CROSS_CATEGORY_DEVICE_DESCRIPTOR]
                 if cross1 is not None and cross2 is not None:
                     cross_both = XTEntityDescriptorManager.merge_descriptors(
-                        cross1, cross2
+                        cross1, cross2, key_fields
                     )
                 elif cross1 is not None:
                     cross_both = cross1
@@ -158,13 +174,13 @@ class XTEntityDescriptorManager:
                     if key in descriptors2:
                         merged_descriptors = (
                             XTEntityDescriptorManager.merge_descriptors(
-                                merged_descriptors, descriptors2[key]
+                                merged_descriptors, descriptors2[key], key_fields
                             )
                         )
                     if cross_both is not None:
                         merged_descriptors = (
                             XTEntityDescriptorManager.merge_descriptors(
-                                merged_descriptors, cross_both
+                                merged_descriptors, cross_both, key_fields
                             )
                         )
                     return_dict[key] = merged_descriptors
@@ -173,7 +189,7 @@ class XTEntityDescriptorManager:
                     if cross_both is not None:
                         merged_descriptors = (
                             XTEntityDescriptorManager.merge_descriptors(
-                                merged_descriptors, cross_both
+                                merged_descriptors, cross_both, key_fields
                             )
                         )
                     if key not in descriptors1:
@@ -187,13 +203,14 @@ class XTEntityDescriptorManager:
                         descriptors1[0]
                     )
                 descr2_keys: list[str] = XTEntityDescriptorManager.get_category_keys(
-                    descriptors2
+                    descriptors2, key_fields
                 )
                 for descriptor in descriptors1:
                     match var_type:
                         case XTEntityDescriptorManager.XTEntityDescriptorType.ENTITY:
                             entity = cast(EntityDescription, descriptor)
-                            if entity.key not in descr2_keys:
+                            compound_key = XTEntityDescriptorManager.get_compound_key(entity, key_fields)
+                            if compound_key is not None and compound_key not in descr2_keys:
                                 return_list.append(descriptor)
                         case XTEntityDescriptorManager.XTEntityDescriptorType.STRING:
                             if descriptor not in descr2_keys:
@@ -202,13 +219,13 @@ class XTEntityDescriptorManager:
             case XTEntityDescriptorManager.XTEntityDescriptorType.TUPLE:
                 return tuple(
                     XTEntityDescriptorManager.merge_descriptors(
-                        list(descriptors1), list(descriptors2)
+                        list(descriptors1), list(descriptors2), key_fields
                     )
                 )
             case XTEntityDescriptorManager.XTEntityDescriptorType.SET:
                 return set(
                     XTEntityDescriptorManager.merge_descriptors(
-                        list(descriptors1), list(descriptors2)
+                        list(descriptors1), list(descriptors2), key_fields
                     )
                 )
 
@@ -598,9 +615,10 @@ class XTEntity(TuyaEntity):
         description: EntityDescription,
         first_pass: bool,
         externally_managed_dpcodes: list[str] = [],
+        key_fields: list[str] | None = None
     ) -> bool:
         result, dpcode = XTEntity._supports_description(
-            device, platform, description, first_pass, externally_managed_dpcodes
+            device, platform, description, first_pass, externally_managed_dpcodes, key_fields
         )
         if result is True:
             # Register the code as being handled by the device
@@ -624,10 +642,15 @@ class XTEntity(TuyaEntity):
         description: EntityDescription,
         first_pass: bool,
         externally_managed_dpcodes: list[str],
+        key_fields: list[str] | None = None
     ) -> tuple[bool, str]:
         dpcode = XTEntity._get_description_dpcode(description)
+        compound_key = None
+        if key_fields is not None:
+            compound_key = XTEntityDescriptorManager.get_compound_key(description, key_fields)
         if XTEntity.is_dpcode_handled(device, platform, dpcode) is True:
-            return False, dpcode
+            if compound_key is None or XTEntity.is_dpcode_handled(device, platform, compound_key) is True:
+                return False, dpcode
         if first_pass is True:
             if dpcode in device.status:
                 return True, dpcode
