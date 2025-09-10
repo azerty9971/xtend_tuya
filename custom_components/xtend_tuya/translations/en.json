@@ -164,6 +164,32 @@
             "xt_generic_binary_sensor": {
                 "name": "{name}"
             },
+        "binary_sensor": {
+            "error": {
+                "name": "Error"
+            },
+            "error_flow_meter": {
+                "name": "Error: Flow meter"
+            },
+            "error_valve_low_battery": {
+                "name": "Error: Valve low battery"
+            },
+            "error_sensor_low_battery": {
+                "name": "Error: Sensor low battery"
+            },
+            "error_sensor_offline": {
+                "name": "Error: Sensor offline"
+            },
+            "error_water_shortage": {
+                "name": "Error: Water shortage"
+            },
+            "error_other": {
+                "name": "Error: Other"
+            },
+            "battery_charging": {
+                "name": "Battery charging"
+            },
+
             "door_contact_state": {
                 "name": "Door contact"
             },
@@ -348,6 +374,12 @@
         "number": {
             "xt_generic_number": {
                 "name": "{name}"
+            },
+            "rain_snow_delay": {
+                "name": "Rain/snow delay"
+            },
+            "watering_duration": {
+                "name": "Watering duration"
             },
             "alarm_duration": {
                 "name": "Alarm duration"
@@ -674,6 +706,16 @@
         "select": {
             "xt_generic_select": {
                 "name": "{name}"
+            },
+            "temperature_unit": {
+                "name": "Temperature unit",
+                "state": {
+                    "1": "°C",
+                    "2": "°F"
+                }
+            },
+            "volume_unit": {
+                "name": "Volume unit"
             },
             "blanket_level": {
                 "state": {
@@ -1211,6 +1253,31 @@
         "sensor": {
             "xt_generic_sensor": {
                 "name": "{name}"
+            },
+            "start_time": {
+                "name": "Start time"
+            },
+            "end_time": {
+                "name": "End time"
+            },
+            "watering_cycle": {
+                "name": "Watering cycle"
+            },
+            "watering_volume": {
+                "name": "Watering volume"
+            },
+            "watering_task": {
+                "name": "Watering task",
+                "state": {
+                    "0": "None",
+                    "1": "Single duration",
+                    "2": "Cycle duration",
+                    "3": "Single volume",
+                    "4": "Cycle volume"
+                }
+            },
+            "battery_level": {
+                "name": "Battery level"
             },
             "temp_unit_convert": {
                 "name": "Temperature unit",
@@ -2184,6 +2251,12 @@
             },
             "xt_cover_invert_status": {
                 "name": "Invert cover status"
+            },
+            "sleep_mode": {
+                "name": "Sleep mode"
+            },
+            "valve": {
+                "name": "Valve"
             },
             "key_rec": {
                 "name": "Key tone"
