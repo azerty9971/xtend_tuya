@@ -229,6 +229,7 @@ class XTLockEntity(XTEntity, LockEntity):  # type: ignore
             if self.status_value_has_changed[dpcode] is False:
                 if self.status_initial_value[dpcode] != self.device.status[dpcode]:
                     self.status_value_has_changed[dpcode] = True
+            LOGGER.warning(f"LOCK value_has_changed {self.device.name} => {dpcode} => {self.status_value_has_changed[dpcode]}")
 
     @property
     def is_locked(self) -> bool | None:  # type: ignore
