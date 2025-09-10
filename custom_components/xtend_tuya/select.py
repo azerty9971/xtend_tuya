@@ -33,7 +33,7 @@ from .ha_tuya_integration.tuya_integration_imports import (
 class XTSelectEntityDescription(TuyaSelectEntityDescription):
     """Describe an Tuya select entity."""
 
-    options: list[str] | None = None  # Allows setting custom options
+    options: list[str] | None = None  # Custom options
     
     def get_entity_instance(
         self,
@@ -379,7 +379,7 @@ class XTSelectEntity(XTEntity, TuyaSelectEntity):
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description
-        # Override options
+        # Use custom options
         if description.options is not None:
             self._attr_options = description.options
 
