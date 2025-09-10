@@ -1317,7 +1317,7 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
         ),
         XTSensorEntityDescription(
             key=XTDPCode.VBAT_STATE,
-            translation_key="battery",
+            translation_key="battery_level",
             device_class=SensorDeviceClass.BATTERY,
             state_class=SensorStateClass.MEASUREMENT,
             entity_category=EntityCategory.DIAGNOSTIC,
