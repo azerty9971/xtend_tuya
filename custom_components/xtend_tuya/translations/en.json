@@ -164,7 +164,6 @@
             "xt_generic_binary_sensor": {
                 "name": "{name}"
             },
-        "binary_sensor": {
             "error": {
                 "name": "Error"
             },
@@ -189,7 +188,6 @@
             "battery_charging": {
                 "name": "Battery charging"
             },
-
             "door_contact_state": {
                 "name": "Door contact"
             },
