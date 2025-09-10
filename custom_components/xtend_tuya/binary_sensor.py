@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import cast, Callable  # Callable for custom is_on function
+from typing import cast, Callable
 from homeassistant.components.binary_sensor import (
     BinarySensorDeviceClass,
 )
@@ -359,16 +359,16 @@ class XTBinarySensorEntity(XTEntity, TuyaBinarySensorEntity):
         """Init Tuya binary sensor."""
         super(XTBinarySensorEntity, self).__init__(device, device_manager, description)
         super(XTEntity, self).__init__(device, device_manager, description)  # type: ignore
-        # Append subkey to unique ID
-        if description.subkey is not None:
-            self._attr_unique_id += f"{description.subkey}"
         self.device = device
         self.device_manager = device_manager
         self._entity_description = description
-
+        # Append subkey to unique ID
+        if description.subkey is not None:
+            self._attr_unique_id += f"{description.subkey}"
+            
     @property
     def is_on(self) -> bool:
-        # Replace is_on with custom function
+        # Use custom is_on function
         if self.entity_description.is_on is not None:
             is_on = self.entity_description.is_on(self.device.status[self.entity_description.key])
         else:
