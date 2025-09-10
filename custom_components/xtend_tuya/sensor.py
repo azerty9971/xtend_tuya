@@ -1,7 +1,7 @@
 """Support for Tuya sensors."""
 
 from __future__ import annotations
-from typing import cast, Callable  # Callable for custom native_value function
+from typing import cast, Callable
 import datetime
 from dataclasses import dataclass, field
 from .const import LOGGER  # noqa: F401
@@ -1829,7 +1829,7 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
             device, device_manager, XTSensorEntityDescription(**description.__dict__)
         )
 
-    # Override native_value function
+    # Use custom native_value function
     @property
     def native_value(self) -> StateType:
         if self.entity_description.native_value is not None:
