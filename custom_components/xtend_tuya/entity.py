@@ -627,7 +627,7 @@ class XTEntity(TuyaEntity):
         debug: bool = False,
     ) -> tuple[bool, str]:
         dpcode = XTEntity._get_description_dpcode(description)
-        if XTEntity.is_dpcode_handled(device, platform, dpcode) is True:
+        if XTEntity.is_dpcode_handled(device, platform, dpcode) is True and getattr(description, "subkey", None) is None:  # Don't consider dpcode handled if the entity description has a subkey
             if debug:
                 LOGGER.warning(f"_supports_description1 => False <=> {dpcode}")
             return False, dpcode
