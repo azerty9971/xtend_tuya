@@ -209,7 +209,8 @@ class XTEntityDescriptorManager:
                     match var_type:
                         case XTEntityDescriptorManager.XTEntityDescriptorType.ENTITY:
                             entity = cast(EntityDescription, descriptor)
-                            if XTEntityDescriptorManager.get_compound_key(entity, key_fields) not in descr2_keys:
+                            compound_key = XTEntityDescriptorManager.get_compound_key(entity, key_fields)
+                            if compound_key is not None and compound_key not in descr2_keys:
                                 return_list.append(descriptor)
                         case XTEntityDescriptorManager.XTEntityDescriptorType.STRING:
                             if descriptor not in descr2_keys:
