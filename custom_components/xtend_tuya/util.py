@@ -224,6 +224,6 @@ def get_device_multi_manager(
 def b64todatetime(value):
     decoded_value = b64decode(value)
     try:
-        return datetime(year=2000+decoded_value[0], month=decoded_value[1], day=decoded_value[2], hour=decoded_value[3], mi>
+        return datetime(year=2000+decoded_value[0], month=decoded_value[1], day=decoded_value[2], hour=decoded_value[3], minute=decoded_value[4], second=decoded_value[5], tzinfo=DEFAULT_TIME_ZONE)
     except:
         return None
