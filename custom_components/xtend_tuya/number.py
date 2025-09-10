@@ -39,7 +39,7 @@ from .entity import (
 class XTNumberEntityDescription(TuyaNumberEntityDescription):
     """Describe an Tuya number entity."""
 
-    native_max_value: float | None = None  # Allows overriding wrong native_max_value
+    native_max_value: float | None = None  # Custom native_max_value
     
     def get_entity_instance(
         self,
@@ -734,7 +734,7 @@ class XTNumberEntity(XTEntity, TuyaNumberEntity):
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description
-        # Override native_max_value
+        # Use custom native_max_value
         if description.native_max_value is not None:
             self._attr_native_max_value = description.native_max_value
     
