@@ -624,20 +624,13 @@ class XTEntity(TuyaEntity):
         description: EntityDescription,
         first_pass: bool,
         externally_managed_dpcodes: list[str],
-        debug: bool = False,
     ) -> tuple[bool, str]:
         dpcode = XTEntity._get_description_dpcode(description)
         if XTEntity.is_dpcode_handled(device, platform, dpcode) is True:
-            if debug:
-                LOGGER.warning(f"_supports_description1 => False <=> {dpcode}")
             return False, dpcode
         if first_pass is True:
             if dpcode in device.status:
-                if debug:
-                    LOGGER.warning(f"_supports_description2 => True <=> {dpcode}")
                 return True, dpcode
-            if debug:
-                LOGGER.warning(f"_supports_description3 => False <=> {dpcode}")
             return False, dpcode
         else:
             # if device.force_compatibility is True:
@@ -650,11 +643,7 @@ class XTEntity(TuyaEntity):
                     is False
                 ):
                     device.replace_status_with_another(current_status, dpcode)
-                    if debug:
-                        LOGGER.warning(f"_supports_description4 => True <=> {dpcode}")
                     return True, dpcode
-        if debug:
-            LOGGER.warning(f"_supports_description5 => False <=> {dpcode}")
         return False, dpcode
 
     @staticmethod
@@ -672,10 +661,11 @@ class XTEntity(TuyaEntity):
         #unit: str | None = None
         value_descr_dict: dict = {}
         if function := device.function.get(dpcode):
-            dp_id = function.dp_id
+            if function.dp_id is not None and function.dp_id != 0:
+                dp_id = function.dp_id
             value_type = function.type
         if status_range := device.status_range.get(dpcode):
-            if dp_id is None:
+            if dp_id is None and status_range.dp_id is not None and status_range.dp_id != 0:
                 dp_id = status_range.dp_id
             if value_type is None:
                 value_type = status_range.type

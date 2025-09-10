@@ -97,7 +97,6 @@ class XTSensorEntityDescription(TuyaSensorEntityDescription, frozen=True):
             description=XTSensorEntityDescription(**description.__dict__),
         )
 
-
 # Commonly used battery sensors, that are re-used in the sensors down below.
 BATTERY_SENSORS: tuple[XTSensorEntityDescription, ...] = (
     XTSensorEntityDescription(
@@ -948,6 +947,7 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
             key=XTDPCode.ALARM_LOCK,
             translation_key="jtmspro_alarm_lock",
             entity_registry_enabled_default=False,
+            reset_after_x_seconds=2,
         ),
         *LOCK_SENSORS,
         *ELECTRICITY_SENSORS,
@@ -1502,6 +1502,8 @@ async def async_setup_entry(
                         entity_registry_enabled_default=False,
                         entity_registry_visible_default=False,
                     )
+                    if descriptor.device_class is not None:
+                        LOGGER.warning(f"Adding generic entity {dpcode} with device class {descriptor.device_class}")
                     entities.append(
                         XTSensorEntity.get_entity_instance(
                             descriptor, device, hass_data.manager
