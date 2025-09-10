@@ -119,6 +119,7 @@ class XTEntityDescriptorManager:
                         compound_key = key_part
                     else:
                         compound_key = f"{compound_key}|{key_part}"
+                        LOGGER.warning(f"new compound key: {compound_key}")
         return compound_key
 
     @staticmethod
