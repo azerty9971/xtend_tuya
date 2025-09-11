@@ -731,6 +731,7 @@ class XTDPCode(StrEnum):
     OFF_BED = "off_bed"
     OFF_BED_TIME = "off_bed_time"
     ONLINE_STATE = "online_state"
+    OPEN_CLOSE = "open_close"
     PEDAL_ANGLE = "pedal_angle"
     PHASEFLAG = "PhaseFlag"
     PHOTO_AGAIN = "photo_again"

@@ -66,6 +66,7 @@ from .ha_tuya_integration.tuya_integration_imports import (
     TuyaDPType,
 )
 
+COMPOUND_KEY: list[str] = ["key", "subkey"]
 
 @dataclass(frozen=True)
 class XTSensorEntityDescription(TuyaSensorEntityDescription, frozen=True):
@@ -99,7 +100,6 @@ class XTSensorEntityDescription(TuyaSensorEntityDescription, frozen=True):
             device_manager=device_manager,
             description=XTSensorEntityDescription(**description.__dict__),
         )
-
 
 # Commonly used battery sensors, that are re-used in the sensors down below.
 BATTERY_SENSORS: tuple[XTSensorEntityDescription, ...] = (
@@ -951,6 +951,7 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
             key=XTDPCode.ALARM_LOCK,
             translation_key="jtmspro_alarm_lock",
             entity_registry_enabled_default=False,
+            reset_after_x_seconds=2,
         ),
         *LOCK_SENSORS,
         *ELECTRICITY_SENSORS,
@@ -1009,20 +1010,20 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
             translation_key="air_quality",
             entity_registry_enabled_default=True,
         ),
-        # XTSensorEntityDescription(
-        #     key=XTDPCode.PM25_VALUE,
-        #     translation_key="pm25",
-        #     device_class=SensorDeviceClass.PM25,
-        #     state_class=SensorStateClass.MEASUREMENT,
-        #     entity_registry_enabled_default=True,
-        # ),
-        # XTSensorEntityDescription(
-        #     key=XTDPCode.CO2_VALUE,
-        #     translation_key="carbon_dioxide",
-        #     device_class=SensorDeviceClass.CO2,
-        #     state_class=SensorStateClass.MEASUREMENT,
-        #     entity_registry_enabled_default=True,
-        # ),
+        XTSensorEntityDescription(
+            key=XTDPCode.PM25_VALUE,
+            translation_key="pm25",
+            device_class=SensorDeviceClass.PM25,
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_registry_enabled_default=True,
+        ),
+        XTSensorEntityDescription(
+            key=XTDPCode.CO2_VALUE,
+            translation_key="carbon_dioxide",
+            device_class=SensorDeviceClass.CO2,
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_registry_enabled_default=True,
+        ),
         XTSensorEntityDescription(
             key=XTDPCode.PM10,
             translation_key="pm10",
@@ -1532,7 +1533,7 @@ async def async_setup_entry(
             dict[str, tuple[XTSensorEntityDescription, ...]],
         ],
         XTEntityDescriptorManager.get_platform_descriptors(
-            SENSORS, entry.runtime_data.multi_manager, this_platform
+            SENSORS, entry.runtime_data.multi_manager, this_platform, COMPOUND_KEY
         ),
     )
 
@@ -1555,6 +1556,8 @@ async def async_setup_entry(
                         entity_registry_enabled_default=False,
                         entity_registry_visible_default=False,
                     )
+                    if descriptor.device_class is not None:
+                        LOGGER.warning(f"Adding generic entity {dpcode} with device class {descriptor.device_class}")
                     entities.append(
                         XTSensorEntity.get_entity_instance(
                             descriptor, device, hass_data.manager
@@ -1597,6 +1600,7 @@ async def async_setup_entry(
                             description,
                             True,
                             externally_managed_dpcodes,
+                            COMPOUND_KEY
                         )
                     )
                     entities.extend(
@@ -1610,6 +1614,7 @@ async def async_setup_entry(
                             description,
                             False,
                             externally_managed_dpcodes,
+                            COMPOUND_KEY
                         )
                     )
         async_add_entities(entities)
