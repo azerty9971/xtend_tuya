@@ -73,11 +73,12 @@ SWITCHES: dict[str, tuple[XTSwitchEntityDescription, ...]] = {
             off_value="no",
             entity_registry_visible_default=False,
         ),
-        XTSwitchEntityDescription(
-            key=XTDPCode.SWITCH,
-            translation_key="switch",
-            entity_category=EntityCategory.CONFIG,
-        ),
+        # Remove cross-category SWITCH: may have different behavior for different categories
+        #XTSwitchEntityDescription(
+        #    key=XTDPCode.SWITCH,
+        #    translation_key="switch",
+        #    entity_category=EntityCategory.CONFIG,
+        #),
         XTSwitchEntityDescription(
             key=XTDPCode.SWITCH_1,
             translation_key="switch_1",
@@ -366,6 +367,17 @@ SWITCHES: dict[str, tuple[XTSwitchEntityDescription, ...]] = {
             key=XTDPCode.IDVERIFICATIONSET,
             translation_key="id_verification_set",
             entity_category=EntityCategory.CONFIG,
+        ),
+    ),
+    # QT-08W Solar Intelligent Water Valve
+    "sfkzq": (
+        XTSwitchEntityDescription(
+            key=XTDPCode.SWITCH,
+            translation_key="valve",
+        ),
+        XTSwitchEntityDescription(
+            key=XTDPCode.WORK_MODE,
+            translation_key="sleep_mode",
         ),
     ),
     "wk": (),

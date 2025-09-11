@@ -33,6 +33,8 @@ from .ha_tuya_integration.tuya_integration_imports import (
 class XTSelectEntityDescription(TuyaSelectEntityDescription):
     """Describe an Tuya select entity."""
 
+    options: list[str] | None = None  # Custom options
+    
     def get_entity_instance(
         self,
         device: XTDevice,
@@ -214,11 +216,24 @@ SELECTS: dict[str, tuple[XTSelectEntityDescription, ...]] = {
             entity_category=EntityCategory.CONFIG,
         ),
     ),
+    # QT-08W Solar Intelligent Water Valve
     "sfkzq": (
         XTSelectEntityDescription(
             key=XTDPCode.WORK_STATE,
             translation_key="sfkzq_work_state",
             entity_category=EntityCategory.CONFIG,
+        ),
+        XTSelectEntityDescription(
+            key=XTDPCode.TEMP_UNIT,
+            translation_key="temperature_unit",
+            entity_category=EntityCategory.CONFIG,
+            options = ["1","2"],
+        ),
+        XTSelectEntityDescription(
+            key=XTDPCode.CAPACITY_UNIT,
+            translation_key="volume_unit",
+            entity_category=EntityCategory.CONFIG,
+            options = ["L","Gal"],
         ),
     ),
     "wk": (*TEMPERATURE_SELECTS,),
@@ -364,6 +379,9 @@ class XTSelectEntity(XTEntity, TuyaSelectEntity):
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description
+        # Use custom options
+        if description.options is not None:
+            self._attr_options = description.options
 
     @staticmethod
     def get_entity_instance(
