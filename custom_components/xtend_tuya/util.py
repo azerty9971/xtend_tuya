@@ -3,6 +3,9 @@
 from __future__ import annotations
 import copy
 from typing import NamedTuple, Any
+from datetime import datetime
+from base64 import b64decode
+from homeassistant.util.dt import DEFAULT_TIME_ZONE
 from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.entity import EntityDescription
@@ -216,3 +219,11 @@ def get_device_multi_manager(
         if device.id in multimanager.device_map:
             return multimanager
     return None
+
+# Decodes a b64-encoded timestamp
+def b64todatetime(value):
+    decoded_value = b64decode(value)
+    try:
+        return datetime(year=2000+decoded_value[0], month=decoded_value[1], day=decoded_value[2], hour=decoded_value[3], minute=decoded_value[4], second=decoded_value[5], tzinfo=DEFAULT_TIME_ZONE)
+    except:
+        return None

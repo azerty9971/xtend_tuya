@@ -39,6 +39,8 @@ from .entity import (
 class XTNumberEntityDescription(TuyaNumberEntityDescription):
     """Describe an Tuya number entity."""
 
+    native_max_value: float | None = None  # Custom native_max_value
+    
     def get_entity_instance(
         self,
         device: XTDevice,
@@ -532,6 +534,23 @@ NUMBERS: dict[str, tuple[XTNumberEntityDescription, ...]] = {
         ),
         *TIMER_SENSORS,
     ),
+    # QT-08W Solar Intelligent Water Valve
+    "sfkzq": (
+        XTNumberEntityDescription(
+            key=XTDPCode.COUNTDOWN,
+            translation_key="watering_duration",
+            device_class=NumberDeviceClass.DURATION,
+            entity_category=EntityCategory.CONFIG,
+        ),
+        XTNumberEntityDescription(
+            key=XTDPCode.DELAY_TASK,
+            translation_key="rain_snow_delay",
+            device_class=NumberDeviceClass.DURATION,
+            entity_category=EntityCategory.CONFIG,
+            native_max_value=3,
+            native_unit_of_measurement="days",
+        ),
+    ),
     "wk": (
         *TEMPERATURE_SENSORS,
         *HUMIDITY_SENSORS,
@@ -715,7 +734,10 @@ class XTNumberEntity(XTEntity, TuyaNumberEntity):
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description
-
+        # Use custom native_max_value
+        if description.native_max_value is not None:
+            self._attr_native_max_value = description.native_max_value
+    
     @staticmethod
     def get_entity_instance(
         description: XTNumberEntityDescription,

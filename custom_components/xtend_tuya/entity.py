@@ -60,7 +60,7 @@ class XTEntityDescriptorManager:
                 platform
             ):
                 include_descriptors = XTEntityDescriptorManager.merge_descriptors(
-                    include_descriptors, descriptors_to_add, key_fields
+                    descriptors_to_add, include_descriptors  # Prioritize XT descriptors over Tuya's
                 )
             for (
                 descriptors_to_exclude

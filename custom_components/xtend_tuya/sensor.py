@@ -1,7 +1,7 @@
 """Support for Tuya sensors."""
 
 from __future__ import annotations
-from typing import cast
+from typing import cast, Callable
 import datetime
 from dataclasses import dataclass, field
 from .const import LOGGER  # noqa: F401
@@ -38,6 +38,7 @@ from homeassistant.helpers.event import (
 from .util import (
     get_default_value,
     restrict_descriptor_category,
+    b64todatetime,
 )
 from .multi_manager.multi_manager import (
     XTConfigEntry,
@@ -85,6 +86,8 @@ class XTSensorEntityDescription(TuyaSensorEntityDescription, frozen=True):
     recalculate_scale_for_percentage_threshold: int = (
         100  # Maximum percentage that the sensor can display (default = 100%)
     )
+
+    native_value: Callable | None = None  # Custom native_value function
 
     def get_entity_instance(
         self,
@@ -1299,6 +1302,7 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
         *ELECTRICITY_SENSORS,
         *TIMER_SENSORS,
     ),
+    # QT-08W Solar Intelligent Water Valve
     "sfkzq": (
         XTSensorEntityDescription(
             key=XTDPCode.WATER_ONCE,
@@ -1311,6 +1315,47 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
             translation_key="water_total",
             state_class=SensorStateClass.TOTAL_INCREASING,
             entity_registry_enabled_default=True,
+        ),
+        XTSensorEntityDescription(
+            key=XTDPCode.VBAT_STATE,
+            translation_key="battery_level",
+            device_class=SensorDeviceClass.BATTERY,
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_category=EntityCategory.DIAGNOSTIC,
+            native_value=lambda x: int(x) & 0x7F,
+        ),
+        XTSensorEntityDescription(
+            key=XTDPCode.CUR_CAP,
+            translation_key="watering_volume",
+            device_class=SensorDeviceClass.WATER,
+            native_unit_of_measurement="L",
+            suggested_display_precision = 0,
+        ),
+        XTSensorEntityDescription(
+            key=XTDPCode.CYC_NUM,
+            translation_key="watering_cycle",
+            native_unit_of_measurement="",
+            native_value=lambda x: int(x),
+        ),
+        XTSensorEntityDescription(
+            key=XTDPCode.START_TIME,
+            translation_key="start_time",
+            device_class=SensorDeviceClass.TIMESTAMP,
+            native_unit_of_measurement="",
+            native_value=b64todatetime,
+        ),
+        XTSensorEntityDescription(
+            key=XTDPCode.CLOSE_TIME,
+            translation_key="end_time",
+            device_class=SensorDeviceClass.TIMESTAMP,
+            native_unit_of_measurement="",
+            native_value=b64todatetime,
+        ),
+        XTSensorEntityDescription(
+            key=XTDPCode.RUN_TASK_STA,
+            translation_key="watering_task",
+            native_unit_of_measurement="",
+            native_value=lambda x: str(x),
         ),
     ),
     "slj": (
@@ -1436,6 +1481,14 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
             entity_registry_enabled_default=True,
             recalculate_scale_for_percentage=True,
             recalculate_scale_for_percentage_threshold=1000,
+        ),
+        XTSensorEntityDescription(
+            key=XTDPCode.BATTERY_PERCENTAGE,
+            translation_key="voltage",
+            device_class=SensorDeviceClass.VOLTAGE,
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_category=EntityCategory.DIAGNOSTIC,
+            suggested_display_precision = 1,
         ),
     ),
     # ZNRB devices don't send correct cloud data, for these devices use https://github.com/make-all/tuya-local instead
@@ -1780,3 +1833,13 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
         return XTSensorEntity(
             device, device_manager, XTSensorEntityDescription(**description.__dict__)
         )
+
+    # Use custom native_value function
+    @property
+    def native_value(self) -> StateType:
+        if self.entity_description.native_value is not None:
+            value = self.device.status.get(self.entity_description.key)
+            value = self.entity_description.native_value(value)
+        else:
+            value = super().native_value
+        return value
