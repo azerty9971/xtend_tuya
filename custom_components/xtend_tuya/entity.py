@@ -57,7 +57,7 @@ class XTEntityDescriptorManager:
                 platform
             ):
                 include_descriptors = XTEntityDescriptorManager.merge_descriptors(
-                    descriptors_to_add, include_descriptors, key_fields
+                    include_descriptors, descriptors_to_add, key_fields
                 )
             for (
                 descriptors_to_exclude
@@ -145,10 +145,10 @@ class XTEntityDescriptorManager:
 
     @staticmethod
     def merge_descriptors(
-        descriptors1: Any, descriptors2: Any, key_fields: list[str]
+        base_descriptors: Any, descriptors_to_add: Any, key_fields: list[str]
     ) -> Any:
-        descr1_type = XTEntityDescriptorManager._get_param_type(descriptors1)
-        descr2_type = XTEntityDescriptorManager._get_param_type(descriptors2)
+        descr1_type = XTEntityDescriptorManager._get_param_type(base_descriptors)
+        descr2_type = XTEntityDescriptorManager._get_param_type(descriptors_to_add)
         if (
             descr1_type != descr2_type
             or descr1_type == XTEntityDescriptorManager.XTEntityDescriptorType.UNKNOWN
@@ -157,62 +157,62 @@ class XTEntityDescriptorManager:
                 f"Merging of descriptors failed, non-matching include/exclude {descr1_type} VS {descr2_type}",
                 stack_info=True,
             )
-            return descriptors1
+            return base_descriptors
         match descr1_type:
             case XTEntityDescriptorManager.XTEntityDescriptorType.DICT:
                 return_dict: dict[str, Any] = {}
-                cross1 = None
-                cross2 = None
+                base_cross = None
+                add_cross = None
                 cross_both = None
-                if CROSS_CATEGORY_DEVICE_DESCRIPTOR in descriptors1:
-                    cross1 = descriptors1[CROSS_CATEGORY_DEVICE_DESCRIPTOR]
-                if CROSS_CATEGORY_DEVICE_DESCRIPTOR in descriptors2:
-                    cross2 = descriptors2[CROSS_CATEGORY_DEVICE_DESCRIPTOR]
-                if cross1 is not None and cross2 is not None:
+                if CROSS_CATEGORY_DEVICE_DESCRIPTOR in base_descriptors:
+                    base_cross = base_descriptors[CROSS_CATEGORY_DEVICE_DESCRIPTOR]
+                if CROSS_CATEGORY_DEVICE_DESCRIPTOR in descriptors_to_add:
+                    add_cross = descriptors_to_add[CROSS_CATEGORY_DEVICE_DESCRIPTOR]
+                if base_cross is not None and add_cross is not None:
                     cross_both = XTEntityDescriptorManager.merge_descriptors(
-                        cross1, cross2, key_fields
+                        base_cross, add_cross, key_fields
                     )
-                elif cross1 is not None:
-                    cross_both = cross1
-                elif cross2 is not None:
-                    cross_both = cross2
-                for key in descriptors1:
-                    merged_descriptors = descriptors1[key]
-                    if key in descriptors2:
+                elif base_cross is not None:
+                    cross_both = base_cross
+                elif add_cross is not None:
+                    cross_both = add_cross
+                for key in base_descriptors:
+                    merged_descriptors = base_descriptors[key]
+                    if key in descriptors_to_add:
                         merged_descriptors = (
                             XTEntityDescriptorManager.merge_descriptors(
-                                merged_descriptors, descriptors2[key], key_fields
+                                merged_descriptors, descriptors_to_add[key], key_fields
                             )
                         )
                     if cross_both is not None:
                         merged_descriptors = (
                             XTEntityDescriptorManager.merge_descriptors(
-                                cross_both, merged_descriptors, key_fields
+                                merged_descriptors, cross_both, key_fields
                             )
                         )
                     return_dict[key] = merged_descriptors
-                for key in descriptors2:
-                    merged_descriptors = descriptors2[key]
-                    if cross_both is not None:
-                        merged_descriptors = (
-                            XTEntityDescriptorManager.merge_descriptors(
-                                cross_both, merged_descriptors, key_fields
+                for key in descriptors_to_add:
+                    if key not in base_descriptors:
+                        merged_descriptors = descriptors_to_add[key]
+                        if cross_both is not None:
+                            merged_descriptors = (
+                                XTEntityDescriptorManager.merge_descriptors(
+                                    merged_descriptors, cross_both, key_fields
+                                )
                             )
-                        )
-                    if key not in descriptors1:
                         return_dict[key] = merged_descriptors
                 return return_dict
             case XTEntityDescriptorManager.XTEntityDescriptorType.LIST:
-                return_list: list = descriptors2
+                return_list: list = base_descriptors
                 var_type = XTEntityDescriptorManager.XTEntityDescriptorType.UNKNOWN
-                if descriptors1:
+                if descriptors_to_add:
                     var_type = XTEntityDescriptorManager._get_param_type(
-                        descriptors1[0]
+                        descriptors_to_add[0]
                     )
-                descr2_keys: list[str] = XTEntityDescriptorManager.get_category_keys(
-                    descriptors2, key_fields
+                base_descr_keys: list[str] = XTEntityDescriptorManager.get_category_keys(
+                    base_descriptors, key_fields
                 )
-                for descriptor in descriptors1:
+                for descriptor in descriptors_to_add:
                     match var_type:
                         case XTEntityDescriptorManager.XTEntityDescriptorType.ENTITY:
                             entity = cast(EntityDescription, descriptor)
@@ -221,23 +221,23 @@ class XTEntityDescriptorManager:
                             )
                             if (
                                 compound_key is not None
-                                and compound_key not in descr2_keys
+                                and compound_key not in base_descr_keys
                             ):
                                 return_list.append(descriptor)
                         case XTEntityDescriptorManager.XTEntityDescriptorType.STRING:
-                            if descriptor not in descr2_keys:
+                            if descriptor not in base_descr_keys:
                                 return_list.append(descriptor)
                 return return_list
             case XTEntityDescriptorManager.XTEntityDescriptorType.TUPLE:
                 return tuple(
                     XTEntityDescriptorManager.merge_descriptors(
-                        list(descriptors1), list(descriptors2), key_fields
+                        list(base_descriptors), list(descriptors_to_add), key_fields
                     )
                 )
             case XTEntityDescriptorManager.XTEntityDescriptorType.SET:
                 return set(
                     XTEntityDescriptorManager.merge_descriptors(
-                        list(descriptors1), list(descriptors2), key_fields
+                        list(base_descriptors), list(descriptors_to_add), key_fields
                     )
                 )
 
