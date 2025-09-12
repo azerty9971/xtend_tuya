@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import NamedTuple, Any, Optional, cast
 from collections import UserDict
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import copy
 import json
 from enum import StrEnum
@@ -205,9 +205,9 @@ class XTDevice(TuyaDevice):
         scale: int | None = None
         step: int | None = None
         unit: str | None = None
-        range: list[str] = []
-        label: list[str] = []
-        value_descr_dict: dict[str, Any] = {}
+        range: list[str] = field(default_factory=list)
+        label: list[str] = field(default_factory=list)
+        value_descr_dict: dict[str, Any] = field(default_factory=dict)
 
 
     def __init__(self, **kwargs: Any) -> None:
