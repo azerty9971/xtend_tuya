@@ -17,7 +17,7 @@ from .const import (
     DOMAIN_ORIG,
     FULLY_OVERRIDEN_PLATFORMS,
 )
-import xtend_tuya.multi_manager.shared.shared_classes as sc
+import custom_components.xtend_tuya.multi_manager.shared.shared_classes as sc
 import custom_components.xtend_tuya.multi_manager.multi_manager as mm
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaEnumTypeData,
