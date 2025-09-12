@@ -28,6 +28,7 @@ from .const import (
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaBinarySensorEntity,
     TuyaBinarySensorEntityDescription,
+    TuyaDPType,
 )
 from .entity import (
     XTEntity,
@@ -266,17 +267,34 @@ async def async_setup_entry(
                     device, this_platform
                 )
                 for dpcode in generic_dpcodes:
-                    descriptor = XTBinarySensorEntityDescription(
-                        key=dpcode,
-                        translation_key="xt_generic_binary_sensor",
-                        translation_placeholders={"name": XTEntity.get_human_name_from_generic_dpcode(dpcode)},
-                        entity_registry_enabled_default=False,
-                        entity_registry_visible_default=False,
-                    )
-                    entities.append(
-                        XTBinarySensorEntity.get_entity_instance(
-                            descriptor, device, hass_data.manager
-                        ))
+                    if dpcode_information := device.get_dpcode_information(dpcode=dpcode):
+                        if dpcode_information.dptype is TuyaDPType.BITMAP and len(dpcode_information.label) > 0:
+                            for label_value in dpcode_information.label:
+                                descriptor = XTBinarySensorEntityDescription(
+                                    key=dpcode,
+                                    subkey=label_value,
+                                    bitmap_key=label_value,
+                                    translation_key="xt_generic_binary_sensor",
+                                    translation_placeholders={"name": f"{dpcode_information.human_name}: {XTEntity.get_human_name(label_value)}"},
+                                    entity_registry_enabled_default=False,
+                                    entity_registry_visible_default=False,
+                                )
+                                entities.append(
+                                    XTBinarySensorEntity.get_entity_instance(
+                                        descriptor, device, hass_data.manager
+                                    ))
+                        else:
+                            descriptor = XTBinarySensorEntityDescription(
+                                key=dpcode,
+                                translation_key="xt_generic_binary_sensor",
+                                translation_placeholders={"name": dpcode_information.human_name},
+                                entity_registry_enabled_default=False,
+                                entity_registry_visible_default=False,
+                            )
+                            entities.append(
+                                XTBinarySensorEntity.get_entity_instance(
+                                    descriptor, device, hass_data.manager
+                                ))
         async_add_entities(entities)
 
     @callback

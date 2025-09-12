@@ -435,7 +435,7 @@ async def async_setup_entry(
                     descriptor = XTSwitchEntityDescription(
                         key=dpcode,
                         translation_key="xt_generic_switch",
-                        translation_placeholders={"name": XTEntity.get_human_name_from_generic_dpcode(dpcode)},
+                        translation_placeholders={"name": XTEntity.get_human_name(dpcode)},
                         entity_registry_enabled_default=False,
                         entity_registry_visible_default=False,
                     )
