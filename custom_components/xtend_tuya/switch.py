@@ -73,12 +73,11 @@ SWITCHES: dict[str, tuple[XTSwitchEntityDescription, ...]] = {
             off_value="no",
             entity_registry_visible_default=False,
         ),
-        # Remove cross-category SWITCH: may have different behavior for different categories
-        #XTSwitchEntityDescription(
-        #    key=XTDPCode.SWITCH,
-        #    translation_key="switch",
-        #    entity_category=EntityCategory.CONFIG,
-        #),
+        XTSwitchEntityDescription(
+            key=XTDPCode.SWITCH,
+            translation_key="switch",
+            entity_category=EntityCategory.CONFIG,
+        ),
         XTSwitchEntityDescription(
             key=XTDPCode.SWITCH_1,
             translation_key="switch_1",

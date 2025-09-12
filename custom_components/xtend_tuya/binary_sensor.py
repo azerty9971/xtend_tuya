@@ -34,6 +34,7 @@ from .entity import (
     XTEntityDescriptorManager,
 )
 
+COMPOUND_KEY: list[str] = ["key", "subkey"]
 
 @dataclass(frozen=True)
 class XTBinarySensorEntityDescription(TuyaBinarySensorEntityDescription):
@@ -249,7 +250,7 @@ async def async_setup_entry(
             dict[str, tuple[XTBinarySensorEntityDescription, ...]],
         ],
         XTEntityDescriptorManager.get_platform_descriptors(
-            BINARY_SENSORS, entry.runtime_data.multi_manager, this_platform
+            BINARY_SENSORS, entry.runtime_data.multi_manager, this_platform, COMPOUND_KEY
         ),
     )
 
@@ -313,6 +314,7 @@ async def async_setup_entry(
                             description,
                             True,
                             externally_managed_dpcodes,
+                            COMPOUND_KEY
                         )
                     )
                     entities.extend(
@@ -326,6 +328,7 @@ async def async_setup_entry(
                             description,
                             False,
                             externally_managed_dpcodes,
+                            COMPOUND_KEY
                         )
                     )
         async_add_entities(entities)
@@ -363,14 +366,14 @@ class XTBinarySensorEntity(XTEntity, TuyaBinarySensorEntity):
         self.device_manager = device_manager
         self._entity_description = description
         # Append subkey to unique ID
-        if description.subkey is not None:
+        if description.subkey is not None and self._attr_unique_id is not None:
             self._attr_unique_id += f"{description.subkey}"
             
     @property
     def is_on(self) -> bool:
         # Use custom is_on function
-        if self.entity_description.is_on is not None:
-            is_on = self.entity_description.is_on(self.device.status[self.entity_description.key])
+        if self._entity_description.is_on is not None:
+            is_on = self._entity_description.is_on(self.device.status[self.entity_description.key])
         else:
             is_on = super().is_on
         if self._entity_description.device_online:

@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 from typing import cast, Callable
-import datetime
 from dataclasses import dataclass, field
 from .const import LOGGER  # noqa: F401
+from datetime import datetime
 from homeassistant.components.sensor import (
     SensorDeviceClass,
     SensorStateClass,
@@ -34,6 +34,9 @@ from homeassistant.helpers.event import (
     async_track_time_change,
     async_call_later,
     async_track_state_change_event,
+)
+from homeassistant.helpers.typing import (
+    StateType,
 )
 from .util import (
     get_default_value,
@@ -1734,7 +1737,7 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
         self.cancel_reset_after_x_seconds = None
 
     def reset_value(
-        self, _: datetime.datetime | None, manual_call: bool = False
+        self, _: datetime | None, manual_call: bool = False
     ) -> None:
         if manual_call and self.cancel_reset_after_x_seconds:
             self.cancel_reset_after_x_seconds()
@@ -1750,7 +1753,7 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
         """Call when entity about to be added to hass."""
         await super().async_added_to_hass()
 
-        async def reset_status_daily(now: datetime.datetime) -> None:
+        async def reset_status_daily(now: datetime) -> None:
             should_reset = False
             if self.entity_description.reset_daily:
                 should_reset = True
@@ -1836,7 +1839,7 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
 
     # Use custom native_value function
     @property
-    def native_value(self) -> StateType:
+    def native_value(self) -> StateType: # type: ignore
         if self.entity_description.native_value is not None:
             value = self.device.status.get(self.entity_description.key)
             value = self.entity_description.native_value(value)

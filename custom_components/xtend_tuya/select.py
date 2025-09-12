@@ -379,9 +379,12 @@ class XTSelectEntity(XTEntity, TuyaSelectEntity):
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description
+        
         # Use custom options
         if description.options is not None:
-            self._attr_options = description.options
+            for option in description.options:
+                if option not in self._attr_options:
+                    self._attr_options.append(option)
 
     @staticmethod
     def get_entity_instance(

@@ -60,7 +60,7 @@ class XTEntityDescriptorManager:
                 platform
             ):
                 include_descriptors = XTEntityDescriptorManager.merge_descriptors(
-                    descriptors_to_add, include_descriptors  # Prioritize XT descriptors over Tuya's
+                    descriptors_to_add, include_descriptors, key_fields
                 )
             for (
                 descriptors_to_exclude
@@ -623,6 +623,10 @@ class XTEntity(TuyaEntity):
         if result is True:
             # Register the code as being handled by the device
             XTEntity.register_handled_dpcode(device, platform, dpcode)
+            if key_fields is not None:
+                compound_key = XTEntityDescriptorManager.get_compound_key(description, key_fields)
+                if compound_key is not None:
+                    XTEntity.register_handled_dpcode(device, platform, compound_key)
         return result
 
     @staticmethod
