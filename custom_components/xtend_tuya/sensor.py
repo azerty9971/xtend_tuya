@@ -1483,6 +1483,7 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
         XTSensorEntityDescription(
             key=XTDPCode.LIQUID_LEVEL_PERCENT,
             translation_key="liquid_level_percent",
+            state_class=SensorStateClass.MEASUREMENT,
             entity_registry_enabled_default=True,
             recalculate_scale_for_percentage=True,
             recalculate_scale_for_percentage_threshold=100,
