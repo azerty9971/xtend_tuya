@@ -17,9 +17,7 @@ from .const import (
     DOMAIN_ORIG,
     FULLY_OVERRIDEN_PLATFORMS,
 )
-from .multi_manager.shared.shared_classes import (
-    XTDevice,
-)
+import xtend_tuya.multi_manager.shared.shared_classes as sc
 import custom_components.xtend_tuya.multi_manager.multi_manager as mm
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaEnumTypeData,
@@ -542,7 +540,7 @@ class XTEntity(TuyaEntity):
             return TUYA_DPTYPE_MAPPING.get(type)
 
     @staticmethod
-    def mark_overriden_entities_as_disables(hass: HomeAssistant, device: XTDevice):
+    def mark_overriden_entities_as_disables(hass: HomeAssistant, device: sc.XTDevice):
         device_registry = dr.async_get(hass)
         entity_registry = er.async_get(hass)
         hass_device = device_registry.async_get_device(
@@ -567,7 +565,7 @@ class XTEntity(TuyaEntity):
 
     @staticmethod
     def register_current_entities_as_handled_dpcode(
-        hass: HomeAssistant, device: XTDevice
+        hass: HomeAssistant, device: sc.XTDevice
     ):
         device_registry = dr.async_get(hass)
         entity_registry = er.async_get(hass)
@@ -610,24 +608,24 @@ class XTEntity(TuyaEntity):
                                     )
 
     @staticmethod
-    def register_handled_dpcode(device: XTDevice, platform: Platform, dpcode: str):
+    def register_handled_dpcode(device: sc.XTDevice, platform: Platform, dpcode: str):
         handled_dpcodes: dict[str, list[str]] = cast(
             dict[str, list[str]],
-            device.get_preference(XTDevice.XTDevicePreference.HANDLED_DPCODES, {}),
+            device.get_preference(sc.XTDevice.XTDevicePreference.HANDLED_DPCODES, {}),
         )
         if platform not in handled_dpcodes:
             handled_dpcodes[platform] = []
         if dpcode not in handled_dpcodes[platform]:
             handled_dpcodes[platform].append(dpcode)
         device.set_preference(
-            XTDevice.XTDevicePreference.HANDLED_DPCODES, handled_dpcodes
+            sc.XTDevice.XTDevicePreference.HANDLED_DPCODES, handled_dpcodes
         )
 
     @staticmethod
-    def is_dpcode_handled(device: XTDevice, platform: Platform, dpcode: str) -> bool:
+    def is_dpcode_handled(device: sc.XTDevice, platform: Platform, dpcode: str) -> bool:
         handled_dpcodes: dict[str, list[str]] = cast(
             dict[str, list[str]],
-            device.get_preference(XTDevice.XTDevicePreference.HANDLED_DPCODES, {}),
+            device.get_preference(sc.XTDevice.XTDevicePreference.HANDLED_DPCODES, {}),
         )
         if platform not in handled_dpcodes:
             return False
@@ -637,7 +635,7 @@ class XTEntity(TuyaEntity):
 
     @staticmethod
     def supports_description(
-        device: XTDevice,
+        device: sc.XTDevice,
         platform: Platform,
         description: EntityDescription,
         first_pass: bool,
@@ -675,7 +673,7 @@ class XTEntity(TuyaEntity):
 
     @staticmethod
     def _supports_description(
-        device: XTDevice,
+        device: sc.XTDevice,
         platform: Platform,
         description: EntityDescription,
         first_pass: bool,
@@ -714,7 +712,7 @@ class XTEntity(TuyaEntity):
 
     @staticmethod
     def __is_dpcode_suitable_for_platform(
-        device: XTDevice, dpcode: str, platform: Platform
+        device: sc.XTDevice, dpcode: str, platform: Platform
     ) -> bool:
         dpcode_info = device.get_dpcode_information(dpcode=dpcode)
         if dpcode_info is None or dpcode_info.dptype is None:
@@ -769,7 +767,7 @@ class XTEntity(TuyaEntity):
 
     @staticmethod
     def get_generic_dpcodes_for_this_platform(
-        device: XTDevice, platform: Platform
+        device: sc.XTDevice, platform: Platform
     ) -> list[str]:
         return_list: list[str] = []
         for dpcode in device.status:
