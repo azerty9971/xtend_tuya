@@ -1,6 +1,27 @@
 {
   "entity": {
     "binary_sensor": {
+      "error_flow_meter": {
+        "default": "mdi:beaker",
+        "state": {
+          "off": "mdi:beaker-check",
+          "on": "mdi:beaker-alert"
+        }
+      },
+      "error_sensor_offline": {
+        "default": "mdi:thermometer",
+        "state": {
+          "off": "mdi:thermometer-check",
+          "on": "mdi:thermometer-alert"
+        }
+      },
+      "error_water_shortage": {
+        "default": "mdi:water",
+        "state": {
+          "off": "mdi:water-check",
+          "on": "mdi:water-alert"
+        }
+      },
       "carbon_monoxide": {
         "default": "mdi:molecule-co"
       },
@@ -38,6 +59,12 @@
       }
     },
     "number": {
+      "watering_duration": {
+        "default": "mdi:timer-outline"
+      },
+      "rain_snow_delay": {
+        "default": "mdi:weather-rainy"
+      },
       "heat_preservation_time": {
         "default": "mdi:timer"
       },
@@ -94,6 +121,12 @@
       }
     },
     "select": {
+      "temperature_unit": {
+        "default": "mdi:temperature-celsius"
+      },
+      "volume_unit": {
+        "default": "mdi:axis-arrow"
+      },
       "cups": {
         "default": "mdi:numeric"
       },
@@ -159,6 +192,18 @@
       }
     },
     "sensor": {
+      "start_time": {
+        "default": "mdi:clock-start"
+      },
+      "end_time": {
+        "default": "mdi:clock-end"
+      },
+      "watering_cycle": {
+        "default": "mdi:reload"
+      },
+      "watering_task": {
+        "default": "mdi:cog"
+      },
       "battery_state": {
         "default": "mdi:battery"
       },
@@ -239,6 +284,20 @@
       }
     },
     "switch": {
+      "sleep_mode": {
+        "default": "mdi:sleep",
+        "state": {
+          "off": "mdi:sleep-off",
+          "on": "mdi:sleep"
+        }
+      },
+      "valve": {
+        "default": "mdi:valve",
+        "state": {
+          "off": "mdi:valve-closed",
+          "on": "mdi:valve-open"
+        }
+      },
       "start": {
         "default": "mdi:kettle-steam"
       },

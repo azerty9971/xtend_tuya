@@ -116,7 +116,7 @@ class XTMergingManager:
                     )
                     if status in status_alias and status_code is not None:
                         # Replace status_code with status in the device
-                        device.replace_status_with_another(str(status_code), status)
+                        device.replace_status_code_with_another(str(status_code), status)
 
     @staticmethod
     def _align_device_properties(

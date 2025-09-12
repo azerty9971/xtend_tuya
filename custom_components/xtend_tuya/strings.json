@@ -161,6 +161,30 @@
   },
   "entity": {
     "binary_sensor": {
+      "error": {
+        "name": "Error"
+      },
+      "error_flow_meter": {
+        "name": "Error: Flow meter"
+      },
+      "error_valve_low_battery": {
+        "name": "Error: Valve low battery"
+      },
+      "error_sensor_low_battery": {
+        "name": "Error: Sensor low battery"
+      },
+      "error_sensor_offline": {
+        "name": "Error: Sensor offline"
+      },
+      "error_water_shortage": {
+        "name": "Error: Water shortage"
+      },
+      "error_other": {
+        "name": "Error: Other"
+      },
+      "battery_charging": {
+        "name": "Battery charging"
+      },
       "pir_state": {
         "name": "Proximity sensor"
       },
@@ -317,6 +341,12 @@
       }
     },
     "number": {
+      "rain_snow_delay": {
+        "name": "Rain/snow delay"
+      },
+      "watering_duration": {
+        "name": "Watering duration"
+      },
       "maxhum_set": {
         "name": "Maximum humidity"
       },
@@ -631,6 +661,16 @@
       }
     },
     "select": {
+      "temperature_unit": {
+        "name": "Temperature unit",
+        "state": {
+          "1": "°C",
+          "2": "°F"
+        }
+      },
+      "volume_unit": {
+        "name": "Volume unit"
+      },
       "currency": {
         "name": "Currency",
         "state": {
@@ -1155,6 +1195,31 @@
       }
     },
     "sensor": {
+      "start_time": {
+        "name": "Start time"
+      },
+      "end_time": {
+        "name": "End time"
+      },
+      "watering_cycle": {
+        "name": "Watering cycle"
+      },
+      "watering_volume": {
+        "name": "Watering volume"
+      },
+      "watering_task": {
+        "name": "Watering task",
+        "state": {
+          "0": "None",
+          "1": "Single duration",
+          "2": "Cycle duration",
+          "3": "Single volume",
+          "4": "Cycle volume"
+        }
+      },
+      "battery_level": {
+        "name": "Battery level"
+      },
       "temp_unit_convert": {
         "name": "Temperature unit",
         "state": {
@@ -2012,6 +2077,12 @@
       }
     },
     "switch": {
+      "sleep_mode": {
+        "name": "Sleep mode"
+      },
+      "valve": {
+        "name": "Valve"
+      },
       "key_rec": {
         "name": "Key tone"
       },

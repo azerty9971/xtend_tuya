@@ -1,7 +1,7 @@
 from __future__ import annotations
-from typing import NamedTuple, Any, Optional
+from typing import NamedTuple, Any, Optional, cast
 from collections import UserDict
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import copy
 import json
 from enum import StrEnum
@@ -14,6 +14,7 @@ import custom_components.xtend_tuya.multi_manager.multi_manager as mm
 import custom_components.xtend_tuya.multi_manager.shared.multi_device_listener as mdl
 import custom_components.xtend_tuya.multi_manager.shared.services.services as services
 import custom_components.xtend_tuya.util as util
+import custom_components.xtend_tuya.entity as entity
 from ...ha_tuya_integration.tuya_integration_imports import (
     TuyaDPType,
 )
@@ -183,6 +184,31 @@ class XTDevice(TuyaDevice):
         LOCK_CALL_DOOR_OPERATE = "LOCK_CALL_DOOR_OPERATE"
         LOCK_CALL_DOOR_OPEN = "LOCK_CALL_DOOR_OPEN"
         HANDLED_DPCODES = "HANDLED_DPCODES"
+    
+    @dataclass
+    class XTDeviceDPCodeInformation:
+        #From status_range/function
+        dpcode: str
+        dpid: int | None = None
+        dptype: TuyaDPType | None = None
+        in_status_range: bool = False
+        in_function: bool = False
+        human_name: str = ""
+
+        #From LocalStrategy
+        read_only: bool = True
+        write_only: bool = False
+        read_write: bool = False
+        access_mode: str | None = None
+        min: int | None = None
+        max: int | None = None
+        scale: int | None = None
+        step: int | None = None
+        unit: str | None = None
+        range: list[str] = field(default_factory=list)
+        label: list[str] = field(default_factory=list)
+        value_descr_dict: dict[str, Any] = field(default_factory=dict)
+
 
     def __init__(self, **kwargs: Any) -> None:
         self.id: str = ""
@@ -303,39 +329,95 @@ class XTDevice(TuyaDevice):
                     return_list[alias] = status_code
         return return_list
 
-    def replace_status_with_another(self, orig_status: str, new_status: str):
+    def replace_status_code_with_another(self, orig_status_code: str, new_status_code: str):
         # LOGGER.debug(f"Replacing {orig_status} with {new_status} in {device.name}")
-        if orig_status in self.status_range:
-            self.status_range[new_status] = self.status_range.pop(orig_status)
-            self.status_range[new_status].code = new_status
+        if orig_status_code in self.status_range:
+            self.status_range[new_status_code] = self.status_range.pop(orig_status_code)
+            self.status_range[new_status_code].code = new_status_code
 
-        if orig_status in self.function:
-            self.function[new_status] = self.function.pop(orig_status)
-            self.function[new_status].code = new_status
+        if orig_status_code in self.function:
+            self.function[new_status_code] = self.function.pop(orig_status_code)
+            self.function[new_status_code].code = new_status_code
 
-        if orig_status in self.status:
-            self.status[new_status] = self.status.pop(orig_status)
+        if orig_status_code in self.status:
+            self.status[new_status_code] = self.status.pop(orig_status_code)
 
         for dpId in self.local_strategy:
             status_code = self.local_strategy[dpId].get("status_code")
             status_alias: list = self.local_strategy[dpId].get("status_code_alias", [])
-            if status_code == orig_status:
-                self.local_strategy[dpId]["status_code"] = new_status
-                if new_status in status_alias:
-                    status_alias.remove(new_status)
-                if orig_status not in status_alias:
-                    status_alias.append(orig_status)
+            if status_code == orig_status_code:
+                self.local_strategy[dpId]["status_code"] = new_status_code
+                if new_status_code in status_alias:
+                    status_alias.remove(new_status_code)
+                if orig_status_code not in status_alias:
+                    status_alias.append(orig_status_code)
                 self.local_strategy[dpId]["status_code_alias"] = status_alias
                 if config_item := self.local_strategy[dpId].get("config_item", None):
                     if status_formats := config_item.get("statusFormat", None):
                         status_formats_dict: dict = json.loads(status_formats)
                         for first_key in status_formats_dict:
-                            status_formats_dict[new_status] = status_formats_dict.pop(
+                            status_formats_dict[new_status_code] = status_formats_dict.pop(
                                 first_key
                             )
                             break
                         config_item["statusFormat"] = json.dumps(status_formats_dict)
                 break
+    
+    def get_dpcode_information(self, dpcode: str | None = None, dpid: int | None = None) -> XTDevice.XTDeviceDPCodeInformation | None:
+        if dpcode is None and dpid is None:
+            return None
+        if dpcode is None and dpid is not None and dpid in self.local_strategy:
+            dpcode = self.local_strategy[dpid].get("status_code")
+        if dpcode is None:
+            return None
+        dp_info: XTDevice.XTDeviceDPCodeInformation = XTDevice.XTDeviceDPCodeInformation(dpcode=dpcode, dpid=dpid, human_name=entity.XTEntity.get_human_name(technical_name=dpcode))
+        if function := self.function.get(dpcode):
+            if function.dp_id is not None and function.dp_id != 0:
+                dp_info.dpid = function.dp_id
+            dp_info.dptype = function.type
+            dp_info.in_function = True
+        if status_range := self.status_range.get(dpcode):
+            if dp_info.dpid is None and status_range.dp_id is not None and status_range.dp_id != 0:
+                dp_info.dpid = status_range.dp_id
+            if dp_info.dptype is None:
+                dp_info.dptype = status_range.type
+            dp_info.in_status_range = True
+        
+        if dp_info.dpid is not None:
+            if local_strategy := self.local_strategy.get(dp_info.dpid):
+                if access_mode := local_strategy.get("access_mode"):
+                    dp_info.access_mode = access_mode
+                    match access_mode:
+                        case "ro":
+                            dp_info.read_only  = True
+                            dp_info.write_only = False
+                            dp_info.read_write = False
+                        case "rw":
+                            dp_info.read_only  = False
+                            dp_info.write_only = False
+                            dp_info.read_write = True
+                        case "wr":
+                            dp_info.read_only  = False
+                            dp_info.write_only = True
+                            dp_info.read_write = False
+                if config_item := local_strategy.get("config_item"):
+                    if dp_info.dptype is None:
+                        if ls_dptype := config_item.get("valueType"):
+                            dp_info.dptype = entity.XTEntity.determine_dptype(ls_dptype)
+                    if ls_value_descr := config_item.get("valueDesc"):
+                        try:
+                            value_descr_dict = cast(dict[str, Any], json.loads(ls_value_descr))
+                            dp_info.unit = value_descr_dict.get("unit")
+                            dp_info.min = value_descr_dict.get("min")
+                            dp_info.max = value_descr_dict.get("max")
+                            dp_info.scale = value_descr_dict.get("scale")
+                            dp_info.step = value_descr_dict.get("step")
+                            dp_info.range = value_descr_dict.get("range", [])
+                            dp_info.label = value_descr_dict.get("label", [])
+                            dp_info.value_descr_dict = value_descr_dict
+                        except Exception:
+                            pass
+        return dp_info
 
 
 class XTDeviceMap(UserDict[str, XTDevice]):
