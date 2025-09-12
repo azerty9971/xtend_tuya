@@ -1476,6 +1476,8 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
         XTSensorEntityDescription(
             key=XTDPCode.LIQUID_DEPTH,
             translation_key="liquid_depth",
+            device_class=SensorDeviceClass.DISTANCE,
+            state_class=SensorStateClass.MEASUREMENT,
             entity_registry_enabled_default=True,
         ),
         XTSensorEntityDescription(
@@ -1483,7 +1485,7 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
             translation_key="liquid_level_percent",
             entity_registry_enabled_default=True,
             recalculate_scale_for_percentage=True,
-            recalculate_scale_for_percentage_threshold=1000,
+            recalculate_scale_for_percentage_threshold=100,
         ),
         XTSensorEntityDescription(
             key=XTDPCode.BATTERY_PERCENTAGE,
