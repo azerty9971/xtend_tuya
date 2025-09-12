@@ -187,7 +187,7 @@ class XTEntityDescriptorManager:
                     if cross_both is not None:
                         merged_descriptors = (
                             XTEntityDescriptorManager.merge_descriptors(
-                                merged_descriptors, cross_both, key_fields
+                                cross_both, merged_descriptors, key_fields
                             )
                         )
                     return_dict[key] = merged_descriptors
@@ -196,7 +196,7 @@ class XTEntityDescriptorManager:
                     if cross_both is not None:
                         merged_descriptors = (
                             XTEntityDescriptorManager.merge_descriptors(
-                                merged_descriptors, cross_both, key_fields
+                                cross_both, merged_descriptors, key_fields
                             )
                         )
                     if key not in descriptors1:
