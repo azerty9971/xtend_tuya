@@ -715,7 +715,11 @@ class XTEntity(TuyaEntity):
         device: sc.XTDevice, dpcode: str, platform: Platform
     ) -> bool:
         dpcode_info = device.get_dpcode_information(dpcode=dpcode)
-        if dpcode_info is None or dpcode_info.dptype is None:
+        if (
+            dpcode_info is None
+            or dpcode_info.dptype is None
+            or dpcode_info.dpid is None     #DPcodes added as virtual dpcodes have a DPID = 0
+        ):
             return False
         match platform:
             case Platform.BINARY_SENSOR:
