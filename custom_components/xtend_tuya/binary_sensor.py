@@ -272,8 +272,6 @@ async def async_setup_entry(
                     if dpcode_information := device.get_dpcode_information(dpcode=dpcode):
                         if dpcode_information.dptype is TuyaDPType.BITMAP and len(dpcode_information.label) > 0:
                             for label_value in dpcode_information.label:
-                                if device.id == "eb83fa0b5d087fd7d6ffcl":
-                                    LOGGER.warning(f"BS Bitmap: label_value: '{label_value}', device name, '{device.name}'")
                                 descriptor = XTBinarySensorEntityDescription(
                                     key=dpcode,
                                     subkey=label_value,
