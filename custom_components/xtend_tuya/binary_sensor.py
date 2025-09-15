@@ -10,6 +10,7 @@ from homeassistant.const import EntityCategory, Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.typing import UndefinedType
 from .util import (
     restrict_descriptor_category,
 )
@@ -29,6 +30,7 @@ from .ha_tuya_integration.tuya_integration_imports import (
     TuyaBinarySensorEntity,
     TuyaBinarySensorEntityDescription,
     TuyaDPType,
+    get_bitmap_bit_mask_tuya_binary_sensor,
 )
 from .entity import (
     XTEntity,
@@ -379,7 +381,7 @@ class XTBinarySensorEntity(XTEntity, TuyaBinarySensorEntity):
     ) -> None:
         """Init Tuya binary sensor."""
         super(XTBinarySensorEntity, self).__init__(device, device_manager, description)
-        super(XTEntity, self).__init__(device, device_manager, description)  # type: ignore
+        super(XTEntity, self).__init__(device, device_manager, description, get_bitmap_bit_mask_tuya_binary_sensor(device, description.dpcode or description.key, description.bitmap_key))  # type: ignore
         self.device = device
         self.device_manager = device_manager
         self._entity_description = description
@@ -404,6 +406,22 @@ class XTBinarySensorEntity(XTEntity, TuyaBinarySensorEntity):
         """Call when entity about to be added to hass."""
         await super().async_added_to_hass()
         self.is_on  # Update the online status if needed
+    
+    #def _name_internal(
+    #    self,
+    #    device_class_name: str | None,
+    #    platform_translations: dict[str, str],
+    #) -> str | UndefinedType | None:
+    #    name = super()._name_internal(device_class_name=device_class_name, platform_translations=platform_translations)
+    #    if self.entity_description.translation_key != "xt_generic_binary_sensor":
+    #        LOGGER.warning(f"Returning name for {self.device.name}=>{self.entity_description.key}: '{name}'")
+    #    return name
+
+    #@property
+    #def _name_translation_key(self) -> str | None:
+    #    name = super()._name_translation_key
+    #    LOGGER.warning(f"Returning name TK for {self.device.name}=>{self.entity_description.key}: '{name}'")
+    #    return name
 
     @staticmethod
     def get_entity_instance(
