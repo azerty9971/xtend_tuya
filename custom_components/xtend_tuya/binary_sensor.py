@@ -10,6 +10,7 @@ from homeassistant.const import EntityCategory, Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.typing import UndefinedType
 from .util import (
     restrict_descriptor_category,
 )
@@ -404,6 +405,15 @@ class XTBinarySensorEntity(XTEntity, TuyaBinarySensorEntity):
         """Call when entity about to be added to hass."""
         await super().async_added_to_hass()
         self.is_on  # Update the online status if needed
+    
+    def _name_internal(
+        self,
+        device_class_name: str | None,
+        platform_translations: dict[str, str],
+    ) -> str | UndefinedType | None:
+        name = super()._name_internal(device_class_name=device_class_name, platform_translations=platform_translations)
+        LOGGER.warning(f"Returning name for {self.device.name}=>{self.entity_description.key}: '{name}'")
+        return name
 
     @staticmethod
     def get_entity_instance(
