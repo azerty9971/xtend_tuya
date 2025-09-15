@@ -271,6 +271,8 @@ async def async_setup_entry(
                     if dpcode_information := device.get_dpcode_information(dpcode=dpcode):
                         if dpcode_information.dptype is TuyaDPType.BITMAP and len(dpcode_information.label) > 0:
                             for label_value in dpcode_information.label:
+                                if device.id == "eb83fa0b5d087fd7d6ffcl":
+                                    LOGGER.warning(f"BS Bitmap: label_value: '{label_value}', device name, '{device.name}'")
                                 descriptor = XTBinarySensorEntityDescription(
                                     key=dpcode,
                                     subkey=label_value,
@@ -406,15 +408,15 @@ class XTBinarySensorEntity(XTEntity, TuyaBinarySensorEntity):
         await super().async_added_to_hass()
         self.is_on  # Update the online status if needed
     
-    def _name_internal(
-        self,
-        device_class_name: str | None,
-        platform_translations: dict[str, str],
-    ) -> str | UndefinedType | None:
-        name = super()._name_internal(device_class_name=device_class_name, platform_translations=platform_translations)
-        if self.entity_description.translation_key != "xt_generic_binary_sensor":
-            LOGGER.warning(f"Returning name for {self.device.name}=>{self.entity_description.key}: '{name}'")
-        return name
+    #def _name_internal(
+    #    self,
+    #    device_class_name: str | None,
+    #    platform_translations: dict[str, str],
+    #) -> str | UndefinedType | None:
+    #    name = super()._name_internal(device_class_name=device_class_name, platform_translations=platform_translations)
+    #    if self.entity_description.translation_key != "xt_generic_binary_sensor":
+    #        LOGGER.warning(f"Returning name for {self.device.name}=>{self.entity_description.key}: '{name}'")
+    #    return name
 
     #@property
     #def _name_translation_key(self) -> str | None:
