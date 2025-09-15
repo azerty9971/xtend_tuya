@@ -415,6 +415,12 @@ class XTBinarySensorEntity(XTEntity, TuyaBinarySensorEntity):
         LOGGER.warning(f"Returning name for {self.device.name}=>{self.entity_description.key}: '{name}'")
         return name
 
+    @property
+    def _name_translation_key(self) -> str | None:
+        name = super()._name_translation_key
+        LOGGER.warning(f"Returning name TK for {self.device.name}=>{self.entity_description.key}: '{name}'")
+        return name
+
     @staticmethod
     def get_entity_instance(
         description: XTBinarySensorEntityDescription,
