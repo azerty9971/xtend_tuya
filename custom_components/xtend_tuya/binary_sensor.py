@@ -412,14 +412,15 @@ class XTBinarySensorEntity(XTEntity, TuyaBinarySensorEntity):
         platform_translations: dict[str, str],
     ) -> str | UndefinedType | None:
         name = super()._name_internal(device_class_name=device_class_name, platform_translations=platform_translations)
-        LOGGER.warning(f"Returning name for {self.device.name}=>{self.entity_description.key}: '{name}'")
+        if self.entity_description.translation_key != "xt_generic_binary_sensor":
+            LOGGER.warning(f"Returning name for {self.device.name}=>{self.entity_description.key}: '{name}'")
         return name
 
-    @property
-    def _name_translation_key(self) -> str | None:
-        name = super()._name_translation_key
-        LOGGER.warning(f"Returning name TK for {self.device.name}=>{self.entity_description.key}: '{name}'")
-        return name
+    #@property
+    #def _name_translation_key(self) -> str | None:
+    #    name = super()._name_translation_key
+    #    LOGGER.warning(f"Returning name TK for {self.device.name}=>{self.entity_description.key}: '{name}'")
+    #    return name
 
     @staticmethod
     def get_entity_instance(
