@@ -491,8 +491,9 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         remote_keys = api.get(f"/v2.0/infrareds/{hub_id}/remotes/{remote_id}/keys")
         if remote_keys.get("success", False) is False:
             return return_list
-        remote_keys_results: list[dict] = remote_keys.get("result", [])
-        for remote_key_dict in remote_keys_results:
+        remote_keys_results: dict = remote_keys.get("result", {})
+        remote_keys_key_list: list[dict] = remote_keys_results.get("key_list", [])
+        for remote_key_dict in remote_keys_key_list:
             key: str | None = remote_key_dict.get("key")
             key_id: int | None = remote_key_dict.get("key_id")
             key_name: str | None = remote_key_dict.get("key_name")
