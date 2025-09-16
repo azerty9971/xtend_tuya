@@ -158,6 +158,27 @@ class XTDeviceSourcePriority(IntEnum):
     TUYA_SHARED     = 20
     TUYA_IOT        = 30
 
+@dataclass
+class XTIRRemoteKeysInformation:
+    key: str
+    key_id: int
+    key_name: str
+    standard_key: bool
+
+@dataclass
+class XTIRRemoteInformation:
+    brand_id: int
+    brand_name: str
+    category_id: int
+    remote_id: str
+    remote_index: int
+    remote_name: str
+    keys: list[XTIRRemoteKeysInformation]
+
+@dataclass
+class XTIRHubInformation:
+    device_id: str
+    remote_ids: list[XTIRRemoteInformation]
 
 @dataclass
 class DescriptionVirtualState:

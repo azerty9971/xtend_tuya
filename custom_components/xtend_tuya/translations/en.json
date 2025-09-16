@@ -259,6 +259,9 @@
             }
         },
         "button": {
+            "xt_generic_button": {
+                "name": "{name}"
+            },
             "filter_reset": {
                 "name": "Filter reset"
             },

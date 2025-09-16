@@ -10,7 +10,7 @@ from homeassistant.const import EntityCategory, Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.typing import UndefinedType
+#from homeassistant.helpers.typing import UndefinedType
 from .util import (
     restrict_descriptor_category,
 )
