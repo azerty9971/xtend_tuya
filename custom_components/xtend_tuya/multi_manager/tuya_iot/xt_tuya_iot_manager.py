@@ -15,6 +15,9 @@ from ...const import (
     MESSAGE_SOURCE_TUYA_IOT,
     XTDeviceSourcePriority,
     XTDPCode,
+    XTIRHubInformation,
+    XTIRRemoteInformation,
+    XTIRRemoteKeysInformation,
 )
 from ..shared.shared_classes import (
     XTDevice,
@@ -428,7 +431,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
             if code == 28841101:
                 return False
         return True
-    
+
     def test_camera_api_subscription(
         self, device: XTDevice, api: XTIOTOpenAPI | None = None
     ) -> bool:
@@ -442,6 +445,71 @@ class XTIOTDeviceManager(TuyaDeviceManager):
             if code == 28841106:
                 return False
         return True
+
+    def get_ir_hub_information(
+        self, device: XTDevice, api: XTIOTOpenAPI | None = None
+    ) -> XTIRHubInformation | None:
+        if api is None:
+            api = self.api
+        LOGGER.warning(f"Looking for IR HUB information of {device.name}")
+        remote_list = api.get(f"/v2.0/infrareds/{device.id}/remotes")
+        if remote_list.get("success", False) is False:
+            return None
+        device_information_results: list[dict] = remote_list.get("result", [])
+        device_information: XTIRHubInformation = XTIRHubInformation(
+            device_id=device.id, remote_ids=[]
+        )
+        for remote_info_dict in device_information_results:
+            brand_id: int | None = remote_info_dict.get("brand_id")
+            brand_name: str = remote_info_dict.get("brand_name", "")
+            category_id: int | None = remote_info_dict.get("category_id")
+            remote_id: str | None = remote_info_dict.get("remote_id")
+            remote_index: int = remote_info_dict.get("remote_index", 0)
+            remote_name: str = remote_info_dict.get("remote_name", "")
+            if brand_id is None or category_id is None or remote_id is None:
+                continue
+            remote_information = XTIRRemoteInformation(
+                brand_id=brand_id,
+                brand_name=brand_name,
+                category_id=category_id,
+                remote_id=remote_id,
+                remote_index=remote_index,
+                remote_name=remote_name,
+                keys=[],
+            )
+            remote_keys = self._get_ir_remote_keys(device.id, remote_id, api)
+            if len(remote_keys) > 0:
+                remote_information.keys = remote_keys
+                LOGGER.warning(f"Adding remote information {remote_information}")
+                device_information.remote_ids.append(remote_information)
+        return device_information
+
+    def _get_ir_remote_keys(
+        self, hub_id: str, remote_id: str, api: XTIOTOpenAPI
+    ) -> list[XTIRRemoteKeysInformation]:
+        return_list: list[XTIRRemoteKeysInformation] = []
+        remote_keys = api.get(f"/v2.0/infrareds/{hub_id}/remotes/{remote_id}/keys")
+        if remote_keys.get("success", False) is False:
+            return return_list
+        remote_keys_results: list[dict] = remote_keys.get("result", [])
+        for remote_key_dict in remote_keys_results:
+            key: str | None = remote_key_dict.get("key")
+            key_id: int | None = remote_key_dict.get("key_id")
+            key_name: str | None = remote_key_dict.get("key_name")
+            standard_key: bool | None = remote_key_dict.get("standard_key")
+            if (
+                key is None
+                or key_id is None
+                or key_name is None
+                or standard_key is None
+            ):
+                continue
+            key_information = XTIRRemoteKeysInformation(
+                    key=key, key_id=key_id, key_name=key_name, standard_key=standard_key
+                )
+            LOGGER.warning(f"Adding key: {key_information}")
+            return_list.append(key_information)
+        return return_list
 
     def get_supported_unlock_types(
         self, device: XTDevice, api: XTIOTOpenAPI

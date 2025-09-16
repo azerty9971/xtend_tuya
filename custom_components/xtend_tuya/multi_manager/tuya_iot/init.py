@@ -57,6 +57,7 @@ from ...const import (
     TUYA_HA_SIGNAL_UPDATE_ENTITY,
     XTDeviceSourcePriority,
     XTMultiManagerProperties,
+    XTIRHubInformation,
 )
 
 
@@ -341,6 +342,12 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
                         },
                         learn_more_url="https://github.com/azerty9971/xtend_tuya/blob/main/docs/configure_cameras.md",
                     )
+    
+    def get_ir_hub_information(self, device: XTDevice) -> XTIRHubInformation | None:
+        if self.iot_account is None:
+            return None
+        return self.iot_account.device_manager.get_ir_hub_information(device)
+
     def get_platform_descriptors_to_merge(self, platform: Platform) -> Any:
         pass
 

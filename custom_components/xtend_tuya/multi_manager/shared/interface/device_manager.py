@@ -17,6 +17,7 @@ from ....const import (
     DOMAIN,
     LOGGER,
     XTDeviceSourcePriority,
+    XTIRHubInformation,
 )
 from homeassistant.helpers.issue_registry import (
     IssueSeverity,
@@ -186,6 +187,9 @@ class XTDeviceManagerInterface(ABC):
         multi_manager: mm.MultiManager,
     ) -> None:
         return None
+    
+    def get_ir_hub_information(self, device: shared.XTDevice) -> XTIRHubInformation | None:
+        pass
 
     async def raise_issue(
         self,
