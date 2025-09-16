@@ -73,12 +73,11 @@ SWITCHES: dict[str, tuple[XTSwitchEntityDescription, ...]] = {
             off_value="no",
             entity_registry_visible_default=False,
         ),
-        # Remove cross-category SWITCH: may have different behavior for different categories
-        #XTSwitchEntityDescription(
-        #    key=XTDPCode.SWITCH,
-        #    translation_key="switch",
-        #    entity_category=EntityCategory.CONFIG,
-        #),
+        XTSwitchEntityDescription(
+            key=XTDPCode.SWITCH,
+            translation_key="switch",
+            entity_category=EntityCategory.CONFIG,
+        ),
         XTSwitchEntityDescription(
             key=XTDPCode.SWITCH_1,
             translation_key="switch_1",
@@ -436,7 +435,7 @@ async def async_setup_entry(
                     descriptor = XTSwitchEntityDescription(
                         key=dpcode,
                         translation_key="xt_generic_switch",
-                        translation_placeholders={"name": XTEntity.get_human_name_from_generic_dpcode(dpcode)},
+                        translation_placeholders={"name": XTEntity.get_human_name(dpcode)},
                         entity_registry_enabled_default=False,
                         entity_registry_visible_default=False,
                     )

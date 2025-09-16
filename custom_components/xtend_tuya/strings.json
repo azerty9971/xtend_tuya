@@ -1211,10 +1211,10 @@
         "name": "Watering task",
         "state": {
           "0": "None",
-          "0.1": "Single duration",
-          "0.2": "Cycle duration",
-          "0.3": "Single volume",
-          "0.4": "Cycle volume"
+          "1": "Single duration",
+          "2": "Cycle duration",
+          "3": "Single volume",
+          "4": "Cycle volume"
         }
       },
       "battery_level": {

@@ -3,6 +3,7 @@ from functools import partial
 import copy
 import importlib
 import os
+import asyncio
 from typing import Any, Literal, Optional, Callable
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
@@ -16,6 +17,9 @@ from ..const import (
     XTDeviceEntityFunctions,
     XTMultiManagerProperties,
     XTMultiManagerPostSetupCallbackPriority,
+    XTIRHubInformation,
+    XTIRRemoteInformation,
+    XTIRRemoteKeysInformation,
 )
 from .shared.shared_classes import (
     DeviceWatcher,
@@ -81,7 +85,10 @@ class MultiManager:  # noqa: F811
         self.scene_id: list[str] = []
         self.general_properties: dict[str, Any] = {}
         self.entity_parsers: dict[str, XTCustomEntityParser] = {}
-        self.post_setup_callbacks: dict[XTMultiManagerPostSetupCallbackPriority, list[tuple[Callable, tuple | None, dict | None]]] = {}
+        self.post_setup_callbacks: dict[
+            XTMultiManagerPostSetupCallbackPriority,
+            list[tuple[Callable, tuple | None, dict | None]],
+        ] = {}
         for priority in XTMultiManagerPostSetupCallbackPriority:
             self.post_setup_callbacks[priority] = []
 
@@ -145,7 +152,7 @@ class MultiManager:  # noqa: F811
             if new_descriptors := entity_parser.get_descriptors_to_merge(platform):
                 return_list.append(new_descriptors)
         return return_list
-    
+
     def get_platform_descriptors_to_exclude(self, platform: Platform) -> list:
         return_list: list = []
         for account in self.accounts.values():
@@ -222,9 +229,9 @@ class MultiManager:  # noqa: F811
             XTDeviceMap.register_device_map(device_map)
         XTDeviceMap.register_device_map(self.device_map)
         self._align_multi_map_devices()
-    
+
     def _align_multi_map_devices(self):
-        #Refresh all master device variables with themselves to trigger alignment
+        # Refresh all master device variables with themselves to trigger alignment
         for device in self.device_map.values():
             for key, value in vars(device).items():
                 setattr(device, key, value)
@@ -523,7 +530,22 @@ class MultiManager:  # noqa: F811
                     args = tuple()
                 if kwargs is None:
                     kwargs = {}
-                callback(*args, **kwargs)
+                if asyncio.iscoroutinefunction(callback):
+                    await callback(*args, **kwargs)
+                else:
+                    callback(*args, **kwargs)
+
+    def get_ir_hub_information(self, device: XTDevice) -> XTIRHubInformation | None:
+        for account in self.accounts.values():
+            ir_device_information = account.get_ir_hub_information(device)
+            if ir_device_information is not None:
+                return ir_device_information
+    
+    def send_ir_command(self, device: XTDevice, key: XTIRRemoteKeysInformation, remote: XTIRRemoteInformation, hub: XTIRHubInformation) -> bool:
+        for account in self.accounts.values():
+            if account.send_ir_command(device, key, remote, hub):
+                return True
+        return False
 
     def set_general_property(
         self, property_id: XTMultiManagerProperties, property_value: Any
