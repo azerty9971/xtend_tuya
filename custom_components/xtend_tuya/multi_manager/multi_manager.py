@@ -18,6 +18,8 @@ from ..const import (
     XTMultiManagerProperties,
     XTMultiManagerPostSetupCallbackPriority,
     XTIRHubInformation,
+    XTIRRemoteInformation,
+    XTIRRemoteKeysInformation,
 )
 from .shared.shared_classes import (
     DeviceWatcher,
@@ -538,6 +540,12 @@ class MultiManager:  # noqa: F811
             ir_device_information = account.get_ir_hub_information(device)
             if ir_device_information is not None:
                 return ir_device_information
+    
+    def send_ir_command(self, device: XTDevice, key: XTIRRemoteKeysInformation, remote: XTIRRemoteInformation, hub: XTIRHubInformation) -> bool:
+        for account in self.accounts.values():
+            if account.send_ir_command(device, key, remote, hub):
+                return True
+        return False
 
     def set_general_property(
         self, property_id: XTMultiManagerProperties, property_value: Any

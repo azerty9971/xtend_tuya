@@ -56,6 +56,7 @@ class XTButtonEntityDescription(TuyaButtonEntityDescription):
             description=XTButtonEntityDescription(**description.__dict__),
         )
 
+
 IR_HUB_CATEGORY_LIST: list[str] = [
     "wnykq",
 ]
@@ -138,16 +139,24 @@ async def async_setup_entry(
         for device_id in device_ids:
             if hub_device := hass_data.manager.device_map.get(device_id):
                 if hub_device.category in IR_HUB_CATEGORY_LIST:
-                    hub_information: XTIRHubInformation | None = await hass.async_add_executor_job(hass_data.manager.get_ir_hub_information, hub_device)
+                    hub_information: XTIRHubInformation | None = (
+                        await hass.async_add_executor_job(
+                            hass_data.manager.get_ir_hub_information, hub_device
+                        )
+                    )
                     if hub_information is None:
                         continue
                     for remote_information in hub_information.remote_ids:
-                        if remote_device := hass_data.manager.device_map.get(remote_information.remote_id):
+                        if remote_device := hass_data.manager.device_map.get(
+                            remote_information.remote_id
+                        ):
                             for remote_key in remote_information.keys:
                                 descriptor = XTButtonEntityDescription(
                                     key=remote_key.key,
                                     translation_key="xt_generic_button",
-                                    translation_placeholders={"name": remote_key.key_name},
+                                    translation_placeholders={
+                                        "name": remote_key.key_name
+                                    },
                                     is_ir_key=True,
                                     ir_hub_information=hub_information,
                                     ir_remote_information=remote_information,
@@ -156,10 +165,11 @@ async def async_setup_entry(
                                     entity_registry_visible_default=True,
                                 )
                                 entities.append(
-                                    XTButtonEntity.get_entity_instance(descriptor, remote_device, hass_data.manager)
+                                    XTButtonEntity.get_entity_instance(
+                                        descriptor, remote_device, hass_data.manager
+                                    )
                                 )
         async_add_entities(entities)
-
 
     @callback
     def async_discover_device(device_map, restrict_dpcode: str | None = None) -> None:
@@ -212,7 +222,10 @@ async def async_setup_entry(
                         )
                     )
                     for description in category_descriptions:
-                        if hasattr(description, "vf_reset_state") and description.vf_reset_state:
+                        if (
+                            hasattr(description, "vf_reset_state")
+                            and description.vf_reset_state
+                        ):
                             for reset_state in description.vf_reset_state:
                                 if reset_state in device.status:
                                     entities.append(
@@ -228,9 +241,7 @@ async def async_setup_entry(
                 XTMultiManagerPostSetupCallbackPriority.PRIORITY_LAST
             ].append((async_add_IR_entities, (device_map,), None))
 
-    hass_data.manager.register_device_descriptors(
-        this_platform, supported_descriptors
-    )
+    hass_data.manager.register_device_descriptors(this_platform, supported_descriptors)
     async_discover_device([*hass_data.manager.device_map])
     # async_discover_device(hass_data.manager, hass_data.manager.open_api_device_map)
 
@@ -241,6 +252,8 @@ async def async_setup_entry(
 
 class XTButtonEntity(XTEntity, TuyaButtonEntity):
     """XT Button Device."""
+
+    _entity_description: XTButtonEntityDescription
 
     def __init__(
         self,
@@ -254,6 +267,7 @@ class XTButtonEntity(XTEntity, TuyaButtonEntity):
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description
+        self._entity_description = description
 
     @staticmethod
     def get_entity_instance(
@@ -268,3 +282,20 @@ class XTButtonEntity(XTEntity, TuyaButtonEntity):
         return XTButtonEntity(
             device, device_manager, XTButtonEntityDescription(**description.__dict__)
         )
+
+    def press(self) -> None:
+        """Press the button."""
+        if (
+            self._entity_description.is_ir_key
+            and self._entity_description.ir_key_information is not None
+            and self._entity_description.ir_remote_information is not None
+            and self._entity_description.ir_hub_information is not None
+        ):
+            self.device_manager.send_ir_command(
+                self.device,
+                self._entity_description.ir_key_information,
+                self._entity_description.ir_remote_information,
+                self._entity_description.ir_hub_information,
+            )
+        else:
+            super().press()

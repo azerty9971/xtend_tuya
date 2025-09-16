@@ -512,6 +512,14 @@ class XTIOTDeviceManager(TuyaDeviceManager):
             return_list.append(key_information)
         return return_list
 
+    def send_ir_command(self, device: XTDevice, key: XTIRRemoteKeysInformation, remote: XTIRRemoteInformation, hub: XTIRHubInformation, api: XTIOTOpenAPI | None = None) -> bool:
+        if api is None:
+            api = self.api
+        ir_command = api.post(f"/v2.0/infrareds/{hub.device_id}/remotes/{remote.remote_id}/raw/command", {"category_id": {remote.category_id}, "key_id": {key.key_id}, "key": {key.key}})
+        if ir_command.get("success", False) and ir_command.get("result", False):
+            return True
+        return False
+
     def get_supported_unlock_types(
         self, device: XTDevice, api: XTIOTOpenAPI
     ) -> list[str]:

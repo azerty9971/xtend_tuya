@@ -58,6 +58,8 @@ from ...const import (
     XTDeviceSourcePriority,
     XTMultiManagerProperties,
     XTIRHubInformation,
+    XTIRRemoteInformation,
+    XTIRRemoteKeysInformation,
 )
 
 
@@ -347,6 +349,11 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
         if self.iot_account is None:
             return None
         return self.iot_account.device_manager.get_ir_hub_information(device)
+    
+    def send_ir_command(self, device: XTDevice, key: XTIRRemoteKeysInformation, remote: XTIRRemoteInformation, hub: XTIRHubInformation) -> bool:
+        if self.iot_account is None:
+            return False
+        return self.iot_account.device_manager.send_ir_command(self, device, key, remote, hub)
 
     def get_platform_descriptors_to_merge(self, platform: Platform) -> Any:
         pass
