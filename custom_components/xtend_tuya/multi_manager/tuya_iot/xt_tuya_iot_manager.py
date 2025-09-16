@@ -520,11 +520,11 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         if api is None:
             api = self.api
         payload: dict[str, Any] = {
-            "category_id": {remote.category_id},
-            "key_id": {key.key_id},
-            "key": {key.key},
+            "category_id": remote.category_id,
+            "key_id": key.key_id,
+            "key": key.key,
         }
-        LOGGER.warning(f"Payload: {payload}")
+        #LOGGER.warning(f"IR command payload: {payload}")
         ir_command = api.post(
             f"/v2.0/infrareds/{hub.device_id}/remotes/{remote.remote_id}/raw/command",
             payload,
