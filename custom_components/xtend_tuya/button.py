@@ -130,7 +130,7 @@ async def async_setup_entry(
     )
 
     @callback
-    def async_add_IR_entities(device_map) -> None:
+    async def async_add_IR_entities(device_map) -> None:
         if hass_data.manager is None:
             return
         entities: list[XTButtonEntity] = []
@@ -138,7 +138,7 @@ async def async_setup_entry(
         for device_id in device_ids:
             if hub_device := hass_data.manager.device_map.get(device_id):
                 if hub_device.category in IR_HUB_CATEGORY_LIST:
-                    hub_information: XTIRHubInformation | None = hass_data.manager.get_ir_hub_information(hub_device)
+                    hub_information: XTIRHubInformation | None = await hass.async_add_executor_job(hass_data.manager.get_ir_hub_information, hub_device)
                     if hub_information is None:
                         continue
                     for remote_information in hub_information.remote_ids:

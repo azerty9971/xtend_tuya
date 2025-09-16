@@ -3,6 +3,7 @@ from functools import partial
 import copy
 import importlib
 import os
+import asyncio
 from typing import Any, Literal, Optional, Callable
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
@@ -527,7 +528,10 @@ class MultiManager:  # noqa: F811
                     args = tuple()
                 if kwargs is None:
                     kwargs = {}
-                callback(*args, **kwargs)
+                if asyncio.iscoroutinefunction(callback):
+                    await callback(*args, **kwargs)
+                else:
+                    callback(*args, **kwargs)
 
     def get_ir_hub_information(self, device: XTDevice) -> XTIRHubInformation | None:
         for account in self.accounts.values():
