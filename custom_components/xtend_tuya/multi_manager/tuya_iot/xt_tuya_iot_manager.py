@@ -451,7 +451,6 @@ class XTIOTDeviceManager(TuyaDeviceManager):
     ) -> XTIRHubInformation | None:
         if api is None:
             api = self.api
-        LOGGER.warning(f"Looking for IR HUB information of {device.name}")
         remote_list = api.get(f"/v2.0/infrareds/{device.id}/remotes")
         if remote_list.get("success", False) is False:
             return None
@@ -480,7 +479,6 @@ class XTIOTDeviceManager(TuyaDeviceManager):
             remote_keys = self._get_ir_remote_keys(device.id, remote_id, api)
             if len(remote_keys) > 0:
                 remote_information.keys = remote_keys
-                LOGGER.warning(f"Adding remote information {remote_information}")
                 device_information.remote_ids.append(remote_information)
         return device_information
 
@@ -508,7 +506,6 @@ class XTIOTDeviceManager(TuyaDeviceManager):
             key_information = XTIRRemoteKeysInformation(
                     key=key, key_id=key_id, key_name=key_name, standard_key=standard_key
                 )
-            LOGGER.warning(f"Adding key: {key_information}")
             return_list.append(key_information)
         return return_list
 
