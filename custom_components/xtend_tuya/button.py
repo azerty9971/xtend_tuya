@@ -169,7 +169,7 @@ async def async_setup_entry(
                         )
                     )
                     for description in category_descriptions:
-                        if description.vf_reset_state:
+                        if hasattr(description, "vf_reset_state") and description.vf_reset_state:
                             for reset_state in description.vf_reset_state:
                                 if reset_state in device.status:
                                     entities.append(
