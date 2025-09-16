@@ -53,7 +53,6 @@ class MultiDeviceListener:
             dispatcher_send(self.hass, signal, [device.id])
 
     def remove_device(self, device_id: str):
-        # log_stack("DeviceListener => async_remove_device")
         device_registry = dr.async_get(self.hass)
         identifiers: set = set()
         account_identifiers: set = set()
@@ -64,15 +63,14 @@ class MultiDeviceListener:
                     account_identifiers.add(account_identifier)
         device_entry = device_registry.async_get_device(identifiers=identifiers)
         if device_entry is not None:
-            device_registry.async_remove_device(device_entry.id)
+            self.hass.add_job(device_registry.async_remove_device, device_entry.id)
 
     @callback
     def async_remove_device(self, device_id: str) -> None:
         """Remove device from Home Assistant."""
-        # log_stack("DeviceListener => async_remove_device")
         device_registry = dr.async_get(self.hass)
         device_entry = device_registry.async_get_device(
             identifiers={(DOMAIN_ORIG, device_id), (DOMAIN, device_id)}
         )
         if device_entry is not None:
-            device_registry.async_remove_device(device_entry.id)
+            self.hass.add_job(device_registry.async_remove_device, device_entry.id)
