@@ -1047,36 +1047,6 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
             state_class=SensorStateClass.MEASUREMENT,
             entity_registry_enabled_default=True,
         ),
-        XTSensorEntityDescription(
-            key=XTDPCode.TEMP_UNIT_CONVERT,
-            translation_key="temp_unit_convert",
-            entity_registry_enabled_default=True,
-            entity_registry_visible_default=False,
-        ),
-        XTSensorEntityDescription(
-            key=XTDPCode.ECO,
-            translation_key="eco_mode",
-            entity_registry_enabled_default=True,
-            entity_registry_visible_default=False,
-        ),
-        XTSensorEntityDescription(
-            key=XTDPCode.SWITCH_ALARM_SOUND,
-            translation_key="switch_alarm_sound",
-            entity_registry_enabled_default=True,
-            entity_registry_visible_default=False,
-        ),
-        XTSensorEntityDescription(
-            key=XTDPCode.TIME,
-            translation_key="time",
-            entity_registry_enabled_default=True,
-            entity_registry_visible_default=False,
-        ),
-        XTSensorEntityDescription(
-            key=XTDPCode.BACKLIGHT_SWITCH,
-            translation_key="backlight_switch",
-            entity_registry_enabled_default=True,
-            entity_registry_visible_default=False,
-        ),
     ),
     # Automatic cat litter box
     # Note: Undocumented
