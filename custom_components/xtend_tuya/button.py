@@ -140,9 +140,6 @@ async def async_setup_entry(
         for device_id in device_ids:
             if hub_device := hass_data.manager.device_map.get(device_id):
                 if hub_device.category in IR_HUB_CATEGORY_LIST:
-                    hass_data.manager.set_general_property(
-                        XTMultiManagerProperties.IR_DEVICE_ID, hub_device.id
-                    )
                     hub_information: XTIRHubInformation | None = (
                         await hass.async_add_executor_job(
                             hass_data.manager.get_ir_hub_information, hub_device
@@ -184,6 +181,10 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
+                if device.category in IR_HUB_CATEGORY_LIST:
+                    hass_data.manager.set_general_property(
+                        XTMultiManagerProperties.IR_DEVICE_ID, device.id
+                    )
                 if category_descriptions := XTEntityDescriptorManager.get_category_descriptors(
                     supported_descriptors, device.category
                 ):
