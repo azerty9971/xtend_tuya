@@ -455,21 +455,25 @@ TEMPERATURE_SENSORS: tuple[XTSensorEntityDescription, ...] = (
     XTSensorEntityDescription(
         key=XTDPCode.TEMPERATURE,
         translation_key="temperature",
+        device_class=SensorDeviceClass.TEMPERATURE,
         state_class=SensorStateClass.MEASUREMENT,
     ),
     XTSensorEntityDescription(
         key=XTDPCode.TEMPERATURE2,
         translation_key="temperature",
+        device_class=SensorDeviceClass.TEMPERATURE,
         state_class=SensorStateClass.MEASUREMENT,
     ),
     XTSensorEntityDescription(
         key=XTDPCode.TEMP2,
         translation_key="temperature",
+        device_class=SensorDeviceClass.TEMPERATURE,
         state_class=SensorStateClass.MEASUREMENT,
     ),
     XTSensorEntityDescription(
         key=XTDPCode.TEMP_CURRENT,
         translation_key="temperature",
+        device_class=SensorDeviceClass.TEMPERATURE,
         state_class=SensorStateClass.MEASUREMENT,
     ),
     XTSensorEntityDescription(
@@ -481,28 +485,34 @@ TEMPERATURE_SENSORS: tuple[XTSensorEntityDescription, ...] = (
     XTSensorEntityDescription(
         key=XTDPCode.TEMP_VALUE,
         translation_key="temperature",
+        device_class=SensorDeviceClass.TEMPERATURE,
         state_class=SensorStateClass.MEASUREMENT,
     ),
     XTSensorEntityDescription(
         key=XTDPCode.TEMP_TOP,
         translation_key="temp_top",
+        device_class=SensorDeviceClass.TEMPERATURE,
         state_class=SensorStateClass.MEASUREMENT,
     ),
     XTSensorEntityDescription(
         key=XTDPCode.TEMP_BOTTOM,
         translation_key="temp_bottom",
+        device_class=SensorDeviceClass.TEMPERATURE,
         state_class=SensorStateClass.MEASUREMENT,
     ),
     XTSensorEntityDescription(
         key=XTDPCode.DEVICETEMP,
+        device_class=SensorDeviceClass.TEMPERATURE,
         translation_key="device_temperature",
     ),
     XTSensorEntityDescription(
         key=XTDPCode.DEVICETEMP2,
+        device_class=SensorDeviceClass.TEMPERATURE,
         translation_key="device_temperature2",
     ),
     XTSensorEntityDescription(
         key=XTDPCode.TEMPSHOW,
+        device_class=SensorDeviceClass.TEMPERATURE,
         translation_key="temp_show",
     ),
     XTSensorEntityDescription(
@@ -515,18 +525,21 @@ HUMIDITY_SENSORS: tuple[XTSensorEntityDescription, ...] = (
     XTSensorEntityDescription(
         key=XTDPCode.HUMIDITY,
         translation_key="humidity",
+        device_class=SensorDeviceClass.HUMIDITY,
         state_class=SensorStateClass.MEASUREMENT,
         entity_registry_enabled_default=True,
     ),
     XTSensorEntityDescription(
         key=XTDPCode.HUMIDITY1,
         translation_key="humidity",
+        device_class=SensorDeviceClass.HUMIDITY,
         state_class=SensorStateClass.MEASUREMENT,
         entity_registry_enabled_default=True,
     ),
     XTSensorEntityDescription(
         key=XTDPCode.HUMIDITY_VALUE,
         translation_key="humidity",
+        device_class=SensorDeviceClass.HUMIDITY,
         state_class=SensorStateClass.MEASUREMENT,
         entity_registry_enabled_default=True,
     ),
