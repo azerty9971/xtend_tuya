@@ -196,7 +196,7 @@ class XTDevice(TuyaDevice):
         human_name: str = ""
 
         #From LocalStrategy
-        read_only: bool = True
+        read_only: bool = False
         write_only: bool = False
         read_write: bool = False
         access_mode: str | None = None
