@@ -2691,6 +2691,17 @@
                     }
                 }
             }
+        },
+        "tuya_iot_ir_not_subscribed": {
+            "title": "Tuya OpenAPI account badly configured (IR)",
+            "fix_flow": {
+                "step": {
+                    "confirm": {
+                        "description": "The integration \"{name}\" (`{config_entry_id}`) Does not have a Tuya OpenAPI account that is subscribed to the IR Control Hub Open Service service\n\nWithout this, IR devices will not function properly.\n\nTo fix this warning please follow the guide at [this URL](https://github.com/azerty9971/xtend_tuya/blob/main/docs/configure_ir.md), then restart Home Assistant.",
+                        "title": "Tuya OpenAPI account badly configured (IR)"
+                    }
+                }
+            }
         }
     }
 }
