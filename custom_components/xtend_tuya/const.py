@@ -141,8 +141,9 @@ class XTDeviceEntityFunctions(StrEnum):
 
 
 class XTMultiManagerProperties(StrEnum):
-    LOCK_DEVICE_ID = "lock_device_id"
-    CAMERA_DEVICE_ID = "camera_device_id"
+    LOCK_DEVICE_ID      = "lock_device_id"
+    CAMERA_DEVICE_ID    = "camera_device_id"
+    IR_DEVICE_ID        = "ir_device_id"
 
 class XTMultiManagerPostSetupCallbackPriority(IntEnum):
     PRIORITY1       = 1

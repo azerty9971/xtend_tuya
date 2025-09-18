@@ -24,6 +24,7 @@ from .const import (
     XTIRHubInformation,
     XTIRRemoteInformation,
     XTIRRemoteKeysInformation,
+    XTMultiManagerProperties,
 )
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaButtonEntity,
@@ -180,6 +181,10 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
+                if device.category in IR_HUB_CATEGORY_LIST:
+                    hass_data.manager.set_general_property(
+                        XTMultiManagerProperties.IR_DEVICE_ID, device.id
+                    )
                 if category_descriptions := XTEntityDescriptorManager.get_category_descriptors(
                     supported_descriptors, device.category
                 ):
