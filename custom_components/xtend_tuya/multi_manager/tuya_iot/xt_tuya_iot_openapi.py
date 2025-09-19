@@ -156,7 +156,7 @@ class XTIOTOpenAPI(TuyaOpenAPI):
         country_code: str = "",
         schema: str = "",
     ) -> dict[str, Any]:
-        self.connecting = True
+        #self.connecting = True
         self.__username = username
         self.__password = password
         self.__country_code = country_code
