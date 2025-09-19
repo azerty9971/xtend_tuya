@@ -265,6 +265,9 @@
             "xt_add_ir_device": {
                 "name": "Add IR device"
             },
+            "xt_add_ir_device_key": {
+                "name": "Register new IR key"
+            },
             "filter_reset": {
                 "name": "Filter reset"
             },

@@ -169,6 +169,21 @@ async def async_setup_entry(
                         if remote_device := hass_data.manager.device_map.get(
                             remote_information.remote_id
                         ):
+                            descriptor = XTButtonEntityDescription(
+                                key="xt_add_device",
+                                translation_key="xt_add_ir_device_key",
+                                is_ir_key=True,
+                                ir_hub_information=hub_information,
+                                ir_remote_information=remote_information,
+                                ir_key_information=None,
+                                entity_registry_enabled_default=True,
+                                entity_registry_visible_default=True,
+                            )
+                            entities.append(
+                                XTButtonEntity.get_entity_instance(
+                                    descriptor, hub_device, hass_data.manager
+                                )
+                            )
                             for remote_key in remote_information.keys:
                                 descriptor = XTButtonEntityDescription(
                                     key=remote_key.key,
@@ -320,6 +335,12 @@ class XTButtonEntity(XTEntity, TuyaButtonEntity):
                 self._entity_description.ir_remote_information,
                 self._entity_description.ir_hub_information,
             )
+        elif (
+            self._entity_description.is_ir_key
+            and self._entity_description.ir_remote_information is not None
+            and self._entity_description.ir_hub_information is not None
+        ):
+            LOGGER.warning(f"Add IR key on {self.device.name} was pressed but is not implemented yet, I'm waiting for my RF hub delivery...")
         elif (
             self._entity_description.is_ir_key
             and self._entity_description.ir_hub_information is not None
