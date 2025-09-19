@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 import time
-import json
+#import json
 from typing import Any
 from tuya_iot import (
     TuyaOpenAPI,
@@ -101,12 +101,12 @@ class XTIOTOpenAPI(TuyaOpenAPI):
         expired_time = self.token_info.expire_time
 
         if expired_time - 60 * 1000 <= now:  # 1min
-            LOGGER.debug(f"[IOT API] is_token_expired is TRUE ({expired_time - 60 * 1000} <= {now})")
+            #LOGGER.debug(f"[IOT API] is_token_expired is TRUE ({expired_time - 60 * 1000} <= {now})")
             return True
         return False
 
     def __refresh_access_token_if_need(self, path: str):
-        LOGGER.debug(f"[IOT API]Calling __refresh_access_token_if_need (path: {path})")
+        #LOGGER.debug(f"[IOT API]Calling __refresh_access_token_if_need (path: {path})")
         if self.is_connect() is False:  # and self.reconnect() is False:
             return
 
@@ -114,11 +114,11 @@ class XTIOTOpenAPI(TuyaOpenAPI):
             return
 
         if path.startswith(self.__refresh_path):
-            LOGGER.debug(f"[IOT API]__refresh_access_token_if_need path starts with refresh path (path: {path}, refresh_path: {self.__refresh_path})")
+            #LOGGER.debug(f"[IOT API]__refresh_access_token_if_need path starts with refresh path (path: {path}, refresh_path: {self.__refresh_path})")
             return
 
         if self.is_token_expired() is False:
-            LOGGER.debug("[IOT API]__refresh_access_token_if_need token is not expired")
+            #LOGGER.debug("[IOT API]__refresh_access_token_if_need token is not expired")
             return
 
         self.token_info.access_token = ""
@@ -131,7 +131,7 @@ class XTIOTOpenAPI(TuyaOpenAPI):
             response = self.get(
                 TO_C_SMART_HOME_REFRESH_TOKEN_API + self.token_info.refresh_token
             )
-        LOGGER.debug(f"[IOT API]__refresh_access_token_if_need response: {response}")
+        #LOGGER.debug(f"[IOT API]__refresh_access_token_if_need response: {response}")
         self.token_info = XTTokenInfo(response)
 
     def connect_non_user_specific(self) -> dict[str, Any]:
@@ -161,7 +161,7 @@ class XTIOTOpenAPI(TuyaOpenAPI):
         self.__password = password
         self.__country_code = country_code
         self.__schema = schema
-        LOGGER.debug(f"[IOT API]Calling connect (non-user specific {self.non_user_specific_api})", stack_info=True)
+        #LOGGER.debug(f"[IOT API]Calling connect (non-user specific {self.non_user_specific_api})", stack_info=True)
         if self.non_user_specific_api:
             return_value = self.connect_non_user_specific()
         else:
@@ -175,7 +175,7 @@ class XTIOTOpenAPI(TuyaOpenAPI):
         return return_value
 
     def reconnect(self) -> bool:
-        LOGGER.debug(f"[IOT API]Calling reconnect (connecting: {self.connecting}, username: {self.__username}, password: {self.__password}, country_code: {self.__country_code})")
+        #LOGGER.debug(f"[IOT API]Calling reconnect (connecting: {self.connecting}, username: {self.__username}, password: {self.__password}, country_code: {self.__country_code})")
         if (
             self.connecting is False
             and self.__username != ""
@@ -183,12 +183,13 @@ class XTIOTOpenAPI(TuyaOpenAPI):
             and self.__country_code != ""
         ):
             self.token_info = None  # type: ignore
-            reconnect_result = self.connect(
+            #reconnect_result = 
+            self.connect(
                 self.__username, self.__password, self.__country_code, self.__schema
             )
-            LOGGER.debug(f"Reconnection result: {json.dumps(reconnect_result, ensure_ascii=False, indent=2) if reconnect_result is not None else "None"}")
-        else:
-            LOGGER.debug(f"One of the conditions didn't match  (connecting: {self.connecting}, username: {self.__username}, password: {self.__password}, country_code: {self.__country_code})")
+            #LOGGER.debug(f"Reconnection result: {json.dumps(reconnect_result, ensure_ascii=False, indent=2) if reconnect_result is not None else "None"}")
+        #else:
+        #    LOGGER.debug(f"One of the conditions didn't match  (connecting: {self.connecting}, username: {self.__username}, password: {self.__password}, country_code: {self.__country_code})")
         return self.is_connect()
 
     def is_connect(self) -> bool:
@@ -196,8 +197,8 @@ class XTIOTOpenAPI(TuyaOpenAPI):
         is_connected = super().is_connect()
         is_token_expired = self.is_token_expired()
         return_value = is_connected is True and is_token_expired is False
-        if return_value is False:
-            LOGGER.debug(f"[IOT API]is_connect is FALSE (is_connected={is_connected}, is_token_expired({is_token_expired}))")
+        #if return_value is False:
+        #    LOGGER.debug(f"[IOT API]is_connect is FALSE (is_connected={is_connected}, is_token_expired({is_token_expired}))")
         return return_value
 
     def test_validity(self) -> dict[str, Any]:
@@ -314,13 +315,13 @@ class XTIOTOpenAPI(TuyaOpenAPI):
 
         result: dict[str, Any] = response.json()
 
-        if result.get("success", True) is False:
-            LOGGER.debug(
-                f"[IOT API]Request: {method} {path} PARAMS: {json.dumps(params, ensure_ascii=False, indent=2) if params is not None else ""} BODY: {json.dumps(body, ensure_ascii=False, indent=2) if body is not None else ""}"
-            )
-            LOGGER.debug(
-                f"[IOT API]Response: {json.dumps(result, ensure_ascii=False, indent=2)}"
-            )
+        #if result.get("success", True) is False:
+        #    LOGGER.debug(
+        #        f"[IOT API]Request: {method} {path} PARAMS: {json.dumps(params, ensure_ascii=False, indent=2) if params is not None else ""} BODY: {json.dumps(body, ensure_ascii=False, indent=2) if body is not None else ""}"
+        #    )
+        #    LOGGER.debug(
+        #        f"[IOT API]Response: {json.dumps(result, ensure_ascii=False, indent=2)}"
+        #    )
 
         if result.get("code", -1) == TUYA_ERROR_CODE_TOKEN_INVALID:
             if self.reconnect() is True and first_pass is True:
