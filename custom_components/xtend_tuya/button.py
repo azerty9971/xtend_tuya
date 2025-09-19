@@ -156,6 +156,7 @@ async def async_setup_entry(
                         ir_hub_information=hub_information,
                         ir_remote_information=None,
                         ir_key_information=None,
+                        entity_category=EntityCategory.CONFIG,
                         entity_registry_enabled_default=True,
                         entity_registry_visible_default=True,
                     )
@@ -176,6 +177,7 @@ async def async_setup_entry(
                                 ir_hub_information=hub_information,
                                 ir_remote_information=remote_information,
                                 ir_key_information=None,
+                                entity_category=EntityCategory.CONFIG,
                                 entity_registry_enabled_default=True,
                                 entity_registry_visible_default=True,
                             )
