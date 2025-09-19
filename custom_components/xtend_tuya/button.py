@@ -181,7 +181,7 @@ async def async_setup_entry(
                             )
                             entities.append(
                                 XTButtonEntity.get_entity_instance(
-                                    descriptor, hub_device, hass_data.manager
+                                    descriptor, remote_device, hass_data.manager
                                 )
                             )
                             for remote_key in remote_information.keys:
