@@ -160,7 +160,7 @@ class XTIOTOpenAPI(TuyaOpenAPI):
         self.__password = password
         self.__country_code = country_code
         self.__schema = schema
-        LOGGER.debug(f"[IOT API]Calling connect (non-user specific {self.connect_non_user_specific})", stack_info=True)
+        LOGGER.debug(f"[IOT API]Calling connect (non-user specific {self.non_user_specific_api})", stack_info=True)
         if self.non_user_specific_api:
             return_value = self.connect_non_user_specific()
         else:
