@@ -62,8 +62,7 @@ class XTIOTOpenMQ(TuyaOpenMQ):
             self.__run_mqtt()
 
             # reconnect every 2 hours required.
-            #time.sleep(self.mq_config.expire_time - 60)
-            time.sleep(600) #DEBUG TO TRIGGER ISSUE MORE OFTEN
+            time.sleep(self.mq_config.expire_time - 60)
 
     def _get_mqtt_config(self, first_pass=True) -> Optional[XTIOTTuyaMQConfig]:
         # LOGGER.debug(f"[{self.class_id}]Calling _get_mqtt_config")
