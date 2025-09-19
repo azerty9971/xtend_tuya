@@ -117,7 +117,7 @@ class XTIOTOpenAPI(TuyaOpenAPI):
             return
 
         if self.is_token_expired() is False:
-            LOGGER.debug("[IOT API]__refresh_access_token_if_need token is expired")
+            LOGGER.debug("[IOT API]__refresh_access_token_if_need token is not expired")
             return
 
         self.token_info.access_token = ""
