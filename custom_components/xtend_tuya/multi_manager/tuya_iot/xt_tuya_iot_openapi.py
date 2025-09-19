@@ -4,7 +4,6 @@ from __future__ import annotations
 import time
 import json
 from typing import Any
-import requests
 from tuya_iot import (
     TuyaOpenAPI,
 )
@@ -93,6 +92,18 @@ class XTIOTOpenAPI(TuyaOpenAPI):
         self.__country_code = ""
         self.__schema = ""
 
+    def is_token_expired(self) -> bool:
+        if self.token_info is None:
+            return True
+        # should use refresh token?
+        now = int(time.time() * 1000)
+        expired_time = self.token_info.expire_time
+
+        if expired_time - 60 * 1000 <= now:  # 1min
+            LOGGER.debug(f"[IOT API] is_token_expired is TRUE ({expired_time - 60 * 1000} <= {now})")
+            return True
+        return False
+
     def __refresh_access_token_if_need(self, path: str):
         # LOGGER.debug(f"[API]Calling __refresh_access_token_if_need")
         if self.is_connect() is False:  # and self.reconnect() is False:
@@ -105,11 +116,7 @@ class XTIOTOpenAPI(TuyaOpenAPI):
             # LOGGER.debug(f"[API]__refresh_access_token_if_need path starts with refresh path")
             return
 
-        # should use refresh token?
-        now = int(time.time() * 1000)
-        expired_time = self.token_info.expire_time
-
-        if expired_time - 60 * 1000 > now:  # 1min
+        if self.is_token_expired() is False:
             # LOGGER.debug(f"[API]__refresh_access_token_if_need token is not old enough ({expired_time - 60 * 1000} > {now})")
             return
 
@@ -175,16 +182,20 @@ class XTIOTOpenAPI(TuyaOpenAPI):
             and self.__country_code
         ):
             self.token_info = None  # type: ignore
-            self.connect(
+            reconnect_result = self.connect(
                 self.__username, self.__password, self.__country_code, self.__schema
             )
+            LOGGER.debug(f"Reconnection result: {json.dumps(reconnect_result, ensure_ascii=False, indent=2) if reconnect_result is not None else "None"}")
         return self.is_connect()
 
     def is_connect(self) -> bool:
         """Is connect to tuya cloud."""
-        ret_val = super().is_connect()
-        # LOGGER.debug(f"[API]is_connect = {ret_val}")
-        return ret_val
+        is_connected = super().is_connect()
+        is_token_expired = self.is_token_expired()
+        return_value = is_connected is True and is_token_expired is False
+        if return_value is False:
+            LOGGER.debug(f"[API]is_connect is FALSE (is_connected={is_connected}, is_token_expired({is_token_expired}))")
+        return return_value
 
     def test_validity(self) -> dict[str, Any]:
         return self.get("/v2.0/cloud/space/child")
@@ -284,22 +295,13 @@ class XTIOTOpenAPI(TuyaOpenAPI):
                 t = {int(time.time()*1000)}"
         ) """
 
-        response = requests.Response()
-        for _ in range(10):
-            try:
-                response = self.session.request(
-                    method,
-                    self.endpoint + path,
-                    params=params,
-                    json=body,
-                    headers=headers,
-                )
-                break
-            except Exception as e:
-                LOGGER.debug(
-                    f"[API]Exception in request, waiting for 2 seconds and retrying {e}"
-                )
-                time.sleep(2)
+        response = self.session.request(
+            method,
+            self.endpoint + path,
+            params=params,
+            json=body,
+            headers=headers,
+        )
 
         if response.ok is False:
             LOGGER.error(
@@ -318,8 +320,7 @@ class XTIOTOpenAPI(TuyaOpenAPI):
             )
 
         if result.get("code", -1) == TUYA_ERROR_CODE_TOKEN_INVALID:
-            self.reconnect()
-            if first_pass:
+            if self.reconnect() is True and first_pass is True:
                 return self.__request(method, path, params, body, False)
 
         return result
