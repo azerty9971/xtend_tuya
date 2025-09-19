@@ -105,7 +105,7 @@ class XTIOTOpenAPI(TuyaOpenAPI):
         return False
 
     def __refresh_access_token_if_need(self, path: str):
-        # LOGGER.debug(f"[API]Calling __refresh_access_token_if_need")
+        LOGGER.debug(f"[IOT API]Calling __refresh_access_token_if_need (path: {path})")
         if self.is_connect() is False:  # and self.reconnect() is False:
             return
 
@@ -113,11 +113,11 @@ class XTIOTOpenAPI(TuyaOpenAPI):
             return
 
         if path.startswith(self.__refresh_path):
-            # LOGGER.debug(f"[API]__refresh_access_token_if_need path starts with refresh path")
+            LOGGER.debug(f"[IOT API]__refresh_access_token_if_need path starts with refresh path (path: {path}, refresh_path: {self.__refresh_path})")
             return
 
         if self.is_token_expired() is False:
-            # LOGGER.debug(f"[API]__refresh_access_token_if_need token is not old enough ({expired_time - 60 * 1000} > {now})")
+            LOGGER.debug("[IOT API]__refresh_access_token_if_need token is expired")
             return
 
         self.token_info.access_token = ""
@@ -130,7 +130,7 @@ class XTIOTOpenAPI(TuyaOpenAPI):
             response = self.get(
                 TO_C_SMART_HOME_REFRESH_TOKEN_API + self.token_info.refresh_token
             )
-        # LOGGER.debug(f"[API]__refresh_access_token_if_need response: {response}")
+        LOGGER.debug(f"[IOT API]__refresh_access_token_if_need response: {response}")
         self.token_info = TuyaTokenInfo(response)
 
     def connect_non_user_specific(self) -> dict[str, Any]:
@@ -174,7 +174,7 @@ class XTIOTOpenAPI(TuyaOpenAPI):
         return return_value
 
     def reconnect(self) -> bool:
-        LOGGER.debug(f"[API]Calling reconnect (connecting: {self.connecting}, username: {self.__username}, password: {self.__password}, country_code: {self.__country_code})")
+        LOGGER.debug(f"[IOT API]Calling reconnect (connecting: {self.connecting}, username: {self.__username}, password: {self.__password}, country_code: {self.__country_code})")
         if (
             self.connecting is False
             and self.__username != ""
@@ -196,7 +196,7 @@ class XTIOTOpenAPI(TuyaOpenAPI):
         is_token_expired = self.is_token_expired()
         return_value = is_connected is True and is_token_expired is False
         if return_value is False:
-            LOGGER.debug(f"[API]is_connect is FALSE (is_connected={is_connected}, is_token_expired({is_token_expired}))")
+            LOGGER.debug(f"[IOT API]is_connect is FALSE (is_connected={is_connected}, is_token_expired({is_token_expired}))")
         return return_value
 
     def test_validity(self) -> dict[str, Any]:
@@ -268,7 +268,7 @@ class XTIOTOpenAPI(TuyaOpenAPI):
     ) -> dict[str, Any]:
 
         self.__refresh_access_token_if_need(path)
-        # LOGGER.debug(f"[API]Requesting: {method} {path} (first_pass={first_pass})")
+        # LOGGER.debug(f"[IOT API]Requesting: {method} {path} (first_pass={first_pass})")
         access_token = self.token_info.access_token if self.token_info else ""
         sign, t = self._calculate_sign(method, path, params, body)
         headers = {
@@ -307,7 +307,7 @@ class XTIOTOpenAPI(TuyaOpenAPI):
 
         if response.ok is False:
             LOGGER.error(
-                f"[API]Response error: code={response.status_code}, body={body if body is not None else ""}"
+                f"[IOT API]Response error: code={response.status_code}, body={body if body is not None else ""}"
             )
             return {}
 
