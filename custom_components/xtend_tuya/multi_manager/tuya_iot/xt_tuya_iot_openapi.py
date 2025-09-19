@@ -174,7 +174,7 @@ class XTIOTOpenAPI(TuyaOpenAPI):
         return return_value
 
     def reconnect(self) -> bool:
-        # LOGGER.debug(f"[API]Calling reconnect (connecting: {self.connecting})")
+        LOGGER.debug(f"[API]Calling reconnect (connecting: {self.connecting}, username: {self.__username}, password: {self.__password}, country_code: {self.__country_code})")
         if (
             not self.connecting
             and self.__username
