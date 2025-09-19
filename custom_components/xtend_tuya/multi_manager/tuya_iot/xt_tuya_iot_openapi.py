@@ -6,6 +6,7 @@ import json
 from typing import Any
 from tuya_iot import (
     TuyaOpenAPI,
+    TuyaTokenInfo,
 )
 from tuya_iot.tuya_enums import AuthType
 from tuya_iot.version import VERSION
@@ -23,7 +24,7 @@ TO_C_SMART_HOME_TOKEN_API = "/v1.0/iot-01/associated-users/actions/authorized-lo
 TO_C_SMART_HOME_TOKEN_API_NEW = "/v1.0/token"
 
 
-class TuyaTokenInfo:
+class XTTokenInfo(TuyaTokenInfo):
     """Tuya token info.
 
     Attributes:
@@ -56,8 +57,8 @@ class XTIOTOpenAPI(TuyaOpenAPI):
     openapi = TuyaOpenAPI(ENDPOINT, ACCESS_ID, ACCESS_KEY)
     """
 
-    token_info: TuyaTokenInfo | None = None
-    connecting: bool = False
+    #token_info: TuyaTokenInfo | None = None
+    #connecting: bool = False
 
     def __init__(
         self,
@@ -77,7 +78,7 @@ class XTIOTOpenAPI(TuyaOpenAPI):
             lang=lang,
         )
 
-        self.connecting = False
+        self.connecting: bool = False
         self.non_user_specific_api = non_user_specific_api
         if self.auth_type == AuthType.CUSTOM:
             self.__login_path = TO_C_CUSTOM_TOKEN_API
@@ -86,7 +87,7 @@ class XTIOTOpenAPI(TuyaOpenAPI):
             self.__login_path = TO_C_SMART_HOME_TOKEN_API
             self.__refresh_path = TO_C_SMART_HOME_REFRESH_TOKEN_API
 
-        self.token_info = None
+        self.token_info: TuyaTokenInfo | None = None
         self.__username = ""
         self.__password = ""
         self.__country_code = ""
@@ -131,7 +132,7 @@ class XTIOTOpenAPI(TuyaOpenAPI):
                 TO_C_SMART_HOME_REFRESH_TOKEN_API + self.token_info.refresh_token
             )
         LOGGER.debug(f"[IOT API]__refresh_access_token_if_need response: {response}")
-        self.token_info = TuyaTokenInfo(response)
+        self.token_info = XTTokenInfo(response)
 
     def connect_non_user_specific(self) -> dict[str, Any]:
         response = self.get(
@@ -144,7 +145,7 @@ class XTIOTOpenAPI(TuyaOpenAPI):
             return response
 
         # Cache token info.
-        self.token_info = TuyaTokenInfo(response)
+        self.token_info = XTTokenInfo(response)
 
         return response
 
