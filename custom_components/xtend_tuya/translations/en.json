@@ -262,6 +262,9 @@
             "xt_generic_button": {
                 "name": "{name}"
             },
+            "xt_add_ir_device": {
+                "name": "Add IR device"
+            },
             "filter_reset": {
                 "name": "Filter reset"
             },
