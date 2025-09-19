@@ -160,7 +160,7 @@ class XTIOTOpenAPI(TuyaOpenAPI):
         self.__password = password
         self.__country_code = country_code
         self.__schema = schema
-        # LOGGER.debug(f"[API]Calling connect")
+        LOGGER.debug(f"[IOT API]Calling connect (non-user specific {self.connect_non_user_specific})", stack_info=True)
         if self.non_user_specific_api:
             return_value = self.connect_non_user_specific()
         else:
@@ -176,16 +176,18 @@ class XTIOTOpenAPI(TuyaOpenAPI):
     def reconnect(self) -> bool:
         LOGGER.debug(f"[API]Calling reconnect (connecting: {self.connecting}, username: {self.__username}, password: {self.__password}, country_code: {self.__country_code})")
         if (
-            not self.connecting
-            and self.__username
-            and self.__password
-            and self.__country_code
+            self.connecting is False
+            and self.__username != ""
+            and self.__password != ""
+            and self.__country_code != ""
         ):
             self.token_info = None  # type: ignore
             reconnect_result = self.connect(
                 self.__username, self.__password, self.__country_code, self.__schema
             )
             LOGGER.debug(f"Reconnection result: {json.dumps(reconnect_result, ensure_ascii=False, indent=2) if reconnect_result is not None else "None"}")
+        else:
+            LOGGER.debug(f"One of the conditions didn't match  (connecting: {self.connecting}, username: {self.__username}, password: {self.__password}, country_code: {self.__country_code})")
         return self.is_connect()
 
     def is_connect(self) -> bool:
