@@ -10,6 +10,7 @@ from homeassistant.const import EntityCategory, Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.util.json import json_loads
 #from homeassistant.helpers.typing import UndefinedType
 from .util import (
     restrict_descriptor_category,
@@ -30,7 +31,7 @@ from .ha_tuya_integration.tuya_integration_imports import (
     TuyaBinarySensorEntity,
     TuyaBinarySensorEntityDescription,
     TuyaDPType,
-    get_bitmap_bit_mask_tuya_binary_sensor,
+    #get_bitmap_bit_mask_tuya_binary_sensor,
 )
 from .entity import (
     XTEntity,
@@ -234,6 +235,20 @@ BINARY_SENSORS: dict[str, tuple[XTBinarySensorEntityDescription, ...]] = {
 BINARY_SENSORS["videolock"] = BINARY_SENSORS["jtmspro"]
 BINARY_SENSORS["jtmsbh"] = BINARY_SENSORS["jtmspro"]
 
+def _get_bitmap_bit_mask(
+    device: XTDevice, dpcode: str, bitmap_key: str | None
+) -> int | None:
+    """Get the bit mask for a given bitmap description."""
+    if (
+        bitmap_key is None
+        or (status_range := device.status_range.get(dpcode)) is None
+        or status_range.type != TuyaDPType.BITMAP
+        or not isinstance(bitmap_values := json_loads(status_range.values), dict)
+        or not isinstance(bitmap_labels := bitmap_values.get("label"), list)
+        or bitmap_key not in bitmap_labels
+    ):
+        return None
+    return bitmap_labels.index(bitmap_key)
 
 async def async_setup_entry(
     hass: HomeAssistant, entry: XTConfigEntry, async_add_entities: AddEntitiesCallback
@@ -381,7 +396,7 @@ class XTBinarySensorEntity(XTEntity, TuyaBinarySensorEntity):
     ) -> None:
         """Init Tuya binary sensor."""
         super(XTBinarySensorEntity, self).__init__(device, device_manager, description)
-        super(XTEntity, self).__init__(device, device_manager, description, get_bitmap_bit_mask_tuya_binary_sensor(device, description.dpcode or description.key, description.bitmap_key))  # type: ignore
+        super(XTEntity, self).__init__(device, device_manager, description, _get_bitmap_bit_mask(device, description.dpcode or description.key, description.bitmap_key))  # type: ignore
         self.device = device
         self.device_manager = device_manager
         self._entity_description = description
