@@ -66,8 +66,7 @@ class XTIOTOpenAPI(TuyaOpenAPI):
         access_secret: str,
         auth_type: AuthType = AuthType.SMART_HOME,
         lang: str = "en",
-        non_user_specific_api: bool = False,
-        api_name: str = "Unnamed API",
+        non_user_specific_api: bool = False
     ) -> None:
         """Init TuyaOpenAPI."""
         super(XTIOTOpenAPI, self).__init__(
@@ -77,7 +76,6 @@ class XTIOTOpenAPI(TuyaOpenAPI):
             auth_type=auth_type,
             lang=lang,
         )
-        self.api_name = api_name
         self.non_user_specific_api = non_user_specific_api
         if self.auth_type == AuthType.CUSTOM:
             self.__login_path = TO_C_CUSTOM_TOKEN_API
