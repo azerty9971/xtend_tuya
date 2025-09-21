@@ -1469,7 +1469,8 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
             state_class=SensorStateClass.MEASUREMENT,
             entity_registry_enabled_default=True,
             recalculate_scale_for_percentage=True,
-            recalculate_scale_for_percentage_threshold=100,
+            recalculate_scale_for_percentage_threshold=1000,
+            suggested_display_precision=0,
         ),
         XTSensorEntityDescription(
             key=XTDPCode.BATTERY_PERCENTAGE,
@@ -1477,7 +1478,7 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
             device_class=SensorDeviceClass.VOLTAGE,
             state_class=SensorStateClass.MEASUREMENT,
             entity_category=EntityCategory.DIAGNOSTIC,
-            suggested_display_precision = 1,
+            suggested_display_precision=1,
         ),
     ),
     # ZNRB devices don't send correct cloud data, for these devices use https://github.com/make-all/tuya-local instead
