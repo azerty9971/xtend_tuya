@@ -538,7 +538,6 @@ class XTIOTDeviceManager(TuyaDeviceManager):
             "key_id": key.key_id,
             "key": key.key,
         }
-        # LOGGER.warning(f"IR command payload: {payload}")
         ir_command = api.post(
             f"/v2.0/infrareds/{hub.device_id}/remotes/{remote.remote_id}/raw/command",
             payload,

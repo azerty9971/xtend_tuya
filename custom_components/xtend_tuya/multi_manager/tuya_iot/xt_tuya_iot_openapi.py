@@ -57,8 +57,6 @@ class XTIOTOpenAPI(TuyaOpenAPI):
     openapi = TuyaOpenAPI(ENDPOINT, ACCESS_ID, ACCESS_KEY)
     """
 
-    # token_info: TuyaTokenInfo | None = None
-
     def __init__(
         self,
         endpoint: str,

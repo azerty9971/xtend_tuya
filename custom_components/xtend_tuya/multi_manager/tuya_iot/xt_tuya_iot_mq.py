@@ -113,8 +113,6 @@ class XTIOTOpenMQ(TuyaOpenMQ):
     def _on_disconnect(self, client, userdata, rc):
         if rc != 0:
             LOGGER.error(f"Unexpected disconnection.{rc}")
-        #else:
-        #    LOGGER.debug("disconnect")
 
     def _start(self, mq_config: TuyaMQConfig) -> mqtt.Client:
         # mqttc = mqtt.Client(callback_api_version=mqtt_CallbackAPIVersion.VERSION2 ,client_id=mq_config.client_id)
