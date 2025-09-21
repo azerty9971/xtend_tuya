@@ -72,7 +72,7 @@ class XTIOTOpenAPI(TuyaOpenAPI, XTAPICommonInterface):
         api_name: str | None = None
     ) -> None:
         """Init TuyaOpenAPI."""
-        super(XTIOTOpenAPI).__init__(
+        super().__init__(
             endpoint=endpoint,
             access_id=access_id,
             access_secret=access_secret,
