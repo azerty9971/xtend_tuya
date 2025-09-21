@@ -2259,6 +2259,15 @@
             "xt_cover_invert_status": {
                 "name": "Invert cover status"
             },
+            "pump_switch": {
+                "name": "Pump switch"
+            },
+            "pump_mode": {
+                "name": "Pump drainage/supply"
+            },
+            "pump_auto": {
+                "name": "Pump auto"
+            },
             "sleep_mode": {
                 "name": "Sleep mode"
             },
