@@ -445,7 +445,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
             if code == 28841106:
                 return False
         return True
-    
+
     def test_ir_api_subscription(
         self, device: XTDevice, api: XTIOTOpenAPI | None = None
     ) -> bool:
@@ -538,7 +538,6 @@ class XTIOTDeviceManager(TuyaDeviceManager):
             "key_id": key.key_id,
             "key": key.key,
         }
-        #LOGGER.warning(f"IR command payload: {payload}")
         ir_command = api.post(
             f"/v2.0/infrareds/{hub.device_id}/remotes/{remote.remote_id}/raw/command",
             payload,

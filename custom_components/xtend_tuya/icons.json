@@ -59,6 +59,18 @@
       }
     },
     "number": {
+      "max_set": {
+        "default": "mdi:water-plus"
+      },
+      "mini_set": {
+        "default": "mdi:water-minus"
+      },
+      "installation_height": {
+        "default": "mdi:arrow-expand-vertical"
+      },
+      "liquid_depth_max": {
+        "default": "mdi:arrow-expand-vertical"
+      },
       "watering_duration": {
         "default": "mdi:timer-outline"
       },
@@ -192,6 +204,20 @@
       }
     },
     "sensor": {
+      "liquid_depth": {
+        "default": "mdi:arrow-expand-vertical"
+      },
+      "liquid_level_percent": {
+        "default": "mdi:water-percent"
+      },
+      "liquid_state": {
+        "default": "mdi:water-remove",
+        "state": {
+          "normal": "mdi:water-check",
+          "lower_alarm": "mdi:water-minus",
+          "upper_alarm": "mdi:water-plus"
+        }
+      },
       "start_time": {
         "default": "mdi:clock-start"
       },
@@ -284,6 +310,13 @@
       }
     },
     "switch": {
+      "pump_switch": {
+        "default": "mdi:water-pump-off",
+        "state": {
+          "off": "mdi:water-pump-off",
+          "on": "mdi:water-pump"
+        }
+      },
       "sleep_mode": {
         "default": "mdi:sleep",
         "state": {

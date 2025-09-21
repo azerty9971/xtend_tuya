@@ -393,6 +393,22 @@ SWITCHES: dict[str, tuple[XTSwitchEntityDescription, ...]] = {
             entity_category=EntityCategory.CONFIG,
         ),
     ),
+    "ywcgq": (
+        XTSwitchEntityDescription(
+            key=XTDPCode.AUTO_PUMP,
+            translation_key="pump_auto",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        XTSwitchEntityDescription(
+            key=XTDPCode.PUMP_MODE,
+            translation_key="pump_mode",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        XTSwitchEntityDescription(
+            key=XTDPCode.RELAY_SWITCH_1,
+            translation_key="pump_switch",
+        ),
+    ),
 }
 
 # Lock duplicates
