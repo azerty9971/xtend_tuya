@@ -13,6 +13,7 @@ from tuya_iot.version import VERSION
 from ...const import (
     LOGGER,  # noqa: F401
 )
+from ..shared.multi_api import XTAPICommonInterface
 
 TUYA_ERROR_CODE_TOKEN_INVALID = 1010
 
@@ -49,7 +50,7 @@ class XTTokenInfo(TuyaTokenInfo):
         self.platform_url = result.get("platform_url", "")
 
 
-class XTIOTOpenAPI(TuyaOpenAPI):
+class XTIOTOpenAPI(TuyaOpenAPI, XTAPICommonInterface):
     """Open Api.
 
     Typical usage example:
@@ -68,16 +69,18 @@ class XTIOTOpenAPI(TuyaOpenAPI):
         auth_type: AuthType = AuthType.SMART_HOME,
         lang: str = "en",
         non_user_specific_api: bool = False,
+        api_name: str | None = None
     ) -> None:
         """Init TuyaOpenAPI."""
-        super().__init__(
+        super(XTIOTOpenAPI).__init__(
             endpoint=endpoint,
             access_id=access_id,
             access_secret=access_secret,
             auth_type=auth_type,
             lang=lang,
         )
-
+        super(TuyaOpenAPI).__init__(api_name if api_name is not None else "Unnamed API")
+        self.api_name = api_name
         self.connecting: bool = False
         self.non_user_specific_api = non_user_specific_api
         if self.auth_type == AuthType.CUSTOM:
@@ -204,7 +207,7 @@ class XTIOTOpenAPI(TuyaOpenAPI):
     def test_validity(self) -> dict[str, Any]:
         return self.get("/v2.0/cloud/space/child")
 
-    def get(self, path: str, params: dict[str, Any] | None = None) -> dict[str, Any]:
+    def get(self, path: str, params: dict[str, Any] | None = None, raw_path: str | None = None) -> dict[str, Any]:
         """Http Get.
 
         Requests the server to return specified resources.
@@ -216,9 +219,13 @@ class XTIOTOpenAPI(TuyaOpenAPI):
         Returns:
             response: response body
         """
+        if raw_path is not None:
+            self.register_api_call("GET", raw_path)
+        else:
+            LOGGER.warning(f"GET is not registered, please provide the raw_path {path}", stack_info=True)
         return self.__request("GET", path, params, None)
 
-    def post(self, path: str, body: dict[str, Any] | None = None) -> dict[str, Any]:
+    def post(self, path: str, body: dict[str, Any] | None = None, raw_path: str | None = None) -> dict[str, Any]:
         """Http Post.
 
         Requests the server to update specified resources.

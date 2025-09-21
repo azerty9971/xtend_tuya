@@ -131,6 +131,7 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
             access_secret=config_entry.options[CONF_ACCESS_SECRET],
             auth_type=auth_type,
             non_user_specific_api=False,
+            api_name=f"XT IOT API '{config_entry.title}' (non_user_specific: {False})"
         )
         non_user_api = XTIOTOpenAPI(
             endpoint=config_entry.options[CONF_ENDPOINT_OT],
@@ -138,6 +139,7 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
             access_secret=config_entry.options[CONF_ACCESS_SECRET],
             auth_type=auth_type,
             non_user_specific_api=True,
+            api_name=f"XT IOT API '{config_entry.title}' (non_user_specific: {True})"
         )
         api.set_dev_channel("hass")
         try:
