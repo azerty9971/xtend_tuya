@@ -69,17 +69,17 @@ class XTIOTOpenAPI(TuyaOpenAPI, XTAPICommonInterface):
         auth_type: AuthType = AuthType.SMART_HOME,
         lang: str = "en",
         non_user_specific_api: bool = False,
-        api_name: str | None = None
+        api_name: str = "Unnamed API"
     ) -> None:
         """Init TuyaOpenAPI."""
-        super().__init__(
+        super(XTIOTOpenAPI, self).__init__(
             endpoint=endpoint,
             access_id=access_id,
             access_secret=access_secret,
             auth_type=auth_type,
             lang=lang,
         )
-        super(TuyaOpenAPI).__init__(api_name if api_name is not None else "Unnamed API")
+        super(TuyaOpenAPI, self).__init__(api_name)
         self.api_name = api_name
         self.connecting: bool = False
         self.non_user_specific_api = non_user_specific_api
