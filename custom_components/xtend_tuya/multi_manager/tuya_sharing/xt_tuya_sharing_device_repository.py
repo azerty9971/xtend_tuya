@@ -1,6 +1,5 @@
 from __future__ import annotations
 from typing import Any
-import json
 from tuya_sharing.customerapi import (
     CustomerApi,
 )
@@ -74,7 +73,6 @@ class XTSharingDeviceRepository(DeviceRepository):
     def _update_device_strategy_info_mod(self, device: CustomerDevice):
         device_id = device.id
         response = self.api.get(f"/v1.0/m/life/devices/{device_id}/status")
-        LOGGER.warning(f"STATUS RESPONSE: {json.dumps(response, ensure_ascii=False, indent=2) if response is not None else ""}")
         support_local = True
         if response.get("success"):
             result = response.get("result", {})
