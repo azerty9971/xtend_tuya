@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 from homeassistant.const import EntityCategory, Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect, dispatcher_send
+from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from .util import (
     restrict_descriptor_category,
@@ -149,6 +150,12 @@ async def async_setup_entry(
                     if hub_information is None:
                         continue
 
+                    #First, clean up the device and subdevices
+                    device_registry = dr.async_get(hass)
+                    device_registry.async_remove_device(hub_information.device_id)
+                    for remote_information in hub_information.remote_ids:
+                        device_registry.async_remove_device(remote_information.remote_id)
+
                     descriptor = XTButtonEntityDescription(
                         key="xt_add_device",
                         translation_key="xt_add_ir_device",
@@ -281,7 +288,6 @@ async def async_setup_entry(
 
     hass_data.manager.register_device_descriptors(this_platform, supported_descriptors)
     async_discover_device([*hass_data.manager.device_map])
-    # async_discover_device(hass_data.manager, hass_data.manager.open_api_device_map)
 
     entry.async_on_unload(
         async_dispatcher_connect(hass, TUYA_DISCOVERY_NEW, async_discover_device)
@@ -347,7 +353,6 @@ class XTButtonEntity(XTEntity, TuyaButtonEntity):
             ):
                 if self.hass:
                     dispatcher_send(self.hass, TUYA_DISCOVERY_NEW, [self.device.id, self._entity_description.ir_hub_information.device_id])
-                pass
         elif (
             self._entity_description.is_ir_key
             and self._entity_description.ir_hub_information is not None
