@@ -583,7 +583,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         ):
             LOGGER.warning(f"Could not put IR Hub {device.name} in learning mode")
             return False
-        learning_time = learning_mode["t"]
+        learning_time = int(learning_mode["t"])
         learned_code_value: str | None = None
         for _ in range(total_timeout):
             learned_code = api.get(
@@ -617,7 +617,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                 "brand_name" : remote.brand_name,
                 "remote_name": remote.remote_name,
                 "codes": [
-                    {"key_name": "test2", "key": "test2", "code": learned_code_value}
+                    {"key_name": "test2", "key": "test2", "code": learned_code_value, "id": learning_time//1000}
                 ]
             }
         )
