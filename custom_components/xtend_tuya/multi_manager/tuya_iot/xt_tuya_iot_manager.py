@@ -551,11 +551,11 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         payload: dict[str, Any] = {
             "category_id": remote.category_id,
             "key_id": key.key_id,
-            "key": key.key,
+            "key": key.key
         }
         ir_command = api.post(
             f"/v2.0/infrareds/{hub.device_id}/remotes/{remote.remote_id}/raw/command",
-            payload,
+            payload
         )
         if ir_command.get("success", False) and ir_command.get("result", False):
             return True
@@ -586,23 +586,43 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         learning_time = learning_mode["t"]
         learned_code_value: str | None = None
         for _ in range(total_timeout):
-            learned_code = api.get(f"/v2.0/infrareds/{hub.device_id}/learning-codes", {"learning_time": learning_time})
+            learned_code = api.get(
+                f"/v2.0/infrareds/{hub.device_id}/learning-codes",
+                {"learning_time": learning_time}
+            )
             if result := learned_code.get("result", {}):
                 if result.get("success", False):
                     learned_code_value = result.get("code")
                     break
             time.sleep(check_interval)
-        
+
         learning_mode = api.put(
             f"/v2.0/infrareds/{hub.device_id}/learning-state",
-            {"state": False},
+            {"state": False}
         )
 
         if learned_code_value is None:
-            LOGGER.warning(f"No code learned for {device.name} in the timeout period ({total_timeout}s)")
+            LOGGER.warning(
+                f"No code learned for {device.name} in the timeout period ({total_timeout}s)"
+            )
             return False
-        
+
         LOGGER.warning(f"Got code {learned_code_value} for device {device.name}")
+
+        # Save learning code as TEST
+        save_result = api.put(
+            f"/v2.0/infrareds/{hub.device_id}/remotes/{remote.remote_id}/learning-codes",
+            {
+                "category_id": {remote.category_id},
+                "brand_name": {remote.brand_name},
+                "remote_name": {remote.remote_name},
+                "codes": [
+                    {"key_name": "test2", "key": "test2", "code": learned_code_value}
+                ],
+            }
+        )
+        if save_result.get("success", False):
+            return True
         return False
 
     def get_supported_unlock_types(

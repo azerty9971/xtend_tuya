@@ -5,7 +5,7 @@ from typing import cast
 from dataclasses import dataclass, field
 from homeassistant.const import EntityCategory, Platform
 from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers.dispatcher import async_dispatcher_connect
+from homeassistant.helpers.dispatcher import async_dispatcher_connect, dispatcher_send
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from .util import (
     restrict_descriptor_category,
@@ -342,11 +342,14 @@ class XTButtonEntity(XTEntity, TuyaButtonEntity):
             and self._entity_description.ir_remote_information is not None
             and self._entity_description.ir_hub_information is not None
         ):
-            self.device_manager.learn_ir_key(
+            if self.device_manager.learn_ir_key(
                 self.device,
                 self._entity_description.ir_remote_information,
                 self._entity_description.ir_hub_information,
-            )
+            ):
+                if self.hass:
+                    dispatcher_send(self.hass, TUYA_DISCOVERY_NEW, [self.device.id])
+                pass
         elif (
             self._entity_description.is_ir_key
             and self._entity_description.ir_hub_information is not None
