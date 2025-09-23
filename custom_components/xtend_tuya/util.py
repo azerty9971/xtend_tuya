@@ -5,12 +5,14 @@ import copy
 from typing import NamedTuple, Any
 from datetime import datetime
 from base64 import b64decode
+from homeassistant.const import (
+    STATE_UNAVAILABLE,
+)
 from homeassistant.util.dt import DEFAULT_TIME_ZONE
 from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers import device_registry as dr, entity_registry as er
 from homeassistant.helpers.entity import EntityDescription
-from homeassistant.helpers.entity_platform import async_get_platforms, EntityPlatform
 from .const import (
     LOGGER,
     DOMAIN,
@@ -276,11 +278,8 @@ def is_device_in_domain_device_maps(
 def delete_all_unavailable_device_entities(hass: HomeAssistant, device_ids: list[str]):
     device_registry = dr.async_get(hass)
     entity_registry = er.async_get(hass)
-    entity_platforms: list[EntityPlatform] = []
     entity_ids_to_remove: list[str] = []
     domains: list[str] = [DOMAIN, DOMAIN_ORIG]
-    for domain in domains:
-        entity_platforms.extend(async_get_platforms(hass, domain))
     for hass_dev_id, device_entry in list(device_registry.devices.items()):
         for item in device_entry.identifiers:
             if len(item) > 1:
@@ -294,17 +293,8 @@ def delete_all_unavailable_device_entities(hass: HomeAssistant, device_ids: list
                             include_disabled_entities=True,
                         )
                         for entity_entry in hass_entities:
-                            for entity_platform in entity_platforms:
-                                if (
-                                    entity_entry.entity_id in entity_platform.entities
-                                    and entity_platform.entities[
-                                        entity_entry.entity_id
-                                    ].available
-                                    is False
-                                ):
-                                    LOGGER.warning(
-                                        f"Will remove {entity_platform.entities[entity_entry.entity_id].name} from {device_id}"
-                                    )
+                            if state := hass.states.get(entity_entry.entity_id):
+                                if state.state == STATE_UNAVAILABLE and entity_entry.entity_id not in entity_ids_to_remove:
                                     entity_ids_to_remove.append(entity_entry.entity_id)
 
     for entity_id in entity_ids_to_remove:
