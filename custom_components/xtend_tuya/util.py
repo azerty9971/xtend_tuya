@@ -13,6 +13,9 @@ from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers import device_registry as dr, entity_registry as er
 from homeassistant.helpers.entity import EntityDescription
+from homeassistant.helpers.device_registry import (
+    DeviceEntry,
+)
 from .const import (
     LOGGER,
     DOMAIN,
@@ -279,24 +282,30 @@ def delete_all_unavailable_device_entities(hass: HomeAssistant, device_ids: list
     device_registry = dr.async_get(hass)
     entity_registry = er.async_get(hass)
     entity_ids_to_remove: list[str] = []
-    domains: list[str] = [DOMAIN, DOMAIN_ORIG]
-    for hass_dev_id, device_entry in list(device_registry.devices.items()):
-        for item in device_entry.identifiers:
-            if len(item) > 1:
-                domain = item[0]
-                device_id = item[1]
-                if domain in domains:
-                    if device_id in device_ids:
-                        hass_entities = er.async_entries_for_device(
-                            entity_registry,
-                            device_id=hass_dev_id,
-                            include_disabled_entities=True,
-                        )
-                        for entity_entry in hass_entities:
-                            if state := hass.states.get(entity_entry.entity_id):
-                                LOGGER.warning(f"Checking state of {entity_entry.entity_id}: {state.as_dict()}")
-                                if state.state == STATE_UNAVAILABLE and entity_entry.entity_id not in entity_ids_to_remove:
-                                    entity_ids_to_remove.append(entity_entry.entity_id)
+    hass_devices: list[DeviceEntry] = []
+    for device_id in device_ids:
+        if hass_device := device_registry.async_get_device(
+            identifiers={(DOMAIN, device_id), (DOMAIN_ORIG, device_id)}
+        ):
+            hass_devices.append(hass_device)
+    for hass_device in hass_devices:
+        hass_entities = er.async_entries_for_device(
+            entity_registry,
+            device_id=hass_device.id,
+            include_disabled_entities=True,
+        )
+        LOGGER.warning(f"Entities of {hass_device.name}: {hass_entities}")
+        for entity_entry in hass_entities:
+            if state := hass.states.get(entity_entry.entity_id):
+                LOGGER.warning(
+                    f"Checking state of {entity_entry.entity_id}: {state.as_dict()}"
+                )
+                if (
+                    state.state == STATE_UNAVAILABLE
+                    and entity_entry.entity_id
+                    not in entity_ids_to_remove
+                ):
+                    entity_ids_to_remove.append(entity_entry.entity_id)
 
     for entity_id in entity_ids_to_remove:
         entity_registry.async_remove(entity_id)
