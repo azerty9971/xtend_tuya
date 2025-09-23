@@ -294,6 +294,7 @@ def delete_all_unavailable_device_entities(hass: HomeAssistant, device_ids: list
                         )
                         for entity_entry in hass_entities:
                             if state := hass.states.get(entity_entry.entity_id):
+                                LOGGER.warning(f"Checking state of {entity_entry.entity_id}: {state.as_dict()}")
                                 if state.state == STATE_UNAVAILABLE and entity_entry.entity_id not in entity_ids_to_remove:
                                     entity_ids_to_remove.append(entity_entry.entity_id)
 
