@@ -5,6 +5,7 @@ https://github.com/tuya/tuya-iot-python-sdk
 
 from __future__ import annotations
 import json
+import time
 from tuya_iot import (
     TuyaDeviceManager,
     TuyaOpenMQ,
@@ -71,7 +72,6 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         self.ipc_manager = XTIOTIPCManager(api, multi_manager)
         self.non_user_api = non_user_api
         self.api = api
-        
 
     def forward_message_to_multi_manager(self, msg: dict):
         self.multi_manager.on_message(MESSAGE_SOURCE_TUYA_IOT, msg)
@@ -559,6 +559,50 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         )
         if ir_command.get("success", False) and ir_command.get("result", False):
             return True
+        return False
+
+    def learn_ir_key(
+        self,
+        device: XTDevice,
+        remote: XTIRRemoteInformation,
+        hub: XTIRHubInformation,
+        api: XTIOTOpenAPI | None = None,
+    ) -> bool:
+        total_timeout: int = 20
+        check_interval: int = 1
+        if api is None:
+            api = self.api
+        # Set device in learning mode
+        learning_mode = api.put(
+            f"/v2.0/infrareds/{hub.device_id}/learning-state",
+            {"state": True},
+        )
+        if (
+            learning_mode.get("success", False) is False
+            or learning_mode.get("t") is None
+        ):
+            LOGGER.warning(f"Could not put IR Hub {device.name} in learning mode")
+            return False
+        learning_time = learning_mode["t"]
+        learned_code_value: str | None = None
+        for _ in range(total_timeout):
+            learned_code = api.get(f"/v2.0/infrareds/{hub.device_id}/learning-codes", {"learning-time": learning_time})
+            if result := learned_code.get("result", {}):
+                if result.get("success", False):
+                    learned_code_value = result.get("code")
+                    break
+            time.sleep(check_interval)
+        
+        learning_mode = api.put(
+            f"/v2.0/infrareds/{hub.device_id}/learning-state",
+            {"state": False},
+        )
+
+        if learned_code_value is None:
+            LOGGER.warning(f"No code learned for {device.name} in the timeout period ({total_timeout}s)")
+            return False
+        
+        LOGGER.warning(f"Got code {learned_code_value} for device {device.name}")
         return False
 
     def get_supported_unlock_types(

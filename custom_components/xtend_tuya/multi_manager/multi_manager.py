@@ -546,6 +546,12 @@ class MultiManager:  # noqa: F811
             if account.send_ir_command(device, key, remote, hub):
                 return True
         return False
+    
+    def learn_ir_key(self, device: XTDevice, remote: XTIRRemoteInformation, hub: XTIRHubInformation) -> bool:
+        for account in self.accounts.values():
+            if account.learn_ir_key(device, remote, hub):
+                return True
+        return False
 
     def set_general_property(
         self, property_id: XTMultiManagerProperties, property_value: Any

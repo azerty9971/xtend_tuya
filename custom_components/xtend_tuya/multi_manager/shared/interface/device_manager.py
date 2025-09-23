@@ -195,6 +195,9 @@ class XTDeviceManagerInterface(ABC):
 
     def send_ir_command(self, device: shared.XTDevice, key: XTIRRemoteKeysInformation, remote: XTIRRemoteInformation, hub: XTIRHubInformation) -> bool:
         return False
+    
+    def learn_ir_key(self, device: shared.XTDevice, remote: XTIRRemoteInformation, hub: XTIRHubInformation) -> bool:
+        return False
 
     async def raise_issue(
         self,

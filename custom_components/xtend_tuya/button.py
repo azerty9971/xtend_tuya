@@ -342,11 +342,17 @@ class XTButtonEntity(XTEntity, TuyaButtonEntity):
             and self._entity_description.ir_remote_information is not None
             and self._entity_description.ir_hub_information is not None
         ):
-            LOGGER.warning(f"Add IR key on {self.device.name} was pressed but is not implemented yet, I'm waiting for my RF hub delivery...")
+            self.device_manager.learn_ir_key(
+                self.device,
+                self._entity_description.ir_remote_information,
+                self._entity_description.ir_hub_information,
+            )
         elif (
             self._entity_description.is_ir_key
             and self._entity_description.ir_hub_information is not None
         ):
-            LOGGER.warning(f"Add device on {self.device.name} was pressed but is not implemented yet, I'm waiting for my RF hub delivery...")
+            LOGGER.warning(
+                f"Add device on {self.device.name} was pressed but is not implemented yet, I'm waiting for my RF hub delivery..."
+            )
         else:
             super().press()
