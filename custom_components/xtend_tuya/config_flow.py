@@ -405,6 +405,31 @@ class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
             errors=errors,
             description_placeholders=placeholders,
         )
+    
+    async def async_step_system(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        if user_input is not None:
+            return self.async_create_entry(
+                        title="USER_INPUT",
+                        data=user_input,
+                    )
+        
+        errors = {}
+        placeholders = {}
+        return self.async_show_form(
+            step_id="system",
+            data_schema=vol.Schema(
+                {
+                    vol.Required(
+                        CONF_USER_CODE, default="26"
+                    ): str,
+                }
+            ),
+            errors=errors,
+            description_placeholders=placeholders,
+        )
+        
 
     async def __async_get_qr_code(self, user_code: str) -> tuple[bool, dict[str, Any]]:
         """Get the QR code."""
