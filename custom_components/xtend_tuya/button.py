@@ -6,10 +6,10 @@ from dataclasses import dataclass, field
 from homeassistant.const import EntityCategory, Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect, dispatcher_send
-from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from .util import (
     restrict_descriptor_category,
+    delete_all_unavailable_device_entities,
 )
 from .multi_manager.multi_manager import (
     XTConfigEntry,
@@ -151,10 +151,10 @@ async def async_setup_entry(
                         continue
 
                     #First, clean up the device and subdevices
-                    device_registry = dr.async_get(hass)
-                    device_registry.async_remove_device(hub_information.device_id)
+                    entity_cleanup_device_ids: list[str] = [hub_information.device_id]
                     for remote_information in hub_information.remote_ids:
-                        device_registry.async_remove_device(remote_information.remote_id)
+                        entity_cleanup_device_ids.append(remote_information.remote_id)
+                    delete_all_unavailable_device_entities(hass, entity_cleanup_device_ids)
 
                     descriptor = XTButtonEntityDescription(
                         key="xt_add_device",
