@@ -5,9 +5,6 @@ import copy
 from typing import NamedTuple, Any
 from datetime import datetime
 from base64 import b64decode
-from homeassistant.const import (
-    STATE_UNAVAILABLE,
-)
 from homeassistant.util.dt import DEFAULT_TIME_ZONE
 from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
@@ -278,10 +275,9 @@ def is_device_in_domain_device_maps(
     return False
 
 
-def delete_all_unavailable_device_entities(hass: HomeAssistant, device_ids: list[str]):
+def delete_all_device_entities(hass: HomeAssistant, device_ids: list[str]):
     device_registry = dr.async_get(hass)
     entity_registry = er.async_get(hass)
-    entity_ids_to_remove: list[str] = []
     hass_devices: list[DeviceEntry] = []
     for device_id in device_ids:
         if hass_device := device_registry.async_get_device(
@@ -294,21 +290,8 @@ def delete_all_unavailable_device_entities(hass: HomeAssistant, device_ids: list
             device_id=hass_device.id,
             include_disabled_entities=True,
         )
-        LOGGER.warning(f"Entities of {hass_device.name}: {hass_entities}")
         for entity_entry in hass_entities:
-            if state := hass.states.get(entity_entry.entity_id):
-                LOGGER.warning(
-                    f"Checking state of {entity_entry.entity_id}: {state.as_dict()}"
-                )
-                if (
-                    state.state == STATE_UNAVAILABLE
-                    and entity_entry.entity_id
-                    not in entity_ids_to_remove
-                ):
-                    entity_ids_to_remove.append(entity_entry.entity_id)
-
-    for entity_id in entity_ids_to_remove:
-        entity_registry.async_remove(entity_id)
+            entity_registry.async_remove(entity_entry.entity_id)
 
 
 # Decodes a b64-encoded timestamp

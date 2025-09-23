@@ -9,7 +9,7 @@ from homeassistant.helpers.dispatcher import async_dispatcher_connect, dispatche
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from .util import (
     restrict_descriptor_category,
-    delete_all_unavailable_device_entities,
+    delete_all_device_entities,
 )
 from .multi_manager.multi_manager import (
     XTConfigEntry,
@@ -154,7 +154,7 @@ async def async_setup_entry(
                     entity_cleanup_device_ids: list[str] = [hub_information.device_id]
                     for remote_information in hub_information.remote_ids:
                         entity_cleanup_device_ids.append(remote_information.remote_id)
-                    delete_all_unavailable_device_entities(hass, entity_cleanup_device_ids)
+                    delete_all_device_entities(hass, entity_cleanup_device_ids)
 
                     descriptor = XTButtonEntityDescription(
                         key="xt_add_device",
