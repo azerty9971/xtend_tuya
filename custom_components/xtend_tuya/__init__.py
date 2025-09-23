@@ -49,6 +49,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
     start_time = datetime.now()
     multi_manager = MultiManager(hass, entry)
     service_manager = ServiceManager(multi_manager=multi_manager)
+    if entry.title == "USER_INPUT":
+        return True
     await multi_manager.setup_entry()
 
     # Get all devices from Tuya
