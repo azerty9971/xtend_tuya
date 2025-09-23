@@ -9,6 +9,9 @@ from tuya_iot import (
     TuyaDeviceManager,
     TuyaOpenMQ,
 )
+from tuya_iot.tuya_enums import (
+    AuthType,
+)
 from typing import Any, cast
 from ...const import (
     LOGGER,
@@ -39,6 +42,10 @@ from .ipc.xt_tuya_iot_ipc_manager import XTIOTIPCManager
 from .xt_tuya_iot_openapi import (
     XTIOTOpenAPI,
 )
+from .xt_tuya_iot_device import (
+    XTIndustrySolutionDeviceManage,
+    XTSmartHomeDeviceManage,
+)
 
 
 class XTIOTDeviceManager(TuyaDeviceManager):
@@ -53,6 +60,10 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         mq: TuyaOpenMQ,
     ) -> None:
         super().__init__(api, mq)
+        if api.auth_type == AuthType.SMART_HOME:
+            self.device_manage = XTSmartHomeDeviceManage(api)
+        else:
+            self.device_manage = XTIndustrySolutionDeviceManage(api)
         self.device_map = XTDeviceMap({}, XTDeviceSourcePriority.TUYA_IOT)  # type: ignore
         mq.remove_message_listener(self.on_message)
         mq.add_message_listener(self.forward_message_to_multi_manager)  # type: ignore
@@ -60,6 +71,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         self.ipc_manager = XTIOTIPCManager(api, multi_manager)
         self.non_user_api = non_user_api
         self.api = api
+        
 
     def forward_message_to_multi_manager(self, msg: dict):
         self.multi_manager.on_message(MESSAGE_SOURCE_TUYA_IOT, msg)
