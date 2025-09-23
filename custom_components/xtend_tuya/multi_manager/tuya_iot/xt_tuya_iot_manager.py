@@ -618,7 +618,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                 "remote_name": {remote.remote_name},
                 "codes": [
                     {"key_name": "test2", "key": "test2", "code": learned_code_value}
-                ],
+                ]
             }
         )
         if save_result.get("success", False):
