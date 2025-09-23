@@ -505,7 +505,9 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                 remote_name=remote_name,
                 keys=[],
             )
-            remote_information.keys = self._get_ir_remote_keys(device.id, remote_id, api)
+            remote_information.keys = self._get_ir_remote_keys(
+                device.id, remote_id, api
+            )
             device_information.remote_ids.append(remote_information)
         return device_information
 
@@ -549,11 +551,11 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         payload: dict[str, Any] = {
             "category_id": remote.category_id,
             "key_id": key.key_id,
-            "key": key.key
+            "key": key.key,
         }
         ir_command = api.post(
             f"/v2.0/infrareds/{hub.device_id}/remotes/{remote.remote_id}/raw/command",
-            payload
+            payload,
         )
         if ir_command.get("success", False) and ir_command.get("result", False):
             return True
@@ -586,7 +588,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         for _ in range(total_timeout):
             learned_code = api.get(
                 f"/v2.0/infrareds/{hub.device_id}/learning-codes",
-                {"learning_time": learning_time}
+                {"learning_time": learning_time},
             )
             if result := learned_code.get("result", {}):
                 if result.get("success", False):
@@ -595,8 +597,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
             time.sleep(check_interval)
 
         learning_mode = api.put(
-            f"/v2.0/infrareds/{hub.device_id}/learning-state",
-            {"state": False}
+            f"/v2.0/infrareds/{hub.device_id}/learning-state", {"state": False}
         )
 
         if learned_code_value is None:
@@ -612,12 +613,18 @@ class XTIOTDeviceManager(TuyaDeviceManager):
             f"/v2.0/infrareds/{hub.device_id}/remotes/{remote.remote_id}/learning-codes",
             {
                 "category_id": remote.category_id,
-                "brand_name" : remote.brand_name,
-                "remote_name": remote.remote_name,
+                #"brand_name": remote.brand_name,
+                #"remote_name": remote.remote_name,
                 "codes": [
-                    {"key_name": "test2", "key": "test2", "code": learned_code_value, "id": learning_time//1000}
-                ]
-            }
+                    {
+                        #"category_id": remote.category_id,
+                        #"key_name": "test2",
+                        "key": "test26",
+                        "code": learned_code_value,
+                        "id": learning_time // 1000,
+                    }
+                ],
+            },
         )
         if save_result.get("success", False):
             return True
