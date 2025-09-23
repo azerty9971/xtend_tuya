@@ -613,9 +613,9 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         save_result = api.put(
             f"/v2.0/infrareds/{hub.device_id}/remotes/{remote.remote_id}/learning-codes",
             {
-                "category_id": {remote.category_id},
-                "brand_name": {remote.brand_name},
-                "remote_name": {remote.remote_name},
+                "category_id": remote.category_id,
+                "brand_name" : remote.brand_name,
+                "remote_name": remote.remote_name,
                 "codes": [
                     {"key_name": "test2", "key": "test2", "code": learned_code_value}
                 ]
