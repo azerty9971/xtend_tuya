@@ -26,7 +26,7 @@ from .const import (
     XTIRRemoteInformation,
     XTIRRemoteKeysInformation,
     XTMultiManagerProperties,
-    LOGGER,
+    LOGGER,  # noqa: F401
 )
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaButtonEntity,
@@ -35,6 +35,10 @@ from .ha_tuya_integration.tuya_integration_imports import (
 from .entity import (
     XTEntity,
     XTEntityDescriptorManager,
+)
+
+from .multi_manager.shared.data_entry.data_entry import (
+    ExampleConfigFlow,
 )
 
 
@@ -357,8 +361,7 @@ class XTButtonEntity(XTEntity, TuyaButtonEntity):
             self._entity_description.is_ir_key
             and self._entity_description.ir_hub_information is not None
         ):
-            LOGGER.warning(
-                f"Add device on {self.device.name} was pressed but is not implemented yet, I'm waiting for my RF hub delivery..."
-            )
+            flow = ExampleConfigFlow()
+            self.hass.add_job(flow.async_step_user, None)
         else:
             super().press()
