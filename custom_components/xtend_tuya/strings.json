@@ -1296,16 +1296,13 @@
       "energyconsumedc": {
         "name": "Energy consumed C"
       },
-      "gross_generation_a":
-      {
+      "gross_generation_a": {
         "name": "Gross generation A"
       },
-      "gross_generation_b":
-      {
+      "gross_generation_b": {
         "name": "Gross generation B"
       },
-      "gross_generation_c":
-      {
+      "gross_generation_c": {
         "name": "Gross generation C"
       },
       "temp_alarm": {
@@ -1631,12 +1628,10 @@
           "closed": "Closed"
         }
       },
-      "temp_show":
-      {
+      "temp_show": {
         "name": "Current temperature"
       },
-      "mzj_work_status":
-      {
+      "mzj_work_status": {
         "name": "Work status",
         "state": {
           "stop": "Stopped",
@@ -1647,12 +1642,10 @@
           "2": "Complete"
         }
       },
-      "gross_generation":
-      {
+      "gross_generation": {
         "name": "Gross generation"
       },
-      "liquid_state":
-      {
+      "liquid_state": {
         "name": "Liquid state",
         "state": {
           "normal": "Normal",
@@ -1663,20 +1656,16 @@
           "2": "Upper alarm"
         }
       },
-      "liquid_depth":
-      {
+      "liquid_depth": {
         "name": "Liquid depth"
       },
-      "liquid_level_percent":
-      {
+      "liquid_level_percent": {
         "name": "Liquid level"
       },
-      "heart_rate":
-      {
+      "heart_rate": {
         "name": "Heart rate"
       },
-      "respiratory_rate":
-      {
+      "respiratory_rate": {
         "name": "Respiratory rate"
       },
       "sleep_stage": {
@@ -1688,20 +1677,16 @@
           "1": "Awake"
         }
       },
-      "time_get_in_bed":
-      {
+      "time_get_in_bed": {
         "name": "Time get in bed"
       },
-      "off_bed_time":
-      {
+      "off_bed_time": {
         "name": "Time get out of bed"
       },
-      "clct_time":
-      {
+      "clct_time": {
         "name": "Collected time"
       },
-      "wnykq_ir_control":
-      {
+      "wnykq_ir_control": {
         "name": "IR control",
         "state": {
           "0": "Study",
@@ -1729,16 +1714,16 @@
       "msp_history": {
         "name": "History",
         "state": {
-          "0":  "None",
-          "1":  "Automatic shoveling completed",
-          "2":  "Manual shoveling completed",
-          "3":  "Trash bin extraction",
-          "4":  "Trash bin reinstallation",
-          "5":  "Start automatic deodorization",
-          "6":  "Start manual deodorization",
-          "7":  "Temperature in the cabin is too high",
-          "8":  "The temperature inside the cabin is suitable",
-          "9":  "Sand dumping completed",
+          "0": "None",
+          "1": "Automatic shoveling completed",
+          "2": "Manual shoveling completed",
+          "3": "Trash bin extraction",
+          "4": "Trash bin reinstallation",
+          "5": "Start automatic deodorization",
+          "6": "Start manual deodorization",
+          "7": "Temperature in the cabin is too high",
+          "8": "The temperature inside the cabin is suitable",
+          "9": "Sand dumping completed",
           "10": "Sand dumping canceled",
           "11": "Litter shoveling canceled",
           "12": "Enter Do Not Disturb mode",
@@ -1791,16 +1776,61 @@
         "name": "Daily consumption"
       },
       "add_ele2": {
-        "name": "Consumption (method B)"
+        "name": "Consumption 2"
       },
       "add_ele2_this_month": {
-        "name": "Monthly consumption (method B)"
+        "name": "Monthly consumption 2"
       },
       "add_ele2_this_year": {
-        "name": "Yearly consumption (method B)"
+        "name": "Yearly consumption 2"
       },
       "add_ele2_today": {
-        "name": "Daily consumption (method B)"
+        "name": "Daily consumption 2"
+      },
+      "cur_power1": {
+        "name": "Power 1"
+      },
+      "cur_power2": {
+        "name": "Power 2"
+      },
+      "cur_current1": {
+        "name": "Current 1"
+      },
+      "cur_current2": {
+        "name": "Current 2"
+      },
+      "cur_voltage1": {
+        "name": "Voltage 1"
+      },
+      "cur_voltage2": {
+        "name": "Voltage 2"
+      },
+      "total_energy1": {
+        "name": "Energy Total 1"
+      },
+      "total_energy2": {
+        "name": "Energy Total 2"
+      },
+      "all_energy": {
+        "name": "Total Energy"
+      },
+      "add_ele1": {
+        "name": "Consumption 1"
+      },
+      "add_ele1_this_month": {
+        "name": "Monthly Consumption 1"
+      },
+      "add_ele1_this_year": {
+        "name": "Yearly Consumption 1"
+      },
+      "add_ele1_today": {
+        "name": "Daily Consumption 1"
+      },
+      "today_acc_energy1": {
+        "name": "Today's Energy 1"
+      },
+      "today_acc_energy2": {
+        "name": "Today's Energy 2"
       },
       "excretion_times_day": {
         "name": "Number of excretion"

@@ -586,6 +586,10 @@ class XTDPCode(StrEnum):
     ADD_ELE_THIS_MONTH = "add_ele_this_month"
     ADD_ELE_THIS_YEAR = "add_ele_this_year"
     ADD_ELE_TODAY = "add_ele_today"
+    ADD_ELE1 = "add_ele1"
+    ADD_ELE1_THIS_MONTH = "add_ele1_this_month"    
+    ADD_ELE1_THIS_YEAR = "add_ele1_this_year"    
+    ADD_ELE1_TODAY = "add_ele1_today" 
     ADD_ELE2 = "add_ele2"  # Added watt since last heartbeat
     ADD_ELE2_THIS_MONTH = "add_ele2_this_month"
     ADD_ELE2_THIS_YEAR = "add_ele2_this_year"
@@ -911,6 +915,16 @@ class XTDPCode(StrEnum):
     WORK_STATUS = "WorkStatus"
     XT_COVER_INVERT_CONTROL = "xt_cover_invert_control"
     XT_COVER_INVERT_STATUS = "xt_cover_invert_status"
+    # cz     
+    CUR_POWER_1 = "cur_power1"
+    CUR_POWER_2 = "cur_power2"
+    CUR_CURRENT_1 = "cur_current1"
+    CUR_CURRENT_2 = "cur_current2"
+    CUR_VOLTAGE_1 = "cur_voltage1"
+    CUR_VOLTAGE_2 = "cur_voltage2"
+    TOTAL_ENERGY_1 = "total_energy1"
+    TOTAL_ENERGY_2 = "total_energy2"
+    ALL_ENERGY = "all_energy"  
     #END OF DPCODES FROM XT
 
 @dataclass
