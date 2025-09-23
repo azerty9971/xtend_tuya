@@ -558,7 +558,7 @@ class MultiManager:  # noqa: F811
         for priority in XTMultiManagerPostSetupCallbackPriority:
             if priority not in self.post_setup_callbacks:
                 continue
-            for callback, args in self.post_setup_callbacks[priority]:
+            for callback, *args in self.post_setup_callbacks[priority]:
                 if args is None:
                     args = tuple()
                 if asyncio.iscoroutinefunction(callback):
