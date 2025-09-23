@@ -234,7 +234,7 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         super(XTEntity, self).__init__(device, device_manager, description)  # type: ignore
         self.device = device
         self.local_hass = hass
-        device_manager.add_post_setup_callback(XTMultiManagerPostSetupCallbackPriority.PRIORITY1, self.add_cover_open_close_option, None)
+        device_manager.add_post_setup_callback(XTMultiManagerPostSetupCallbackPriority.PRIORITY1, self.add_cover_open_close_option)
 
     @property
     def is_cover_control_inverted(self) -> bool | None:

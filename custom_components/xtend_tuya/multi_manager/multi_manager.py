@@ -566,8 +566,8 @@ class MultiManager:  # noqa: F811
                 else:
                     callback(*args)
 
-    def add_post_setup_callback(self, priority: XTMultiManagerPostSetupCallbackPriority, callback: Callable, args: tuple | None = None):
+    def add_post_setup_callback(self, priority: XTMultiManagerPostSetupCallbackPriority, callback: Callable, *args):
         if self.loading_finalized is False:
-            self.post_setup_callbacks[priority].append((callback, args))
+            self.post_setup_callbacks[priority].append((callback, *args))
         else:
-            self.hass.add_job(callback, args)
+            self.hass.add_job(callback, *args)
