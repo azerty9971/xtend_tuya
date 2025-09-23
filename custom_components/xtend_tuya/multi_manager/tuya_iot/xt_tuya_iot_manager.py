@@ -505,10 +505,8 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                 remote_name=remote_name,
                 keys=[],
             )
-            remote_keys = self._get_ir_remote_keys(device.id, remote_id, api)
-            if len(remote_keys) > 0:
-                remote_information.keys = remote_keys
-                device_information.remote_ids.append(remote_information)
+            remote_information.keys = self._get_ir_remote_keys(device.id, remote_id, api)
+            device_information.remote_ids.append(remote_information)
         return device_information
 
     def _get_ir_remote_keys(
