@@ -168,7 +168,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         virtual_state=VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME
         | VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD,
         vs_copy_to_state=[
-            XTDPCode.ADD_ELE2,
+            XTDPCode.ADD_ELE,
             XTDPCode.ADD_ELE_TODAY,
             XTDPCode.ADD_ELE_THIS_MONTH,
             XTDPCode.ADD_ELE_THIS_YEAR,
@@ -180,22 +180,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         entity_registry_enabled_default=True,
         restoredata=True,
     ),
-    XTSensorEntityDescription(
-        key=XTDPCode.ADD_ELE2,
-        virtual_state=VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME,
-        vs_copy_delta_to_state=[
-            XTDPCode.ADD_ELE2_TODAY,
-            XTDPCode.ADD_ELE2_THIS_MONTH,
-            XTDPCode.ADD_ELE2_THIS_YEAR,
-        ],
-        translation_key="add_ele2",
-        device_class=SensorDeviceClass.ENERGY,
-        state_class=SensorStateClass.TOTAL_INCREASING,
-        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
-        entity_registry_enabled_default=False,
-        restoredata=True,
-    ),
-    XTSensorEntityDescription(
+     XTSensorEntityDescription(
         key=XTDPCode.ADD_ELE_TODAY,
         virtual_state=VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD,
         translation_key="add_ele_today",
@@ -227,7 +212,71 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         entity_registry_enabled_default=True,
         restoredata=True,
         reset_yearly=True,
+    ),    
+    XTSensorEntityDescription(
+        key=XTDPCode.ADD_ELE1,
+        virtual_state=VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME,
+        vs_copy_delta_to_state=[
+            XTDPCode.ADD_ELE1_TODAY,
+            XTDPCode.ADD_ELE1_THIS_MONTH,
+            XTDPCode.ADD_ELE1_THIS_YEAR,
+        ],
+        translation_key="add_ele1",
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        entity_registry_enabled_default=False,
+        restoredata=True,
+    ),   
+    XTSensorEntityDescription(
+        key=XTDPCode.ADD_ELE1_TODAY,
+        virtual_state=VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD,
+        translation_key="add_ele1_today",
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        entity_registry_enabled_default=False,
+        restoredata=True,
+        reset_daily=True,
     ),
+    XTSensorEntityDescription(
+        key=XTDPCode.ADD_ELE1_THIS_MONTH,
+        virtual_state=VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD,
+        translation_key="add_ele1_this_month",
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        entity_registry_enabled_default=False,
+        restoredata=True,
+        reset_monthly=True,
+    ),
+    XTSensorEntityDescription(
+        key=XTDPCode.ADD_ELE1_THIS_YEAR,
+        virtual_state=VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD,
+        translation_key="add_ele1_this_year",
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        entity_registry_enabled_default=False,
+        restoredata=True,
+        reset_yearly=True,
+    ),
+    XTSensorEntityDescription(
+        key=XTDPCode.ADD_ELE2,
+        virtual_state=VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME,
+        vs_copy_delta_to_state=[
+            XTDPCode.ADD_ELE2_TODAY,
+            XTDPCode.ADD_ELE2_THIS_MONTH,
+            XTDPCode.ADD_ELE2_THIS_YEAR,
+        ],
+        translation_key="add_ele2",
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        entity_registry_enabled_default=False,
+        restoredata=True,
+    ),
+   
     XTSensorEntityDescription(
         key=XTDPCode.ADD_ELE2_TODAY,
         virtual_state=VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD,
@@ -379,7 +428,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         virtual_state=VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME
         | VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD,
         vs_copy_to_state=[
-            XTDPCode.ADD_ELE2,
+            XTDPCode.ADD_ELE,
             XTDPCode.ADD_ELE_TODAY,
             XTDPCode.ADD_ELE_THIS_MONTH,
             XTDPCode.ADD_ELE_THIS_YEAR,
@@ -448,6 +497,30 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         state_class=SensorStateClass.TOTAL_INCREASING,
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         restoredata=True,
+    ),
+    # cz      
+    XTSensorEntityDescription(
+        key=XTDPCode.TOTAL_ENERGY_1,
+        translation_key="total_energy1",
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_registry_enabled_default=True
+    ),
+    XTSensorEntityDescription(
+        key=XTDPCode.TOTAL_ENERGY_2,
+        translation_key="total_energy2",
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_registry_enabled_default=True
+    ),
+    XTSensorEntityDescription(
+        key=XTDPCode.ALL_ENERGY,
+        virtual_state=VirtualStates.STATE_COPY_TO_MULTIPLE_STATE_NAME,
+        vs_copy_delta_to_state=[XTDPCode.ADD_ELE_TODAY,XTDPCode.ADD_ELE_THIS_MONTH,XTDPCode.ADD_ELE_THIS_YEAR],
+        translation_key="all_energy",
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_registry_enabled_default=True
     ),
 )
 

@@ -478,204 +478,264 @@
                 }
             }
         },
-        "sensor": {
-            "air_quality": {
-                "name": "Calidad del aire",
-                "state": {
-                    "good": "Bueno",
-                    "great": "Excelente",
-                    "mild": "Moderado",
-                    "severe": "Severo"
-                }
-            },
-            "air_quality_index": {
-                "name": "\u00cdndice de calidad del aire",
-                "state": {
-                    "level_1": "Nivel 1",
-                    "level_2": "Nivel 2",
-                    "level_3": "Nivel 3",
-                    "level_4": "Nivel 4",
-                    "level_5": "Nivel 5",
-                    "level_6": "Nivel 6"
-                }
-            },
-            "battery": {
-                "name": "Bater\u00eda"
-            },
-            "battery_state": {
-                "name": "Estado de la bater\u00eda"
-            },
-            "carbon_dioxide": {
-                "name": "Di\u00f3xido de carbono"
-            },
-            "carbon_monoxide": {
-                "name": "Mon\u00f3xido de carbono"
-            },
-            "cleaning_area": {
-                "name": "\u00c1rea de limpieza"
-            },
-            "cleaning_time": {
-                "name": "Tiempo de limpieza"
-            },
-            "concentration_carbon_dioxide": {
-                "name": "Concentraci\u00f3n de di\u00f3xido de carbono"
-            },
-            "current": {
-                "name": "Intensidad de corriente"
-            },
-            "current_temperature": {
-                "name": "Temperatura actual"
-            },
-            "duster_cloth_life": {
-                "name": "Vida \u00fatil de la gamuza"
-            },
-            "filter_duration": {
-                "name": "Duraci\u00f3n del filtro"
-            },
-            "filter_life": {
-                "name": "Vida \u00fatil del filtro"
-            },
-            "filter_utilization": {
-                "name": "Utilizaci\u00f3n del filtro"
-            },
-            "formaldehyde": {
-                "name": "Formaldeh\u00eddo"
-            },
-            "gas": {
-                "name": "Gas"
-            },
-            "humidity": {
-                "name": "Humedad"
-            },
-            "illuminance": {
-                "name": "Iluminancia"
-            },
-            "last_amount": {
-                "name": "\u00daltima cantidad"
-            },
-            "last_operation_duration": {
-                "name": "Duraci\u00f3n de la \u00faltima operaci\u00f3n"
-            },
-            "luminosity": {
-                "name": "Luminosidad"
-            },
-            "methane": {
-                "name": "Metano"
-            },
-            "phase_a_current": {
-                "name": "Corriente de la fase A"
-            },
-            "phase_a_power": {
-                "name": "Potencia de la fase A"
-            },
-            "phase_a_voltage": {
-                "name": "Tensi\u00f3n de la fase A"
-            },
-            "phase_b_current": {
-                "name": "Corriente de la fase B"
-            },
-            "phase_b_power": {
-                "name": "Potencia de la fase B"
-            },
-            "phase_b_voltage": {
-                "name": "Tensi\u00f3n de la fase B"
-            },
-            "phase_c_current": {
-                "name": "Corriente de la fase C"
-            },
-            "phase_c_power": {
-                "name": "Potencia de la fase C"
-            },
-            "phase_c_voltage": {
-                "name": "Tensi\u00f3n de la fase C"
-            },
-            "pm1": {
-                "name": "PM1"
-            },
-            "pm10": {
-                "name": "PM10"
-            },
-            "pm25": {
-                "name": "PM2.5"
-            },
-            "power": {
-                "name": "Potencia"
-            },
-            "pump_time": {
-                "name": "Duraci\u00f3n de la bomba de agua"
-            },
-            "remaining_time": {
-                "name": "Tiempo restante"
-            },
-            "rolling_brush_life": {
-                "name": "Vida \u00fatil del cepillo giratorio"
-            },
-            "side_brush_life": {
-                "name": "Vida \u00fatil del cepillo lateral"
-            },
-            "smoke_amount": {
-                "name": "Cantidad de humo"
-            },
-            "sous_vide_status": {
-                "name": "Estado",
-                "state": {
-                    "boiling_temp": "Temperatura de ebullici\u00f3n",
-                    "cooling": "Enfriando",
-                    "heating": "Calentando",
-                    "heating_temp": "Temperatura de calentamiento",
-                    "reserve_1": "Reserva 1",
-                    "reserve_2": "Reserva 2",
-                    "reserve_3": "Reserva 3",
-                    "standby": "En espera",
-                    "warm": "Conservaci\u00f3n del calor"
-                }
-            },
-            "status": {
-                "name": "Estado"
-            },
-            "temperature": {
-                "name": "Temperatura"
-            },
-            "temperature_external": {
-                "name": "Temperatura de la sonda"
-            },
-            "total_absorption_particles": {
-                "name": "Total de absorci\u00f3n de part\u00edculas"
-            },
-            "total_cleaning_area": {
-                "name": "\u00c1rea total de limpieza"
-            },
-            "total_cleaning_time": {
-                "name": "Tiempo total de limpieza"
-            },
-            "total_cleaning_times": {
-                "name": "Veces totales de limpieza"
-            },
-            "total_energy": {
-                "name": "Energ\u00eda total"
-            },
-            "total_operating_time": {
-                "name": "Tiempo total de funcionamiento"
-            },
-            "total_production": {
-                "name": "Producci\u00f3n total"
-            },
-            "total_volatile_organic_compound": {
-                "name": "Compuesto org\u00e1nico vol\u00e1til total"
-            },
-            "total_watering_time": {
-                "name": "Tiempo total de riego"
-            },
-            "voc": {
-                "name": "Compuestos org\u00e1nicos vol\u00e1tiles"
-            },
-            "voltage": {
-                "name": "Voltaje"
-            },
-            "water_level": {
-                "name": "Nivel del agua"
-            }
+      "sensor": {
+        "air_quality": {
+          "name": "Calidad del aire",
+          "state": {
+            "good": "Bueno",
+            "great": "Excelente",
+            "mild": "Moderado",
+            "severe": "Severo"
+          }
         },
+        "air_quality_index": {
+          "name": "\u00cdndice de calidad del aire",
+          "state": {
+            "level_1": "Nivel 1",
+            "level_2": "Nivel 2",
+            "level_3": "Nivel 3",
+            "level_4": "Nivel 4",
+            "level_5": "Nivel 5",
+            "level_6": "Nivel 6"
+          }
+        },
+        "battery": {
+          "name": "Bater\u00eda"
+        },
+        "battery_state": {
+          "name": "Estado de la bater\u00eda"
+        },
+        "carbon_dioxide": {
+          "name": "Di\u00f3xido de carbono"
+        },
+        "carbon_monoxide": {
+          "name": "Mon\u00f3xido de carbono"
+        },
+        "cleaning_area": {
+          "name": "\u00c1rea de limpieza"
+        },
+        "cleaning_time": {
+          "name": "Tiempo de limpieza"
+        },
+        "concentration_carbon_dioxide": {
+          "name": "Concentraci\u00f3n de di\u00f3xido de carbono"
+        },
+        "current": {
+          "name": "Intensidad de corriente"
+        },
+        "current_temperature": {
+          "name": "Temperatura actual"
+        },
+        "duster_cloth_life": {
+          "name": "Vida \u00fatil de la gamuza"
+        },
+        "filter_duration": {
+          "name": "Duraci\u00f3n del filtro"
+        },
+        "filter_life": {
+          "name": "Vida \u00fatil del filtro"
+        },
+        "filter_utilization": {
+          "name": "Utilizaci\u00f3n del filtro"
+        },
+        "formaldehyde": {
+          "name": "Formaldeh\u00eddo"
+        },
+        "gas": {
+          "name": "Gas"
+        },
+        "humidity": {
+          "name": "Humedad"
+        },
+        "illuminance": {
+          "name": "Iluminancia"
+        },
+        "last_amount": {
+          "name": "\u00daltima cantidad"
+        },
+        "last_operation_duration": {
+          "name": "Duraci\u00f3n de la \u00faltima operaci\u00f3n"
+        },
+        "luminosity": {
+          "name": "Luminosidad"
+        },
+        "methane": {
+          "name": "Metano"
+        },
+        "phase_a_current": {
+          "name": "Corriente de la fase A"
+        },
+        "phase_a_power": {
+          "name": "Potencia de la fase A"
+        },
+        "phase_a_voltage": {
+          "name": "Tensi\u00f3n de la fase A"
+        },
+        "phase_b_current": {
+          "name": "Corriente de la fase B"
+        },
+        "phase_b_power": {
+          "name": "Potencia de la fase B"
+        },
+        "phase_b_voltage": {
+          "name": "Tensi\u00f3n de la fase B"
+        },
+        "phase_c_current": {
+          "name": "Corriente de la fase C"
+        },
+        "phase_c_power": {
+          "name": "Potencia de la fase C"
+        },
+        "phase_c_voltage": {
+          "name": "Tensi\u00f3n de la fase C"
+        },
+        "pm1": {
+          "name": "PM1"
+        },
+        "pm10": {
+          "name": "PM10"
+        },
+        "pm25": {
+          "name": "PM2.5"
+        },
+        "power": {
+          "name": "Potencia"
+        },
+        "pump_time": {
+          "name": "Duraci\u00f3n de la bomba de agua"
+        },
+        "remaining_time": {
+          "name": "Tiempo restante"
+        },
+        "rolling_brush_life": {
+          "name": "Vida \u00fatil del cepillo giratorio"
+        },
+        "side_brush_life": {
+          "name": "Vida \u00fatil del cepillo lateral"
+        },
+        "smoke_amount": {
+          "name": "Cantidad de humo"
+        },
+        "sous_vide_status": {
+          "name": "Estado",
+          "state": {
+            "boiling_temp": "Temperatura de ebullici\u00f3n",
+            "cooling": "Enfriando",
+            "heating": "Calentando",
+            "heating_temp": "Temperatura de calentamiento",
+            "reserve_1": "Reserva 1",
+            "reserve_2": "Reserva 2",
+            "reserve_3": "Reserva 3",
+            "standby": "En espera",
+            "warm": "Conservaci\u00f3n del calor"
+          }
+        },
+        "status": {
+          "name": "Estado"
+        },
+        "temperature": {
+          "name": "Temperatura"
+        },
+        "temperature_external": {
+          "name": "Temperatura de la sonda"
+        },
+        "total_absorption_particles": {
+          "name": "Total de absorci\u00f3n de part\u00edculas"
+        },
+        "total_cleaning_area": {
+          "name": "\u00c1rea total de limpieza"
+        },
+        "total_cleaning_time": {
+          "name": "Tiempo total de limpieza"
+        },
+        "total_cleaning_times": {
+          "name": "Veces totales de limpieza"
+        },
+        "total_energy": {
+          "name": "Energ\u00eda total"
+        },
+        "total_operating_time": {
+          "name": "Tiempo total de funcionamiento"
+        },
+        "total_production": {
+          "name": "Producci\u00f3n total"
+        },
+        "total_volatile_organic_compound": {
+          "name": "Compuesto org\u00e1nico vol\u00e1til total"
+        },
+        "total_watering_time": {
+          "name": "Tiempo total de riego"
+        },
+        "voc": {
+          "name": "Compuestos org\u00e1nicos vol\u00e1tiles"
+        },
+        "voltage": {
+          "name": "Voltaje"
+        },
+        "water_level": {
+          "name": "Nivel del agua"
+        },
+        "add_ele1": {
+          "name": "Consumo 1"
+        },
+        "add_ele_today": {
+          "name": "Consumo Diario "
+        },
+        "add_ele_this_month": {
+          "name": "Consumo Mensual"
+        },
+        "add_ele_this_year": {
+          "name": "Consumo Anual"
+        },
+        "add_ele1_this_month": {
+          "name": "Consumo Mensual 1"
+        },
+        "add_ele1_this_year": {
+          "name": "Consumo Anual 1"
+        },
+        "add_ele1_today": {
+          "name": "Consumo Diario 1"
+        },
+        "add_ele2": {
+          "name": "Consumo 2"
+        },
+        "add_ele2_this_month": {
+          "name": "Consumo Nensual 2"
+        },
+        "add_ele2_this_year": {
+          "name": "Consumo Anual 2"
+        },
+        "add_ele2_today": {
+          "name": "Consumo Diario 2"
+        },
+        "cur_power1": {
+          "name": "Potencia 1"
+        },
+        "cur_power2": {
+          "name": "Potencia 2"
+        },
+        "cur_current1": {
+          "name": "Corriente 1"
+        },
+        "cur_current2": {
+          "name": "Corriente 2"
+        },
+        "cur_voltage1": {
+          "name": "Voltage 1"
+        },
+        "cur_voltage2": {
+          "name": "Voltage 2"
+        },
+        "total_energy1": {
+          "name": "Energ\u00eda Total 1"
+        },
+        "total_energy2": {
+          "name": "Energ\u00eda Total 2"
+        },
+        "all_energy": {
+          "name": "Energ\u00eda Total"
+        }
+      },
         "switch": {
             "alarm_1": {
                 "name": "Alarma 1"
