@@ -47,9 +47,9 @@ async def update_listener(hass: HomeAssistant, entry: XTConfigEntry):
 async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
     """Async setup hass config entry."""
     start_time = datetime.now()
-    multi_manager = MultiManager(hass)
+    multi_manager = MultiManager(hass, entry)
     service_manager = ServiceManager(multi_manager=multi_manager)
-    await multi_manager.setup_entry(hass, entry)
+    await multi_manager.setup_entry()
 
     # Get all devices from Tuya
     await hass.async_add_executor_job(multi_manager.update_device_cache)
@@ -90,7 +90,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
             model=f"{device.product_name} (unsupported)",
         )
 
-    await multi_manager.setup_entity_parsers(hass)
+    await multi_manager.setup_entity_parsers()
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 

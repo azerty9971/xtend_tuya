@@ -66,7 +66,8 @@ from ..entity_parser.entity_parser import (
 
 
 class MultiManager:  # noqa: F811
-    def __init__(self, hass: HomeAssistant) -> None:
+    def __init__(self, hass: HomeAssistant, config_entry: XTConfigEntry) -> None:
+        self.config_entry = config_entry
         self.virtual_state_handler = XTVirtualStateHandler(self)
         self.virtual_function_handler = XTVirtualFunctionHandler(self)
         self.multi_mqtt_queue: MultiMQTTQueue = MultiMQTTQueue(self)
@@ -109,7 +110,7 @@ class MultiManager:  # noqa: F811
         return None
 
     async def setup_entry(
-        self, hass: HomeAssistant, config_entry: XTConfigEntry
+        self
     ) -> None:
         # Load all the plugins
         # subdirs = await self.hass.async_add_executor_job(os.listdir, os.path.dirname(__file__))
@@ -125,7 +126,7 @@ class MultiManager:  # noqa: F811
                     )
                     LOGGER.debug(f"Plugin {load_path} loaded")
                     instance: XTDeviceManagerInterface = plugin.get_plugin_instance()
-                    if await instance.setup_from_entry(hass, config_entry, self):
+                    if await instance.setup_from_entry(self.hass, self.config_entry, self):
                         self.accounts[instance.get_type_name()] = instance
                 except ModuleNotFoundError as e:
                     LOGGER.error(f"Loading module failed: {e}")
@@ -133,8 +134,8 @@ class MultiManager:  # noqa: F811
         for account in self.accounts.values():
             await self.hass.async_add_executor_job(account.on_post_setup)
 
-    async def setup_entity_parsers(self, hass: HomeAssistant) -> None:
-        await XTCustomEntityParser.setup_entity_parsers(hass, self)
+    async def setup_entity_parsers(self) -> None:
+        await XTCustomEntityParser.setup_entity_parsers(self.hass, self)
 
     def get_domain_identifiers_of_device(self, device_id: str) -> list:
         return_list: list = []
