@@ -10,6 +10,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers import device_registry as dr, entity_registry as er
 from homeassistant.helpers.entity import EntityDescription
+from homeassistant.helpers.entity_platform import async_get_platforms, EntityPlatform
 from .const import (
     LOGGER,
     DOMAIN,
@@ -275,19 +276,39 @@ def is_device_in_domain_device_maps(
 def delete_all_unavailable_device_entities(hass: HomeAssistant, device_ids: list[str]):
     device_registry = dr.async_get(hass)
     entity_registry = er.async_get(hass)
+    entity_platforms: list[EntityPlatform] = []
+    entity_ids_to_remove: list[str] = []
+    domains: list[str] = [DOMAIN, DOMAIN_ORIG]
+    for domain in domains:
+        entity_platforms.extend(async_get_platforms(hass, domain))
     for hass_dev_id, device_entry in list(device_registry.devices.items()):
         for item in device_entry.identifiers:
             if len(item) > 1:
                 domain = item[0]
                 device_id = item[1]
-                if domain in [DOMAIN, DOMAIN_ORIG]:
+                if domain in domains:
                     if device_id in device_ids:
                         hass_entities = er.async_entries_for_device(
                             entity_registry,
                             device_id=hass_dev_id,
                             include_disabled_entities=True,
                         )
-                        LOGGER.warning(f"All entities found: {hass_entities}")
+                        for entity_entry in hass_entities:
+                            for entity_platform in entity_platforms:
+                                if (
+                                    entity_entry.entity_id in entity_platform.entities
+                                    and entity_platform.entities[
+                                        entity_entry.entity_id
+                                    ].available
+                                    is False
+                                ):
+                                    LOGGER.warning(
+                                        f"Will remove {entity_platform.entities[entity_entry.entity_id].name} from {device_id}"
+                                    )
+                                    entity_ids_to_remove.append(entity_entry.entity_id)
+
+    for entity_id in entity_ids_to_remove:
+        entity_registry.async_remove(entity_id)
 
 
 # Decodes a b64-encoded timestamp
