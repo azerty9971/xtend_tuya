@@ -586,7 +586,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         learning_time = learning_mode["t"]
         learned_code_value: str | None = None
         for _ in range(total_timeout):
-            learned_code = api.get(f"/v2.0/infrareds/{hub.device_id}/learning-codes", {"learning-time": learning_time})
+            learned_code = api.get(f"/v2.0/infrareds/{hub.device_id}/learning-codes", {"learning_time": learning_time})
             if result := learned_code.get("result", {}):
                 if result.get("success", False):
                     learned_code_value = result.get("code")
