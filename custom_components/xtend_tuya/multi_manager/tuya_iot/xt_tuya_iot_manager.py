@@ -619,7 +619,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                     {
                         #"category_id": remote.category_id,
                         #"key_name": "test2",
-                        "key": "test26",
+                        "key": "test27",
                         "code": learned_code_value,
                         "id": learning_time // 1000,
                     }
