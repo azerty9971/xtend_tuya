@@ -87,10 +87,11 @@ class MultiManager:  # noqa: F811
         self.entity_parsers: dict[str, XTCustomEntityParser] = {}
         self.post_setup_callbacks: dict[
             XTMultiManagerPostSetupCallbackPriority,
-            list[tuple[Callable, tuple | None, dict | None]],
+            list[tuple[Callable, tuple | None]],
         ] = {}
         for priority in XTMultiManagerPostSetupCallbackPriority:
             self.post_setup_callbacks[priority] = []
+        self.loading_finalized: bool = False
 
     @property
     def device_map(self):
@@ -522,18 +523,8 @@ class MultiManager:  # noqa: F811
     ):
         for account in self.accounts.values():
             await account.on_loading_finalized(hass, config_entry, self)
-        for priority in XTMultiManagerPostSetupCallbackPriority:
-            if priority not in self.post_setup_callbacks:
-                continue
-            for callback, args, kwargs in self.post_setup_callbacks[priority]:
-                if args is None:
-                    args = tuple()
-                if kwargs is None:
-                    kwargs = {}
-                if asyncio.iscoroutinefunction(callback):
-                    await callback(*args, **kwargs)
-                else:
-                    callback(*args, **kwargs)
+        await self.process_post_setup_callback()
+        self.loading_finalized = True
 
     def get_ir_hub_information(self, device: XTDevice) -> XTIRHubInformation | None:
         for account in self.accounts.values():
@@ -562,3 +553,21 @@ class MultiManager:  # noqa: F811
         self, property_id: XTMultiManagerProperties, default: Any | None = None
     ) -> Any | None:
         return self.general_properties.get(property_id, default)
+
+    async def process_post_setup_callback(self):
+        for priority in XTMultiManagerPostSetupCallbackPriority:
+            if priority not in self.post_setup_callbacks:
+                continue
+            for callback, args in self.post_setup_callbacks[priority]:
+                if args is None:
+                    args = tuple()
+                if asyncio.iscoroutinefunction(callback):
+                    await callback(*args)
+                else:
+                    callback(*args)
+
+    def add_post_setup_callback(self, priority: XTMultiManagerPostSetupCallbackPriority, callback: Callable, args: tuple | None = None):
+        if self.loading_finalized is False:
+            self.post_setup_callbacks[priority].append((callback, args))
+        else:
+            self.hass.add_job(callback, args)

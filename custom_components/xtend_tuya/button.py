@@ -277,9 +277,7 @@ async def async_setup_entry(
 
         async_add_entities(entities)
         if restrict_dpcode is None:
-            hass_data.manager.post_setup_callbacks[
-                XTMultiManagerPostSetupCallbackPriority.PRIORITY_LAST
-            ].append((async_add_IR_entities, (device_map,), None))
+            hass_data.manager.add_post_setup_callback(XTMultiManagerPostSetupCallbackPriority.PRIORITY_LAST, async_add_IR_entities, (device_map,))
 
     hass_data.manager.register_device_descriptors(this_platform, supported_descriptors)
     async_discover_device([*hass_data.manager.device_map])
@@ -348,7 +346,7 @@ class XTButtonEntity(XTEntity, TuyaButtonEntity):
                 self._entity_description.ir_hub_information,
             ):
                 if self.hass:
-                    dispatcher_send(self.hass, TUYA_DISCOVERY_NEW, [self.device.id])
+                    dispatcher_send(self.hass, TUYA_DISCOVERY_NEW, [self.device.id, self._entity_description.ir_hub_information.device_id])
                 pass
         elif (
             self._entity_description.is_ir_key
