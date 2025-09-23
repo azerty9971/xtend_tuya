@@ -15,5 +15,5 @@ def show_test_user_input(hass: HomeAssistant):
 @callback
 def _show_test_user_input(hass: HomeAssistant):
     discovery_flow.async_create_flow(
-        hass, DOMAIN, context={"source": SOURCE_SYSTEM}, data={}
+        hass, DOMAIN, context={"source": SOURCE_SYSTEM}, data=None
     )

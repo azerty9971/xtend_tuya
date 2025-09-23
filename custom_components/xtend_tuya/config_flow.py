@@ -410,10 +410,7 @@ class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
         if user_input is not None:
-            return self.async_create_entry(
-                        title="USER_INPUT",
-                        data=user_input,
-                    )
+            return self.async_abort(reason="ABORTED")
         
         errors = {}
         placeholders = {}
