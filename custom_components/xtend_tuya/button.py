@@ -361,6 +361,6 @@ class XTButtonEntity(XTEntity, TuyaButtonEntity):
             self._entity_description.is_ir_key
             and self._entity_description.ir_hub_information is not None
         ):
-            show_test_user_input(self.hass)
+            show_test_user_input(self.hass, self.device_manager)
         else:
             super().press()
