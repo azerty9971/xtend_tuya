@@ -413,7 +413,7 @@ class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
     ) -> ConfigFlowResult:
         LOGGER.warning(f"Calling async_step_system, user_input: {user_input}")
         if user_input is not None:
-            return self.async_abort(reason="ABORTED")
+            return self.async_abort(reason="")
         
         errors = {}
         placeholders = {}
