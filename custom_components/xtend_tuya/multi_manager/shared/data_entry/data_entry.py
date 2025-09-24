@@ -28,7 +28,7 @@ async def _show_test_user_input(hass: HomeAssistant, multi_manager: mm.MultiMana
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
         context=ConfigFlowContext(
-            source=SOURCE_SYSTEM,
+            source=SOURCE_RECONFIGURE,
             entry_id=multi_manager.config_entry.entry_id,
             title_placeholders={"name": multi_manager.config_entry.title},
             unique_id=multi_manager.config_entry.unique_id,
