@@ -34,6 +34,6 @@ async def _show_test_user_input(hass: HomeAssistant, multi_manager: mm.MultiMana
             title_placeholders={"name": multi_manager.config_entry.title},
             unique_id=multi_manager.config_entry.unique_id,
         ),
-        data=None #{"schema": data_schema}
+        data={"schema": data_schema}
     )
     LOGGER.warning(f"Result data: {result}")
