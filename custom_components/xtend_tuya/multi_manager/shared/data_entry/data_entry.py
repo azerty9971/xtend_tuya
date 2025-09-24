@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import voluptuous as vol
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import (
     discovery_flow,
@@ -18,6 +19,12 @@ def show_test_user_input(hass: HomeAssistant, multi_manager: mm.MultiManager):
 
 
 async def _show_test_user_input(hass: HomeAssistant, multi_manager: mm.MultiManager):
+    data_schema = vol.Schema(
+                {
+                    vol.Required(
+                        "TEST", default="26"
+                    ): str,
+                })
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
         context=ConfigFlowContext(
@@ -26,6 +33,6 @@ async def _show_test_user_input(hass: HomeAssistant, multi_manager: mm.MultiMana
             title_placeholders={"name": multi_manager.config_entry.title},
             unique_id=multi_manager.config_entry.unique_id,
         ),
-        data=None,
+        data={"schema": data_schema},
     )
     LOGGER.warning(f"Result data: {result}")

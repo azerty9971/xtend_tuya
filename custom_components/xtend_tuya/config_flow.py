@@ -412,20 +412,14 @@ class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
         LOGGER.warning(f"Calling async_step_system, user_input: {user_input}")
-        if user_input is not None:
+        if user_input is None or user_input.get("schema") is None:
             return self.async_abort(reason="")
         
         errors = {}
         placeholders = {}
         return self.async_show_form(
             step_id="system",
-            data_schema=vol.Schema(
-                {
-                    vol.Required(
-                        CONF_USER_CODE, default="26"
-                    ): str,
-                }
-            ),
+            data_schema=user_input.get("schema"),
             errors=errors,
             description_placeholders=placeholders,
         )
