@@ -114,6 +114,8 @@ class TuyaOptionFlow(OptionsFlow):
         errors = {}
         placeholders = {}
 
+        LOGGER.warning(f"Calling reconfigure user_input: {user_input}")
+
         if user_input is not None:
             response, data = await self.hass.async_add_executor_job(
                 self._try_login, user_input
