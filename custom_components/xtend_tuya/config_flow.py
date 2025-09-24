@@ -410,6 +410,11 @@ class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
             description_placeholders=placeholders,
         )
     
+    async def async_step_reconfigure(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        return await self.async_step_system(user_input)
+
     async def async_step_system(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
