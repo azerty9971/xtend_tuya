@@ -139,6 +139,8 @@ class TuyaOptionFlow(OptionsFlow):
 
         if user_input is None:
             user_input = {}
+        
+        LOGGER.warning(f"Config flow started for {self.config_entry.title}", stack_info=True)
 
         default_country = "United States"
         default_endpoint = TuyaCloudOpenAPIEndpoint.AMERICA
