@@ -10,6 +10,9 @@ from homeassistant.core import callback
 from homeassistant.config_entries import ConfigEntry, ConfigFlow, OptionsFlow
 from homeassistant.config_entries import ConfigFlowResult
 from homeassistant.helpers import selector
+from homeassistant.helpers.typing import (
+    DiscoveryInfoType,
+)
 from .const import (
     TuyaCloudOpenAPIEndpoint,
     CONF_ENDPOINT,
@@ -409,25 +412,20 @@ class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
             errors=errors,
             description_placeholders=placeholders,
         )
-    
-    async def async_step_reconfigure(
-        self, user_input: dict[str, Any] | None = None
-    ) -> ConfigFlowResult:
-        return await self.async_step_system(user_input)
 
-    async def async_step_system(
-        self, user_input: dict[str, Any] | None = None
+    async def async_step_discovery(
+        self, discovery_info: DiscoveryInfoType
     ) -> ConfigFlowResult:
-        LOGGER.warning(f"Calling async_step_system, user_input: {user_input}")
-        if user_input is None or user_input.get("schema") is None:
-            LOGGER.warning(f"ABORT Calling async_step_system, user_input: {user_input}")
+        LOGGER.warning(f"Calling async_step_discovery, user_input: {discovery_info}")
+        if discovery_info is None or discovery_info.get("schema") is None:
+            LOGGER.warning(f"ABORT Calling async_step_discovery, user_input: {discovery_info}")
             return self.async_abort(reason="")
         
         errors = {}
         placeholders = {}
         return self.async_show_form(
             step_id="system",
-            data_schema=user_input.get("schema"),
+            data_schema=discovery_info.get("schema"),
             errors=errors,
             description_placeholders=placeholders,
         )
