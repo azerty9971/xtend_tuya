@@ -57,7 +57,7 @@ class XTDataEntryManager(ABC):
             )
 
     @abstractmethod
-    def user_interaction_callback(
+    async def user_interaction_callback(
         self,
         config_flow: ConfigFlow,
         flow_data: XTFlowDataBase,

@@ -52,7 +52,7 @@ class XTDataEntryAddIRDevice(XTDataEntryManager):
         )
         XTDataEntryManager.show_user_input(self, flow_data)
 
-    def user_interaction_callback(
+    async def user_interaction_callback(
         self,
         config_flow: ConfigFlow,
         flow_data: XTFlowDataBase,
@@ -94,7 +94,7 @@ class XTDataEntryAddIRDeviceKey(XTDataEntryManager):
         )
         XTDataEntryManager.show_user_input(self, flow_data)
 
-    def user_interaction_callback(
+    async def user_interaction_callback(
         self,
         config_flow: ConfigFlow,
         flow_data: XTFlowDataBase,
@@ -116,8 +116,8 @@ class XTDataEntryAddIRDeviceKey(XTDataEntryManager):
                 }
             ))
         else:
-            if flow_data.multi_manager.learn_ir_key(real_flow_data.device, real_flow_data.remote, real_flow_data.hub, real_flow_data.key_name):
+            if await flow_data.hass.async_add_executor_job(flow_data.multi_manager.learn_ir_key, real_flow_data.device, real_flow_data.remote, real_flow_data.hub, real_flow_data.key_name):
                 return self.async_abort(config_flow=config_flow, reason=f"Key {real_flow_data.key_name} successfully added.")
             else:
                 return self.async_abort(config_flow=config_flow, reason=f"Error adding key {real_flow_data.key_name}.")
-        return self.async_abort(config_flow=config_flow, reason="")
+        #return self.async_abort(config_flow=config_flow, reason="")

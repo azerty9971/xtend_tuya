@@ -423,7 +423,7 @@ class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
         for multimanager in all_mm:
             if handler := multimanager.get_user_input_data(self.flow_id):
                 if handler.processing_callback is not None:
-                    return handler.processing_callback(self, handler, discovery_info)
+                    return await handler.processing_callback(self, handler, discovery_info)
         if isinstance(discovery_info, data_entry.XTFlowDataBase):
             return self.async_show_form(
                 step_id="discovery",
