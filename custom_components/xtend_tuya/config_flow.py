@@ -44,7 +44,9 @@ from .const import (
     TUYA_RESPONSE_PLATFORM_URL,
     LOGGER,  # noqa: F401
 )
-
+import custom_components.xtend_tuya.util as util
+import custom_components.xtend_tuya.multi_manager.multi_manager as mm
+import custom_components.xtend_tuya.multi_manager.shared.data_entry.shared_data_entry as data_entry
 
 class TuyaOptionFlow(OptionsFlow):
     def __init__(self, config_entry: ConfigEntry) -> None:
@@ -416,19 +418,12 @@ class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
     async def async_step_discovery(
         self, discovery_info: DiscoveryInfoType
     ) -> ConfigFlowResult:
-        LOGGER.warning(f"Calling async_step_discovery, user_input: {discovery_info}, flow id: {self.flow_id}")
-        if discovery_info is None or discovery_info.get("schema") is None:
-            LOGGER.warning(f"ABORT Calling async_step_discovery, user_input: {discovery_info}")
-            return self.async_abort(reason="")
-        
-        errors = {}
-        placeholders = {}
-        return self.async_show_form(
-            step_id="discovery",
-            data_schema=discovery_info.get("schema"),
-            errors=errors,
-            description_placeholders=placeholders,
-        )
+        all_mm: list[mm.MultiManager] = util.get_all_multi_managers(self.hass)
+        handler: data_entry.XTFlowDataBase | None = None
+        for multimanager in all_mm:
+            if handler := multimanager.get_user_input_data(self.flow_id):
+                return handler.processing_callback(self, handler, discovery_info)
+        return self.async_abort(reason="Xtend Tuya processing function didn't return a handler, contact the developer")
         
 
     async def __async_get_qr_code(self, user_code: str) -> tuple[bool, dict[str, Any]]:

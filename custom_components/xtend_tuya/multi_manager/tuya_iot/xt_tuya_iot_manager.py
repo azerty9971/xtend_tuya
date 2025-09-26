@@ -566,6 +566,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         device: XTDevice,
         remote: XTIRRemoteInformation,
         hub: XTIRHubInformation,
+        key_name: str,
         api: XTIOTOpenAPI | None = None,
     ) -> bool:
         total_timeout: int = 20
@@ -619,7 +620,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                     {
                         #"category_id": remote.category_id,
                         #"key_name": "test2",
-                        "key": "test27",
+                        "key": key_name,
                         "code": learned_code_value,
                         "id": learning_time // 1000,
                     }

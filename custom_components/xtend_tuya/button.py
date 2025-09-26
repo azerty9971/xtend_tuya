@@ -37,8 +37,9 @@ from .entity import (
     XTEntityDescriptorManager,
 )
 
-from .multi_manager.shared.data_entry.data_entry import (
-    show_test_user_input,
+from .multi_manager.shared.data_entry.ir_device_data_entry import (
+    XTDataEntryAddIRDevice,
+    XTDataEntryAddIRDeviceKey,
 )
 
 
@@ -350,17 +351,19 @@ class XTButtonEntity(XTEntity, TuyaButtonEntity):
             and self._entity_description.ir_remote_information is not None
             and self._entity_description.ir_hub_information is not None
         ):
-            if self.device_manager.learn_ir_key(
-                self.device,
-                self._entity_description.ir_remote_information,
-                self._entity_description.ir_hub_information,
-            ):
-                if self.hass:
-                    dispatcher_send(self.hass, TUYA_DISCOVERY_NEW, [self.device.id, self._entity_description.ir_hub_information.device_id])
+            XTDataEntryAddIRDeviceKey().start_add_ir_device_key_flow(self.hass, self.device_manager, self.device, self._entity_description.ir_hub_information, self._entity_description.ir_remote_information)
+            #if self.device_manager.learn_ir_key(
+            #    self.device,
+            #    self._entity_description.ir_remote_information,
+            #    self._entity_description.ir_hub_information,
+            #    "TEST_KEY_TEMP"
+            #):
+            #    if self.hass:
+            #        dispatcher_send(self.hass, TUYA_DISCOVERY_NEW, [self.device.id, self._entity_description.ir_hub_information.device_id])
         elif (
             self._entity_description.is_ir_key
             and self._entity_description.ir_hub_information is not None
         ):
-            show_test_user_input(self.hass, self.device_manager, {"name": self.device.name})
+            XTDataEntryAddIRDevice().start_add_ir_device_flow(self.hass, self.device_manager, self.device)
         else:
             super().press()

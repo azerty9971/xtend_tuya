@@ -63,6 +63,7 @@ from .shared.interface.device_manager import (
 from ..entity_parser.entity_parser import (
     XTCustomEntityParser,
 )
+import custom_components.xtend_tuya.multi_manager.shared.data_entry.shared_data_entry as shared_data_entry
 
 
 class MultiManager:  # noqa: F811
@@ -93,6 +94,7 @@ class MultiManager:  # noqa: F811
         for priority in XTMultiManagerPostSetupCallbackPriority:
             self.post_setup_callbacks[priority] = []
         self.loading_finalized: bool = False
+        self._user_input_flows: dict[str, shared_data_entry.XTFlowDataBase] = {}
 
     @property
     def device_map(self):
@@ -539,9 +541,9 @@ class MultiManager:  # noqa: F811
                 return True
         return False
     
-    def learn_ir_key(self, device: XTDevice, remote: XTIRRemoteInformation, hub: XTIRHubInformation) -> bool:
+    def learn_ir_key(self, device: XTDevice, remote: XTIRRemoteInformation, hub: XTIRHubInformation, key_name: str) -> bool:
         for account in self.accounts.values():
-            if account.learn_ir_key(device, remote, hub):
+            if account.learn_ir_key(device, remote, hub, key_name):
                 return True
         return False
 
@@ -572,3 +574,10 @@ class MultiManager:  # noqa: F811
             self.post_setup_callbacks[priority].append((callback, *args))
         else:
             self.hass.add_job(callback, *args)
+    
+    def register_user_input_data(self, flow_data: shared_data_entry.XTFlowDataBase):
+        if flow_data.flow_id is not None:
+            self._user_input_flows[flow_data.flow_id] = flow_data
+
+    def get_user_input_data(self, flow_id: str) -> shared_data_entry.XTFlowDataBase | None:
+        return self._user_input_flows.get(flow_id)
