@@ -67,6 +67,8 @@ class XTDataEntryAddIRDevice(XTDataEntryManager):
 
 class XTDataEntryAddIRDeviceKey(XTDataEntryManager):
 
+    KEY_NAME: str = "key_name"
+
     def start_add_ir_device_key_flow(
         self,
         hass: HomeAssistant,
@@ -81,7 +83,7 @@ class XTDataEntryAddIRDeviceKey(XTDataEntryManager):
             hass=hass,
             schema=vol.Schema(
                 {
-                    vol.Required("Please enter a key name", default=""): str,
+                    vol.Required(XTDataEntryAddIRDeviceKey.KEY_NAME, default=""): str,
                 }
             ),
             title=f"Add new key for {device.name}",
@@ -104,10 +106,18 @@ class XTDataEntryAddIRDeviceKey(XTDataEntryManager):
         real_flow_data = cast(XTFlowDataAddIRDeviceKey, flow_data)
         if discovery_info is not None:
             LOGGER.warning(f"Showed discovery info: {discovery_info}")
+            real_flow_data.key_name = discovery_info.get(XTDataEntryAddIRDeviceKey.KEY_NAME)
+            if real_flow_data.key_name == "":
+                real_flow_data.key_name = None
         if real_flow_data.key_name is None:
             return self.async_show_form(config_flow=config_flow, data_schema=vol.Schema(
                 {
-                    vol.Required("Please enter a key name", default=""): str,
+                    vol.Required(XTDataEntryAddIRDeviceKey.KEY_NAME, default=""): str,
                 }
             ))
+        else:
+            if flow_data.multi_manager.learn_ir_key(real_flow_data.device, real_flow_data.remote, real_flow_data.hub, real_flow_data.key_name):
+                return self.async_abort(config_flow=config_flow, reason=f"Key {real_flow_data.key_name} successfully added.")
+            else:
+                return self.async_abort(config_flow=config_flow, reason=f"Error adding key {real_flow_data.key_name}.")
         return self.async_abort(config_flow=config_flow, reason="")
