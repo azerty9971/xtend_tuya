@@ -427,7 +427,7 @@ class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
         if isinstance(discovery_info, data_entry.XTFlowDataBase):
             return self.async_show_form(
                 step_id="discovery",
-                data_schema=discovery_info.get("schema"),
+                data_schema=discovery_info.schema,
                 errors={},
                 description_placeholders={},
             )
