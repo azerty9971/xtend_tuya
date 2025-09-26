@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Callable, cast
+from typing import Callable, cast  # noqa: F401
 from abc import ABC, abstractmethod
 from collections.abc import Mapping
 import voluptuous as vol

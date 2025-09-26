@@ -422,7 +422,15 @@ class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
         handler: data_entry.XTFlowDataBase | None = None
         for multimanager in all_mm:
             if handler := multimanager.get_user_input_data(self.flow_id):
-                return handler.processing_callback(self, handler, discovery_info)
+                if handler.processing_callback is not None:
+                    return handler.processing_callback(self, handler, discovery_info)
+        if isinstance(discovery_info, data_entry.XTFlowDataBase):
+            return self.async_show_form(
+                step_id="discovery",
+                data_schema=discovery_info.get("schema"),
+                errors={},
+                description_placeholders={},
+            )
         return self.async_abort(reason="Xtend Tuya processing function didn't return a handler, contact the developer")
         
 
