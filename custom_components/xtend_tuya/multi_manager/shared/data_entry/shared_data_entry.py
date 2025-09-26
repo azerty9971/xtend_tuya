@@ -61,7 +61,7 @@ class XTDataEntryManager(ABC):
         self,
         config_flow: ConfigFlow,
         flow_data: XTFlowDataBase,
-        discovery_info: DiscoveryInfoType,
+        discovery_info: DiscoveryInfoType | None,
     ) -> ConfigFlowResult:
         pass
 

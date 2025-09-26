@@ -416,7 +416,7 @@ class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
         )
 
     async def async_step_discovery(
-        self, discovery_info: DiscoveryInfoType
+        self, discovery_info: DiscoveryInfoType | None
     ) -> ConfigFlowResult:
         all_mm: list[mm.MultiManager] = util.get_all_multi_managers(self.hass)
         handler: data_entry.XTFlowDataBase | None = None

@@ -56,7 +56,7 @@ class XTDataEntryAddIRDevice(XTDataEntryManager):
         self,
         config_flow: ConfigFlow,
         flow_data: XTFlowDataBase,
-        discovery_info: DiscoveryInfoType,
+        discovery_info: DiscoveryInfoType | None,
     ) -> ConfigFlowResult:
         LOGGER.warning(
             f"Calling XTDataEntryAddIRDevice->user_interaction_callback: flow_data: {flow_data}, discovery_info: {discovery_info}"
@@ -96,14 +96,16 @@ class XTDataEntryAddIRDeviceKey(XTDataEntryManager):
         self,
         config_flow: ConfigFlow,
         flow_data: XTFlowDataBase,
-        discovery_info: DiscoveryInfoType,
+        discovery_info: DiscoveryInfoType | None,
     ) -> ConfigFlowResult:
         LOGGER.warning(
             f"Calling XTDataEntryAddIRDevice->user_interaction_callback: flow_data: {flow_data}, discovery_info: {discovery_info}"
         )
         real_flow_data = cast(XTFlowDataAddIRDeviceKey, flow_data)
+        if discovery_info is not None:
+            LOGGER.warning(f"Showed discovery info: {discovery_info}")
         if real_flow_data.key_name is None:
-            self.async_show_form(config_flow=config_flow, data_schema=vol.Schema(
+            return self.async_show_form(config_flow=config_flow, data_schema=vol.Schema(
                 {
                     vol.Required("Please enter a key name", default=""): str,
                 }
