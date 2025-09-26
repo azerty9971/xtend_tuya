@@ -424,7 +424,7 @@ class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
         errors = {}
         placeholders = {}
         return self.async_show_form(
-            step_id="system",
+            step_id="discovery",
             data_schema=discovery_info.get("schema"),
             errors=errors,
             description_placeholders=placeholders,
