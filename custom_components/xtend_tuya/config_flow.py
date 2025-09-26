@@ -416,7 +416,7 @@ class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
     async def async_step_discovery(
         self, discovery_info: DiscoveryInfoType
     ) -> ConfigFlowResult:
-        LOGGER.warning(f"Calling async_step_discovery, user_input: {discovery_info}")
+        LOGGER.warning(f"Calling async_step_discovery, user_input: {discovery_info}, flow id: {self.flow_id}")
         if discovery_info is None or discovery_info.get("schema") is None:
             LOGGER.warning(f"ABORT Calling async_step_discovery, user_input: {discovery_info}")
             return self.async_abort(reason="")
