@@ -3,6 +3,7 @@ from __future__ import annotations
 import voluptuous as vol
 from dataclasses import dataclass
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.dispatcher import dispatcher_send
 from .shared_data_entry import (
     XTFlowDataBase,
     XTDataEntryManager,
@@ -15,6 +16,7 @@ from ....const import (
     LOGGER,
     XTIRHubInformation,
     XTIRRemoteInformation,
+    TUYA_DISCOVERY_NEW
 )
 import custom_components.xtend_tuya.multi_manager.multi_manager as mm
 
@@ -67,7 +69,7 @@ class XTDataEntryAddIRDevice(XTDataEntryManager):
 
 class XTDataEntryAddIRDeviceKey(XTDataEntryManager):
 
-    KEY_NAME: str = "key_name"
+    KEY_NAME: str = "new_ir_key_name"
 
     def start_add_ir_device_key_flow(
         self,
@@ -117,6 +119,7 @@ class XTDataEntryAddIRDeviceKey(XTDataEntryManager):
             ))
         else:
             if await flow_data.hass.async_add_executor_job(flow_data.multi_manager.learn_ir_key, real_flow_data.device, real_flow_data.remote, real_flow_data.hub, real_flow_data.key_name):
+                dispatcher_send(flow_data.hass, TUYA_DISCOVERY_NEW, [real_flow_data.remote.remote_id, real_flow_data.hub.device_id])
                 return self.async_abort(config_flow=config_flow, reason=f"Key {real_flow_data.key_name} successfully added.")
             else:
                 return self.async_abort(config_flow=config_flow, reason=f"Error adding key {real_flow_data.key_name}.")
