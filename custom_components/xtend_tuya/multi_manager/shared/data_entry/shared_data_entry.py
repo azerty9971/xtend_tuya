@@ -70,6 +70,13 @@ class XTDataEntryManager(ABC):
         if self.flow_data is None:
             return
         self.flow_data.processing_class = self
+        self.hass.async_create_task(
+            self.hass.config_entries.flow.async_init(
+                DOMAIN,
+                context={"source": SOURCE_USER},
+                data=self.flow_data
+            )
+        )
 #        flow_data.hass.add_job(self._show_user_input)
 
 
