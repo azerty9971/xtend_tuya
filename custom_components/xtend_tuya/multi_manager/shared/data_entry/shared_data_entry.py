@@ -43,7 +43,7 @@ class XTDataEntryManager(ABC):
         listen_id = f"{DOMAIN}_{uuid.uuid4()}"
         @callback
         def register_event(event):
-            LOGGER.warning(f"Called registered event: {event}")
+            LOGGER.warning(f"Called registered event: {type(event)}")
             self.show_user_input(self, self.convert_event_data_to_user_input(event))
         hass.bus.async_listen(listen_id, register_event)
         return listen_id
