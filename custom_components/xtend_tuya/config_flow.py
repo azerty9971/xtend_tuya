@@ -254,6 +254,7 @@ class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
         """Step user."""
+        LOGGER.warning(f"Calling USER step: {user_input}")
         tuya_data = self.hass.config_entries.async_entries(DOMAIN_ORIG, False, False)
         xt_tuya_data = self.hass.config_entries.async_entries(DOMAIN, True, True)
         if tuya_data:
@@ -423,15 +424,20 @@ class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
             description_placeholders=placeholders,
         )
 
-    async def generic_data_entry(
-        self, discovery_info: DiscoveryInfoType | None
-    ) -> ConfigFlowResult:
+    async def get_overriden_data_entry(self) -> data_entry.XTFlowDataBase | None:
         all_mm: list[mm.MultiManager] = util.get_all_multi_managers(self.hass)
         handler: data_entry.XTFlowDataBase | None = None
         for multimanager in all_mm:
             if handler := multimanager.get_user_input_data(self.flow_id):
-                if handler.processing_callback is not None:
-                    return await handler.processing_callback(self, handler, discovery_info)
+                return handler
+        return None
+                
+    async def generic_data_entry(
+        self, discovery_info: DiscoveryInfoType | None
+    ) -> ConfigFlowResult:
+        if handler := await self.get_overriden_data_entry():
+            if handler.processing_callback is not None:
+                return await handler.processing_callback(self, handler, discovery_info)
         if isinstance(discovery_info, data_entry.XTFlowDataBase):
             return self.async_show_form(
                 step_id=discovery_info.source,
