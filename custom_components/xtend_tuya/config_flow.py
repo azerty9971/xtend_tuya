@@ -238,12 +238,10 @@ class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
         self.__login_control = LoginControl()
 
     def __getattr__(self, name: str):
-        LOGGER.warning(f"Trying to find attribute {name} in TuyaConfigFlow")
-        if name.startswith("async_step_") and name[len("async_step_"):] in XTDiscoverySource:
-            LOGGER.warning("Returning the generic implementation")
-            return self.async_step_generic_data_entry
+        step_prefix: str = "async_step_"
+        if name.startswith(step_prefix) and name[len(step_prefix):] in XTDiscoverySource:
+            return self.generic_data_entry
         else:
-            # Default behaviour
             raise AttributeError
 
     @staticmethod
@@ -425,7 +423,7 @@ class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
             description_placeholders=placeholders,
         )
 
-    async def async_step_generic_data_entry(
+    async def generic_data_entry(
         self, discovery_info: DiscoveryInfoType | None
     ) -> ConfigFlowResult:
         all_mm: list[mm.MultiManager] = util.get_all_multi_managers(self.hass)
