@@ -55,11 +55,11 @@ class XTDataEntryManager(ABC):
 
     def fire_event(self):
         if flow_data := self.get_flow_data():
-            self.hass.async_run_hass_job(HassJob(self._fire_event), flow_data)
+            self._fire_event(flow_data)
 
     @callback
     def _fire_event(self, flow_data: XTFlowDataBase):
-        self.hass.bus.async_fire(self.event_id, flow_data.__dict__)
+        self.hass.bus.fire(self.event_id, flow_data.__dict__)
     
     @abstractmethod
     def convert_event_data_to_user_input(self, event) -> XTFlowDataBase:
