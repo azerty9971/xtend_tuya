@@ -258,11 +258,9 @@ class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
         LOGGER.warning(f"Calling USER step: {user_input}")
         if isinstance(user_input, data_entry.XTFlowDataBase):
             await self.async_set_unique_id(unique_id=str(uuid.uuid4()))
+            self._abort_if_unique_id_configured()
             return self.async_show_form(
-                step_id=user_input.source,
-                data_schema=user_input.schema,
-                errors={},
-                description_placeholders={},
+                step_id=user_input.source
             )
         tuya_data = self.hass.config_entries.async_entries(DOMAIN_ORIG, False, False)
         xt_tuya_data = self.hass.config_entries.async_entries(DOMAIN, True, True)
