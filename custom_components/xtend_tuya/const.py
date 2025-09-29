@@ -159,6 +159,10 @@ class XTDeviceSourcePriority(IntEnum):
     TUYA_SHARED     = 20
     TUYA_IOT        = 30
 
+class XTDiscoverySource(StrEnum):
+    SOURCE_ADD_IR_DEVICE_KEY    = "xt_ir_add_key"
+    SOURCE_ADD_IR_DEVICE        = "xt_ir_add_device"
+
 @dataclass
 class XTIRRemoteKeysInformation:
     key: str

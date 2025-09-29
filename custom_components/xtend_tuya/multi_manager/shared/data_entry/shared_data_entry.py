@@ -31,17 +31,19 @@ class XTFlowDataBase:
 
 class XTDataEntryManager(ABC):
 
-    @staticmethod
-    def show_user_input(base_class: XTDataEntryManager, flow_data: XTFlowDataBase):
-        flow_data.processing_callback = base_class.user_interaction_callback
-        flow_data.hass.add_job(XTDataEntryManager._show_user_input, flow_data)
+    def __init__(self, source: str) -> None:
+        self.source = source
 
-    @staticmethod
-    async def _show_user_input(flow_data: XTFlowDataBase):
+    
+    def show_user_input(self, base_class: XTDataEntryManager, flow_data: XTFlowDataBase):
+        flow_data.processing_callback = base_class.user_interaction_callback
+        flow_data.hass.add_job(self._show_user_input, flow_data)
+
+    async def _show_user_input(self, flow_data: XTFlowDataBase):
         result = await flow_data.hass.config_entries.flow.async_init(
             DOMAIN,
             context=ConfigFlowContext(
-                source=SOURCE_DISCOVERY,
+                source=self.source,
                 entry_id=flow_data.multi_manager.config_entry.entry_id,
                 title_placeholders={"name": f"{flow_data.title}"},
             ),

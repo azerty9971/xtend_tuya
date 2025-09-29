@@ -16,9 +16,16 @@
             "scan": {
                 "description": "Use Smart Life app or Tuya Smart app to scan the following QR-code to complete the login.\n\nContinue to the next step once you have completed this step in the app."
             },
-            "discovery": {
+            "xt_ir_add_key": {
+                "description": "Enter the name of the new key, then press Submit then point your remote to the hub and hit the key on your remote",
                 "data": {
-                    "new_ir_key_name": "Enter the name of the new key, then press Submit then point your remote to the hub and hit the key on your remote"
+                    "new_ir_key_name": "New key name"
+                }
+            },
+            "xt_ir_add_device": {
+                "description": "Enter the name of the new key, then press Submit then point your remote to the hub and hit the key on your remote",
+                "data": {
+                    "new_ir_key_name": "New key name"
                 }
             }
         },

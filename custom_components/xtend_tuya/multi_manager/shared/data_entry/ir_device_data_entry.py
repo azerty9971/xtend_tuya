@@ -52,7 +52,7 @@ class XTDataEntryAddIRDevice(XTDataEntryManager):
             device=device,
             processing_callback=None,
         )
-        XTDataEntryManager.show_user_input(self, flow_data)
+        self.show_user_input(self, flow_data)
 
     async def user_interaction_callback(
         self,
@@ -94,7 +94,7 @@ class XTDataEntryAddIRDeviceKey(XTDataEntryManager):
             hub=hub,
             remote=remote
         )
-        XTDataEntryManager.show_user_input(self, flow_data)
+        self.show_user_input(self, flow_data)
 
     async def user_interaction_callback(
         self,

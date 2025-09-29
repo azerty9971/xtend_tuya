@@ -5,7 +5,7 @@ from typing import cast
 from dataclasses import dataclass, field
 from homeassistant.const import EntityCategory, Platform
 from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers.dispatcher import async_dispatcher_connect, dispatcher_send
+from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from .util import (
     restrict_descriptor_category,
@@ -27,6 +27,7 @@ from .const import (
     XTIRRemoteKeysInformation,
     XTMultiManagerProperties,
     LOGGER,  # noqa: F401
+    XTDiscoverySource,
 )
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaButtonEntity,
@@ -351,7 +352,7 @@ class XTButtonEntity(XTEntity, TuyaButtonEntity):
             and self._entity_description.ir_remote_information is not None
             and self._entity_description.ir_hub_information is not None
         ):
-            XTDataEntryAddIRDeviceKey().start_add_ir_device_key_flow(self.hass, self.device_manager, self.device, self._entity_description.ir_hub_information, self._entity_description.ir_remote_information)
+            XTDataEntryAddIRDeviceKey(source=XTDiscoverySource.SOURCE_ADD_IR_DEVICE_KEY).start_add_ir_device_key_flow(self.hass, self.device_manager, self.device, self._entity_description.ir_hub_information, self._entity_description.ir_remote_information)
             #if self.device_manager.learn_ir_key(
             #    self.device,
             #    self._entity_description.ir_remote_information,
@@ -364,6 +365,6 @@ class XTButtonEntity(XTEntity, TuyaButtonEntity):
             self._entity_description.is_ir_key
             and self._entity_description.ir_hub_information is not None
         ):
-            XTDataEntryAddIRDevice().start_add_ir_device_flow(self.hass, self.device_manager, self.device)
+            XTDataEntryAddIRDevice(source=XTDiscoverySource.SOURCE_ADD_IR_DEVICE).start_add_ir_device_flow(self.hass, self.device_manager, self.device)
         else:
             super().press()
