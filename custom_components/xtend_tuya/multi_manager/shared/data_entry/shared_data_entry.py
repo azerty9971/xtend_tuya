@@ -40,7 +40,7 @@ class XTDataEntryManager(ABC):
 #        pass
 
     def register_bus_event(self, hass: HomeAssistant) -> str:
-        listen_id = f"{DOMAIN}_{type(self)}_{uuid.uuid4}"
+        listen_id = f"{DOMAIN}_{uuid.uuid4()}"
         @callback
         def register_event(event):
             LOGGER.warning(f"Called registered event: {event}")
