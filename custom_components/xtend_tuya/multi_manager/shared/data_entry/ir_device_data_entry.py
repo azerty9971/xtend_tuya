@@ -11,6 +11,7 @@ from .shared_data_entry import (
     ConfigFlowResult,
     DiscoveryInfoType,
     cast,
+    Event,
 )
 from ....const import (
     LOGGER,
@@ -58,8 +59,8 @@ class XTDataEntryAddIRDevice(XTDataEntryManager):
     def get_flow_data(self) -> XTFlowDataBase | None:
         return None
 
-    def convert_event_data_to_user_input(self, event) -> XTFlowDataBase:
-        return XTFlowDataAddIRDeviceKey(**event)
+    def convert_event_data_to_user_input(self, event: Event) -> XTFlowDataBase:
+        return XTFlowDataAddIRDeviceKey(**event.data)
 
     async def user_interaction_callback(
         self,
@@ -138,8 +139,8 @@ class XTDataEntryAddIRDeviceKey(XTDataEntryManager):
         self._fire_event(flow_data)
         # self.show_user_input(self, flow_data)
 
-    def convert_event_data_to_user_input(self, event) -> XTFlowDataBase:
-        return XTFlowDataAddIRDeviceKey(**event)
+    def convert_event_data_to_user_input(self, event: Event) -> XTFlowDataBase:
+        return XTFlowDataAddIRDeviceKey(**event.data)
 
     async def user_interaction_callback(
         self,

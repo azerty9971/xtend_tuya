@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 from collections.abc import Mapping
 import voluptuous as vol
 from dataclasses import dataclass
-from homeassistant.core import HomeAssistant, callback, HassJob
+from homeassistant.core import HomeAssistant, callback, Event
 from homeassistant.config_entries import (
     ConfigFlowContext,
     ConfigFlowResult,
@@ -62,7 +62,7 @@ class XTDataEntryManager(ABC):
         self.hass.bus.fire(self.event_id, flow_data.__dict__)
     
     @abstractmethod
-    def convert_event_data_to_user_input(self, event) -> XTFlowDataBase:
+    def convert_event_data_to_user_input(self, event: Event) -> XTFlowDataBase:
         pass
 
     @callback
