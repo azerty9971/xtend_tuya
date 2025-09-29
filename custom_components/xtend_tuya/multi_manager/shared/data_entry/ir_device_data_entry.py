@@ -36,26 +36,6 @@ class XTFlowDataAddIRDeviceKey(XTFlowDataBase):
 
 
 class XTDataEntryAddIRDevice(XTDataEntryManager):
-
-    def start_add_ir_device_flow(
-        self, hass: HomeAssistant, multi_manager: mm.MultiManager, device: mm.XTDevice
-    ):
-        flow_data = XTFlowDataAddIRDevice(
-            flow_id=None,
-            source=self.source,
-            multi_manager=multi_manager,
-            hass=hass,
-            schema=vol.Schema(
-                {
-                    vol.Required("TEST", default="26"): str,
-                }
-            ),
-            title=f"Add new IR device ({device.name})",
-            device=device,
-            processing_callback=None,
-        )
-        self.show_user_input(self, flow_data)
-
     def get_flow_data(self) -> XTFlowDataBase | None:
         return None
 
@@ -104,37 +84,10 @@ class XTDataEntryAddIRDeviceKey(XTDataEntryManager):
             ),
             title=f"Add new key for {self.device.name}",
             device=self.device,
-            processing_callback=None,
+            processing_class=self,
             hub=self.hub,
             remote=self.remote,
         )
-
-    def start_add_ir_device_key_flow(
-        self,
-        hass: HomeAssistant,
-        multi_manager: mm.MultiManager,
-        device: mm.XTDevice,
-        hub: XTIRHubInformation,
-        remote: XTIRRemoteInformation,
-    ):
-        flow_data = XTFlowDataAddIRDeviceKey(
-            flow_id=None,
-            source=self.source,
-            multi_manager=multi_manager,
-            hass=hass,
-            schema=vol.Schema(
-                {
-                    vol.Required(XTDataEntryAddIRDeviceKey.KEY_NAME, default=""): str,
-                }
-            ),
-            title=f"Add new key for {device.name}",
-            device=device,
-            processing_callback=None,
-            hub=hub,
-            remote=remote,
-        )
-        self._fire_event(flow_data)
-        # self.show_user_input(self, flow_data)
 
     async def user_interaction_callback(
         self,

@@ -27,7 +27,7 @@ class XTFlowDataBase:
     hass: HomeAssistant
     schema: vol.Schema
     title: str
-    processing_callback: Callable | None
+    processing_class: XTDataEntryManager
 
 
 class XTDataEntryManager(ABC):
@@ -44,8 +44,7 @@ class XTDataEntryManager(ABC):
         listen_id = f"{DOMAIN}_{uuid.uuid4()}"
         @callback
         def register_event(_):
-            if flow_data := self.get_flow_data():
-                self.show_user_input(self, flow_data)
+            self.show_user_input()
         hass.bus.async_listen(listen_id, register_event)
         return listen_id
     
@@ -66,10 +65,13 @@ class XTDataEntryManager(ABC):
 
     @callback
     def show_user_input(
-        self, base_class: XTDataEntryManager, flow_data: XTFlowDataBase
+        self
     ):
-        flow_data.processing_callback = base_class.user_interaction_callback
-        flow_data.hass.add_job(self._show_user_input)
+        if self.flow_data is None:
+            return
+        self.flow_data.processing_class = self
+#        flow_data.hass.add_job(self._show_user_input)
+
 
     async def _show_user_input(self):
         if self.flow_data is None:

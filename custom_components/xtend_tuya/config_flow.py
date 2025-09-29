@@ -255,12 +255,12 @@ class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
         """Step user."""
-        #LOGGER.warning(f"Calling USER step: {user_input}")
+        LOGGER.warning(f"Calling USER step: {self.flow_id}")
         if isinstance(user_input, data_entry.XTFlowDataBase):
             await self.async_set_unique_id(unique_id=str(uuid.uuid4()))
             self._abort_if_unique_id_configured()
             return self.async_show_form(
-                step_id="user",
+                step_id=user_input.source,
                 data_schema=user_input.schema
             )
         tuya_data = self.hass.config_entries.async_entries(DOMAIN_ORIG, False, False)
@@ -444,8 +444,7 @@ class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
         self, discovery_info: DiscoveryInfoType | None
     ) -> ConfigFlowResult:
         if handler := await self.get_overriden_data_entry():
-            if handler.processing_callback is not None:
-                return await handler.processing_callback(self, handler, discovery_info)
+            return await handler.processing_class.user_interaction_callback(self, handler, discovery_info)
         if isinstance(discovery_info, data_entry.XTFlowDataBase):
             return self.async_show_form(
                 step_id=discovery_info.source,
