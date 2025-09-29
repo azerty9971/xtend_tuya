@@ -434,27 +434,16 @@ class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
     async def generic_data_entry(
         self, discovery_info: DiscoveryInfoType | data_entry.XTFlowDataBase | None
     ) -> ConfigFlowResult:
-        return_value: Any = None
         if isinstance(discovery_info, data_entry.XTFlowDataBase):
             handler = discovery_info
             if handler.flow_id is None:
                 handler.flow_id = self.flow_id
                 handler.multi_manager.register_user_input_data(handler)
-            return_value = await handler.processing_class.user_interaction_callback(self, handler, None)
-            return return_value
+            return await handler.processing_class.user_interaction_callback(self, None)
         else:
             if handler := await self.get_overriden_data_entry():
-                return_value = await handler.processing_class.user_interaction_callback(self, handler, discovery_info)
-                return return_value
-        #if isinstance(discovery_info, data_entry.XTFlowDataBase):
-        #    return self.async_show_form(
-        #        step_id=discovery_info.source,
-        #        data_schema=discovery_info.schema,
-        #        errors={},
-        #        description_placeholders={},
-        #    )
-        return_value = self.async_abort(reason="Xtend Tuya processing function didn't return a handler, contact the developer")
-        return return_value
+                return await handler.processing_class.user_interaction_callback(self, discovery_info)
+        return self.async_abort(reason="Xtend Tuya processing function didn't return a handler, contact the developer")
         
 
     async def __async_get_qr_code(self, user_code: str) -> tuple[bool, dict[str, Any]]:

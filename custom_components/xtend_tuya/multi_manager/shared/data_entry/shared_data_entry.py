@@ -2,7 +2,6 @@ from __future__ import annotations
 import uuid
 from typing import Callable, cast  # noqa: F401
 from abc import ABC, abstractmethod
-from collections.abc import Mapping
 import voluptuous as vol
 from dataclasses import dataclass
 from homeassistant.core import HomeAssistant, callback
@@ -26,8 +25,6 @@ class XTFlowDataBase:
     flow_id: str | None
     source: str
     multi_manager: mm.MultiManager
-    hass: HomeAssistant
-    title: str
     processing_class: XTDataEntryManager
 
 
@@ -39,8 +36,9 @@ class XTDataEntryManager(ABC):
         self.flow_data = self.get_flow_data()
         self.unique_id = self.get_unique_id()
         self.register_bus_event(hass)
-    #    def __del__(self):
-    #        pass
+    
+    #def __del__(self):
+    #    pass
 
     def get_unique_id(self) -> str:
         return f"{DOMAIN}_{self.source}_{uuid.uuid4()}"
@@ -58,13 +56,7 @@ class XTDataEntryManager(ABC):
         pass
 
     def fire_event(self):
-        # if flow_data := self.get_flow_data():
-        #    self._fire_event(flow_data)
         self.hass.bus.fire(self.unique_id, {})
-
-    # @callback
-    # def _fire_event(self, flow_data: XTFlowDataBase):
-    #    self.hass.bus.fire(self.event_id, {})
 
     @callback
     def show_user_input(self):
@@ -74,17 +66,19 @@ class XTDataEntryManager(ABC):
                 DOMAIN,
                 context=ConfigFlowContext(
                     source=self.source,
-                    title_placeholders={"name": f"{self.flow_data.title}"},
+                    title_placeholders=self.get_translation_placeholders(),
                 ),
                 data=self.flow_data,
             )
         )
 
+    def get_translation_placeholders(self) -> dict[str, str]:
+        return {}
+
     @abstractmethod
     async def user_interaction_callback(
         self,
         config_flow: ConfigFlow,
-        flow_data: XTFlowDataBase,
         discovery_info: DiscoveryInfoType | None,
     ) -> ConfigFlowResult:
         pass
@@ -94,10 +88,9 @@ class XTDataEntryManager(ABC):
         *,
         config_flow: ConfigFlow,
         reason: str,
-        description_placeholders: Mapping[str, str] | None = None,
     ) -> ConfigFlowResult:
         return config_flow.async_abort(
-            reason=reason, description_placeholders=description_placeholders
+            reason=reason, description_placeholders=self.get_translation_placeholders()
         )
 
     def async_show_form(
@@ -106,7 +99,6 @@ class XTDataEntryManager(ABC):
         config_flow: ConfigFlow,
         data_schema: vol.Schema | None = None,
         errors: dict[str, str] | None = None,
-        description_placeholders: Mapping[str, str] | None = None,
         last_step: bool | None = None,
         preview: str | None = None,
     ) -> ConfigFlowResult:
@@ -114,7 +106,7 @@ class XTDataEntryManager(ABC):
             step_id=self.source,
             data_schema=data_schema,
             errors=errors,
-            description_placeholders=description_placeholders,
+            description_placeholders=self.get_translation_placeholders(),
             last_step=last_step,
             preview=preview,
         )
