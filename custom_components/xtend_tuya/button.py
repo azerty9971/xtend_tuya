@@ -352,8 +352,7 @@ class XTButtonEntity(XTEntity, TuyaButtonEntity):
             and self._entity_description.ir_remote_information is not None
             and self._entity_description.ir_hub_information is not None
         ):
-            XTDataEntryAddIRDeviceKey(source="user").start_add_ir_device_key_flow(self.hass, self.device_manager, self.device, self._entity_description.ir_hub_information, self._entity_description.ir_remote_information)
-            #XTDataEntryAddIRDeviceKey(source=XTDiscoverySource.SOURCE_ADD_IR_DEVICE_KEY).start_add_ir_device_key_flow(self.hass, self.device_manager, self.device, self._entity_description.ir_hub_information, self._entity_description.ir_remote_information)
+            XTDataEntryAddIRDeviceKey(source=XTDiscoverySource.SOURCE_ADD_IR_DEVICE_KEY).start_add_ir_device_key_flow(self.hass, self.device_manager, self.device, self._entity_description.ir_hub_information, self._entity_description.ir_remote_information)
             #if self.device_manager.learn_ir_key(
             #    self.device,
             #    self._entity_description.ir_remote_information,

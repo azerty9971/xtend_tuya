@@ -44,7 +44,7 @@ class XTDataEntryManager(ABC):
         result = await flow_data.hass.config_entries.flow.async_init(
             DOMAIN,
             context=ConfigFlowContext(
-                source=self.source,
+                source="user",
                 entry_id=flow_data.multi_manager.config_entry.entry_id,
                 title_placeholders={"name": f"{flow_data.title}"},
             ),

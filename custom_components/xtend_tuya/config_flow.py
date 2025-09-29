@@ -255,6 +255,13 @@ class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
     ) -> ConfigFlowResult:
         """Step user."""
         LOGGER.warning(f"Calling USER step: {user_input}")
+        if isinstance(user_input, data_entry.XTFlowDataBase):
+            return self.async_show_form(
+                step_id=user_input.source,
+                data_schema=user_input.schema,
+                errors={},
+                description_placeholders={},
+            )
         tuya_data = self.hass.config_entries.async_entries(DOMAIN_ORIG, False, False)
         xt_tuya_data = self.hass.config_entries.async_entries(DOMAIN, True, True)
         if tuya_data:
