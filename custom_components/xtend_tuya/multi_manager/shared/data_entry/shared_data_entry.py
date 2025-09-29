@@ -55,8 +55,9 @@ class XTDataEntryManager(ABC):
 
     def fire_event(self):
         if flow_data := self.get_flow_data():
-            self._fire_event(flow_data=flow_data)
+            self.hass.async_add_job(self._fire_event, flow_data)
 
+    @callback
     def _fire_event(self, flow_data: XTFlowDataBase):
         self.hass.bus.async_fire(self.event_id, flow_data.__dict__)
     
