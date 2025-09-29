@@ -238,6 +238,7 @@ class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
         self.__login_control = LoginControl()
 
     def __getattr__(self, name):
+        LOGGER.warning(f"Trying to find attribute {name} in TuyaConfigFlow")
         if name in XTDiscoverySource:
             return self.async_step_generic_data_entry
         else:
