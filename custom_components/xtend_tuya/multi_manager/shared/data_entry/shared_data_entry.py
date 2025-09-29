@@ -35,8 +35,9 @@ class XTDataEntryManager(ABC):
     def __init__(self, source: str) -> None:
         self.source = source
 
-    
-    def show_user_input(self, base_class: XTDataEntryManager, flow_data: XTFlowDataBase):
+    def show_user_input(
+        self, base_class: XTDataEntryManager, flow_data: XTFlowDataBase
+    ):
         flow_data.processing_callback = base_class.user_interaction_callback
         flow_data.hass.add_job(self._show_user_input, flow_data)
 
@@ -89,9 +90,12 @@ class XTDataEntryManager(ABC):
         last_step: bool | None = None,
         preview: str | None = None,
     ) -> ConfigFlowResult:
+        new_schema = data_schema
+        if new_schema is not None:
+            new_schema = vol.Schema({vol.Required(self.source): data_schema})
         return config_flow.async_show_form(
             step_id=SOURCE_DISCOVERY,
-            data_schema=data_schema,
+            data_schema=new_schema,
             errors=errors,
             description_placeholders=description_placeholders,
             last_step=last_step,
