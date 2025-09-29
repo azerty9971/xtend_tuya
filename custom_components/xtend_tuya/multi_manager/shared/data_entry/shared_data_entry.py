@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 from collections.abc import Mapping
 import voluptuous as vol
 from dataclasses import dataclass
-from homeassistant.core import HomeAssistant, callback
+from homeassistant.core import HomeAssistant, callback, HassJob
 from homeassistant.config_entries import (
     ConfigFlowContext,
     ConfigFlowResult,
@@ -55,7 +55,7 @@ class XTDataEntryManager(ABC):
 
     def fire_event(self):
         if flow_data := self.get_flow_data():
-            self.hass.async_add_executor_job(self._fire_event, flow_data)
+            self.hass.async_add_hass_job(HassJob(self._fire_event), flow_data)
 
     @callback
     def _fire_event(self, flow_data: XTFlowDataBase):
