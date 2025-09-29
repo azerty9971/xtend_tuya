@@ -34,6 +34,9 @@ class XTDataEntryManager(ABC):
 
     def __init__(self, source: str) -> None:
         self.source = source
+    
+    def __del__(self):
+        pass
 
     @callback
     def show_user_input(
@@ -47,7 +50,7 @@ class XTDataEntryManager(ABC):
         result = await flow_data.hass.config_entries.flow.async_init(
             DOMAIN,
             context=ConfigFlowContext(
-                source="user",
+                source=SOURCE_USER,
                 # entry_id=flow_data.multi_manager.config_entry.entry_id,
                 #title_placeholders={"name": f"{flow_data.title}"},
             ),
