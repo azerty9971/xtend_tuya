@@ -5,11 +5,12 @@ from abc import ABC, abstractmethod
 from collections.abc import Mapping
 import voluptuous as vol
 from dataclasses import dataclass
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.config_entries import (
     ConfigFlowContext,
     ConfigFlowResult,
     ConfigFlow,
+    SOURCE_USER
 )
 from homeassistant.helpers.typing import (
     DiscoveryInfoType,
@@ -34,11 +35,15 @@ class XTDataEntryManager(ABC):
     def __init__(self, source: str) -> None:
         self.source = source
 
+    @callback
     def show_user_input(
         self, base_class: XTDataEntryManager, flow_data: XTFlowDataBase
     ):
         flow_data.processing_callback = base_class.user_interaction_callback
-        flow_data.hass.add_job(self._show_user_input, flow_data)
+        #flow_data.hass.add_job(self._show_user_input, flow_data)
+        flow_data.hass.async_create_task(
+            flow_data.hass.config_entries.flow.async_init(DOMAIN, context={"source": SOURCE_USER}, data=flow_data)
+        )
 
     async def _show_user_input(self, flow_data: XTFlowDataBase):
         result = await flow_data.hass.config_entries.flow.async_init(
