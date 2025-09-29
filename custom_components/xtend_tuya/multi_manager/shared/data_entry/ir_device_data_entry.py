@@ -50,6 +50,11 @@ class XTDataEntryAddIRDevice(XTDataEntryManager):
         self.device = device
         self.hub = hub
         super().__init__(source, hass)
+    
+    def get_translation_placeholders(self) -> dict[str, str]:
+        return super().get_translation_placeholders() | {
+            "device_name": self.device.name,
+        }
 
     def get_flow_data(self) -> XTFlowDataBase:
         return XTFlowDataAddIRDevice(
@@ -58,7 +63,7 @@ class XTDataEntryAddIRDevice(XTDataEntryManager):
             multi_manager=self.multi_manager,
             device=self.device,
             processing_class=self,
-            hub=self.hub
+            hub=self.hub,
         )
 
     async def user_interaction_callback(
@@ -94,7 +99,12 @@ class XTDataEntryAddIRDeviceKey(XTDataEntryManager):
         self.flow_data = cast(XTFlowDataAddIRDeviceKey, self.flow_data)
 
     def get_translation_placeholders(self) -> dict[str, str]:
-        return {"key_name": self.flow_data.key_name if self.flow_data.key_name is not None else "", "device_name": self.flow_data.device.name}
+        return super().get_translation_placeholders() | {
+            "key_name": (
+                self.flow_data.key_name if self.flow_data.key_name is not None else ""
+            ),
+            "device_name": self.flow_data.device.name,
+        }
 
     def get_flow_data(self) -> XTFlowDataBase:
         return XTFlowDataAddIRDeviceKey(
@@ -143,11 +153,9 @@ class XTDataEntryAddIRDeviceKey(XTDataEntryManager):
                     [self.flow_data.remote.remote_id, self.flow_data.hub.device_id],
                 )
                 return self.finish_flow(
-                    config_flow=config_flow,
-                    reason="ir_add_key_success"
+                    config_flow=config_flow, reason="ir_add_key_success"
                 )
             else:
                 return self.finish_flow(
-                    config_flow=config_flow,
-                    reason="ir_add_key_failed"
+                    config_flow=config_flow, reason="ir_add_key_failed"
                 )

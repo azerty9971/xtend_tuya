@@ -73,7 +73,7 @@ class XTDataEntryManager(ABC):
         )
 
     def get_translation_placeholders(self) -> dict[str, str]:
-        return {}
+        return {"name": self.source}
 
     @abstractmethod
     async def user_interaction_callback(
