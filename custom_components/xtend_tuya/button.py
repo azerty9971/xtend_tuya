@@ -41,6 +41,7 @@ from .entity import (
 from .multi_manager.shared.data_entry.ir_device_data_entry import (
     XTDataEntryAddIRDevice,
     XTDataEntryAddIRDeviceKey,
+    XTDataEntryManager,
 )
 
 
@@ -156,7 +157,7 @@ async def async_setup_entry(
                     if hub_information is None:
                         continue
 
-                    #First, clean up the device and subdevices
+                    # First, clean up the device and subdevices
                     entity_cleanup_device_ids: list[str] = [hub_information.device_id]
                     for remote_information in hub_information.remote_ids:
                         entity_cleanup_device_ids.append(remote_information.remote_id)
@@ -184,7 +185,7 @@ async def async_setup_entry(
                             remote_information.remote_id
                         ):
                             descriptor = XTButtonEntityDescription(
-                                key="xt_add_device",
+                                key="xt_add_device_key",
                                 translation_key="xt_add_ir_device_key",
                                 is_ir_key=True,
                                 ir_hub_information=hub_information,
@@ -290,7 +291,11 @@ async def async_setup_entry(
 
         async_add_entities(entities)
         if restrict_dpcode is None:
-            hass_data.manager.add_post_setup_callback(XTMultiManagerPostSetupCallbackPriority.PRIORITY_LAST, async_add_IR_entities, device_map)
+            hass_data.manager.add_post_setup_callback(
+                XTMultiManagerPostSetupCallbackPriority.PRIORITY_LAST,
+                async_add_IR_entities,
+                device_map,
+            )
 
     hass_data.manager.register_device_descriptors(this_platform, supported_descriptors)
     async_discover_device([*hass_data.manager.device_map])
@@ -318,6 +323,27 @@ class XTButtonEntity(XTEntity, TuyaButtonEntity):
         self.device_manager = device_manager
         self.entity_description = description
         self._entity_description = description
+        self._button_press_handler: XTDataEntryManager | None = None
+        if (
+            self._entity_description.is_ir_key
+            and self._entity_description.ir_remote_information is not None
+            and self._entity_description.ir_hub_information is not None
+        ):
+            self._button_press_handler = XTDataEntryAddIRDeviceKey(
+                source=XTDiscoverySource.SOURCE_ADD_IR_DEVICE_KEY,
+                hass=device_manager.hass,
+                multi_manager=device_manager,
+                device=device,
+                hub=self._entity_description.ir_hub_information,
+                remote=self._entity_description.ir_remote_information
+            )
+        elif (
+            self._entity_description.is_ir_key
+            and self._entity_description.ir_hub_information is not None
+        ):
+            self._button_press_handler = XTDataEntryAddIRDevice(
+                source=XTDiscoverySource.SOURCE_ADD_IR_DEVICE, hass=device_manager.hass
+            )
 
     @staticmethod
     def get_entity_instance(
@@ -347,24 +373,7 @@ class XTButtonEntity(XTEntity, TuyaButtonEntity):
                 self._entity_description.ir_remote_information,
                 self._entity_description.ir_hub_information,
             )
-        elif (
-            self._entity_description.is_ir_key
-            and self._entity_description.ir_remote_information is not None
-            and self._entity_description.ir_hub_information is not None
-        ):
-            XTDataEntryAddIRDeviceKey(source=XTDiscoverySource.SOURCE_ADD_IR_DEVICE_KEY).start_add_ir_device_key_flow(self.hass, self.device_manager, self.device, self._entity_description.ir_hub_information, self._entity_description.ir_remote_information)
-            #if self.device_manager.learn_ir_key(
-            #    self.device,
-            #    self._entity_description.ir_remote_information,
-            #    self._entity_description.ir_hub_information,
-            #    "TEST_KEY_TEMP"
-            #):
-            #    if self.hass:
-            #        dispatcher_send(self.hass, TUYA_DISCOVERY_NEW, [self.device.id, self._entity_description.ir_hub_information.device_id])
-        elif (
-            self._entity_description.is_ir_key
-            and self._entity_description.ir_hub_information is not None
-        ):
-            XTDataEntryAddIRDevice(source=XTDiscoverySource.SOURCE_ADD_IR_DEVICE).start_add_ir_device_flow(self.hass, self.device_manager, self.device)
+        elif self._button_press_handler is not None:
+            self._button_press_handler.fire_event()
         else:
             super().press()

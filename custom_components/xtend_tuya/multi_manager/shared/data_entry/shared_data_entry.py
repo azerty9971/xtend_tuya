@@ -1,5 +1,5 @@
 from __future__ import annotations
-
+import uuid
 from typing import Callable, cast  # noqa: F401
 from abc import ABC, abstractmethod
 from collections.abc import Mapping
@@ -32,10 +32,36 @@ class XTFlowDataBase:
 
 class XTDataEntryManager(ABC):
 
-    def __init__(self, source: str) -> None:
+    def __init__(self, source: str, hass: HomeAssistant) -> None:
         self.source = source
+        self.hass = hass
+        self.event_id = self.register_bus_event(hass)
+#    def __del__(self):
+#        pass
+
+    def register_bus_event(self, hass: HomeAssistant) -> str:
+        listen_id = f"{DOMAIN}_{type(self)}_{uuid.uuid4}"
+        @callback
+        def register_event(event):
+            LOGGER.warning(f"Called registered event: {event}")
+            self.show_user_input(self, self.convert_event_data_to_user_input(event))
+        hass.bus.async_listen(listen_id, register_event)
+        return listen_id
     
-    def __del__(self):
+
+    @abstractmethod
+    def get_flow_data(self) -> XTFlowDataBase | None:
+        pass
+
+    def fire_event(self):
+        if flow_data := self.get_flow_data():
+            self._fire_event(flow_data=flow_data)
+
+    def _fire_event(self, flow_data: XTFlowDataBase):
+        self.hass.bus.async_fire(self.event_id, flow_data.__dict__)
+    
+    @abstractmethod
+    def convert_event_data_to_user_input(self, event) -> XTFlowDataBase:
         pass
 
     @callback
@@ -45,7 +71,6 @@ class XTDataEntryManager(ABC):
         flow_data.processing_callback = base_class.user_interaction_callback
         flow_data.hass.add_job(self._show_user_input, flow_data)
 
-    @callback
     async def _show_user_input(self, flow_data: XTFlowDataBase):
         result = await flow_data.hass.config_entries.flow.async_init(
             DOMAIN,
