@@ -92,7 +92,7 @@ class XTDataEntryManager(ABC):
     ) -> ConfigFlowResult:
         new_schema = data_schema
         if new_schema is not None:
-            new_schema = vol.Schema({vol.Required(str(self.source)): data_schema})
+            new_schema = vol.Schema({vol.Required(str(self.source)): new_schema.schema})
         return config_flow.async_show_form(
             step_id=SOURCE_DISCOVERY,
             data_schema=new_schema,
