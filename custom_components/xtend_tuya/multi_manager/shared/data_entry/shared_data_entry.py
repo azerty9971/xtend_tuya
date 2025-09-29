@@ -7,7 +7,6 @@ import voluptuous as vol
 from dataclasses import dataclass
 from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import (
-    SOURCE_DISCOVERY,
     ConfigFlowContext,
     ConfigFlowResult,
     ConfigFlow,
