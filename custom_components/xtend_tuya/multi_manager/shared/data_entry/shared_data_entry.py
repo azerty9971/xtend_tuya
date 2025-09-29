@@ -56,12 +56,13 @@ class XTDataEntryManager(ABC):
         pass
 
     def fire_event(self):
-        if flow_data := self.get_flow_data():
-            self._fire_event(flow_data)
+        #if flow_data := self.get_flow_data():
+        #    self._fire_event(flow_data)
+        self.hass.bus.fire(self.event_id, {})
 
-    @callback
-    def _fire_event(self, flow_data: XTFlowDataBase):
-        self.hass.bus.fire(self.event_id, flow_data.__dict__)
+    #@callback
+    #def _fire_event(self, flow_data: XTFlowDataBase):
+    #    self.hass.bus.fire(self.event_id, {})
 
     @callback
     def show_user_input(
