@@ -41,6 +41,7 @@ class XTDataEntryAddIRDevice(XTDataEntryManager):
     ):
         flow_data = XTFlowDataAddIRDevice(
             flow_id=None,
+            source=self.source,
             multi_manager=multi_manager,
             hass=hass,
             schema=vol.Schema(
@@ -81,6 +82,7 @@ class XTDataEntryAddIRDeviceKey(XTDataEntryManager):
     ):
         flow_data = XTFlowDataAddIRDeviceKey(
             flow_id=None,
+            source=self.source,
             multi_manager=multi_manager,
             hass=hass,
             schema=vol.Schema(

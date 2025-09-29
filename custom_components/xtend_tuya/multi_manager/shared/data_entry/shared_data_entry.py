@@ -22,6 +22,7 @@ import custom_components.xtend_tuya.multi_manager.multi_manager as mm
 @dataclass
 class XTFlowDataBase:
     flow_id: str | None
+    source: str
     multi_manager: mm.MultiManager
     hass: HomeAssistant
     schema: vol.Schema

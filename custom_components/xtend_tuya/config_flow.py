@@ -43,6 +43,7 @@ from .const import (
     TUYA_SMART_APP,
     TUYA_RESPONSE_PLATFORM_URL,
     LOGGER,  # noqa: F401
+    XTDiscoverySource,
 )
 import custom_components.xtend_tuya.util as util
 import custom_components.xtend_tuya.multi_manager.multi_manager as mm
@@ -236,6 +237,13 @@ class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
         """Initialize the config flow."""
         self.__login_control = LoginControl()
 
+    def __getattr__(self, name):
+        if name in XTDiscoverySource:
+            return self.async_step_generic_data_entry
+        else:
+            # Default behaviour
+            raise AttributeError
+
     @staticmethod
     @callback
     def async_get_options_flow(config_entry):
@@ -415,7 +423,7 @@ class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
             description_placeholders=placeholders,
         )
 
-    async def async_step_discovery(
+    async def async_step_generic_data_entry(
         self, discovery_info: DiscoveryInfoType | None
     ) -> ConfigFlowResult:
         all_mm: list[mm.MultiManager] = util.get_all_multi_managers(self.hass)
@@ -426,7 +434,7 @@ class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
                     return await handler.processing_callback(self, handler, discovery_info)
         if isinstance(discovery_info, data_entry.XTFlowDataBase):
             return self.async_show_form(
-                step_id="discovery",
+                step_id=discovery_info.source,
                 data_schema=discovery_info.schema,
                 errors={},
                 description_placeholders={},
