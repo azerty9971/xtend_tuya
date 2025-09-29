@@ -441,17 +441,24 @@ class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
         return None
                 
     async def generic_data_entry(
-        self, discovery_info: DiscoveryInfoType | None
+        self, discovery_info: DiscoveryInfoType | data_entry.XTFlowDataBase | None
     ) -> ConfigFlowResult:
-        if handler := await self.get_overriden_data_entry():
-            return await handler.processing_class.user_interaction_callback(self, handler, discovery_info)
         if isinstance(discovery_info, data_entry.XTFlowDataBase):
-            return self.async_show_form(
-                step_id=discovery_info.source,
-                data_schema=discovery_info.schema,
-                errors={},
-                description_placeholders={},
-            )
+            handler = discovery_info
+            if handler.flow_id is None:
+                handler.flow_id = self.flow_id
+                handler.multi_manager.register_user_input_data(handler)
+            return await handler.processing_class.user_interaction_callback(self, handler, None)
+        else:
+            if handler := await self.get_overriden_data_entry():
+                return await handler.processing_class.user_interaction_callback(self, handler, discovery_info)
+        #if isinstance(discovery_info, data_entry.XTFlowDataBase):
+        #    return self.async_show_form(
+        #        step_id=discovery_info.source,
+        #        data_schema=discovery_info.schema,
+        #        errors={},
+        #        description_placeholders={},
+        #    )
         return self.async_abort(reason="Xtend Tuya processing function didn't return a handler, contact the developer")
         
 
