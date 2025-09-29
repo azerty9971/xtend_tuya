@@ -85,11 +85,11 @@ class XTDataEntryAddIRDeviceKey(XTDataEntryManager):
         hub: XTIRHubInformation,
         remote: XTIRRemoteInformation,
     ) -> None:
-        super().__init__(source, hass)
         self.multi_manager = multi_manager
         self.device = device
         self.hub = hub
         self.remote = remote
+        super().__init__(source, hass)
 
     def get_flow_data(self) -> XTFlowDataBase | None:
         return XTFlowDataAddIRDeviceKey(
