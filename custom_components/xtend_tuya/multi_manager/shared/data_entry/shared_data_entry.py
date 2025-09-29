@@ -91,8 +91,10 @@ class XTDataEntryManager(ABC):
         preview: str | None = None,
     ) -> ConfigFlowResult:
         new_schema = data_schema
+        LOGGER.warning(f"Data shema before: {data_schema}")
         if new_schema is not None:
             new_schema = vol.Schema({vol.Required(str(self.source)): new_schema.schema})
+            LOGGER.warning(f"Data schema after: {new_schema}")
         return config_flow.async_show_form(
             step_id=SOURCE_DISCOVERY,
             data_schema=new_schema,
