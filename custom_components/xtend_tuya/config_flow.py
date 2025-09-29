@@ -237,9 +237,10 @@ class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
         """Initialize the config flow."""
         self.__login_control = LoginControl()
 
-    def __getattr__(self, name):
+    def __getattr__(self, name: str):
         LOGGER.warning(f"Trying to find attribute {name} in TuyaConfigFlow")
-        if name in XTDiscoverySource:
+        if name.startswith("async_step_") and name[len("async_step_"):] in XTDiscoverySource:
+            LOGGER.warning("Returning the generic implementation")
             return self.async_step_generic_data_entry
         else:
             # Default behaviour
