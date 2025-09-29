@@ -40,18 +40,16 @@ class XTDataEntryManager(ABC):
         self, base_class: XTDataEntryManager, flow_data: XTFlowDataBase
     ):
         flow_data.processing_callback = base_class.user_interaction_callback
-        #flow_data.hass.add_job(self._show_user_input, flow_data)
-        flow_data.hass.async_create_task(
-            flow_data.hass.config_entries.flow.async_init(DOMAIN, context={"source": SOURCE_USER}, data=flow_data)
-        )
+        flow_data.hass.add_job(self._show_user_input, flow_data)
 
+    @callback
     async def _show_user_input(self, flow_data: XTFlowDataBase):
         result = await flow_data.hass.config_entries.flow.async_init(
             DOMAIN,
             context=ConfigFlowContext(
                 source="user",
                 # entry_id=flow_data.multi_manager.config_entry.entry_id,
-                title_placeholders={"name": f"{flow_data.title}"},
+                #title_placeholders={"name": f"{flow_data.title}"},
             ),
             data=flow_data,
         )
