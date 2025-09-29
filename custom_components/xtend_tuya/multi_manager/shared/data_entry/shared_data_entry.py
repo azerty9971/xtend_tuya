@@ -72,7 +72,7 @@ class XTDataEntryManager(ABC):
             self.hass.config_entries.flow.async_init(
                 DOMAIN,
                 context=ConfigFlowContext(
-                    source=SOURCE_DISCOVERY,
+                    source=self.source,
                     unique_id=f"{DOMAIN}_{uuid.uuid4()}",
                     # title_placeholders={"name": f"{flow_data.title}"},
                 ),
