@@ -6,7 +6,6 @@ from typing import Any
 from tuya_sharing import LoginControl
 from tuya_iot import AuthType, TuyaOpenAPI
 import voluptuous as vol
-import uuid
 from homeassistant.core import callback
 from homeassistant.config_entries import ConfigEntry, ConfigFlow, OptionsFlow
 from homeassistant.config_entries import ConfigFlowResult
@@ -255,11 +254,6 @@ class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
         """Step user."""
-        LOGGER.warning(f"Calling USER step: {self.flow_id}")
-        if isinstance(user_input, data_entry.XTFlowDataBase):
-            #await self.async_set_unique_id(unique_id=str(uuid.uuid4()))
-            #self._abort_if_unique_id_configured()
-            return await self.generic_data_entry(user_input)
         tuya_data = self.hass.config_entries.async_entries(DOMAIN_ORIG, False, False)
         xt_tuya_data = self.hass.config_entries.async_entries(DOMAIN, True, True)
         if tuya_data:

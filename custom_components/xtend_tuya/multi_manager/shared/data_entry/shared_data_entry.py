@@ -10,7 +10,7 @@ from homeassistant.config_entries import (
     ConfigFlowContext,
     ConfigFlowResult,
     ConfigFlow,
-    SOURCE_USER,
+    SOURCE_DISCOVERY,
 )
 from homeassistant.helpers.typing import (
     DiscoveryInfoType,
@@ -72,34 +72,13 @@ class XTDataEntryManager(ABC):
             self.hass.config_entries.flow.async_init(
                 DOMAIN,
                 context=ConfigFlowContext(
-                    source=SOURCE_USER,
+                    source=SOURCE_DISCOVERY,
                     unique_id=f"{DOMAIN}_{uuid.uuid4()}",
                     # title_placeholders={"name": f"{flow_data.title}"},
                 ),
                 data=self.flow_data,
             )
         )
-
-    #        flow_data.hass.add_job(self._show_user_input)
-
-    async def _show_user_input(self):
-        result = await self.hass.config_entries.flow.async_init(
-            DOMAIN,
-            context=ConfigFlowContext(
-                source=SOURCE_USER,
-                # entry_id=flow_data.multi_manager.config_entry.entry_id,
-                # title_placeholders={"name": f"{flow_data.title}"},
-            ),
-            data=self.flow_data,
-        )
-        LOGGER.warning(f"Result data: {result}")
-        self.flow_data.flow_id = result.get("flow_id")
-        if self.flow_data.flow_id is not None:
-            self.flow_data.multi_manager.register_user_input_data(self.flow_data)
-        else:
-            LOGGER.warning(
-                f"Could not register flow data in multi manager (flow_id is None), title={self.flow_data.title}"
-            )
 
     @abstractmethod
     async def user_interaction_callback(
