@@ -45,7 +45,7 @@ class XTDataEntryManager(ABC):
             DOMAIN,
             context=ConfigFlowContext(
                 source="user",
-                entry_id=flow_data.multi_manager.config_entry.entry_id,
+                # entry_id=flow_data.multi_manager.config_entry.entry_id,
                 title_placeholders={"name": f"{flow_data.title}"},
             ),
             data=flow_data,
