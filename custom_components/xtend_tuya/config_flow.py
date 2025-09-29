@@ -255,7 +255,7 @@ class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
         """Step user."""
-        LOGGER.warning(f"Calling USER step: {user_input}")
+        #LOGGER.warning(f"Calling USER step: {user_input}")
         if isinstance(user_input, data_entry.XTFlowDataBase):
             await self.async_set_unique_id(unique_id=str(uuid.uuid4()))
             self._abort_if_unique_id_configured()

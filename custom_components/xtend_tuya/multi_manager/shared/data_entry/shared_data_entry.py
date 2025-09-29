@@ -43,8 +43,7 @@ class XTDataEntryManager(ABC):
     def register_bus_event(self, hass: HomeAssistant) -> str:
         listen_id = f"{DOMAIN}_{uuid.uuid4()}"
         @callback
-        def register_event(event):
-            LOGGER.warning(f"Called registered event: {type(event)}")
+        def register_event(_):
             if flow_data := self.get_flow_data():
                 self.show_user_input(self, flow_data)
         hass.bus.async_listen(listen_id, register_event)
@@ -58,6 +57,7 @@ class XTDataEntryManager(ABC):
     def fire_event(self):
         #if flow_data := self.get_flow_data():
         #    self._fire_event(flow_data)
+        LOGGER.warning(f"Firing event {self.event_id}")
         self.hass.bus.fire(self.event_id, {})
 
     #@callback
