@@ -11,7 +11,6 @@ from .shared_data_entry import (
     ConfigFlowResult,
     DiscoveryInfoType,
     cast,
-    Event,
 )
 from ....const import (
     LOGGER,
@@ -36,8 +35,35 @@ class XTFlowDataAddIRDeviceKey(XTFlowDataBase):
 
 
 class XTDataEntryAddIRDevice(XTDataEntryManager):
-    def get_flow_data(self) -> XTFlowDataBase | None:
-        return None
+
+    def __init__(
+        self,
+        source: str,
+        hass: HomeAssistant,
+        multi_manager: mm.MultiManager,
+        device: mm.XTDevice,
+        hub: XTIRHubInformation,
+    ) -> None:
+        self.multi_manager = multi_manager
+        self.device = device
+        self.hub = hub
+        super().__init__(source, hass)
+
+    def get_flow_data(self) -> XTFlowDataBase:
+        return XTFlowDataAddIRDevice(
+            flow_id=None,
+            source=self.source,
+            multi_manager=self.multi_manager,
+            hass=self.hass,
+            schema=vol.Schema(
+                {
+                    vol.Required(XTDataEntryAddIRDeviceKey.KEY_NAME, default=""): str,
+                }
+            ),
+            title=f"Add IR device under {self.device.name}",
+            device=self.device,
+            processing_class=self
+        )
 
     async def user_interaction_callback(
         self,
@@ -71,7 +97,7 @@ class XTDataEntryAddIRDeviceKey(XTDataEntryManager):
         self.remote = remote
         super().__init__(source, hass)
 
-    def get_flow_data(self) -> XTFlowDataBase | None:
+    def get_flow_data(self) -> XTFlowDataBase:
         return XTFlowDataAddIRDeviceKey(
             flow_id=None,
             source=self.source,

@@ -5,12 +5,12 @@ from abc import ABC, abstractmethod
 from collections.abc import Mapping
 import voluptuous as vol
 from dataclasses import dataclass
-from homeassistant.core import HomeAssistant, callback, Event
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.config_entries import (
     ConfigFlowContext,
     ConfigFlowResult,
     ConfigFlow,
-    SOURCE_USER
+    SOURCE_USER,
 )
 from homeassistant.helpers.typing import (
     DiscoveryInfoType,
@@ -37,59 +37,58 @@ class XTDataEntryManager(ABC):
         self.hass = hass
         self.event_id = self.register_bus_event(hass)
         self.flow_data = self.get_flow_data()
-#    def __del__(self):
-#        pass
+
+    #    def __del__(self):
+    #        pass
 
     def register_bus_event(self, hass: HomeAssistant) -> str:
         listen_id = f"{DOMAIN}_{uuid.uuid4()}"
+
         @callback
         def register_event(_):
             self.show_user_input()
+
         hass.bus.async_listen(listen_id, register_event)
         return listen_id
-    
 
     @abstractmethod
-    def get_flow_data(self) -> XTFlowDataBase | None:
+    def get_flow_data(self) -> XTFlowDataBase:
         pass
 
     def fire_event(self):
-        #if flow_data := self.get_flow_data():
+        # if flow_data := self.get_flow_data():
         #    self._fire_event(flow_data)
         LOGGER.warning(f"Firing event {self.event_id}")
         self.hass.bus.fire(self.event_id, {})
 
-    #@callback
-    #def _fire_event(self, flow_data: XTFlowDataBase):
+    # @callback
+    # def _fire_event(self, flow_data: XTFlowDataBase):
     #    self.hass.bus.fire(self.event_id, {})
 
     @callback
-    def show_user_input(
-        self
-    ):
-        if self.flow_data is None:
-            return
+    def show_user_input(self):
         self.flow_data.processing_class = self
         self.hass.async_create_task(
             self.hass.config_entries.flow.async_init(
                 DOMAIN,
-                context={"source": SOURCE_USER},
-                data=self.flow_data
+                context=ConfigFlowContext(
+                    source=SOURCE_USER,
+                    unique_id=f"{DOMAIN}_{uuid.uuid4()}",
+                    # title_placeholders={"name": f"{flow_data.title}"},
+                ),
+                data=self.flow_data,
             )
         )
-#        flow_data.hass.add_job(self._show_user_input)
 
+    #        flow_data.hass.add_job(self._show_user_input)
 
     async def _show_user_input(self):
-        if self.flow_data is None:
-            LOGGER.warning(f"Flow data is empty {self.event_id}")
-            return
         result = await self.hass.config_entries.flow.async_init(
             DOMAIN,
             context=ConfigFlowContext(
                 source=SOURCE_USER,
                 # entry_id=flow_data.multi_manager.config_entry.entry_id,
-                #title_placeholders={"name": f"{flow_data.title}"},
+                # title_placeholders={"name": f"{flow_data.title}"},
             ),
             data=self.flow_data,
         )

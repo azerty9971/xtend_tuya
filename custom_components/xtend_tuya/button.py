@@ -342,7 +342,11 @@ class XTButtonEntity(XTEntity, TuyaButtonEntity):
             and self._entity_description.ir_hub_information is not None
         ):
             self._button_press_handler = XTDataEntryAddIRDevice(
-                source=XTDiscoverySource.SOURCE_ADD_IR_DEVICE, hass=device_manager.hass
+                source=XTDiscoverySource.SOURCE_ADD_IR_DEVICE,
+                hass=device_manager.hass,
+                multi_manager=device_manager,
+                device=device,
+                hub=self._entity_description.ir_hub_information
             )
 
     @staticmethod
