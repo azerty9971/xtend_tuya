@@ -36,6 +36,7 @@ class XTDataEntryManager(ABC):
         self.source = source
         self.hass = hass
         self.event_id = self.register_bus_event(hass)
+        self.flow_data = self.get_flow_data()
 #    def __del__(self):
 #        pass
 
@@ -44,7 +45,8 @@ class XTDataEntryManager(ABC):
         @callback
         def register_event(event):
             LOGGER.warning(f"Called registered event: {type(event)}")
-            self.show_user_input(self, self.convert_event_data_to_user_input(event))
+            if flow_data := self.get_flow_data():
+                self.show_user_input(self, flow_data)
         hass.bus.async_listen(listen_id, register_event)
         return listen_id
     
@@ -60,35 +62,34 @@ class XTDataEntryManager(ABC):
     @callback
     def _fire_event(self, flow_data: XTFlowDataBase):
         self.hass.bus.fire(self.event_id, flow_data.__dict__)
-    
-    @abstractmethod
-    def convert_event_data_to_user_input(self, event: Event) -> XTFlowDataBase:
-        pass
 
     @callback
     def show_user_input(
         self, base_class: XTDataEntryManager, flow_data: XTFlowDataBase
     ):
         flow_data.processing_callback = base_class.user_interaction_callback
-        flow_data.hass.add_job(self._show_user_input, flow_data)
+        flow_data.hass.add_job(self._show_user_input)
 
-    async def _show_user_input(self, flow_data: XTFlowDataBase):
-        result = await flow_data.hass.config_entries.flow.async_init(
+    async def _show_user_input(self):
+        if self.flow_data is None:
+            LOGGER.warning(f"Flow data is empty {self.event_id}")
+            return
+        result = await self.hass.config_entries.flow.async_init(
             DOMAIN,
             context=ConfigFlowContext(
                 source=SOURCE_USER,
                 # entry_id=flow_data.multi_manager.config_entry.entry_id,
                 #title_placeholders={"name": f"{flow_data.title}"},
             ),
-            data=flow_data,
+            data=self.flow_data,
         )
         LOGGER.warning(f"Result data: {result}")
-        flow_data.flow_id = result.get("flow_id")
-        if flow_data.flow_id is not None:
-            flow_data.multi_manager.register_user_input_data(flow_data)
+        self.flow_data.flow_id = result.get("flow_id")
+        if self.flow_data.flow_id is not None:
+            self.flow_data.multi_manager.register_user_input_data(self.flow_data)
         else:
             LOGGER.warning(
-                f"Could not register flow data in multi manager (flow_id is None), title={flow_data.title}"
+                f"Could not register flow data in multi manager (flow_id is None), title={self.flow_data.title}"
             )
 
     @abstractmethod
