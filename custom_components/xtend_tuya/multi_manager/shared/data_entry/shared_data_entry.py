@@ -10,12 +10,14 @@ from homeassistant.config_entries import (
     ConfigFlowContext,
     ConfigFlowResult,
     ConfigFlow,
-    SOURCE_DISCOVERY,
 )
 from homeassistant.helpers.typing import (
     DiscoveryInfoType,
 )
-from ....const import DOMAIN, LOGGER
+from ....const import (
+    DOMAIN,
+    LOGGER,  # noqa: F401
+)
 import custom_components.xtend_tuya.multi_manager.multi_manager as mm
 
 
@@ -35,21 +37,22 @@ class XTDataEntryManager(ABC):
     def __init__(self, source: str, hass: HomeAssistant) -> None:
         self.source = source
         self.hass = hass
-        self.event_id = self.register_bus_event(hass)
         self.flow_data = self.get_flow_data()
-
+        self.unique_id = self.get_unique_id()
+        self.register_bus_event(hass)
     #    def __del__(self):
     #        pass
 
-    def register_bus_event(self, hass: HomeAssistant) -> str:
-        listen_id = f"{DOMAIN}_{uuid.uuid4()}"
+    def get_unique_id(self) -> str:
+        return f"{DOMAIN}_{self.source}_{uuid.uuid4()}"
 
+    def register_bus_event(self, hass: HomeAssistant) -> str:
         @callback
         def register_event(_):
             self.show_user_input()
 
-        hass.bus.async_listen(listen_id, register_event)
-        return listen_id
+        hass.bus.async_listen(self.unique_id, register_event)
+        return self.unique_id
 
     @abstractmethod
     def get_flow_data(self) -> XTFlowDataBase:
@@ -58,8 +61,7 @@ class XTDataEntryManager(ABC):
     def fire_event(self):
         # if flow_data := self.get_flow_data():
         #    self._fire_event(flow_data)
-        LOGGER.warning(f"Firing event {self.event_id}")
-        self.hass.bus.fire(self.event_id, {})
+        self.hass.bus.fire(self.unique_id, {})
 
     # @callback
     # def _fire_event(self, flow_data: XTFlowDataBase):
@@ -73,8 +75,8 @@ class XTDataEntryManager(ABC):
                 DOMAIN,
                 context=ConfigFlowContext(
                     source=self.source,
-                    unique_id=f"{DOMAIN}_{uuid.uuid4()}",
-                    # title_placeholders={"name": f"{flow_data.title}"},
+                    #unique_id=f"{DOMAIN}_{uuid.uuid4()}",
+                    title_placeholders={"name": f"{self.flow_data.title}"},
                 ),
                 data=self.flow_data,
             )
