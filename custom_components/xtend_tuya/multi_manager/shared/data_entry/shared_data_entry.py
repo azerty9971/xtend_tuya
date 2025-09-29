@@ -27,7 +27,6 @@ class XTFlowDataBase:
     source: str
     multi_manager: mm.MultiManager
     hass: HomeAssistant
-    schema: vol.Schema
     title: str
     processing_class: XTDataEntryManager
 

@@ -57,11 +57,6 @@ class XTDataEntryAddIRDevice(XTDataEntryManager):
             source=self.source,
             multi_manager=self.multi_manager,
             hass=self.hass,
-            schema=vol.Schema(
-                {
-                    vol.Required(XTDataEntryAddIRDeviceKey.KEY_NAME, default=""): str,
-                }
-            ),
             title=f"Add IR device under {self.device.name}",
             device=self.device,
             processing_class=self,
@@ -74,6 +69,7 @@ class XTDataEntryAddIRDevice(XTDataEntryManager):
         flow_data: XTFlowDataBase,
         discovery_info: DiscoveryInfoType | None,
     ) -> ConfigFlowResult:
+        flow_data = cast(XTFlowDataAddIRDevice, flow_data)
         LOGGER.warning(
             f"Calling XTDataEntryAddIRDevice->user_interaction_callback: flow_data: {flow_data}, discovery_info: {discovery_info}"
         )
@@ -106,11 +102,6 @@ class XTDataEntryAddIRDeviceKey(XTDataEntryManager):
             source=self.source,
             multi_manager=self.multi_manager,
             hass=self.hass,
-            schema=vol.Schema(
-                {
-                    vol.Required(XTDataEntryAddIRDeviceKey.KEY_NAME, default=""): str,
-                }
-            ),
             title=f"Add new key for {self.device.name}",
             device=self.device,
             processing_class=self,
@@ -124,14 +115,14 @@ class XTDataEntryAddIRDeviceKey(XTDataEntryManager):
         flow_data: XTFlowDataBase,
         discovery_info: DiscoveryInfoType | None,
     ) -> ConfigFlowResult:
-        real_flow_data = cast(XTFlowDataAddIRDeviceKey, flow_data)
+        flow_data = cast(XTFlowDataAddIRDeviceKey, flow_data)
         if discovery_info is not None:
-            real_flow_data.key_name = discovery_info.get(
+            flow_data.key_name = discovery_info.get(
                 XTDataEntryAddIRDeviceKey.KEY_NAME
             )
-            if real_flow_data.key_name == "":
-                real_flow_data.key_name = None
-        if real_flow_data.key_name is None:
+            if flow_data.key_name == "":
+                flow_data.key_name = None
+        if flow_data.key_name is None:
             return self.async_show_form(
                 config_flow=config_flow,
                 data_schema=vol.Schema(
@@ -145,25 +136,25 @@ class XTDataEntryAddIRDeviceKey(XTDataEntryManager):
         else:
             if await flow_data.hass.async_add_executor_job(
                 flow_data.multi_manager.learn_ir_key,
-                real_flow_data.device,
-                real_flow_data.remote,
-                real_flow_data.hub,
-                real_flow_data.key_name,
+                flow_data.device,
+                flow_data.remote,
+                flow_data.hub,
+                flow_data.key_name,
             ):
                 dispatcher_send(
                     flow_data.hass,
                     TUYA_DISCOVERY_NEW,
-                    [real_flow_data.remote.remote_id, real_flow_data.hub.device_id],
+                    [flow_data.remote.remote_id, flow_data.hub.device_id],
                 )
                 return self.finish_flow(
                     config_flow=config_flow,
                     reason="ir_add_key_success",
-                    description_placeholders={"key_name": real_flow_data.key_name, "device_name": real_flow_data.device.name}
+                    description_placeholders={"key_name": flow_data.key_name, "device_name": flow_data.device.name}
                 )
             else:
                 return self.finish_flow(
                     config_flow=config_flow,
                     reason="ir_add_key_failed",
-                    description_placeholders={"key_name": real_flow_data.key_name, "device_name": real_flow_data.device.name}
+                    description_placeholders={"key_name": flow_data.key_name, "device_name": flow_data.device.name}
                 )
         # return self.async_abort(config_flow=config_flow, reason="")
