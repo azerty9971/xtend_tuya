@@ -157,7 +157,7 @@ class XTDataEntryAddIRDeviceKey(XTDataEntryManager):
                 )
                 return self.finish_flow(
                     config_flow=config_flow,
-                    reason="ir_add_key",
+                    reason="ir_add_key_success",
                     description_placeholders={"key_name": real_flow_data.key_name, "device_name": real_flow_data.device.name}
                 )
             else:
