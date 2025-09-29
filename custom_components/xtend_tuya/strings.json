@@ -40,7 +40,7 @@
         },
         "abort": {
             "reauth_successful": "Reauthentication successful",
-            "ir_add_key_success": "IR key {key_name} has been added to {device_name}",
+            "ir_add_key": "IR key {key_name} has been added to {device_name}",
             "ir_add_key_failed": "Could not add {key_name} to {device_name}"
         }
     },

@@ -75,7 +75,6 @@ class XTDataEntryManager(ABC):
                 DOMAIN,
                 context=ConfigFlowContext(
                     source=self.source,
-                    #unique_id=f"{DOMAIN}_{uuid.uuid4()}",
                     title_placeholders={"name": f"{self.flow_data.title}"},
                 ),
                 data=self.flow_data,

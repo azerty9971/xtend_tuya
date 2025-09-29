@@ -124,9 +124,6 @@ class XTDataEntryAddIRDeviceKey(XTDataEntryManager):
         flow_data: XTFlowDataBase,
         discovery_info: DiscoveryInfoType | None,
     ) -> ConfigFlowResult:
-        LOGGER.warning(
-            f"Calling XTDataEntryAddIRDevice->user_interaction_callback: flow_data: {flow_data}, discovery_info: {discovery_info}"
-        )
         real_flow_data = cast(XTFlowDataAddIRDeviceKey, flow_data)
         if discovery_info is not None:
             real_flow_data.key_name = discovery_info.get(
@@ -160,7 +157,7 @@ class XTDataEntryAddIRDeviceKey(XTDataEntryManager):
                 )
                 return self.finish_flow(
                     config_flow=config_flow,
-                    reason="ir_add_key_success",
+                    reason="ir_add_key",
                     description_placeholders={"key_name": real_flow_data.key_name, "device_name": real_flow_data.device.name}
                 )
             else:

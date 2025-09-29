@@ -602,12 +602,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         )
 
         if learned_code_value is None:
-            LOGGER.warning(
-                f"No code learned for {device.name} in the timeout period ({total_timeout}s)"
-            )
             return False
-
-        LOGGER.warning(f"Got code {learned_code_value} for device {device.name}")
 
         # Save learning code as TEST
         save_result = api.put(
