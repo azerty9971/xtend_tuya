@@ -24,6 +24,8 @@ import custom_components.xtend_tuya.multi_manager.multi_manager as mm
 @dataclass
 class XTFlowDataAddIRDevice(XTFlowDataBase):
     device: mm.XTDevice
+    hub: XTIRHubInformation
+    step: int = 1
 
 
 @dataclass
@@ -62,7 +64,8 @@ class XTDataEntryAddIRDevice(XTDataEntryManager):
             ),
             title=f"Add IR device under {self.device.name}",
             device=self.device,
-            processing_class=self
+            processing_class=self,
+            hub=self.hub
         )
 
     async def user_interaction_callback(
@@ -75,7 +78,7 @@ class XTDataEntryAddIRDevice(XTDataEntryManager):
             f"Calling XTDataEntryAddIRDevice->user_interaction_callback: flow_data: {flow_data}, discovery_info: {discovery_info}"
         )
 
-        return self.async_abort(config_flow=config_flow, reason="")
+        return self.finish_flow(config_flow=config_flow, reason="")
 
 
 class XTDataEntryAddIRDeviceKey(XTDataEntryManager):
@@ -126,7 +129,6 @@ class XTDataEntryAddIRDeviceKey(XTDataEntryManager):
         )
         real_flow_data = cast(XTFlowDataAddIRDeviceKey, flow_data)
         if discovery_info is not None:
-            LOGGER.warning(f"Showed discovery info: {discovery_info}")
             real_flow_data.key_name = discovery_info.get(
                 XTDataEntryAddIRDeviceKey.KEY_NAME
             )
@@ -156,13 +158,15 @@ class XTDataEntryAddIRDeviceKey(XTDataEntryManager):
                     TUYA_DISCOVERY_NEW,
                     [real_flow_data.remote.remote_id, real_flow_data.hub.device_id],
                 )
-                return self.async_abort(
+                return self.finish_flow(
                     config_flow=config_flow,
-                    reason=f"Key {real_flow_data.key_name} successfully added.",
+                    reason="ir_add_key_success",
+                    description_placeholders={"key_name": real_flow_data.key_name, "device_name": real_flow_data.device.name}
                 )
             else:
-                return self.async_abort(
+                return self.finish_flow(
                     config_flow=config_flow,
-                    reason=f"Error adding key {real_flow_data.key_name}.",
+                    reason="ir_add_key_failed",
+                    description_placeholders={"key_name": real_flow_data.key_name, "device_name": real_flow_data.device.name}
                 )
         # return self.async_abort(config_flow=config_flow, reason="")

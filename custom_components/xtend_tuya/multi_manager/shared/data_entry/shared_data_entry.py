@@ -91,7 +91,7 @@ class XTDataEntryManager(ABC):
     ) -> ConfigFlowResult:
         pass
 
-    def async_abort(
+    def finish_flow(
         self,
         *,
         config_flow: ConfigFlow,
