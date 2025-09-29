@@ -66,6 +66,7 @@ class XTDataEntryManager(ABC):
                 DOMAIN,
                 context=ConfigFlowContext(
                     source=self.source,
+                    entry_id=self.source,
                     title_placeholders=self.get_translation_placeholders(),
                 ),
                 data=self.flow_data,
