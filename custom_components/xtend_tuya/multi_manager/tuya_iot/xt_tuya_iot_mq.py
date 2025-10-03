@@ -15,7 +15,7 @@ from tuya_iot.openmq import (
     time,
 )
 from ...const import (
-    LOGGER,  # noqa: F401
+    LOGGER,
 )
 from .xt_tuya_iot_openapi import (
     XTIOTOpenAPI,
@@ -36,7 +36,6 @@ class XTIOTTuyaMQConfig(TuyaMQConfig):
 
 
 class XTIOTOpenMQ(TuyaOpenMQ):
-
     link_id: str | None = None
     class_id: str | None = None
     sleep_time: float | None = None
@@ -86,7 +85,6 @@ class XTIOTOpenMQ(TuyaOpenMQ):
                 "2.0" if (self.api.auth_type == AuthType.CUSTOM) else "1.0"
             ),
         }
-        # LOGGER.warning(f"Calling {path} => {body}")
         response = self.api.post(path, body)
 
         if response.get("success", False) is False:
@@ -113,8 +111,6 @@ class XTIOTOpenMQ(TuyaOpenMQ):
     def _on_disconnect(self, client, userdata, rc):
         if rc != 0:
             LOGGER.error(f"Unexpected disconnection.{rc}")
-        else:
-            LOGGER.debug("disconnect")
 
     def _start(self, mq_config: TuyaMQConfig) -> mqtt.Client:
         # mqttc = mqtt.Client(callback_api_version=mqtt_CallbackAPIVersion.VERSION2 ,client_id=mq_config.client_id)

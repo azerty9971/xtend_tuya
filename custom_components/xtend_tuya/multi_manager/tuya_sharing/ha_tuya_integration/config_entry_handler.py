@@ -5,18 +5,11 @@ from ....ha_tuya_integration.tuya_integration_imports import (
     tuya_integration,
     TuyaCustomerDevice,
 )
-from ....const import (
-    DOMAIN_ORIG,  # noqa: F401
-    LOGGER,  # noqa: F401
-)
 from ...multi_manager import (
     XTConfigEntry,
 )
 from ..xt_tuya_sharing_manager import (
     XTSharingDeviceManager,
-)
-from ..util import (
-    get_config_entry_runtime_data,  # noqa: F401
 )
 from ...shared.shared_classes import (
     XTDeviceMap,
@@ -34,7 +27,9 @@ class XTHATuyaIntegrationConfigEntryManager:
         if not before_call:
             self.manager.on_external_refresh_mq()
 
-    def on_tuya_device_attribute_change(self, before_call: bool, base_object: TuyaCustomerDevice, attr, value):
+    def on_tuya_device_attribute_change(
+        self, before_call: bool, base_object: TuyaCustomerDevice, attr, value
+    ):
         if not before_call:
             XTDeviceMap.set_device_key_value_multimap(base_object.id, attr, value)
 

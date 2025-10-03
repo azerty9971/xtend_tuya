@@ -12,7 +12,6 @@ from homeassistant.const import Platform
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from .const import (
     TUYA_DISCOVERY_NEW,
-    CROSS_CATEGORY_DEVICE_DESCRIPTOR,  # noqa: F401
 )
 from .util import (
     restrict_descriptor_category,
@@ -77,8 +76,11 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if category_descriptions := XTEntityDescriptorManager.get_category_descriptors(
-                    supported_descriptors, device.category
+                if (
+                    category_descriptions
+                    := XTEntityDescriptorManager.get_category_descriptors(
+                        supported_descriptors, device.category
+                    )
                 ):
                     externally_managed_dpcodes = (
                         XTEntityDescriptorManager.get_category_keys(

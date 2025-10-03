@@ -84,9 +84,7 @@ async def async_setup_entry(
                     )
         async_add_entities(entities)
 
-    hass_data.manager.register_device_descriptors(
-        this_platform, supported_descriptors
-    )
+    hass_data.manager.register_device_descriptors(this_platform, supported_descriptors)
     async_discover_device([*hass_data.manager.device_map])
 
     entry.async_on_unload(

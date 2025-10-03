@@ -4,7 +4,6 @@ from typing import Any
 from ...const import (
     VirtualStates,
     DescriptionVirtualState,
-    LOGGER,  # noqa: F401
 )
 import custom_components.xtend_tuya.multi_manager.multi_manager as mm
 import custom_components.xtend_tuya.multi_manager.shared.shared_classes as shared
@@ -96,8 +95,9 @@ class XTVirtualStateHandler:
                                 if dp_id := self.multi_manager._read_dpId_from_code(
                                     virtual_state.key, device
                                 ):
-                                    if new_dp_id := self._get_empty_local_strategy_dp_id(
-                                        device
+                                    if (
+                                        new_dp_id
+                                        := self._get_empty_local_strategy_dp_id(device)
                                     ):
                                         new_local_strategy = copy.deepcopy(
                                             device.local_strategy[dp_id]
@@ -118,9 +118,7 @@ class XTVirtualStateHandler:
                                                     "statusFormat"
                                                 ] = new_local_strategy_config_item[
                                                     "statusFormat"
-                                                ].replace(
-                                                    virtual_state.key, new_code
-                                                )
+                                                ].replace(virtual_state.key, new_code)
                                         new_local_strategy["status_code"] = new_code
                                         device.local_strategy[new_dp_id] = (
                                             new_local_strategy
@@ -141,8 +139,9 @@ class XTVirtualStateHandler:
                                 if dp_id := self.multi_manager._read_dpId_from_code(
                                     virtual_state.key, device
                                 ):
-                                    if new_dp_id := self._get_empty_local_strategy_dp_id(
-                                        device
+                                    if (
+                                        new_dp_id
+                                        := self._get_empty_local_strategy_dp_id(device)
                                     ):
                                         new_local_strategy = copy.deepcopy(
                                             device.local_strategy[dp_id]
@@ -163,9 +162,7 @@ class XTVirtualStateHandler:
                                                     "statusFormat"
                                                 ] = new_local_strategy_config_item[
                                                     "statusFormat"
-                                                ].replace(
-                                                    virtual_state.key, new_code
-                                                )
+                                                ].replace(virtual_state.key, new_code)
                                         new_local_strategy["status_code"] = new_code
                                         device.local_strategy[new_dp_id] = (
                                             new_local_strategy
@@ -189,8 +186,9 @@ class XTVirtualStateHandler:
                                 if dp_id := self.multi_manager._read_dpId_from_code(
                                     virtual_state.key, device
                                 ):
-                                    if new_dp_id := self._get_empty_local_strategy_dp_id(
-                                        device
+                                    if (
+                                        new_dp_id
+                                        := self._get_empty_local_strategy_dp_id(device)
                                     ):
                                         new_local_strategy = copy.deepcopy(
                                             device.local_strategy[dp_id]

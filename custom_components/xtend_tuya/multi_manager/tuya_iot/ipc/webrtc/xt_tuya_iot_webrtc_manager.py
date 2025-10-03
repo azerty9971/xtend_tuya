@@ -13,9 +13,6 @@ from homeassistant.components.camera.webrtc import (
     WebRTCCandidate,
     WebRTCAnswer,
 )
-from .....const import (
-    LOGGER,  # noqa: F401
-)
 import custom_components.xtend_tuya.multi_manager.tuya_iot.ipc.xt_tuya_iot_ipc_manager as ipc_man
 from ....shared.shared_classes import (
     XTDevice,
@@ -186,7 +183,8 @@ class XTIOTWebRTCManager:
             f"/v1.0/devices/{device_id}/webrtc-configs"
         )
         self.ipc_manager.multi_manager.device_watcher.report_message(
-            device_id, f"webrtc_config {webrtc_config}")
+            device_id, f"webrtc_config {webrtc_config}"
+        )
         if webrtc_config.get("success"):
             result = webrtc_config.get("result", {})
             if session_id is not None:
@@ -721,7 +719,7 @@ class XTIOTWebRTCManager:
                         "to": f"{device.id}",
                         "sub_dev_id": "",
                         "sessionid": f"{session_id}",
-                        "moto_id": f"{webrtc_config.get("moto_id", "!!!MOTO_ID_NOT_FOUND!!!")}",
+                        "moto_id": f"{webrtc_config.get('moto_id', '!!!MOTO_ID_NOT_FOUND!!!')}",
                         "tid": "",
                     },
                     "msg": {
@@ -730,7 +728,7 @@ class XTIOTWebRTCManager:
                         "stream_type": self._get_stream_type(
                             device.id, session_id, channel
                         ),
-                        "auth": f"{webrtc_config.get("auth", "!!!AUTH_NOT_FOUND!!!")}",
+                        "auth": f"{webrtc_config.get('auth', '!!!AUTH_NOT_FOUND!!!')}",
                     },
                 },
             }
@@ -902,9 +900,9 @@ class XTIOTWebRTCRTPMap:
     def __init__(self, rtpmap_line: str, m_line: str) -> None:
         self.rtpmap = rtpmap_line
         self.m_line = m_line
-        self.a_lines: dict[str, XTIOTWebRTCRTPMapALineGroup] = (
-            {}
-        )  # dict[a=...:, tokens]
+        self.a_lines: dict[
+            str, XTIOTWebRTCRTPMapALineGroup
+        ] = {}  # dict[a=...:, tokens]
 
     def __repr__(self) -> str:
         return_str = self.rtpmap + ENDLINE

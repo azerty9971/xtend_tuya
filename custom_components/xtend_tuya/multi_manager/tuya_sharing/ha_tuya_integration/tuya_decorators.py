@@ -7,9 +7,6 @@ from ....ha_tuya_integration.tuya_integration_imports import (
     tuya_integration,
     TuyaManager,
 )
-from ....const import (
-    LOGGER,  # noqa: F401
-)
 
 
 class XTDecorator:

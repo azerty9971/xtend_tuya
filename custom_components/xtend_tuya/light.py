@@ -19,8 +19,7 @@ from .multi_manager.multi_manager import (
 from .const import (
     TUYA_DISCOVERY_NEW,
     XTDPCode,
-    LOGGER,  # noqa: F401
-    CROSS_CATEGORY_DEVICE_DESCRIPTOR,  # noqa: F401
+    LOGGER,
     XTMultiManagerPostSetupCallbackPriority,
 )
 from .ha_tuya_integration.tuya_integration_imports import (
@@ -41,10 +40,16 @@ class XTLightEntityDescription(TuyaLightEntityDescription):
 
     brightness_max: TuyaDPCode | XTDPCode | None = None  # type: ignore
     brightness_min: TuyaDPCode | XTDPCode | None = None  # type: ignore
-    brightness: TuyaDPCode | tuple[TuyaDPCode, ...] | XTDPCode | tuple[XTDPCode, ...] | None = None  # type: ignore
-    color_data: TuyaDPCode | tuple[TuyaDPCode, ...] | XTDPCode | tuple[XTDPCode, ...] | None = None  # type: ignore
+    brightness: (
+        TuyaDPCode | tuple[TuyaDPCode, ...] | XTDPCode | tuple[XTDPCode, ...] | None
+    ) = None  # type: ignore
+    color_data: (
+        TuyaDPCode | tuple[TuyaDPCode, ...] | XTDPCode | tuple[XTDPCode, ...] | None
+    ) = None  # type: ignore
     color_mode: TuyaDPCode | XTDPCode | None = None  # type: ignore
-    color_temp: TuyaDPCode | tuple[TuyaDPCode, ...] | XTDPCode | tuple[XTDPCode, ...] | None = None  # type: ignore
+    color_temp: (
+        TuyaDPCode | tuple[TuyaDPCode, ...] | XTDPCode | tuple[XTDPCode, ...] | None
+    ) = None  # type: ignore
 
     def get_entity_instance(
         self,
@@ -105,14 +110,17 @@ async def async_setup_entry(
                     descriptor = XTLightEntityDescription(
                         key=dpcode,
                         translation_key="xt_generic_light",
-                        translation_placeholders={"name": XTEntity.get_human_name(dpcode)},
+                        translation_placeholders={
+                            "name": XTEntity.get_human_name(dpcode)
+                        },
                         entity_registry_enabled_default=False,
                         entity_registry_visible_default=False,
                     )
                     entities.append(
                         XTLightEntity.get_entity_instance(
                             descriptor, device, hass_data.manager
-                        ))
+                        )
+                    )
         async_add_entities(entities)
 
     @callback
@@ -124,8 +132,11 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if category_descriptions := XTEntityDescriptorManager.get_category_descriptors(
-                    supported_descriptors, device.category
+                if (
+                    category_descriptions
+                    := XTEntityDescriptorManager.get_category_descriptors(
+                        supported_descriptors, device.category
+                    )
                 ):
                     externally_managed_dpcodes = (
                         XTEntityDescriptorManager.get_category_keys(
@@ -168,9 +179,11 @@ async def async_setup_entry(
 
         async_add_entities(entities)
         if restrict_dpcode is None:
-            hass_data.manager.post_setup_callbacks[
-                XTMultiManagerPostSetupCallbackPriority.PRIORITY_LAST
-            ].append((async_add_generic_entities, (device_map,), None))
+            hass_data.manager.add_post_setup_callback(
+                XTMultiManagerPostSetupCallbackPriority.PRIORITY_LAST,
+                async_add_generic_entities,
+                device_map,
+            )
 
     hass_data.manager.register_device_descriptors(this_platform, supported_descriptors)
     async_discover_device([*hass_data.manager.device_map])
@@ -189,7 +202,6 @@ class XTLightEntity(XTEntity, TuyaLightEntity):
         device_manager: MultiManager,
         description: XTLightEntityDescription,
     ) -> None:
-
         try:
             super(XTLightEntity, self).__init__(device, device_manager, description)
             self.fix_color_data(device, description)

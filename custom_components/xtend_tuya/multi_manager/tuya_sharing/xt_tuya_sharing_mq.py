@@ -18,7 +18,6 @@ from urllib.parse import urlsplit
 
 
 class XTSharingMQ(SharingMQ):
-
     # This block will be useful when we'll use Paho MQTT 3.x or above
     # def _on_disconnect(self, client: mqtt.Client, userdata: Any, flags: mqtt_DisconnectFlags, rc: mqtt_ReasonCode, properties: mqtt_Properties | None = None):
     #     super()._on_disconnect(client=client, userdata=userdata, rc=rc)

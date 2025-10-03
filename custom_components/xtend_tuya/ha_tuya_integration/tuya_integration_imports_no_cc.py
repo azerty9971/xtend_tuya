@@ -9,7 +9,7 @@ from homeassistant.components.tuya.binary_sensor import (
     BINARY_SENSORS as BINARY_SENSORS_TUYA,  # noqa: F401
     TuyaBinarySensorEntity as TuyaBinarySensorEntity,
     TuyaBinarySensorEntityDescription as TuyaBinarySensorEntityDescription,
-    #_get_bitmap_bit_mask as get_bitmap_bit_mask_tuya_binary_sensor  # noqa: F401
+    # _get_bitmap_bit_mask as get_bitmap_bit_mask_tuya_binary_sensor  # noqa: F401
 )
 from homeassistant.components.button import (
     ButtonEntityDescription as TuyaButtonEntityDescription,  # noqa: F401
@@ -36,9 +36,10 @@ from homeassistant.components.tuya.cover import (
 from homeassistant.components.event import (
     EventEntityDescription,
 )
+
 try:
     from homeassistant.components.tuya.event import (
-        EVENTS as EVENTS_TUYA, # noqa: F401
+        EVENTS as EVENTS_TUYA,  # noqa: F401
         TuyaEventEntity as TuyaEventEntity,
     )
 except Exception:
@@ -115,6 +116,7 @@ from homeassistant.components.tuya.entity import (
     TuyaEntity as TuyaEntity,
     _DPTYPE_MAPPING as TUYA_DPTYPE_MAPPING,  # noqa: F401
 )
+
 try:
     from homeassistant.components.tuya.models import (
         EnumTypeData as TuyaEnumTypeData,  # noqa: F401

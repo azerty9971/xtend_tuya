@@ -10,7 +10,6 @@ from homeassistant.helpers.http import KEY_AUTHENTICATED, HomeAssistantView
 from homeassistant.helpers.entity_component import EntityComponent, entity
 from aiohttp import hdrs, web
 from ....const import (
-    LOGGER,  # noqa: F401
     DOMAIN,
 )
 

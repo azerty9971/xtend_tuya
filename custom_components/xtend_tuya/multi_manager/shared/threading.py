@@ -1,6 +1,7 @@
 from __future__ import annotations
 from threading import Thread
 
+
 class XTThread(Thread):
     def __init__(self, callable, immediate_start: bool = False, *args, **kwargs):
         self.callable = callable
@@ -13,10 +14,11 @@ class XTThread(Thread):
             self.callable(*args, **kwargs)
         except Exception as e:
             self.exception = e
-    
+
     def raise_exception_if_needed(self):
         if self.exception:
             raise self.exception
+
 
 class XTThreadingManager:
     join_timeout: float = 0.05

@@ -5,9 +5,13 @@ https://github.com/tuya/tuya-iot-python-sdk
 
 from __future__ import annotations
 import json
+import time
 from tuya_iot import (
     TuyaDeviceManager,
     TuyaOpenMQ,
+)
+from tuya_iot.tuya_enums import (
+    AuthType,
 )
 from typing import Any, cast
 from ...const import (
@@ -39,10 +43,13 @@ from .ipc.xt_tuya_iot_ipc_manager import XTIOTIPCManager
 from .xt_tuya_iot_openapi import (
     XTIOTOpenAPI,
 )
+from .xt_tuya_iot_device import (
+    XTIndustrySolutionDeviceManage,
+    XTSmartHomeDeviceManage,
+)
 
 
 class XTIOTDeviceManager(TuyaDeviceManager):
-
     device_map: XTDeviceMap = XTDeviceMap({}, XTDeviceSourcePriority.TUYA_IOT)
 
     def __init__(
@@ -53,6 +60,10 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         mq: TuyaOpenMQ,
     ) -> None:
         super().__init__(api, mq)
+        if api.auth_type == AuthType.SMART_HOME:
+            self.device_manage = XTSmartHomeDeviceManage(api)
+        else:
+            self.device_manage = XTIndustrySolutionDeviceManage(api)
         self.device_map = XTDeviceMap({}, XTDeviceSourcePriority.TUYA_IOT)  # type: ignore
         mq.remove_message_listener(self.on_message)
         mq.add_message_listener(self.forward_message_to_multi_manager)  # type: ignore
@@ -192,6 +203,9 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         return super()._on_device_other(device_id, biz_code, data)
 
     def _on_device_report(self, device_id: str, status: list):
+        self.multi_manager.device_watcher.report_message(
+            device_id, f"[IOT]On device report: {status}"
+        )
         device = self.device_map.get(device_id, None)
         if not device:
             return
@@ -363,7 +377,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                 property_str = json.dumps({prop_key: property[prop_key]})
                 self.multi_manager.device_watcher.report_message(
                     device_id,
-                    f"Sending property update, payload: {json.dumps({"properties": property_str})}",
+                    f"Sending property update, payload: {json.dumps({'properties': property_str})}",
                 )
                 self.api.post(
                     f"/v2.0/cloud/thing/{device_id}/shadow/properties/issue",
@@ -445,7 +459,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
             if code == 28841106:
                 return False
         return True
-    
+
     def test_ir_api_subscription(
         self, device: XTDevice, api: XTIOTOpenAPI | None = None
     ) -> bool:
@@ -490,10 +504,10 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                 remote_name=remote_name,
                 keys=[],
             )
-            remote_keys = self._get_ir_remote_keys(device.id, remote_id, api)
-            if len(remote_keys) > 0:
-                remote_information.keys = remote_keys
-                device_information.remote_ids.append(remote_information)
+            remote_information.keys = self._get_ir_remote_keys(
+                device.id, remote_id, api
+            )
+            device_information.remote_ids.append(remote_information)
         return device_information
 
     def _get_ir_remote_keys(
@@ -538,12 +552,76 @@ class XTIOTDeviceManager(TuyaDeviceManager):
             "key_id": key.key_id,
             "key": key.key,
         }
-        #LOGGER.warning(f"IR command payload: {payload}")
         ir_command = api.post(
             f"/v2.0/infrareds/{hub.device_id}/remotes/{remote.remote_id}/raw/command",
             payload,
         )
         if ir_command.get("success", False) and ir_command.get("result", False):
+            return True
+        return False
+
+    def learn_ir_key(
+        self,
+        device: XTDevice,
+        remote: XTIRRemoteInformation,
+        hub: XTIRHubInformation,
+        key_name: str,
+        api: XTIOTOpenAPI | None = None,
+    ) -> bool:
+        total_timeout: int = 20
+        check_interval: int = 1
+        if api is None:
+            api = self.api
+        # Set device in learning mode
+        learning_mode = api.put(
+            f"/v2.0/infrareds/{hub.device_id}/learning-state",
+            {"state": True},
+        )
+        if (
+            learning_mode.get("success", False) is False
+            or learning_mode.get("t") is None
+        ):
+            LOGGER.warning(f"Could not put IR Hub {device.name} in learning mode")
+            return False
+        learning_time = int(learning_mode["t"])
+        learned_code_value: str | None = None
+        for _ in range(total_timeout):
+            learned_code = api.get(
+                f"/v2.0/infrareds/{hub.device_id}/learning-codes",
+                {"learning_time": learning_time},
+            )
+            if result := learned_code.get("result", {}):
+                if result.get("success", False):
+                    learned_code_value = result.get("code")
+                    break
+            time.sleep(check_interval)
+
+        learning_mode = api.put(
+            f"/v2.0/infrareds/{hub.device_id}/learning-state", {"state": False}
+        )
+
+        if learned_code_value is None:
+            return False
+
+        # Save learning code as TEST
+        save_result = api.put(
+            f"/v2.0/infrareds/{hub.device_id}/remotes/{remote.remote_id}/learning-codes",
+            {
+                "category_id": remote.category_id,
+                # "brand_name": remote.brand_name,
+                # "remote_name": remote.remote_name,
+                "codes": [
+                    {
+                        # "category_id": remote.category_id,
+                        # "key_name": "test2",
+                        "key": key_name,
+                        "code": learned_code_value,
+                        "id": learning_time // 1000,
+                    }
+                ],
+            },
+        )
+        if save_result.get("success", False):
             return True
         return False
 

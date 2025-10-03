@@ -9,6 +9,7 @@ from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from .util import (
     restrict_descriptor_category,
+    delete_all_device_entities,
 )
 from .multi_manager.multi_manager import (
     XTConfigEntry,
@@ -19,13 +20,12 @@ from .const import (
     TUYA_DISCOVERY_NEW,
     XTDPCode,
     VirtualFunctions,
-    CROSS_CATEGORY_DEVICE_DESCRIPTOR,  # noqa: F401
     XTMultiManagerPostSetupCallbackPriority,
     XTIRHubInformation,
     XTIRRemoteInformation,
     XTIRRemoteKeysInformation,
     XTMultiManagerProperties,
-    LOGGER,
+    XTDiscoverySource,
 )
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaButtonEntity,
@@ -34,6 +34,12 @@ from .ha_tuya_integration.tuya_integration_imports import (
 from .entity import (
     XTEntity,
     XTEntityDescriptorManager,
+)
+
+from .multi_manager.shared.data_entry.ir_device_data_entry import (
+    XTDataEntryAddIRDevice,
+    XTDataEntryAddIRDeviceKey,
+    XTDataEntryManager,
 )
 
 
@@ -141,13 +147,19 @@ async def async_setup_entry(
         for device_id in device_ids:
             if hub_device := hass_data.manager.device_map.get(device_id):
                 if hub_device.category in IR_HUB_CATEGORY_LIST:
-                    hub_information: XTIRHubInformation | None = (
-                        await hass.async_add_executor_job(
-                            hass_data.manager.get_ir_hub_information, hub_device
-                        )
+                    hub_information: (
+                        XTIRHubInformation | None
+                    ) = await hass.async_add_executor_job(
+                        hass_data.manager.get_ir_hub_information, hub_device
                     )
                     if hub_information is None:
                         continue
+
+                    # First, clean up the device and subdevices
+                    entity_cleanup_device_ids: list[str] = [hub_information.device_id]
+                    for remote_information in hub_information.remote_ids:
+                        entity_cleanup_device_ids.append(remote_information.remote_id)
+                    delete_all_device_entities(hass, entity_cleanup_device_ids)
 
                     descriptor = XTButtonEntityDescription(
                         key="xt_add_device",
@@ -171,7 +183,7 @@ async def async_setup_entry(
                             remote_information.remote_id
                         ):
                             descriptor = XTButtonEntityDescription(
-                                key="xt_add_device",
+                                key="xt_add_device_key",
                                 translation_key="xt_add_ir_device_key",
                                 is_ir_key=True,
                                 ir_hub_information=hub_information,
@@ -220,8 +232,11 @@ async def async_setup_entry(
                     hass_data.manager.set_general_property(
                         XTMultiManagerProperties.IR_DEVICE_ID, device.id
                     )
-                if category_descriptions := XTEntityDescriptorManager.get_category_descriptors(
-                    supported_descriptors, device.category
+                if (
+                    category_descriptions
+                    := XTEntityDescriptorManager.get_category_descriptors(
+                        supported_descriptors, device.category
+                    )
                 ):
                     externally_managed_dpcodes = (
                         XTEntityDescriptorManager.get_category_keys(
@@ -277,13 +292,14 @@ async def async_setup_entry(
 
         async_add_entities(entities)
         if restrict_dpcode is None:
-            hass_data.manager.post_setup_callbacks[
-                XTMultiManagerPostSetupCallbackPriority.PRIORITY_LAST
-            ].append((async_add_IR_entities, (device_map,), None))
+            hass_data.manager.add_post_setup_callback(
+                XTMultiManagerPostSetupCallbackPriority.PRIORITY_LAST,
+                async_add_IR_entities,
+                device_map,
+            )
 
     hass_data.manager.register_device_descriptors(this_platform, supported_descriptors)
     async_discover_device([*hass_data.manager.device_map])
-    # async_discover_device(hass_data.manager, hass_data.manager.open_api_device_map)
 
     entry.async_on_unload(
         async_dispatcher_connect(hass, TUYA_DISCOVERY_NEW, async_discover_device)
@@ -308,6 +324,31 @@ class XTButtonEntity(XTEntity, TuyaButtonEntity):
         self.device_manager = device_manager
         self.entity_description = description
         self._entity_description = description
+        self._button_press_handler: XTDataEntryManager | None = None
+        if (
+            self._entity_description.is_ir_key
+            and self._entity_description.ir_remote_information is not None
+            and self._entity_description.ir_hub_information is not None
+        ):
+            self._button_press_handler = XTDataEntryAddIRDeviceKey(
+                source=XTDiscoverySource.SOURCE_ADD_IR_DEVICE_KEY,
+                hass=device_manager.hass,
+                multi_manager=device_manager,
+                device=device,
+                hub=self._entity_description.ir_hub_information,
+                remote=self._entity_description.ir_remote_information,
+            )
+        elif (
+            self._entity_description.is_ir_key
+            and self._entity_description.ir_hub_information is not None
+        ):
+            self._button_press_handler = XTDataEntryAddIRDevice(
+                source=XTDiscoverySource.SOURCE_ADD_IR_DEVICE,
+                hass=device_manager.hass,
+                multi_manager=device_manager,
+                device=device,
+                hub=self._entity_description.ir_hub_information,
+            )
 
     @staticmethod
     def get_entity_instance(
@@ -337,16 +378,7 @@ class XTButtonEntity(XTEntity, TuyaButtonEntity):
                 self._entity_description.ir_remote_information,
                 self._entity_description.ir_hub_information,
             )
-        elif (
-            self._entity_description.is_ir_key
-            and self._entity_description.ir_remote_information is not None
-            and self._entity_description.ir_hub_information is not None
-        ):
-            LOGGER.warning(f"Add IR key on {self.device.name} was pressed but is not implemented yet, I'm waiting for my RF hub delivery...")
-        elif (
-            self._entity_description.is_ir_key
-            and self._entity_description.ir_hub_information is not None
-        ):
-            LOGGER.warning(f"Add device on {self.device.name} was pressed but is not implemented yet, I'm waiting for my RF hub delivery...")
+        elif self._button_press_handler is not None:
+            self._button_press_handler.fire_event()
         else:
             super().press()

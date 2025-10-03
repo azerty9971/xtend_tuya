@@ -26,7 +26,6 @@ from .multi_manager.multi_manager import (
 )
 from .const import (
     TUYA_DISCOVERY_NEW,
-    LOGGER,  # noqa: F401
     XTDPCode,
     MESSAGE_SOURCE_TUYA_IOT,
     XTMultiManagerProperties,

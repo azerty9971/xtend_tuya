@@ -10,7 +10,6 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.const import Platform
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from .const import (
-    LOGGER,  # noqa: F401
     TUYA_DISCOVERY_NEW,
     XTDPCode,
     XTMultiManagerProperties,
@@ -56,8 +55,7 @@ LOCKS: dict[str, XTLockEntityDescription] = {}
 LOCK_LOCKED_UNLOCKED_STATUS_DPCODES: list[XTDPCode] = [
     XTDPCode.LOCK_MOTOR_STATE,
     XTDPCode.OPEN_CLOSE,
-
-    #This one is a string value, keep it at the end of the enum
+    # This one is a string value, keep it at the end of the enum
     XTDPCode.CLOSED_OPENED,
 ]
 
@@ -238,8 +236,10 @@ class XTLockEntity(XTEntity, LockEntity):  # type: ignore
         """Return true if the lock is locked."""
         if self.temporary_unlock:
             return True
-        
-        is_unlocked_mixed = self._get_state_value(self.entity_description.unlock_status_list)
+
+        is_unlocked_mixed = self._get_state_value(
+            self.entity_description.unlock_status_list
+        )
         is_unlocked: bool | None = None
         if isinstance(is_unlocked_mixed, bool):
             is_unlocked = is_unlocked_mixed
@@ -281,7 +281,10 @@ class XTLockEntity(XTEntity, LockEntity):  # type: ignore
     def _get_state_value(self, codes: list[XTDPCode]) -> Any | None:
         self.update_changed_value_list()
         for code in codes:
-            if code in self.status_value_has_changed and self.status_value_has_changed[code] is True:
+            if (
+                code in self.status_value_has_changed
+                and self.status_value_has_changed[code] is True
+            ):
                 return self.device.status[str(code)]
         for code in codes:
             if str(code) in self.device.status:

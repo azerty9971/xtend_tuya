@@ -18,7 +18,6 @@ from .const import (
     TUYA_DISCOVERY_NEW,
     XTDPCode,
     CROSS_CATEGORY_DEVICE_DESCRIPTOR,
-    LOGGER,  # noqa: F401
     XTMultiManagerPostSetupCallbackPriority,
 )
 from .ha_tuya_integration.tuya_integration_imports import (
@@ -451,14 +450,17 @@ async def async_setup_entry(
                     descriptor = XTSwitchEntityDescription(
                         key=dpcode,
                         translation_key="xt_generic_switch",
-                        translation_placeholders={"name": XTEntity.get_human_name(dpcode)},
+                        translation_placeholders={
+                            "name": XTEntity.get_human_name(dpcode)
+                        },
                         entity_registry_enabled_default=False,
                         entity_registry_visible_default=False,
                     )
                     entities.append(
                         XTSwitchEntity.get_entity_instance(
                             descriptor, device, hass_data.manager
-                        ))
+                        )
+                    )
         async_add_entities(entities)
 
     @callback
@@ -470,8 +472,11 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if category_descriptions := XTEntityDescriptorManager.get_category_descriptors(
-                    supported_descriptors, device.category
+                if (
+                    category_descriptions
+                    := XTEntityDescriptorManager.get_category_descriptors(
+                        supported_descriptors, device.category
+                    )
                 ):
                     externally_managed_dpcodes = (
                         XTEntityDescriptorManager.get_category_keys(
@@ -514,13 +519,13 @@ async def async_setup_entry(
 
         async_add_entities(entities)
         if restrict_dpcode is None:
-            hass_data.manager.post_setup_callbacks[
-                XTMultiManagerPostSetupCallbackPriority.PRIORITY_LAST
-            ].append((async_add_generic_entities, (device_map,), None))
+            hass_data.manager.add_post_setup_callback(
+                XTMultiManagerPostSetupCallbackPriority.PRIORITY_LAST,
+                async_add_generic_entities,
+                device_map,
+            )
 
-    hass_data.manager.register_device_descriptors(
-        this_platform, supported_descriptors
-    )
+    hass_data.manager.register_device_descriptors(this_platform, supported_descriptors)
     async_discover_device([*hass_data.manager.device_map])
 
     entry.async_on_unload(

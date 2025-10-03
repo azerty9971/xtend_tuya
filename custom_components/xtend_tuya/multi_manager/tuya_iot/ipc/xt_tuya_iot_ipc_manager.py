@@ -2,9 +2,6 @@ from __future__ import annotations
 from ...multi_manager import (
     MultiManager,
 )
-from ....const import (
-    LOGGER,  # noqa: F401
-)
 from ..xt_tuya_iot_openapi import (
     XTIOTOpenAPI,
 )
