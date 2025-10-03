@@ -12,7 +12,6 @@ from homeassistant.const import Platform
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from .const import (
     TUYA_DISCOVERY_NEW,
-    CROSS_CATEGORY_DEVICE_DESCRIPTOR,  # noqa: F401
 )
 from .util import (
     restrict_descriptor_category,

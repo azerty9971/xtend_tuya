@@ -11,7 +11,7 @@ from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from .const import (
     XTDPCode,
-    LOGGER,  # noqa: F401
+    LOGGER,
     CROSS_CATEGORY_DEVICE_DESCRIPTOR,
     DOMAIN,
     DOMAIN_ORIG,

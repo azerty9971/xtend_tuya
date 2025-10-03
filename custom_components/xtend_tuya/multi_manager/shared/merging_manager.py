@@ -3,7 +3,7 @@ import json
 import copy
 from typing import Any
 from ...const import (
-    LOGGER,  # noqa: F401
+    LOGGER,
 )
 import custom_components.xtend_tuya.multi_manager.shared.cloud_fix as cf
 import custom_components.xtend_tuya.multi_manager.multi_manager as mm

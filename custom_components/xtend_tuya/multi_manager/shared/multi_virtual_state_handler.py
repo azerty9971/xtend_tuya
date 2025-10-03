@@ -4,7 +4,6 @@ from typing import Any
 from ...const import (
     VirtualStates,
     DescriptionVirtualState,
-    LOGGER,  # noqa: F401
 )
 import custom_components.xtend_tuya.multi_manager.multi_manager as mm
 import custom_components.xtend_tuya.multi_manager.shared.shared_classes as shared

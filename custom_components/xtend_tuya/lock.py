@@ -10,7 +10,6 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.const import Platform
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from .const import (
-    LOGGER,  # noqa: F401
     TUYA_DISCOVERY_NEW,
     XTDPCode,
     XTMultiManagerProperties,

@@ -12,9 +12,6 @@ from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect, dispatcher_send
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from .const import (
-    LOGGER,  # noqa: F401
-)
 from .util import (
     restrict_descriptor_category,
 )
@@ -29,7 +26,6 @@ from .multi_manager.shared.shared_classes import (
 from .const import (
     TUYA_DISCOVERY_NEW,
     XTDPCode,
-    CROSS_CATEGORY_DEVICE_DESCRIPTOR,  # noqa: F401
     XTMultiManagerPostSetupCallbackPriority,
 )
 from .ha_tuya_integration.tuya_integration_imports import (

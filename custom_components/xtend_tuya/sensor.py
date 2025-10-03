@@ -3,7 +3,6 @@
 from __future__ import annotations
 from typing import cast, Callable
 from dataclasses import dataclass, field
-from .const import LOGGER  # noqa: F401
 from datetime import datetime
 from homeassistant.components.sensor import (
     SensorDeviceClass,
@@ -51,10 +50,11 @@ from .multi_manager.multi_manager import (
 from .const import (
     TUYA_DISCOVERY_NEW,
     XTDPCode,
-    VirtualStates,  # noqa: F401
+    VirtualStates,
     XTDeviceEntityFunctions,
     CROSS_CATEGORY_DEVICE_DESCRIPTOR,
     XTMultiManagerPostSetupCallbackPriority,
+    LOGGER,
 )
 from .entity import (
     XTEntity,
@@ -1546,8 +1546,6 @@ async def async_setup_entry(
                         entity_registry_enabled_default=False,
                         entity_registry_visible_default=False,
                     )
-                    if descriptor.device_class is not None:
-                        LOGGER.warning(f"Adding generic entity {dpcode} with device class {descriptor.device_class}")
                     entities.append(
                         XTSensorEntity.get_entity_instance(
                             descriptor, device, hass_data.manager

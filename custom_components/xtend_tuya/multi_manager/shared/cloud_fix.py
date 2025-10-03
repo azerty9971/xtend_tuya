@@ -7,9 +7,6 @@ from .shared_classes import (
     XTDeviceFunction,
     XTDeviceStatusRange,
 )
-from ...const import (
-    LOGGER,  # noqa: F401
-)
 from ...ha_tuya_integration.tuya_integration_imports import (
     TuyaDPType,
 )

@@ -13,9 +13,6 @@ from homeassistant.components.camera.webrtc import (
     WebRTCCandidate,
     WebRTCAnswer,
 )
-from .....const import (
-    LOGGER,  # noqa: F401
-)
 import custom_components.xtend_tuya.multi_manager.tuya_iot.ipc.xt_tuya_iot_ipc_manager as ipc_man
 from ....shared.shared_classes import (
     XTDevice,

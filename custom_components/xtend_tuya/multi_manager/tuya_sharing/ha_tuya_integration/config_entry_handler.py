@@ -5,18 +5,11 @@ from ....ha_tuya_integration.tuya_integration_imports import (
     tuya_integration,
     TuyaCustomerDevice,
 )
-from ....const import (
-    DOMAIN_ORIG,  # noqa: F401
-    LOGGER,  # noqa: F401
-)
 from ...multi_manager import (
     XTConfigEntry,
 )
 from ..xt_tuya_sharing_manager import (
     XTSharingDeviceManager,
-)
-from ..util import (
-    get_config_entry_runtime_data,  # noqa: F401
 )
 from ...shared.shared_classes import (
     XTDeviceMap,

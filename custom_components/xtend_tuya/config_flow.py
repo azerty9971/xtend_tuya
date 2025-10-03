@@ -20,7 +20,6 @@ from .const import (
     CONF_TOKEN_INFO,
     CONF_USER_CODE,
     DOMAIN,
-    DOMAIN_ORIG,  # noqa: F401
     TUYA_CLIENT_ID,
     TUYA_RESPONSE_CODE,
     TUYA_RESPONSE_MSG,
@@ -42,7 +41,6 @@ from .const import (
     TUYA_COUNTRIES,
     TUYA_SMART_APP,
     TUYA_RESPONSE_PLATFORM_URL,
-    LOGGER,  # noqa: F401
     XTDiscoverySource,
 )
 import custom_components.xtend_tuya.util as util
@@ -120,8 +118,6 @@ class TuyaOptionFlow(OptionsFlow):
         errors = {}
         placeholders = {}
 
-        LOGGER.warning(f"Calling reconfigure user_input: {user_input}")
-
         if user_input is not None:
             response, data = await self.hass.async_add_executor_job(
                 self._try_login, user_input
@@ -147,8 +143,6 @@ class TuyaOptionFlow(OptionsFlow):
 
         if user_input is None:
             user_input = {}
-        
-        LOGGER.warning(f"Config flow started for {self.config_entry.title}", stack_info=True)
 
         default_country = "United States"
         default_endpoint = TuyaCloudOpenAPIEndpoint.AMERICA

@@ -7,7 +7,7 @@ from typing import Any, cast
 from homeassistant.components.climate.const import (
     ClimateEntityFeature,
     HVACMode,
-    SWING_BOTH,  # noqa: F401
+    SWING_BOTH,
     SWING_HORIZONTAL,
     SWING_OFF,
     SWING_ON,
@@ -29,8 +29,6 @@ from .multi_manager.multi_manager import (
 from .const import (
     TUYA_DISCOVERY_NEW,
     XTDPCode,
-    CROSS_CATEGORY_DEVICE_DESCRIPTOR,  # noqa: F401
-    LOGGER,  # noqa: F401
 )
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaClimateEntity,

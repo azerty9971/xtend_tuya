@@ -20,13 +20,11 @@ from .const import (
     TUYA_DISCOVERY_NEW,
     XTDPCode,
     VirtualFunctions,
-    CROSS_CATEGORY_DEVICE_DESCRIPTOR,  # noqa: F401
     XTMultiManagerPostSetupCallbackPriority,
     XTIRHubInformation,
     XTIRRemoteInformation,
     XTIRRemoteKeysInformation,
     XTMultiManagerProperties,
-    LOGGER,  # noqa: F401
     XTDiscoverySource,
 )
 from .ha_tuya_integration.tuya_integration_imports import (

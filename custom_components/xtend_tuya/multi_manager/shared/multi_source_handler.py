@@ -2,7 +2,6 @@ from __future__ import annotations
 import copy
 from typing import Any
 import custom_components.xtend_tuya.multi_manager.multi_manager as mm
-from ...const import LOGGER  # noqa: F401
 
 
 class SourceCodeCounter:

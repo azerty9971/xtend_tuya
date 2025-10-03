@@ -17,7 +17,6 @@ from tuya_sharing.home import (
     HomeRepository,
 )
 from ...const import (
-    LOGGER,  # noqa: F401
     MESSAGE_SOURCE_TUYA_SHARING,
     XTDeviceSourcePriority,
 )

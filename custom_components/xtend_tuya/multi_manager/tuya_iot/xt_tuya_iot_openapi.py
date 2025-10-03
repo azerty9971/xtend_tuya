@@ -11,7 +11,7 @@ from tuya_iot import (
 from tuya_iot.tuya_enums import AuthType
 from tuya_iot.version import VERSION
 from ...const import (
-    LOGGER,  # noqa: F401
+    LOGGER,
 )
 
 TUYA_ERROR_CODE_TOKEN_INVALID = 1010

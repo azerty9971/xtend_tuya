@@ -19,8 +19,7 @@ from .multi_manager.multi_manager import (
 from .const import (
     TUYA_DISCOVERY_NEW,
     XTDPCode,
-    LOGGER,  # noqa: F401
-    CROSS_CATEGORY_DEVICE_DESCRIPTOR,  # noqa: F401
+    LOGGER,
     XTMultiManagerPostSetupCallbackPriority,
 )
 from .ha_tuya_integration.tuya_integration_imports import (

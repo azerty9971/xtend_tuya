@@ -7,9 +7,6 @@ from tuya_sharing.device import (
     CustomerDevice,
     DeviceRepository,
 )
-from ...const import (
-    LOGGER,  # noqa: F401
-)
 import custom_components.xtend_tuya.multi_manager.tuya_sharing.xt_tuya_sharing_manager as sm
 from ..multi_manager import (
     MultiManager,

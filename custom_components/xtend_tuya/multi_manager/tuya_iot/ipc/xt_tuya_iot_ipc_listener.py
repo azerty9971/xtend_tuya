@@ -1,8 +1,5 @@
 from __future__ import annotations
 import custom_components.xtend_tuya.multi_manager.tuya_iot.ipc.xt_tuya_iot_ipc_manager as ipc_man
-from ....const import (
-    LOGGER,  # noqa: F401
-)
 
 
 class XTIOTIPCListener:

@@ -1,6 +1,5 @@
 from __future__ import annotations
 import uuid
-from typing import Callable, cast  # noqa: F401
 from abc import ABC, abstractmethod
 import voluptuous as vol
 from dataclasses import dataclass
@@ -15,7 +14,6 @@ from homeassistant.helpers.typing import (
 )
 from ....const import (
     DOMAIN,
-    LOGGER,  # noqa: F401
 )
 import custom_components.xtend_tuya.multi_manager.multi_manager as mm
 

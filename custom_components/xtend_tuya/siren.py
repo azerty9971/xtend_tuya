@@ -16,7 +16,6 @@ from .multi_manager.multi_manager import (
 )
 from .const import (
     TUYA_DISCOVERY_NEW,
-    CROSS_CATEGORY_DEVICE_DESCRIPTOR,  # noqa: F401
 )
 from .entity import (
     XTEntity,

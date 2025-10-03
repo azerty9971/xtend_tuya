@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import voluptuous as vol
+from typing import cast
 from dataclasses import dataclass
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.dispatcher import dispatcher_send
@@ -10,7 +11,6 @@ from .shared_data_entry import (
     ConfigFlow,
     ConfigFlowResult,
     DiscoveryInfoType,
-    cast,
 )
 from ....const import (
     LOGGER,

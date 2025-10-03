@@ -18,7 +18,6 @@ from .const import (
     TUYA_DISCOVERY_NEW,
     XTDPCode,
     CROSS_CATEGORY_DEVICE_DESCRIPTOR,
-    LOGGER,  # noqa: F401
     XTMultiManagerPostSetupCallbackPriority,
 )
 from .ha_tuya_integration.tuya_integration_imports import (

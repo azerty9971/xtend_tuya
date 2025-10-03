@@ -3,7 +3,7 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import dispatcher_send
 from homeassistant.helpers import device_registry as dr
 from ...const import (
-    LOGGER,  # noqa: F401
+    LOGGER,
     DOMAIN,
     DOMAIN_ORIG,
 )
