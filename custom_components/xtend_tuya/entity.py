@@ -209,8 +209,10 @@ class XTEntityDescriptorManager:
                     var_type = XTEntityDescriptorManager._get_param_type(
                         descriptors_to_add[0]
                     )
-                base_descr_keys: list[str] = XTEntityDescriptorManager.get_category_keys(
-                    base_descriptors, key_fields
+                base_descr_keys: list[str] = (
+                    XTEntityDescriptorManager.get_category_keys(
+                        base_descriptors, key_fields
+                    )
                 )
                 for descriptor in descriptors_to_add:
                     match var_type:
@@ -504,7 +506,8 @@ class XTEntity(TuyaEntity):
                 ):
                     if not (
                         enum_type := TuyaEnumTypeData.from_json(
-                            dpcode, getattr(self.device, key)[dpcode].values  # type: ignore
+                            dpcode,
+                            getattr(self.device, key)[dpcode].values,  # type: ignore
                         )
                     ):
                         continue
@@ -516,7 +519,8 @@ class XTEntity(TuyaEntity):
                 ):
                     if not (
                         integer_type := TuyaIntegerTypeData.from_json(
-                            dpcode, getattr(self.device, key)[dpcode].values  # type: ignore
+                            dpcode,
+                            getattr(self.device, key)[dpcode].values,  # type: ignore
                         )
                     ):
                         continue
@@ -718,7 +722,8 @@ class XTEntity(TuyaEntity):
         if (
             dpcode_info is None
             or dpcode_info.dptype is None
-            or dpcode_info.dpid is None     #DPcodes added as virtual dpcodes have a DPID = 0
+            or dpcode_info.dpid
+            is None  # DPcodes added as virtual dpcodes have a DPID = 0
         ):
             return False
         match platform:

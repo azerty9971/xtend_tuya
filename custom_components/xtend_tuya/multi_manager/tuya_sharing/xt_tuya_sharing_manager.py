@@ -35,7 +35,9 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
     def __init__(
         self, multi_manager: MultiManager, other_device_manager: Manager | None = None
     ) -> None:
-        super().__init__(client_id="", user_code="", terminal_id="", end_point="", token_response={})
+        super().__init__(
+            client_id="", user_code="", terminal_id="", end_point="", token_response={}
+        )
         self.multi_manager = multi_manager
         self.terminal_id: str | None = None
         self.mq = None
@@ -44,7 +46,9 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
         self.device_repository: dr.XTSharingDeviceRepository | None = None
         self.scene_repository: SceneRepository | None = None
         self.user_repository: UserRepository | None = None
-        self.device_map: XTDeviceMap = XTDeviceMap({}, XTDeviceSourcePriority.TUYA_SHARED)  # type: ignore
+        self.device_map: XTDeviceMap = XTDeviceMap(
+            {}, XTDeviceSourcePriority.TUYA_SHARED
+        )  # type: ignore
         self.user_homes: list[SmartLifeHome] = []
         self.device_listeners = set()
         self.__other_device_manager: Manager | None = None
@@ -94,14 +98,20 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
     ) -> None:
         self.__other_device_manager = other_device_manager
         if self.__other_device_manager:
-            new_device_map: XTDeviceMap = XTDeviceMap({}, XTDeviceSourcePriority.REGULAR_TUYA)
+            new_device_map: XTDeviceMap = XTDeviceMap(
+                {}, XTDeviceSourcePriority.REGULAR_TUYA
+            )
             for device in self.__other_device_manager.device_map.values():
-                new_device_map[device.id] = XTDevice.from_compatible_device(device, "RT", XTDeviceSourcePriority.REGULAR_TUYA, True)
-            self.__overriden_device_map = XTDeviceMap(new_device_map, XTDeviceSourcePriority.REGULAR_TUYA)
+                new_device_map[device.id] = XTDevice.from_compatible_device(
+                    device, "RT", XTDeviceSourcePriority.REGULAR_TUYA, True
+                )
+            self.__overriden_device_map = XTDeviceMap(
+                new_device_map, XTDeviceSourcePriority.REGULAR_TUYA
+            )
 
     def get_overriden_device_manager(self) -> Manager | None:
         return self.__other_device_manager
-    
+
     def get_overriden_device_map(self) -> XTDeviceMap | None:
         return self.__overriden_device_map
 

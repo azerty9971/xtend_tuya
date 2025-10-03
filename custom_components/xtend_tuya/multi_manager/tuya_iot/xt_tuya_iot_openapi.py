@@ -64,7 +64,7 @@ class XTIOTOpenAPI(TuyaOpenAPI):
         access_secret: str,
         auth_type: AuthType = AuthType.SMART_HOME,
         lang: str = "en",
-        non_user_specific_api: bool = False
+        non_user_specific_api: bool = False,
     ) -> None:
         """Init TuyaOpenAPI."""
         super(XTIOTOpenAPI, self).__init__(
@@ -247,7 +247,6 @@ class XTIOTOpenAPI(TuyaOpenAPI):
         body: dict[str, Any] | None = None,
         first_pass: bool = True,
     ) -> dict[str, Any]:
-
         self.__refresh_access_token_if_need(path)
         access_token = self.token_info.access_token if self.token_info else ""
         sign, t = self._calculate_sign(method, path, params, body)
@@ -279,7 +278,7 @@ class XTIOTOpenAPI(TuyaOpenAPI):
 
         if response.ok is False:
             LOGGER.error(
-                f"[IOT API]Response error: code={response.status_code}, body={body if body is not None else ""}"
+                f"[IOT API]Response error: code={response.status_code}, body={body if body is not None else ''}"
             )
             return {}
 
@@ -287,7 +286,7 @@ class XTIOTOpenAPI(TuyaOpenAPI):
 
         # if result.get("success", True) is False:
         LOGGER.debug(
-            f"[IOT API]Request: {method} {path} PARAMS: {json.dumps(params, ensure_ascii=False, indent=2) if params is not None else ""} BODY: {json.dumps(body, ensure_ascii=False, indent=2) if body is not None else ""}"
+            f"[IOT API]Request: {method} {path} PARAMS: {json.dumps(params, ensure_ascii=False, indent=2) if params is not None else ''} BODY: {json.dumps(body, ensure_ascii=False, indent=2) if body is not None else ''}"
         )
         LOGGER.debug(
             f"[IOT API]Response: {json.dumps(result, ensure_ascii=False, indent=2)}"

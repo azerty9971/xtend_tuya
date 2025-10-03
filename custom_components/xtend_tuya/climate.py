@@ -205,8 +205,11 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if device_descriptor := XTEntityDescriptorManager.get_category_descriptors(
-                    supported_descriptors, device.category
+                if (
+                    device_descriptor
+                    := XTEntityDescriptorManager.get_category_descriptors(
+                        supported_descriptors, device.category
+                    )
                 ):
                     entities.append(
                         XTClimateEntity.get_entity_instance(
@@ -218,9 +221,7 @@ async def async_setup_entry(
                     )
         async_add_entities(entities)
 
-    hass_data.manager.register_device_descriptors(
-        this_platform, supported_descriptors
-    )
+    hass_data.manager.register_device_descriptors(this_platform, supported_descriptors)
     async_discover_device([*hass_data.manager.device_map])
 
     entry.async_on_unload(
@@ -255,7 +256,9 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
         super(XTClimateEntity, self).__init__(
             device, device_manager, description, system_temperature_unit
         )
-        super(XTEntity, self).__init__(device, device_manager, description, system_temperature_unit)  # type: ignore
+        super(XTEntity, self).__init__(
+            device, device_manager, description, system_temperature_unit
+        )  # type: ignore
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description

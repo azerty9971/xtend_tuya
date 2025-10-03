@@ -37,7 +37,6 @@ class XTFlowDataAddIRDeviceKey(XTFlowDataBase):
 
 
 class XTDataEntryAddIRDevice(XTDataEntryManager):
-
     def __init__(
         self,
         source: str,
@@ -50,11 +49,11 @@ class XTDataEntryAddIRDevice(XTDataEntryManager):
         self.device = device
         self.hub = hub
         super().__init__(source, hass)
-    
+
     def get_translation_placeholders(self) -> dict[str, str]:
         return super().get_translation_placeholders() | {
             "device_name": self.device.name,
-            "name": f"Add IR device under {self.device.name}"
+            "name": f"Add IR device under {self.device.name}",
         }
 
     def get_flow_data(self) -> XTFlowDataBase:
@@ -80,7 +79,6 @@ class XTDataEntryAddIRDevice(XTDataEntryManager):
 
 
 class XTDataEntryAddIRDeviceKey(XTDataEntryManager):
-
     KEY_NAME: str = "new_ir_key_name"
 
     def __init__(
@@ -105,7 +103,7 @@ class XTDataEntryAddIRDeviceKey(XTDataEntryManager):
                 self.flow_data.key_name if self.flow_data.key_name is not None else ""
             ),
             "device_name": self.flow_data.device.name,
-            "name": f"Add IR Key for {self.device.name}"
+            "name": f"Add IR Key for {self.device.name}",
         }
 
     def get_flow_data(self) -> XTFlowDataBase:

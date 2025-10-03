@@ -147,10 +147,10 @@ async def async_setup_entry(
         for device_id in device_ids:
             if hub_device := hass_data.manager.device_map.get(device_id):
                 if hub_device.category in IR_HUB_CATEGORY_LIST:
-                    hub_information: XTIRHubInformation | None = (
-                        await hass.async_add_executor_job(
-                            hass_data.manager.get_ir_hub_information, hub_device
-                        )
+                    hub_information: (
+                        XTIRHubInformation | None
+                    ) = await hass.async_add_executor_job(
+                        hass_data.manager.get_ir_hub_information, hub_device
                     )
                     if hub_information is None:
                         continue
@@ -232,8 +232,11 @@ async def async_setup_entry(
                     hass_data.manager.set_general_property(
                         XTMultiManagerProperties.IR_DEVICE_ID, device.id
                     )
-                if category_descriptions := XTEntityDescriptorManager.get_category_descriptors(
-                    supported_descriptors, device.category
+                if (
+                    category_descriptions
+                    := XTEntityDescriptorManager.get_category_descriptors(
+                        supported_descriptors, device.category
+                    )
                 ):
                     externally_managed_dpcodes = (
                         XTEntityDescriptorManager.get_category_keys(
@@ -333,7 +336,7 @@ class XTButtonEntity(XTEntity, TuyaButtonEntity):
                 multi_manager=device_manager,
                 device=device,
                 hub=self._entity_description.ir_hub_information,
-                remote=self._entity_description.ir_remote_information
+                remote=self._entity_description.ir_remote_information,
             )
         elif (
             self._entity_description.is_ir_key
@@ -344,7 +347,7 @@ class XTButtonEntity(XTEntity, TuyaButtonEntity):
                 hass=device_manager.hass,
                 multi_manager=device_manager,
                 device=device,
-                hub=self._entity_description.ir_hub_information
+                hub=self._entity_description.ir_hub_information,
             )
 
     @staticmethod

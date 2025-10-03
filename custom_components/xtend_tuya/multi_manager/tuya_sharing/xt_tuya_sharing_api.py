@@ -6,7 +6,6 @@ from tuya_sharing.customerapi import (
 
 
 class XTSharingAPI(CustomerApi):
-
     def get(self, path: str, params: dict[str, Any] | None = None) -> dict[str, Any]:
         return_value = super().get(path=path, params=params)
         return return_value

@@ -71,6 +71,7 @@ from .ha_tuya_integration.tuya_integration_imports import (
 
 COMPOUND_KEY: list[str] = ["key", "subkey"]
 
+
 @dataclass(frozen=True)
 class XTSensorEntityDescription(TuyaSensorEntityDescription, frozen=True):
     """Describes XT sensor entity."""
@@ -103,6 +104,7 @@ class XTSensorEntityDescription(TuyaSensorEntityDescription, frozen=True):
             device_manager=device_manager,
             description=XTSensorEntityDescription(**description.__dict__),
         )
+
 
 # Commonly used battery sensors, that are re-used in the sensors down below.
 BATTERY_SENSORS: tuple[XTSensorEntityDescription, ...] = (
@@ -1315,7 +1317,7 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
             translation_key="watering_volume",
             device_class=SensorDeviceClass.WATER,
             native_unit_of_measurement="L",
-            suggested_display_precision = 0,
+            suggested_display_precision=0,
         ),
         XTSensorEntityDescription(
             key=XTDPCode.CYC_NUM,
@@ -1542,16 +1544,18 @@ async def async_setup_entry(
                     descriptor = XTSensorEntityDescription(
                         key=dpcode,
                         translation_key="xt_generic_sensor",
-                        translation_placeholders={"name": XTEntity.get_human_name(dpcode)},
+                        translation_placeholders={
+                            "name": XTEntity.get_human_name(dpcode)
+                        },
                         entity_registry_enabled_default=False,
                         entity_registry_visible_default=False,
                     )
                     entities.append(
                         XTSensorEntity.get_entity_instance(
                             descriptor, device, hass_data.manager
-                        ))
+                        )
+                    )
         async_add_entities(entities)
-
 
     @callback
     def async_discover_device(device_map, restrict_dpcode: str | None = None) -> None:
@@ -1562,8 +1566,11 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if category_descriptions := XTEntityDescriptorManager.get_category_descriptors(
-                    supported_descriptors, device.category
+                if (
+                    category_descriptions
+                    := XTEntityDescriptorManager.get_category_descriptors(
+                        supported_descriptors, device.category
+                    )
                 ):
                     externally_managed_dpcodes = (
                         XTEntityDescriptorManager.get_category_keys(
@@ -1588,7 +1595,7 @@ async def async_setup_entry(
                             description,
                             True,
                             externally_managed_dpcodes,
-                            COMPOUND_KEY
+                            COMPOUND_KEY,
                         )
                     )
                     entities.extend(
@@ -1602,12 +1609,16 @@ async def async_setup_entry(
                             description,
                             False,
                             externally_managed_dpcodes,
-                            COMPOUND_KEY
+                            COMPOUND_KEY,
                         )
                     )
         async_add_entities(entities)
         if restrict_dpcode is None:
-            hass_data.manager.add_post_setup_callback(XTMultiManagerPostSetupCallbackPriority.PRIORITY_LAST, async_add_generic_entities, device_map)
+            hass_data.manager.add_post_setup_callback(
+                XTMultiManagerPostSetupCallbackPriority.PRIORITY_LAST,
+                async_add_generic_entities,
+                device_map,
+            )
 
     hass_data.manager.register_device_descriptors(this_platform, supported_descriptors)
     async_discover_device([*hass_data.manager.device_map])
@@ -1696,7 +1707,6 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
         device_manager: MultiManager,
         description: XTSensorEntityDescription,
     ) -> None:
-
         if description.recalculate_scale_for_percentage:
             device_manager.execute_device_entity_function(
                 XTDeviceEntityFunctions.RECALCULATE_PERCENT_SCALE,
@@ -1719,9 +1729,7 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
         self.entity_description = description  # type: ignore
         self.cancel_reset_after_x_seconds = None
 
-    def reset_value(
-        self, _: datetime | None, manual_call: bool = False
-    ) -> None:
+    def reset_value(self, _: datetime | None, manual_call: bool = False) -> None:
         if manual_call and self.cancel_reset_after_x_seconds:
             self.cancel_reset_after_x_seconds()
         self.cancel_reset_after_x_seconds = None
@@ -1781,7 +1789,9 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
             ):
                 # Scale integer/float value
                 if isinstance(self._type_data, TuyaIntegerTypeData):
-                    scaled_value_back = self._type_data.scale_value_back(self._restored_data.native_value)  # type: ignore
+                    scaled_value_back = self._type_data.scale_value_back(
+                        self._restored_data.native_value
+                    )  # type: ignore
                     self._restored_data.native_value = scaled_value_back
 
                 if device := self.device_manager.device_map.get(self.device.id, None):
@@ -1822,7 +1832,7 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
 
     # Use custom native_value function
     @property
-    def native_value(self) -> StateType: # type: ignore
+    def native_value(self) -> StateType:  # type: ignore
         if self.entity_description.native_value is not None:
             value = self.device.status.get(self.entity_description.key)
             value = self.entity_description.native_value(value)

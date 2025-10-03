@@ -9,6 +9,7 @@ from tuya_iot.device import (
     IndustrySolutionDeviceManage,
 )
 
+
 class XTSmartHomeDeviceManage(SmartHomeDeviceManage):
     def get_device_list_info(self, device_ids: list[str]) -> dict[str, Any]:
         response = self.api.get("/v1.0/devices/", {"device_ids": ",".join(device_ids)})
@@ -18,7 +19,7 @@ class XTSmartHomeDeviceManage(SmartHomeDeviceManage):
                     info.pop("status")
         response["result"]["list"] = response["result"]["devices"]
         return response
-    
+
     def get_device_list_status(self, device_ids: list[str]) -> dict[str, Any]:
         response = self.api.get("/v1.0/devices/", {"device_ids": ",".join(device_ids)})
         status_list = []
@@ -28,6 +29,7 @@ class XTSmartHomeDeviceManage(SmartHomeDeviceManage):
 
         response["result"] = status_list
         return response
+
 
 class XTIndustrySolutionDeviceManage(IndustrySolutionDeviceManage):
     pass

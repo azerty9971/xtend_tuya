@@ -141,27 +141,30 @@ class XTDeviceEntityFunctions(StrEnum):
 
 
 class XTMultiManagerProperties(StrEnum):
-    LOCK_DEVICE_ID      = "lock_device_id"
-    CAMERA_DEVICE_ID    = "camera_device_id"
-    IR_DEVICE_ID        = "ir_device_id"
+    LOCK_DEVICE_ID = "lock_device_id"
+    CAMERA_DEVICE_ID = "camera_device_id"
+    IR_DEVICE_ID = "ir_device_id"
+
 
 class XTMultiManagerPostSetupCallbackPriority(IntEnum):
-    PRIORITY1       = 1
-    PRIORITY2       = 2
-    PRIORITY3       = 3
-    PRIORITY_LAST   = 999
+    PRIORITY1 = 1
+    PRIORITY2 = 2
+    PRIORITY3 = 3
+    PRIORITY_LAST = 999
 
 
 # Defines the priority of the sources for the merging process
 # In case of conflict take the data from the lowest priority
 class XTDeviceSourcePriority(IntEnum):
-    REGULAR_TUYA    = 10
-    TUYA_SHARED     = 20
-    TUYA_IOT        = 30
+    REGULAR_TUYA = 10
+    TUYA_SHARED = 20
+    TUYA_IOT = 30
+
 
 class XTDiscoverySource(StrEnum):
-    SOURCE_ADD_IR_DEVICE_KEY    = "ir_add_key"
-    SOURCE_ADD_IR_DEVICE        = "ir_add_device"
+    SOURCE_ADD_IR_DEVICE_KEY = "ir_add_key"
+    SOURCE_ADD_IR_DEVICE = "ir_add_device"
+
 
 @dataclass
 class XTIRRemoteKeysInformation:
@@ -169,6 +172,7 @@ class XTIRRemoteKeysInformation:
     key_id: int
     key_name: str
     standard_key: bool
+
 
 @dataclass
 class XTIRRemoteInformation:
@@ -180,10 +184,12 @@ class XTIRRemoteInformation:
     remote_name: str
     keys: list[XTIRRemoteKeysInformation]
 
+
 @dataclass
 class XTIRHubInformation:
     device_id: str
     remote_ids: list[XTIRRemoteInformation]
+
 
 @dataclass
 class DescriptionVirtualState:
@@ -221,7 +227,7 @@ class XTDPCode(StrEnum):
     https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
     """
 
-    #DPCODES FROM TUYA
+    # DPCODES FROM TUYA
     AIR_QUALITY = "air_quality"
     AIR_QUALITY_INDEX = "air_quality_index"
     ALARM_DELAY_TIME = "alarm_delay_time"
@@ -573,11 +579,9 @@ class XTDPCode(StrEnum):
     WORK_MODE = "work_mode"  # Working mode
     WORK_POWER = "work_power"
     WORK_STATE_E = "work_state_e"
-    #END DPCODES FROM TUYA
+    # END DPCODES FROM TUYA
 
-
-
-    #DPCODES FROM XT
+    # DPCODES FROM XT
     ACCESSORY_LOCK = "accessory_lock"
     ACHZ = "ACHZ"
     ACI = "ACI"
@@ -915,7 +919,8 @@ class XTDPCode(StrEnum):
     WORK_STATUS = "WorkStatus"
     XT_COVER_INVERT_CONTROL = "xt_cover_invert_control"
     XT_COVER_INVERT_STATUS = "xt_cover_invert_status"
-    #END OF DPCODES FROM XT
+    # END OF DPCODES FROM XT
+
 
 @dataclass
 class Country:

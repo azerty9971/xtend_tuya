@@ -11,7 +11,6 @@ import custom_components.xtend_tuya.multi_manager.shared.shared_classes as share
 
 
 class XTMergingManager:
-
     # All the methods of this class (except merge device) take the LEFT device as a priority in case of conflict
 
     @staticmethod
@@ -116,7 +115,9 @@ class XTMergingManager:
                     )
                     if status in status_alias and status_code is not None:
                         # Replace status_code with status in the device
-                        device.replace_status_code_with_another(str(status_code), status)
+                        device.replace_status_code_with_another(
+                            str(status_code), status
+                        )
 
     @staticmethod
     def _align_device_properties(
@@ -226,8 +227,10 @@ class XTMergingManager:
                         code
                     ].values
                 else:
-                    device1.status_range[code].values = (
-                        cf.CloudFixes.get_fixed_value_descr(value1_raw, value2_raw)
+                    device1.status_range[
+                        code
+                    ].values = cf.CloudFixes.get_fixed_value_descr(
+                        value1_raw, value2_raw
                     )
                     device2.status_range[code].values = device1.status_range[
                         code
@@ -451,8 +454,9 @@ class XTMergingManager:
             if left is not None:
                 return left
             return right
-        if type(left) is not type(right) and not (
-            isinstance(left, str) and isinstance(right, str)
+        if (
+            type(left) is not type(right)
+            and not (isinstance(left, str) and isinstance(right, str))
         ):  # Used to prevent warning on classes that represent a string (DPType and TuyaDPType)
             if msg_queue is not None:
                 msg_queue.append(

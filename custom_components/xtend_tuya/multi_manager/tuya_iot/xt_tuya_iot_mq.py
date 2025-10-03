@@ -36,7 +36,6 @@ class XTIOTTuyaMQConfig(TuyaMQConfig):
 
 
 class XTIOTOpenMQ(TuyaOpenMQ):
-
     link_id: str | None = None
     class_id: str | None = None
     sleep_time: float | None = None

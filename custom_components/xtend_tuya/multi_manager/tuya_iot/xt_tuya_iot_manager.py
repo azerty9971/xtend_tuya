@@ -50,7 +50,6 @@ from .xt_tuya_iot_device import (
 
 
 class XTIOTDeviceManager(TuyaDeviceManager):
-
     device_map: XTDeviceMap = XTDeviceMap({}, XTDeviceSourcePriority.TUYA_IOT)
 
     def __init__(
@@ -378,7 +377,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                 property_str = json.dumps({prop_key: property[prop_key]})
                 self.multi_manager.device_watcher.report_message(
                     device_id,
-                    f"Sending property update, payload: {json.dumps({"properties": property_str})}",
+                    f"Sending property update, payload: {json.dumps({'properties': property_str})}",
                 )
                 self.api.post(
                     f"/v2.0/cloud/thing/{device_id}/shadow/properties/issue",
@@ -609,12 +608,12 @@ class XTIOTDeviceManager(TuyaDeviceManager):
             f"/v2.0/infrareds/{hub.device_id}/remotes/{remote.remote_id}/learning-codes",
             {
                 "category_id": remote.category_id,
-                #"brand_name": remote.brand_name,
-                #"remote_name": remote.remote_name,
+                # "brand_name": remote.brand_name,
+                # "remote_name": remote.remote_name,
                 "codes": [
                     {
-                        #"category_id": remote.category_id,
-                        #"key_name": "test2",
+                        # "category_id": remote.category_id,
+                        # "key_name": "test2",
                         "key": key_name,
                         "code": learned_code_value,
                         "id": learning_time // 1000,

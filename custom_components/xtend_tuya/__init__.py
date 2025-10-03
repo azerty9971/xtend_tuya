@@ -20,10 +20,7 @@ from .multi_manager.multi_manager import (
 from .multi_manager.shared.shared_classes import (
     HomeAssistantXTData,
 )
-from .util import (
-    get_config_entry_runtime_data,
-    is_device_in_domain_device_maps
-)
+from .util import get_config_entry_runtime_data, is_device_in_domain_device_maps
 from .multi_manager.shared.services.services import (
     ServiceManager,
 )

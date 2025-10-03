@@ -14,7 +14,6 @@ import custom_components.xtend_tuya.entity as entity
 
 
 class CloudFixes:
-
     @staticmethod
     def apply_fixes(device: XTDevice):
         CloudFixes._unify_data_types(device)
@@ -93,7 +92,6 @@ class CloudFixes:
 
     @staticmethod
     def _fix_unaligned_function_or_status_range(device: XTDevice):
-
         # Remove status_ranges that are refering to an alias
         status_push: dict[str, XTDeviceStatusRange] = {}
         status_pop: list[str] = []
@@ -129,13 +127,13 @@ class CloudFixes:
                                         ls_value[fix_code] = fix_dict[fix_code]
                                     config_item["valueDesc"] = json.dumps(ls_value)
                                     if strat_code in device.status_range:
-                                        device.status_range[strat_code].values = (
-                                            config_item["valueDesc"]
-                                        )
+                                        device.status_range[
+                                            strat_code
+                                        ].values = config_item["valueDesc"]
                                     if strat_code in device.function:
-                                        device.function[strat_code].values = (
-                                            config_item["valueDesc"]
-                                        )
+                                        device.function[
+                                            strat_code
+                                        ].values = config_item["valueDesc"]
                         status_pop.append(status)
         for status in status_pop:
             device.status_range.pop(status)
@@ -177,13 +175,13 @@ class CloudFixes:
                                         ls_value[fix_code] = fix_dict[fix_code]
                                     config_item["valueDesc"] = json.dumps(ls_value)
                                     if strat_code in device.status_range:
-                                        device.status_range[strat_code].values = (
-                                            config_item["valueDesc"]
-                                        )
+                                        device.status_range[
+                                            strat_code
+                                        ].values = config_item["valueDesc"]
                                     if strat_code in device.function:
-                                        device.function[strat_code].values = (
-                                            config_item["valueDesc"]
-                                        )
+                                        device.function[
+                                            strat_code
+                                        ].values = config_item["valueDesc"]
                         function_pop.append(function)
         for function in function_pop:
             device.function.pop(function)

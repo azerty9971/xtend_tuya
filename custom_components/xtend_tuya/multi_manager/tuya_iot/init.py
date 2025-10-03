@@ -130,14 +130,14 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
             access_id=config_entry.options[CONF_ACCESS_ID],
             access_secret=config_entry.options[CONF_ACCESS_SECRET],
             auth_type=auth_type,
-            non_user_specific_api=False
+            non_user_specific_api=False,
         )
         non_user_api = XTIOTOpenAPI(
             endpoint=config_entry.options[CONF_ENDPOINT_OT],
             access_id=config_entry.options[CONF_ACCESS_ID],
             access_secret=config_entry.options[CONF_ACCESS_SECRET],
             auth_type=auth_type,
-            non_user_specific_api=True
+            non_user_specific_api=True,
         )
         api.set_dev_channel("hass")
         try:
@@ -232,7 +232,9 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
     def remove_device_listeners(self) -> None:
         if self.iot_account is None:
             return None
-        self.iot_account.device_manager.remove_device_listener(self.multi_manager.multi_device_listener)  # type: ignore
+        self.iot_account.device_manager.remove_device_listener(
+            self.multi_manager.multi_device_listener
+        )  # type: ignore
 
     def unload(self):
         pass
@@ -344,7 +346,7 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
                         },
                         learn_more_url="https://github.com/azerty9971/xtend_tuya/blob/main/docs/configure_cameras.md",
                     )
-        
+
         if ir_hub_device_id := multi_manager.get_general_property(
             XTMultiManagerProperties.IR_DEVICE_ID, None
         ):
@@ -367,21 +369,35 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
                         },
                         learn_more_url="https://github.com/azerty9971/xtend_tuya/blob/main/docs/configure_ir.md",
                     )
-    
+
     def get_ir_hub_information(self, device: XTDevice) -> XTIRHubInformation | None:
         if self.iot_account is None:
             return None
         return self.iot_account.device_manager.get_ir_hub_information(device)
-    
-    def send_ir_command(self, device: XTDevice, key: XTIRRemoteKeysInformation, remote: XTIRRemoteInformation, hub: XTIRHubInformation) -> bool:
+
+    def send_ir_command(
+        self,
+        device: XTDevice,
+        key: XTIRRemoteKeysInformation,
+        remote: XTIRRemoteInformation,
+        hub: XTIRHubInformation,
+    ) -> bool:
         if self.iot_account is None:
             return False
         return self.iot_account.device_manager.send_ir_command(device, key, remote, hub)
-    
-    def learn_ir_key(self, device: XTDevice, remote: XTIRRemoteInformation, hub: XTIRHubInformation, key_name: str) -> bool:
+
+    def learn_ir_key(
+        self,
+        device: XTDevice,
+        remote: XTIRRemoteInformation,
+        hub: XTIRHubInformation,
+        key_name: str,
+    ) -> bool:
         if self.iot_account is None:
             return False
-        return self.iot_account.device_manager.learn_ir_key(device, remote, hub, key_name)
+        return self.iot_account.device_manager.learn_ir_key(
+            device, remote, hub, key_name
+        )
 
     def get_platform_descriptors_to_merge(self, platform: Platform) -> Any:
         pass

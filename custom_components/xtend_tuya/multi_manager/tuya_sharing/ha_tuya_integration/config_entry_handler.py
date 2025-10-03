@@ -27,7 +27,9 @@ class XTHATuyaIntegrationConfigEntryManager:
         if not before_call:
             self.manager.on_external_refresh_mq()
 
-    def on_tuya_device_attribute_change(self, before_call: bool, base_object: TuyaCustomerDevice, attr, value):
+    def on_tuya_device_attribute_change(
+        self, before_call: bool, base_object: TuyaCustomerDevice, attr, value
+    ):
         if not before_call:
             XTDeviceMap.set_device_key_value_multimap(base_object.id, attr, value)
 

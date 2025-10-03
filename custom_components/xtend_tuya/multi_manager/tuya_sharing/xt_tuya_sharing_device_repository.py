@@ -36,9 +36,15 @@ class XTSharingDeviceRepository(DeviceRepository):
 
         # Now convert the status_range and function to XT format
         for code in device.status_range:
-            device.status_range[code] = XTDeviceStatusRange.from_compatible_status_range(device.status_range[code])  # type: ignore
+            device.status_range[code] = (
+                XTDeviceStatusRange.from_compatible_status_range(
+                    device.status_range[code]
+                )
+            )  # type: ignore
         for code in device.function:
-            device.function[code] = XTDeviceFunction.from_compatible_function(device.function[code])  # type: ignore
+            device.function[code] = XTDeviceFunction.from_compatible_function(
+                device.function[code]
+            )  # type: ignore
 
     def query_devices_by_home(self, home_id: str) -> list[CustomerDevice]:
         response = self.api.get("/v1.0/m/life/ha/home/devices", {"homeId": home_id})

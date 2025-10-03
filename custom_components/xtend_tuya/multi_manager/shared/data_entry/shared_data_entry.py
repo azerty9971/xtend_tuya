@@ -27,15 +27,14 @@ class XTFlowDataBase:
 
 
 class XTDataEntryManager(ABC):
-
     def __init__(self, source: str, hass: HomeAssistant) -> None:
         self.source = source
         self.hass = hass
         self.flow_data = self.get_flow_data()
         self.unique_id = self.get_unique_id()
         self.register_bus_event(hass)
-    
-    #def __del__(self):
+
+    # def __del__(self):
     #    pass
 
     def get_unique_id(self) -> str:

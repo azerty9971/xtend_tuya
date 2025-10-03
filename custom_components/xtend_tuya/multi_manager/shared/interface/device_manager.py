@@ -28,7 +28,6 @@ from homeassistant.helpers.issue_registry import (
 
 
 class XTDeviceManagerInterface(ABC):
-
     @abstractmethod
     def get_type_name(self) -> str:
         pass
@@ -189,14 +188,28 @@ class XTDeviceManagerInterface(ABC):
         multi_manager: mm.MultiManager,
     ) -> None:
         return None
-    
-    def get_ir_hub_information(self, device: shared.XTDevice) -> XTIRHubInformation | None:
+
+    def get_ir_hub_information(
+        self, device: shared.XTDevice
+    ) -> XTIRHubInformation | None:
         pass
 
-    def send_ir_command(self, device: shared.XTDevice, key: XTIRRemoteKeysInformation, remote: XTIRRemoteInformation, hub: XTIRHubInformation) -> bool:
+    def send_ir_command(
+        self,
+        device: shared.XTDevice,
+        key: XTIRRemoteKeysInformation,
+        remote: XTIRRemoteInformation,
+        hub: XTIRHubInformation,
+    ) -> bool:
         return False
-    
-    def learn_ir_key(self, device: shared.XTDevice, remote: XTIRRemoteInformation, hub: XTIRHubInformation, key_name: str) -> bool:
+
+    def learn_ir_key(
+        self,
+        device: shared.XTDevice,
+        remote: XTIRRemoteInformation,
+        hub: XTIRHubInformation,
+        key_name: str,
+    ) -> bool:
         return False
 
     async def raise_issue(

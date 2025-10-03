@@ -33,7 +33,7 @@ class XTSelectEntityDescription(TuyaSelectEntityDescription):
     """Describe an Tuya select entity."""
 
     options: list[str] | None = None  # Custom options
-    
+
     def get_entity_instance(
         self,
         device: XTDevice,
@@ -226,13 +226,13 @@ SELECTS: dict[str, tuple[XTSelectEntityDescription, ...]] = {
             key=XTDPCode.TEMP_UNIT,
             translation_key="temperature_unit",
             entity_category=EntityCategory.CONFIG,
-            options = ["1","2"],
+            options=["1", "2"],
         ),
         XTSelectEntityDescription(
             key=XTDPCode.CAPACITY_UNIT,
             translation_key="volume_unit",
             entity_category=EntityCategory.CONFIG,
-            options = ["L","Gal"],
+            options=["L", "Gal"],
         ),
     ),
     "wk": (*TEMPERATURE_SELECTS,),
@@ -286,14 +286,17 @@ async def async_setup_entry(
                     descriptor = XTSelectEntityDescription(
                         key=dpcode,
                         translation_key="xt_generic_select",
-                        translation_placeholders={"name": XTEntity.get_human_name(dpcode)},
+                        translation_placeholders={
+                            "name": XTEntity.get_human_name(dpcode)
+                        },
                         entity_registry_enabled_default=False,
                         entity_registry_visible_default=False,
                     )
                     entities.append(
                         XTSelectEntity.get_entity_instance(
                             descriptor, device, hass_data.manager
-                        ))
+                        )
+                    )
         async_add_entities(entities)
 
     @callback
@@ -305,8 +308,11 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if category_descriptions := XTEntityDescriptorManager.get_category_descriptors(
-                    supported_descriptors, device.category
+                if (
+                    category_descriptions
+                    := XTEntityDescriptorManager.get_category_descriptors(
+                        supported_descriptors, device.category
+                    )
                 ):
                     externally_managed_dpcodes = (
                         XTEntityDescriptorManager.get_category_keys(
@@ -349,11 +355,13 @@ async def async_setup_entry(
 
         async_add_entities(entities)
         if restrict_dpcode is None:
-            hass_data.manager.add_post_setup_callback(XTMultiManagerPostSetupCallbackPriority.PRIORITY_LAST, async_add_generic_entities, device_map)
+            hass_data.manager.add_post_setup_callback(
+                XTMultiManagerPostSetupCallbackPriority.PRIORITY_LAST,
+                async_add_generic_entities,
+                device_map,
+            )
 
-    hass_data.manager.register_device_descriptors(
-        this_platform, supported_descriptors
-    )
+    hass_data.manager.register_device_descriptors(this_platform, supported_descriptors)
     async_discover_device([*hass_data.manager.device_map])
 
     entry.async_on_unload(
@@ -376,7 +384,7 @@ class XTSelectEntity(XTEntity, TuyaSelectEntity):
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description
-        
+
         # Use custom options
         if description.options is not None:
             for option in description.options:

@@ -111,9 +111,7 @@ class MultiManager:  # noqa: F811
             return self.accounts[account_name]
         return None
 
-    async def setup_entry(
-        self
-    ) -> None:
+    async def setup_entry(self) -> None:
         # Load all the plugins
         # subdirs = await self.hass.async_add_executor_job(os.listdir, os.path.dirname(__file__))
         subdirs = AllowedPlugins.get_plugins_to_load()
@@ -128,7 +126,9 @@ class MultiManager:  # noqa: F811
                     )
                     LOGGER.debug(f"Plugin {load_path} loaded")
                     instance: XTDeviceManagerInterface = plugin.get_plugin_instance()
-                    if await instance.setup_from_entry(self.hass, self.config_entry, self):
+                    if await instance.setup_from_entry(
+                        self.hass, self.config_entry, self
+                    ):
                         self.accounts[instance.get_type_name()] = instance
                 except ModuleNotFoundError as e:
                     LOGGER.error(f"Loading module failed: {e}")
@@ -489,9 +489,7 @@ class MultiManager:  # noqa: F811
             old_online_status = device.online
             for online_status in device.online_states:
                 device.online = device.online_states[online_status]
-                if (
-                    device.online
-                ):  # Prefer to be more On than Off if multiple state are not in accordance
+                if device.online:  # Prefer to be more On than Off if multiple state are not in accordance
                     break
             if device.online != old_online_status:
                 self.multi_device_listener.update_device(device, None)
@@ -530,14 +528,26 @@ class MultiManager:  # noqa: F811
             ir_device_information = account.get_ir_hub_information(device)
             if ir_device_information is not None:
                 return ir_device_information
-    
-    def send_ir_command(self, device: XTDevice, key: XTIRRemoteKeysInformation, remote: XTIRRemoteInformation, hub: XTIRHubInformation) -> bool:
+
+    def send_ir_command(
+        self,
+        device: XTDevice,
+        key: XTIRRemoteKeysInformation,
+        remote: XTIRRemoteInformation,
+        hub: XTIRHubInformation,
+    ) -> bool:
         for account in self.accounts.values():
             if account.send_ir_command(device, key, remote, hub):
                 return True
         return False
-    
-    def learn_ir_key(self, device: XTDevice, remote: XTIRRemoteInformation, hub: XTIRHubInformation, key_name: str) -> bool:
+
+    def learn_ir_key(
+        self,
+        device: XTDevice,
+        remote: XTIRRemoteInformation,
+        hub: XTIRHubInformation,
+        key_name: str,
+    ) -> bool:
         for account in self.accounts.values():
             if account.learn_ir_key(device, remote, hub, key_name):
                 return True
@@ -565,15 +575,22 @@ class MultiManager:  # noqa: F811
                 else:
                     callback(*args)
 
-    def add_post_setup_callback(self, priority: XTMultiManagerPostSetupCallbackPriority, callback: Callable, *args):
+    def add_post_setup_callback(
+        self,
+        priority: XTMultiManagerPostSetupCallbackPriority,
+        callback: Callable,
+        *args,
+    ):
         if self.loading_finalized is False:
             self.post_setup_callbacks[priority].append((callback, *args))
         else:
             self.hass.add_job(callback, *args)
-    
+
     def register_user_input_data(self, flow_data: shared_data_entry.XTFlowDataBase):
         if flow_data.flow_id is not None:
             self._user_input_flows[flow_data.flow_id] = flow_data
 
-    def get_user_input_data(self, flow_id: str) -> shared_data_entry.XTFlowDataBase | None:
+    def get_user_input_data(
+        self, flow_id: str
+    ) -> shared_data_entry.XTFlowDataBase | None:
         return self._user_input_flows.get(flow_id)
