@@ -163,7 +163,9 @@ class XTEventEntity(XTEntity, TuyaEventEntity):
             self._attr_event_types: list[str] = dpcode.range
 
     async def _handle_state_update(
-        self, updated_status_properties: list[str] | None, *args, **kwargs
+        self,
+        updated_status_properties: list[str] | None,
+        dp_timestamps: dict | None = None,
     ) -> None:
         if (
             updated_status_properties is None
