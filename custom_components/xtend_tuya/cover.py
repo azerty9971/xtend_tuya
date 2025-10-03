@@ -12,9 +12,6 @@ from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect, dispatcher_send
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from .const import (
-    LOGGER,  # noqa: F401
-)
 from .util import (
     restrict_descriptor_category,
 )
@@ -29,7 +26,6 @@ from .multi_manager.shared.shared_classes import (
 from .const import (
     TUYA_DISCOVERY_NEW,
     XTDPCode,
-    CROSS_CATEGORY_DEVICE_DESCRIPTOR,  # noqa: F401
     XTMultiManagerPostSetupCallbackPriority,
 )
 from .ha_tuya_integration.tuya_integration_imports import (
@@ -49,7 +45,9 @@ class XTCoverEntityDescription(TuyaCoverEntityDescription):
     """Describes XT cover entity."""
 
     current_state: TuyaDPCode | XTDPCode | None = None  # type: ignore
-    current_position: TuyaDPCode | tuple[TuyaDPCode, ...] | XTDPCode | tuple[XTDPCode, ...] | None = None  # type: ignore
+    current_position: (
+        TuyaDPCode | tuple[TuyaDPCode, ...] | XTDPCode | tuple[XTDPCode, ...] | None
+    ) = None  # type: ignore
     set_position: TuyaDPCode | XTDPCode | None = None  # type: ignore
 
     # Additional attributes for XT specific functionality
@@ -164,8 +162,11 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if category_descriptions := XTEntityDescriptorManager.get_category_descriptors(
-                    supported_descriptors, device.category
+                if (
+                    category_descriptions
+                    := XTEntityDescriptorManager.get_category_descriptors(
+                        supported_descriptors, device.category
+                    )
                 ):
                     externally_managed_dpcodes = (
                         XTEntityDescriptorManager.get_category_keys(
@@ -234,7 +235,10 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         super(XTEntity, self).__init__(device, device_manager, description)  # type: ignore
         self.device = device
         self.local_hass = hass
-        device_manager.post_setup_callbacks[XTMultiManagerPostSetupCallbackPriority.PRIORITY1].append((self.add_cover_open_close_option, None, None))
+        device_manager.add_post_setup_callback(
+            XTMultiManagerPostSetupCallbackPriority.PRIORITY1,
+            self.add_cover_open_close_option,
+        )
 
     @property
     def is_cover_control_inverted(self) -> bool | None:

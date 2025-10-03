@@ -3,7 +3,6 @@
 from __future__ import annotations
 import logging
 import asyncio
-from typing import Any
 from datetime import datetime
 from homeassistant.config_entries import ConfigEntry, ConfigEntryState
 from homeassistant.core import HomeAssistant
@@ -21,7 +20,7 @@ from .multi_manager.multi_manager import (
 from .multi_manager.shared.shared_classes import (
     HomeAssistantXTData,
 )
-from .util import get_config_entry_runtime_data
+from .util import get_config_entry_runtime_data, is_device_in_domain_device_maps
 from .multi_manager.shared.services.services import (
     ServiceManager,
 )
@@ -45,9 +44,9 @@ async def update_listener(hass: HomeAssistant, entry: XTConfigEntry):
 async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
     """Async setup hass config entry."""
     start_time = datetime.now()
-    multi_manager = MultiManager(hass)
+    multi_manager = MultiManager(hass, entry)
     service_manager = ServiceManager(multi_manager=multi_manager)
-    await multi_manager.setup_entry(hass, entry)
+    await multi_manager.setup_entry()
 
     # Get all devices from Tuya
     await hass.async_add_executor_job(multi_manager.update_device_cache)
@@ -88,7 +87,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
             model=f"{device.product_name} (unsupported)",
         )
 
-    await multi_manager.setup_entity_parsers(hass)
+    await multi_manager.setup_entity_parsers()
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
@@ -96,8 +95,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
     # So the subscription is here
     await hass.async_add_executor_job(multi_manager.refresh_mq)
     service_manager.register_services()
-    await multi_manager.on_loading_finalized(hass, entry)
     hass.async_create_task(cleanup_duplicated_devices(hass, entry))
+    await multi_manager.on_loading_finalized(hass, entry)
     LOGGER.debug(f"Xtended Tuya {entry.title} loaded in {datetime.now() - start_time}")
     return True
 
@@ -187,55 +186,6 @@ def is_config_entry_master(
     config_entries = hass.config_entries.async_entries(domain, False, False)
     if len(config_entries) > 0:
         return config_entries[0] == current_entry
-    return False
-
-
-def get_domain_device_map(
-    hass: HomeAssistant,
-    domain: str,
-    except_of_entry: ConfigEntry | None = None,
-    with_scene: bool = False,
-) -> dict[str, Any]:
-    device_map = {}
-    config_entries = hass.config_entries.async_entries(domain, False, False)
-    for config_entry in config_entries:
-        if config_entry == except_of_entry:
-            continue
-        if runtime_data := get_config_entry_runtime_data(hass, config_entry, domain):
-            for device_id in runtime_data.device_manager.device_map:
-                if device_id not in device_map:
-                    device_map[device_id] = runtime_data.device_manager.device_map[
-                        device_id
-                    ]
-            if with_scene and hasattr(runtime_data.device_manager, "scene_id"):
-                for scene_id in runtime_data.device_manager.scene_id:  # type: ignore
-                    device_map[scene_id] = None
-    return device_map
-
-
-def is_device_in_domain_device_maps(
-    hass: HomeAssistant,
-    domains: list[str],
-    device_entry_identifiers: tuple[str, str],
-    except_of_entry: ConfigEntry | None = None,
-    with_scene: bool = False,
-):
-    if len(device_entry_identifiers) > 1:
-        device_domain = device_entry_identifiers[0]
-    else:
-        return True
-    if device_domain in domains:
-        for domain in domains:
-            device_map = get_domain_device_map(
-                hass, domain, except_of_entry, with_scene
-            )
-            device_id = device_entry_identifiers[1]
-            if device_id in device_map:
-                return True
-
-    else:
-        return True
-
     return False
 
 

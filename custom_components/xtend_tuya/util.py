@@ -8,10 +8,15 @@ from base64 import b64decode
 from homeassistant.util.dt import DEFAULT_TIME_ZONE
 from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.helpers import device_registry as dr, entity_registry as er
 from homeassistant.helpers.entity import EntityDescription
+from homeassistant.helpers.device_registry import (
+    DeviceEntry,
+)
 from .const import (
     LOGGER,
     DOMAIN,
+    DOMAIN_ORIG,
 )
 from tuya_sharing.manager import (
     Manager,
@@ -220,10 +225,87 @@ def get_device_multi_manager(
             return multimanager
     return None
 
+
+def get_domain_device_map(
+    hass: HomeAssistant,
+    domain: str,
+    except_of_entry: ConfigEntry | None = None,
+    with_scene: bool = False,
+) -> dict[str, Any]:
+    device_map = {}
+    config_entries = hass.config_entries.async_entries(domain, False, False)
+    for config_entry in config_entries:
+        if config_entry == except_of_entry:
+            continue
+        if runtime_data := get_config_entry_runtime_data(hass, config_entry, domain):
+            for device_id in runtime_data.device_manager.device_map:
+                if device_id not in device_map:
+                    device_map[device_id] = runtime_data.device_manager.device_map[
+                        device_id
+                    ]
+            if with_scene and hasattr(runtime_data.device_manager, "scene_id"):
+                for scene_id in runtime_data.device_manager.scene_id:  # type: ignore
+                    device_map[scene_id] = None
+    return device_map
+
+
+def is_device_in_domain_device_maps(
+    hass: HomeAssistant,
+    domains: list[str],
+    device_entry_identifiers: tuple[str, str],
+    except_of_entry: ConfigEntry | None = None,
+    with_scene: bool = False,
+):
+    if len(device_entry_identifiers) > 1:
+        device_domain = device_entry_identifiers[0]
+    else:
+        return True
+    if device_domain in domains:
+        for domain in domains:
+            device_map = get_domain_device_map(
+                hass, domain, except_of_entry, with_scene
+            )
+            device_id = device_entry_identifiers[1]
+            if device_id in device_map:
+                return True
+
+    else:
+        return True
+
+    return False
+
+
+def delete_all_device_entities(hass: HomeAssistant, device_ids: list[str]):
+    device_registry = dr.async_get(hass)
+    entity_registry = er.async_get(hass)
+    hass_devices: list[DeviceEntry] = []
+    for device_id in device_ids:
+        if hass_device := device_registry.async_get_device(
+            identifiers={(DOMAIN, device_id), (DOMAIN_ORIG, device_id)}
+        ):
+            hass_devices.append(hass_device)
+    for hass_device in hass_devices:
+        hass_entities = er.async_entries_for_device(
+            entity_registry,
+            device_id=hass_device.id,
+            include_disabled_entities=True,
+        )
+        for entity_entry in hass_entities:
+            entity_registry.async_remove(entity_entry.entity_id)
+
+
 # Decodes a b64-encoded timestamp
 def b64todatetime(value):
     decoded_value = b64decode(value)
     try:
-        return datetime(year=2000+decoded_value[0], month=decoded_value[1], day=decoded_value[2], hour=decoded_value[3], minute=decoded_value[4], second=decoded_value[5], tzinfo=DEFAULT_TIME_ZONE)
+        return datetime(
+            year=2000 + decoded_value[0],
+            month=decoded_value[1],
+            day=decoded_value[2],
+            hour=decoded_value[3],
+            minute=decoded_value[4],
+            second=decoded_value[5],
+            tzinfo=DEFAULT_TIME_ZONE,
+        )
     except Exception:
         return None

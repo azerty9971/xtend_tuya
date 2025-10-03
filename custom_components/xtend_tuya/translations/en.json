@@ -15,6 +15,23 @@
             },
             "scan": {
                 "description": "Use Smart Life app or Tuya Smart app to scan the following QR-code to complete the login.\n\nContinue to the next step once you have completed this step in the app."
+            },
+            "ir_add_key": {
+                "title": "New IR key for {device_name}",
+                "description": "Enter the name of the new key, then press Submit then point your remote to the hub and hit the key on your remote",
+                "data": {
+                    "new_ir_key_name": "New key name"
+                },
+                "data_description": {
+                    "new_ir_key_name": "The name of the key to add to the IR device."
+                }
+            },
+            "ir_add_device": {
+                "title": "New IR device under {device_name}",
+                "description": "Enter the name of the new device",
+                "data": {
+                    "new_ir_device_name": "New device name"
+                }
             }
         },
         "error": {
@@ -22,7 +39,9 @@
             "login_error": "Login error ({code}): {msg}"
         },
         "abort": {
-            "reauth_successful": "Reauthentication successful"
+            "reauth_successful": "Reauthentication successful",
+            "ir_add_key_success": "IR key {key_name} has been added to {device_name}",
+            "ir_add_key_failed": "Could not add {key_name} to {device_name}"
         }
     },
     "options": {
@@ -1305,18 +1324,18 @@
             "backlight_switch": {
                 "name": "Backlight Switch"
             },
-            "power_a":{
+            "power_a": {
                 "name": "Power A"
             },
-            "power_b":{
+            "power_b": {
                 "name": "Power B"
             },
-            "direction_a":{
+            "direction_a": {
                 "name": "Power direction A"
             },
-            "direction_b":{
+            "direction_b": {
                 "name": "Power direction B"
-            },  
+            },
             "voltage_a": {
                 "name": "Voltage A"
             },

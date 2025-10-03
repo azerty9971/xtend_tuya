@@ -168,7 +168,9 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
         sharing_device_manager.user_repository = UserRepository(
             sharing_device_manager.customer_api
         )
-        sharing_device_manager.add_device_listener(self.multi_manager.multi_device_listener)  # type: ignore
+        sharing_device_manager.add_device_listener(
+            self.multi_manager.multi_device_listener
+        )  # type: ignore
         return TuyaSharingData(
             device_manager=sharing_device_manager,
             device_ids=[],
@@ -209,7 +211,8 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
         if self.sharing_account is None or self.sharing_account.device_manager is None:
             return return_list
         if (
-            other_device_map := self.sharing_account.device_manager.get_overriden_device_map()
+            other_device_map
+            := self.sharing_account.device_manager.get_overriden_device_map()
         ):
             return_list.append(other_device_map)
         return_list.append(self.sharing_account.device_manager.device_map)
@@ -223,7 +226,9 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
     def remove_device_listeners(self) -> None:
         if self.sharing_account is None:
             return None
-        self.sharing_account.device_manager.remove_device_listener(self.multi_manager.multi_device_listener)  # type: ignore
+        self.sharing_account.device_manager.remove_device_listener(
+            self.multi_manager.multi_device_listener
+        )  # type: ignore
 
     def unload(self):
         for decorator in self.tuya_integration_decorator:
@@ -325,12 +330,15 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
     def get_platform_descriptors_to_merge(self, platform: Platform) -> Any:
         if self.sharing_account is None:
             return None
-        #if self.sharing_account.device_manager.reuse_config:
+        # if self.sharing_account.device_manager.reuse_config:
         #    return None
         return get_tuya_platform_descriptors(platform)
-    
+
     def get_platform_descriptors_to_exclude(self, platform: Platform) -> Any:
-        if self.sharing_account is not None and self.sharing_account.device_manager.reuse_config:
+        if (
+            self.sharing_account is not None
+            and self.sharing_account.device_manager.reuse_config
+        ):
             return get_tuya_platform_descriptors(platform)
 
     def send_commands(self, device_id: str, commands: list[dict[str, Any]]) -> bool:

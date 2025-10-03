@@ -14,7 +14,6 @@ from ..xt_tuya_iot_mq import (
 from ..xt_tuya_iot_openapi import (
     XTIOTOpenAPI,
 )
-from ....const import LOGGER  # noqa: F401
 
 
 class XTIOTOpenMQIPC(XTIOTOpenMQ):

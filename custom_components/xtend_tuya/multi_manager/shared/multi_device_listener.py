@@ -3,7 +3,7 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import dispatcher_send
 from homeassistant.helpers import device_registry as dr
 from ...const import (
-    LOGGER,  # noqa: F401
+    LOGGER,
     DOMAIN,
     DOMAIN_ORIG,
 )
@@ -18,7 +18,10 @@ class MultiDeviceListener:
         self.hass = hass
 
     def update_device(
-        self, device: sh.XTDevice, updated_status_properties: list[str] | None = None
+        self,
+        device: sh.XTDevice,
+        updated_status_properties: list[str] | None = None,
+        dp_timestamps: dict | None = None,
     ):
         signal_list: list[str] = []
         for account in self.multi_manager.accounts.values():

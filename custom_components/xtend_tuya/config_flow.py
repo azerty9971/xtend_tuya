@@ -10,6 +10,9 @@ from homeassistant.core import callback
 from homeassistant.config_entries import ConfigEntry, ConfigFlow, OptionsFlow
 from homeassistant.config_entries import ConfigFlowResult
 from homeassistant.helpers import selector
+from homeassistant.helpers.typing import (
+    DiscoveryInfoType,
+)
 from .const import (
     TuyaCloudOpenAPIEndpoint,
     CONF_ENDPOINT,
@@ -17,7 +20,6 @@ from .const import (
     CONF_TOKEN_INFO,
     CONF_USER_CODE,
     DOMAIN,
-    DOMAIN_ORIG,
     TUYA_CLIENT_ID,
     TUYA_RESPONSE_CODE,
     TUYA_RESPONSE_MSG,
@@ -39,8 +41,11 @@ from .const import (
     TUYA_COUNTRIES,
     TUYA_SMART_APP,
     TUYA_RESPONSE_PLATFORM_URL,
-    LOGGER,  # noqa: F401
+    XTDiscoverySource,
 )
+import custom_components.xtend_tuya.util as util
+import custom_components.xtend_tuya.multi_manager.multi_manager as mm
+import custom_components.xtend_tuya.multi_manager.shared.data_entry.shared_data_entry as data_entry
 
 
 class TuyaOptionFlow(OptionsFlow):
@@ -227,6 +232,16 @@ class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
         """Initialize the config flow."""
         self.__login_control = LoginControl()
 
+    def __getattr__(self, name: str):
+        step_prefix: str = "async_step_"
+        if (
+            name.startswith(step_prefix)
+            and name[len(step_prefix) :] in XTDiscoverySource
+        ):
+            return self.generic_data_entry
+        else:
+            raise AttributeError
+
     @staticmethod
     @callback
     def async_get_options_flow(config_entry):
@@ -237,20 +252,20 @@ class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
         """Step user."""
-        tuya_data = self.hass.config_entries.async_entries(DOMAIN_ORIG, False, False)
-        xt_tuya_data = self.hass.config_entries.async_entries(DOMAIN, True, True)
-        if tuya_data:
-            for config_entry in tuya_data:
-                xt_tuya_config_already_exists = False
-                for xt_tuya_config in xt_tuya_data:
-                    if xt_tuya_config.title == config_entry.title:
-                        xt_tuya_config_already_exists = True
-                        break
-                if not xt_tuya_config_already_exists:
-                    return self.async_create_entry(
-                        title=config_entry.title,
-                        data=config_entry.data,
-                    )
+        #        tuya_data = self.hass.config_entries.async_entries(DOMAIN_ORIG, False, False)
+        #        xt_tuya_data = self.hass.config_entries.async_entries(DOMAIN, True, True)
+        #        if tuya_data:
+        #            for config_entry in tuya_data:
+        #                xt_tuya_config_already_exists = False
+        #                for xt_tuya_config in xt_tuya_data:
+        #                    if xt_tuya_config.title == config_entry.title:
+        #                        xt_tuya_config_already_exists = True
+        #                        break
+        #                if not xt_tuya_config_already_exists:
+        #                    return self.async_create_entry(
+        #                        title=config_entry.title,
+        #                        data=config_entry.data,
+        #                    )
 
         errors = {}
         placeholders = {}
@@ -404,6 +419,32 @@ class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
             ),
             errors=errors,
             description_placeholders=placeholders,
+        )
+
+    async def get_overriden_data_entry(self) -> data_entry.XTFlowDataBase | None:
+        all_mm: list[mm.MultiManager] = util.get_all_multi_managers(self.hass)
+        handler: data_entry.XTFlowDataBase | None = None
+        for multimanager in all_mm:
+            if handler := multimanager.get_user_input_data(self.flow_id):
+                return handler
+        return None
+
+    async def generic_data_entry(
+        self, discovery_info: DiscoveryInfoType | data_entry.XTFlowDataBase | None
+    ) -> ConfigFlowResult:
+        if isinstance(discovery_info, data_entry.XTFlowDataBase):
+            handler = discovery_info
+            if handler.flow_id is None:
+                handler.flow_id = self.flow_id
+                handler.multi_manager.register_user_input_data(handler)
+            return await handler.processing_class.user_interaction_callback(self, None)
+        else:
+            if handler := await self.get_overriden_data_entry():
+                return await handler.processing_class.user_interaction_callback(
+                    self, discovery_info
+                )
+        return self.async_abort(
+            reason="Xtend Tuya processing function didn't return a handler, contact the developer"
         )
 
     async def __async_get_qr_code(self, user_code: str) -> tuple[bool, dict[str, Any]]:

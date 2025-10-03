@@ -10,7 +10,7 @@ from .views import (
 )
 from ....const import (
     DOMAIN,
-    LOGGER,  # noqa: F401
+    LOGGER,
     MESSAGE_SOURCE_TUYA_SHARING,
     MESSAGE_SOURCE_TUYA_IOT,
 )
@@ -215,7 +215,6 @@ class ServiceManager:
     ) -> web.Response | str | None:
         source = event.data.get(CONF_SOURCE, MESSAGE_SOURCE_TUYA_IOT)
         session_id = event.data.get(CONF_SESSION_ID, None)
-        # LOGGER.warning(f"DEBUG CALL: {event}")
         if session_id is None:
             return None
         multi_manager_list = get_all_multi_managers(self.hass)
@@ -224,7 +223,6 @@ class ServiceManager:
                 if debug_output := await self.hass.async_add_executor_job(
                     account.get_webrtc_exchange_debug, session_id
                 ):
-                    # LOGGER.warning(f"DEBUG OUTPUT: {debug_output}")
                     return debug_output
         return None
 
@@ -235,7 +233,6 @@ class ServiceManager:
         device_id = event.data.get(CONF_DEVICE_ID, None)
         session_id = event.data.get(CONF_SESSION_ID, None)
         channel = event.data.get(CONF_CHANNEL, None)
-        # LOGGER.warning(f"DEBUG SDP CALL: {event}")
         if device_id is None or session_id is None:
             return None
         multi_manager = self._get_correct_multi_manager(source, device_id)

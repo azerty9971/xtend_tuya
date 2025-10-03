@@ -4,7 +4,6 @@ from __future__ import annotations
 from typing import Any, cast
 from homeassistant.components.event import (
     EventEntityDescription,
-    EventDeviceClass,  # noqa: F401
 )
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant, callback
@@ -20,8 +19,6 @@ from .multi_manager.multi_manager import (
 )
 from .const import (
     TUYA_DISCOVERY_NEW,
-    XTDPCode,  # noqa: F401
-    CROSS_CATEGORY_DEVICE_DESCRIPTOR,  # noqa: F401
     LOGGER,
 )
 from .ha_tuya_integration.tuya_integration_imports import (
@@ -89,8 +86,11 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if category_descriptions := XTEntityDescriptorManager.get_category_descriptors(
-                    supported_descriptors, device.category
+                if (
+                    category_descriptions
+                    := XTEntityDescriptorManager.get_category_descriptors(
+                        supported_descriptors, device.category
+                    )
                 ):
                     externally_managed_dpcodes = (
                         XTEntityDescriptorManager.get_category_keys(
@@ -166,7 +166,9 @@ class XTEventEntity(XTEntity, TuyaEventEntity):
             self._attr_event_types: list[str] = dpcode.range
 
     async def _handle_state_update(
-        self, updated_status_properties: list[str] | None
+        self,
+        updated_status_properties: list[str] | None,
+        dp_timestamps: dict | None = None,
     ) -> None:
         if (
             updated_status_properties is None

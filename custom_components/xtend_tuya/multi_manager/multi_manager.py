@@ -63,10 +63,12 @@ from .shared.interface.device_manager import (
 from ..entity_parser.entity_parser import (
     XTCustomEntityParser,
 )
+import custom_components.xtend_tuya.multi_manager.shared.data_entry.shared_data_entry as shared_data_entry
 
 
 class MultiManager:  # noqa: F811
-    def __init__(self, hass: HomeAssistant) -> None:
+    def __init__(self, hass: HomeAssistant, config_entry: XTConfigEntry) -> None:
+        self.config_entry = config_entry
         self.virtual_state_handler = XTVirtualStateHandler(self)
         self.virtual_function_handler = XTVirtualFunctionHandler(self)
         self.multi_mqtt_queue: MultiMQTTQueue = MultiMQTTQueue(self)
@@ -87,10 +89,12 @@ class MultiManager:  # noqa: F811
         self.entity_parsers: dict[str, XTCustomEntityParser] = {}
         self.post_setup_callbacks: dict[
             XTMultiManagerPostSetupCallbackPriority,
-            list[tuple[Callable, tuple | None, dict | None]],
+            list[tuple[Callable, tuple | None]],
         ] = {}
         for priority in XTMultiManagerPostSetupCallbackPriority:
             self.post_setup_callbacks[priority] = []
+        self.loading_finalized: bool = False
+        self._user_input_flows: dict[str, shared_data_entry.XTFlowDataBase] = {}
 
     @property
     def device_map(self):
@@ -107,9 +111,7 @@ class MultiManager:  # noqa: F811
             return self.accounts[account_name]
         return None
 
-    async def setup_entry(
-        self, hass: HomeAssistant, config_entry: XTConfigEntry
-    ) -> None:
+    async def setup_entry(self) -> None:
         # Load all the plugins
         # subdirs = await self.hass.async_add_executor_job(os.listdir, os.path.dirname(__file__))
         subdirs = AllowedPlugins.get_plugins_to_load()
@@ -124,7 +126,9 @@ class MultiManager:  # noqa: F811
                     )
                     LOGGER.debug(f"Plugin {load_path} loaded")
                     instance: XTDeviceManagerInterface = plugin.get_plugin_instance()
-                    if await instance.setup_from_entry(hass, config_entry, self):
+                    if await instance.setup_from_entry(
+                        self.hass, self.config_entry, self
+                    ):
                         self.accounts[instance.get_type_name()] = instance
                 except ModuleNotFoundError as e:
                     LOGGER.error(f"Loading module failed: {e}")
@@ -132,8 +136,8 @@ class MultiManager:  # noqa: F811
         for account in self.accounts.values():
             await self.hass.async_add_executor_job(account.on_post_setup)
 
-    async def setup_entity_parsers(self, hass: HomeAssistant) -> None:
-        await XTCustomEntityParser.setup_entity_parsers(hass, self)
+    async def setup_entity_parsers(self) -> None:
+        await XTCustomEntityParser.setup_entity_parsers(self.hass, self)
 
     def get_domain_identifiers_of_device(self, device_id: str) -> list:
         return_list: list = []
@@ -330,12 +334,10 @@ class MultiManager:  # noqa: F811
                 return code, dpId, value, True
         if code is None and fail_if_code_not_found:
             if device:
-                # LOGGER.warning(f"_read_code_value_from_state FAILED => {device.id} <=> {device.name} <=> {state} <=> {device.local_strategy}")
                 pass
             return None, None, None, False
         if dpId is None and fail_if_dpid_not_found:
             if device:
-                # LOGGER.warning(f"_read_code_value_from_state FAILED => {device.id} <=> {device.name} <=> {state} <=> {device.local_strategy}")
                 pass
             return None, None, None, False
         return code, dpId, value, True
@@ -353,7 +355,6 @@ class MultiManager:  # noqa: F811
                 item["dpId"] = dpId
                 item["value"] = value
             else:
-                # LOGGER.warning(f"convert_device_report_status_list code retrieval failed => {item} <=>{device_id}")
                 pass
         return status
 
@@ -363,7 +364,6 @@ class MultiManager:  # noqa: F811
             return
         dev_id = self._get_device_id_from_message(msg)
         if not dev_id:
-            LOGGER.warning(f"dev_id {dev_id} not found!")
             return
 
         new_message = self._convert_message_for_all_accounts(msg)
@@ -489,9 +489,7 @@ class MultiManager:  # noqa: F811
             old_online_status = device.online
             for online_status in device.online_states:
                 device.online = device.online_states[online_status]
-                if (
-                    device.online
-                ):  # Prefer to be more On than Off if multiple state are not in accordance
+                if device.online:  # Prefer to be more On than Off if multiple state are not in accordance
                     break
             if device.online != old_online_status:
                 self.multi_device_listener.update_device(device, None)
@@ -522,28 +520,36 @@ class MultiManager:  # noqa: F811
     ):
         for account in self.accounts.values():
             await account.on_loading_finalized(hass, config_entry, self)
-        for priority in XTMultiManagerPostSetupCallbackPriority:
-            if priority not in self.post_setup_callbacks:
-                continue
-            for callback, args, kwargs in self.post_setup_callbacks[priority]:
-                if args is None:
-                    args = tuple()
-                if kwargs is None:
-                    kwargs = {}
-                if asyncio.iscoroutinefunction(callback):
-                    await callback(*args, **kwargs)
-                else:
-                    callback(*args, **kwargs)
+        await self.process_post_setup_callback()
+        self.loading_finalized = True
 
     def get_ir_hub_information(self, device: XTDevice) -> XTIRHubInformation | None:
         for account in self.accounts.values():
             ir_device_information = account.get_ir_hub_information(device)
             if ir_device_information is not None:
                 return ir_device_information
-    
-    def send_ir_command(self, device: XTDevice, key: XTIRRemoteKeysInformation, remote: XTIRRemoteInformation, hub: XTIRHubInformation) -> bool:
+
+    def send_ir_command(
+        self,
+        device: XTDevice,
+        key: XTIRRemoteKeysInformation,
+        remote: XTIRRemoteInformation,
+        hub: XTIRHubInformation,
+    ) -> bool:
         for account in self.accounts.values():
             if account.send_ir_command(device, key, remote, hub):
+                return True
+        return False
+
+    def learn_ir_key(
+        self,
+        device: XTDevice,
+        remote: XTIRRemoteInformation,
+        hub: XTIRHubInformation,
+        key_name: str,
+    ) -> bool:
+        for account in self.accounts.values():
+            if account.learn_ir_key(device, remote, hub, key_name):
                 return True
         return False
 
@@ -556,3 +562,35 @@ class MultiManager:  # noqa: F811
         self, property_id: XTMultiManagerProperties, default: Any | None = None
     ) -> Any | None:
         return self.general_properties.get(property_id, default)
+
+    async def process_post_setup_callback(self):
+        for priority in XTMultiManagerPostSetupCallbackPriority:
+            if priority not in self.post_setup_callbacks:
+                continue
+            for callback, *args in self.post_setup_callbacks[priority]:
+                if args is None:
+                    args = tuple()
+                if asyncio.iscoroutinefunction(callback):
+                    await callback(*args)
+                else:
+                    callback(*args)
+
+    def add_post_setup_callback(
+        self,
+        priority: XTMultiManagerPostSetupCallbackPriority,
+        callback: Callable,
+        *args,
+    ):
+        if self.loading_finalized is False:
+            self.post_setup_callbacks[priority].append((callback, *args))
+        else:
+            self.hass.add_job(callback, *args)
+
+    def register_user_input_data(self, flow_data: shared_data_entry.XTFlowDataBase):
+        if flow_data.flow_id is not None:
+            self._user_input_flows[flow_data.flow_id] = flow_data
+
+    def get_user_input_data(
+        self, flow_id: str
+    ) -> shared_data_entry.XTFlowDataBase | None:
+        return self._user_input_flows.get(flow_id)
