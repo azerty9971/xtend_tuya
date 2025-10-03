@@ -18,7 +18,10 @@ class MultiDeviceListener:
         self.hass = hass
 
     def update_device(
-        self, device: sh.XTDevice, updated_status_properties: list[str] | None = None
+        self,
+        device: sh.XTDevice,
+        updated_status_properties: list[str] | None = None,
+        dp_timestamps: dict | None = None,
     ):
         signal_list: list[str] = []
         for account in self.multi_manager.accounts.values():
