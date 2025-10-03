@@ -20,7 +20,7 @@ from .const import (
     CONF_TOKEN_INFO,
     CONF_USER_CODE,
     DOMAIN,
-    DOMAIN_ORIG,
+    DOMAIN_ORIG,  # noqa: F401
     TUYA_CLIENT_ID,
     TUYA_RESPONSE_CODE,
     TUYA_RESPONSE_MSG,
