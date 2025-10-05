@@ -506,8 +506,8 @@ class XTEntity(TuyaEntity):
                 ):
                     if not (
                         enum_type := TuyaEnumTypeData.from_json(
-                            dpcode,
-                            getattr(self.device, key)[dpcode].values,  # type: ignore
+                            dpcode, # type: ignore
+                            getattr(self.device, key)[dpcode].values,
                         )
                     ):
                         continue
@@ -519,8 +519,8 @@ class XTEntity(TuyaEntity):
                 ):
                     if not (
                         integer_type := TuyaIntegerTypeData.from_json(
-                            dpcode,
-                            getattr(self.device, key)[dpcode].values,  # type: ignore
+                            dpcode, # type: ignore
+                            getattr(self.device, key)[dpcode].values,
                         )
                     ):
                         continue

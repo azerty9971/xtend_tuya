@@ -45,9 +45,9 @@ class XTCoverEntityDescription(TuyaCoverEntityDescription):
     """Describes XT cover entity."""
 
     current_state: TuyaDPCode | XTDPCode | None = None  # type: ignore
-    current_position: (
+    current_position: ( # type: ignore
         TuyaDPCode | tuple[TuyaDPCode, ...] | XTDPCode | tuple[XTDPCode, ...] | None
-    ) = None  # type: ignore
+    ) = None
     set_position: TuyaDPCode | XTDPCode | None = None  # type: ignore
 
     # Additional attributes for XT specific functionality

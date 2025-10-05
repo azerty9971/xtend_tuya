@@ -46,9 +46,9 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
         self.device_repository: dr.XTSharingDeviceRepository | None = None
         self.scene_repository: SceneRepository | None = None
         self.user_repository: UserRepository | None = None
-        self.device_map: XTDeviceMap = XTDeviceMap(
+        self.device_map: XTDeviceMap = XTDeviceMap( # type: ignore
             {}, XTDeviceSourcePriority.TUYA_SHARED
-        )  # type: ignore
+        )
         self.user_homes: list[SmartLifeHome] = []
         self.device_listeners = set()
         self.__other_device_manager: Manager | None = None

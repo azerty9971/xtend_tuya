@@ -1566,11 +1566,8 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if (
-                    category_descriptions
-                    := XTEntityDescriptorManager.get_category_descriptors(
-                        supported_descriptors, device.category
-                    )
+                if category_descriptions := XTEntityDescriptorManager.get_category_descriptors(
+                    supported_descriptors, device.category
                 ):
                     externally_managed_dpcodes = (
                         XTEntityDescriptorManager.get_category_keys(
@@ -1790,8 +1787,8 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
                 # Scale integer/float value
                 if isinstance(self._type_data, TuyaIntegerTypeData):
                     scaled_value_back = self._type_data.scale_value_back(
-                        self._restored_data.native_value
-                    )  # type: ignore
+                        self._restored_data.native_value  # type: ignore
+                    )
                     self._restored_data.native_value = scaled_value_back
 
                 if device := self.device_manager.device_map.get(self.device.id, None):
