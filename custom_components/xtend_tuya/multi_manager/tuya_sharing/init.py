@@ -169,8 +169,8 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
             sharing_device_manager.customer_api
         )
         sharing_device_manager.add_device_listener(
-            self.multi_manager.multi_device_listener
-        )  # type: ignore
+            self.multi_manager.multi_device_listener # type: ignore
+        )
         return TuyaSharingData(
             device_manager=sharing_device_manager,
             device_ids=[],
@@ -227,8 +227,8 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
         if self.sharing_account is None:
             return None
         self.sharing_account.device_manager.remove_device_listener(
-            self.multi_manager.multi_device_listener
-        )  # type: ignore
+            self.multi_manager.multi_device_listener # type: ignore
+        )
 
     def unload(self):
         for decorator in self.tuya_integration_decorator:
