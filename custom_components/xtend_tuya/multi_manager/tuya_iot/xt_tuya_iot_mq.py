@@ -127,8 +127,13 @@ class XTIOTOpenMQ(TuyaOpenMQ):
         url = urlsplit(mq_config.url)
         if url.scheme == "ssl":
             mqttc.tls_set()
-        LOGGER.debug(f"Connecting MQTT: '{url.hostname}':'{url.port}' ")
-        mqttc.connect(url.hostname, url.port)
+        
+        hostname: str = url.hostname
+        port: int = url.port
+        #Fix for Singapore MQTT queue (until Tuya fixes it)
+        hostname = hostname.replace("--", "-sg")
+        LOGGER.debug(f"Connecting MQTT: '{hostname}':'{port}' ")
+        mqttc.connect(hostname, port)
 
         mqttc.loop_start()
         return mqttc
