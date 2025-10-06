@@ -127,7 +127,7 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         self.device = device
         self.device_manager = device_manager
         self.iot_manager: XTDeviceManagerInterface | None = None
-        self.hass = hass
+        self._hass = hass
         self.webrtc_configuration: WebRTCClientConfiguration | None = None
         self.wait_for_candidates = None
         self.supports_2way_audio: bool = False
@@ -174,7 +174,7 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
             self.device.id, "Getting WebRTC Config 1", self.device
         )
         return_tuple = await self.iot_manager.async_get_webrtc_ice_servers(
-            self.device, "GO2RTC", self.hass
+            self.device, "GO2RTC", self._hass
         )
         if return_tuple is None:
             return None
@@ -224,7 +224,7 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         if self.wait_for_candidates:
             self.wait_for_candidates()
         self.wait_for_candidates = async_call_later(
-            self.hass,
+            self._hass,
             1,
             HassJob(
                 functools.partial(self.send_closing_candidate, session_id, self.device),
@@ -234,7 +234,7 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         )
         if self.has_multiple_streams:
             self.wait_for_candidates = async_call_later(
-                self.hass,
+                self._hass,
                 2,
                 HassJob(
                     functools.partial(
@@ -248,7 +248,7 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
                 ),
             )
         return await self.iot_manager.async_handle_async_webrtc_offer(
-            offer_sdp, session_id, send_message, self.device, self.hass
+            offer_sdp, session_id, send_message, self.device, self._hass
         )
 
     @callback
