@@ -39,7 +39,11 @@ class XTEventLoopProtector:
             else:
                 return callback(*args)
         else:
-            return await XTEventLoopProtector.hass.async_add_executor_job(callback, *args)
+            if is_coroutine:
+                job = await XTEventLoopProtector.hass.async_add_executor_job(callback, *args)
+                return await job
+            else:
+                return await XTEventLoopProtector.hass.async_add_executor_job(callback, *args)
 
 
 class XTThread(threading.Thread):
