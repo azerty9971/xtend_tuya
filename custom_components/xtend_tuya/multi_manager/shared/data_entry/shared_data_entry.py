@@ -64,11 +64,11 @@ class XTDataEntryManager(ABC):
         XTEventLoopProtector.execute_out_of_event_loop(
             self.hass.config_entries.flow.async_init,
             DOMAIN,
-            ConfigFlowContext(
+            context=ConfigFlowContext(
                 source=self.source,
                 title_placeholders=self.get_translation_placeholders(),
             ),
-            self.flow_data,
+            data=self.flow_data,
         )
 
     def get_translation_placeholders(self) -> dict[str, str]:
