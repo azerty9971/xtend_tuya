@@ -77,9 +77,6 @@ async def async_setup_entry(
         ),
     )
 
-    entities: list[XTCameraEntity] = []
-    extra_entities: list[XTCameraEntity] = []
-
     @callback
     async def add_camera_devices(device_map) -> None:
         if hass_data.manager is None:
@@ -99,6 +96,9 @@ async def async_setup_entry(
                         #this device doesn't support webrtc or rtsp, skip it...
                         continue
                     entities.append(entity)
+                    if entity.has_multiple_streams:
+                        entities.append(XTCameraEntity(device, hass_data.manager, hass, entity.webrtc_configuration, WebRTCStreamQuality.LOW_QUALITY))
+
         async_add_entities(entities)
 
     @callback
@@ -115,19 +115,6 @@ async def async_setup_entry(
         )
 
     async_discover_device([*hass_data.manager.device_map])
-    #for entity in entities:
-    #    await entity.get_webrtc_config()
-    #    if entity.has_multiple_streams:
-    #        extra_entities.append(
-    #            XTCameraEntity(
-    #                entity.device,
-    #                hass_data.manager,
-    #                hass,
-    #                None,
-    #                WebRTCStreamQuality.LOW_QUALITY,
-    #            )
-    #        )
-    #async_add_entities(extra_entities)
 
     entry.async_on_unload(
         async_dispatcher_connect(hass, TUYA_DISCOVERY_NEW, async_discover_device)
