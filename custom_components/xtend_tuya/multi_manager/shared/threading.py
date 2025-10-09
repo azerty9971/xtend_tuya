@@ -1,8 +1,33 @@
 from __future__ import annotations
-from threading import Thread
+import threading
+import inspect
+from homeassistant.core import (
+    HomeAssistant,
+)
+from ...const import (
+    LOGGER,
+)
 
 
-class XTThread(Thread):
+class XTEventLoopProtector:
+
+    hass: HomeAssistant | None = None
+
+    @staticmethod
+    def protect_event_loop(callback, *args) -> None:
+        if XTEventLoopProtector.hass is None:
+            LOGGER.error("protect_event_loop called without a HASS instance")
+            return
+        if (
+            XTEventLoopProtector.hass.loop_thread_id != threading.get_ident()
+            and inspect.iscoroutinefunction(callback) is False
+        ):
+            callback(*args)
+        else:
+            XTEventLoopProtector.hass.async_add_job(callback, *args)
+
+
+class XTThread(threading.Thread):
     def __init__(self, callable, immediate_start: bool = False, *args, **kwargs):
         self.callable = callable
         self.immediate_start = immediate_start

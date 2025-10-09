@@ -20,6 +20,9 @@ from .multi_manager.multi_manager import (
 from .multi_manager.shared.shared_classes import (
     HomeAssistantXTData,
 )
+from .multi_manager.shared.threading import (
+    XTEventLoopProtector,
+)
 from .util import get_config_entry_runtime_data, is_device_in_domain_device_maps
 from .multi_manager.shared.services.services import (
     ServiceManager,
@@ -43,6 +46,7 @@ async def update_listener(hass: HomeAssistant, entry: XTConfigEntry):
 
 async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
     """Async setup hass config entry."""
+    XTEventLoopProtector.hass = hass
     start_time = datetime.now()
     multi_manager = MultiManager(hass, entry)
     service_manager = ServiceManager(multi_manager=multi_manager)
