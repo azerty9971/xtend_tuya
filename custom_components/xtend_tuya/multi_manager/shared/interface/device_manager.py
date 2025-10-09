@@ -42,7 +42,7 @@ class XTDeviceManagerInterface(ABC):
         hass: HomeAssistant,
         config_entry: XTConfigEntry,
         multi_manager: mm.MultiManager,
-    ) -> bool:
+    ) -> None:
         pass
 
     @abstractmethod

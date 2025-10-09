@@ -97,15 +97,14 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
         hass: HomeAssistant,
         config_entry: XTConfigEntry,
         multi_manager: MultiManager,
-    ) -> bool:
+    ) -> None:
         self.multi_manager: MultiManager = multi_manager
         self.hass = hass
         self.sharing_account: TuyaSharingData | None = await self._init_from_entry(
             hass, config_entry
         )
         if self.sharing_account:
-            return True
-        return False
+            self.multi_manager.register_account(self)
 
     async def _init_from_entry(
         self, hass: HomeAssistant, config_entry: XTConfigEntry

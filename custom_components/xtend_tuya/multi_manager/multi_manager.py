@@ -29,6 +29,7 @@ from .shared.shared_classes import (
 )
 from .shared.threading import (
     XTThreadingManager,
+    XTConcurrencyManager,
     XTEventLoopProtector,
 )
 from .shared.debug.debug_helper import (
@@ -105,6 +106,9 @@ class MultiManager:  # noqa: F811
     def mq(self):
         return self.multi_mqtt_queue
 
+    def register_account(self, instance: XTDeviceManagerInterface):
+        self.accounts[instance.get_type_name()] = instance
+
     def get_account_by_name(
         self, account_name: str | None
     ) -> XTDeviceManagerInterface | None:
@@ -115,26 +119,32 @@ class MultiManager:  # noqa: F811
     async def setup_entry(self) -> None:
         # Load all the plugins
         subdirs = AllowedPlugins.get_plugins_to_load()
+        concurrency_manager = XTConcurrencyManager()
         for directory in subdirs:
             if os.path.isdir(os.path.dirname(__file__) + os.sep + directory):
                 load_path = f".{directory}.init"
                 try:
-                    plugin = await XTEventLoopProtector.execute_out_of_event_loop_and_return(
-                        partial(
-                            importlib.import_module, name=load_path, package=__package__
+                    plugin = (
+                        await XTEventLoopProtector.execute_out_of_event_loop_and_return(
+                            partial(
+                                importlib.import_module,
+                                name=load_path,
+                                package=__package__,
+                            )
                         )
                     )
                     LOGGER.debug(f"Plugin {load_path} loaded")
                     instance: XTDeviceManagerInterface = plugin.get_plugin_instance()
-                    if await instance.setup_from_entry(
-                        self.hass, self.config_entry, self
-                    ):
-                        self.accounts[instance.get_type_name()] = instance
+                    concurrency_manager.add_coroutine(
+                        instance.setup_from_entry(self.hass, self.config_entry, self)
+                    )
                 except ModuleNotFoundError as e:
                     LOGGER.error(f"Loading module failed: {e}")
-
+        await concurrency_manager.gather()
         for account in self.accounts.values():
-            await XTEventLoopProtector.execute_out_of_event_loop_and_return(account.on_post_setup)
+            await XTEventLoopProtector.execute_out_of_event_loop_and_return(
+                account.on_post_setup
+            )
 
     async def setup_entity_parsers(self) -> None:
         await XTCustomEntityParser.setup_entity_parsers(self.hass, self)
@@ -489,7 +499,9 @@ class MultiManager:  # noqa: F811
             old_online_status = device.online
             for online_status in device.online_states:
                 device.online = device.online_states[online_status]
-                if device.online:  # Prefer to be more On than Off if multiple state are not in accordance
+                if (
+                    device.online
+                ):  # Prefer to be more On than Off if multiple state are not in accordance
                     break
             if device.online != old_online_status:
                 self.multi_device_listener.update_device(device, None)

@@ -12,6 +12,19 @@ from ...const import (
 )
 
 
+class XTConcurrencyManager:
+
+    hass: HomeAssistant | None = None
+
+    def __init__(self) -> None:
+        self.coro_list: list = []
+
+    def add_coroutine(self, coroutine):
+        self.coro_list.append(coroutine)
+    
+    async def gather(self):
+        await asyncio.gather(*self.coro_list)
+
 class XTEventLoopProtector:
 
     hass: HomeAssistant | None = None
