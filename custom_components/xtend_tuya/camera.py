@@ -14,6 +14,9 @@ from homeassistant.core import HomeAssistant, callback, HassJob, HassJobType
 from homeassistant.helpers.event import async_call_later
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.components.camera.const import (
+    StreamType,
+)
 from homeassistant.components.camera.webrtc import (
     WebRTCSendMessage,
     WebRTCClientConfiguration,
@@ -191,7 +194,7 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         self._supports_native_async_webrtc = False
     
     def supports_webrtc(self) -> bool:
-        return self._supports_native_sync_webrtc or self._supports_native_async_webrtc
+        return StreamType.WEB_RTC in self.camera_capabilities.frontend_stream_types
 
     async def get_webrtc_config(self) -> None:
         if self.iot_manager is None:
