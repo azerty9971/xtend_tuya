@@ -1,6 +1,7 @@
 from __future__ import annotations
 import threading
 import inspect
+from typing import Any
 from homeassistant.core import (
     HomeAssistant,
 )
@@ -25,6 +26,20 @@ class XTEventLoopProtector:
             callback(*args)
         else:
             XTEventLoopProtector.hass.async_add_job(callback, *args)
+
+    @staticmethod
+    async def protect_event_loop_and_return(callback, *args) -> Any:
+        if XTEventLoopProtector.hass is None:
+            LOGGER.error("protect_event_loop_and_return called without a HASS instance")
+            return
+        is_coroutine: bool = inspect.iscoroutinefunction(callback)
+        if XTEventLoopProtector.hass.loop_thread_id != threading.get_ident():
+            if is_coroutine:
+                return await callback(*args)
+            else:
+                return callback(*args)
+        else:
+            return await XTEventLoopProtector.hass.async_add_executor_job(callback, *args)
 
 
 class XTThread(threading.Thread):
