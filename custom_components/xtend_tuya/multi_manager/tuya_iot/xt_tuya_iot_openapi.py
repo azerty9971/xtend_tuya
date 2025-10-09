@@ -8,6 +8,9 @@ from tuya_iot import (
     TuyaOpenAPI,
     TuyaTokenInfo,
 )
+from homeassistant.core import (
+    HomeAssistant,
+)
 from tuya_iot.tuya_enums import AuthType
 from tuya_iot.version import VERSION
 from ...const import (
@@ -59,6 +62,7 @@ class XTIOTOpenAPI(TuyaOpenAPI):
 
     def __init__(
         self,
+        hass: HomeAssistant,
         endpoint: str,
         access_id: str,
         access_secret: str,
@@ -74,6 +78,7 @@ class XTIOTOpenAPI(TuyaOpenAPI):
             auth_type=auth_type,
             lang=lang,
         )
+        self.hass = hass
         self.non_user_specific_api = non_user_specific_api
         if self.auth_type == AuthType.CUSTOM:
             self.__login_path = TO_C_CUSTOM_TOKEN_API
