@@ -152,7 +152,7 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
 
     def _on_device_report(self, device_id: str, status: list):
         self.multi_manager.device_watcher.report_message(
-            device_id, f"[IOT]On device report: {status}"
+            device_id, f"[{MESSAGE_SOURCE_TUYA_SHARING}]On device report: {status}"
         )
         device = self.device_map.get(device_id, None)
         if not device:
