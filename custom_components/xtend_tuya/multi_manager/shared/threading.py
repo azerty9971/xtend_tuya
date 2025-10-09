@@ -18,7 +18,7 @@ class XTEventLoopProtector:
 
     @staticmethod
     @callback
-    def execute_out_of_event_loop(callback, *args) -> None:
+    def execute_out_of_event_loop(callback, *args, **kwargs) -> None:
         if XTEventLoopProtector.hass is None:
             LOGGER.error("protect_event_loop called without a HASS instance")
             return
@@ -27,15 +27,18 @@ class XTEventLoopProtector:
             #Not in the event loop
             if is_coroutine:
                 LOGGER.warning(f"Calling coroutine thread safe {callback}")
-                asyncio.run_coroutine_threadsafe(callback(*args), XTEventLoopProtector.hass.loop)
+                asyncio.run_coroutine_threadsafe(callback(*args, **kwargs), XTEventLoopProtector.hass.loop)
             else:
-                callback(*args)
+                callback(*args, **kwargs)
         else:
             #In the event loop
             if is_coroutine:
-                XTEventLoopProtector.hass.async_create_task(callback(*args))
+                XTEventLoopProtector.hass.async_create_task(callback(*args, **kwargs))
             else:
-                XTEventLoopProtector.hass.async_add_executor_job(callback, *args)
+                if len(kwargs) > 0:
+                    LOGGER.error("calling execute_out_of_event_loop with kwargs not supported", stack_info=True)
+                else:
+                    XTEventLoopProtector.hass.async_add_executor_job(callback, *args)
 
     @staticmethod
     @callback
