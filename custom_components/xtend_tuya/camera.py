@@ -92,6 +92,9 @@ async def async_setup_entry(
                     await XTEventLoopProtector.protect_event_loop_and_return(entity.get_webrtc_config)
                     if entity.webrtc_configuration is None:
                         entity.disable_webrtc()
+                    if entity.supports_webrtc() is False and await entity.stream_source() is None:
+                        #this device doesn't support webrtc or rtsp, skip it...
+                        continue
                     entities.append(entity)
         async_add_entities(entities)
 
@@ -313,3 +316,10 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         if self.iot_manager is None or self.webrtc_configuration is None:
             return super()._async_get_webrtc_client_configuration()
         return self.webrtc_configuration
+    
+    async def stream_source(self) -> str | None:
+        """Return the source of the stream."""
+        try:
+            return await super().stream_source()
+        except Exception:
+            return None
