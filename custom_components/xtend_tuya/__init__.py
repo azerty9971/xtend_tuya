@@ -69,7 +69,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
 
     # Cleanup device registry
     last_time = datetime.now()
-    await cleanup_device_registry(hass, multi_manager, entry)
+    XTEventLoopProtector.execute_out_of_event_loop(cleanup_device_registry, hass, multi_manager, entry)
     LOGGER.debug(f"Xtended Tuya {entry.title} cleanup_device_registry in {datetime.now() - last_time}")
 
     # Register known device IDs
