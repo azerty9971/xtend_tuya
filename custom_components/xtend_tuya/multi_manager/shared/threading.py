@@ -25,7 +25,7 @@ class XTEventLoopProtector:
         ):
             callback(*args)
         else:
-            XTEventLoopProtector.hass.async_add_job(callback, *args)
+            XTEventLoopProtector.hass.async_add_executor_job(callback, *args)
 
     @staticmethod
     async def protect_event_loop_and_return(callback, *args) -> Any:
