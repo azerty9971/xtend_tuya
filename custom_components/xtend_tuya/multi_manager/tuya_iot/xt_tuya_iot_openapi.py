@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 import time
-import json
+import json  # noqa: F401
 from typing import Any
 from tuya_iot import (
     TuyaOpenAPI,
