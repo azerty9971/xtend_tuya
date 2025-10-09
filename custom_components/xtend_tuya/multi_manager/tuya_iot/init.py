@@ -147,28 +147,28 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
         api.set_dev_channel("hass")
         try:
             if auth_type == AuthType.CUSTOM:
-                response1 = await hass.async_add_executor_job(
+                response1 = await XTEventLoopProtector.execute_out_of_event_loop_and_return(
                     api.connect,
                     config_entry.options[CONF_USERNAME],
                     config_entry.options[CONF_PASSWORD],
                 )
             else:
-                response1 = await hass.async_add_executor_job(
+                response1 = await XTEventLoopProtector.execute_out_of_event_loop_and_return(
                     api.connect,
                     config_entry.options[CONF_USERNAME],
                     config_entry.options[CONF_PASSWORD],
                     config_entry.options[CONF_COUNTRY_CODE],
                     config_entry.options[CONF_APP_TYPE],
                 )
-            response2 = await hass.async_add_executor_job(
+            response2 = await XTEventLoopProtector.execute_out_of_event_loop_and_return(
                 non_user_api.connect,
                 config_entry.options[CONF_USERNAME],
                 config_entry.options[CONF_PASSWORD],
                 config_entry.options[CONF_COUNTRY_CODE],
                 config_entry.options[CONF_APP_TYPE],
             )
-            response3 = await hass.async_add_executor_job(api.test_validity)
-            response4 = await hass.async_add_executor_job(non_user_api.test_validity)
+            response3 = await XTEventLoopProtector.execute_out_of_event_loop_and_return(api.test_validity)
+            response4 = await XTEventLoopProtector.execute_out_of_event_loop_and_return(non_user_api.test_validity)
         except requests.exceptions.RequestException:
             await self.raise_issue(
                 hass=hass,
@@ -312,7 +312,7 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
         ):
             # Verify if we are subscribed to the lock service
             if device := multi_manager.device_map.get(lock_device_id, None):
-                test_api = await hass.async_add_executor_job(
+                test_api = await XTEventLoopProtector.execute_out_of_event_loop_and_return(
                     self.iot_account.device_manager.test_lock_api_subscription, device
                 )
                 if not test_api:
@@ -334,7 +334,7 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
         ):
             # Verify if we are subscribed to the lock service
             if device := multi_manager.device_map.get(camera_device_id, None):
-                test_api = await hass.async_add_executor_job(
+                test_api = await XTEventLoopProtector.execute_out_of_event_loop_and_return(
                     self.iot_account.device_manager.test_camera_api_subscription, device
                 )
                 if not test_api:
@@ -357,7 +357,7 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
         ):
             # Verify if we are subscribed to the lock service
             if device := multi_manager.device_map.get(ir_hub_device_id, None):
-                test_api = await hass.async_add_executor_job(
+                test_api = await XTEventLoopProtector.execute_out_of_event_loop_and_return(
                     self.iot_account.device_manager.test_ir_api_subscription, device
                 )
                 if not test_api:
@@ -519,7 +519,7 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
     ) -> tuple[str, dict] | None:
         if self.iot_account is None:
             return None
-        return await hass.async_add_executor_job(
+        return await XTEventLoopProtector.execute_out_of_event_loop_and_return(
             self.iot_account.device_manager.ipc_manager.webrtc_manager.get_ice_servers,
             device.id,
             None,
@@ -562,7 +562,7 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
     ) -> None:
         if self.iot_account is None:
             return None
-        XTEventLoopProtector.protect_event_loop(
+        XTEventLoopProtector.execute_out_of_event_loop(
             self.iot_account.device_manager.ipc_manager.webrtc_manager.async_handle_async_webrtc_offer,
             offer_sdp,
             session_id,
@@ -585,7 +585,7 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
     ) -> None:
         if self.iot_account is None:
             return None
-        XTEventLoopProtector.protect_event_loop(
+        XTEventLoopProtector.execute_out_of_event_loop(
             self.iot_account.device_manager.ipc_manager.webrtc_manager.on_webrtc_candidate,
             session_id,
             candidate,
@@ -595,7 +595,7 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
     def on_webrtc_close_session(self, session_id: str, device: XTDevice) -> None:
         if self.iot_account is None:
             return None
-        XTEventLoopProtector.protect_event_loop(
+        XTEventLoopProtector.execute_out_of_event_loop(
             self.iot_account.device_manager.ipc_manager.webrtc_manager.on_webrtc_close_session,
             session_id,
             device,
@@ -606,7 +606,7 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
     ) -> None:
         if self.iot_account is None:
             return None
-        XTEventLoopProtector.protect_event_loop(
+        XTEventLoopProtector.execute_out_of_event_loop(
             self.iot_account.device_manager.ipc_manager.webrtc_manager.set_resolution,
             session_id,
             resolution,

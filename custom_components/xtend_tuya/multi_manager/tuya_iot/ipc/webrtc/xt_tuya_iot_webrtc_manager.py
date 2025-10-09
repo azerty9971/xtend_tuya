@@ -17,6 +17,9 @@ import custom_components.xtend_tuya.multi_manager.tuya_iot.ipc.xt_tuya_iot_ipc_m
 from ....shared.shared_classes import (
     XTDevice,
 )
+from ....shared.threading import (
+    XTEventLoopProtector,
+)
 
 ENDLINE = "\r\n"
 
@@ -160,7 +163,7 @@ class XTIOTWebRTCManager:
             if current_exchange.hass is not None:
                 local_hass = hass
         if local_hass is not None:
-            return await local_hass.async_add_executor_job(
+            return await XTEventLoopProtector.execute_out_of_event_loop_and_return(
                 self._get_config_from_cloud, device_id, session_id
             )
         else:
@@ -506,13 +509,13 @@ class XTIOTWebRTCManager:
         offer_changed = self.get_candidates_from_offer(session_id, offer_sdp)
         offer_changed = self.fix_offer(offer_changed, session_id)
         self.set_sdp_offer(session_id, offer_changed)
-        sdp_offer_payload = await hass.async_add_executor_job(
+        sdp_offer_payload = await XTEventLoopProtector.execute_out_of_event_loop_and_return(
             self.format_offer_payload, session_id, offer_changed, device
         )
         self.send_to_ipc_mqtt(session_id, device, json.dumps(sdp_offer_payload))
         session_data.offer_sent = True
         for candidate in session_data.offer_candidate:
-            if candidate_payload := await hass.async_add_executor_job(
+            if candidate_payload := await XTEventLoopProtector.execute_out_of_event_loop_and_return(
                 self.format_offer_candidate, session_id, candidate, device
             ):
                 self.send_to_ipc_mqtt(session_id, device, json.dumps(candidate_payload))

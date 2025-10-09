@@ -29,6 +29,7 @@ from .shared.shared_classes import (
 )
 from .shared.threading import (
     XTThreadingManager,
+    XTEventLoopProtector,
 )
 from .shared.debug.debug_helper import (
     DebugHelper,
@@ -113,13 +114,12 @@ class MultiManager:  # noqa: F811
 
     async def setup_entry(self) -> None:
         # Load all the plugins
-        # subdirs = await self.hass.async_add_executor_job(os.listdir, os.path.dirname(__file__))
         subdirs = AllowedPlugins.get_plugins_to_load()
         for directory in subdirs:
             if os.path.isdir(os.path.dirname(__file__) + os.sep + directory):
                 load_path = f".{directory}.init"
                 try:
-                    plugin = await self.hass.async_add_executor_job(
+                    plugin = await XTEventLoopProtector.execute_out_of_event_loop_and_return(
                         partial(
                             importlib.import_module, name=load_path, package=__package__
                         )
@@ -134,7 +134,7 @@ class MultiManager:  # noqa: F811
                     LOGGER.error(f"Loading module failed: {e}")
 
         for account in self.accounts.values():
-            await self.hass.async_add_executor_job(account.on_post_setup)
+            await XTEventLoopProtector.execute_out_of_event_loop_and_return(account.on_post_setup)
 
     async def setup_entity_parsers(self) -> None:
         await XTCustomEntityParser.setup_entity_parsers(self.hass, self)

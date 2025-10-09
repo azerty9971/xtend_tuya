@@ -1,9 +1,11 @@
 from __future__ import annotations
 import threading
 import inspect
+import asyncio
 from typing import Any
 from homeassistant.core import (
     HomeAssistant,
+    callback,
 )
 from ...const import (
     LOGGER,
@@ -15,20 +17,29 @@ class XTEventLoopProtector:
     hass: HomeAssistant | None = None
 
     @staticmethod
-    def protect_event_loop(callback, *args) -> None:
+    @callback
+    def execute_out_of_event_loop(callback, *args) -> None:
         if XTEventLoopProtector.hass is None:
             LOGGER.error("protect_event_loop called without a HASS instance")
             return
-        if (
-            XTEventLoopProtector.hass.loop_thread_id != threading.get_ident()
-            and inspect.iscoroutinefunction(callback) is False
-        ):
-            callback(*args)
+        is_coroutine: bool = inspect.iscoroutinefunction(callback)
+        if XTEventLoopProtector.hass.loop_thread_id != threading.get_ident():
+            #Not in the event loop
+            if is_coroutine:
+                LOGGER.warning(f"Calling coroutine thread safe {callback}")
+                asyncio.run_coroutine_threadsafe(callback(*args), XTEventLoopProtector.hass.loop)
+            else:
+                callback(*args)
         else:
-            XTEventLoopProtector.hass.async_add_executor_job(callback, *args)
+            #In the event loop
+            if is_coroutine:
+                XTEventLoopProtector.hass.async_create_task(callback(*args))
+            else:
+                XTEventLoopProtector.hass.async_add_executor_job(callback, *args)
 
     @staticmethod
-    async def protect_event_loop_and_return(callback, *args) -> Any:
+    @callback
+    async def execute_out_of_event_loop_and_return(callback, *args) -> Any:
         if XTEventLoopProtector.hass is None:
             LOGGER.error("protect_event_loop_and_return called without a HASS instance")
             return
@@ -40,10 +51,14 @@ class XTEventLoopProtector:
                 return callback(*args)
         else:
             if is_coroutine:
-                job = await XTEventLoopProtector.hass.async_add_executor_job(callback, *args)
+                job = await XTEventLoopProtector.hass.async_add_executor_job(
+                    callback, *args
+                )
                 return await job
             else:
-                return await XTEventLoopProtector.hass.async_add_executor_job(callback, *args)
+                return await XTEventLoopProtector.hass.async_add_executor_job(
+                    callback, *args
+                )
 
 
 class XTThread(threading.Thread):

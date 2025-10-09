@@ -53,7 +53,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
     await multi_manager.setup_entry()
 
     # Get all devices from Tuya
-    await hass.async_add_executor_job(multi_manager.update_device_cache)
+    await XTEventLoopProtector.execute_out_of_event_loop_and_return(multi_manager.update_device_cache)
 
     # Connection is successful, store the manager & listener
     entry.runtime_data = HomeAssistantXTData(
@@ -97,7 +97,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
 
     # If the device does not register any entities, the device does not need to subscribe
     # So the subscription is here
-    await hass.async_add_executor_job(multi_manager.refresh_mq)
+    await XTEventLoopProtector.execute_out_of_event_loop_and_return(multi_manager.refresh_mq)
     service_manager.register_services()
     hass.async_create_task(cleanup_duplicated_devices(hass, entry))
     await multi_manager.on_loading_finalized(hass, entry)
@@ -201,7 +201,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
             if tuya.manager.mq is not None:
                 tuya.manager.mq.stop()
             tuya.manager.remove_device_listeners()
-            await hass.async_add_executor_job(tuya.manager.unload)
+            await XTEventLoopProtector.execute_out_of_event_loop_and_return(tuya.manager.unload)
     return unload_ok
 
 
@@ -212,4 +212,4 @@ async def async_remove_entry(hass: HomeAssistant, entry: XTConfigEntry) -> None:
     """
     runtime_data = get_config_entry_runtime_data(hass, entry, DOMAIN)
     if runtime_data:
-        await hass.async_add_executor_job(runtime_data.device_manager.unload)
+        await XTEventLoopProtector.execute_out_of_event_loop_and_return(runtime_data.device_manager.unload)

@@ -18,6 +18,9 @@ from ....const import (
     XTIRRemoteInformation,
     TUYA_DISCOVERY_NEW,
 )
+from ..threading import (
+    XTEventLoopProtector,
+)
 import custom_components.xtend_tuya.multi_manager.multi_manager as mm
 
 
@@ -140,7 +143,7 @@ class XTDataEntryAddIRDeviceKey(XTDataEntryManager):
                 ),
             )
         else:
-            if await self.hass.async_add_executor_job(
+            if await XTEventLoopProtector.execute_out_of_event_loop_and_return(
                 self.flow_data.multi_manager.learn_ir_key,
                 self.flow_data.device,
                 self.flow_data.remote,

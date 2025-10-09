@@ -43,6 +43,9 @@ from .const import (
     TUYA_RESPONSE_PLATFORM_URL,
     XTDiscoverySource,
 )
+from .multi_manager.shared.threading import (
+    XTEventLoopProtector,
+)
 import custom_components.xtend_tuya.util as util
 import custom_components.xtend_tuya.multi_manager.multi_manager as mm
 import custom_components.xtend_tuya.multi_manager.shared.data_entry.shared_data_entry as data_entry
@@ -120,7 +123,7 @@ class TuyaOptionFlow(OptionsFlow):
         placeholders = {}
 
         if user_input is not None:
-            response, data = await self.hass.async_add_executor_job(
+            response, data = await XTEventLoopProtector.execute_out_of_event_loop_and_return(
                 self._try_login, user_input
             )
 
@@ -318,7 +321,7 @@ class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
                 ),
             )
 
-        ret, info = await self.hass.async_add_executor_job(
+        ret, info = await XTEventLoopProtector.execute_out_of_event_loop_and_return(
             self.__login_control.login_result,
             self.__qr_code,
             TUYA_CLIENT_ID,
@@ -449,7 +452,7 @@ class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
 
     async def __async_get_qr_code(self, user_code: str) -> tuple[bool, dict[str, Any]]:
         """Get the QR code."""
-        response = await self.hass.async_add_executor_job(
+        response = await XTEventLoopProtector.execute_out_of_event_loop_and_return(
             self.__login_control.qr_code,
             TUYA_CLIENT_ID,
             TUYA_SCHEMA,
