@@ -174,13 +174,13 @@ class MultiManager:  # noqa: F811
                 return_list.append(new_descriptors)
         return return_list
 
-    def update_device_cache(self):
+    async def update_device_cache(self):
         self.is_ready_for_messages = False
         XTDeviceMap.clear_master_device_map()
-        thread_manager: XTThreadingManager = XTThreadingManager()
+        concurrency_manager = XTConcurrencyManager()
 
-        def update_device_cache_thread(manager: XTDeviceManagerInterface) -> None:
-            manager.update_device_cache()
+        async def update_device_cache_thread(manager: XTDeviceManagerInterface) -> None:
+            await manager.update_device_cache()
 
             # New devices have been created in their own device maps
             # let's convert them to XTDevice
@@ -191,9 +191,9 @@ class MultiManager:  # noqa: F811
                     )
 
         for manager in self.accounts.values():
-            thread_manager.add_thread(update_device_cache_thread, manager=manager)
+            concurrency_manager.add_coroutine(update_device_cache_thread(manager=manager))
 
-        thread_manager.start_and_wait()
+        await concurrency_manager.gather()
 
         # Register all devices in the master device map
         self._update_master_device_map()

@@ -218,10 +218,10 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
             home_manager=home_manager,
         )
 
-    def update_device_cache(self):
+    async def update_device_cache(self):
         if self.iot_account is None:
             return None
-        self.iot_account.home_manager.update_device_cache()
+        await self.iot_account.home_manager.async_update_device_cache()
         new_device_ids: list[str] = [
             device_id for device_id in self.iot_account.device_manager.device_map
         ]

@@ -179,7 +179,7 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
             ha_tuya_integration_config_manager=ha_tuya_integration_config_manager,
         )
 
-    def update_device_cache(self):
+    async def update_device_cache(self):
         if self.sharing_account is None:
             return None
         try:

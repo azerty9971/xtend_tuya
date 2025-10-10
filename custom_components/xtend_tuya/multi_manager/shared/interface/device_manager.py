@@ -46,7 +46,7 @@ class XTDeviceManagerInterface(ABC):
         pass
 
     @abstractmethod
-    def update_device_cache(self):
+    async def update_device_cache(self):
         pass
 
     @abstractmethod
