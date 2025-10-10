@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import Optional, Literal, Any
 import json
+from datetime import datetime
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady
@@ -98,6 +99,7 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
         config_entry: XTConfigEntry,
         multi_manager: MultiManager,
     ) -> None:
+        last_time = datetime.now()
         self.multi_manager: MultiManager = multi_manager
         self.hass = hass
         self.sharing_account: TuyaSharingData | None = await self._init_from_entry(
@@ -105,6 +107,7 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
         )
         if self.sharing_account:
             self.multi_manager.register_account(self)
+        LOGGER.debug(f"Xtended Tuya {config_entry.title} {datetime.now() - last_time} for setup_from_entry {self.get_type_name()}")
 
     async def _init_from_entry(
         self, hass: HomeAssistant, config_entry: XTConfigEntry

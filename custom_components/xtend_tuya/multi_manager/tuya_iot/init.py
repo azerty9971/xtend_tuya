@@ -1,6 +1,7 @@
 from __future__ import annotations
 import requests
 import json
+from datetime import datetime
 from typing import Optional, Literal, Any
 from webrtc_models import (
     RTCIceCandidateInit,
@@ -88,11 +89,13 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
         config_entry: XTConfigEntry,
         multi_manager: MultiManager,
     ) -> None:
+        last_time = datetime.now()
         self.multi_manager: MultiManager = multi_manager
         self.hass = hass
         self.iot_account = await self._init_from_entry(hass, config_entry)
         if self.iot_account:
             self.multi_manager.register_account(self)
+        LOGGER.debug(f"Xtended Tuya {config_entry.title} {datetime.now() - last_time} for setup_from_entry {self.get_type_name()}")
 
     async def _init_from_entry(
         self, hass: HomeAssistant, config_entry: XTConfigEntry
