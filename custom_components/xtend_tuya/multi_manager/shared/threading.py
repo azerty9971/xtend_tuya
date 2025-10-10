@@ -76,15 +76,8 @@ class XTEventLoopProtector:
         else:
             # In the event loop
             if is_coroutine:
-
-                def run_coroutine(hass: HomeAssistant, callback, *args, **kwargs):
-                    return asyncio.run_coroutine_threadsafe(
-                        callback(*args, **kwargs), hass.loop
-                    ).result()
-
-                return await XTEventLoopProtector.hass.async_add_executor_job(
-                    run_coroutine(XTEventLoopProtector.hass, callback, *args, **kwargs)
-                )
+                LOGGER.warning("Non-sensical call to execute_out_of_event_loop_and_return", stack_info=True)
+                return await callback(*args, **kwargs)
             else:
                 return await XTEventLoopProtector.hass.async_add_executor_job(
                     partial(callback, *args, **kwargs)
