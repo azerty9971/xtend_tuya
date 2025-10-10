@@ -171,7 +171,8 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
             )
             response3 = await XTEventLoopProtector.execute_out_of_event_loop_and_return(api.test_validity)
             response4 = await XTEventLoopProtector.execute_out_of_event_loop_and_return(non_user_api.test_validity)
-        except requests.exceptions.RequestException:
+        except requests.exceptions.RequestException as e:
+            LOGGER.error(f"Tuya IOT request didn't work: {e}")
             await self.raise_issue(
                 hass=hass,
                 config_entry=config_entry,
@@ -191,7 +192,14 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
             or response3.get("success", False) is False
             or response4.get("success", False) is False
         ):
-            # raise ConfigEntryNotReady(response)
+            if response1.get("success", False) is False:
+                LOGGER.error(f"Error connecting the USER api: {response1}")
+            if response2.get("success", False) is False:
+                LOGGER.error(f"Error connecting the NON-USER api: {response2}")
+            if response3.get("success", False) is False:
+                LOGGER.error(f"Error validating the USER api: {response3}")
+            if response4.get("success", False) is False:
+                LOGGER.error(f"Error validating the NON-USER api: {response4}")
             await self.raise_issue(
                 hass=hass,
                 config_entry=config_entry,
