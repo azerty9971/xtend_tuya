@@ -292,12 +292,13 @@ class XTIOTOpenAPI(TuyaOpenAPI):
         result: dict[str, Any] = response.json()
 
         # if result.get("success", True) is False:
+        time_taken = datetime.now() - start_time
         LOGGER.debug(
-            f"[IOT API]Request: {method} {path} PARAMS: {json.dumps(params, ensure_ascii=False, indent=2) if params is not None else ''} BODY: {json.dumps(body, ensure_ascii=False, indent=2) if body is not None else ''} took {datetime.now() - start_time}"
+            f"[IOT API][{time_taken}]Request: {method} {path} PARAMS: {json.dumps(params, ensure_ascii=False, indent=2) if params is not None else ''} BODY: {json.dumps(body, ensure_ascii=False, indent=2) if body is not None else ''}"
         )
-        #LOGGER.debug(
-        #    f"[IOT API]Response: {json.dumps(result, ensure_ascii=False, indent=2)}"
-        #)
+        LOGGER.debug(
+            f"[IOT API][{time_taken}]Response: {json.dumps(result, ensure_ascii=False, indent=2)}"
+        )
 
         if result.get("code", -1) == TUYA_ERROR_CODE_TOKEN_INVALID:
             if self.reconnect() is True and first_pass is True:
