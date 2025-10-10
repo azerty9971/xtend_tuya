@@ -14,6 +14,9 @@ from homeassistant.core import HomeAssistant, callback, HassJob, HassJobType
 from homeassistant.helpers.event import async_call_later
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.components.camera.const import (
+    StreamType,
+)
 from homeassistant.components.camera.webrtc import (
     WebRTCSendMessage,
     WebRTCClientConfiguration,
@@ -29,6 +32,7 @@ from .const import (
     XTDPCode,
     MESSAGE_SOURCE_TUYA_IOT,
     XTMultiManagerProperties,
+    XTMultiManagerPostSetupCallbackPriority,
 )
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaCameraEntity,
@@ -70,8 +74,29 @@ async def async_setup_entry(
         ),
     )
 
-    entities: list[XTCameraEntity] = []
-    extra_entities: list[XTCameraEntity] = []
+    @callback
+    async def add_camera_devices(device_map) -> None:
+        if hass_data.manager is None:
+            return
+        entities: list[XTCameraEntity] = []
+        device_ids = [*device_map]
+        for device_id in device_ids:
+            if device := hass_data.manager.device_map.get(device_id):
+                if XTCameraEntity.should_entity_be_added(
+                    hass, device, hass_data.manager, supported_descriptors
+                ):
+                    entity = XTCameraEntity(device, hass_data.manager, hass)
+                    await entity.get_webrtc_config()
+                    if entity.webrtc_configuration is None:
+                        entity.disable_webrtc()
+                    if entity.supports_webrtc() is False and await entity.stream_source() is None:
+                        #this device doesn't support webrtc or rtsp, skip it...
+                        continue
+                    entities.append(entity)
+                    if entity.has_multiple_streams:
+                        entities.append(XTCameraEntity(device, hass_data.manager, hass, entity.webrtc_configuration, WebRTCStreamQuality.LOW_QUALITY))
+
+        async_add_entities(entities)
 
     @callback
     def async_discover_device(device_map, restrict_dpcode: str | None = None) -> None:
@@ -80,29 +105,13 @@ async def async_setup_entry(
             return
         if restrict_dpcode is not None:
             return None
-        device_ids = [*device_map]
-        entities.clear()
-        for device_id in device_ids:
-            if device := hass_data.manager.device_map.get(device_id):
-                if XTCameraEntity.should_entity_be_added(
-                    hass, device, hass_data.manager, supported_descriptors
-                ):
-                    entities.append(XTCameraEntity(device, hass_data.manager, hass))
-        async_add_entities(entities)
+        hass_data.manager.add_post_setup_callback(
+            XTMultiManagerPostSetupCallbackPriority.PRIORITY_LAST,
+            add_camera_devices,
+            device_map,
+        )
 
     async_discover_device([*hass_data.manager.device_map])
-    for entity in entities:
-        await entity.get_webrtc_config()
-        if entity.has_multiple_streams:
-            extra_entities.append(
-                XTCameraEntity(
-                    entity.device,
-                    hass_data.manager,
-                    hass,
-                    WebRTCStreamQuality.LOW_QUALITY,
-                )
-            )
-    async_add_entities(extra_entities)
 
     entry.async_on_unload(
         async_dispatcher_connect(hass, TUYA_DISCOVERY_NEW, async_discover_device)
@@ -117,6 +126,7 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         device: XTDevice,
         device_manager: MultiManager,
         hass: HomeAssistant,
+        webrtc_config: WebRTCClientConfiguration | None = None,
         stream_quality: WebRTCStreamQuality = WebRTCStreamQuality.HIGH_QUALITY,
     ) -> None:
         """Init XT Camera."""
@@ -127,8 +137,8 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         self.device = device
         self.device_manager = device_manager
         self.iot_manager: XTDeviceManagerInterface | None = None
-        self.hass = hass
-        self.webrtc_configuration: WebRTCClientConfiguration | None = None
+        self._hass = hass
+        self.webrtc_configuration: WebRTCClientConfiguration | None = webrtc_config
         self.wait_for_candidates = None
         self.supports_2way_audio: bool = False
         self.has_multiple_streams: bool = False
@@ -166,6 +176,9 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
     def disable_webrtc(self):
         self._supports_native_sync_webrtc = False
         self._supports_native_async_webrtc = False
+    
+    def supports_webrtc(self) -> bool:
+        return StreamType.WEB_RTC in self.camera_capabilities.frontend_stream_types
 
     async def get_webrtc_config(self) -> None:
         if self.iot_manager is None:
@@ -174,7 +187,7 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
             self.device.id, "Getting WebRTC Config 1", self.device
         )
         return_tuple = await self.iot_manager.async_get_webrtc_ice_servers(
-            self.device, "GO2RTC", self.hass
+            self.device, "GO2RTC", self._hass
         )
         if return_tuple is None:
             return None
@@ -224,7 +237,7 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         if self.wait_for_candidates:
             self.wait_for_candidates()
         self.wait_for_candidates = async_call_later(
-            self.hass,
+            self._hass,
             1,
             HassJob(
                 functools.partial(self.send_closing_candidate, session_id, self.device),
@@ -234,7 +247,7 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         )
         if self.has_multiple_streams:
             self.wait_for_candidates = async_call_later(
-                self.hass,
+                self._hass,
                 2,
                 HassJob(
                     functools.partial(
@@ -248,7 +261,7 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
                 ),
             )
         return await self.iot_manager.async_handle_async_webrtc_offer(
-            offer_sdp, session_id, send_message, self.device, self.hass
+            offer_sdp, session_id, send_message, self.device, self._hass
         )
 
     @callback
@@ -290,3 +303,10 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         if self.iot_manager is None or self.webrtc_configuration is None:
             return super()._async_get_webrtc_client_configuration()
         return self.webrtc_configuration
+    
+    async def stream_source(self) -> str | None:
+        """Return the source of the stream."""
+        try:
+            return await super().stream_source()
+        except Exception:
+            return None

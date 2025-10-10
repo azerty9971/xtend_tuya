@@ -34,6 +34,10 @@ class XTIOTTuyaMQConfig(TuyaMQConfig):
         self.expire_time: int = 0
         super().__init__(mqConfigResponse)
 
+        #Fix for Singapore DC
+        if self.url is not None:
+            self.url = self.url.replace("--", "-sg")
+
 
 class XTIOTOpenMQ(TuyaOpenMQ):
     link_id: str | None = None
@@ -127,7 +131,8 @@ class XTIOTOpenMQ(TuyaOpenMQ):
         url = urlsplit(mq_config.url)
         if url.scheme == "ssl":
             mqttc.tls_set()
-
+        
+        LOGGER.debug(f"Connecting MQTT: '{url.hostname}':'{url.port}' ")
         mqttc.connect(url.hostname, url.port)
 
         mqttc.loop_start()

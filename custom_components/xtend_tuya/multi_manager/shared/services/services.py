@@ -14,6 +14,9 @@ from ....const import (
     MESSAGE_SOURCE_TUYA_SHARING,
     MESSAGE_SOURCE_TUYA_IOT,
 )
+from ..threading import (
+    XTEventLoopProtector,
+)
 from ....util import (
     get_all_multi_managers,
 )
@@ -165,7 +168,7 @@ class ServiceManager:
             return None
         if multi_manager := self._get_correct_multi_manager(source, device_id):
             if account := multi_manager.get_account_by_name(source):
-                response = await self.hass.async_add_executor_job(
+                response = await XTEventLoopProtector.execute_out_of_event_loop_and_return(
                     account.get_device_stream_allocate, device_id, stream_type
                 )
                 return response
@@ -181,7 +184,7 @@ class ServiceManager:
         if source is not None and method is not None and url is not None:
             if account := self.multi_manager.get_account_by_name(source):
                 try:
-                    if response := await self.hass.async_add_executor_job(
+                    if response := await XTEventLoopProtector.execute_out_of_event_loop_and_return(
                         account.call_api, method, url, payload
                     ):
                         LOGGER.debug(f"API call response: {response}")
@@ -200,7 +203,7 @@ class ServiceManager:
             return None
         if multi_manager := self._get_correct_multi_manager(source, device_id):
             if account := multi_manager.get_account_by_name(source):
-                if ice_servers := await self.hass.async_add_executor_job(
+                if ice_servers := await XTEventLoopProtector.execute_out_of_event_loop_and_return(
                     account.get_webrtc_ice_servers,
                     device_id,
                     session_id,
@@ -220,7 +223,7 @@ class ServiceManager:
         multi_manager_list = get_all_multi_managers(self.hass)
         for multi_manager in multi_manager_list:
             if account := multi_manager.get_account_by_name(source):
-                if debug_output := await self.hass.async_add_executor_job(
+                if debug_output := await XTEventLoopProtector.execute_out_of_event_loop_and_return(
                     account.get_webrtc_exchange_debug, session_id
                 ):
                     return debug_output
@@ -244,7 +247,7 @@ class ServiceManager:
                     case "application/sdp":
                         if channel is not None:
                             if account := multi_manager.get_account_by_name(source):
-                                sdp_answer = await self.hass.async_add_executor_job(
+                                sdp_answer = await XTEventLoopProtector.execute_out_of_event_loop_and_return(
                                     account.get_webrtc_sdp_answer,
                                     device_id,
                                     session_id,
@@ -269,7 +272,7 @@ class ServiceManager:
                 match event.content_type:
                     case "application/trickle-ice-sdpfrag":
                         if account := multi_manager.get_account_by_name(source):
-                            patch_answer = await self.hass.async_add_executor_job(
+                            patch_answer = await XTEventLoopProtector.execute_out_of_event_loop_and_return(
                                 account.send_webrtc_trickle_ice,
                                 device_id,
                                 session_id,
@@ -284,7 +287,7 @@ class ServiceManager:
                         return None
             case "DELETE":
                 if account := multi_manager.get_account_by_name(source):
-                    delete_answer = await self.hass.async_add_executor_job(
+                    delete_answer = await XTEventLoopProtector.execute_out_of_event_loop_and_return(
                         account.delete_webrtc_session, device_id, session_id
                     )
                     if delete_answer is not None:

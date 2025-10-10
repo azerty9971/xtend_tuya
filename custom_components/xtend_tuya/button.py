@@ -16,6 +16,9 @@ from .multi_manager.multi_manager import (
     MultiManager,
     XTDevice,
 )
+from .multi_manager.shared.threading import (
+    XTEventLoopProtector,
+)
 from .const import (
     TUYA_DISCOVERY_NEW,
     XTDPCode,
@@ -149,7 +152,7 @@ async def async_setup_entry(
                 if hub_device.category in IR_HUB_CATEGORY_LIST:
                     hub_information: (
                         XTIRHubInformation | None
-                    ) = await hass.async_add_executor_job(
+                    ) = await XTEventLoopProtector.execute_out_of_event_loop_and_return(
                         hass_data.manager.get_ir_hub_information, hub_device
                     )
                     if hub_information is None:

@@ -42,11 +42,11 @@ class XTDeviceManagerInterface(ABC):
         hass: HomeAssistant,
         config_entry: XTConfigEntry,
         multi_manager: mm.MultiManager,
-    ) -> bool:
+    ) -> None:
         pass
 
     @abstractmethod
-    def update_device_cache(self):
+    async def update_device_cache(self):
         pass
 
     @abstractmethod

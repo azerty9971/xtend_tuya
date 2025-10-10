@@ -30,7 +30,8 @@ from ..shared.shared_classes import (
     XTDeviceMap,
 )
 from ..shared.threading import (
-    XTThreadingManager,
+    XTConcurrencyManager,
+    XTEventLoopProtector,
 )
 from ..shared.merging_manager import (
     XTMergingManager,
@@ -110,6 +111,33 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                 return response
         return {}
 
+    async def async_update_device_list_in_smart_home_mod(self):
+        if self.api.token_info is None:  # CHANGED
+            return None  # CHANGED
+        response = await XTEventLoopProtector.execute_out_of_event_loop_and_return(self.api.get, f"/v1.0/users/{self.api.token_info.uid}/devices")
+        if response["success"]:
+            for item in response["result"]:
+                device = XTDevice(**item)  # CHANGED
+                device.source = "IOT update_device_list_in_smart_home_mod"  # CHANGED
+                status = {}
+                for item_status in device.status:
+                    if "code" in item_status and "value" in item_status:
+                        code = item_status["code"]  # type: ignore
+                        value = item_status["value"]  # type: ignore
+                        status[code] = value
+                device.status = status
+                self.device_map[device.id] = device  # CHANGED
+                if "id" not in item:
+                    LOGGER.warning(f"Received invalid device info: {item}")
+
+        # ADDED
+        for device in self.multi_manager.devices_shared.values():
+            if device.id not in self.device_map:
+                self.device_map[device.id] = device
+        # END ADDED
+
+        await self.async_update_device_function_cache()
+
     # Copy of the Tuya original method with some minor modifications
     def update_device_list_in_smart_home_mod(self):
         if self.api.token_info is None:  # CHANGED
@@ -138,6 +166,19 @@ class XTIOTDeviceManager(TuyaDeviceManager):
 
         self.update_device_function_cache()
 
+    async def async_update_device_caches(self, devIds: list[str]):
+        """Update devices status in cache.
+
+        Update devices info, devices status
+
+        Args:
+          devIds(list[str]): devices' id, max 20 once call
+        """
+        self._update_device_list_info_cache(devIds)
+        self._update_device_list_status_cache(devIds)
+
+        self.update_device_function_cache(devIds)
+
     def get_devices_from_sharing(self) -> dict[str, XTDevice]:
         return_dict: dict[str, XTDevice] = {}
         if self.api.token_info is None:
@@ -159,11 +200,14 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                 return_dict[item["id"]] = device
         return return_dict
 
+    async def async_update_device_list_in_smart_home(self):
+        await self.async_update_device_list_in_smart_home_mod()
+
     def update_device_list_in_smart_home(self):
         self.update_device_list_in_smart_home_mod()
 
-    def update_device_function_cache(self, devIds: list = []):
-        thread_manager: XTThreadingManager = XTThreadingManager()
+    async def async_update_device_function_cache(self, devIds: list = []):
+        concurrency_manager = XTConcurrencyManager(max_concurrency=9)
 
         device_map = (
             filter(lambda d: d.id in devIds, self.device_map.values())
@@ -171,40 +215,42 @@ class XTIOTDeviceManager(TuyaDeviceManager):
             else self.device_map.values()
         )
 
-        for device in device_map:
-            thread_manager.add_thread(
-                super().update_device_function_cache, devIds=[device.id]
-            )
-        thread_manager.start_and_wait(max_concurrency=9)
+        async def update_single_device(device: XTDevice):
+            await XTEventLoopProtector.execute_out_of_event_loop_and_return(self.update_device_function_cache, [device.id])
 
-        # super().update_device_function_cache(devIds)
-        def update_device_function_cache_threading(device_id: str) -> None:
-            device = self.device_map[device_id]
+        for device in device_map:
+            concurrency_manager.add_coroutine(update_single_device(device))
+        await concurrency_manager.gather()
+
+    def update_device_function_cache(self, devIds: list = []):
+        device_map = (
+            filter(lambda d: d.id in devIds, self.device_map.values())
+            if devIds
+            else self.device_map.values()
+        )
+
+        for device in device_map:
+            super().update_device_function_cache(devIds=[device.id])
+
+        for device in device_map:
             device_open_api = self.get_open_api_device(device)
             # self.multi_manager.device_watcher.report_message(device_id, f"About to merge {device}\r\n\r\nand\r\n\r\n{device_open_api}", device)
             XTMergingManager.merge_devices(device, device_open_api, self.multi_manager)
             self.multi_manager.virtual_state_handler.apply_init_virtual_states(device)
-            # self.multi_manager.device_watcher.report_message(device_id, f"Merged into \n\r{device}", device)
-
-        thread_manager: XTThreadingManager = XTThreadingManager()
-        for device_id in self.device_map:
-            thread_manager.add_thread(
-                update_device_function_cache_threading, device_id=device_id
-            )
-        thread_manager.start_and_wait(max_concurrency=9)
 
     def on_message(self, msg: str):
         super().on_message(msg)
 
     def _on_device_other(self, device_id: str, biz_code: str, data: dict[str, Any]):
         self.multi_manager.device_watcher.report_message(
-            device_id, f"[IOT]On device other: {biz_code} <=> {data}"
+            device_id,
+            f"[{MESSAGE_SOURCE_TUYA_IOT}]On device other: {biz_code} <=> {data}",
         )
         return super()._on_device_other(device_id, biz_code, data)
 
     def _on_device_report(self, device_id: str, status: list):
         self.multi_manager.device_watcher.report_message(
-            device_id, f"[IOT]On device report: {status}"
+            device_id, f"[{MESSAGE_SOURCE_TUYA_IOT}]On device report: {status}"
         )
         device = self.device_map.get(device_id, None)
         if not device:
