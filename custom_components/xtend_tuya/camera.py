@@ -27,9 +27,6 @@ from .multi_manager.multi_manager import (
     XTDevice,
     XTDeviceManagerInterface,
 )
-from .multi_manager.shared.threading import (
-    XTEventLoopProtector,
-)
 from .const import (
     TUYA_DISCOVERY_NEW,
     XTDPCode,

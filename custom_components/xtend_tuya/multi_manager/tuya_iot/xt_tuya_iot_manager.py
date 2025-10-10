@@ -30,7 +30,6 @@ from ..shared.shared_classes import (
     XTDeviceMap,
 )
 from ..shared.threading import (
-    XTThreadingManager,
     XTConcurrencyManager,
     XTEventLoopProtector,
 )

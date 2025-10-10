@@ -1,15 +1,10 @@
 from __future__ import annotations
 from tuya_iot import (
-    TuyaDeviceManager,
     TuyaHomeManager,
     TuyaOpenAPI,
     TuyaOpenMQ,
 )
 from tuya_iot.asset import TuyaAssetManager
-from tuya_iot.device import TuyaDeviceManager
-from tuya_iot.infrared import TuyaRemote, TuyaRemoteDevice, TuyaRemoteDeviceKey
-from tuya_iot.openapi import TuyaOpenAPI
-from tuya_iot.openmq import TuyaOpenMQ
 from tuya_iot.tuya_enums import AuthType
 from ..multi_manager import (
     MultiManager,
@@ -20,9 +15,6 @@ from ..shared.threading import (
 )
 from .xt_tuya_iot_manager import (
     XTIOTDeviceManager,
-)
-from ...const import (
-    LOGGER,
 )
 
 
@@ -48,8 +40,6 @@ class XTIOTHomeManager(TuyaHomeManager):
         for asset in assets:
             concurrency_manager.add_coroutine(self.async_query_device_ids(asset_manager, asset["asset_id"], device_ids))
         await concurrency_manager.gather()
-        if asset_id == "-1":
-            LOGGER.warning(f"async_query_device_ids: {device_ids}")
         return device_ids
 
     async def async_update_device_cache(self):

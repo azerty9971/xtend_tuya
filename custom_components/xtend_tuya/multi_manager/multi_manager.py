@@ -28,7 +28,6 @@ from .shared.shared_classes import (
     XTDevice,
 )
 from .shared.threading import (
-    XTThreadingManager,
     XTConcurrencyManager,
     XTEventLoopProtector,
 )
