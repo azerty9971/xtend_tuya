@@ -2,6 +2,7 @@ from __future__ import annotations
 import threading
 import inspect
 import asyncio
+from functools import partial
 from typing import Any
 from homeassistant.core import (
     HomeAssistant,
@@ -21,9 +22,10 @@ class XTConcurrencyManager:
 
     def add_coroutine(self, coroutine):
         self.coro_list.append(coroutine)
-    
+
     async def gather(self):
         await asyncio.gather(*self.coro_list)
+
 
 class XTEventLoopProtector:
 
@@ -37,43 +39,55 @@ class XTEventLoopProtector:
             return
         is_coroutine: bool = inspect.iscoroutinefunction(callback)
         if XTEventLoopProtector.hass.loop_thread_id != threading.get_ident():
-            #Not in the event loop
+            # Not in the event loop
             if is_coroutine:
                 LOGGER.warning(f"Calling coroutine thread safe {callback}")
-                asyncio.run_coroutine_threadsafe(callback(*args, **kwargs), XTEventLoopProtector.hass.loop)
+                asyncio.run_coroutine_threadsafe(
+                    callback(*args, **kwargs), XTEventLoopProtector.hass.loop
+                )
             else:
                 callback(*args, **kwargs)
         else:
-            #In the event loop
+            # In the event loop
             if is_coroutine:
                 XTEventLoopProtector.hass.async_create_task(callback(*args, **kwargs))
             else:
                 if len(kwargs) > 0:
-                    LOGGER.error("calling execute_out_of_event_loop with kwargs not supported", stack_info=True)
+                    LOGGER.error(
+                        "calling execute_out_of_event_loop with kwargs not supported",
+                        stack_info=True,
+                    )
                 else:
                     XTEventLoopProtector.hass.async_add_executor_job(callback, *args)
 
     @staticmethod
     @callback
-    async def execute_out_of_event_loop_and_return(callback, *args) -> Any:
+    async def execute_out_of_event_loop_and_return(callback, *args, **kwargs) -> Any:
         if XTEventLoopProtector.hass is None:
             LOGGER.error("protect_event_loop_and_return called without a HASS instance")
             return
         is_coroutine: bool = inspect.iscoroutinefunction(callback)
         if XTEventLoopProtector.hass.loop_thread_id != threading.get_ident():
+            # Not in the event loop
             if is_coroutine:
                 return await callback(*args)
             else:
                 return callback(*args)
         else:
+            # In the event loop
             if is_coroutine:
-                job = await XTEventLoopProtector.hass.async_add_executor_job(
-                    callback, *args
+
+                def run_coroutine(hass: HomeAssistant, callback, *args, **kwargs):
+                    return asyncio.run_coroutine_threadsafe(
+                        callback(*args, **kwargs), hass.loop
+                    ).result()
+
+                return await XTEventLoopProtector.hass.async_add_executor_job(
+                    run_coroutine(XTEventLoopProtector.hass, callback, *args, **kwargs)
                 )
-                return await job
             else:
                 return await XTEventLoopProtector.hass.async_add_executor_job(
-                    callback, *args
+                    partial(callback, *args, **kwargs)
                 )
 
 
