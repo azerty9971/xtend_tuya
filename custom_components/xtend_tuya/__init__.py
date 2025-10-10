@@ -59,7 +59,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
 
     # Get all devices from Tuya
     last_time = datetime.now()
-    await XTEventLoopProtector.execute_out_of_event_loop_and_return(multi_manager.update_device_cache)
+    await multi_manager.update_device_cache()
     LOGGER.debug(f"Xtended Tuya {entry.title} {datetime.now() - last_time} for update_device_cache")
 
     # Connection is successful, store the manager & listener
