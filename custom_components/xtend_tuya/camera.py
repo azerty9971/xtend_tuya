@@ -89,7 +89,7 @@ async def async_setup_entry(
                     hass, device, hass_data.manager, supported_descriptors
                 ):
                     entity = XTCameraEntity(device, hass_data.manager, hass)
-                    await XTEventLoopProtector.execute_out_of_event_loop_and_return(entity.get_webrtc_config)
+                    await entity.get_webrtc_config()
                     if entity.webrtc_configuration is None:
                         entity.disable_webrtc()
                     if entity.supports_webrtc() is False and await entity.stream_source() is None:
