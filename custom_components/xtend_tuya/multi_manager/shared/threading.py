@@ -17,14 +17,19 @@ class XTConcurrencyManager:
 
     hass: HomeAssistant | None = None
 
-    def __init__(self) -> None:
+    def __init__(self, max_concurrency: int = 9999) -> None:
         self.coro_list: list = []
+        self.max_concurrency = max_concurrency
 
     def add_coroutine(self, coroutine):
         self.coro_list.append(coroutine)
 
     async def gather(self):
-        await asyncio.gather(*self.coro_list)
+        list_size = len(self.coro_list)
+        i = 0
+        while (i*self.max_concurrency < list_size):
+            await asyncio.gather(*self.coro_list[i*self.max_concurrency : (i+1)*self.max_concurrency])
+            i = i + 1
 
 
 class XTEventLoopProtector:

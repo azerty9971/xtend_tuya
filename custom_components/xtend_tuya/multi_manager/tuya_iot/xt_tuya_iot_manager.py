@@ -208,7 +208,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         self.update_device_list_in_smart_home_mod()
 
     async def async_update_device_function_cache(self, devIds: list = []):
-        concurrency_manager = XTConcurrencyManager()
+        concurrency_manager = XTConcurrencyManager(max_concurrency=9)
 
         device_map = (
             filter(lambda d: d.id in devIds, self.device_map.values())
