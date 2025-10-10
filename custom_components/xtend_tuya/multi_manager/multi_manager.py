@@ -179,8 +179,8 @@ class MultiManager:  # noqa: F811
         XTDeviceMap.clear_master_device_map()
         concurrency_manager = XTConcurrencyManager()
 
-        async def update_device_cache_thread(manager: XTDeviceManagerInterface) -> None:
-            await manager.update_device_cache()
+        async def update_manager_device_cache(manager: XTDeviceManagerInterface) -> None:
+            await XTEventLoopProtector.execute_out_of_event_loop_and_return(manager.update_device_cache)
 
             # New devices have been created in their own device maps
             # let's convert them to XTDevice
@@ -191,7 +191,7 @@ class MultiManager:  # noqa: F811
                     )
 
         for manager in self.accounts.values():
-            concurrency_manager.add_coroutine(update_device_cache_thread(manager=manager))
+            concurrency_manager.add_coroutine(update_manager_device_cache(manager=manager))
 
         await concurrency_manager.gather()
 
