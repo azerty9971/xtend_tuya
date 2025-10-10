@@ -4,6 +4,7 @@ from __future__ import annotations
 import time
 import json  # noqa: F401
 from typing import Any
+from datetime import datetime
 from tuya_iot import (
     TuyaOpenAPI,
     TuyaTokenInfo,
@@ -252,6 +253,7 @@ class XTIOTOpenAPI(TuyaOpenAPI):
         body: dict[str, Any] | None = None,
         first_pass: bool = True,
     ) -> dict[str, Any]:
+        start_time = datetime.now()
         self.__refresh_access_token_if_need(path)
         access_token = self.token_info.access_token if self.token_info else ""
         sign, t = self._calculate_sign(method, path, params, body)
@@ -291,7 +293,7 @@ class XTIOTOpenAPI(TuyaOpenAPI):
 
         # if result.get("success", True) is False:
         LOGGER.debug(
-            f"[IOT API]Request: {method} {path} PARAMS: {json.dumps(params, ensure_ascii=False, indent=2) if params is not None else ''} BODY: {json.dumps(body, ensure_ascii=False, indent=2) if body is not None else ''}"
+            f"[IOT API]Request: {method} {path} PARAMS: {json.dumps(params, ensure_ascii=False, indent=2) if params is not None else ''} BODY: {json.dumps(body, ensure_ascii=False, indent=2) if body is not None else ''} took {datetime.now() - start_time}"
         )
         #LOGGER.debug(
         #    f"[IOT API]Response: {json.dumps(result, ensure_ascii=False, indent=2)}"
