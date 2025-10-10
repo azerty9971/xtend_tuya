@@ -32,6 +32,7 @@ from ..shared.shared_classes import (
 from ..shared.threading import (
     XTThreadingManager,
     XTConcurrencyManager,
+    XTEventLoopProtector,
 )
 from ..shared.merging_manager import (
     XTMergingManager,
@@ -114,7 +115,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
     async def async_update_device_list_in_smart_home_mod(self):
         if self.api.token_info is None:  # CHANGED
             return None  # CHANGED
-        response = self.api.get(f"/v1.0/users/{self.api.token_info.uid}/devices")
+        response = await XTEventLoopProtector.execute_out_of_event_loop_and_return(self.api.get, f"/v1.0/users/{self.api.token_info.uid}/devices")
         if response["success"]:
             for item in response["result"]:
                 device = XTDevice(**item)  # CHANGED
@@ -216,7 +217,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         )
 
         async def update_single_device(device: XTDevice):
-            self.update_device_function_cache(devIds=[device.id])
+            await XTEventLoopProtector.execute_out_of_event_loop_and_return(self.update_device_function_cache, [device.id])
 
         for device in device_map:
             concurrency_manager.add_coroutine(update_single_device(device))

@@ -16,6 +16,7 @@ from ..multi_manager import (
 )
 from ..shared.threading import (
     XTConcurrencyManager,
+    XTEventLoopProtector,
 )
 from .xt_tuya_iot_manager import (
     XTIOTDeviceManager,
@@ -38,7 +39,7 @@ class XTIOTHomeManager(TuyaHomeManager):
         self, asset_manager: TuyaAssetManager, asset_id: str, device_ids: list
     ) -> list:
         if asset_id != "-1":
-            device_ids += asset_manager.get_device_list(asset_id)
+            device_ids += await XTEventLoopProtector.execute_out_of_event_loop_and_return(asset_manager.get_device_list, asset_id)
         assets = asset_manager.get_asset_list(asset_id)
         concurrency_manager = XTConcurrencyManager()
         for asset in assets:
