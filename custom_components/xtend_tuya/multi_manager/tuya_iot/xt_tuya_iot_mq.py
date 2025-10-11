@@ -34,10 +34,6 @@ class XTIOTTuyaMQConfig(TuyaMQConfig):
         self.expire_time: int = 0
         super().__init__(mqConfigResponse)
 
-        #Fix for Singapore DC
-        if self.url is not None:
-            self.url = self.url.replace("--", "-sg")
-
 
 class XTIOTOpenMQ(TuyaOpenMQ):
     link_id: str | None = None
