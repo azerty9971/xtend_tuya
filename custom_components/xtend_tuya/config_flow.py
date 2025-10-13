@@ -300,21 +300,6 @@ class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
         """Step user."""
-        #        tuya_data = self.hass.config_entries.async_entries(DOMAIN_ORIG, False, False)
-        #        xt_tuya_data = self.hass.config_entries.async_entries(DOMAIN, True, True)
-        #        if tuya_data:
-        #            for config_entry in tuya_data:
-        #                xt_tuya_config_already_exists = False
-        #                for xt_tuya_config in xt_tuya_data:
-        #                    if xt_tuya_config.title == config_entry.title:
-        #                        xt_tuya_config_already_exists = True
-        #                        break
-        #                if not xt_tuya_config_already_exists:
-        #                    return self.async_create_entry(
-        #                        title=config_entry.title,
-        #                        data=config_entry.data,
-        #                    )
-
         errors = {}
         placeholders = {}
 
