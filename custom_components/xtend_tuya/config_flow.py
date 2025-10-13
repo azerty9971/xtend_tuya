@@ -7,7 +7,7 @@ from tuya_sharing import LoginControl
 from tuya_iot import AuthType, TuyaOpenAPI
 import voluptuous as vol
 from homeassistant.core import callback
-from homeassistant.config_entries import ConfigEntry, ConfigFlow, OptionsFlow
+from homeassistant.config_entries import ConfigEntry, ConfigFlow, OptionsFlowWithReload, FlowType
 from homeassistant.config_entries import ConfigFlowResult
 from homeassistant.helpers import selector
 from homeassistant.helpers.typing import (
@@ -51,7 +51,7 @@ import custom_components.xtend_tuya.multi_manager.multi_manager as mm
 import custom_components.xtend_tuya.multi_manager.shared.data_entry.shared_data_entry as data_entry
 
 
-class TuyaOptionFlow(OptionsFlow):
+class TuyaOptionFlow(OptionsFlowWithReload):
     def __init__(self, config_entry: ConfigEntry) -> None:
         """Initialize options flow."""
         self.handler = config_entry.entry_id
@@ -123,8 +123,10 @@ class TuyaOptionFlow(OptionsFlow):
         placeholders = {}
 
         if user_input is not None:
-            response, data = await XTEventLoopProtector.execute_out_of_event_loop_and_return(
-                self._try_login, user_input
+            response, data = (
+                await XTEventLoopProtector.execute_out_of_event_loop_and_return(
+                    self._try_login, user_input
+                )
             )
 
             if response.get(TUYA_RESPONSE_SUCCESS, False):
@@ -373,6 +375,7 @@ class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
         return self.async_create_entry(
             title=info.get("username", ""),
             data=entry_data,
+            next_flow=(FlowType.CONFIG_FLOW, "configure")
         )
 
     async def async_step_reauth(self, _: Mapping[str, Any]) -> ConfigFlowResult:
