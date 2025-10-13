@@ -34,7 +34,7 @@
                 }
             },
             "configure": {
-                "description": "Add a Tuya OpenAPI credential to improve the compatibility with some Tuya devices",
+                "description": "Add a Tuya OpenAPI credential to improve the compatibility with some Tuya devices. Please follow the guide at [this URL](https://github.com/azerty9971/xtend_tuya/blob/main/docs/cloud_credentials.md)",
                 "data": {
                     "no_openapi": "Don't ask for OpenAPI credentials",
                     "country_code": "Country",
@@ -59,7 +59,7 @@
     "options": {
         "step": {
             "configure": {
-                "description": "Add a Tuya OpenAPI credential to improve the compatibility with some Tuya devices",
+                "description": "Add a Tuya OpenAPI credential to improve the compatibility with some Tuya devices. Please follow the guide at [this URL](https://github.com/azerty9971/xtend_tuya/blob/main/docs/cloud_credentials.md)",
                 "data": {
                     "no_openapi": "Don't ask for OpenAPI credentials",
                     "country_code": "Country",
