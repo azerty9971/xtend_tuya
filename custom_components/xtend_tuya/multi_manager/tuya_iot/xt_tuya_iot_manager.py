@@ -605,6 +605,16 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         if ir_command.get("success", False) and ir_command.get("result", False):
             return True
         return False
+    
+    def get_ir_category_list(self, infrared_device: XTDevice, api: XTIOTOpenAPI | None = None,) -> dict[int, str]:
+        if api is None:
+            api = self.api
+        category_response = api.get(f"/v2.0/infrareds/{infrared_device.id}/categories")
+        if category_response.get("success", False):
+            return {}
+        category_list = category_response.get("result", [])
+        LOGGER.warning(f"Category list: {category_list}")
+        return {}
 
     def learn_ir_key(
         self,

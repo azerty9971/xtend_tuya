@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import voluptuous as vol
 from typing import cast
+from enum import StrEnum
 from dataclasses import dataclass
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.dispatcher import dispatcher_send
@@ -26,9 +27,12 @@ import custom_components.xtend_tuya.multi_manager.multi_manager as mm
 
 @dataclass
 class XTFlowDataAddIRDevice(XTFlowDataBase):
-    device: mm.XTDevice
+    hub_device: mm.XTDevice
     hub: XTIRHubInformation
     step: int = 1
+    device_name: str | None = None
+    device_category: int | None = None
+    device_category_dict: dict[int, str] | None = None
 
 
 @dataclass
@@ -40,6 +44,10 @@ class XTFlowDataAddIRDeviceKey(XTFlowDataBase):
 
 
 class XTDataEntryAddIRDevice(XTDataEntryManager):
+    class Fields(StrEnum):
+        DEVICE_NAME = "device_name"
+        DEVICE_CATEGORY = "device_category"
+
     def __init__(
         self,
         source: str,
@@ -52,6 +60,7 @@ class XTDataEntryAddIRDevice(XTDataEntryManager):
         self.device = device
         self.hub = hub
         super().__init__(source, hass)
+        self.flow_data = cast(XTFlowDataAddIRDevice, self.flow_data)
 
     def get_translation_placeholders(self) -> dict[str, str]:
         return super().get_translation_placeholders() | {
@@ -64,7 +73,7 @@ class XTDataEntryAddIRDevice(XTDataEntryManager):
             flow_id=None,
             source=self.source,
             multi_manager=self.multi_manager,
-            device=self.device,
+            hub_device=self.device,
             processing_class=self,
             hub=self.hub,
         )
@@ -77,12 +86,64 @@ class XTDataEntryAddIRDevice(XTDataEntryManager):
         LOGGER.warning(
             f"Calling XTDataEntryAddIRDevice->user_interaction_callback: flow_data: {self.flow_data}, discovery_info: {discovery_info}"
         )
-
+        match self.flow_data.step:
+            case 1:
+                if discovery_info is not None:
+                    self.flow_data.device_name = discovery_info.get(
+                        XTDataEntryAddIRDevice.Fields.DEVICE_NAME
+                    )
+                    if self.flow_data.device_name == "":
+                        self.flow_data.device_name = None
+                else:
+                    return self.async_show_form(
+                        config_flow=config_flow,
+                        data_schema=vol.Schema(
+                            {
+                                vol.Required(
+                                    XTDataEntryAddIRDevice.Fields.DEVICE_NAME, default=""
+                                ): str,
+                            }
+                        ),
+                    )
+                if self.flow_data.device_name is not None:
+                    self.flow_data.step = 2
+                    self.flow_data.device_category_dict = self.flow_data.multi_manager.get_ir_category_list(self.flow_data.hub_device)
+                    return await self.user_interaction_callback(config_flow, None)
+            case 2:
+                if discovery_info is not None:
+                    self.flow_data.device_category = discovery_info.get(
+                        XTDataEntryAddIRDevice.Fields.DEVICE_CATEGORY
+                    )
+                    if self.flow_data.device_category == 0:
+                        self.flow_data.device_category = None
+                else:
+                    if self.flow_data.device_category_dict is None:
+                        LOGGER.error(f"Infrared category list for device {self.flow_data.hub_device.name} was not retrieved")
+                        return self.finish_flow(config_flow=config_flow, reason="")
+                    return self.async_show_form(
+                        config_flow=config_flow,
+                        data_schema=vol.Schema(
+                            {
+                                vol.Required(
+                                    XTDataEntryAddIRDevice.Fields.DEVICE_CATEGORY
+                                ): vol.In(
+                                    {
+                                        key: value
+                                        for key, value in self.flow_data.device_category_dict.items()
+                                    }
+                                )
+                            }
+                        ),
+                    )
+                if self.flow_data.device_category is not None:
+                    self.flow_data.step = 3
+                    return await self.user_interaction_callback(config_flow, None)
         return self.finish_flow(config_flow=config_flow, reason="")
 
 
 class XTDataEntryAddIRDeviceKey(XTDataEntryManager):
-    KEY_NAME: str = "new_ir_key_name"
+    class Fields(StrEnum):
+        KEY_NAME = "new_ir_key_name"
 
     def __init__(
         self,
@@ -127,7 +188,7 @@ class XTDataEntryAddIRDeviceKey(XTDataEntryManager):
     ) -> ConfigFlowResult:
         if discovery_info is not None:
             self.flow_data.key_name = discovery_info.get(
-                XTDataEntryAddIRDeviceKey.KEY_NAME
+                XTDataEntryAddIRDeviceKey.Fields.KEY_NAME
             )
             if self.flow_data.key_name == "":
                 self.flow_data.key_name = None
@@ -137,7 +198,7 @@ class XTDataEntryAddIRDeviceKey(XTDataEntryManager):
                 data_schema=vol.Schema(
                     {
                         vol.Required(
-                            XTDataEntryAddIRDeviceKey.KEY_NAME, default=""
+                            XTDataEntryAddIRDeviceKey.Fields.KEY_NAME, default=""
                         ): str,
                     }
                 ),

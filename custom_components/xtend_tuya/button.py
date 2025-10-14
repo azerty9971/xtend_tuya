@@ -50,7 +50,7 @@ from .multi_manager.shared.data_entry.ir_device_data_entry import (
 class XTButtonEntityDescription(TuyaButtonEntityDescription):
     virtual_function: VirtualFunctions | None = None
     vf_reset_state: list[XTDPCode] | None = field(default_factory=list)
-    is_ir_key: bool = False
+    is_ir_descriptor: bool = False
     ir_hub_information: XTIRHubInformation | None = None
     ir_remote_information: XTIRRemoteInformation | None = None
     ir_key_information: XTIRRemoteKeysInformation | None = None
@@ -167,7 +167,7 @@ async def async_setup_entry(
                     descriptor = XTButtonEntityDescription(
                         key="xt_add_device",
                         translation_key="xt_add_ir_device",
-                        is_ir_key=True,
+                        is_ir_descriptor=True,
                         ir_hub_information=hub_information,
                         ir_remote_information=None,
                         ir_key_information=None,
@@ -188,7 +188,7 @@ async def async_setup_entry(
                             descriptor = XTButtonEntityDescription(
                                 key="xt_add_device_key",
                                 translation_key="xt_add_ir_device_key",
-                                is_ir_key=True,
+                                is_ir_descriptor=True,
                                 ir_hub_information=hub_information,
                                 ir_remote_information=remote_information,
                                 ir_key_information=None,
@@ -208,7 +208,7 @@ async def async_setup_entry(
                                     translation_placeholders={
                                         "name": remote_key.key_name
                                     },
-                                    is_ir_key=True,
+                                    is_ir_descriptor=True,
                                     ir_hub_information=hub_information,
                                     ir_remote_information=remote_information,
                                     ir_key_information=remote_key,
@@ -329,7 +329,7 @@ class XTButtonEntity(XTEntity, TuyaButtonEntity):
         self._entity_description = description
         self._button_press_handler: XTDataEntryManager | None = None
         if (
-            self._entity_description.is_ir_key
+            self._entity_description.is_ir_descriptor
             and self._entity_description.ir_remote_information is not None
             and self._entity_description.ir_hub_information is not None
         ):
@@ -342,7 +342,7 @@ class XTButtonEntity(XTEntity, TuyaButtonEntity):
                 remote=self._entity_description.ir_remote_information,
             )
         elif (
-            self._entity_description.is_ir_key
+            self._entity_description.is_ir_descriptor
             and self._entity_description.ir_hub_information is not None
         ):
             self._button_press_handler = XTDataEntryAddIRDevice(
@@ -370,7 +370,7 @@ class XTButtonEntity(XTEntity, TuyaButtonEntity):
     def press(self) -> None:
         """Press the button."""
         if (
-            self._entity_description.is_ir_key
+            self._entity_description.is_ir_descriptor
             and self._entity_description.ir_key_information is not None
             and self._entity_description.ir_remote_information is not None
             and self._entity_description.ir_hub_information is not None

@@ -401,6 +401,11 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
             return False
         return self.iot_account.device_manager.send_ir_command(device, key, remote, hub)
 
+    def get_ir_category_list(self, device: XTDevice) -> dict[int, str]:
+        if self.iot_account is None:
+            return {}
+        return self.iot_account.device_manager.get_ir_category_list(device)
+
     def learn_ir_key(
         self,
         device: XTDevice,

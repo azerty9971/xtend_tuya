@@ -539,6 +539,13 @@ class MultiManager:  # noqa: F811
             ir_device_information = account.get_ir_hub_information(device)
             if ir_device_information is not None:
                 return ir_device_information
+    
+    def get_ir_category_list(self, device: XTDevice) -> dict[int, str]:
+        for account in self.accounts.values():
+            if account_list := account.get_ir_category_list(device):
+                return account_list
+        return {}
+            
 
     def send_ir_command(
         self,
