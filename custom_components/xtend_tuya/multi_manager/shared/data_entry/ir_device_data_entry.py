@@ -100,7 +100,7 @@ class XTDataEntryAddIRDevice(XTDataEntryManager):
                         data_schema=vol.Schema(
                             {
                                 vol.Required(
-                                    XTDataEntryAddIRDevice.Fields.DEVICE_NAME, default=""
+                                    str(XTDataEntryAddIRDevice.Fields.DEVICE_NAME), default=""
                                 ): str,
                             }
                         ),
@@ -125,7 +125,7 @@ class XTDataEntryAddIRDevice(XTDataEntryManager):
                         data_schema=vol.Schema(
                             {
                                 vol.Required(
-                                    XTDataEntryAddIRDevice.Fields.DEVICE_CATEGORY
+                                    str(XTDataEntryAddIRDevice.Fields.DEVICE_CATEGORY)
                                 ): vol.In(
                                     {
                                         key: value
