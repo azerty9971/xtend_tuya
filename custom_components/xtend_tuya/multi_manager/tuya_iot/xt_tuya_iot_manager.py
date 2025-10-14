@@ -609,12 +609,19 @@ class XTIOTDeviceManager(TuyaDeviceManager):
     def get_ir_category_list(self, infrared_device: XTDevice, api: XTIOTOpenAPI | None = None,) -> dict[int, str]:
         if api is None:
             api = self.api
+        return_dict: dict[int, str] = {}
         category_response = api.get(f"/v2.0/infrareds/{infrared_device.id}/categories")
         if category_response.get("success", False) is False:
             return {}
-        category_list = category_response.get("result", [])
-        LOGGER.warning(f"Category list: {category_list}")
-        return {}
+        category_list: list[dict[str, Any]] = category_response.get("result", [])
+        for category in category_list:
+            try:
+                id = int(category.get("category_id", 0))
+                name = str(category.get("category_name"))
+                return_dict[id] = name
+            except Exception:
+                continue
+        return return_dict
 
     def learn_ir_key(
         self,
