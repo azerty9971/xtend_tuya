@@ -107,7 +107,7 @@ class XTDataEntryAddIRDevice(XTDataEntryManager):
                     )
                 if self.flow_data.device_name is not None:
                     self.flow_data.step = 2
-                    self.flow_data.device_category_dict = self.flow_data.multi_manager.get_ir_category_list(self.flow_data.hub_device)
+                    self.flow_data.device_category_dict = await XTEventLoopProtector.execute_out_of_event_loop_and_return(self.flow_data.multi_manager.get_ir_category_list, self.flow_data.hub_device)
                     return await self.user_interaction_callback(config_flow, None)
             case 2:
                 if discovery_info is not None:
