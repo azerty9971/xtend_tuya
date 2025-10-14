@@ -610,7 +610,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         if api is None:
             api = self.api
         category_response = api.get(f"/v2.0/infrareds/{infrared_device.id}/categories")
-        if category_response.get("success", False):
+        if category_response.get("success", False) is False:
             return {}
         category_list = category_response.get("result", [])
         LOGGER.warning(f"Category list: {category_list}")
