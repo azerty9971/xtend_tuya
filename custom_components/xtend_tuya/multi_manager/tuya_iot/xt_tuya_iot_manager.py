@@ -606,7 +606,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
             return True
         return False
     
-    def get_ir_category_list(self, infrared_device: XTDevice, api: XTIOTOpenAPI | None = None,) -> dict[int, str]:
+    def get_ir_category_list(self, infrared_device: XTDevice, api: XTIOTOpenAPI | None = None) -> dict[int, str]:
         if api is None:
             api = self.api
         return_dict: dict[int, str] = {}
@@ -618,6 +618,23 @@ class XTIOTDeviceManager(TuyaDeviceManager):
             try:
                 id = int(category.get("category_id", 0))
                 name = str(category.get("category_name"))
+                return_dict[id] = name
+            except Exception:
+                continue
+        return return_dict
+    
+    def get_ir_brand_list(self, infrared_device: XTDevice, category_id: int, api: XTIOTOpenAPI | None = None) -> dict[int, str]:
+        if api is None:
+            api = self.api
+        return_dict: dict[int, str] = {}
+        category_response = api.get(f"/v2.0/infrareds/{infrared_device.id}/categories/{category_id}/brands")
+        if category_response.get("success", False) is False:
+            return {}
+        category_list: list[dict[str, Any]] = category_response.get("result", [])
+        for category in category_list:
+            try:
+                id = int(category.get("brand_id", 0))
+                name = str(category.get("brand_name"))
                 return_dict[id] = name
             except Exception:
                 continue

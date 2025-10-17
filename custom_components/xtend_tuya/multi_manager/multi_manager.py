@@ -545,7 +545,13 @@ class MultiManager:  # noqa: F811
             if account_list := account.get_ir_category_list(device):
                 return account_list
         return {}
-            
+    
+
+    def get_ir_brand_list(self, device: XTDevice, category_id: int) -> dict[int, str]:
+        for account in self.accounts.values():
+            if account_list := account.get_ir_brand_list(device, category_id):
+                return account_list
+        return {}    
 
     def send_ir_command(
         self,

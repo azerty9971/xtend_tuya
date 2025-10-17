@@ -70,7 +70,10 @@ class XTDeviceManagerInfraRedInterface(ABC):
     
     def get_ir_category_list(self, device: shared.XTDevice) -> dict[int, str]:
         return {}
+    
 
+    def get_ir_brand_list(self, device: shared.XTDevice, category_id: int) -> dict[int, str]:
+        return {}
 
 class XTDeviceManagerIPCameraInterface(ABC):
     def get_webrtc_sdp_answer(
