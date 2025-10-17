@@ -287,10 +287,10 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
             return [TUYA_HA_SIGNAL_UPDATE_ENTITY]
         return None
 
-    def on_add_device(self, device: XTDevice) -> list[str] | None:
+    def on_add_device(self, device_id: str) -> list[str] | None:
         if self.iot_account is None:
             return None
-        if device.id in self.iot_account.device_ids:
+        if device_id in self.iot_account.device_ids:
             return [TUYA_DISCOVERY_NEW]
         return None
 

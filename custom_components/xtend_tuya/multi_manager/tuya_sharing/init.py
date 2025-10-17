@@ -294,11 +294,11 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
             return return_list
         return None
 
-    def on_add_device(self, device: XTDevice) -> list[str] | None:
+    def on_add_device(self, device_id: str) -> list[str] | None:
         return_list: list[str] = []
         if self.sharing_account is None:
             return None
-        if device.id in self.sharing_account.device_ids:
+        if device_id in self.sharing_account.device_ids:
             return_list.append(TUYA_DISCOVERY_NEW)
         if self.sharing_account.device_manager.reuse_config:
             return_list.append(TUYA_DISCOVERY_NEW_ORIG)

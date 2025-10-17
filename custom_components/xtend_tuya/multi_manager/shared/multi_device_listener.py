@@ -48,12 +48,15 @@ class MultiDeviceListener:
                 )
 
     def add_device(self, device: sh.XTDevice):
-        self.hass.add_job(self.async_remove_device, device.id)
+        self.add_device_by_id(device.id)
+    
+    def add_device_by_id(self, device_id: str):
+        self.hass.add_job(self.async_remove_device, device_id)
         signal_list: list[str] = []
         for account in self.multi_manager.accounts.values():
-            signal_list = util.append_lists(signal_list, account.on_add_device(device))
+            signal_list = util.append_lists(signal_list, account.on_add_device(device_id))
         for signal in signal_list:
-            dispatcher_send(self.hass, signal, [device.id])
+            dispatcher_send(self.hass, signal, [device_id])
 
     def remove_device(self, device_id: str):
         device_registry = dr.async_get(self.hass)

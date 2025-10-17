@@ -639,16 +639,16 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         if api is None:
             api = self.api
         return_dict: dict[int, str] = {}
-        category_response = api.get(
+        brand_response = api.get(
             f"/v2.0/infrareds/{infrared_device.id}/categories/{category_id}/brands"
         )
-        if category_response.get("success", False) is False:
+        if brand_response.get("success", False) is False:
             return {}
-        category_list: list[dict[str, Any]] = category_response.get("result", [])
-        for category in category_list:
+        category_list: list[dict[str, Any]] = brand_response.get("result", [])
+        for brand in category_list:
             try:
-                id = int(category.get("brand_id", 0))
-                name = str(category.get("brand_name"))
+                id = int(brand.get("brand_id", 0))
+                name = str(brand.get("brand_name"))
                 return_dict[id] = name
             except Exception:
                 continue
@@ -665,7 +665,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
     ) -> bool:
         if api is None:
             api = self.api
-        category_response = api.post(
+        ir_device_create_response = api.post(
             f"/v2.0/infrareds/{device.id}/remotes",
             {
                 "category_id": category_id,
@@ -675,7 +675,12 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                 "remote_index": int(datetime.datetime.now().timestamp())
             }
         )
-        return category_response.get("success", False)
+        success = ir_device_create_response.get("success", False)
+        if success is True:
+            new_device_id = ir_device_create_response.get("result")
+            if new_device_id is not None:
+                self.multi_manager.multi_device_listener.add_device_by_id(new_device_id)
+        return success
 
     def learn_ir_key(
         self,
