@@ -1755,8 +1755,12 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
             if should_reset:
                 if device := self.device_manager.device_map.get(self.device.id, None):
                     if self.entity_description.key in device.status:
-                        device.status[self.entity_description.key] = float(0)
-                        self.async_write_ha_state()
+                        default_value = get_default_value(self._type)
+                        if now.hour != 0 or now.minute != 0:
+                            LOGGER.error(f"Resetting {device.name}'s status {self.entity_description.key} to {default_value} at unexpected time", stack_info=True)
+                        else:
+                            device.status[self.entity_description.key] = default_value
+                            self.async_write_ha_state()
 
         if (
             self.entity_description.reset_daily
@@ -1807,11 +1811,12 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
         default_value = get_default_value(self._type)
         if new_state is None or not new_state.state or new_state.state == default_value:
             return
-        if self.cancel_reset_after_x_seconds:
-            self.cancel_reset_after_x_seconds()
-        self.cancel_reset_after_x_seconds = async_call_later(
-            self.hass, self.entity_description.reset_after_x_seconds, self.reset_value
-        )
+        if self.entity_description.reset_after_x_seconds:
+            if self.cancel_reset_after_x_seconds:
+                self.cancel_reset_after_x_seconds()
+            self.cancel_reset_after_x_seconds = async_call_later(
+                self.hass, self.entity_description.reset_after_x_seconds, self.reset_value
+            )
 
     @staticmethod
     def get_entity_instance(
