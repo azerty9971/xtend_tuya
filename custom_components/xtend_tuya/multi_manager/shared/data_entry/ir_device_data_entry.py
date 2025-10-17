@@ -221,7 +221,7 @@ class XTDataEntryAddIRDevice(XTDataEntryManager):
                         TUYA_DISCOVERY_NEW,
                         [self.flow_data.hub_device.id],
                     )
-                    self.finish_flow(config_flow=config_flow, reason="ir_add_device_success")
+                    return self.finish_flow(config_flow=config_flow, reason="ir_add_device_success")
         return self.finish_flow(config_flow=config_flow, reason="ir_add_device_failed")
 
 
