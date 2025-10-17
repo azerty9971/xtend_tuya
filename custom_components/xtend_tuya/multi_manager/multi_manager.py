@@ -178,7 +178,9 @@ class MultiManager:  # noqa: F811
         XTDeviceMap.clear_master_device_map()
         concurrency_manager = XTConcurrencyManager()
 
-        async def update_manager_device_cache(manager: XTDeviceManagerInterface) -> None:
+        async def update_manager_device_cache(
+            manager: XTDeviceManagerInterface,
+        ) -> None:
             await manager.update_device_cache()
 
             # New devices have been created in their own device maps
@@ -190,7 +192,9 @@ class MultiManager:  # noqa: F811
                     )
 
         for manager in self.accounts.values():
-            concurrency_manager.add_coroutine(update_manager_device_cache(manager=manager))
+            concurrency_manager.add_coroutine(
+                update_manager_device_cache(manager=manager)
+            )
 
         await concurrency_manager.gather()
 
@@ -539,19 +543,31 @@ class MultiManager:  # noqa: F811
             ir_device_information = account.get_ir_hub_information(device)
             if ir_device_information is not None:
                 return ir_device_information
-    
+
     def get_ir_category_list(self, device: XTDevice) -> dict[int, str]:
         for account in self.accounts.values():
             if account_list := account.get_ir_category_list(device):
                 return account_list
         return {}
-    
 
     def get_ir_brand_list(self, device: XTDevice, category_id: int) -> dict[int, str]:
         for account in self.accounts.values():
             if account_list := account.get_ir_brand_list(device, category_id):
                 return account_list
-        return {}    
+        return {}
+
+    def create_ir_device(
+        self,
+        device: XTDevice,
+        remote_name: str,
+        category_id: int,
+        brand_id: int,
+        brand_name: str,
+    ) -> bool:
+        for account in self.accounts.values():
+            if account.create_ir_device(device, remote_name, category_id, brand_id, brand_name) is True:
+                return True
+        return False
 
     def send_ir_command(
         self,

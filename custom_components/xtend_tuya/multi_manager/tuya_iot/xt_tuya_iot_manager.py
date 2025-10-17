@@ -5,6 +5,7 @@ https://github.com/tuya/tuya-iot-python-sdk
 
 from __future__ import annotations
 import json
+import datetime
 import time
 from tuya_iot import (
     TuyaDeviceManager,
@@ -114,7 +115,9 @@ class XTIOTDeviceManager(TuyaDeviceManager):
     async def async_update_device_list_in_smart_home_mod(self):
         if self.api.token_info is None:  # CHANGED
             return None  # CHANGED
-        response = await XTEventLoopProtector.execute_out_of_event_loop_and_return(self.api.get, f"/v1.0/users/{self.api.token_info.uid}/devices")
+        response = await XTEventLoopProtector.execute_out_of_event_loop_and_return(
+            self.api.get, f"/v1.0/users/{self.api.token_info.uid}/devices"
+        )
         if response["success"]:
             for item in response["result"]:
                 device = XTDevice(**item)  # CHANGED
@@ -216,7 +219,9 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         )
 
         async def update_single_device(device: XTDevice):
-            await XTEventLoopProtector.execute_out_of_event_loop_and_return(self.update_device_function_cache, [device.id])
+            await XTEventLoopProtector.execute_out_of_event_loop_and_return(
+                self.update_device_function_cache, [device.id]
+            )
 
         for device in device_map:
             concurrency_manager.add_coroutine(update_single_device(device))
@@ -605,8 +610,10 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         if ir_command.get("success", False) and ir_command.get("result", False):
             return True
         return False
-    
-    def get_ir_category_list(self, infrared_device: XTDevice, api: XTIOTOpenAPI | None = None) -> dict[int, str]:
+
+    def get_ir_category_list(
+        self, infrared_device: XTDevice, api: XTIOTOpenAPI | None = None
+    ) -> dict[int, str]:
         if api is None:
             api = self.api
         return_dict: dict[int, str] = {}
@@ -622,12 +629,19 @@ class XTIOTDeviceManager(TuyaDeviceManager):
             except Exception:
                 continue
         return return_dict
-    
-    def get_ir_brand_list(self, infrared_device: XTDevice, category_id: int, api: XTIOTOpenAPI | None = None) -> dict[int, str]:
+
+    def get_ir_brand_list(
+        self,
+        infrared_device: XTDevice,
+        category_id: int,
+        api: XTIOTOpenAPI | None = None,
+    ) -> dict[int, str]:
         if api is None:
             api = self.api
         return_dict: dict[int, str] = {}
-        category_response = api.get(f"/v2.0/infrareds/{infrared_device.id}/categories/{category_id}/brands")
+        category_response = api.get(
+            f"/v2.0/infrareds/{infrared_device.id}/categories/{category_id}/brands"
+        )
         if category_response.get("success", False) is False:
             return {}
         category_list: list[dict[str, Any]] = category_response.get("result", [])
@@ -639,6 +653,29 @@ class XTIOTDeviceManager(TuyaDeviceManager):
             except Exception:
                 continue
         return return_dict
+
+    def create_ir_device(
+        self,
+        device: XTDevice,
+        remote_name: str,
+        category_id: int,
+        brand_id: int,
+        brand_name: str,
+        api: XTIOTOpenAPI | None = None,
+    ) -> bool:
+        if api is None:
+            api = self.api
+        category_response = api.post(
+            f"/v2.0/infrareds/{device.id}/remotes",
+            {
+                "category_id": category_id,
+                "remote_name": remote_name,
+                "brand_id": brand_id,
+                "brand_name": brand_name,
+                "remote_index": int(datetime.datetime.now().timestamp())
+            }
+        )
+        return category_response.get("success", False)
 
     def learn_ir_key(
         self,

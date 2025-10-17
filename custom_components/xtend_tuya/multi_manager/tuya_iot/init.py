@@ -410,6 +410,18 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
         if self.iot_account is None:
             return {}
         return self.iot_account.device_manager.get_ir_brand_list(device, category_id)
+    
+    def create_ir_device(
+        self,
+        device: XTDevice,
+        remote_name: str,
+        category_id: int,
+        brand_id: int,
+        brand_name: str,
+    ) -> bool:
+        if self.iot_account is None:
+            return False
+        return self.iot_account.device_manager.create_ir_device(device, remote_name, category_id, brand_id, brand_name)
 
     def learn_ir_key(
         self,

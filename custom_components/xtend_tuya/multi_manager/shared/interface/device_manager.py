@@ -74,6 +74,16 @@ class XTDeviceManagerInfraRedInterface(ABC):
 
     def get_ir_brand_list(self, device: shared.XTDevice, category_id: int) -> dict[int, str]:
         return {}
+    
+    def create_ir_device(
+        self,
+        device: shared.XTDevice,
+        remote_name: str,
+        category_id: int,
+        brand_id: int,
+        brand_name: str,
+    ) -> bool:
+        return False
 
 class XTDeviceManagerIPCameraInterface(ABC):
     def get_webrtc_sdp_answer(
