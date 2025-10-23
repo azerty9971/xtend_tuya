@@ -223,12 +223,14 @@ class XTDataEntryAddIRDevice(XTDataEntryManager):
                     )
                 )
                 if new_device_id is not None:
-                    self.multi_manager.add_device_by_id(new_device_id)
+                    await XTEventLoopProtector.execute_out_of_event_loop_and_return(
+                        self.multi_manager.add_device_by_id, new_device_id
+                    )
                     dispatcher_send(
-                    self.hass,
-                    TUYA_DISCOVERY_NEW,
-                    [new_device_id, self.flow_data.hub.device_id],
-                )
+                        self.hass,
+                        TUYA_DISCOVERY_NEW,
+                        [new_device_id, self.flow_data.hub.device_id],
+                    )
                     return self.finish_flow(
                         config_flow=config_flow, reason="ir_add_device_success"
                     )
