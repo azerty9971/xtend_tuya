@@ -294,7 +294,8 @@ class XTDataEntryAddIRDeviceKey(XTDataEntryManager):
                 data_schema=vol.Schema(
                     {
                         vol.Required(
-                            XTDataEntryAddIRDeviceKey.Fields.KEY_NAME, default=""
+                            str(XTDataEntryAddIRDeviceKey.Fields.KEY_NAME),
+                            default="",
                         ): str,
                     }
                 ),
