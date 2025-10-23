@@ -11,6 +11,9 @@ from tuya_iot import (
     TuyaDeviceManager,
     TuyaOpenMQ,
 )
+from tuya_iot.device import (
+    BIZCODE_BIND_USER,
+)
 from tuya_iot.tuya_enums import (
     AuthType,
 )
@@ -251,7 +254,26 @@ class XTIOTDeviceManager(TuyaDeviceManager):
             device_id,
             f"[{MESSAGE_SOURCE_TUYA_IOT}]On device other: {biz_code} <=> {data}",
         )
+        if biz_code == BIZCODE_BIND_USER:
+            self.add_device_by_id(data["devId"])
+            return None
+            
         return super()._on_device_other(device_id, biz_code, data)
+
+    def add_device_by_id(self, device_id):
+        device_ids = [device_id]
+        # wait for es sync
+        time.sleep(1)
+
+        self._update_device_list_info_cache(device_ids)
+        self._update_device_list_status_cache(device_ids)
+
+        self.update_device_function_cache(device_ids)
+
+        if device_id in self.device_map.keys():
+            device = self.device_map.get(device_id)
+            for listener in self.device_listeners:
+                listener.add_device(device)
 
     def _on_device_report(self, device_id: str, status: list):
         self.multi_manager.device_watcher.report_message(

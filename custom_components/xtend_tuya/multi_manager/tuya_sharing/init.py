@@ -294,7 +294,7 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
             return return_list
         return None
 
-    def on_add_device(self, device_id: str) -> list[str] | None:
+    def get_add_device_signal_list(self, device_id: str) -> list[str] | None:
         return_list: list[str] = []
         if self.sharing_account is None:
             return None

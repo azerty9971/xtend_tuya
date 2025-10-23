@@ -179,7 +179,7 @@ class XTDeviceManagerDeviceManagementInterface(ABC):
     def on_update_device(self, device: shared.XTDevice) -> list[str] | None:
         return None
 
-    def on_add_device(self, device_id: str) -> list[str] | None:
+    def get_add_device_signal_list(self, device_id: str) -> list[str] | None:
         return None
 
 class XTDeviceManagerMQTTManagementInterface(ABC):

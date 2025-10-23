@@ -55,7 +55,7 @@ class MultiDeviceListener:
         self.hass.add_job(self.async_remove_device, device_id)
         signal_list: list[str] = []
         for account in self.multi_manager.accounts.values():
-            signal_list = util.append_lists(signal_list, account.on_add_device(device_id))
+            signal_list = util.append_lists(signal_list, account.get_add_device_signal_list(device_id))
         for signal in signal_list:
             dispatcher_send(self.hass, signal, [device_id])
 
