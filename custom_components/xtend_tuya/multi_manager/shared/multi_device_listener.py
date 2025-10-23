@@ -51,7 +51,6 @@ class MultiDeviceListener:
         self.add_device_by_id(device.id)
     
     def add_device_by_id(self, device_id: str):
-        self.multi_manager.update_master_device_map()
         self.hass.add_job(self.async_remove_device, device_id)
         signal_list: list[str] = []
         for account in self.multi_manager.accounts.values():

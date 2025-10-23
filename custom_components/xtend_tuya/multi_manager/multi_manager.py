@@ -394,6 +394,11 @@ class MultiManager:  # noqa: F811
 
         if source in self.accounts:
             self.accounts[source].on_message(new_message)
+    
+    def add_device_by_id(self, device_id: str):
+        for account in self.accounts.values():
+            account.add_device_by_id(device_id)
+        self.update_master_device_map()
 
     def _get_device_id_from_message(self, msg: dict) -> str | None:
         protocol = msg.get("protocol", 0)

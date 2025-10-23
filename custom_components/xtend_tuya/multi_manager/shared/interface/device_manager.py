@@ -181,6 +181,9 @@ class XTDeviceManagerDeviceManagementInterface(ABC):
 
     def get_add_device_signal_list(self, device_id: str) -> list[str] | None:
         return None
+    
+    def add_device_by_id(self, device_id: str):
+        return None
 
 class XTDeviceManagerMQTTManagementInterface(ABC):
     def on_mqtt_stop(self):

@@ -305,6 +305,11 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
         if return_list:
             return return_list
         return None
+    
+    def add_device_by_id(self, device_id: str):
+        if self.sharing_account is None:
+            return None
+        self.sharing_account.device_manager.add_device_by_id(device_id)
 
     def on_mqtt_stop(self):
         if (

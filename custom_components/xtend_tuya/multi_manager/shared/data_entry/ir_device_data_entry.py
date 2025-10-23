@@ -223,6 +223,7 @@ class XTDataEntryAddIRDevice(XTDataEntryManager):
                     )
                 )
                 if new_device_id is not None:
+                    self.multi_manager.add_device_by_id(new_device_id)
                     dispatcher_send(
                     self.hass,
                     TUYA_DISCOVERY_NEW,

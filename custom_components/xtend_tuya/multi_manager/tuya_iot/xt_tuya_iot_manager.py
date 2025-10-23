@@ -255,12 +255,12 @@ class XTIOTDeviceManager(TuyaDeviceManager):
             f"[{MESSAGE_SOURCE_TUYA_IOT}]On device other: {biz_code} <=> {data}",
         )
         if biz_code == BIZCODE_BIND_USER:
-            self.add_device_by_id(data["devId"])
+            self.multi_manager.add_device_by_id(data["devId"])
             return None
             
         return super()._on_device_other(device_id, biz_code, data)
 
-    def add_device_by_id(self, device_id):
+    def add_device_by_id(self, device_id: str):
         device_ids = [device_id]
         # wait for es sync
         time.sleep(1)

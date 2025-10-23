@@ -293,6 +293,11 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
         if device_id in self.iot_account.device_ids:
             return [TUYA_DISCOVERY_NEW]
         return None
+    
+    def add_device_by_id(self, device_id: str):
+        if self.iot_account is None:
+            return None
+        self.iot_account.device_manager.add_device_by_id(device_id)
 
     def on_mqtt_stop(self):
         if self.iot_account is None:
