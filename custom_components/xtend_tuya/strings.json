@@ -2697,12 +2697,12 @@
             }
         },
         "tuya_iot_failed_login": {
-            "title": "Tuya OpenAPI login failed",
+            "title": "Tuya OpenAPI credentials expired",
             "fix_flow": {
                 "step": {
                     "confirm": {
-                        "description": "The integration \"{name}\" (`{config_entry_id}`) could not connect to the Tuya OpenAPI service (failed login)\n\nTo fix this error please follow the guide at [this URL](https://github.com/azerty9971/xtend_tuya/blob/main/docs/renew_cloud_credentials.md), then restart Home Assistant.",
-                        "title": "Tuya OpenAPI login failed"
+                        "description": "The integration \"{name}\" (`{config_entry_id}`) could not connect to the Tuya OpenAPI service (credentials expired)\n\nTo fix this error please follow the guide at [this URL](https://github.com/azerty9971/xtend_tuya/blob/main/docs/renew_cloud_credentials.md), then restart Home Assistant.",
+                        "title": "Tuya OpenAPI credentials expired"
                     }
                 }
             }
