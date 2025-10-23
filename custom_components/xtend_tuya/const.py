@@ -88,6 +88,7 @@ FULLY_OVERRIDEN_PLATFORMS = [
     Platform.FAN,
     Platform.HUMIDIFIER,
     Platform.LOCK,
+    Platform.REMOTE,
 ]
 
 PLATFORMS = [
@@ -103,6 +104,7 @@ PLATFORMS = [
     Platform.LIGHT,
     Platform.LOCK,
     Platform.NUMBER,
+    Platform.REMOTE,
     Platform.SCENE,
     Platform.SELECT,
     Platform.SENSOR,
