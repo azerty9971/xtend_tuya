@@ -206,7 +206,7 @@ async def async_setup_entry(
                                     key=remote_key.key,
                                     translation_key="xt_generic_button",
                                     translation_placeholders={
-                                        "name": remote_key.key_name
+                                        "name": remote_key.key
                                     },
                                     is_ir_descriptor=True,
                                     ir_hub_information=hub_information,
