@@ -662,7 +662,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         brand_id: int,
         brand_name: str,
         api: XTIOTOpenAPI | None = None,
-    ) -> bool:
+    ) -> str | None:
         if api is None:
             api = self.api
         ir_device_create_response = api.post(
@@ -675,12 +675,11 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                 "remote_index": int(datetime.datetime.now().timestamp())
             }
         )
-        success = ir_device_create_response.get("success", False)
-        if success is True:
+        if ir_device_create_response.get("success", False) is True:
             new_device_id = ir_device_create_response.get("result")
             if new_device_id is not None:
-                self.multi_manager.multi_device_listener.add_device_by_id(new_device_id)
-        return success
+                return new_device_id
+        return None
 
     def learn_ir_key(
         self,

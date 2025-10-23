@@ -82,8 +82,8 @@ class XTDeviceManagerInfraRedInterface(ABC):
         category_id: int,
         brand_id: int,
         brand_name: str,
-    ) -> bool:
-        return False
+    ) -> str | None:
+        return None
 
 class XTDeviceManagerIPCameraInterface(ABC):
     def get_webrtc_sdp_answer(

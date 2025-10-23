@@ -72,7 +72,11 @@ class XTDataEntryAddIRDevice(XTDataEntryManager):
 
     def get_translation_placeholders(self) -> dict[str, str]:
         return super().get_translation_placeholders() | {
-            "remote_name": self.flow_data.device_name if self.flow_data.device_name is not None else "",
+            "remote_name": (
+                self.flow_data.device_name
+                if self.flow_data.device_name is not None
+                else ""
+            ),
             "device_name": self.device.name,
             "name": f"Add IR device under {self.device.name}",
         }
@@ -208,15 +212,25 @@ class XTDataEntryAddIRDevice(XTDataEntryManager):
                     return await self.user_interaction_callback(config_flow, None)
             case 4:
                 # We have all the information to create the device
-                if await XTEventLoopProtector.execute_out_of_event_loop_and_return(
-                            self.flow_data.multi_manager.create_ir_device,
-                            self.flow_data.hub_device,
-                            self.flow_data.device_name,
-                            self.flow_data.device_category,
-                            self.flow_data.device_brand_id,
-                            self.flow_data.device_brand_name
-                        ):
-                    return self.finish_flow(config_flow=config_flow, reason="ir_add_device_success")
+                new_device_id = (
+                    await XTEventLoopProtector.execute_out_of_event_loop_and_return(
+                        self.flow_data.multi_manager.create_ir_device,
+                        self.flow_data.hub_device,
+                        self.flow_data.device_name,
+                        self.flow_data.device_category,
+                        self.flow_data.device_brand_id,
+                        self.flow_data.device_brand_name,
+                    )
+                )
+                if new_device_id is not None:
+                    dispatcher_send(
+                    self.hass,
+                    TUYA_DISCOVERY_NEW,
+                    [new_device_id, self.flow_data.hub.device_id],
+                )
+                    return self.finish_flow(
+                        config_flow=config_flow, reason="ir_add_device_success"
+                    )
         return self.finish_flow(config_flow=config_flow, reason="ir_add_device_failed")
 
 

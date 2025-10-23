@@ -199,7 +199,7 @@ class MultiManager:  # noqa: F811
         await concurrency_manager.gather()
 
         # Register all devices in the master device map
-        self._update_master_device_map()
+        self.update_master_device_map()
 
         # Now let's aggregate all of these devices into a single
         # "All functionnality" device
@@ -217,7 +217,7 @@ class MultiManager:  # noqa: F811
             self.on_message(messages[0], messages[1])
         self.pending_messages.clear()
 
-    def _update_master_device_map(self):
+    def update_master_device_map(self):
         for manager in self.accounts.values():
             for device_map in manager.get_available_device_maps():
                 for device_id in device_map:
@@ -563,11 +563,12 @@ class MultiManager:  # noqa: F811
         category_id: int,
         brand_id: int,
         brand_name: str,
-    ) -> bool:
+    ) -> str | None:
         for account in self.accounts.values():
-            if account.create_ir_device(device, remote_name, category_id, brand_id, brand_name) is True:
-                return True
-        return False
+            device_id = account.create_ir_device(device, remote_name, category_id, brand_id, brand_name)
+            if device_id is not None:
+                return device_id
+        return None
 
     def send_ir_command(
         self,
