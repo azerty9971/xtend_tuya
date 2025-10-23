@@ -183,14 +183,6 @@ class MultiManager:  # noqa: F811
         ) -> None:
             await manager.update_device_cache()
 
-            # New devices have been created in their own device maps
-            # let's convert them to XTDevice
-            for device_map in manager.get_available_device_maps():
-                for device_id in device_map:
-                    device_map[device_id] = manager.convert_to_xt_device(
-                        device_map[device_id], device_map.device_source_priority
-                    )
-
         for manager in self.accounts.values():
             concurrency_manager.add_coroutine(
                 update_manager_device_cache(manager=manager)
@@ -221,6 +213,13 @@ class MultiManager:  # noqa: F811
         for manager in self.accounts.values():
             for device_map in manager.get_available_device_maps():
                 for device_id in device_map:
+                    
+                    # New devices have been created in their own device maps
+                    # let's convert them to XTDevice
+                    device_map[device_id] = manager.convert_to_xt_device(
+                        device_map[device_id], device_map.device_source_priority
+                    )
+                    
                     if device_id not in self.master_device_map:
                         self.master_device_map[device_id] = device_map[device_id]
 
@@ -394,7 +393,7 @@ class MultiManager:  # noqa: F811
 
         if source in self.accounts:
             self.accounts[source].on_message(new_message)
-    
+
     def add_device_by_id(self, device_id: str):
         for account in self.accounts.values():
             account.add_device_by_id(device_id)
@@ -570,7 +569,9 @@ class MultiManager:  # noqa: F811
         brand_name: str,
     ) -> str | None:
         for account in self.accounts.values():
-            device_id = account.create_ir_device(device, remote_name, category_id, brand_id, brand_name)
+            device_id = account.create_ir_device(
+                device, remote_name, category_id, brand_id, brand_name
+            )
             if device_id is not None:
                 return device_id
         return None
