@@ -63,9 +63,6 @@ from .ha_tuya_integration.platform_descriptors import get_tuya_platform_descript
 from ..multi_manager import (
     MultiManager,
 )
-from ..shared.threading import (
-    XTEventLoopProtector,
-)
 from ...const import (
     DOMAIN,
     MESSAGE_SOURCE_TUYA_SHARING,
@@ -186,7 +183,7 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
         if self.sharing_account is None:
             return None
         try:
-            await XTEventLoopProtector.execute_out_of_event_loop_and_return(self.sharing_account.device_manager.update_device_cache)
+            self.sharing_account.device_manager.update_device_cache()
             new_device_ids: list[str] = [
                 device_id
                 for device_id in self.sharing_account.device_manager.device_map

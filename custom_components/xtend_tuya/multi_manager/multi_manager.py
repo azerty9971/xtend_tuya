@@ -181,7 +181,7 @@ class MultiManager:  # noqa: F811
         async def update_manager_device_cache(
             manager: XTDeviceManagerInterface,
         ) -> None:
-            await manager.update_device_cache()
+            await XTEventLoopProtector.execute_out_of_event_loop_and_return(manager.update_device_cache)
 
             # New devices have been created in their own device maps
             # let's convert them to XTDevice
