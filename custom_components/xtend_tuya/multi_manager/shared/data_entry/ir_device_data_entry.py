@@ -96,9 +96,6 @@ class XTDataEntryAddIRDevice(XTDataEntryManager):
         config_flow: ConfigFlow,
         discovery_info: DiscoveryInfoType | None,
     ) -> ConfigFlowResult:
-        LOGGER.warning(
-            f"Calling XTDataEntryAddIRDevice->user_interaction_callback: flow_data: {self.flow_data}, discovery_info: {discovery_info}"
-        )
         match self.flow_data.step:
             case 1:
                 if discovery_info is not None:
