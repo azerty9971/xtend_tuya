@@ -236,11 +236,12 @@ class XTIOTDeviceManager(TuyaDeviceManager):
             if devIds
             else self.device_map.values()
         )
-        for device in device_map:
-            LOGGER.warning(f"update_device_function_cache: {device}")
 
         for device in device_map:
             super().update_device_function_cache(devIds=[device.id])
+
+        for device in device_map:
+            LOGGER.warning(f"update_device_function_cache: {device}")
 
         for device in device_map:
             device_open_api = self.get_open_api_device(device)
