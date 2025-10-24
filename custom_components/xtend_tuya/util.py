@@ -292,9 +292,7 @@ def delete_all_device_entities(hass: HomeAssistant, device_ids: list[str], platf
             include_disabled_entities=True,
         )
         for entity_entry in hass_entities:
-            LOGGER.warning(f"Considering removal of {entity_entry.name} entry({entity_entry}) provided platform: {platform}")
             if platform is None or entity_entry.entity_id.startswith(f"{platform}."):
-                LOGGER.warning(f"Removed {entity_entry.name}")
                 entity_registry.async_remove(entity_entry.entity_id)
 
 
