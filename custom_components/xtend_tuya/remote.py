@@ -273,14 +273,20 @@ class XTRemoteEntity(XTEntity, RemoteEntity):  # type: ignore
                 need_refresh = True
         if need_refresh:
             dispatcher_send(
-                    self.hass,
-                    TUYA_DISCOVERY_NEW,
-                    [self.entity_description.ir_remote_information.remote_id, self.entity_description.ir_hub_information.device_id],
-                )
+                self.hass,
+                TUYA_DISCOVERY_NEW,
+                [
+                    self.entity_description.ir_remote_information.remote_id,
+                    self.entity_description.ir_hub_information.device_id,
+                ],
+            )
 
     async def async_delete_command(self, **kwargs: Any) -> None:
         command_list: list[str] = kwargs.get(ATTR_COMMAND, [])
-        if self.entity_description.ir_remote_information is None:
+        if (
+            self.entity_description.ir_remote_information is None
+            or self.entity_description.ir_hub_information is None
+        ):
             return None
         key_deleted: bool = False
         for single_command in command_list:
@@ -299,7 +305,15 @@ class XTRemoteEntity(XTEntity, RemoteEntity):  # type: ignore
             LOGGER.error(
                 f"Could not delete the IR keys {command_list} for device {self.device.name}: Commands not in device listed commands: {self.entity_description.ir_remote_information.keys}"
             )
-        
+        else:
+            dispatcher_send(
+                self.hass,
+                TUYA_DISCOVERY_NEW,
+                [
+                    self.entity_description.ir_remote_information.remote_id,
+                    self.entity_description.ir_hub_information.device_id,
+                ],
+            )
 
     async def async_turn_on(self, **kwargs: Any) -> None:
         """Turn the entity on."""
