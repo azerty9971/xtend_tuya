@@ -593,10 +593,12 @@ class MultiManager:  # noqa: F811
         device: XTDevice,
         remote: XTIRRemoteInformation,
         hub: XTIRHubInformation,
+        key: str,
         key_name: str,
+        timeout: int | None = None
     ) -> bool:
         for account in self.accounts.values():
-            if account.learn_ir_key(device, remote, hub, key_name):
+            if account.learn_ir_key(device, remote, hub, key, key_name, timeout):
                 return True
         return False
 

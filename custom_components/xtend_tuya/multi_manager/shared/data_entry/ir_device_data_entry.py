@@ -46,7 +46,8 @@ class XTFlowDataAddIRDeviceKey(XTFlowDataBase):
     device: mm.XTDevice
     hub: XTIRHubInformation
     remote: XTIRRemoteInformation
-    key_name: str | None = None
+    human_key_name: str | None = None
+    technical_key_name: str | None = None
 
 
 class XTDataEntryAddIRDevice(XTDataEntryManager):
@@ -236,7 +237,8 @@ class XTDataEntryAddIRDevice(XTDataEntryManager):
 
 class XTDataEntryAddIRDeviceKey(XTDataEntryManager):
     class Fields(StrEnum):
-        KEY_NAME = "new_ir_key_name"
+        HUMAN_KEY_NAME = "new_ir_key_human"
+        TECHNICAL_KEY_NAME = "new_ir_key_technical"
 
     def __init__(
         self,
@@ -257,7 +259,7 @@ class XTDataEntryAddIRDeviceKey(XTDataEntryManager):
     def get_translation_placeholders(self) -> dict[str, str]:
         return super().get_translation_placeholders() | {
             "key_name": (
-                self.flow_data.key_name if self.flow_data.key_name is not None else ""
+                self.flow_data.human_key_name if self.flow_data.human_key_name is not None else ""
             ),
             "device_name": self.flow_data.device.name,
             "name": f"Add IR Key for {self.device.name}",
@@ -280,18 +282,27 @@ class XTDataEntryAddIRDeviceKey(XTDataEntryManager):
         discovery_info: DiscoveryInfoType | None,
     ) -> ConfigFlowResult:
         if discovery_info is not None:
-            self.flow_data.key_name = discovery_info.get(
-                XTDataEntryAddIRDeviceKey.Fields.KEY_NAME
+            self.flow_data.human_key_name = discovery_info.get(
+                XTDataEntryAddIRDeviceKey.Fields.HUMAN_KEY_NAME
             )
-            if self.flow_data.key_name == "":
-                self.flow_data.key_name = None
-        if self.flow_data.key_name is None:
+            if self.flow_data.human_key_name == "":
+                self.flow_data.human_key_name = None
+            self.flow_data.technical_key_name = discovery_info.get(
+                XTDataEntryAddIRDeviceKey.Fields.TECHNICAL_KEY_NAME
+            )
+            if self.flow_data.technical_key_name is None:
+                self.flow_data.technical_key_name = self.flow_data.human_key_name
+        if self.flow_data.human_key_name is None:
             return self.async_show_form(
                 config_flow=config_flow,
                 data_schema=vol.Schema(
                     {
                         vol.Required(
-                            str(XTDataEntryAddIRDeviceKey.Fields.KEY_NAME),
+                            str(XTDataEntryAddIRDeviceKey.Fields.HUMAN_KEY_NAME),
+                            default="",
+                        ): str,
+                        vol.Optional(
+                            str(XTDataEntryAddIRDeviceKey.Fields.TECHNICAL_KEY_NAME),
                             default="",
                         ): str,
                     }
@@ -303,7 +314,8 @@ class XTDataEntryAddIRDeviceKey(XTDataEntryManager):
                 self.flow_data.device,
                 self.flow_data.remote,
                 self.flow_data.hub,
-                self.flow_data.key_name,
+                self.flow_data.technical_key_name,
+                self.flow_data.human_key_name,
             ):
                 dispatcher_send(
                     self.hass,

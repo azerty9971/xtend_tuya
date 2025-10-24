@@ -55,7 +55,9 @@ class XTDeviceManagerInfraRedInterface(ABC):
         device: shared.XTDevice,
         remote: XTIRRemoteInformation,
         hub: XTIRHubInformation,
+        key: str,
         key_name: str,
+        timeout: int | None = None
     ) -> bool:
         return False
     

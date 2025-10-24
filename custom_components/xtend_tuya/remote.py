@@ -7,10 +7,15 @@ from homeassistant.components.remote import (
     RemoteEntity,
     RemoteEntityDescription,
     RemoteEntityFeature,
+    ATTR_TIMEOUT,
 )
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.const import EntityCategory, Platform
-from homeassistant.helpers.dispatcher import async_dispatcher_connect
+from homeassistant.const import (
+    EntityCategory,
+    Platform,
+    ATTR_COMMAND,
+)
+from homeassistant.helpers.dispatcher import async_dispatcher_connect, dispatcher_send
 from .const import (
     TUYA_DISCOVERY_NEW,
     XTMultiManagerPostSetupCallbackPriority,
@@ -40,6 +45,7 @@ from .multi_manager.shared.threading import (
 @dataclass(frozen=True)
 class XTRemoteEntityDescription(RemoteEntityDescription):
     """Describes a Tuya remote."""
+
     ir_hub_information: XTIRHubInformation | None = None
     ir_remote_information: XTIRRemoteInformation | None = None
     ir_key_information: XTIRRemoteKeysInformation | None = None
@@ -61,6 +67,7 @@ REMOTES: dict[str, tuple[XTRemoteEntityDescription, ...]] = {}
 IR_HUB_CATEGORY_LIST: list[str] = [
     "wnykq",
 ]
+
 
 async def async_setup_entry(
     hass: HomeAssistant, entry: XTConfigEntry, async_add_entities: AddEntitiesCallback
@@ -91,10 +98,10 @@ async def async_setup_entry(
         for device_id in device_ids:
             if hub_device := hass_data.manager.device_map.get(device_id):
                 if hub_device.category in IR_HUB_CATEGORY_LIST:
-                    hub_information: (
-                        XTIRHubInformation | None
-                    ) = await XTEventLoopProtector.execute_out_of_event_loop_and_return(
-                        hass_data.manager.get_ir_hub_information, hub_device
+                    hub_information: XTIRHubInformation | None = (
+                        await XTEventLoopProtector.execute_out_of_event_loop_and_return(
+                            hass_data.manager.get_ir_hub_information, hub_device
+                        )
                     )
                     if hub_information is None:
                         continue
@@ -103,7 +110,9 @@ async def async_setup_entry(
                     entity_cleanup_device_ids: list[str] = [hub_information.device_id]
                     for remote_information in hub_information.remote_ids:
                         entity_cleanup_device_ids.append(remote_information.remote_id)
-                    delete_all_device_entities(hass, entity_cleanup_device_ids, this_platform)
+                    delete_all_device_entities(
+                        hass, entity_cleanup_device_ids, this_platform
+                    )
                     for remote_information in hub_information.remote_ids:
                         if remote_device := hass_data.manager.device_map.get(
                             remote_information.remote_id
@@ -134,11 +143,8 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if (
-                    category_descriptions
-                    := XTEntityDescriptorManager.get_category_descriptors(
-                        supported_descriptors, device.category
-                    )
+                if category_descriptions := XTEntityDescriptorManager.get_category_descriptors(
+                    supported_descriptors, device.category
                 ):
                     externally_managed_dpcodes = (
                         XTEntityDescriptorManager.get_category_keys(
@@ -214,28 +220,73 @@ class XTRemoteEntity(XTEntity, RemoteEntity):  # type: ignore
         self.device_manager = device_manager
         self._attr_unique_id = f"{super().unique_id}_remote_{description.key}"
         self._attr_supported_features = (
-            RemoteEntityFeature.LEARN_COMMAND | RemoteEntityFeature.DELETE_COMMAND | RemoteEntityFeature.ACTIVITY
+            RemoteEntityFeature.LEARN_COMMAND | RemoteEntityFeature.DELETE_COMMAND
         )
-        if description.ir_remote_information is not None and description.ir_remote_information.keys is not None:
+        if (
+            description.ir_remote_information is not None
+            and description.ir_remote_information.keys is not None
+        ):
             self._attr_activity_list: list[str] | None = []
             for key in description.ir_remote_information.keys:
                 self._attr_activity_list.append(key.key_name)
 
     async def async_send_command(self, command: Iterable[str], **kwargs: Any) -> None:
-        LOGGER.warning(f"async_send_command => {self.device.name} <=> {command} <=> {kwargs}")
-    
+        if self.entity_description.ir_remote_information is None:
+            return None
+        key_sent: bool = False
+        for single_command in command:
+            for key in self.entity_description.ir_remote_information.keys:
+                if key.key == single_command:
+                    XTEventLoopProtector.execute_out_of_event_loop(
+                        self.device_manager.send_ir_command,
+                        self.device,
+                        key,
+                        self.entity_description.ir_remote_information,
+                        self.entity_description.ir_hub_information,
+                    )
+                    key_sent = True
+        if key_sent is False:
+            LOGGER.error(
+                f"Could not send the IR commands {command} for device {self.device.name}: Commands not in device listed commands: {self.entity_description.ir_remote_information.keys}"
+            )
+
     async def async_learn_command(self, **kwargs: Any) -> None:
-        LOGGER.warning(f"async_learn_command => {self.device.name} <=> {kwargs}")
-    
+        timeout = kwargs.get(ATTR_TIMEOUT, 30)
+        command_list = kwargs.get(ATTR_COMMAND, [])
+        need_refresh: bool = False
+        if (
+            self.entity_description.ir_remote_information is None
+            or self.entity_description.ir_hub_information is None
+        ):
+            return None
+        for command in command_list:
+            if await XTEventLoopProtector.execute_out_of_event_loop_and_return(
+                self.device_manager.learn_ir_key,
+                self.device,
+                self.entity_description.ir_remote_information,
+                self.entity_description.ir_hub_information,
+                command,
+                timeout,
+            ):
+                need_refresh = True
+        if need_refresh:
+            dispatcher_send(
+                    self.hass,
+                    TUYA_DISCOVERY_NEW,
+                    [self.entity_description.ir_remote_information.remote_id, self.entity_description.ir_hub_information.device_id],
+                )
+
     async def async_delete_command(self, **kwargs: Any) -> None:
         LOGGER.warning(f"async_delete_command => {self.device.name} <=> {kwargs}")
-    
+
     async def async_turn_on(self, **kwargs: Any) -> None:
         """Turn the entity on."""
-        LOGGER.warning(f"async_turn_on => {self.device.name} <=> {kwargs}")
+        # Nothing to do...
+        pass
 
     async def async_turn_off(self, **kwargs: Any) -> None:
-        LOGGER.warning(f"async_turn_off => {self.device.name} <=> {kwargs}")
+        # Nothing to do...
+        pass
 
     @staticmethod
     def get_entity_instance(

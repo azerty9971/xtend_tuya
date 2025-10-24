@@ -20,10 +20,12 @@
                 "title": "New IR key for {device_name}",
                 "description": "Enter the name of the new key, then press Submit then point your remote to the hub and hit the key on your remote",
                 "data": {
-                    "new_ir_key_name": "New key name"
+                    "new_ir_key_human": "New key display name",
+                    "new_ir_key_technical": "New key technical name"
                 },
                 "data_description": {
-                    "new_ir_key_name": "The name of the key to add to the IR device."
+                    "new_ir_key_human": "The display text of the new key that will be added to the IR device.",
+                    "new_ir_key_technical": "The technical name of the new key that will be added to the IR device."
                 }
             },
             "ir_add_device": {

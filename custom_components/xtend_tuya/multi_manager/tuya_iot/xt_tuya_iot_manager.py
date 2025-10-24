@@ -708,10 +708,12 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         device: XTDevice,
         remote: XTIRRemoteInformation,
         hub: XTIRHubInformation,
+        key: str,
         key_name: str,
+        timeout: int | None = None,
         api: XTIOTOpenAPI | None = None,
     ) -> bool:
-        total_timeout: int = 20
+        total_timeout: int = timeout if timeout is not None else 30
         check_interval: int = 1
         if api is None:
             api = self.api
@@ -746,7 +748,6 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         if learned_code_value is None:
             return False
 
-        # Save learning code as TEST
         save_result = api.put(
             f"/v2.0/infrareds/{hub.device_id}/remotes/{remote.remote_id}/learning-codes",
             {
@@ -756,8 +757,8 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                 "codes": [
                     {
                         # "category_id": remote.category_id,
-                        # "key_name": "test2",
-                        "key": key_name,
+                        "key_name": key_name,
+                        "key": key,
                         "code": learned_code_value,
                         "id": learning_time // 1000,
                     }

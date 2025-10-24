@@ -175,6 +175,15 @@ class XTIRRemoteKeysInformation:
     key_name: str
     standard_key: bool
 
+    def __repr__(self) -> str:
+        return self.key
+
+    def __eq__(self, value: object) -> bool:
+        if value == self.key:
+            return True
+        else:
+            return False
+
 
 @dataclass
 class XTIRRemoteInformation:
