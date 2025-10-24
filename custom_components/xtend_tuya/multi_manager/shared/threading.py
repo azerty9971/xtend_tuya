@@ -68,10 +68,13 @@ class XTEventLoopProtector:
     @staticmethod
     @callback
     async def execute_out_of_event_loop_and_return(callback, *args, **kwargs) -> Any:
-        if XTEventLoopProtector.hass is None:
-            LOGGER.error("protect_event_loop_and_return called without a HASS instance")
-            return
         is_coroutine: bool = inspect.iscoroutinefunction(callback)
+        if XTEventLoopProtector.hass is None:
+            if is_coroutine:
+                return await callback(*args)
+            else:
+                return callback(*args)
+        
         if XTEventLoopProtector.hass.loop_thread_id != threading.get_ident():
             # Not in the event loop
             if is_coroutine:
