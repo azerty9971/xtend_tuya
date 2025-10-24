@@ -243,9 +243,11 @@ class XTRemoteEntity(XTEntity, RemoteEntity):  # type: ignore
         description: XTRemoteEntityDescription,
     ) -> None:
         """Init XT remote."""
+        super(XTRemoteEntity, self).__init__(device, device_manager)
         self.entity_description = description  # type: ignore
         self.device = device
         self.device_manager = device_manager
+        self._attr_unique_id = f"{super().unique_id}_remote_{description.key}"
         self._attr_supported_features = (
             RemoteEntityFeature.LEARN_COMMAND | RemoteEntityFeature.DELETE_COMMAND | RemoteEntityFeature.ACTIVITY
         )
