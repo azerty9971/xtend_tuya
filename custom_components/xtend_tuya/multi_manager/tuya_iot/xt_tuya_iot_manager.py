@@ -241,9 +241,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
             super().update_device_function_cache(devIds=[device.id])
 
         for device in device_map:
-            LOGGER.warning(f"update_device_function_cache: {device}")
-
-        for device in device_map:
+            LOGGER.warning(f"update_device_function_cache mainloop: {device}")
             device_open_api = self.get_open_api_device(device)
             self.multi_manager.device_watcher.report_message(device.id, f"device_open_api: {device_open_api}", device)
             # self.multi_manager.device_watcher.report_message(device_id, f"About to merge {device}\r\n\r\nand\r\n\r\n{device_open_api}", device)
