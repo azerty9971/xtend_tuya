@@ -235,8 +235,9 @@ class XTRemoteEntity(XTEntity, RemoteEntity):  # type: ignore
             return None
         key_sent: bool = False
         for single_command in command:
+            single_command = single_command.lower()
             for key in self.entity_description.ir_remote_information.keys:
-                if key.key == single_command:
+                if key.key.lower() == single_command:
                     XTEventLoopProtector.execute_out_of_event_loop(
                         self.device_manager.send_ir_command,
                         self.device,
