@@ -165,7 +165,7 @@ async def async_setup_entry(
                     delete_all_device_entities(hass, entity_cleanup_device_ids, this_platform)
 
                     descriptor = XTButtonEntityDescription(
-                        key="xt_add_device",
+                        key="xt_add_ir_device",
                         translation_key="xt_add_ir_device",
                         is_ir_descriptor=True,
                         ir_hub_information=hub_information,
@@ -186,7 +186,7 @@ async def async_setup_entry(
                             remote_information.remote_id
                         ):
                             descriptor = XTButtonEntityDescription(
-                                key="xt_add_device_key",
+                                key="xt_add_ir_device_key",
                                 translation_key="xt_add_ir_device_key",
                                 is_ir_descriptor=True,
                                 ir_hub_information=hub_information,
@@ -203,7 +203,7 @@ async def async_setup_entry(
                             )
                             for remote_key in remote_information.keys:
                                 descriptor = XTButtonEntityDescription(
-                                    key=remote_key.key,
+                                    key=f"xt_ir_key_{remote_key.key}",
                                     translation_key="xt_generic_button",
                                     translation_placeholders={
                                         "name": remote_key.key_name
