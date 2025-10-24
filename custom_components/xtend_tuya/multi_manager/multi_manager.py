@@ -178,24 +178,20 @@ class MultiManager:  # noqa: F811
         XTDeviceMap.clear_master_device_map()
         concurrency_manager = XTConcurrencyManager()
 
-        async def update_manager_device_cache(manager: XTDeviceManagerInterface) -> None:
+        async def update_manager_device_cache(
+            manager: XTDeviceManagerInterface,
+        ) -> None:
             await manager.update_device_cache()
 
-            # New devices have been created in their own device maps
-            # let's convert them to XTDevice
-            for device_map in manager.get_available_device_maps():
-                for device_id in device_map:
-                    device_map[device_id] = manager.convert_to_xt_device(
-                        device_map[device_id], device_map.device_source_priority
-                    )
-
         for manager in self.accounts.values():
-            concurrency_manager.add_coroutine(update_manager_device_cache(manager=manager))
+            concurrency_manager.add_coroutine(
+                update_manager_device_cache(manager=manager)
+            )
 
         await concurrency_manager.gather()
 
         # Register all devices in the master device map
-        self._update_master_device_map()
+        self.update_master_device_map()
 
         # Now let's aggregate all of these devices into a single
         # "All functionnality" device
@@ -213,10 +209,17 @@ class MultiManager:  # noqa: F811
             self.on_message(messages[0], messages[1])
         self.pending_messages.clear()
 
-    def _update_master_device_map(self):
+    def update_master_device_map(self):
         for manager in self.accounts.values():
             for device_map in manager.get_available_device_maps():
                 for device_id in device_map:
+                    
+                    # New devices have been created in their own device maps
+                    # let's convert them to XTDevice
+                    device_map[device_id] = manager.convert_to_xt_device(
+                        device_map[device_id], device_map.device_source_priority
+                    )
+                    
                     if device_id not in self.master_device_map:
                         self.master_device_map[device_id] = device_map[device_id]
 
@@ -391,6 +394,11 @@ class MultiManager:  # noqa: F811
         if source in self.accounts:
             self.accounts[source].on_message(new_message)
 
+    def add_device_by_id(self, device_id: str):
+        for account in self.accounts.values():
+            account.add_device_by_id(device_id)
+        self.update_master_device_map()
+
     def _get_device_id_from_message(self, msg: dict) -> str | None:
         protocol = msg.get("protocol", 0)
         data = msg.get("data", {})
@@ -540,6 +548,34 @@ class MultiManager:  # noqa: F811
             if ir_device_information is not None:
                 return ir_device_information
 
+    def get_ir_category_list(self, device: XTDevice) -> dict[int, str]:
+        for account in self.accounts.values():
+            if account_list := account.get_ir_category_list(device):
+                return account_list
+        return {}
+
+    def get_ir_brand_list(self, device: XTDevice, category_id: int) -> dict[int, str]:
+        for account in self.accounts.values():
+            if account_list := account.get_ir_brand_list(device, category_id):
+                return account_list
+        return {}
+
+    def create_ir_device(
+        self,
+        device: XTDevice,
+        remote_name: str,
+        category_id: int,
+        brand_id: int,
+        brand_name: str,
+    ) -> str | None:
+        for account in self.accounts.values():
+            device_id = account.create_ir_device(
+                device, remote_name, category_id, brand_id, brand_name
+            )
+            if device_id is not None:
+                return device_id
+        return None
+
     def send_ir_command(
         self,
         device: XTDevice,
@@ -557,10 +593,24 @@ class MultiManager:  # noqa: F811
         device: XTDevice,
         remote: XTIRRemoteInformation,
         hub: XTIRHubInformation,
+        key: str,
         key_name: str,
+        timeout: int | None = None
     ) -> bool:
         for account in self.accounts.values():
-            if account.learn_ir_key(device, remote, hub, key_name):
+            if account.learn_ir_key(device, remote, hub, key, key_name, timeout):
+                return True
+        return False
+    
+    def delete_ir_key(
+        self,
+        device: XTDevice,
+        key: XTIRRemoteKeysInformation,
+        remote: XTIRRemoteInformation,
+        hub: XTIRHubInformation
+    ):
+        for account in self.accounts.values():
+            if account.delete_ir_key(device, key, remote, hub):
                 return True
         return False
 

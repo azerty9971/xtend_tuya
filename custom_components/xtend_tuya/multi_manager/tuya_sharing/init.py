@@ -294,17 +294,22 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
             return return_list
         return None
 
-    def on_add_device(self, device: XTDevice) -> list[str] | None:
+    def get_add_device_signal_list(self, device_id: str) -> list[str] | None:
         return_list: list[str] = []
         if self.sharing_account is None:
             return None
-        if device.id in self.sharing_account.device_ids:
+        if device_id in self.sharing_account.device_ids:
             return_list.append(TUYA_DISCOVERY_NEW)
         if self.sharing_account.device_manager.reuse_config:
             return_list.append(TUYA_DISCOVERY_NEW_ORIG)
         if return_list:
             return return_list
         return None
+    
+    def add_device_by_id(self, device_id: str):
+        if self.sharing_account is None:
+            return None
+        self.sharing_account.device_manager.add_device_by_id(device_id)
 
     def on_mqtt_stop(self):
         if (

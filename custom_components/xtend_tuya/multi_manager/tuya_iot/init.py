@@ -287,12 +287,17 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
             return [TUYA_HA_SIGNAL_UPDATE_ENTITY]
         return None
 
-    def on_add_device(self, device: XTDevice) -> list[str] | None:
+    def get_add_device_signal_list(self, device_id: str) -> list[str] | None:
         if self.iot_account is None:
             return None
-        if device.id in self.iot_account.device_ids:
+        if device_id in self.iot_account.device_ids:
             return [TUYA_DISCOVERY_NEW]
         return None
+    
+    def add_device_by_id(self, device_id: str):
+        if self.iot_account is None:
+            return None
+        self.iot_account.device_manager.add_device_by_id(device_id)
 
     def on_mqtt_stop(self):
         if self.iot_account is None:
@@ -401,18 +406,53 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
             return False
         return self.iot_account.device_manager.send_ir_command(device, key, remote, hub)
 
+    def get_ir_category_list(self, device: XTDevice) -> dict[int, str]:
+        if self.iot_account is None:
+            return {}
+        return self.iot_account.device_manager.get_ir_category_list(device)
+    
+    def get_ir_brand_list(self, device: XTDevice, category_id: int) -> dict[int, str]:
+        if self.iot_account is None:
+            return {}
+        return self.iot_account.device_manager.get_ir_brand_list(device, category_id)
+    
+    def create_ir_device(
+        self,
+        device: XTDevice,
+        remote_name: str,
+        category_id: int,
+        brand_id: int,
+        brand_name: str,
+    ) -> str | None:
+        if self.iot_account is None:
+            return None
+        return self.iot_account.device_manager.create_ir_device(device, remote_name, category_id, brand_id, brand_name)
+
     def learn_ir_key(
         self,
         device: XTDevice,
         remote: XTIRRemoteInformation,
         hub: XTIRHubInformation,
+        key: str,
         key_name: str,
+        timeout: int | None = None
     ) -> bool:
         if self.iot_account is None:
             return False
         return self.iot_account.device_manager.learn_ir_key(
-            device, remote, hub, key_name
+            device, remote, hub, key, key_name, timeout
         )
+    
+    def delete_ir_key(
+        self,
+        device: XTDevice,
+        key: XTIRRemoteKeysInformation,
+        remote: XTIRRemoteInformation,
+        hub: XTIRHubInformation
+    ) -> bool:
+        if self.iot_account is None:
+            return False
+        return self.iot_account.device_manager.delete_ir_key(device, key, remote, hub)
 
     def get_platform_descriptors_to_merge(self, platform: Platform) -> Any:
         pass

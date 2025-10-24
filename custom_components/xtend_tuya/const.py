@@ -88,6 +88,7 @@ FULLY_OVERRIDEN_PLATFORMS = [
     Platform.FAN,
     Platform.HUMIDIFIER,
     Platform.LOCK,
+    Platform.REMOTE,
 ]
 
 PLATFORMS = [
@@ -103,6 +104,7 @@ PLATFORMS = [
     Platform.LIGHT,
     Platform.LOCK,
     Platform.NUMBER,
+    Platform.REMOTE,
     Platform.SCENE,
     Platform.SELECT,
     Platform.SENSOR,
@@ -172,6 +174,17 @@ class XTIRRemoteKeysInformation:
     key_id: int
     key_name: str
     standard_key: bool
+    learn_id: int | None = None
+    code: str | None = None
+
+    def __repr__(self) -> str:
+        return self.key
+
+    def __eq__(self, value: object) -> bool:
+        if value == self.key:
+            return True
+        else:
+            return False
 
 
 @dataclass

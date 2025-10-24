@@ -5,10 +5,14 @@ https://github.com/tuya/tuya-iot-python-sdk
 
 from __future__ import annotations
 import json
+import datetime
 import time
 from tuya_iot import (
     TuyaDeviceManager,
     TuyaOpenMQ,
+)
+from tuya_iot.device import (
+    BIZCODE_BIND_USER,
 )
 from tuya_iot.tuya_enums import (
     AuthType,
@@ -114,7 +118,9 @@ class XTIOTDeviceManager(TuyaDeviceManager):
     async def async_update_device_list_in_smart_home_mod(self):
         if self.api.token_info is None:  # CHANGED
             return None  # CHANGED
-        response = await XTEventLoopProtector.execute_out_of_event_loop_and_return(self.api.get, f"/v1.0/users/{self.api.token_info.uid}/devices")
+        response = await XTEventLoopProtector.execute_out_of_event_loop_and_return(
+            self.api.get, f"/v1.0/users/{self.api.token_info.uid}/devices"
+        )
         if response["success"]:
             for item in response["result"]:
                 device = XTDevice(**item)  # CHANGED
@@ -216,7 +222,9 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         )
 
         async def update_single_device(device: XTDevice):
-            await XTEventLoopProtector.execute_out_of_event_loop_and_return(self.update_device_function_cache, [device.id])
+            await XTEventLoopProtector.execute_out_of_event_loop_and_return(
+                self.update_device_function_cache, [device.id]
+            )
 
         for device in device_map:
             concurrency_manager.add_coroutine(update_single_device(device))
@@ -246,7 +254,26 @@ class XTIOTDeviceManager(TuyaDeviceManager):
             device_id,
             f"[{MESSAGE_SOURCE_TUYA_IOT}]On device other: {biz_code} <=> {data}",
         )
+        if biz_code == BIZCODE_BIND_USER:
+            self.multi_manager.add_device_by_id(data["devId"])
+            return None
+            
         return super()._on_device_other(device_id, biz_code, data)
+
+    def add_device_by_id(self, device_id: str):
+        device_ids = [device_id]
+        # wait for es sync
+        time.sleep(1)
+
+        self._update_device_list_info_cache(device_ids)
+        self._update_device_list_status_cache(device_ids)
+
+        self.update_device_function_cache(device_ids)
+
+        if device_id in self.device_map.keys():
+            device = self.device_map.get(device_id)
+            for listener in self.device_listeners:
+                listener.add_device(device)
 
     def _on_device_report(self, device_id: str, status: list):
         self.multi_manager.device_watcher.report_message(
@@ -563,6 +590,13 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         remote_keys = api.get(f"/v2.0/infrareds/{hub_id}/remotes/{remote_id}/keys")
         if remote_keys.get("success", False) is False:
             return return_list
+        learning_codes = api.get(f"/v2.0/infrareds/{hub_id}/remotes/{remote_id}/learning-codes")
+        learning_codes_dict: dict[int, dict[str, Any]] = {}
+        if learning_codes.get("success", False):
+            learning_code_results: list[dict] = learning_codes.get("result", [])
+            for learning_code_result_dict in learning_code_results:
+                if learning_code_id := learning_code_result_dict.get("id"):
+                    learning_codes_dict[learning_code_id] = learning_code_result_dict
         remote_keys_results: dict = remote_keys.get("result", {})
         remote_keys_key_list: list[dict] = remote_keys_results.get("key_list", [])
         for remote_key_dict in remote_keys_key_list:
@@ -570,6 +604,11 @@ class XTIOTDeviceManager(TuyaDeviceManager):
             key_id: int | None = remote_key_dict.get("key_id")
             key_name: str | None = remote_key_dict.get("key_name")
             standard_key: bool | None = remote_key_dict.get("standard_key")
+            learn_id: int | None = None
+            code: str | None = None
+            if key_id in learning_codes_dict:
+                learn_id = learning_codes_dict[key_id].get("learn_id")
+                code = learning_codes_dict[key_id].get("code")
             if (
                 key is None
                 or key_id is None
@@ -578,7 +617,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
             ):
                 continue
             key_information = XTIRRemoteKeysInformation(
-                key=key, key_id=key_id, key_name=key_name, standard_key=standard_key
+                key=key, key_id=key_id, key_name=key_name, standard_key=standard_key, learn_id=learn_id, code=code
             )
             return_list.append(key_information)
         return return_list
@@ -606,15 +645,104 @@ class XTIOTDeviceManager(TuyaDeviceManager):
             return True
         return False
 
+    def delete_ir_key(
+        self,
+        device: XTDevice,
+        key: XTIRRemoteKeysInformation,
+        remote: XTIRRemoteInformation,
+        hub: XTIRHubInformation,
+        api: XTIOTOpenAPI | None = None,
+    ) -> bool:
+        if api is None:
+            api = self.api
+        delete_ir_command = api.delete(
+            f"/v2.0/infrareds/{hub.device_id}/learning-codes/{key.learn_id}",
+        )
+        if delete_ir_command.get("success", False) and delete_ir_command.get("result", False):
+            return True
+        return False
+
+    def get_ir_category_list(
+        self, infrared_device: XTDevice, api: XTIOTOpenAPI | None = None
+    ) -> dict[int, str]:
+        if api is None:
+            api = self.api
+        return_dict: dict[int, str] = {}
+        category_response = api.get(f"/v2.0/infrareds/{infrared_device.id}/categories")
+        if category_response.get("success", False) is False:
+            return {}
+        category_list: list[dict[str, Any]] = category_response.get("result", [])
+        for category in category_list:
+            try:
+                id = int(category.get("category_id", 0))
+                name = str(category.get("category_name"))
+                return_dict[id] = name
+            except Exception:
+                continue
+        return return_dict
+
+    def get_ir_brand_list(
+        self,
+        infrared_device: XTDevice,
+        category_id: int,
+        api: XTIOTOpenAPI | None = None,
+    ) -> dict[int, str]:
+        if api is None:
+            api = self.api
+        return_dict: dict[int, str] = {}
+        brand_response = api.get(
+            f"/v2.0/infrareds/{infrared_device.id}/categories/{category_id}/brands"
+        )
+        if brand_response.get("success", False) is False:
+            return {}
+        category_list: list[dict[str, Any]] = brand_response.get("result", [])
+        for brand in category_list:
+            try:
+                id = int(brand.get("brand_id", 0))
+                name = str(brand.get("brand_name"))
+                return_dict[id] = name
+            except Exception:
+                continue
+        return return_dict
+
+    def create_ir_device(
+        self,
+        device: XTDevice,
+        remote_name: str,
+        category_id: int,
+        brand_id: int,
+        brand_name: str,
+        api: XTIOTOpenAPI | None = None,
+    ) -> str | None:
+        if api is None:
+            api = self.api
+        ir_device_create_response = api.post(
+            f"/v2.0/infrareds/{device.id}/remotes",
+            {
+                "category_id": category_id,
+                "remote_name": remote_name,
+                "brand_id": brand_id,
+                "brand_name": brand_name,
+                "remote_index": int(datetime.datetime.now().timestamp())
+            }
+        )
+        if ir_device_create_response.get("success", False) is True:
+            new_device_id = ir_device_create_response.get("result")
+            if new_device_id is not None:
+                return new_device_id
+        return None
+
     def learn_ir_key(
         self,
         device: XTDevice,
         remote: XTIRRemoteInformation,
         hub: XTIRHubInformation,
+        key: str,
         key_name: str,
+        timeout: int | None = None,
         api: XTIOTOpenAPI | None = None,
     ) -> bool:
-        total_timeout: int = 20
+        total_timeout: int = timeout if timeout is not None else 30
         check_interval: int = 1
         if api is None:
             api = self.api
@@ -649,7 +777,6 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         if learned_code_value is None:
             return False
 
-        # Save learning code as TEST
         save_result = api.put(
             f"/v2.0/infrareds/{hub.device_id}/remotes/{remote.remote_id}/learning-codes",
             {
@@ -659,8 +786,8 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                 "codes": [
                     {
                         # "category_id": remote.category_id,
-                        # "key_name": "test2",
-                        "key": key_name,
+                        "key_name": key_name,
+                        "key": key,
                         "code": learned_code_value,
                         "id": learning_time // 1000,
                     }
