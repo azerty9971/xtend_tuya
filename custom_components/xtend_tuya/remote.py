@@ -264,6 +264,13 @@ class XTRemoteEntity(XTEntity, RemoteEntity):  # type: ignore
     
     async def async_delete_command(self, **kwargs: Any) -> None:
         LOGGER.warning(f"async_delete_command => {self.device.name} <=> {kwargs}")
+    
+    async def async_turn_on(self, **kwargs: Any) -> None:
+        """Turn the entity on."""
+        LOGGER.warning(f"async_turn_on => {self.device.name} <=> {kwargs}")
+
+    async def async_turn_off(self, **kwargs: Any) -> None:
+        LOGGER.warning(f"async_turn_off => {self.device.name} <=> {kwargs}")
 
     @staticmethod
     def get_entity_instance(
