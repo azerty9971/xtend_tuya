@@ -745,6 +745,11 @@
                 "name": "Deo end time"
             }
         },
+        "remote": {
+            "xt_generic_remote": {
+                "name": "{name}"
+            }
+        },
         "select": {
             "xt_generic_select": {
                 "name": "{name}"

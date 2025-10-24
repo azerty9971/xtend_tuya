@@ -118,8 +118,9 @@ async def async_setup_entry(
                             remote_information.remote_id
                         ):
                             descriptor = XTRemoteEntityDescription(
-                                key="xt_add_device_key",
-                                translation_key="xt_add_ir_device_key",
+                                key="xt_generic_remote",
+                                translation_key="xt_generic_remote",
+                                translation_placeholders={"name": remote_device.name},
                                 ir_hub_information=hub_information,
                                 ir_remote_information=remote_information,
                                 ir_key_information=None,
