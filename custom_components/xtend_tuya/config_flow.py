@@ -51,6 +51,7 @@ from .const import (
 )
 from .multi_manager.shared.threading import (
     XTEventLoopProtector,
+    XTConcurrencyManager,
 )
 import custom_components.xtend_tuya.util as util
 import custom_components.xtend_tuya.multi_manager.multi_manager as mm
@@ -314,6 +315,9 @@ class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
         """Step user."""
         errors = {}
         placeholders = {}
+
+        XTEventLoopProtector.hass = self.hass
+        XTConcurrencyManager.hass = self.hass
 
         if user_input is not None:
             success, response = await self.__async_get_qr_code(
