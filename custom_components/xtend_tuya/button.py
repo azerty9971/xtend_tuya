@@ -162,7 +162,7 @@ async def async_setup_entry(
                     entity_cleanup_device_ids: list[str] = [hub_information.device_id]
                     for remote_information in hub_information.remote_ids:
                         entity_cleanup_device_ids.append(remote_information.remote_id)
-                    delete_all_device_entities(hass, entity_cleanup_device_ids)
+                    delete_all_device_entities(hass, entity_cleanup_device_ids, this_platform)
 
                     descriptor = XTButtonEntityDescription(
                         key="xt_add_device",

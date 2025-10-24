@@ -7,6 +7,7 @@ from datetime import datetime
 from base64 import b64decode
 from homeassistant.util.dt import DEFAULT_TIME_ZONE
 from homeassistant.core import HomeAssistant
+from homeassistant.const import Platform
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers import device_registry as dr, entity_registry as er
 from homeassistant.helpers.entity import EntityDescription
@@ -275,7 +276,7 @@ def is_device_in_domain_device_maps(
     return False
 
 
-def delete_all_device_entities(hass: HomeAssistant, device_ids: list[str]):
+def delete_all_device_entities(hass: HomeAssistant, device_ids: list[str], platform: Platform | None = None):
     device_registry = dr.async_get(hass)
     entity_registry = er.async_get(hass)
     hass_devices: list[DeviceEntry] = []
@@ -291,7 +292,8 @@ def delete_all_device_entities(hass: HomeAssistant, device_ids: list[str]):
             include_disabled_entities=True,
         )
         for entity_entry in hass_entities:
-            entity_registry.async_remove(entity_entry.entity_id)
+            if platform is None or platform == entity_entry.platform:
+                entity_registry.async_remove(entity_entry.entity_id)
 
 
 # Decodes a b64-encoded timestamp

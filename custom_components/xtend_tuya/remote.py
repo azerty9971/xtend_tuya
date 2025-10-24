@@ -103,24 +103,7 @@ async def async_setup_entry(
                     entity_cleanup_device_ids: list[str] = [hub_information.device_id]
                     for remote_information in hub_information.remote_ids:
                         entity_cleanup_device_ids.append(remote_information.remote_id)
-                    delete_all_device_entities(hass, entity_cleanup_device_ids)
-
-                    descriptor = XTRemoteEntityDescription(
-                        key="xt_add_device",
-                        translation_key="xt_add_ir_device",
-                        ir_hub_information=hub_information,
-                        ir_remote_information=None,
-                        ir_key_information=None,
-                        entity_category=EntityCategory.CONFIG,
-                        entity_registry_enabled_default=True,
-                        entity_registry_visible_default=True,
-                    )
-                    entities.append(
-                        XTRemoteEntity.get_entity_instance(
-                            descriptor, hub_device, hass_data.manager
-                        )
-                    )
-
+                    delete_all_device_entities(hass, entity_cleanup_device_ids, this_platform)
                     for remote_information in hub_information.remote_ids:
                         if remote_device := hass_data.manager.device_map.get(
                             remote_information.remote_id
@@ -140,24 +123,6 @@ async def async_setup_entry(
                                     descriptor, remote_device, hass_data.manager
                                 )
                             )
-                            for remote_key in remote_information.keys:
-                                descriptor = XTRemoteEntityDescription(
-                                    key=remote_key.key,
-                                    translation_key="xt_generic_button",
-                                    translation_placeholders={
-                                        "name": remote_key.key
-                                    },
-                                    ir_hub_information=hub_information,
-                                    ir_remote_information=remote_information,
-                                    ir_key_information=remote_key,
-                                    entity_registry_enabled_default=True,
-                                    entity_registry_visible_default=True,
-                                )
-                                entities.append(
-                                    XTRemoteEntity.get_entity_instance(
-                                        descriptor, remote_device, hass_data.manager
-                                    )
-                                )
         async_add_entities(entities)
 
     @callback
