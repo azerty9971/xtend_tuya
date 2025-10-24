@@ -63,7 +63,9 @@ class XTConfigFlows:
         RESULT = "RESULT"
         SHOW_FORM = "SHOW_FORM"
 
-    def __init__(self, parent: ConfigEntryBaseFlow, config_entry: ConfigEntry | None = None) -> None:
+    def __init__(
+        self, parent: ConfigEntryBaseFlow, config_entry: ConfigEntry | None = None
+    ) -> None:
         self.config_entry = config_entry
         if self.config_entry is not None:
             self.options = self.config_entry.options
@@ -78,7 +80,9 @@ class XTConfigFlows:
         return self.parent.async_show_form(*args, **kwargs)
 
     @staticmethod
-    def _try_login_open_api(user_input: dict[str, Any]) -> tuple[dict[Any, Any], dict[str, Any]]:
+    def _try_login_open_api(
+        user_input: dict[str, Any],
+    ) -> tuple[dict[Any, Any], dict[str, Any]]:
         """Try login."""
         response = {}
 
@@ -180,64 +184,69 @@ class XTConfigFlows:
                         default_endpoint = country.endpoint
                         break
 
-        return (XTConfigFlows.XTStepResultType.SHOW_FORM, self.async_show_form(
-            step_id="configure",
-            data_schema=vol.Schema(
-                {
-                    vol.Optional(
-                        CONF_NO_OPENAPI,
-                        default=bool(
-                            user_input.get(
-                                CONF_NO_OPENAPI, self.options.get(CONF_NO_OPENAPI, "")
-                            )
+        return (
+            XTConfigFlows.XTStepResultType.SHOW_FORM,
+            self.async_show_form(
+                step_id="configure",
+                data_schema=vol.Schema(
+                    {
+                        vol.Optional(
+                            CONF_NO_OPENAPI,
+                            default=bool(
+                                user_input.get(
+                                    CONF_NO_OPENAPI,
+                                    self.options.get(CONF_NO_OPENAPI, ""),
+                                )
+                            ),
+                        ): bool,
+                        vol.Optional(
+                            CONF_COUNTRY_CODE,
+                            default=user_input.get(CONF_COUNTRY_CODE, default_country),
+                        ): vol.In(
+                            # We don't pass a dict {code:name} because country codes can be duplicate.
+                            [country.name for country in TUYA_COUNTRIES]
                         ),
-                    ): bool,
-                    vol.Optional(
-                        CONF_COUNTRY_CODE,
-                        default=user_input.get(CONF_COUNTRY_CODE, default_country),
-                    ): vol.In(
-                        # We don't pass a dict {code:name} because country codes can be duplicate.
-                        [country.name for country in TUYA_COUNTRIES]
-                    ),
-                    vol.Optional(
-                        CONF_ENDPOINT_OT,
-                        default=user_input.get(CONF_ENDPOINT_OT, default_endpoint),
-                    ): vol.In(
-                        {
-                            endpoint.value: endpoint.get_human_name(endpoint.value)
-                            for endpoint in TuyaCloudOpenAPIEndpoint
-                        }
-                    ),
-                    vol.Optional(
-                        CONF_ACCESS_ID_OT,
-                        default=user_input.get(
-                            CONF_ACCESS_ID_OT, self.options.get(CONF_ACCESS_ID_OT, "")
+                        vol.Optional(
+                            CONF_ENDPOINT_OT,
+                            default=user_input.get(CONF_ENDPOINT_OT, default_endpoint),
+                        ): vol.In(
+                            {
+                                endpoint.value: endpoint.get_human_name(endpoint.value)
+                                for endpoint in TuyaCloudOpenAPIEndpoint
+                            }
                         ),
-                    ): str,
-                    vol.Optional(
-                        CONF_ACCESS_SECRET_OT,
-                        default=user_input.get(
+                        vol.Optional(
+                            CONF_ACCESS_ID_OT,
+                            default=user_input.get(
+                                CONF_ACCESS_ID_OT,
+                                self.options.get(CONF_ACCESS_ID_OT, ""),
+                            ),
+                        ): str,
+                        vol.Optional(
                             CONF_ACCESS_SECRET_OT,
-                            self.options.get(CONF_ACCESS_SECRET_OT, ""),
-                        ),
-                    ): str,
-                    vol.Optional(
-                        CONF_USERNAME_OT,
-                        default=user_input.get(
-                            CONF_USERNAME_OT, self.options.get(CONF_USERNAME_OT, "")
-                        ),
-                    ): str,
-                    vol.Optional(
-                        CONF_PASSWORD_OT,
-                        default=user_input.get(
-                            CONF_PASSWORD_OT, self.options.get(CONF_PASSWORD_OT, "")
-                        ),
-                    ): str,
-                }
+                            default=user_input.get(
+                                CONF_ACCESS_SECRET_OT,
+                                self.options.get(CONF_ACCESS_SECRET_OT, ""),
+                            ),
+                        ): str,
+                        vol.Optional(
+                            CONF_USERNAME_OT,
+                            default=user_input.get(
+                                CONF_USERNAME_OT, self.options.get(CONF_USERNAME_OT, "")
+                            ),
+                        ): str,
+                        vol.Optional(
+                            CONF_PASSWORD_OT,
+                            default=user_input.get(
+                                CONF_PASSWORD_OT, self.options.get(CONF_PASSWORD_OT, "")
+                            ),
+                        ): str,
+                    }
+                ),
+                errors=errors,
+                description_placeholders=placeholders,
             ),
-            errors=errors,
-            description_placeholders=placeholders,
-        ))
+        )
 
 
 class TuyaOptionFlow(OptionsFlowWithReload):
@@ -253,7 +262,9 @@ class TuyaOptionFlow(OptionsFlowWithReload):
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
-        result_type, data = await XTConfigFlows(self, self.xt_config_entry).async_step_configure(user_input=user_input)
+        result_type, data = await XTConfigFlows(
+            self, self.xt_config_entry
+        ).async_step_configure(user_input=user_input)
         match result_type:
             case XTConfigFlows.XTStepResultType.SHOW_FORM:
                 data = cast(ConfigFlowResult, data)
@@ -261,11 +272,12 @@ class TuyaOptionFlow(OptionsFlowWithReload):
             case XTConfigFlows.XTStepResultType.RESULT:
                 data = cast(dict[str, str], data)
                 return self.async_create_entry(title="", data=data)
-    
+
     async def async_step_configure(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
         return await self.async_step_init(user_input=user_input)
+
 
 class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
     """Tuya config flow."""
@@ -334,14 +346,20 @@ class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
     async def async_step_configure(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
-        result_type, data = await XTConfigFlows(self, config_entry=None).async_step_configure(user_input=user_input)
+        result_type, data = await XTConfigFlows(
+            self, config_entry=None
+        ).async_step_configure(user_input=user_input)
         match result_type:
             case XTConfigFlows.XTStepResultType.SHOW_FORM:
                 data = cast(ConfigFlowResult, data)
                 return data
             case XTConfigFlows.XTStepResultType.RESULT:
                 data = cast(dict[str, str], data)
-                return self.async_create_entry(title=self.config_entry_title, data=self.config_entry_data, options=data)
+                return self.async_create_entry(
+                    title=self.config_entry_title,
+                    data=self.config_entry_data,
+                    options=data,
+                )
 
     async def async_step_scan(
         self, user_input: dict[str, Any] | None = None
