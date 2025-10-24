@@ -267,6 +267,7 @@ class XTRemoteEntity(XTEntity, RemoteEntity):  # type: ignore
                 self.entity_description.ir_remote_information,
                 self.entity_description.ir_hub_information,
                 command,
+                command,
                 timeout,
             ):
                 need_refresh = True
