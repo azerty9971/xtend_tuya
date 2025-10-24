@@ -242,6 +242,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
 
         for device in device_map:
             device_open_api = self.get_open_api_device(device)
+            self.multi_manager.device_watcher.report_message(device.id, f"device_open_api: {device_open_api}", device)
             # self.multi_manager.device_watcher.report_message(device_id, f"About to merge {device}\r\n\r\nand\r\n\r\n{device_open_api}", device)
             XTMergingManager.merge_devices(device, device_open_api, self.multi_manager)
             self.multi_manager.virtual_state_handler.apply_init_virtual_states(device)
@@ -257,7 +258,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         if biz_code == BIZCODE_BIND_USER:
             self.multi_manager.add_device_by_id(data["devId"])
             return None
-            
+
         return super()._on_device_other(device_id, biz_code, data)
 
     def add_device_by_id(self, device_id: str):
@@ -590,7 +591,9 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         remote_keys = api.get(f"/v2.0/infrareds/{hub_id}/remotes/{remote_id}/keys")
         if remote_keys.get("success", False) is False:
             return return_list
-        learning_codes = api.get(f"/v2.0/infrareds/{hub_id}/remotes/{remote_id}/learning-codes")
+        learning_codes = api.get(
+            f"/v2.0/infrareds/{hub_id}/remotes/{remote_id}/learning-codes"
+        )
         learning_codes_dict: dict[int, dict[str, Any]] = {}
         if learning_codes.get("success", False):
             learning_code_results: list[dict] = learning_codes.get("result", [])
@@ -617,7 +620,12 @@ class XTIOTDeviceManager(TuyaDeviceManager):
             ):
                 continue
             key_information = XTIRRemoteKeysInformation(
-                key=key, key_id=key_id, key_name=key_name, standard_key=standard_key, learn_id=learn_id, code=code
+                key=key,
+                key_id=key_id,
+                key_name=key_name,
+                standard_key=standard_key,
+                learn_id=learn_id,
+                code=code,
             )
             return_list.append(key_information)
         return return_list
@@ -658,7 +666,9 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         delete_ir_command = api.delete(
             f"/v2.0/infrareds/{hub.device_id}/learning-codes/{key.learn_id}",
         )
-        if delete_ir_command.get("success", False) and delete_ir_command.get("result", False):
+        if delete_ir_command.get("success", False) and delete_ir_command.get(
+            "result", False
+        ):
             return True
         return False
 
@@ -723,8 +733,8 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                 "remote_name": remote_name,
                 "brand_id": brand_id,
                 "brand_name": brand_name,
-                "remote_index": int(datetime.datetime.now().timestamp())
-            }
+                "remote_index": int(datetime.datetime.now().timestamp()),
+            },
         )
         if ir_device_create_response.get("success", False) is True:
             new_device_id = ir_device_create_response.get("result")
