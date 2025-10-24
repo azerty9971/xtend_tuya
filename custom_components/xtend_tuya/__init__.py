@@ -20,6 +20,10 @@ from .multi_manager.multi_manager import (
 from .multi_manager.shared.shared_classes import (
     HomeAssistantXTData,
 )
+from .multi_manager.shared.threading import (
+    XTEventLoopProtector,
+    XTConcurrencyManager,
+)
 from .util import get_config_entry_runtime_data, is_device_in_domain_device_maps
 from .multi_manager.shared.services.services import (
     ServiceManager,
@@ -43,13 +47,20 @@ async def update_listener(hass: HomeAssistant, entry: XTConfigEntry):
 
 async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
     """Async setup hass config entry."""
+    XTEventLoopProtector.hass = hass
+    XTConcurrencyManager.hass = hass
     start_time = datetime.now()
+    last_time = start_time
     multi_manager = MultiManager(hass, entry)
     service_manager = ServiceManager(multi_manager=multi_manager)
+    last_time = datetime.now()
     await multi_manager.setup_entry()
+    LOGGER.debug(f"Xtended Tuya {entry.title} {datetime.now() - last_time} for setup_entry")
 
     # Get all devices from Tuya
-    await hass.async_add_executor_job(multi_manager.update_device_cache)
+    last_time = datetime.now()
+    await multi_manager.update_device_cache()
+    LOGGER.debug(f"Xtended Tuya {entry.title} {datetime.now() - last_time} for update_device_cache")
 
     # Connection is successful, store the manager & listener
     entry.runtime_data = HomeAssistantXTData(
@@ -59,16 +70,21 @@ async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
     )
 
     # Cleanup device registry
-    await cleanup_device_registry(hass, multi_manager, entry)
+    last_time = datetime.now()
+    XTEventLoopProtector.execute_out_of_event_loop(cleanup_device_registry, hass, multi_manager, entry)
+    LOGGER.debug(f"Xtended Tuya {entry.title} {datetime.now() - last_time} for cleanup_device_registry")
 
     # Register known device IDs
+    last_time = datetime.now()
     device_registry = dr.async_get(hass)
     aggregated_device_map = multi_manager.device_map
     for device in aggregated_device_map.values():
         XTEntity.mark_overriden_entities_as_disables(hass, device)
         XTEntity.register_current_entities_as_handled_dpcode(hass, device)
         multi_manager.virtual_state_handler.apply_init_virtual_states(device)
+    LOGGER.debug(f"Xtended Tuya {entry.title} {datetime.now() - last_time} for device id registration")
 
+    last_time = datetime.now()
     for device in aggregated_device_map.values():
         domain_identifiers: list = multi_manager.get_domain_identifiers_of_device(
             device.id
@@ -86,17 +102,33 @@ async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
             name=device.name,
             model=f"{device.product_name} (unsupported)",
         )
+    LOGGER.debug(f"Xtended Tuya {entry.title} {datetime.now() - last_time} for create device")
 
+    last_time = datetime.now()
     await multi_manager.setup_entity_parsers()
+    LOGGER.debug(f"Xtended Tuya {entry.title} {datetime.now() - last_time} for setup_entity_parsers")
 
+    last_time = datetime.now()
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+    LOGGER.debug(f"Xtended Tuya {entry.title} {datetime.now() - last_time} for async_forward_entry_setups")
 
     # If the device does not register any entities, the device does not need to subscribe
     # So the subscription is here
-    await hass.async_add_executor_job(multi_manager.refresh_mq)
+    last_time = datetime.now()
+    await XTEventLoopProtector.execute_out_of_event_loop_and_return(multi_manager.refresh_mq)
+    LOGGER.debug(f"Xtended Tuya {entry.title} {datetime.now() - last_time} for refresh_mq")
+
+    last_time = datetime.now()
     service_manager.register_services()
-    hass.async_create_task(cleanup_duplicated_devices(hass, entry))
+    LOGGER.debug(f"Xtended Tuya {entry.title} {datetime.now() - last_time} for register_services")
+
+    last_time = datetime.now()
+    XTEventLoopProtector.execute_out_of_event_loop(cleanup_duplicated_devices, hass, entry)
+    LOGGER.debug(f"Xtended Tuya {entry.title} {datetime.now() - last_time} for cleanup_duplicated_devices")
+
+    last_time = datetime.now()
     await multi_manager.on_loading_finalized(hass, entry)
+    LOGGER.debug(f"Xtended Tuya {entry.title} {datetime.now() - last_time} for on_loading_finalized")
     LOGGER.debug(f"Xtended Tuya {entry.title} loaded in {datetime.now() - start_time}")
     return True
 
@@ -197,7 +229,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
             if tuya.manager.mq is not None:
                 tuya.manager.mq.stop()
             tuya.manager.remove_device_listeners()
-            await hass.async_add_executor_job(tuya.manager.unload)
+            await XTEventLoopProtector.execute_out_of_event_loop_and_return(tuya.manager.unload)
     return unload_ok
 
 
@@ -208,4 +240,4 @@ async def async_remove_entry(hass: HomeAssistant, entry: XTConfigEntry) -> None:
     """
     runtime_data = get_config_entry_runtime_data(hass, entry, DOMAIN)
     if runtime_data:
-        await hass.async_add_executor_job(runtime_data.device_manager.unload)
+        await XTEventLoopProtector.execute_out_of_event_loop_and_return(runtime_data.device_manager.unload)

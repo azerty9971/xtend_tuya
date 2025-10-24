@@ -36,15 +36,15 @@ class XTSharingDeviceRepository(DeviceRepository):
 
         # Now convert the status_range and function to XT format
         for code in device.status_range:
-            device.status_range[code] = (
+            device.status_range[code] = (  # type: ignore
                 XTDeviceStatusRange.from_compatible_status_range(
                     device.status_range[code]
                 )
-            )  # type: ignore
+            )
         for code in device.function:
-            device.function[code] = XTDeviceFunction.from_compatible_function(
+            device.function[code] = XTDeviceFunction.from_compatible_function(  # type: ignore
                 device.function[code]
-            )  # type: ignore
+            )
 
     def query_devices_by_home(self, home_id: str) -> list[CustomerDevice]:
         response = self.api.get("/v1.0/m/life/ha/home/devices", {"homeId": home_id})
@@ -104,31 +104,7 @@ class XTSharingDeviceRepository(DeviceRepository):
             device.local_strategy = dp_id_map  # CHANGED
 
     def update_device_strategy_info(self, device: CustomerDevice):
-        # super().update_device_strategy_info(device)
         self._update_device_strategy_info_mod(device)
-        # Sometimes the Type provided by Tuya is ill formed,
-        # replace it with the one from the local strategy
-        # for loc_strat in device.local_strategy.values():
-        #     if "statusCode" not in loc_strat or "valueType" not in loc_strat:
-        #         continue
-        #     code = loc_strat["statusCode"]
-        #     value_type = loc_strat["valueType"]
-
-        #     if code in device.status_range:
-        #         device.status_range[code].type = value_type
-        #     if code in device.function:
-        #         device.function[code].type     = value_type
-
-        #     if (
-        #         "valueDesc"  in loc_strat and
-        #         code not in device.status_range and
-        #         code not in device.function
-        #         ):
-        #         device.status_range[code] = DeviceStatusRange()   #CHANGED
-        #         device.status_range[code].code   = code
-        #         device.status_range[code].type   = value_type
-        #         device.status_range[code].values = loc_strat["valueDesc"]
-
         self.multi_manager.virtual_state_handler.apply_init_virtual_states(device)  # type: ignore
 
     def send_commands(self, device_id: str, commands: list[dict[str, Any]]):

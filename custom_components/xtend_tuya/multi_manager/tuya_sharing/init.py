@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import Optional, Literal, Any
 import json
+from datetime import datetime
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady
@@ -62,6 +63,9 @@ from .ha_tuya_integration.platform_descriptors import get_tuya_platform_descript
 from ..multi_manager import (
     MultiManager,
 )
+from ..shared.threading import (
+    XTEventLoopProtector,
+)
 from ...const import (
     DOMAIN,
     MESSAGE_SOURCE_TUYA_SHARING,
@@ -97,15 +101,16 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
         hass: HomeAssistant,
         config_entry: XTConfigEntry,
         multi_manager: MultiManager,
-    ) -> bool:
+    ) -> None:
+        last_time = datetime.now()
         self.multi_manager: MultiManager = multi_manager
         self.hass = hass
         self.sharing_account: TuyaSharingData | None = await self._init_from_entry(
             hass, config_entry
         )
         if self.sharing_account:
-            return True
-        return False
+            self.multi_manager.register_account(self)
+        LOGGER.debug(f"Xtended Tuya {config_entry.title} {datetime.now() - last_time} for setup_from_entry {self.get_type_name()}")
 
     async def _init_from_entry(
         self, hass: HomeAssistant, config_entry: XTConfigEntry
@@ -169,19 +174,19 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
             sharing_device_manager.customer_api
         )
         sharing_device_manager.add_device_listener(
-            self.multi_manager.multi_device_listener
-        )  # type: ignore
+            self.multi_manager.multi_device_listener # type: ignore
+        )
         return TuyaSharingData(
             device_manager=sharing_device_manager,
             device_ids=[],
             ha_tuya_integration_config_manager=ha_tuya_integration_config_manager,
         )
 
-    def update_device_cache(self):
+    async def update_device_cache(self):
         if self.sharing_account is None:
             return None
         try:
-            self.sharing_account.device_manager.update_device_cache()
+            await XTEventLoopProtector.execute_out_of_event_loop_and_return(self.sharing_account.device_manager.update_device_cache)
             new_device_ids: list[str] = [
                 device_id
                 for device_id in self.sharing_account.device_manager.device_map
@@ -227,8 +232,8 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
         if self.sharing_account is None:
             return None
         self.sharing_account.device_manager.remove_device_listener(
-            self.multi_manager.multi_device_listener
-        )  # type: ignore
+            self.multi_manager.multi_device_listener # type: ignore
+        )
 
     def unload(self):
         for decorator in self.tuya_integration_decorator:
@@ -289,17 +294,22 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
             return return_list
         return None
 
-    def on_add_device(self, device: XTDevice) -> list[str] | None:
+    def get_add_device_signal_list(self, device_id: str) -> list[str] | None:
         return_list: list[str] = []
         if self.sharing_account is None:
             return None
-        if device.id in self.sharing_account.device_ids:
+        if device_id in self.sharing_account.device_ids:
             return_list.append(TUYA_DISCOVERY_NEW)
         if self.sharing_account.device_manager.reuse_config:
             return_list.append(TUYA_DISCOVERY_NEW_ORIG)
         if return_list:
             return return_list
         return None
+    
+    def add_device_by_id(self, device_id: str):
+        if self.sharing_account is None:
+            return None
+        self.sharing_account.device_manager.add_device_by_id(device_id)
 
     def on_mqtt_stop(self):
         if (

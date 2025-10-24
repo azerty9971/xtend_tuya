@@ -3,6 +3,7 @@ This file contains all the code that inherit from Tuya integration
 """
 
 from __future__ import annotations
+import time
 from typing import Any
 from tuya_sharing.manager import (
     Manager,
@@ -11,6 +12,7 @@ from tuya_sharing.manager import (
     CustomerApi,
     BIZCODE_OFFLINE,
     BIZCODE_ONLINE,
+    BIZCODE_BIND_USER,
 )
 from tuya_sharing.home import (
     SmartLifeHome,
@@ -46,9 +48,9 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
         self.device_repository: dr.XTSharingDeviceRepository | None = None
         self.scene_repository: SceneRepository | None = None
         self.user_repository: UserRepository | None = None
-        self.device_map: XTDeviceMap = XTDeviceMap(
+        self.device_map: XTDeviceMap = XTDeviceMap( # type: ignore
             {}, XTDeviceSourcePriority.TUYA_SHARED
-        )  # type: ignore
+        )
         self.user_homes: list[SmartLifeHome] = []
         self.device_listeners = set()
         self.__other_device_manager: Manager | None = None
@@ -146,13 +148,30 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
             device_id,
             f"[{MESSAGE_SOURCE_TUYA_SHARING}]On device other: {biz_code} <=> {data}",
         )
-        super()._on_device_other(device_id, biz_code, data)
+        if biz_code == BIZCODE_BIND_USER:
+            self.multi_manager.add_device_by_id(device_id)
+        else:
+            super()._on_device_other(device_id, biz_code, data)
         if biz_code in [BIZCODE_ONLINE, BIZCODE_OFFLINE]:
             self.multi_manager.update_device_online_status(device_id)
+    
+    def add_device_by_id(self, device_id: str):
+        device_ids = [device_id]
+        # wait for es sync
+        time.sleep(1)
+
+        self._update_device_list_info_cache(device_ids)
+
+        if device_id in self.device_map.keys():
+            device = self.device_map.get(device_id)
+            if device is not None and self.mq is not None:
+                self.mq.subscribe_device(device_id, device)
+                for listener in self.device_listeners:
+                    listener.add_device(device)
 
     def _on_device_report(self, device_id: str, status: list):
         self.multi_manager.device_watcher.report_message(
-            device_id, f"[IOT]On device report: {status}"
+            device_id, f"[{MESSAGE_SOURCE_TUYA_SHARING}]On device report: {status}"
         )
         device = self.device_map.get(device_id, None)
         if not device:

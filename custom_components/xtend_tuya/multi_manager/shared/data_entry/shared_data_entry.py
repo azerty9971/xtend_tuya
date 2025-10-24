@@ -15,6 +15,9 @@ from homeassistant.helpers.typing import (
 from ....const import (
     DOMAIN,
 )
+from ..threading import (
+    XTEventLoopProtector,
+)
 import custom_components.xtend_tuya.multi_manager.multi_manager as mm
 
 
@@ -58,15 +61,14 @@ class XTDataEntryManager(ABC):
     @callback
     def show_user_input(self):
         self.flow_data.processing_class = self
-        self.hass.async_create_task(
-            self.hass.config_entries.flow.async_init(
-                DOMAIN,
-                context=ConfigFlowContext(
-                    source=self.source,
-                    title_placeholders=self.get_translation_placeholders(),
-                ),
-                data=self.flow_data,
-            )
+        XTEventLoopProtector.execute_out_of_event_loop(
+            self.hass.config_entries.flow.async_init,
+            DOMAIN,
+            context=ConfigFlowContext(
+                source=self.source,
+                title_placeholders=self.get_translation_placeholders(),
+            ),
+            data=self.flow_data,
         )
 
     def get_translation_placeholders(self) -> dict[str, str]:

@@ -7,6 +7,9 @@ from .multi_manager.multi_manager import (
     XTConfigEntry,
     MultiManager,
 )
+from .multi_manager.shared.threading import (
+    XTEventLoopProtector,
+)
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaSceneEntity,
     TuyaScene,
@@ -26,7 +29,7 @@ async def async_setup_entry(
     if hass_data.manager is None:
         return
 
-    scenes = await hass.async_add_executor_job(hass_data.manager.query_scenes)
+    scenes = await XTEventLoopProtector.execute_out_of_event_loop_and_return(hass_data.manager.query_scenes)
     async_add_entities(
         XTSceneEntity(hass_data.manager, XTScene(**scene.__dict__)) for scene in scenes
     )

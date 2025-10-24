@@ -20,10 +20,12 @@
                 "title": "New IR key for {device_name}",
                 "description": "Enter the name of the new key, then press Submit then point your remote to the hub and hit the key on your remote",
                 "data": {
-                    "new_ir_key_name": "New key name"
+                    "new_ir_key_human": "New key display name",
+                    "new_ir_key_technical": "New key technical name"
                 },
                 "data_description": {
-                    "new_ir_key_name": "The name of the key to add to the IR device."
+                    "new_ir_key_human": "The display text of the new key that will be added to the IR device.",
+                    "new_ir_key_technical": "The technical name of the new key that will be added to the IR device."
                 }
             },
             "ir_add_device": {
@@ -32,6 +34,18 @@
                 "data": {
                     "new_ir_device_name": "New device name"
                 }
+            },
+            "configure": {
+                "description": "Add a Tuya OpenAPI credential to improve the compatibility with some Tuya devices. Please follow the guide at [this URL](https://github.com/azerty9971/xtend_tuya/blob/main/docs/cloud_credentials.md)",
+                "data": {
+                    "no_openapi": "Don't ask for OpenAPI credentials",
+                    "country_code": "Country",
+                    "access_id": "Tuya IoT Access ID",
+                    "access_secret": "Tuya IoT Access Secret",
+                    "username": "SmartLife/Tuya account",
+                    "password": "SmartLife/Tuya account password"
+                },
+                "title": "Add Tuya OpenAPI credentials"
             }
         },
         "error": {
@@ -41,13 +55,15 @@
         "abort": {
             "reauth_successful": "Reauthentication successful",
             "ir_add_key_success": "IR key {key_name} has been added to {device_name}",
-            "ir_add_key_failed": "Could not add {key_name} to {device_name}"
+            "ir_add_key_failed": "Could not add {key_name} to {device_name}",
+            "ir_add_device_success": "IR device {remote_name} has been added to {device_name}",
+            "ir_add_device_failed": "Could not add {remote_name} to {device_name}"
         }
     },
     "options": {
         "step": {
-            "init": {
-                "description": "Add a Tuya OpenAPI credential to improve the compatibility with some Tuya devices",
+            "configure": {
+                "description": "Add a Tuya OpenAPI credential to improve the compatibility with some Tuya devices. Please follow the guide at [this URL](https://github.com/azerty9971/xtend_tuya/blob/main/docs/cloud_credentials.md)",
                 "data": {
                     "no_openapi": "Don't ask for OpenAPI credentials",
                     "country_code": "Country",
@@ -727,6 +743,11 @@
             },
             "deo_end_time": {
                 "name": "Deo end time"
+            }
+        },
+        "remote": {
+            "xt_generic_remote": {
+                "name": "{name}"
             }
         },
         "select": {
@@ -2683,12 +2704,12 @@
             }
         },
         "tuya_iot_failed_login": {
-            "title": "Tuya OpenAPI login failed",
+            "title": "Tuya OpenAPI credentials expired",
             "fix_flow": {
                 "step": {
                     "confirm": {
-                        "description": "The integration \"{name}\" (`{config_entry_id}`) could not connect to the Tuya OpenAPI service (failed login)\n\nTo fix this error please follow the guide at [this URL](https://github.com/azerty9971/xtend_tuya/blob/main/docs/renew_cloud_credentials.md), then restart Home Assistant.",
-                        "title": "Tuya OpenAPI login failed"
+                        "description": "The integration \"{name}\" (`{config_entry_id}`) could not connect to the Tuya OpenAPI service (credentials expired)\n\nTo fix this error please follow the guide at [this URL](https://github.com/azerty9971/xtend_tuya/blob/main/docs/renew_cloud_credentials.md), then restart Home Assistant.",
+                        "title": "Tuya OpenAPI credentials expired"
                     }
                 }
             }

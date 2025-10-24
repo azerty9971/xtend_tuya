@@ -420,12 +420,12 @@ class XTBinarySensorEntity(XTEntity, TuyaBinarySensorEntity):
         super(XTBinarySensorEntity, self).__init__(device, device_manager, description)
         super(XTEntity, self).__init__(
             device,
-            device_manager,
+            device_manager, # type: ignore
             description,
             _get_bitmap_bit_mask(
                 device, description.dpcode or description.key, description.bitmap_key
             ),
-        )  # type: ignore
+        )
         self.device = device
         self.device_manager = device_manager
         self._entity_description = description

@@ -40,16 +40,16 @@ class XTLightEntityDescription(TuyaLightEntityDescription):
 
     brightness_max: TuyaDPCode | XTDPCode | None = None  # type: ignore
     brightness_min: TuyaDPCode | XTDPCode | None = None  # type: ignore
-    brightness: (
+    brightness: ( # type: ignore
         TuyaDPCode | tuple[TuyaDPCode, ...] | XTDPCode | tuple[XTDPCode, ...] | None
-    ) = None  # type: ignore
-    color_data: (
+    ) = None
+    color_data: ( # type: ignore
         TuyaDPCode | tuple[TuyaDPCode, ...] | XTDPCode | tuple[XTDPCode, ...] | None
-    ) = None  # type: ignore
+    ) = None
     color_mode: TuyaDPCode | XTDPCode | None = None  # type: ignore
-    color_temp: (
+    color_temp: ( # type: ignore
         TuyaDPCode | tuple[TuyaDPCode, ...] | XTDPCode | tuple[XTDPCode, ...] | None
-    ) = None  # type: ignore
+    ) = None
 
     def get_entity_instance(
         self,

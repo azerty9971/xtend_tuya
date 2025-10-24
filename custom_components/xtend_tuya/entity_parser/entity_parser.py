@@ -7,6 +7,9 @@ from abc import abstractmethod
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from ..const import LOGGER
+from ..multi_manager.shared.threading import (
+    XTEventLoopProtector,
+)
 import custom_components.xtend_tuya.multi_manager.multi_manager as mm
 
 
@@ -23,8 +26,7 @@ class XTCustomEntityParser:
         hass: HomeAssistant, multi_manager: mm.MultiManager
     ) -> None:
         # Load all the plugins
-        # subdirs = await self.hass.async_add_executor_job(os.listdir, os.path.dirname(__file__))
-        subdirs = await hass.async_add_executor_job(
+        subdirs = await XTEventLoopProtector.execute_out_of_event_loop_and_return(
             partial(os.listdir, path=os.path.dirname(__file__))
         )
         for directory in subdirs:
@@ -33,7 +35,7 @@ class XTCustomEntityParser:
             if os.path.isdir(os.path.dirname(__file__) + os.sep + directory):
                 load_path = f".{directory}.init"
                 try:
-                    plugin = await hass.async_add_executor_job(
+                    plugin = await XTEventLoopProtector.execute_out_of_event_loop_and_return(
                         partial(
                             importlib.import_module, name=load_path, package=__package__
                         )

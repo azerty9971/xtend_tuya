@@ -39,7 +39,7 @@ from homeassistant.components.event import (
 
 try:
     from homeassistant.components.tuya.event import (
-        EVENTS as EVENTS_TUYA,  # noqa: F401
+        EVENTS as EVENTS_TUYA,  # noqa: F401 # type: ignore
         TuyaEventEntity as TuyaEventEntity,
     )
 except Exception:

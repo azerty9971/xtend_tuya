@@ -127,7 +127,8 @@ class XTIOTOpenMQ(TuyaOpenMQ):
         url = urlsplit(mq_config.url)
         if url.scheme == "ssl":
             mqttc.tls_set()
-
+        
+        LOGGER.debug(f"Connecting MQTT: '{url.hostname}':'{url.port}' ")
         mqttc.connect(url.hostname, url.port)
 
         mqttc.loop_start()

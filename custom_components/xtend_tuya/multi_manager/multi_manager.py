@@ -28,7 +28,8 @@ from .shared.shared_classes import (
     XTDevice,
 )
 from .shared.threading import (
-    XTThreadingManager,
+    XTConcurrencyManager,
+    XTEventLoopProtector,
 )
 from .shared.debug.debug_helper import (
     DebugHelper,
@@ -104,6 +105,9 @@ class MultiManager:  # noqa: F811
     def mq(self):
         return self.multi_mqtt_queue
 
+    def register_account(self, instance: XTDeviceManagerInterface):
+        self.accounts[instance.get_type_name()] = instance
+
     def get_account_by_name(
         self, account_name: str | None
     ) -> XTDeviceManagerInterface | None:
@@ -113,28 +117,33 @@ class MultiManager:  # noqa: F811
 
     async def setup_entry(self) -> None:
         # Load all the plugins
-        # subdirs = await self.hass.async_add_executor_job(os.listdir, os.path.dirname(__file__))
         subdirs = AllowedPlugins.get_plugins_to_load()
+        concurrency_manager = XTConcurrencyManager()
         for directory in subdirs:
             if os.path.isdir(os.path.dirname(__file__) + os.sep + directory):
                 load_path = f".{directory}.init"
                 try:
-                    plugin = await self.hass.async_add_executor_job(
-                        partial(
-                            importlib.import_module, name=load_path, package=__package__
+                    plugin = (
+                        await XTEventLoopProtector.execute_out_of_event_loop_and_return(
+                            partial(
+                                importlib.import_module,
+                                name=load_path,
+                                package=__package__,
+                            )
                         )
                     )
                     LOGGER.debug(f"Plugin {load_path} loaded")
                     instance: XTDeviceManagerInterface = plugin.get_plugin_instance()
-                    if await instance.setup_from_entry(
-                        self.hass, self.config_entry, self
-                    ):
-                        self.accounts[instance.get_type_name()] = instance
+                    concurrency_manager.add_coroutine(
+                        instance.setup_from_entry(self.hass, self.config_entry, self)
+                    )
                 except ModuleNotFoundError as e:
                     LOGGER.error(f"Loading module failed: {e}")
-
+        await concurrency_manager.gather()
         for account in self.accounts.values():
-            await self.hass.async_add_executor_job(account.on_post_setup)
+            await XTEventLoopProtector.execute_out_of_event_loop_and_return(
+                account.on_post_setup
+            )
 
     async def setup_entity_parsers(self) -> None:
         await XTCustomEntityParser.setup_entity_parsers(self.hass, self)
@@ -164,29 +173,25 @@ class MultiManager:  # noqa: F811
                 return_list.append(new_descriptors)
         return return_list
 
-    def update_device_cache(self):
+    async def update_device_cache(self):
         self.is_ready_for_messages = False
         XTDeviceMap.clear_master_device_map()
-        thread_manager: XTThreadingManager = XTThreadingManager()
+        concurrency_manager = XTConcurrencyManager()
 
-        def update_device_cache_thread(manager: XTDeviceManagerInterface) -> None:
-            manager.update_device_cache()
-
-            # New devices have been created in their own device maps
-            # let's convert them to XTDevice
-            for device_map in manager.get_available_device_maps():
-                for device_id in device_map:
-                    device_map[device_id] = manager.convert_to_xt_device(
-                        device_map[device_id], device_map.device_source_priority
-                    )
+        async def update_manager_device_cache(
+            manager: XTDeviceManagerInterface,
+        ) -> None:
+            await manager.update_device_cache()
 
         for manager in self.accounts.values():
-            thread_manager.add_thread(update_device_cache_thread, manager=manager)
+            concurrency_manager.add_coroutine(
+                update_manager_device_cache(manager=manager)
+            )
 
-        thread_manager.start_and_wait()
+        await concurrency_manager.gather()
 
         # Register all devices in the master device map
-        self._update_master_device_map()
+        self.update_master_device_map()
 
         # Now let's aggregate all of these devices into a single
         # "All functionnality" device
@@ -204,10 +209,17 @@ class MultiManager:  # noqa: F811
             self.on_message(messages[0], messages[1])
         self.pending_messages.clear()
 
-    def _update_master_device_map(self):
+    def update_master_device_map(self):
         for manager in self.accounts.values():
             for device_map in manager.get_available_device_maps():
                 for device_id in device_map:
+                    
+                    # New devices have been created in their own device maps
+                    # let's convert them to XTDevice
+                    device_map[device_id] = manager.convert_to_xt_device(
+                        device_map[device_id], device_map.device_source_priority
+                    )
+                    
                     if device_id not in self.master_device_map:
                         self.master_device_map[device_id] = device_map[device_id]
 
@@ -382,6 +394,11 @@ class MultiManager:  # noqa: F811
         if source in self.accounts:
             self.accounts[source].on_message(new_message)
 
+    def add_device_by_id(self, device_id: str):
+        for account in self.accounts.values():
+            account.add_device_by_id(device_id)
+        self.update_master_device_map()
+
     def _get_device_id_from_message(self, msg: dict) -> str | None:
         protocol = msg.get("protocol", 0)
         data = msg.get("data", {})
@@ -489,7 +506,9 @@ class MultiManager:  # noqa: F811
             old_online_status = device.online
             for online_status in device.online_states:
                 device.online = device.online_states[online_status]
-                if device.online:  # Prefer to be more On than Off if multiple state are not in accordance
+                if (
+                    device.online
+                ):  # Prefer to be more On than Off if multiple state are not in accordance
                     break
             if device.online != old_online_status:
                 self.multi_device_listener.update_device(device, None)
@@ -529,6 +548,34 @@ class MultiManager:  # noqa: F811
             if ir_device_information is not None:
                 return ir_device_information
 
+    def get_ir_category_list(self, device: XTDevice) -> dict[int, str]:
+        for account in self.accounts.values():
+            if account_list := account.get_ir_category_list(device):
+                return account_list
+        return {}
+
+    def get_ir_brand_list(self, device: XTDevice, category_id: int) -> dict[int, str]:
+        for account in self.accounts.values():
+            if account_list := account.get_ir_brand_list(device, category_id):
+                return account_list
+        return {}
+
+    def create_ir_device(
+        self,
+        device: XTDevice,
+        remote_name: str,
+        category_id: int,
+        brand_id: int,
+        brand_name: str,
+    ) -> str | None:
+        for account in self.accounts.values():
+            device_id = account.create_ir_device(
+                device, remote_name, category_id, brand_id, brand_name
+            )
+            if device_id is not None:
+                return device_id
+        return None
+
     def send_ir_command(
         self,
         device: XTDevice,
@@ -546,10 +593,24 @@ class MultiManager:  # noqa: F811
         device: XTDevice,
         remote: XTIRRemoteInformation,
         hub: XTIRHubInformation,
+        key: str,
         key_name: str,
+        timeout: int | None = None
     ) -> bool:
         for account in self.accounts.values():
-            if account.learn_ir_key(device, remote, hub, key_name):
+            if account.learn_ir_key(device, remote, hub, key, key_name, timeout):
+                return True
+        return False
+    
+    def delete_ir_key(
+        self,
+        device: XTDevice,
+        key: XTIRRemoteKeysInformation,
+        remote: XTIRRemoteInformation,
+        hub: XTIRHubInformation
+    ):
+        for account in self.accounts.values():
+            if account.delete_ir_key(device, key, remote, hub):
                 return True
         return False
 
