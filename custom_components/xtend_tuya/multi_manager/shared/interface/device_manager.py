@@ -70,6 +70,15 @@ class XTDeviceManagerInfraRedInterface(ABC):
     ) -> bool:
         return False
     
+    def delete_ir_key(
+        self,
+        device: shared.XTDevice,
+        key: XTIRRemoteKeysInformation,
+        remote: XTIRRemoteInformation,
+        hub: XTIRHubInformation
+    ) -> bool:
+        return False
+    
     def get_ir_category_list(self, device: shared.XTDevice) -> dict[int, str]:
         return {}
     

@@ -442,6 +442,17 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
         return self.iot_account.device_manager.learn_ir_key(
             device, remote, hub, key, key_name, timeout
         )
+    
+    def delete_ir_key(
+        self,
+        device: XTDevice,
+        key: XTIRRemoteKeysInformation,
+        remote: XTIRRemoteInformation,
+        hub: XTIRHubInformation
+    ) -> bool:
+        if self.iot_account is None:
+            return False
+        return self.iot_account.device_manager.delete_ir_key(device, key, remote, hub)
 
     def get_platform_descriptors_to_merge(self, platform: Platform) -> Any:
         pass

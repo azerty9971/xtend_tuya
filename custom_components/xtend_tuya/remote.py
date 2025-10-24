@@ -279,7 +279,27 @@ class XTRemoteEntity(XTEntity, RemoteEntity):  # type: ignore
                 )
 
     async def async_delete_command(self, **kwargs: Any) -> None:
-        LOGGER.warning(f"async_delete_command => {self.device.name} <=> {kwargs}")
+        command_list: list[str] = kwargs.get(ATTR_COMMAND, [])
+        if self.entity_description.ir_remote_information is None:
+            return None
+        key_deleted: bool = False
+        for single_command in command_list:
+            single_command = single_command.lower()
+            for key in self.entity_description.ir_remote_information.keys:
+                if key.key.lower() == single_command:
+                    XTEventLoopProtector.execute_out_of_event_loop(
+                        self.device_manager.delete_ir_key,
+                        self.device,
+                        key,
+                        self.entity_description.ir_remote_information,
+                        self.entity_description.ir_hub_information,
+                    )
+                    key_deleted = True
+        if key_deleted is False:
+            LOGGER.error(
+                f"Could not delete the IR keys {command_list} for device {self.device.name}: Commands not in device listed commands: {self.entity_description.ir_remote_information.keys}"
+            )
+        
 
     async def async_turn_on(self, **kwargs: Any) -> None:
         """Turn the entity on."""

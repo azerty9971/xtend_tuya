@@ -601,6 +601,18 @@ class MultiManager:  # noqa: F811
             if account.learn_ir_key(device, remote, hub, key, key_name, timeout):
                 return True
         return False
+    
+    def delete_ir_key(
+        self,
+        device: XTDevice,
+        key: XTIRRemoteKeysInformation,
+        remote: XTIRRemoteInformation,
+        hub: XTIRHubInformation
+    ):
+        for account in self.accounts.values():
+            if account.delete_ir_key(device, key, remote, hub):
+                return True
+        return False
 
     def set_general_property(
         self, property_id: XTMultiManagerProperties, property_value: Any

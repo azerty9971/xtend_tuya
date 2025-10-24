@@ -590,6 +590,13 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         remote_keys = api.get(f"/v2.0/infrareds/{hub_id}/remotes/{remote_id}/keys")
         if remote_keys.get("success", False) is False:
             return return_list
+        learning_codes = api.get(f"/v2.0/infrareds/{hub_id}/remotes/{remote_id}/learning-codes")
+        learning_codes_dict: dict[int, dict[str, Any]] = {}
+        if learning_codes.get("success", False):
+            learning_code_results: list[dict] = learning_codes.get("result", [])
+            for learning_code_result_dict in learning_code_results:
+                if learning_code_id := learning_code_result_dict.get("id"):
+                    learning_codes_dict[learning_code_id] = learning_code_result_dict
         remote_keys_results: dict = remote_keys.get("result", {})
         remote_keys_key_list: list[dict] = remote_keys_results.get("key_list", [])
         for remote_key_dict in remote_keys_key_list:
@@ -597,6 +604,11 @@ class XTIOTDeviceManager(TuyaDeviceManager):
             key_id: int | None = remote_key_dict.get("key_id")
             key_name: str | None = remote_key_dict.get("key_name")
             standard_key: bool | None = remote_key_dict.get("standard_key")
+            learn_id: int | None = None
+            code: str | None = None
+            if key_id in learning_codes_dict:
+                learn_id = learning_codes_dict[key_id].get("learn_id")
+                code = learning_codes_dict[key_id].get("code")
             if (
                 key is None
                 or key_id is None
@@ -605,7 +617,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
             ):
                 continue
             key_information = XTIRRemoteKeysInformation(
-                key=key, key_id=key_id, key_name=key_name, standard_key=standard_key
+                key=key, key_id=key_id, key_name=key_name, standard_key=standard_key, learn_id=learn_id, code=code
             )
             return_list.append(key_information)
         return return_list
@@ -630,6 +642,23 @@ class XTIOTDeviceManager(TuyaDeviceManager):
             payload,
         )
         if ir_command.get("success", False) and ir_command.get("result", False):
+            return True
+        return False
+
+    def delete_ir_key(
+        self,
+        device: XTDevice,
+        key: XTIRRemoteKeysInformation,
+        remote: XTIRRemoteInformation,
+        hub: XTIRHubInformation,
+        api: XTIOTOpenAPI | None = None,
+    ) -> bool:
+        if api is None:
+            api = self.api
+        delete_ir_command = api.delete(
+            f"/v2.0/infrareds/{hub.device_id}/learning-codes/{key.learn_id}",
+        )
+        if delete_ir_command.get("success", False) and delete_ir_command.get("result", False):
             return True
         return False
 

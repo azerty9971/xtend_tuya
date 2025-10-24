@@ -174,6 +174,8 @@ class XTIRRemoteKeysInformation:
     key_id: int
     key_name: str
     standard_key: bool
+    learn_id: int | None = None
+    code: str | None = None
 
     def __repr__(self) -> str:
         return self.key
