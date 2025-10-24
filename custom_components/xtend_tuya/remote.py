@@ -243,7 +243,6 @@ class XTRemoteEntity(XTEntity, RemoteEntity):  # type: ignore
         description: XTRemoteEntityDescription,
     ) -> None:
         """Init XT remote."""
-        super().__init__(device, device_manager)
         self.entity_description = description  # type: ignore
         self.device = device
         self.device_manager = device_manager
@@ -252,13 +251,13 @@ class XTRemoteEntity(XTEntity, RemoteEntity):  # type: ignore
         )
 
     async def async_send_command(self, command: Iterable[str], **kwargs: Any) -> None:
-        LOGGER.warning(f"async_send_command => {command} <=> {kwargs}")
+        LOGGER.warning(f"async_send_command => {self.device.name} <=> {command} <=> {kwargs}")
     
     async def async_learn_command(self, **kwargs: Any) -> None:
-        LOGGER.warning(f"async_learn_command => {kwargs}")
+        LOGGER.warning(f"async_learn_command => {self.device.name} <=> {kwargs}")
     
     async def async_delete_command(self, **kwargs: Any) -> None:
-        LOGGER.warning(f"async_delete_command => {kwargs}")
+        LOGGER.warning(f"async_delete_command => {self.device.name} <=> {kwargs}")
 
     @staticmethod
     def get_entity_instance(
