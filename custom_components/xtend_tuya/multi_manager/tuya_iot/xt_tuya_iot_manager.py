@@ -236,7 +236,8 @@ class XTIOTDeviceManager(TuyaDeviceManager):
             if devIds
             else self.device_map.values()
         )
-        LOGGER.warning(f"update_device_function_cache: {device_map.__dict__}")
+        for device in device_map:
+            LOGGER.warning(f"update_device_function_cache: {device}")
 
         for device in device_map:
             super().update_device_function_cache(devIds=[device.id])
