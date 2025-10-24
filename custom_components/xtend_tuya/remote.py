@@ -247,8 +247,12 @@ class XTRemoteEntity(XTEntity, RemoteEntity):  # type: ignore
         self.device = device
         self.device_manager = device_manager
         self._attr_supported_features = (
-            RemoteEntityFeature.LEARN_COMMAND | RemoteEntityFeature.DELETE_COMMAND
+            RemoteEntityFeature.LEARN_COMMAND | RemoteEntityFeature.DELETE_COMMAND | RemoteEntityFeature.ACTIVITY
         )
+        if description.ir_remote_information is not None and description.ir_remote_information.keys is not None:
+            self._attr_activity_list: list[str] | None = []
+            for key in description.ir_remote_information.keys:
+                self._attr_activity_list.append(key.key_name)
 
     async def async_send_command(self, command: Iterable[str], **kwargs: Any) -> None:
         LOGGER.warning(f"async_send_command => {self.device.name} <=> {command} <=> {kwargs}")
