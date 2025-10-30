@@ -27,8 +27,12 @@ class XTConcurrencyManager:
     async def gather(self):
         list_size = len(self.coro_list)
         i = 0
-        while (i*self.max_concurrency < list_size):
-            await asyncio.gather(*self.coro_list[i*self.max_concurrency : (i+1)*self.max_concurrency])
+        while i * self.max_concurrency < list_size:
+            await asyncio.gather(
+                *self.coro_list[
+                    i * self.max_concurrency : (i + 1) * self.max_concurrency
+                ]
+            )
             i = i + 1
 
 
@@ -74,7 +78,7 @@ class XTEventLoopProtector:
                 return await callback(*args)
             else:
                 return callback(*args)
-        
+
         if XTEventLoopProtector.hass.loop_thread_id != threading.get_ident():
             # Not in the event loop
             if is_coroutine:
@@ -84,12 +88,24 @@ class XTEventLoopProtector:
         else:
             # In the event loop
             if is_coroutine:
-                LOGGER.warning("Non-sensical call to execute_out_of_event_loop_and_return", stack_info=True)
+                LOGGER.warning(
+                    "Non-sensical call to execute_out_of_event_loop_and_return",
+                    stack_info=True,
+                )
                 return await callback(*args, **kwargs)
             else:
-                return await XTEventLoopProtector.hass.async_add_executor_job(
-                    partial(callback, *args, **kwargs)
+                LOGGER.debug(
+                    "Calling execute_out_of_event_loop_and_return in watched case",
+                    stack_info=True,
                 )
+                if kwargs:
+                    return await XTEventLoopProtector.hass.async_add_executor_job(
+                        partial(callback, *args, **kwargs)
+                    )
+                else:
+                    return await XTEventLoopProtector.hass.async_add_executor_job(
+                        callback, *args
+                    )
 
 
 class XTThread(threading.Thread):
