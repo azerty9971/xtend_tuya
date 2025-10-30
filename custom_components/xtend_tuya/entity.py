@@ -266,7 +266,7 @@ class XTEntityDescriptorManager:
                                     if entity_type is not None and other_entity.translation_placeholders is not None:
                                         old_dict = entity.__dict__
                                         LOGGER.warning(f"Old dict: {old_dict}")
-                                        return_list.remove(entity)
+                                        return_list.remove(descriptor)
                                         return_list.append(entity_type(**old_dict))
                         
                         case XTEntityDescriptorManager.XTEntityDescriptorType.STRING:
