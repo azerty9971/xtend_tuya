@@ -6,7 +6,6 @@ from typing import Any, cast
 from enum import StrEnum
 from tuya_sharing import LoginControl
 from tuya_iot import AuthType
-from multi_manager.tuya_iot.xt_tuya_iot_openapi import XTIOTOpenAPI
 import voluptuous as vol
 from homeassistant.core import callback
 from homeassistant.config_entries import (
@@ -54,6 +53,7 @@ from .multi_manager.shared.threading import (
     XTEventLoopProtector,
     XTConcurrencyManager,
 )
+from .multi_manager.tuya_iot.xt_tuya_iot_openapi import XTIOTOpenAPI
 import custom_components.xtend_tuya.util as util
 import custom_components.xtend_tuya.multi_manager.multi_manager as mm
 import custom_components.xtend_tuya.multi_manager.shared.data_entry.shared_data_entry as data_entry
