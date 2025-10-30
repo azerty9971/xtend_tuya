@@ -70,7 +70,7 @@ async def async_setup_entry(
     supported_descriptors, externally_managed_descriptors = cast(
         tuple[tuple[str, ...], tuple[str, ...]],
         XTEntityDescriptorManager.get_platform_descriptors(
-            CAMERAS, entry.runtime_data.multi_manager, this_platform
+            CAMERAS, entry.runtime_data.multi_manager, None, this_platform
         ),
     )
 

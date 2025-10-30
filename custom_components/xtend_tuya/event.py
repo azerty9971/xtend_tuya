@@ -73,7 +73,7 @@ async def async_setup_entry(
             dict[str, tuple[XTEventEntityDescription, ...]],
         ],
         XTEntityDescriptorManager.get_platform_descriptors(
-            EVENTS, entry.runtime_data.multi_manager, this_platform
+            EVENTS, entry.runtime_data.multi_manager, XTEventEntityDescription, this_platform
         ),
     )
 

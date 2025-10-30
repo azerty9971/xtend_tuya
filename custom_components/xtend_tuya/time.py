@@ -63,7 +63,7 @@ async def async_setup_entry(
             dict[str, tuple[XTTimeEntityDescription, ...]],
         ],
         XTEntityDescriptorManager.get_platform_descriptors(
-            TIMES, entry.runtime_data.multi_manager, this_platform
+            TIMES, entry.runtime_data.multi_manager, XTTimeEntityDescription, this_platform
         ),
     )
 

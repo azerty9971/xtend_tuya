@@ -40,7 +40,7 @@ async def async_setup_entry(
             list[str],
         ],
         XTEntityDescriptorManager.get_platform_descriptors(
-            VACUUMS, entry.runtime_data.multi_manager, this_platform
+            VACUUMS, entry.runtime_data.multi_manager, None, this_platform
         ),
     )
 

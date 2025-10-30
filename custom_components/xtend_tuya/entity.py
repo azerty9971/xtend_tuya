@@ -45,6 +45,7 @@ class XTEntityDescriptorManager:
     def get_platform_descriptors(
         platform_descriptors: Any,
         multi_manager: mm.MultiManager,
+        descriptor_type: type[Any] | None,
         platform: Platform | None,
         key_fields: list[str] = ["key"],
     ) -> tuple[Any, Any]:
@@ -57,13 +58,13 @@ class XTEntityDescriptorManager:
                 platform
             ):
                 include_descriptors = XTEntityDescriptorManager.merge_descriptors(
-                    include_descriptors, descriptors_to_add, key_fields
+                    include_descriptors, descriptors_to_add, key_fields, descriptor_type
                 )
             for (
                 descriptors_to_exclude
             ) in multi_manager.get_platform_descriptors_to_exclude(platform):
                 exclude_descriptors = XTEntityDescriptorManager.merge_descriptors(
-                    exclude_descriptors, descriptors_to_exclude, key_fields
+                    exclude_descriptors, descriptors_to_exclude, key_fields, descriptor_type
                 )
         return include_descriptors, exclude_descriptors
 
@@ -110,6 +111,40 @@ class XTEntityDescriptorManager:
             for category_key in category_content:
                 return_list.append(category_key)
         return return_list
+    
+    @staticmethod
+    def get_category_dict(
+        category_content: Any, key_fields: list[str] = ["key"]
+    ) -> dict[str, EntityDescription | None]:
+        return_dict: dict[str, EntityDescription | None] = {}
+        if not category_content:
+            return return_dict
+        ref_type = XTEntityDescriptorManager._get_param_type(category_content)
+        if (
+            ref_type is XTEntityDescriptorManager.XTEntityDescriptorType.LIST
+            or ref_type is XTEntityDescriptorManager.XTEntityDescriptorType.TUPLE
+            or ref_type is XTEntityDescriptorManager.XTEntityDescriptorType.SET
+        ):
+            content_type = XTEntityDescriptorManager._get_param_type(
+                category_content[0]
+            )
+            for descriptor in category_content:
+                match content_type:
+                    case XTEntityDescriptorManager.XTEntityDescriptorType.ENTITY:
+                        entity = cast(EntityDescription, descriptor)
+                        compound_key: str | None = (
+                            XTEntityDescriptorManager.get_compound_key(
+                                entity, key_fields
+                            )
+                        )
+                        if compound_key is not None:
+                            return_dict[compound_key] = entity
+                    case XTEntityDescriptorManager.XTEntityDescriptorType.STRING:
+                        return_dict[descriptor] = None
+        elif ref_type is XTEntityDescriptorManager.XTEntityDescriptorType.DICT:
+            for category_key in category_content:
+                return_dict[category_key] = None
+        return return_dict
 
     @staticmethod
     def get_compound_key(
@@ -145,7 +180,7 @@ class XTEntityDescriptorManager:
 
     @staticmethod
     def merge_descriptors(
-        base_descriptors: Any, descriptors_to_add: Any, key_fields: list[str]
+        base_descriptors: Any, descriptors_to_add: Any, key_fields: list[str], entity_type: type[Any] | None
     ) -> Any:
         descr1_type = XTEntityDescriptorManager._get_param_type(base_descriptors)
         descr2_type = XTEntityDescriptorManager._get_param_type(descriptors_to_add)
@@ -170,7 +205,7 @@ class XTEntityDescriptorManager:
                     add_cross = descriptors_to_add[CROSS_CATEGORY_DEVICE_DESCRIPTOR]
                 if base_cross is not None and add_cross is not None:
                     cross_both = XTEntityDescriptorManager.merge_descriptors(
-                        base_cross, add_cross, key_fields
+                        base_cross, add_cross, key_fields, entity_type
                     )
                 elif base_cross is not None:
                     cross_both = base_cross
@@ -181,13 +216,13 @@ class XTEntityDescriptorManager:
                     if key in descriptors_to_add:
                         merged_descriptors = (
                             XTEntityDescriptorManager.merge_descriptors(
-                                merged_descriptors, descriptors_to_add[key], key_fields
+                                merged_descriptors, descriptors_to_add[key], key_fields, entity_type
                             )
                         )
                     if cross_both is not None:
                         merged_descriptors = (
                             XTEntityDescriptorManager.merge_descriptors(
-                                merged_descriptors, cross_both, key_fields
+                                merged_descriptors, cross_both, key_fields, entity_type
                             )
                         )
                     return_dict[key] = merged_descriptors
@@ -197,7 +232,7 @@ class XTEntityDescriptorManager:
                         if cross_both is not None:
                             merged_descriptors = (
                                 XTEntityDescriptorManager.merge_descriptors(
-                                    merged_descriptors, cross_both, key_fields
+                                    merged_descriptors, cross_both, key_fields, entity_type
                                 )
                             )
                         return_dict[key] = merged_descriptors
@@ -209,8 +244,8 @@ class XTEntityDescriptorManager:
                     var_type = XTEntityDescriptorManager._get_param_type(
                         descriptors_to_add[0]
                     )
-                base_descr_keys: list[str] = (
-                    XTEntityDescriptorManager.get_category_keys(
+                base_descr_keys: dict[str, EntityDescription | None] = (
+                    XTEntityDescriptorManager.get_category_dict(
                         base_descriptors, key_fields
                     )
                 )
@@ -225,7 +260,12 @@ class XTEntityDescriptorManager:
                                 compound_key is not None
                                 and compound_key not in base_descr_keys
                             ):
-                                return_list.append(descriptor)
+                                if other_entity := base_descr_keys[compound_key]:
+                                    if entity_type is not None and other_entity.translation_placeholders is not None:
+                                        old_dict = entity.__dict__
+                                        LOGGER.warning(f"Old dict: {old_dict}")
+                                        entity = entity_type(**old_dict)
+                                return_list.append(entity)
                         case XTEntityDescriptorManager.XTEntityDescriptorType.STRING:
                             if descriptor not in base_descr_keys:
                                 return_list.append(descriptor)
@@ -233,13 +273,13 @@ class XTEntityDescriptorManager:
             case XTEntityDescriptorManager.XTEntityDescriptorType.TUPLE:
                 return tuple(
                     XTEntityDescriptorManager.merge_descriptors(
-                        list(base_descriptors), list(descriptors_to_add), key_fields
+                        list(base_descriptors), list(descriptors_to_add), key_fields, entity_type
                     )
                 )
             case XTEntityDescriptorManager.XTEntityDescriptorType.SET:
                 return set(
                     XTEntityDescriptorManager.merge_descriptors(
-                        list(base_descriptors), list(descriptors_to_add), key_fields
+                        list(base_descriptors), list(descriptors_to_add), key_fields, entity_type
                     )
                 )
 

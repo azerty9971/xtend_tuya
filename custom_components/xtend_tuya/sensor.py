@@ -1525,7 +1525,7 @@ async def async_setup_entry(
             dict[str, tuple[XTSensorEntityDescription, ...]],
         ],
         XTEntityDescriptorManager.get_platform_descriptors(
-            SENSORS, entry.runtime_data.multi_manager, this_platform, COMPOUND_KEY
+            SENSORS, entry.runtime_data.multi_manager, XTSensorEntityDescription, this_platform, COMPOUND_KEY
         ),
     )
 

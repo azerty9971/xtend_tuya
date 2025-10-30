@@ -91,7 +91,7 @@ async def async_setup_entry(
             dict[str, tuple[XTLightEntityDescription, ...]],
         ],
         XTEntityDescriptorManager.get_platform_descriptors(
-            LIGHTS, entry.runtime_data.multi_manager, this_platform
+            LIGHTS, entry.runtime_data.multi_manager, XTLightEntityDescription, this_platform
         ),
     )
 
