@@ -90,7 +90,7 @@ class XTIOTOpenAPI(TuyaOpenAPI):
             self.__login_path = TO_C_SMART_HOME_TOKEN_API
             self.__refresh_path = TO_C_SMART_HOME_REFRESH_TOKEN_API
 
-        self.token_info: TuyaTokenInfo | None = None
+        self.token_info: XTTokenInfo | None = None
         self.__username = ""
         self.__password = ""
         self.__country_code = ""
@@ -161,13 +161,60 @@ class XTIOTOpenAPI(TuyaOpenAPI):
         if self.non_user_specific_api:
             return_value = self.connect_non_user_specific()
         else:
-            return_value = super().connect(
+            return_value = self.connect_user_specific(
                 username=username,
                 password=password,
                 country_code=country_code,
                 schema=schema,
             )
         return return_value
+    
+    def connect_user_specific(
+        self,
+        username: str = "",
+        password: str = "",
+        country_code: str = "",
+        schema: str = "",
+    ) -> dict[str, Any]:
+        """Connect to Tuya Cloud.
+
+        Args:
+            username (str): user name in to C
+            password (str): user password in to C
+            country_code (str): country code in SMART_HOME
+            schema (str): app schema in SMART_HOME
+
+        Returns:
+            response: connect response
+        """
+        if self.auth_type == AuthType.CUSTOM:
+            response = self.post(
+                TO_C_CUSTOM_TOKEN_API,
+                {
+                    "username": username,
+                    "password": hashlib.sha256(password.encode("utf8"))
+                    .hexdigest()
+                    .lower(),
+                },
+            )
+        else:
+            response = self.post(
+                TO_C_SMART_HOME_TOKEN_API,
+                {
+                    "username": username,
+                    "password": hashlib.md5(password.encode("utf8")).hexdigest(),
+                    "country_code": country_code,
+                    "schema": schema,
+                },
+            )
+
+        if not response["success"]:
+            return response
+
+        # Cache token info.
+        self.token_info = XTTokenInfo(response)
+
+        return response
 
     def reconnect(self) -> bool:
         if (
