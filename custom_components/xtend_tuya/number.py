@@ -622,7 +622,7 @@ async def async_setup_entry(
             dict[str, tuple[XTNumberEntityDescription, ...]],
         ],
         XTEntityDescriptorManager.get_platform_descriptors(
-            NUMBERS, entry.runtime_data.multi_manager, this_platform
+            NUMBERS, entry.runtime_data.multi_manager, XTNumberEntityDescription, this_platform
         ),
     )
 

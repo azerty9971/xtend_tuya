@@ -114,8 +114,15 @@ from homeassistant.components.tuya.const import (
 )
 from homeassistant.components.tuya.entity import (
     TuyaEntity as TuyaEntity,
-    _DPTYPE_MAPPING as TUYA_DPTYPE_MAPPING,  # noqa: F401
 )
+try:
+    from homeassistant.components.tuya.util import (
+        _DPTYPE_MAPPING as TUYA_DPTYPE_MAPPING,  # noqa: F401 # type: ignore
+    )
+except Exception:
+    from homeassistant.components.tuya.entity import (
+        _DPTYPE_MAPPING as TUYA_DPTYPE_MAPPING, # noqa: F401 # type: ignore
+    )
 
 try:
     from homeassistant.components.tuya.models import (

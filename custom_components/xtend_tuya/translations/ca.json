@@ -53,21 +53,6 @@
             },
             "curtain": {
                 "name": "Cortina"
-            },
-            "curtain_2": {
-                "name": "Cortina 2"
-            },
-            "curtain_3": {
-                "name": "Cortina 3"
-            },
-            "door": {
-                "name": "Porta"
-            },
-            "door_2": {
-                "name": "Porta 2"
-            },
-            "door_3": {
-                "name": "Porta 3"
             }
         },
         "light": {
@@ -77,12 +62,6 @@
             "light": {
                 "name": "Llum"
             },
-            "light_2": {
-                "name": "Llum 2"
-            },
-            "light_3": {
-                "name": "Llum 3"
-            },
             "night_light": {
                 "name": "Llum de nit"
             }
@@ -91,29 +70,11 @@
             "cloud_recipe": {
                 "name": "Recepta al n\u00favol"
             },
-            "cook_temperature": {
-                "name": "Temperatura de cocci\u00f3"
-            },
-            "cook_time": {
-                "name": "Temps de cocci\u00f3"
-            },
             "maximum_brightness": {
                 "name": "Lluminositat m\u00e0xima"
             },
-            "maximum_brightness_2": {
-                "name": "Lluminositat m\u00e0xima 2"
-            },
-            "maximum_brightness_3": {
-                "name": "Lluminositat m\u00e0xima 3"
-            },
             "minimum_brightness": {
                 "name": "Lluminositat m\u00ednima"
-            },
-            "minimum_brightness_2": {
-                "name": "Lluminositat m\u00ednima 2"
-            },
-            "minimum_brightness_3": {
-                "name": "Lluminositat m\u00ednima 3"
             },
             "move_down": {
                 "name": "Mou avall"
@@ -158,6 +119,12 @@
                     "0": "Autom\u00e0tica",
                     "1": "OFF",
                     "2": "ON"
+                }
+            },
+            "blanket_level": {
+                "state": {
+                    "level_1": "Baix/a",
+                    "level_10": "Alt/a"
                 }
             },
             "brightness": {
@@ -251,6 +218,19 @@
                     "work": "Feina"
                 }
             },
+            "indexed_blanket_level": {
+                "state": {
+                    "level_1": "Baix/a",
+                    "level_10": "Alt/a"
+                }
+            },
+            "indexed_led_type": {
+                "state": {
+                    "halogen": "Halogen",
+                    "incandescent": "Incandescent",
+                    "led": "LED"
+                }
+            },
             "ipc_work_mode": {
                 "name": "Mode IPC",
                 "state": {
@@ -260,22 +240,6 @@
             },
             "led_type": {
                 "name": "Tipus de font del llum",
-                "state": {
-                    "halogen": "Halogen",
-                    "incandescent": "Incandescent",
-                    "led": "LED"
-                }
-            },
-            "led_type_2": {
-                "name": "Tipus de font del llum 2",
-                "state": {
-                    "halogen": "Halogen",
-                    "incandescent": "Incandescent",
-                    "led": "LED"
-                }
-            },
-            "led_type_3": {
-                "name": "Tipus de font del llum 3",
                 "state": {
                     "halogen": "Halogen",
                     "incandescent": "Incandescent",
@@ -297,7 +261,12 @@
                 "name": "Mode"
             },
             "motion_sensitivity": {
-                "name": "Sensibilitat de detecci\u00f3 de moviment"
+                "name": "Sensibilitat de detecci\u00f3 de moviment",
+                "state": {
+                    "0": "Baix/a",
+                    "1": "Mitj\u00e0/na",
+                    "2": "Alt/a"
+                }
             },
             "record_mode": {
                 "state": {
@@ -325,6 +294,8 @@
                 "name": "Ajust del dip\u00f2sit d'aigua",
                 "state": {
                     "closed": "Tancat/ada",
+                    "high": "Alt/a",
+                    "low": "Baix/a",
                     "middle": "Mitj\u00e0"
                 }
             },
@@ -442,8 +413,21 @@
             "last_operation_duration": {
                 "name": "Durada de l'\u00faltima operaci\u00f3"
             },
+            "liquid_state": {
+                "state": {
+                    "lower_alarm": "Baix/a",
+                    "normal": "Normal",
+                    "upper_alarm": "Alt/a"
+                }
+            },
             "luminosity": {
                 "name": "Lluminositat"
+            },
+            "odor_elimination_status": {
+                "state": {
+                    "charging": "Carregant",
+                    "standby": "En espera"
+                }
             },
             "phase_a_current": {
                 "name": "Corrent de la fase A"
@@ -483,6 +467,9 @@
             },
             "power": {
                 "name": "Pot\u00e8ncia"
+            },
+            "precipitation_intensity": {
+                "name": "Intensitat de precipitaci\u00f3"
             },
             "remaining_time": {
                 "name": "Temps restant"
@@ -529,29 +516,21 @@
             "total_watering_time": {
                 "name": "Temps total de reg"
             },
-            "voc": {
-                "name": "COVs"
-            },
             "voltage": {
                 "name": "Voltatge"
             },
             "water_level": {
                 "name": "Nivell d'aigua"
+            },
+            "water_level_state": {
+                "state": {
+                    "level_1": "Baix/a",
+                    "level_2": "Mitj\u00e0/na",
+                    "level_3": "Ple/na"
+                }
             }
         },
         "switch": {
-            "alarm_1": {
-                "name": "Alarma 1"
-            },
-            "alarm_2": {
-                "name": "Alarma 2"
-            },
-            "alarm_3": {
-                "name": "Alarma 3"
-            },
-            "alarm_4": {
-                "name": "Alarma 4"
-            },
             "anion": {
                 "name": "Ani\u00f3"
             },
@@ -624,24 +603,6 @@
             "socket": {
                 "name": "Endoll"
             },
-            "socket_1": {
-                "name": "Endoll 1"
-            },
-            "socket_2": {
-                "name": "Endoll 2"
-            },
-            "socket_3": {
-                "name": "Endoll 3"
-            },
-            "socket_4": {
-                "name": "Endoll 4"
-            },
-            "socket_5": {
-                "name": "Endoll 5"
-            },
-            "socket_6": {
-                "name": "Endoll 6"
-            },
             "sound": {
                 "name": "So"
             },
@@ -660,50 +621,8 @@
             "switch": {
                 "name": "Interruptor"
             },
-            "switch_1": {
-                "name": "Interruptor 1"
-            },
-            "switch_2": {
-                "name": "Interruptor 2"
-            },
-            "switch_3": {
-                "name": "Interruptor 3"
-            },
-            "switch_4": {
-                "name": "Interruptor 4"
-            },
-            "switch_5": {
-                "name": "Interruptor 5"
-            },
-            "switch_6": {
-                "name": "Interruptor 6"
-            },
-            "switch_7": {
-                "name": "Interruptor 7"
-            },
-            "switch_8": {
-                "name": "Interruptor 8"
-            },
             "time_watermark": {
                 "name": "Marca d'aigua de temps"
-            },
-            "usb_1": {
-                "name": "USB 1"
-            },
-            "usb_2": {
-                "name": "USB 2"
-            },
-            "usb_3": {
-                "name": "USB 3"
-            },
-            "usb_4": {
-                "name": "USB 4"
-            },
-            "usb_5": {
-                "name": "USB 5"
-            },
-            "usb_6": {
-                "name": "USB 6"
             },
             "uv_sterilization": {
                 "name": "Esterilitzaci\u00f3 UV"

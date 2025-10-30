@@ -11,14 +11,12 @@
             "reauth_user_code": {
                 "data": {
                     "user_code": "Kullan\u0131c\u0131 kodu"
-                },
-                "description": "Tuya entegrasyonu art\u0131k geli\u015ftirilmi\u015f bir oturum a\u00e7ma y\u00f6ntemi kullan\u0131yor. Smart Life veya Tuya Smart hesab\u0131n\u0131zla yeniden kimlik do\u011frulamas\u0131 yapmak i\u00e7in kullan\u0131c\u0131 kodunuzu girmeniz gerekiyor. \n \n Bu kodu Smart Life uygulamas\u0131nda veya Tuya Smart uygulamas\u0131nda **Ayarlar** > **Hesap ve G\u00fcvenlik** ekran\u0131nda bulabilir ve **Kullan\u0131c\u0131 Kodu** alan\u0131nda g\u00f6sterilen kodu girebilirsiniz. Kullan\u0131c\u0131 kodu b\u00fcy\u00fck/k\u00fc\u00e7\u00fck harfe duyarl\u0131d\u0131r, l\u00fctfen uygulamada g\u00f6sterildi\u011fi \u015fekilde tam olarak girdi\u011finizden emin olun."
+                }
             },
             "user": {
                 "data": {
                     "user_code": "Kullan\u0131c\u0131 kodu"
-                },
-                "description": "Smart Life veya Tuya Smart kullan\u0131c\u0131 kodunuzu girin. \n\n Bu kodu Smart Life uygulamas\u0131nda veya Tuya Smart uygulamas\u0131nda **Ayarlar** > **Hesap ve G\u00fcvenlik** ekran\u0131nda bulabilir ve **Kullan\u0131c\u0131 Kodu** alan\u0131na g\u00f6sterilen kodu girebilirsiniz. Kullan\u0131c\u0131 kodu b\u00fcy\u00fck/k\u00fc\u00e7\u00fck harfe duyarl\u0131d\u0131r; l\u00fctfen tam olarak uygulamada g\u00f6sterildi\u011fi gibi girdi\u011finizden emin olun."
+                }
             }
         }
     },
@@ -81,21 +79,19 @@
             },
             "curtain": {
                 "name": "Perde"
-            },
-            "curtain_2": {
-                "name": "Perde 2"
-            },
-            "curtain_3": {
-                "name": "Perde 3"
-            },
-            "door": {
-                "name": "Kap\u0131"
-            },
-            "door_2": {
-                "name": "Kap\u0131 2"
-            },
-            "door_3": {
-                "name": "Kap\u0131 3"
+            }
+        },
+        "event": {
+            "numbered_button": {
+                "state_attributes": {
+                    "event_type": {
+                        "state": {
+                            "click": "T\u0131kland\u0131",
+                            "double_click": "\u00c7ift t\u0131kland\u0131",
+                            "press": "Uzun s\u00fcre bas\u0131l\u0131"
+                        }
+                    }
+                }
             }
         },
         "light": {
@@ -104,12 +100,6 @@
             },
             "light": {
                 "name": "I\u015f\u0131k"
-            },
-            "light_2": {
-                "name": "I\u015f\u0131k 2"
-            },
-            "light_3": {
-                "name": "I\u015f\u0131k 3"
             },
             "night_light": {
                 "name": "Gece lambas\u0131"
@@ -121,12 +111,6 @@
             },
             "cloud_recipe": {
                 "name": "Bulut tarifi"
-            },
-            "cook_temperature": {
-                "name": "Pi\u015firme s\u0131cakl\u0131\u011f\u0131"
-            },
-            "cook_time": {
-                "name": "Pi\u015firme s\u00fcresi"
             },
             "down_delay": {
                 "name": "A\u015fa\u011f\u0131 gecikme"
@@ -143,20 +127,8 @@
             "maximum_brightness": {
                 "name": "Maksimum parlakl\u0131k"
             },
-            "maximum_brightness_2": {
-                "name": "Maksimum parlakl\u0131k 2"
-            },
-            "maximum_brightness_3": {
-                "name": "Maksimum parlakl\u0131k 3"
-            },
             "minimum_brightness": {
                 "name": "minimum parlakl\u0131k"
-            },
-            "minimum_brightness_2": {
-                "name": "Minimum parlakl\u0131k 2"
-            },
-            "minimum_brightness_3": {
-                "name": "Minimum parlakl\u0131k 3"
             },
             "move_down": {
                 "name": "A\u015fa\u011f\u0131 ta\u015f\u0131"
@@ -172,9 +144,6 @@
             },
             "sensitivity": {
                 "name": "Hassasiyet"
-            },
-            "target_dis_closest": {
-                "name": "En yak\u0131n hedef mesafesi"
             },
             "temperature": {
                 "name": "S\u0131cakl\u0131k"
@@ -210,6 +179,18 @@
                     "0": "Otomatik",
                     "1": "Kapal\u0131",
                     "2": "A\u00e7\u0131k"
+                }
+            },
+            "blanket_level": {
+                "state": {
+                    "level_2": "Seviye 2",
+                    "level_3": "Seviye 3",
+                    "level_4": "Seviye 4",
+                    "level_5": "Seviye 5",
+                    "level_6": "Seviye 6",
+                    "level_7": "Seviye 7",
+                    "level_8": "Seviye 8",
+                    "level_9": "Seviye 9"
                 }
             },
             "brightness": {
@@ -312,22 +293,6 @@
             },
             "led_type": {
                 "name": "I\u015f\u0131k kayna\u011f\u0131 tipi",
-                "state": {
-                    "halogen": "Halojen",
-                    "incandescent": "Akkor",
-                    "led": "LED"
-                }
-            },
-            "led_type_2": {
-                "name": "I\u015f\u0131k 2 kaynak tipi",
-                "state": {
-                    "halogen": "Halojen",
-                    "incandescent": "Akkor",
-                    "led": "LED"
-                }
-            },
-            "led_type_3": {
-                "name": "I\u015f\u0131k 3 kaynak tipi",
                 "state": {
                     "halogen": "Halojen",
                     "incandescent": "Akkor",
@@ -490,6 +455,9 @@
             "duster_cloth_life": {
                 "name": "Toz bezi kullan\u0131m \u00f6mr\u00fc"
             },
+            "filter_duration": {
+                "name": "Filtre s\u00fcresi"
+            },
             "filter_life": {
                 "name": "Filtre \u00f6mr\u00fc"
             },
@@ -559,6 +527,9 @@
             "power": {
                 "name": "G\u00fc\u00e7"
             },
+            "pump_time": {
+                "name": "Su pompas\u0131 s\u00fcresi"
+            },
             "remaining_time": {
                 "name": "Kalan s\u00fcre"
             },
@@ -621,29 +592,20 @@
             "total_watering_time": {
                 "name": "Toplam sulama s\u00fcresi"
             },
-            "voc": {
-                "name": "VOC'lar"
+            "uv_runtime": {
+                "name": "UV \u00e7al\u0131\u015fma zaman\u0131"
             },
             "voltage": {
                 "name": "Voltaj"
             },
             "water_level": {
                 "name": "Su seviyesi"
+            },
+            "water_time": {
+                "name": "Su kullan\u0131m s\u00fcresi"
             }
         },
         "switch": {
-            "alarm_1": {
-                "name": "Alarm 1"
-            },
-            "alarm_2": {
-                "name": "Alarm 2"
-            },
-            "alarm_3": {
-                "name": "Alarm 3"
-            },
-            "alarm_4": {
-                "name": "Alarm 4"
-            },
             "anion": {
                 "name": "Anyon"
             },
@@ -740,24 +702,6 @@
             "socket": {
                 "name": "Soket"
             },
-            "socket_1": {
-                "name": "Soket 1"
-            },
-            "socket_2": {
-                "name": "Soket 2"
-            },
-            "socket_3": {
-                "name": "Soket 3"
-            },
-            "socket_4": {
-                "name": "Soket 4"
-            },
-            "socket_5": {
-                "name": "Soket 5"
-            },
-            "socket_6": {
-                "name": "Soket 6"
-            },
             "sound": {
                 "name": "Ses"
             },
@@ -776,50 +720,8 @@
             "switch": {
                 "name": "Anahtar"
             },
-            "switch_1": {
-                "name": "Anahtar 1"
-            },
-            "switch_2": {
-                "name": "Anahtar 2"
-            },
-            "switch_3": {
-                "name": "Anahtar 3"
-            },
-            "switch_4": {
-                "name": "Anahtar 4"
-            },
-            "switch_5": {
-                "name": "Anahtar 5"
-            },
-            "switch_6": {
-                "name": "Anahtar 6"
-            },
-            "switch_7": {
-                "name": "Anahtar 7"
-            },
-            "switch_8": {
-                "name": "Anahtar 8"
-            },
             "time_watermark": {
                 "name": "Zaman filigran\u0131"
-            },
-            "usb_1": {
-                "name": "USB 1"
-            },
-            "usb_2": {
-                "name": "USB 2"
-            },
-            "usb_3": {
-                "name": "USB 3"
-            },
-            "usb_4": {
-                "name": "USB 4"
-            },
-            "usb_5": {
-                "name": "USB 5"
-            },
-            "usb_6": {
-                "name": "USB 6"
             },
             "uv_sterilization": {
                 "name": "UV sterilizasyonu"

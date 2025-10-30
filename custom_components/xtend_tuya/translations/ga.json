@@ -1,5 +1,109 @@
 {
+    "config": {
+        "abort": {
+            "reauth_successful": "D'\u00e9irigh leis an athfh\u00edordheimhni\u00fa"
+        },
+        "error": {
+            "invalid_auth": "F\u00edordheimhni\u00fa neamhbhail\u00ed",
+            "login_error": "Earr\u00e1id log\u00e1la isteach ({code}): {msg}"
+        },
+        "step": {
+            "reauth_user_code": {
+                "data": {
+                    "user_code": "C\u00f3d \u00fas\u00e1ideora"
+                },
+                "description": "\u00das\u00e1ideann comhth\u00e1th\u00fa Tuya modh log\u00e1la isteach feabhsaithe anois. Chun athfh\u00edordheimhni\u00fa le do chuntas Smart Life n\u00f3 Tuya Smart, n\u00ed m\u00f3r duit do ch\u00f3d \u00fas\u00e1ideora a iontr\u00e1il.\n\nIs f\u00e9idir leat an c\u00f3d seo a fh\u00e1il san aip Smart Life n\u00f3 san aip Tuya Smart i **Socruithe** > **Cuntas agus Sl\u00e1nd\u00e1il** an sc\u00e1ile\u00e1n, agus an c\u00f3d a thaispe\u00e1ntar sa r\u00e9imse **C\u00f3d \u00das\u00e1ideora** a iontr\u00e1il. T\u00e1 an c\u00f3d \u00fas\u00e1ideora \u00edogair \u00f3 thaobh c\u00e1s de, d\u00e9an cinnte \u00e9 a iontr\u00e1il d\u00edreach mar a thaispe\u00e1ntar san aip."
+            },
+            "scan": {
+                "description": "Bain \u00fas\u00e1id as an aip Smart Life n\u00f3 as an aip Tuya Smart chun an c\u00f3d QR seo a leanas a scanadh chun an log\u00e1il isteach a chr\u00edochn\u00fa.\n\nLean ar aghaidh go dt\u00ed an ch\u00e9ad ch\u00e9im eile a luaithe a bheidh an ch\u00e9im seo cr\u00edochnaithe agat san aip."
+            },
+            "user": {
+                "data": {
+                    "user_code": "C\u00f3d \u00fas\u00e1ideora"
+                },
+                "description": "Cuir isteach do ch\u00f3d \u00fas\u00e1ideora Smart Life n\u00f3 Tuya Smart.\n\nIs f\u00e9idir leat an c\u00f3d seo a fh\u00e1il san aip Smart Life n\u00f3 san aip Tuya Smart i **Socruithe** > **Cuntas agus Sl\u00e1nd\u00e1il**, agus cuir isteach an c\u00f3d a thaispe\u00e1ntar sa r\u00e9imse **C\u00f3d \u00das\u00e1ideora**. T\u00e1 an c\u00f3d \u00fas\u00e1ideora \u00edogair \u00f3 thaobh c\u00e1s de, d\u00e9an cinnte \u00e9 a iontr\u00e1il d\u00edreach mar a thaispe\u00e1ntar san aip."
+            }
+        }
+    },
     "entity": {
+        "binary_sensor": {
+            "carbon_dioxide": {
+                "name": "D\u00e9-ocsa\u00edd charb\u00f3in"
+            },
+            "carbon_monoxide": {
+                "name": "Aonocsa\u00edd charb\u00f3in"
+            },
+            "defrost": {
+                "name": "D\u00edreoite"
+            },
+            "drop": {
+                "name": "Titim"
+            },
+            "feeding": {
+                "name": "Beath\u00fa"
+            },
+            "formaldehyde": {
+                "name": "Formaild\u00e9ad"
+            },
+            "methane": {
+                "name": "Meat\u00e1n"
+            },
+            "pm25": {
+                "name": "PM2.5"
+            },
+            "pressure": {
+                "name": "Br\u00fa"
+            },
+            "tankfull": {
+                "name": "Umar l\u00e1n"
+            },
+            "tilt": {
+                "name": "Claonadh"
+            },
+            "valve": {
+                "name": "Comhla"
+            },
+            "voc": {
+                "name": "VOCanna"
+            },
+            "wet": {
+                "name": "Fliuch"
+            }
+        },
+        "button": {
+            "reset_duster_cloth": {
+                "name": "Athshocraigh \u00e9adach deannaigh"
+            },
+            "reset_edge_brush": {
+                "name": "Athshocraigh scuab imeall"
+            },
+            "reset_filter": {
+                "name": "Athshocraigh an scagaire"
+            },
+            "reset_map": {
+                "name": "Athshocraigh an l\u00e9arsc\u00e1il"
+            },
+            "reset_roll_brush": {
+                "name": "Athshocraigh scuab rolla"
+            },
+            "snooze": {
+                "name": "Codladh beag"
+            }
+        },
+        "cover": {
+            "blind": {
+                "name": "Dall"
+            },
+            "curtain": {
+                "name": "Cuirt\u00edn"
+            },
+            "indexed_curtain": {
+                "name": "Cuirt\u00edn {index}"
+            },
+            "indexed_door": {
+                "name": "Doras {index}"
+            }
+        },
         "event": {
             "numbered_button": {
                 "name": "Cnaipe {button_number}",
@@ -14,8 +118,265 @@
                 }
             }
         },
+        "light": {
+            "backlight": {
+                "name": "C\u00falsholas"
+            },
+            "indexed_light": {
+                "name": "Solas {index}"
+            },
+            "light": {
+                "name": "Solas"
+            },
+            "night_light": {
+                "name": "Solas o\u00edche"
+            }
+        },
+        "number": {
+            "alarm_delay": {
+                "name": "Moill al\u00e1raim"
+            },
+            "alarm_duration": {
+                "name": "Fad an al\u00e1raim"
+            },
+            "alarm_maximum": {
+                "name": "Uasmh\u00e9id al\u00e1raim"
+            },
+            "alarm_minimum": {
+                "name": "\u00cdosmh\u00e9id al\u00e1raim"
+            },
+            "arm_delay": {
+                "name": "Moill l\u00e1imhe"
+            },
+            "battery_backup_reserve": {
+                "name": "C\u00faltaca ceallra\u00ed"
+            },
+            "cloud_recipe": {
+                "name": "Oideas scamall"
+            },
+            "down_delay": {
+                "name": "Moill s\u00edos"
+            },
+            "far_detection": {
+                "name": "Brath i bhfad i gc\u00e9in"
+            },
+            "feed": {
+                "name": "Fotha"
+            },
+            "heat_preservation_time": {
+                "name": "Am caomhnaithe teasa"
+            },
+            "indexed_cook_temperature": {
+                "name": "Teocht ch\u00f3caireachta {index}"
+            },
+            "indexed_irrigation_duration": {
+                "name": "Fad uisci\u00fach\u00e1in {index}"
+            },
+            "indexed_maximum_brightness": {
+                "name": "Uasmh\u00e9id gile {index}"
+            },
+            "indexed_minimum_brightness": {
+                "name": "\u00cdosmh\u00e9id gile {index}"
+            },
+            "indexed_temperature": {
+                "name": "Teocht {index}"
+            },
+            "installation_height": {
+                "name": "Airde suite\u00e1la"
+            },
+            "inverter_output_power_limit": {
+                "name": "Teorainn chumhachta aschuir inbh\u00e9art\u00f3ra"
+            },
+            "maximum_brightness": {
+                "name": "Uasmh\u00e9id gile"
+            },
+            "maximum_liquid_depth": {
+                "name": "Doimhneacht leachtach uasta"
+            },
+            "minimum_brightness": {
+                "name": "\u00cdosmh\u00e9id gile"
+            },
+            "move_down": {
+                "name": "Bog s\u00edos"
+            },
+            "move_up": {
+                "name": "Bog suas"
+            },
+            "near_detection": {
+                "name": "Brath gar"
+            },
+            "powder": {
+                "name": "P\u00fadar"
+            },
+            "sensitivity": {
+                "name": "\u00cdogaireacht"
+            },
+            "siren_duration": {
+                "name": "Fad na sir\u00e9ine"
+            },
+            "temp_correction": {
+                "name": "Ceart\u00fa teochta"
+            },
+            "temperature": {
+                "name": "Teocht"
+            },
+            "temperature_after_boiling": {
+                "name": "Teocht tar \u00e9is fiuchta"
+            },
+            "time": {
+                "name": "Am"
+            },
+            "voice_times": {
+                "name": "Amanna gutha"
+            },
+            "volume": {
+                "name": "Toirt"
+            },
+            "water_level": {
+                "name": "Leibh\u00e9al an uisce"
+            }
+        },
         "select": {
+            "basic_anti_flicker": {
+                "name": "Frith-fhliuchra",
+                "state": {
+                    "0": "D\u00edchumasaithe",
+                    "1": "50 Hz",
+                    "2": "60 Hz"
+                }
+            },
+            "basic_nightvision": {
+                "name": "F\u00eds o\u00edche",
+                "state": {
+                    "0": "Uathoibr\u00edoch",
+                    "1": "As",
+                    "2": "Ar si\u00fal"
+                }
+            },
             "blanket_level": {
+                "name": "Leibh\u00e9al",
+                "state": {
+                    "level_2": "Leibh\u00e9al 2",
+                    "level_3": "Leibh\u00e9al 4",
+                    "level_4": "Leibh\u00e9al 4",
+                    "level_5": "Leibh\u00e9al 5",
+                    "level_6": "Leibh\u00e9al 6",
+                    "level_7": "Leibh\u00e9al 7",
+                    "level_8": "Leibh\u00e9al 8",
+                    "level_9": "Leibh\u00e9al 9"
+                }
+            },
+            "brightness": {
+                "name": "Gile"
+            },
+            "concentration": {
+                "name": "Ti\u00fachan"
+            },
+            "countdown": {
+                "name": "Comhaireamh s\u00edos",
+                "state": {
+                    "1h": "1 uair an chloig",
+                    "2h": "2 uair an chloig",
+                    "3h": "3 uair an chloig",
+                    "4h": "4 uair an chloig",
+                    "5h": "5 uair an chloig",
+                    "6h": "6 uair an chloig",
+                    "cancel": "Cealaigh"
+                }
+            },
+            "cups": {
+                "name": "Cup\u00e1in"
+            },
+            "curtain_mode": {
+                "name": "M\u00f3d",
+                "state": {
+                    "morning": "Maidin",
+                    "night": "O\u00edche"
+                }
+            },
+            "curtain_motor_mode": {
+                "name": "M\u00f3d m\u00f3tair",
+                "state": {
+                    "back": "Ar ais",
+                    "forward": "Ar Aghaidh"
+                }
+            },
+            "decibel_sensitivity": {
+                "name": "\u00cdogaireacht braite fuaime",
+                "state": {
+                    "0": "\u00cdogaireacht \u00edseal",
+                    "1": "\u00cdogaireacht ard"
+                }
+            },
+            "desk_level": {
+                "name": "leibh\u00e9al",
+                "state": {
+                    "level_1": "Leibh\u00e9al 1",
+                    "level_2": "Leibh\u00e9al 2",
+                    "level_3": "Leibh\u00e9al 3",
+                    "level_4": "Leibh\u00e9al 4"
+                }
+            },
+            "desk_up_down": {
+                "name": "Suas/S\u00edos",
+                "state": {
+                    "down": "S\u00edos",
+                    "stop": "Stad",
+                    "up": "Suas"
+                }
+            },
+            "fingerbot_mode": {
+                "name": "M\u00f3d",
+                "state": {
+                    "click": "Br\u00faigh",
+                    "switch": "Lasc"
+                }
+            },
+            "horizontal_fan_angle": {
+                "name": "Uillinn flap luasctha cothrom\u00e1nach",
+                "state": {
+                    "30": "30\u00b0",
+                    "60": "60\u00b0",
+                    "90": "90\u00b0"
+                }
+            },
+            "humidifier_level": {
+                "name": "Leibh\u00e9al sprae\u00e1la",
+                "state": {
+                    "level_1": "Leibh\u00e9al 1",
+                    "level_10": "Leibh\u00e9al 10",
+                    "level_2": "Leibh\u00e9al 2",
+                    "level_3": "Leibh\u00e9al 3",
+                    "level_4": "Leibh\u00e9al 4",
+                    "level_5": "Leibh\u00e9al 5",
+                    "level_6": "Leibh\u00e9al 6",
+                    "level_7": "Leibh\u00e9al 7",
+                    "level_8": "Leibh\u00e9al 8",
+                    "level_9": "Leibh\u00e9al 9"
+                }
+            },
+            "humidifier_moodlighting": {
+                "name": "Soilsi\u00fa gi\u00famar",
+                "state": {
+                    "1": "Gi\u00famar 1",
+                    "2": "Gi\u00famar 2",
+                    "3": "Gi\u00famar 3",
+                    "4": "Gi\u00famar 4",
+                    "5": "Gi\u00famar 5"
+                }
+            },
+            "humidifier_spray_mode": {
+                "name": "M\u00f3d sprae\u00e1la",
+                "state": {
+                    "auto": "Uath",
+                    "health": "Sl\u00e1inte",
+                    "humidity": "Taise",
+                    "sleep": "Codladh",
+                    "work": "Obair"
+                }
+            },
+            "indexed_blanket_level": {
+                "name": "Leibh\u00e9al {index}",
                 "state": {
                     "level_1": "\u00cdseal",
                     "level_10": "Ard",
@@ -28,24 +389,658 @@
                     "level_8": "Leibh\u00e9al 8",
                     "level_9": "Leibh\u00e9al 9"
                 }
+            },
+            "indexed_led_type": {
+                "name": "Cine\u00e1l foinse solais {index}",
+                "state": {
+                    "halogen": "Halaigin",
+                    "incandescent": "Gealbhruthach",
+                    "led": "LED"
+                }
+            },
+            "inverter_work_mode": {
+                "name": "M\u00f3d oibre inbh\u00e9art\u00f3ra",
+                "state": {
+                    "manual": "M\u00f3d l\u00e1imhe",
+                    "self_powered": "F\u00e9inchumhachtaithe",
+                    "time_of_use": "Am \u00fas\u00e1ide"
+                }
+            },
+            "ipc_work_mode": {
+                "name": "M\u00f3d IPC",
+                "state": {
+                    "0": "M\u00f3d \u00edsealchumhachta",
+                    "1": "M\u00f3d oibre lean\u00fanach"
+                }
+            },
+            "led_type": {
+                "name": "Cine\u00e1l foinse solais",
+                "state": {
+                    "halogen": "Halaigin",
+                    "incandescent": "Gealbhruthach",
+                    "led": "LED"
+                }
+            },
+            "light_mode": {
+                "name": "M\u00f3d solais t\u00e1scaire",
+                "state": {
+                    "none": "As",
+                    "pos": "L\u00e9irigh staid an lasc inbh\u00e9artaithe",
+                    "relay": "L\u00e9irigh staid an lasctha ar si\u00fal/as"
+                }
+            },
+            "material": {
+                "name": "\u00c1bhar"
+            },
+            "mode": {
+                "name": "M\u00f3d"
+            },
+            "motion_sensitivity": {
+                "name": "\u00cdogaireacht braite gluaisne",
+                "state": {
+                    "0": "\u00cdseal",
+                    "1": "Me\u00e1nach",
+                    "2": "Ard"
+                }
+            },
+            "odor_elimination_mode": {
+                "name": "M\u00f3d deireadh a chur le boladh",
+                "state": {
+                    "interim": "Eatramhach",
+                    "smart": "Cliste"
+                }
+            },
+            "record_mode": {
+                "name": "M\u00f3d taifeadta",
+                "state": {
+                    "1": "Taifead imeachta\u00ed amh\u00e1in",
+                    "2": "Taifeadadh lean\u00fanach"
+                }
+            },
+            "relay_status": {
+                "name": "Iompar cumhachta ar",
+                "state": {
+                    "last": "Cuimhnigh an st\u00e1t deireanach",
+                    "memory": "Cuimhnigh an st\u00e1t deireanach",
+                    "off": "As",
+                    "on": "Ar si\u00fal",
+                    "power_off": "As",
+                    "power_on": "Ar si\u00fal"
+                }
+            },
+            "target_humidity": {
+                "name": "Taise sprice"
+            },
+            "temperature_level": {
+                "name": "Leibh\u00e9al teochta"
+            },
+            "vacuum_cistern": {
+                "name": "Coigeart\u00fa umar uisce",
+                "state": {
+                    "closed": "D\u00fanta",
+                    "high": "Ard",
+                    "low": "\u00cdseal",
+                    "middle": "L\u00e1r"
+                }
+            },
+            "vacuum_collection": {
+                "name": "M\u00f3d baili\u00fach\u00e1in deannaigh",
+                "state": {
+                    "large": "M\u00f3r",
+                    "middle": "L\u00e1r",
+                    "small": "Beag"
+                }
+            },
+            "vacuum_mode": {
+                "name": "M\u00f3d",
+                "state": {
+                    "bow": "Bogha",
+                    "chargego": "Fill ar ais chuig an duga",
+                    "left_bow": "Bogha ar chl\u00e9",
+                    "left_spiral": "B\u00edseach ar chl\u00e9",
+                    "mop": "Mop",
+                    "part": "Cuid",
+                    "partial_bow": "Bogha go p\u00e1irteach",
+                    "pick_zone": "Crios piocadh",
+                    "point": "Pointe",
+                    "pose": "Staidi\u00fair",
+                    "random": "Randamach",
+                    "right_bow": "Bogha ar dheis",
+                    "right_spiral": "Sprial ar dheis",
+                    "single": "Singil",
+                    "smart": "Cliste",
+                    "spiral": "B\u00edorlach",
+                    "standby": "Fuireachas",
+                    "wall_follow": "Lean an balla",
+                    "zone": "Crios"
+                }
+            },
+            "vertical_fan_angle": {
+                "name": "Uillinn flap luasctha ingearach",
+                "state": {
+                    "30": "30\u00b0",
+                    "60": "60\u00b0",
+                    "90": "90\u00b0"
+                }
+            },
+            "volume": {
+                "name": "Toirt"
+            },
+            "weather_delay": {
+                "name": "Moill aimsire",
+                "state": {
+                    "120h": "120 uair",
+                    "144h": "144 uair",
+                    "168h": "168 uair",
+                    "24h": "24 uair",
+                    "48h": "48 uair",
+                    "72h": "72 uair",
+                    "96h": "96 uair",
+                    "cancel": "Cealaigh"
+                }
             }
         },
         "sensor": {
+            "air_pressure": {
+                "name": "Br\u00fa aeir"
+            },
+            "air_quality": {
+                "name": "C\u00e1il\u00edocht an aeir",
+                "state": {
+                    "good": "Maith",
+                    "great": "Iontach",
+                    "mild": "\u00c9adrom",
+                    "severe": "Trom"
+                }
+            },
+            "air_quality_index": {
+                "name": "Inn\u00e9acs c\u00e1il\u00edochta aeir",
+                "state": {
+                    "level_1": "Leibh\u00e9al 1",
+                    "level_2": "Leibh\u00e9al 2",
+                    "level_3": "Leibh\u00e9al 3",
+                    "level_4": "Leibh\u00e9al 4",
+                    "level_5": "Leibh\u00e9al 5",
+                    "level_6": "Leibh\u00e9al 6"
+                }
+            },
+            "battery": {
+                "name": "Ceallra\u00ed"
+            },
+            "battery_power": {
+                "name": "Cumhacht ceallra\u00ed"
+            },
+            "battery_soc": {
+                "name": "SOC Ceallra\u00ed"
+            },
+            "battery_state": {
+                "name": "Staid na ceallra\u00ed"
+            },
+            "carbon_dioxide": {
+                "name": "D\u00e9-ocsa\u00edd charb\u00f3in"
+            },
+            "carbon_monoxide": {
+                "name": "Aonocsa\u00edd charb\u00f3in"
+            },
+            "cat_weight": {
+                "name": "Me\u00e1chan cait"
+            },
+            "cleaning_area": {
+                "name": "Limist\u00e9ar glantach\u00e1in"
+            },
+            "cleaning_time": {
+                "name": "Am glantach\u00e1in"
+            },
+            "concentration_carbon_dioxide": {
+                "name": "Ti\u00fachan d\u00e9-ocsa\u00edd charb\u00f3in"
+            },
+            "current": {
+                "name": "Reatha"
+            },
+            "current_temperature": {
+                "name": "Teocht reatha"
+            },
+            "depth": {
+                "name": "Doimhneacht"
+            },
+            "dew_point_temperature": {
+                "name": "Pointe dr\u00fachta"
+            },
+            "duster_cloth_life": {
+                "name": "Saolr\u00e9 \u00e9adach duster"
+            },
+            "feels_like_temperature": {
+                "name": "Motha\u00edonn s\u00e9 cos\u00fail"
+            },
             "filter_duration": {
                 "name": "Fad an scagaire"
+            },
+            "filter_life": {
+                "name": "Saolr\u00e9 an scagaire"
+            },
+            "filter_utilization": {
+                "name": "\u00das\u00e1id scagaire"
+            },
+            "formaldehyde": {
+                "name": "Formaild\u00e9ad"
+            },
+            "gas": {
+                "name": "G\u00e1s"
+            },
+            "heat_index_temperature": {
+                "name": "Inn\u00e9acs teasa"
+            },
+            "humidity": {
+                "name": "Taise"
+            },
+            "humidity_outdoor": {
+                "name": "Taise lasmuigh"
+            },
+            "illuminance": {
+                "name": "Soilsi\u00fa"
+            },
+            "indexed_humidity_outdoor": {
+                "name": "Cain\u00e9al taise lasmuigh {index}"
+            },
+            "indexed_temperature_external": {
+                "name": "Cain\u00e9al teochta braiteora {index}"
+            },
+            "inverter_output_power": {
+                "name": "Cumhacht aschuir inbh\u00e9art\u00f3ra"
+            },
+            "last_amount": {
+                "name": "An m\u00e9id deireanach"
+            },
+            "last_operation_duration": {
+                "name": "Fad na hoibr\u00edochta deireana\u00ed"
+            },
+            "lifetime_battery_charge_energy": {
+                "name": "Fuinneamh muirir ceallra\u00ed ar feadh an tsaoil"
+            },
+            "lifetime_battery_discharge_energy": {
+                "name": "Fuinneamh urscaoilte ceallra\u00ed ar feadh an tsaoil"
+            },
+            "lifetime_inverter_output_energy": {
+                "name": "Fuinneamh aschuir inverter ar feadh an tsaoil"
+            },
+            "lifetime_offgrid_port_energy": {
+                "name": "Fuinneamh calafoirt lasmuigh den ghreille ar feadh an tsaoil"
+            },
+            "lifetime_pv_energy": {
+                "name": "Fuinneamh PV ar feadh an tsaoil"
+            },
+            "liquid_depth": {
+                "name": "Doimhneacht leachtach"
+            },
+            "liquid_level": {
+                "name": "Leibh\u00e9al leachtach"
+            },
+            "liquid_state": {
+                "name": "Staid leachtach",
+                "state": {
+                    "lower_alarm": "\u00cdseal",
+                    "normal": "Gn\u00e1th",
+                    "upper_alarm": "Ard"
+                }
+            },
+            "luminosity": {
+                "name": "Lonr\u00falacht"
+            },
+            "methane": {
+                "name": "Meat\u00e1n"
+            },
+            "odor_elimination_status": {
+                "name": "St\u00e1das",
+                "state": {
+                    "charge_done": "Muirear d\u00e9anta",
+                    "charging": "Muirear\u00fa",
+                    "standby": "Fuireachas",
+                    "work": "Ag obair"
+                }
+            },
+            "phase_a_current": {
+                "name": "C\u00e9im A reatha"
+            },
+            "phase_a_power": {
+                "name": "Cumhacht C\u00e9im A"
+            },
+            "phase_a_voltage": {
+                "name": "Voltas C\u00e9im A"
+            },
+            "phase_b_current": {
+                "name": "C\u00e9im B reatha"
+            },
+            "phase_b_power": {
+                "name": "Cumhacht C\u00e9im B"
+            },
+            "phase_b_voltage": {
+                "name": "Voltas C\u00e9im B"
+            },
+            "phase_c_current": {
+                "name": "C\u00e9im C reatha"
+            },
+            "phase_c_power": {
+                "name": "Cumhacht C\u00e9im C"
+            },
+            "phase_c_voltage": {
+                "name": "Voltas C\u00e9im C"
+            },
+            "pm1": {
+                "name": "PM1"
+            },
+            "pm10": {
+                "name": "PM10"
+            },
+            "pm25": {
+                "name": "PM2.5"
+            },
+            "power": {
+                "name": "Cumhacht"
+            },
+            "precipitation_intensity": {
+                "name": "D\u00e9ine fheasachta"
+            },
+            "precipitation_today": {
+                "name": "Deascadh ioml\u00e1n inniu"
             },
             "pump_time": {
                 "name": "Fad an chaid\u00e9il uisce"
             },
+            "pv_channel_power": {
+                "name": "Cumhacht cain\u00e9al PV {index}"
+            },
+            "remaining_time": {
+                "name": "Am at\u00e1 f\u00e1gtha"
+            },
+            "rolling_brush_life": {
+                "name": "Saolr\u00e9 scuab rollta"
+            },
+            "side_brush_life": {
+                "name": "Saolr\u00e9 scuab taobh"
+            },
+            "smoke_amount": {
+                "name": "M\u00e9id deataigh"
+            },
+            "sous_vide_status": {
+                "name": "St\u00e1das",
+                "state": {
+                    "boiling_temp": "Teocht fiuchta",
+                    "cooling": "Fuar\u00fa",
+                    "heating": "T\u00e9amh",
+                    "heating_temp": "Teocht t\u00e9imh",
+                    "reserve_1": "C\u00falchiste 1",
+                    "reserve_2": "C\u00falchiste 2",
+                    "reserve_3": "C\u00falchiste 3",
+                    "standby": "Fuireachas",
+                    "warm": "Caomhn\u00fa teasa"
+                }
+            },
+            "status": {
+                "name": "St\u00e1das"
+            },
+            "supply_frequency": {
+                "name": "Minic\u00edocht sol\u00e1thair"
+            },
+            "temperature": {
+                "name": "Teocht"
+            },
             "temperature_external": {
                 "name": "Teocht an t\u00f3iread\u00f3ra"
+            },
+            "total_absorption_particles": {
+                "name": "Ions\u00fa ioml\u00e1n na gc\u00e1ithn\u00edn\u00ed"
+            },
+            "total_cleaning_area": {
+                "name": "Limist\u00e9ar glantach\u00e1in ioml\u00e1n"
+            },
+            "total_cleaning_time": {
+                "name": "Am glantach\u00e1in ioml\u00e1n"
+            },
+            "total_cleaning_times": {
+                "name": "Amanna glantach\u00e1in ioml\u00e1na"
+            },
+            "total_dissolved_solids": {
+                "name": "Solaid thuaslagtha ioml\u00e1na"
+            },
+            "total_energy": {
+                "name": "Fuinneamh ioml\u00e1n"
+            },
+            "total_operating_time": {
+                "name": "Am oibri\u00fach\u00e1in ioml\u00e1n"
+            },
+            "total_power": {
+                "name": "Cumhacht ioml\u00e1n"
+            },
+            "total_production": {
+                "name": "T\u00e1irgeadh ioml\u00e1n"
+            },
+            "total_pv_power": {
+                "name": "Cumhacht ioml\u00e1n PV"
+            },
+            "total_volatile_organic_compound": {
+                "name": "Comhdh\u00fail org\u00e1nach so-ghalaithe ioml\u00e1n"
+            },
+            "total_watering_time": {
+                "name": "Am ioml\u00e1n uisce"
+            },
+            "uv_index": {
+                "name": "Inn\u00e9acs UV"
             },
             "uv_runtime": {
                 "name": "Am rith UV"
             },
+            "voc": {
+                "name": "Comhdh\u00faile org\u00e1nacha so-ghalaithe"
+            },
+            "voltage": {
+                "name": "Voltas"
+            },
+            "water_level": {
+                "name": "Leibh\u00e9al an uisce"
+            },
+            "water_level_state": {
+                "name": "Leibh\u00e9al an uisce",
+                "state": {
+                    "level_1": "\u00cdseal",
+                    "level_2": "Me\u00e1nach",
+                    "level_3": "L\u00e1n"
+                }
+            },
             "water_time": {
                 "name": "Fad \u00fas\u00e1ide uisce"
+            },
+            "wind_chill_index_temperature": {
+                "name": "Inn\u00e9acs fuaraithe gaoithe"
+            },
+            "wind_direction": {
+                "name": "Treo na gaoithe"
             }
+        },
+        "switch": {
+            "anion": {
+                "name": "Anion"
+            },
+            "arm_beep": {
+                "name": "Arm\u00e1il b\u00edp"
+            },
+            "battery_lock": {
+                "name": "Glas ceallra\u00ed"
+            },
+            "child_lock": {
+                "name": "Glas leana\u00ed"
+            },
+            "cry_detection": {
+                "name": "Brath caointe"
+            },
+            "disinfection": {
+                "name": "D\u00edghalr\u00fa"
+            },
+            "do_not_disturb": {
+                "name": "N\u00e1 cuir isteach"
+            },
+            "energy_saving": {
+                "name": "Coigilt fuinnimh"
+            },
+            "filter_cartridge_reset": {
+                "name": "Athshocr\u00fa cart\u00fas scagaire"
+            },
+            "filter_reset": {
+                "name": "Athshocr\u00fa scagaire"
+            },
+            "flip": {
+                "name": "Smeach"
+            },
+            "frost_protection": {
+                "name": "Cosaint sioc"
+            },
+            "heat_preservation": {
+                "name": "Caomhn\u00fa teasa"
+            },
+            "humidification": {
+                "name": "Taisi\u00fa"
+            },
+            "indexed_alarm": {
+                "name": "Al\u00e1ram {index}"
+            },
+            "indexed_socket": {
+                "name": "Soic\u00e9ad {index}"
+            },
+            "indexed_switch": {
+                "name": "Athraigh {index}"
+            },
+            "indexed_usb": {
+                "name": "USB {index}"
+            },
+            "ionizer": {
+                "name": "Ianaitheoir"
+            },
+            "motion_alarm": {
+                "name": "Al\u00e1ram gluaisne"
+            },
+            "motion_recording": {
+                "name": "Taifeadadh gluaisne"
+            },
+            "motion_tracking": {
+                "name": "Rian\u00fa gluaisne"
+            },
+            "music": {
+                "name": "Ceol"
+            },
+            "mute": {
+                "name": "Balbhaigh"
+            },
+            "mute_voice": {
+                "name": "Guth balbh"
+            },
+            "natural_wind": {
+                "name": "Gaoth n\u00e1d\u00fartha"
+            },
+            "open_window_detection": {
+                "name": "Brath fuinneoige oscailte"
+            },
+            "output_power_limit": {
+                "name": "Teorainn chumhachta aschuir"
+            },
+            "oxygen_bar": {
+                "name": "Barra ocsaigine"
+            },
+            "plug": {
+                "name": "Breise\u00e1n"
+            },
+            "power": {
+                "name": "Cumhacht"
+            },
+            "privacy_mode": {
+                "name": "M\u00f3d pr\u00edobh\u00e1ideachta"
+            },
+            "pump": {
+                "name": "Caid\u00e9al"
+            },
+            "radio": {
+                "name": "Raidi\u00f3"
+            },
+            "reset_of_water_usage_days": {
+                "name": "Athshocr\u00fa laethanta \u00fas\u00e1ide uisce"
+            },
+            "reverse": {
+                "name": "Droim ar ais"
+            },
+            "siren": {
+                "name": "Bonn\u00e1n"
+            },
+            "sleep": {
+                "name": "Codladh"
+            },
+            "sleep_aid": {
+                "name": "C\u00fanamh codlata"
+            },
+            "slow_feed": {
+                "name": "Beath\u00fa mall"
+            },
+            "snooze": {
+                "name": "Codladh"
+            },
+            "socket": {
+                "name": "Soic\u00e9ad"
+            },
+            "sound": {
+                "name": "Fuaim"
+            },
+            "sound_detection": {
+                "name": "Brath fuaime"
+            },
+            "spray": {
+                "name": "Sprae\u00e1il"
+            },
+            "start": {
+                "name": "Tosaigh"
+            },
+            "sterilization": {
+                "name": "Steirili\u00fa"
+            },
+            "switch": {
+                "name": "Lasc"
+            },
+            "time_watermark": {
+                "name": "Uisce uisce ama"
+            },
+            "uv_sterilization": {
+                "name": "Steirili\u00fa UV"
+            },
+            "video_recording": {
+                "name": "Taifeadadh f\u00edse"
+            },
+            "voice": {
+                "name": "Guth"
+            },
+            "water": {
+                "name": "Uisce"
+            },
+            "water_pump_reset": {
+                "name": "Athshocr\u00fa caid\u00e9il uisce"
+            },
+            "wide_dynamic_range": {
+                "name": "Raon dinimici\u00fail leathan"
+            }
+        },
+        "valve": {
+            "indexed_valve": {
+                "name": "Comhla {index}"
+            },
+            "valve": {
+                "name": "Comhla"
+            }
+        }
+    },
+    "exceptions": {
+        "action_dpcode_not_found": {
+            "message": "N\u00ed f\u00e9idir an gn\u00edomh a phr\u00f3ise\u00e1il mar nach sol\u00e1thra\u00edonn an gl\u00e9as c\u00f3d feidhme comhfhreagrach (bh\u00edothas ag s\u00fail le ceann de {expected} i {available})."
+        }
+    },
+    "issues": {
+        "deprecated_entity_new_valve": {
+            "description": "T\u00e1 an t-eintiteas Tuya `{entity}` imithe i l\u00e9ig, agus t\u00e1 eintiteas comhla nua ina \u00e1it.\nNuashonraigh do phain\u00e9il rialaithe, uathoibrithe agus scripteanna, d\u00edchumasaigh `{entity}` agus athl\u00f3d\u00e1il an comhth\u00e1th\u00fa/atosaigh Home Assistant chun an fhadhb seo a r\u00e9iteach.",
+            "title": "T\u00e1 {name} imithe i l\u00e9ig"
         }
     }
 }

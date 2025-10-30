@@ -12,7 +12,7 @@
                 "data": {
                     "user_code": "Naudotojo kodas"
                 },
-                "description": "Tuya integracija dabar naudoja patobulint\u0105 prisijungimo metod\u0105. Nor\u0117dami i\u0161 naujo autentifikuoti savo Smart Life arba Tuya Smart paskyr\u0105, turite \u012fvesti savo naudotojo kod\u0105. \n\n \u0160\u012f kod\u0105 galite rasti program\u0117l\u0117je \u201eSmart Life\u201c arba \u201eTuya Smart\u201c program\u0117l\u0117je **Nustatym\u0173** > **Paskyra ir sauga** ekrane ir \u012fveskite lauke **Naudotojo kodas** rodom\u0105 kod\u0105. Naudotojo kodas yra did\u017eiosios ir ma\u017eosios raid\u0117s, b\u016btinai \u012fveskite j\u012f tiksliai taip, kaip parodyta program\u0117l\u0117je."
+                "description": "Tuya integracija dabar naudoja patobulint\u0105 prisijungimo metod\u0105. Nor\u0117dami i\u0161 naujo patvirtinti savo tapatyb\u0119 naudodami Smart Life arba Tuya Smart paskyr\u0105, turite \u012fvesti savo vartotojo kod\u0105. \n \n \u0160\u012f kod\u0105 galite rasti Smart Life arba Tuya Smart program\u0117l\u0117je, eidami \u012f **Nustatymai** > **Paskyra ir saugumas** ekran\u0105 ir \u012fveskite kod\u0105, rodom\u0105 lauke **Vartotojo kodas**. Vartotojo kodas yra did\u017ei\u0173j\u0173 ir ma\u017e\u0173j\u0173 raid\u017ei\u0173 jautri, tod\u0117l b\u016btinai \u012fveskite j\u012f tiksliai taip, kaip parodyta program\u0117l\u0117je."
             },
             "scan": {
                 "description": "Naudodamiesi program\u0117le Smart Life arba Tuya Smart program\u0117le nuskaitykite toliau nurodyt\u0105 QR kod\u0105, kad u\u017ebaigtum\u0117te prisijungim\u0105. Atlik\u0119 \u0161\u012f veiksm\u0105 program\u0117l\u0117je, pereikite prie kito veiksmo."
@@ -21,7 +21,7 @@
                 "data": {
                     "user_code": "Naudotojo kodas"
                 },
-                "description": "\u012eveskite savo Smart Life arba Tuya Smart naudotojo kod\u0105. \n\n \u0160\u012f kod\u0105 galite rasti program\u0117l\u0117je \u201eSmart Life\u201c arba \u201eTuya Smart\u201c program\u0117l\u0117je **Nustatym\u0173** > **Paskyra ir sauga** ekrane ir \u012fveskite lauke **Naudotojo kodas** rodom\u0105 kod\u0105. Naudotojo kodas yra did\u017eiosios ir ma\u017eosios raid\u0117s, b\u016btinai \u012fveskite j\u012f tiksliai taip, kaip parodyta program\u0117l\u0117je."
+                "description": "\u012eveskite savo Smart Life arba Tuya Smart naudotojo kod\u0105. \n \n \u0160\u012f kod\u0105 galite rasti \u201eSmart Life\u201c arba \u201eTuya Smart\u201c program\u0117l\u0117je, eidami \u012f **Nustatymai** > **Paskyra ir saugumas** ekran\u0105, ir \u012fveskite kod\u0105, rodom\u0105 lauke **Vartotojo kodas**. Naudotojo kodas yra did\u017ei\u0173j\u0173 ir ma\u017e\u0173j\u0173 raid\u017ei\u0173 jautri, tod\u0117l b\u016btinai \u012fveskite j\u012f tiksliai taip, kaip parodyta program\u0117l\u0117je."
             }
         }
     },
@@ -32,6 +32,9 @@
             },
             "carbon_monoxide": {
                 "name": "Anglies monoksidas"
+            },
+            "defrost": {
+                "name": "Atitirpinimas"
             },
             "drop": {
                 "name": "Numesti"
@@ -51,11 +54,20 @@
             "pressure": {
                 "name": "Sl\u0117gis"
             },
+            "tankfull": {
+                "name": "Pilnas bakas"
+            },
             "tilt": {
                 "name": "Pakreipti"
             },
+            "valve": {
+                "name": "Vo\u017etuvas"
+            },
             "voc": {
                 "name": "VOCs"
+            },
+            "wet": {
+                "name": "\u0160lapias"
             }
         },
         "button": {
@@ -85,20 +97,11 @@
             "curtain": {
                 "name": "U\u017euolaida"
             },
-            "curtain_2": {
-                "name": "U\u017euolaida 2"
+            "indexed_curtain": {
+                "name": "U\u017euolaida {index}"
             },
-            "curtain_3": {
-                "name": "U\u017euolaida 3"
-            },
-            "door": {
-                "name": "Durys"
-            },
-            "door_2": {
-                "name": "Durys 2"
-            },
-            "door_3": {
-                "name": "Durys 3"
+            "indexed_door": {
+                "name": "Durys {index}"
             }
         },
         "event": {
@@ -119,31 +122,43 @@
             "backlight": {
                 "name": "Foninis ap\u0161vietimas"
             },
+            "indexed_light": {
+                "name": "\u0160viesa {index}"
+            },
             "light": {
                 "name": "Lempa"
-            },
-            "light_2": {
-                "name": "\u0160viesa 2"
-            },
-            "light_3": {
-                "name": "\u0160viesa 3"
             },
             "night_light": {
                 "name": "Naktin\u0117 \u0161viesa"
             }
         },
         "number": {
+            "alarm_delay": {
+                "name": "Signalizacijos v\u0117lavimas"
+            },
             "alarm_duration": {
                 "name": "Signalizacijos trukm\u0117"
+            },
+            "alarm_maximum": {
+                "name": "Maksimalus aliarmas"
+            },
+            "alarm_minimum": {
+                "name": "Minimalus aliarmas"
+            },
+            "arm_delay": {
+                "name": "\u012ejungimo u\u017edelsimas"
+            },
+            "battery_backup_reserve": {
+                "name": "Baterijos atsargin\u0117 kopija"
             },
             "cloud_recipe": {
                 "name": "Debes\u0173 receptas"
             },
             "cook_temperature": {
-                "name": "Gaminimo temperat\u016bra"
+                "name": "Virimo temperat\u016bra"
             },
             "cook_time": {
-                "name": "Gaminimo laikas"
+                "name": "Virimo laikas"
             },
             "down_delay": {
                 "name": "V\u0117lavimas \u017eemyn"
@@ -157,23 +172,35 @@
             "heat_preservation_time": {
                 "name": "\u0160ilumos i\u0161saugojimo laikas"
             },
+            "indexed_cook_temperature": {
+                "name": "Virimo temperat\u016bra {index}"
+            },
+            "indexed_irrigation_duration": {
+                "name": "Dr\u0117kinimo trukm\u0117 {index}"
+            },
+            "indexed_maximum_brightness": {
+                "name": "Maksimalus ry\u0161kumas {index}"
+            },
+            "indexed_minimum_brightness": {
+                "name": "Minimalus ry\u0161kumas {index}"
+            },
+            "indexed_temperature": {
+                "name": "Temperat\u016bra {index}"
+            },
+            "installation_height": {
+                "name": "Montavimo auk\u0161tis"
+            },
+            "inverter_output_power_limit": {
+                "name": "Inverterio i\u0161\u0117jimo galios riba"
+            },
             "maximum_brightness": {
                 "name": "Did\u017eiausias ry\u0161kumas"
             },
-            "maximum_brightness_2": {
-                "name": "Did\u017eiausias ry\u0161kumas 2"
-            },
-            "maximum_brightness_3": {
-                "name": "Did\u017eiausias ry\u0161kumas 3"
+            "maximum_liquid_depth": {
+                "name": "Did\u017eiausias skys\u010dio gylis"
             },
             "minimum_brightness": {
                 "name": "Minimalus ry\u0161kumas"
-            },
-            "minimum_brightness_2": {
-                "name": "Ma\u017eiausias ry\u0161kumas 2"
-            },
-            "minimum_brightness_3": {
-                "name": "Ma\u017eiausias ry\u0161kumas 3"
             },
             "move_down": {
                 "name": "Jud\u0117k \u017eemyn"
@@ -190,8 +217,14 @@
             "sensitivity": {
                 "name": "Jautrumas"
             },
+            "siren_duration": {
+                "name": "Sirenos trukm\u0117"
+            },
             "target_dis_closest": {
                 "name": "Artimiausias taikinio atstumas"
+            },
+            "temp_correction": {
+                "name": "Temperat\u016bros korekcija"
             },
             "temperature": {
                 "name": "Temperat\u016bra"
@@ -230,6 +263,7 @@
                 }
             },
             "blanket_level": {
+                "name": "Lygis",
                 "state": {
                     "level_1": "\u017demas",
                     "level_10": "Auk\u0161tas",
@@ -285,6 +319,23 @@
                     "1": "Didelis jautrumas"
                 }
             },
+            "desk_level": {
+                "name": "Lygis",
+                "state": {
+                    "level_1": "1 lygis",
+                    "level_2": "2 lygis",
+                    "level_3": "3 lygis",
+                    "level_4": "4 lygis"
+                }
+            },
+            "desk_up_down": {
+                "name": "Auk\u0161tyn/\u017demyn",
+                "state": {
+                    "down": "\u017demyn",
+                    "stop": "Sustabdyti",
+                    "up": "Auk\u0161tyn"
+                }
+            },
             "fingerbot_mode": {
                 "name": "Re\u017eimas",
                 "state": {
@@ -335,6 +386,37 @@
                     "work": "Darbas"
                 }
             },
+            "indexed_blanket_level": {
+                "name": "Lygis {index}",
+                "state": {
+                    "level_1": "\u017demas",
+                    "level_10": "Auk\u0161tas",
+                    "level_2": "2 lygis",
+                    "level_3": "3 lygis",
+                    "level_4": "4 lygis",
+                    "level_5": "5 lygis",
+                    "level_6": "6 lygis",
+                    "level_7": "7 lygis",
+                    "level_8": "8 lygis",
+                    "level_9": "9 lygis"
+                }
+            },
+            "indexed_led_type": {
+                "name": "\u0160viesos {index} \u0161altinio tipas",
+                "state": {
+                    "halogen": "Halogenas",
+                    "incandescent": "Kaitrin\u0117",
+                    "led": "LED"
+                }
+            },
+            "inverter_work_mode": {
+                "name": "Inverterio darbo re\u017eimas",
+                "state": {
+                    "manual": "Rankinis re\u017eimas",
+                    "self_powered": "Savaranki\u0161kai maitinamas",
+                    "time_of_use": "Naudojimo laikas"
+                }
+            },
             "ipc_work_mode": {
                 "name": "IPC re\u017eimas",
                 "state": {
@@ -344,22 +426,6 @@
             },
             "led_type": {
                 "name": "\u0160viesos \u0161altinio tipas",
-                "state": {
-                    "halogen": "Halogenas",
-                    "incandescent": "Kaitrin\u0117",
-                    "led": "LED"
-                }
-            },
-            "led_type_2": {
-                "name": "2 \u0161viesos \u0161altinio tipas",
-                "state": {
-                    "halogen": "Halogenas",
-                    "incandescent": "Kaitrin\u0117",
-                    "led": "LED"
-                }
-            },
-            "led_type_3": {
-                "name": "3 \u0161viesos \u0161altinio tipas",
                 "state": {
                     "halogen": "Halogenas",
                     "incandescent": "Kaitrin\u0117",
@@ -386,6 +452,13 @@
                     "0": "\u017demas",
                     "1": "Vidutinis",
                     "2": "Auk\u0161tas"
+                }
+            },
+            "odor_elimination_mode": {
+                "name": "Kvap\u0173 \u0161alinimo re\u017eimas",
+                "state": {
+                    "interim": "Laikinasis",
+                    "smart": "I\u0161manusis"
                 }
             },
             "record_mode": {
@@ -479,6 +552,9 @@
             }
         },
         "sensor": {
+            "air_pressure": {
+                "name": "Oro sl\u0117gis"
+            },
             "air_quality": {
                 "name": "Oro kokyb\u0117",
                 "state": {
@@ -502,6 +578,12 @@
             "battery": {
                 "name": "Baterija"
             },
+            "battery_power": {
+                "name": "Akumuliatoriaus maitinimas"
+            },
+            "battery_soc": {
+                "name": "Akumuliatoriaus SOC"
+            },
             "battery_state": {
                 "name": "Baterijos b\u016bsena"
             },
@@ -510,6 +592,9 @@
             },
             "carbon_monoxide": {
                 "name": "Anglies monoksidas"
+            },
+            "cat_weight": {
+                "name": "Kat\u0117s svoris"
             },
             "cleaning_area": {
                 "name": "Valymo zona"
@@ -526,8 +611,17 @@
             "current_temperature": {
                 "name": "Dabartin\u0117 temperat\u016bra"
             },
+            "depth": {
+                "name": "Gylis"
+            },
+            "dew_point_temperature": {
+                "name": "Rasos ta\u0161kas"
+            },
             "duster_cloth_life": {
                 "name": "\u0160luost\u0117s eksploatavimo laikas"
+            },
+            "feels_like_temperature": {
+                "name": "Jau\u010diasi kaip"
             },
             "filter_duration": {
                 "name": "Filtro trukm\u0117"
@@ -544,11 +638,26 @@
             "gas": {
                 "name": "Dujos"
             },
+            "heat_index_temperature": {
+                "name": "\u0160ilumos indeksas"
+            },
             "humidity": {
                 "name": "Oro dr\u0117gm\u0117"
             },
+            "humidity_outdoor": {
+                "name": "Lauko dr\u0117gm\u0117"
+            },
             "illuminance": {
                 "name": "Ap\u0161vieta"
+            },
+            "indexed_humidity_outdoor": {
+                "name": "Lauko dr\u0117gm\u0117s kanalas {index}"
+            },
+            "indexed_temperature_external": {
+                "name": "Zondo temperat\u016bros kanalas {index}"
+            },
+            "inverter_output_power": {
+                "name": "Inverterio i\u0161\u0117jimo galia"
             },
             "last_amount": {
                 "name": "Paskutin\u0117 suma"
@@ -556,11 +665,49 @@
             "last_operation_duration": {
                 "name": "Paskutin\u0117s operacijos trukm\u0117"
             },
+            "lifetime_battery_charge_energy": {
+                "name": "Baterijos \u012fkrovimo energija per vis\u0105 naudojimo laik\u0105"
+            },
+            "lifetime_battery_discharge_energy": {
+                "name": "Baterijos i\u0161krovimo energija per vis\u0105 naudojimo laik\u0105"
+            },
+            "lifetime_inverter_output_energy": {
+                "name": "Inverterio i\u0161\u0117jimo energija vis\u0105 naudojimo laik\u0105"
+            },
+            "lifetime_offgrid_port_energy": {
+                "name": "Vis\u0105 eksploatavimo laik\u0105 veikianti autonominio prievado energija"
+            },
+            "lifetime_pv_energy": {
+                "name": "Vis\u0105 gyvenim\u0105 veikianti PV energija"
+            },
+            "liquid_depth": {
+                "name": "Skys\u010dio gylis"
+            },
+            "liquid_level": {
+                "name": "Skys\u010dio lygis"
+            },
+            "liquid_state": {
+                "name": "Skysta b\u016bsena",
+                "state": {
+                    "lower_alarm": "\u017demas",
+                    "normal": "Normalus",
+                    "upper_alarm": "Auk\u0161tas"
+                }
+            },
             "luminosity": {
                 "name": "\u0160viesumas"
             },
             "methane": {
                 "name": "Metanas"
+            },
+            "odor_elimination_status": {
+                "name": "B\u016bsena",
+                "state": {
+                    "charge_done": "\u012ekrovimas atliktas",
+                    "charging": "\u012ekrovimas",
+                    "standby": "Bud\u0117jimo re\u017eimas",
+                    "work": "Darbas"
+                }
             },
             "phase_a_current": {
                 "name": "A faz\u0117s srov\u0117"
@@ -601,8 +748,17 @@
             "power": {
                 "name": "Galia"
             },
+            "precipitation_intensity": {
+                "name": "Krituli\u0173 intensyvumas"
+            },
+            "precipitation_today": {
+                "name": "Bendras krituli\u0173 kiekis \u0161iandien"
+            },
             "pump_time": {
                 "name": "Vandens siurblio veikimo trukm\u0117"
+            },
+            "pv_channel_power": {
+                "name": "PV kanalo {index} galia"
             },
             "remaining_time": {
                 "name": "Lik\u0119s laikas"
@@ -633,6 +789,9 @@
             "status": {
                 "name": "B\u016bsena"
             },
+            "supply_frequency": {
+                "name": "Maitinimo da\u017enis"
+            },
             "temperature": {
                 "name": "Temperat\u016bra"
             },
@@ -651,20 +810,32 @@
             "total_cleaning_times": {
                 "name": "Bendri valymo laikai"
             },
+            "total_dissolved_solids": {
+                "name": "Bendras i\u0161tirpusi\u0173 kiet\u0173j\u0173 daleli\u0173 kiekis"
+            },
             "total_energy": {
                 "name": "Bendra energija"
             },
             "total_operating_time": {
                 "name": "Bendras veikimo laikas"
             },
+            "total_power": {
+                "name": "Bendra galia"
+            },
             "total_production": {
                 "name": "Bendra gamyba"
+            },
+            "total_pv_power": {
+                "name": "Bendra PV galia"
             },
             "total_volatile_organic_compound": {
                 "name": "Bendras lakus organinis junginys"
             },
             "total_watering_time": {
                 "name": "Bendras laistymo laikas"
+            },
+            "uv_index": {
+                "name": "UV indeksas"
             },
             "uv_runtime": {
                 "name": "UV veikimo laikas"
@@ -678,25 +849,30 @@
             "water_level": {
                 "name": "Vandens lygis"
             },
+            "water_level_state": {
+                "name": "Vandens lygis",
+                "state": {
+                    "level_1": "\u017demas",
+                    "level_2": "Vidutinis",
+                    "level_3": "Pilnas"
+                }
+            },
             "water_time": {
                 "name": "Vandens naudojimo trukm\u0117"
+            },
+            "wind_chill_index_temperature": {
+                "name": "V\u0117jo \u0161al\u010dio indeksas"
+            },
+            "wind_direction": {
+                "name": "V\u0117jo kryptis"
             }
         },
         "switch": {
-            "alarm_1": {
-                "name": "Signalizacija 1"
-            },
-            "alarm_2": {
-                "name": "Signalizacija 2"
-            },
-            "alarm_3": {
-                "name": "Signalizacija 3"
-            },
-            "alarm_4": {
-                "name": "Signalizacija 4"
-            },
             "anion": {
                 "name": "Anijonas"
+            },
+            "arm_beep": {
+                "name": "Rankos pyptel\u0117jimas"
             },
             "battery_lock": {
                 "name": "Akumuliatoriaus u\u017eraktas"
@@ -725,11 +901,26 @@
             "flip": {
                 "name": "Apversti"
             },
+            "frost_protection": {
+                "name": "Apsauga nuo \u0161al\u010dio"
+            },
             "heat_preservation": {
                 "name": "\u0160ilumos i\u0161saugojimas"
             },
             "humidification": {
                 "name": "Dr\u0117kinimas"
+            },
+            "indexed_alarm": {
+                "name": "Signalizacija {index}"
+            },
+            "indexed_socket": {
+                "name": "Rozet\u0117 {index}"
+            },
+            "indexed_switch": {
+                "name": "Jungiklis {index}"
+            },
+            "indexed_usb": {
+                "name": "USB {index}"
             },
             "ionizer": {
                 "name": "Jonizatorius"
@@ -743,6 +934,9 @@
             "motion_tracking": {
                 "name": "Judesio sekimas"
             },
+            "music": {
+                "name": "Muzika"
+            },
             "mute": {
                 "name": "Nutildyti"
             },
@@ -754,6 +948,9 @@
             },
             "open_window_detection": {
                 "name": "Atidaryto lango aptikimas"
+            },
+            "output_power_limit": {
+                "name": "I\u0161\u0117jimo galios riba"
             },
             "oxygen_bar": {
                 "name": "Deguonies baras"
@@ -779,6 +976,9 @@
             "reverse": {
                 "name": "Atvirk\u0161\u010diai"
             },
+            "siren": {
+                "name": "Sirena"
+            },
             "sleep": {
                 "name": "Miegas"
             },
@@ -788,26 +988,11 @@
             "slow_feed": {
                 "name": "L\u0117tas maitinimas"
             },
+            "snooze": {
+                "name": "Snaudimas"
+            },
             "socket": {
                 "name": "Rozet\u0117"
-            },
-            "socket_1": {
-                "name": "Rozet\u0117 1"
-            },
-            "socket_2": {
-                "name": "Rozet\u0117 2"
-            },
-            "socket_3": {
-                "name": "Rozet\u0117 3"
-            },
-            "socket_4": {
-                "name": "Rozet\u0117 4"
-            },
-            "socket_5": {
-                "name": "Rozet\u0117 5"
-            },
-            "socket_6": {
-                "name": "Rozet\u0117 6"
             },
             "sound": {
                 "name": "Garsas"
@@ -827,50 +1012,8 @@
             "switch": {
                 "name": "Jungiklis"
             },
-            "switch_1": {
-                "name": "Jungiklis 1"
-            },
-            "switch_2": {
-                "name": "Jungiklis 2"
-            },
-            "switch_3": {
-                "name": "Jungiklis 3"
-            },
-            "switch_4": {
-                "name": "Jungiklis 4"
-            },
-            "switch_5": {
-                "name": "Jungiklis 5"
-            },
-            "switch_6": {
-                "name": "Jungiklis 6"
-            },
-            "switch_7": {
-                "name": "Jungiklis 7"
-            },
-            "switch_8": {
-                "name": "Jungiklis 8"
-            },
             "time_watermark": {
                 "name": "Laiko vandens \u017eenklas"
-            },
-            "usb_1": {
-                "name": "USB 1"
-            },
-            "usb_2": {
-                "name": "USB 2"
-            },
-            "usb_3": {
-                "name": "USB 3"
-            },
-            "usb_4": {
-                "name": "USB 4"
-            },
-            "usb_5": {
-                "name": "USB 5"
-            },
-            "usb_6": {
-                "name": "USB 6"
             },
             "uv_sterilization": {
                 "name": "UV sterilizacija"
@@ -890,6 +1033,25 @@
             "wide_dynamic_range": {
                 "name": "Platus dinaminis diapazonas"
             }
+        },
+        "valve": {
+            "indexed_valve": {
+                "name": "Vo\u017etuvas {index}"
+            },
+            "valve": {
+                "name": "Vo\u017etuvas"
+            }
+        }
+    },
+    "exceptions": {
+        "action_dpcode_not_found": {
+            "message": "Nepavyko apdoroti veiksmo, nes \u012frenginys nepateikia atitinkamo funkcijos kodo (tik\u0117tasi vieno i\u0161 {expected} tarp {available} )."
+        }
+    },
+    "issues": {
+        "deprecated_entity_new_valve": {
+            "description": "Tuya objektas ' {entity} ' yra nebenaudojamas, j\u012f pakei\u010dia naujas vo\u017etuvo objektas. \n Atnaujinkite savo ataskait\u0173 suvestines, automatizavimo funkcijas ir scenarijus, i\u0161junkite ' {entity} ' ir i\u0161 naujo \u012fkelkite integracij\u0105 / paleiskite Home Assistant, kad i\u0161spr\u0119stum\u0117te \u0161i\u0105 problem\u0105.",
+            "title": "{name} nebenaudojamas"
         }
     }
 }

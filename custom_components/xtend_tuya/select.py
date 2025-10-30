@@ -267,7 +267,7 @@ async def async_setup_entry(
             dict[str, tuple[XTSelectEntityDescription, ...]],
         ],
         XTEntityDescriptorManager.get_platform_descriptors(
-            SELECTS, entry.runtime_data.multi_manager, this_platform
+            SELECTS, entry.runtime_data.multi_manager, XTSelectEntityDescription, this_platform
         ),
     )
 

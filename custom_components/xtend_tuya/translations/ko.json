@@ -64,21 +64,6 @@
             },
             "curtain": {
                 "name": "\ucee4\ud2bc"
-            },
-            "curtain_2": {
-                "name": "\ucee4\ud2bc 2"
-            },
-            "curtain_3": {
-                "name": "\ucee4\ud2bc 3"
-            },
-            "door": {
-                "name": "\ubb38"
-            },
-            "door_2": {
-                "name": "\ubb38 2"
-            },
-            "door_3": {
-                "name": "\ubb38 3"
             }
         },
         "light": {
@@ -88,12 +73,6 @@
             "light": {
                 "name": "\uc870\uba85"
             },
-            "light_2": {
-                "name": "\uc870\uba85 2"
-            },
-            "light_3": {
-                "name": "\uc870\uba85 3"
-            },
             "night_light": {
                 "name": "\uc57c\uac04 \uc870\uba85"
             }
@@ -101,12 +80,6 @@
         "number": {
             "cloud_recipe": {
                 "name": "\ud074\ub77c\uc6b0\ub4dc \ub808\uc2dc\ud53c"
-            },
-            "cook_temperature": {
-                "name": "\uc870\ub9ac \uc628\ub3c4"
-            },
-            "cook_time": {
-                "name": "\uc870\ub9ac \uc2dc\uac04"
             },
             "down_delay": {
                 "name": "\ub2e4\uc6b4 \uc9c0\uc5f0"
@@ -123,20 +96,8 @@
             "maximum_brightness": {
                 "name": "\ucd5c\ub300 \ubc1d\uae30"
             },
-            "maximum_brightness_2": {
-                "name": "\ucd5c\ub300 \ubc1d\uae30 2"
-            },
-            "maximum_brightness_3": {
-                "name": "\ucd5c\ub300 \ubc1d\uae30 3"
-            },
             "minimum_brightness": {
                 "name": "\ucd5c\uc18c \ubc1d\uae30"
-            },
-            "minimum_brightness_2": {
-                "name": "\ucd5c\uc18c \ubc1d\uae30 2"
-            },
-            "minimum_brightness_3": {
-                "name": "\ucd5c\uc18c \ubc1d\uae30 3"
             },
             "move_down": {
                 "name": "\uc544\ub798\ub85c \uc774\ub3d9"
@@ -295,22 +256,6 @@
                     "led": "LED"
                 }
             },
-            "led_type_2": {
-                "name": "\uc870\uba85 2 \uad11\uc6d0 \uc720\ud615",
-                "state": {
-                    "halogen": "\ud560\ub85c\uac90",
-                    "incandescent": "\ubc31\uc5f4\ub4f1",
-                    "led": "LED"
-                }
-            },
-            "led_type_3": {
-                "name": "\uc870\uba85 3 \uad11\uc6d0 \uc720\ud615",
-                "state": {
-                    "halogen": "\ud560\ub85c\uac90",
-                    "incandescent": "\ubc31\uc5f4\ub4f1",
-                    "led": "LED"
-                }
-            },
             "light_mode": {
                 "name": "\ud45c\uc2dc\ub4f1 \ubaa8\ub4dc",
                 "state": {
@@ -416,6 +361,9 @@
             }
         },
         "sensor": {
+            "air_pressure": {
+                "name": "\uae30\uc555"
+            },
             "air_quality": {
                 "name": "\uacf5\uae30\uc9c8",
                 "state": {
@@ -522,7 +470,7 @@
                 "name": "PM2.5"
             },
             "power": {
-                "name": "\uc804\uc6d0"
+                "name": "\uc804\ub825"
             },
             "remaining_time": {
                 "name": "\ub0a8\uc740 \uc2dc\uac04"
@@ -580,9 +528,6 @@
             "total_watering_time": {
                 "name": "\ucd1d \uad00\uc218 \uc2dc\uac04"
             },
-            "voc": {
-                "name": "\ud718\ubc1c\uc131 \uc720\uae30 \ud654\ud569\ubb3c"
-            },
             "voltage": {
                 "name": "\uc804\uc555"
             },
@@ -591,18 +536,6 @@
             }
         },
         "switch": {
-            "alarm_1": {
-                "name": "\uc54c\ub78c 1"
-            },
-            "alarm_2": {
-                "name": "\uc54c\ub78c 2"
-            },
-            "alarm_3": {
-                "name": "\uc54c\ub78c 3"
-            },
-            "alarm_4": {
-                "name": "\uc54c\ub78c 4"
-            },
             "anion": {
                 "name": "\uc74c\uc774\uc628"
             },
@@ -696,24 +629,6 @@
             "socket": {
                 "name": "\uc18c\ucf13"
             },
-            "socket_1": {
-                "name": "\uc18c\ucf13 1"
-            },
-            "socket_2": {
-                "name": "\uc18c\ucf13 2"
-            },
-            "socket_3": {
-                "name": "\uc18c\ucf13 3"
-            },
-            "socket_4": {
-                "name": "\uc18c\ucf13 4"
-            },
-            "socket_5": {
-                "name": "\uc18c\ucf13 5"
-            },
-            "socket_6": {
-                "name": "\uc18c\ucf13 6"
-            },
             "sound": {
                 "name": "\uc18c\ub9ac"
             },
@@ -732,50 +647,8 @@
             "switch": {
                 "name": "\uc2a4\uc704\uce58"
             },
-            "switch_1": {
-                "name": "\uc2a4\uc704\uce58 1"
-            },
-            "switch_2": {
-                "name": "\uc2a4\uc704\uce58 2"
-            },
-            "switch_3": {
-                "name": "\uc2a4\uc704\uce58 3"
-            },
-            "switch_4": {
-                "name": "\uc2a4\uc704\uce58 4"
-            },
-            "switch_5": {
-                "name": "\uc2a4\uc704\uce58 5"
-            },
-            "switch_6": {
-                "name": "\uc2a4\uc704\uce58 6"
-            },
-            "switch_7": {
-                "name": "\uc2a4\uc704\uce58 7"
-            },
-            "switch_8": {
-                "name": "\uc2a4\uc704\uce58 8"
-            },
             "time_watermark": {
                 "name": "\uc2dc\uac04 \uc6cc\ud130\ub9c8\ud06c"
-            },
-            "usb_1": {
-                "name": "USB 1"
-            },
-            "usb_2": {
-                "name": "USB 2"
-            },
-            "usb_3": {
-                "name": "USB 3"
-            },
-            "usb_4": {
-                "name": "USB 4"
-            },
-            "usb_5": {
-                "name": "USB 5"
-            },
-            "usb_6": {
-                "name": "USB 6"
             },
             "uv_sterilization": {
                 "name": "\uc790\uc678\uc120 \uc0b4\uade0"

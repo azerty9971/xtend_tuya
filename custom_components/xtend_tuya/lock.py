@@ -98,7 +98,7 @@ async def async_setup_entry(
     supported_descriptors, externally_managed_descriptors = cast(
         tuple[dict[str, XTLockEntityDescription], dict[str, XTLockEntityDescription]],
         XTEntityDescriptorManager.get_platform_descriptors(
-            LOCKS, entry.runtime_data.multi_manager, this_platform
+            LOCKS, entry.runtime_data.multi_manager, XTLockEntityDescription, this_platform
         ),
     )
 

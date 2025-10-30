@@ -137,7 +137,7 @@ async def async_setup_entry(
             dict[str, tuple[XTButtonEntityDescription, ...]],
         ],
         XTEntityDescriptorManager.get_platform_descriptors(
-            BUTTONS, entry.runtime_data.multi_manager, this_platform
+            BUTTONS, entry.runtime_data.multi_manager, XTButtonEntityDescription, this_platform
         ),
     )
 
