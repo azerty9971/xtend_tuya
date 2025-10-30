@@ -265,7 +265,9 @@ class XTEntityDescriptorManager:
                                 if other_entity := base_descr_keys[compound_key]:
                                     if entity_type is not None and other_entity.translation_placeholders is not None:
                                         old_dict = entity.__dict__
-                                        LOGGER.warning(f"Old dict: {old_dict}")
+                                        if "translation_placeholders" in old_dict:
+                                            old_dict["translation_placeholders"] = other_entity.translation_placeholders
+                                        LOGGER.warning(f"New dict: {old_dict}")
                                         return_list.remove(descriptor)
                                         return_list.append(entity_type(**old_dict))
                         
