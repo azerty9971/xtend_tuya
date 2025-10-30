@@ -274,7 +274,11 @@ class XTEntityDescriptorManager:
                                 return_list.append(entity_to_add)
                             else:
                                 if base_entity := base_descr_keys[compound_key]:
-                                    return_list.append(XTEntityDescriptorManager.merge_descriptor(base_entity, entity_to_add, entity_type))
+                                    return_list.append(
+                                        XTEntityDescriptorManager.merge_descriptor(
+                                            base_entity, entity_to_add, entity_type
+                                        )
+                                    )
 
                         case XTEntityDescriptorManager.XTEntityDescriptorType.STRING:
                             if descriptor not in base_descr_keys:
@@ -298,16 +302,20 @@ class XTEntityDescriptorManager:
                         entity_type,
                     )
                 )
-    
+
     @staticmethod
-    def merge_descriptor(base: EntityDescription, other: EntityDescription, real_type: type[Any] | None) -> EntityDescription:
+    def merge_descriptor(
+        base: EntityDescription, other: EntityDescription, real_type: type[Any] | None
+    ) -> EntityDescription:
         if real_type is None:
             return base
         base_dict = base.__dict__
-        if "translation_placeholders" in base_dict:
-            base_dict["translation_placeholders"] = (
-                other.translation_placeholders
-            )
+        if (
+            other.translation_placeholders is not None
+            and base.translation_placeholders is None
+        ):
+            base_dict["translation_key"] = other.translation_key
+            base_dict["translation_placeholders"] = other.translation_placeholders
         return real_type(**base_dict)
 
     @staticmethod
