@@ -87,7 +87,7 @@ class XTEventLoopProtector:
                 LOGGER.warning("Non-sensical call to execute_out_of_event_loop_and_return", stack_info=True)
                 return await callback(*args, **kwargs)
             else:
-                LOGGER.debug("Calling execute_out_of_event_loop_and_return in watched case")
+                LOGGER.debug("Calling execute_out_of_event_loop_and_return in watched case", stack_info=True)
                 return await XTEventLoopProtector.hass.async_add_executor_job(
                     partial(callback, *args, **kwargs)
                 )
