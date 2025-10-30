@@ -11,14 +11,12 @@
             "reauth_user_code": {
                 "data": {
                     "user_code": "C\u00f3digo de utilizador"
-                },
-                "description": "A integra\u00e7\u00e3o do Tuya agora usa um m\u00e9todo de login aprimorado. Para autenticar novamente com sua conta Smart Life ou Tuya Smart, voc\u00ea precisa inserir seu c\u00f3digo de utilizador. \n\n Voc\u00ea pode encontrar esse c\u00f3digo no aplicativo Smart Life ou no aplicativo Tuya Smart em **Configura\u00e7\u00f5es** > **Conta e seguran\u00e7a** e inserir o c\u00f3digo mostrado no campo **C\u00f3digo de utilizador**. O c\u00f3digo de utilizador diferencia mai\u00fasculas de min\u00fasculas. Certifique-se de inseri-lo exatamente como mostrado no aplicativo."
+                }
             },
             "user": {
                 "data": {
                     "user_code": "C\u00f3digo de utilizador"
-                },
-                "description": "Digite seu c\u00f3digo de usu\u00e1rio Smart Life ou Tuya Smart. \n\n Voc\u00ea pode encontrar esse c\u00f3digo no aplicativo Smart Life ou no aplicativo Tuya Smart em **Configura\u00e7\u00f5es** > **Conta e seguran\u00e7a** e inserir o c\u00f3digo mostrado no campo **C\u00f3digo de utilizador**. O c\u00f3digo de utilizador diferencia mai\u00fasculas de min\u00fasculas. Certifique-se de inseri-lo exatamente como mostrado no aplicativo."
+                }
             }
         }
     },
@@ -81,21 +79,6 @@
             },
             "curtain": {
                 "name": "Cortina"
-            },
-            "curtain_2": {
-                "name": "Cortina 2"
-            },
-            "curtain_3": {
-                "name": "Cortina 3"
-            },
-            "door": {
-                "name": "Porta"
-            },
-            "door_2": {
-                "name": "Porta 2"
-            },
-            "door_3": {
-                "name": "Porta 3"
             }
         },
         "light": {
@@ -105,12 +88,6 @@
             "light": {
                 "name": "Luz"
             },
-            "light_2": {
-                "name": "Luz 2"
-            },
-            "light_3": {
-                "name": "Luz 3"
-            },
             "night_light": {
                 "name": "Luz noturna"
             }
@@ -118,12 +95,6 @@
         "number": {
             "cloud_recipe": {
                 "name": "Receita da nuvem"
-            },
-            "cook_temperature": {
-                "name": "Temperatura de cozimento"
-            },
-            "cook_time": {
-                "name": "Tempo de cozimento"
             },
             "down_delay": {
                 "name": "Atraso para baixo"
@@ -140,20 +111,8 @@
             "maximum_brightness": {
                 "name": "Brilho m\u00e1ximo"
             },
-            "maximum_brightness_2": {
-                "name": "Brilho m\u00e1ximo 2"
-            },
-            "maximum_brightness_3": {
-                "name": "Brilho m\u00e1ximo 3"
-            },
             "minimum_brightness": {
                 "name": "Brilho m\u00ednimo"
-            },
-            "minimum_brightness_2": {
-                "name": "Brilho m\u00ednimo 2"
-            },
-            "minimum_brightness_3": {
-                "name": "Brilho m\u00ednimo 3"
             },
             "move_down": {
                 "name": "Mover para baixo"
@@ -208,8 +167,6 @@
             },
             "blanket_level": {
                 "state": {
-                    "level_1": "Baixo",
-                    "level_10": "Alto",
                     "level_2": "N\u00edvel 2",
                     "level_3": "N\u00edvel 3",
                     "level_4": "N\u00edvel 4",
@@ -320,22 +277,6 @@
             },
             "led_type": {
                 "name": "Tipo de fonte de luz",
-                "state": {
-                    "halogen": "Halog\u00eanio",
-                    "incandescent": "Incandescente",
-                    "led": "LED"
-                }
-            },
-            "led_type_2": {
-                "name": "Tipo de fonte de luz 2",
-                "state": {
-                    "halogen": "Halog\u00eanio",
-                    "incandescent": "Incandescente",
-                    "led": "LED"
-                }
-            },
-            "led_type_3": {
-                "name": "Tipo de fonte de luz 3",
                 "state": {
                     "halogen": "Halog\u00eanio",
                     "incandescent": "Incandescente",
@@ -627,9 +568,6 @@
             "total_watering_time": {
                 "name": "Tempo total de rega"
             },
-            "voc": {
-                "name": "VOCs"
-            },
             "voltage": {
                 "name": "Voltagem"
             },
@@ -638,18 +576,6 @@
             }
         },
         "switch": {
-            "alarm_1": {
-                "name": "Alarme 1"
-            },
-            "alarm_2": {
-                "name": "Alarme 2"
-            },
-            "alarm_3": {
-                "name": "Alarme 3"
-            },
-            "alarm_4": {
-                "name": "Alarme 4"
-            },
             "anion": {
                 "name": "\u00c2nion"
             },
@@ -743,24 +669,6 @@
             "socket": {
                 "name": "Tomada"
             },
-            "socket_1": {
-                "name": "Tomada 1"
-            },
-            "socket_2": {
-                "name": "Tomada 2"
-            },
-            "socket_3": {
-                "name": "Tomada 3"
-            },
-            "socket_4": {
-                "name": "Tomada 4"
-            },
-            "socket_5": {
-                "name": "Tomada 5"
-            },
-            "socket_6": {
-                "name": "Tomada 6"
-            },
             "sound": {
                 "name": "Som"
             },
@@ -779,50 +687,8 @@
             "switch": {
                 "name": "Interruptor"
             },
-            "switch_1": {
-                "name": "Interruptor 1"
-            },
-            "switch_2": {
-                "name": "Interruptor 2"
-            },
-            "switch_3": {
-                "name": "Interruptor 3"
-            },
-            "switch_4": {
-                "name": "Interruptor 4"
-            },
-            "switch_5": {
-                "name": "Interruptor 5"
-            },
-            "switch_6": {
-                "name": "Interruptor 6"
-            },
-            "switch_7": {
-                "name": "Interruptor 7"
-            },
-            "switch_8": {
-                "name": "Interruptor 8"
-            },
             "time_watermark": {
                 "name": "Marca d'\u00e1gua de tempo"
-            },
-            "usb_1": {
-                "name": "USB 1"
-            },
-            "usb_2": {
-                "name": "USB 2"
-            },
-            "usb_3": {
-                "name": "USB 3"
-            },
-            "usb_4": {
-                "name": "USB 4"
-            },
-            "usb_5": {
-                "name": "USB 5"
-            },
-            "usb_6": {
-                "name": "USB 6"
             },
             "uv_sterilization": {
                 "name": "Esteriliza\u00e7\u00e3o por UV"

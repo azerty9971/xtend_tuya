@@ -11,14 +11,12 @@
             "reauth_user_code": {
                 "data": {
                     "user_code": "Code d'utilisateur"
-                },
-                "description": "L'int\u00e9gration Tuya utilise d\u00e9sormais une m\u00e9thode de connexion am\u00e9lior\u00e9e. Pour vous r\u00e9authentifier avec votre compte Smart Life ou Tuya Smart, vous devez saisir votre code utilisateur.\n\nVous pouvez trouver ce code dans l'application Smart Life ou Tuya Smart dans **R\u00e9glages** > **Compte et s\u00e9curit\u00e9**, et entrer le code indiqu\u00e9 dans le champ **Code utilisateur**. Le code utilisateur est sensible \u00e0 la casse, veillez \u00e0 le saisir exactement comme indiqu\u00e9 dans l'application."
+                }
             },
             "user": {
                 "data": {
                     "user_code": "Code d'utilisateur"
-                },
-                "description": "Entrez votre code utilisateur Smart Life ou Tuya Smart.\n\nVous pouvez trouver ce code dans l'application Smart Life ou l'application Tuya Smart dans l'\u00e9cran **Param\u00e8tres** > **Compte et s\u00e9curit\u00e9**, et saisir le code affich\u00e9 dans le champ **Code utilisateur**. Le code utilisateur est sensible \u00e0 la casse, assurez-vous de le saisir exactement comme indiqu\u00e9 dans l'application."
+                }
             }
         }
     },
@@ -51,6 +49,9 @@
             "tilt": {
                 "name": "Inclinaison"
             },
+            "valve": {
+                "name": "Vanne"
+            },
             "voc": {
                 "name": "COV"
             }
@@ -81,21 +82,6 @@
             },
             "curtain": {
                 "name": "Rideau"
-            },
-            "curtain_2": {
-                "name": "Rideau 2"
-            },
-            "curtain_3": {
-                "name": "Rideau 3"
-            },
-            "door": {
-                "name": "Porte"
-            },
-            "door_2": {
-                "name": "Porte 2"
-            },
-            "door_3": {
-                "name": "Porte 3"
             }
         },
         "event": {
@@ -119,17 +105,23 @@
             "light": {
                 "name": "Lumi\u00e8re"
             },
-            "light_2": {
-                "name": "Lumi\u00e8re 2"
-            },
-            "light_3": {
-                "name": "Lumi\u00e8re 3"
-            },
             "night_light": {
                 "name": "Veilleuse"
             }
         },
         "number": {
+            "alarm_delay": {
+                "name": "D\u00e9lai de l'alarme"
+            },
+            "alarm_duration": {
+                "name": "Dur\u00e9e de l'alarme"
+            },
+            "alarm_maximum": {
+                "name": "Alarme maximale"
+            },
+            "alarm_minimum": {
+                "name": "Alarme minimale"
+            },
             "cloud_recipe": {
                 "name": "Recette cloud"
             },
@@ -151,23 +143,20 @@
             "heat_preservation_time": {
                 "name": "Dur\u00e9e de conservation de la chaleur"
             },
+            "indexed_irrigation_duration": {
+                "name": "Dur\u00e9e d'irrigation {index}"
+            },
+            "installation_height": {
+                "name": "Hauteur d'installation"
+            },
             "maximum_brightness": {
                 "name": "Luminosit\u00e9 maximale"
             },
-            "maximum_brightness_2": {
-                "name": "Luminosit\u00e9 maximale 2"
-            },
-            "maximum_brightness_3": {
-                "name": "Luminosit\u00e9 maximale 3"
+            "maximum_liquid_depth": {
+                "name": "Profondeur maximale du liquide"
             },
             "minimum_brightness": {
                 "name": "Luminosit\u00e9 minimale"
-            },
-            "minimum_brightness_2": {
-                "name": "Luminosit\u00e9 minimale 2"
-            },
-            "minimum_brightness_3": {
-                "name": "Luminosit\u00e9 minimale 3"
             },
             "move_down": {
                 "name": "Descendre"
@@ -327,22 +316,6 @@
                     "led": "LED"
                 }
             },
-            "led_type_2": {
-                "name": "Type de source de la lumi\u00e8re 2",
-                "state": {
-                    "halogen": "Halog\u00e8ne",
-                    "incandescent": "Incandescent",
-                    "led": "LED"
-                }
-            },
-            "led_type_3": {
-                "name": "Type de source de la lumi\u00e8re 3",
-                "state": {
-                    "halogen": "Halog\u00e8ne",
-                    "incandescent": "Incandescent",
-                    "led": "LED"
-                }
-            },
             "light_mode": {
                 "name": "Mode voyant lumineux",
                 "state": {
@@ -456,32 +429,8 @@
             }
         },
         "sensor": {
-            "power_a":{
-                "name": "Puissance voie A"
-            },
-            "power_b":{
-                "name": "Puissance voie B"
-            },
-            "direction_a":{
-                "name": "Direction puissance voie A"
-            },
-            "direction_b":{
-                "name": "Direction puissance voie B"
-            },  
-            "voltage_a": {
-                "name": "Tension A"
-            },
-            "current_a": {
-                "name": "Courant voie A"
-            },
-            "current_b": {
-                "name": "Courant voie B"
-            },
-            "power_factor": {
-                "name": "Facteur de puissance voie A"
-            },
-            "power_factor_b": {
-                "name": "Facteur de puissance voie B"
+            "air_pressure": {
+                "name": "Pression atmosph\u00e9rique"
             },
             "air_quality": {
                 "name": "Qualit\u00e9 de l'air",
@@ -540,14 +489,37 @@
             "humidity": {
                 "name": "Humidit\u00e9"
             },
+            "humidity_outdoor": {
+                "name": "Humidit\u00e9 ext\u00e9rieure"
+            },
             "illuminance": {
                 "name": "\u00c9clairement"
+            },
+            "indexed_humidity_outdoor": {
+                "name": "Canal {index} d'humidit\u00e9 ext\u00e9rieure"
+            },
+            "indexed_temperature_external": {
+                "name": "Canal {index} de la sonde de temp\u00e9rature"
             },
             "last_amount": {
                 "name": "Dernier montant"
             },
             "last_operation_duration": {
                 "name": "Dur\u00e9e de la derni\u00e8re op\u00e9ration"
+            },
+            "liquid_depth": {
+                "name": "Profondeur du liquide"
+            },
+            "liquid_level": {
+                "name": "Niveau du liquide"
+            },
+            "liquid_state": {
+                "name": "\u00c9tat du liquide",
+                "state": {
+                    "lower_alarm": "Faible",
+                    "normal": "Normal",
+                    "upper_alarm": "\u00c9lev\u00e9"
+                }
             },
             "luminosity": {
                 "name": "Luminosit\u00e9"
@@ -594,6 +566,12 @@
             "power": {
                 "name": "Puissance"
             },
+            "precipitation_intensity": {
+                "name": "Intensit\u00e9 des pr\u00e9cipitations"
+            },
+            "precipitation_today": {
+                "name": "Pr\u00e9cipitations totales aujourd'hui"
+            },
             "pump_time": {
                 "name": "Dur\u00e9e de la pompe \u00e0 eau"
             },
@@ -626,6 +604,9 @@
             "status": {
                 "name": "Statut"
             },
+            "supply_frequency": {
+                "name": "Fr\u00e9quence de l'approvisionnement"
+            },
             "temperature": {
                 "name": "Temp\u00e9rature"
             },
@@ -656,6 +637,9 @@
             "total_watering_time": {
                 "name": "Temps d'arrosage total"
             },
+            "uv_index": {
+                "name": "Incice UV"
+            },
             "uv_runtime": {
                 "name": "Dur\u00e9e des UV"
             },
@@ -670,21 +654,12 @@
             },
             "water_time": {
                 "name": "Dur\u00e9e de la consommation d'eau"
+            },
+            "wind_direction": {
+                "name": "Direction du vent"
             }
         },
         "switch": {
-            "alarm_1": {
-                "name": "Alarme 1"
-            },
-            "alarm_2": {
-                "name": "Alarme 2"
-            },
-            "alarm_3": {
-                "name": "Alarme 3"
-            },
-            "alarm_4": {
-                "name": "Alarme 4"
-            },
             "anion": {
                 "name": "Anion"
             },
@@ -715,11 +690,17 @@
             "flip": {
                 "name": "Retourner"
             },
+            "frost_protection": {
+                "name": "Protection hors-gel"
+            },
             "heat_preservation": {
                 "name": "Pr\u00e9servation de la chaleur"
             },
             "humidification": {
                 "name": "Humidification"
+            },
+            "indexed_alarm": {
+                "name": "Alarme {index}"
             },
             "ionizer": {
                 "name": "Ioniseur"
@@ -778,24 +759,6 @@
             "socket": {
                 "name": "Prise"
             },
-            "socket_1": {
-                "name": "Prise 1"
-            },
-            "socket_2": {
-                "name": "Prise 2"
-            },
-            "socket_3": {
-                "name": "Prise 3"
-            },
-            "socket_4": {
-                "name": "Prise 4"
-            },
-            "socket_5": {
-                "name": "Prise 5"
-            },
-            "socket_6": {
-                "name": "Prise 6"
-            },
             "sound": {
                 "name": "Son"
             },
@@ -814,50 +777,8 @@
             "switch": {
                 "name": "Switch"
             },
-            "switch_1": {
-                "name": "Switch 1"
-            },
-            "switch_2": {
-                "name": "Switch 2"
-            },
-            "switch_3": {
-                "name": "Switch 3"
-            },
-            "switch_4": {
-                "name": "Switch 4"
-            },
-            "switch_5": {
-                "name": "Switch 5"
-            },
-            "switch_6": {
-                "name": "Switch 6"
-            },
-            "switch_7": {
-                "name": "Switch 7"
-            },
-            "switch_8": {
-                "name": "Switch 8"
-            },
             "time_watermark": {
                 "name": "Horodater"
-            },
-            "usb_1": {
-                "name": "USB 1"
-            },
-            "usb_2": {
-                "name": "USB 2"
-            },
-            "usb_3": {
-                "name": "USB 3"
-            },
-            "usb_4": {
-                "name": "USB 4"
-            },
-            "usb_5": {
-                "name": "USB 5"
-            },
-            "usb_6": {
-                "name": "USB 6"
             },
             "uv_sterilization": {
                 "name": "St\u00e9rilisation UV"
@@ -876,6 +797,11 @@
             },
             "wide_dynamic_range": {
                 "name": "Large plage dynamique"
+            }
+        },
+        "valve": {
+            "indexed_valve": {
+                "name": "Vanne {index}"
             }
         }
     }

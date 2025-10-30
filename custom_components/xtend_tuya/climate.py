@@ -190,7 +190,7 @@ async def async_setup_entry(
             dict[str, XTClimateEntityDescription], dict[str, XTClimateEntityDescription]
         ],
         XTEntityDescriptorManager.get_platform_descriptors(
-            CLIMATE_DESCRIPTIONS, entry.runtime_data.multi_manager, this_platform
+            CLIMATE_DESCRIPTIONS, entry.runtime_data.multi_manager, XTClimateEntityDescription, this_platform
         ),
     )
 

@@ -6,12 +6,38 @@
             },
             "curtain": {
                 "name": "Zavesa"
-            },
-            "door": {
-                "name": "Vrata"
+            }
+        },
+        "number": {
+            "time": {
+                "name": "Time"
             }
         },
         "select": {
+            "basic_anti_flicker": {
+                "state": {
+                    "1": "50 Hz",
+                    "2": "60 Hz"
+                }
+            },
+            "basic_nightvision": {
+                "state": {
+                    "1": "Isklju\u010deno",
+                    "2": "Uklju\u010deno"
+                }
+            },
+            "blanket_level": {
+                "state": {
+                    "level_2": "Nivo 2",
+                    "level_3": "Nivo 3",
+                    "level_4": "Nivo 4",
+                    "level_5": "Nivo 5",
+                    "level_6": "Nivo 6",
+                    "level_7": "Nivo 7",
+                    "level_8": "Nivo 8",
+                    "level_9": "Nivo 9"
+                }
+            },
             "countdown": {
                 "name": "Odbrojavanje",
                 "state": {
@@ -23,11 +49,54 @@
                     "6h": "6 sati",
                     "cancel": "Otka\u017ei"
                 }
+            },
+            "light_mode": {
+                "state": {
+                    "none": "Isklju\u010den",
+                    "relay": "Prika\u017ei stanje prekida\u010da (uklju\u010deno/isklju\u010deno)"
+                }
+            },
+            "relay_status": {
+                "state": {
+                    "last": "Zapamti poslednje stanje",
+                    "memory": "Zapamti poslednje stanje",
+                    "off": "Isklju\u010den",
+                    "on": "Uklju\u010den",
+                    "power_off": "Isklju\u010den",
+                    "power_on": "Uklju\u010den"
+                }
+            },
+            "weather_delay": {
+                "state": {
+                    "cancel": "Otka\u017ei"
+                }
             }
         },
         "sensor": {
             "illuminance": {
                 "name": "Osvetljenost"
+            },
+            "odor_elimination_status": {
+                "state": {
+                    "charging": "Punjenje",
+                    "standby": "Pripravnost"
+                }
+            },
+            "sous_vide_status": {
+                "state": {
+                    "heating": "Grejanje"
+                }
+            },
+            "water_level_state": {
+                "name": "Nivo vode"
+            }
+        },
+        "switch": {
+            "frost_protection": {
+                "name": "Za\u0161tita od smrzavanja"
+            },
+            "time_watermark": {
+                "name": "Vremenski \u017eig"
             }
         }
     }

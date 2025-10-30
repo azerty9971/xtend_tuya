@@ -48,29 +48,9 @@
                 "name": "Soneca"
             }
         },
-        "cover": {
-            "curtain_2": {
-                "name": "Cortina 2"
-            },
-            "curtain_3": {
-                "name": "Cortina 3"
-            },
-            "door_2": {
-                "name": "Porta 2"
-            },
-            "door_3": {
-                "name": "Porta 3"
-            }
-        },
         "light": {
             "backlight": {
                 "name": "Luz de fondo"
-            },
-            "light_2": {
-                "name": "Luz 2"
-            },
-            "light_3": {
-                "name": "Luz 3"
             },
             "night_light": {
                 "name": "Luz nocturna"
@@ -79,12 +59,6 @@
         "number": {
             "cloud_recipe": {
                 "name": "Receita de nube"
-            },
-            "cook_temperature": {
-                "name": "Temperatura de cocci\u00f3n"
-            },
-            "cook_time": {
-                "name": "Tempo de cocci\u00f3n"
             },
             "down_delay": {
                 "name": "Retraso de baixada"
@@ -101,20 +75,8 @@
             "maximum_brightness": {
                 "name": "Brillo m\u00e1ximo"
             },
-            "maximum_brightness_2": {
-                "name": "Brillo m\u00e1ximo 2"
-            },
-            "maximum_brightness_3": {
-                "name": "Brillo m\u00e1ximo 3"
-            },
             "minimum_brightness": {
                 "name": "Brillo m\u00ednimo"
-            },
-            "minimum_brightness_2": {
-                "name": "Brillo m\u00ednimo 2"
-            },
-            "minimum_brightness_3": {
-                "name": "Brillo m\u00ednimo 3"
             },
             "move_down": {
                 "name": "Mover cara abaixo"
@@ -135,12 +97,6 @@
             },
             "led_type": {
                 "name": "Tipo de fonte de luz"
-            },
-            "led_type_2": {
-                "name": "Tipo de fonte de luz 2"
-            },
-            "led_type_3": {
-                "name": "Tipo de fonte de luz 3"
             },
             "light_mode": {
                 "name": "Modo de luz indicadora"
@@ -235,18 +191,6 @@
             }
         },
         "switch": {
-            "alarm_1": {
-                "name": "Alarma 1"
-            },
-            "alarm_2": {
-                "name": "Alarma 2"
-            },
-            "alarm_3": {
-                "name": "Alarma 3"
-            },
-            "alarm_4": {
-                "name": "Alarma 4"
-            },
             "anion": {
                 "name": "Ani\u00f3n"
             },
@@ -303,24 +247,6 @@
             },
             "socket": {
                 "name": "Enchufe"
-            },
-            "socket_1": {
-                "name": "Enchufe 1"
-            },
-            "socket_2": {
-                "name": "Enchufe 2"
-            },
-            "socket_3": {
-                "name": "Enchufe 3"
-            },
-            "socket_4": {
-                "name": "Enchufe 4"
-            },
-            "socket_5": {
-                "name": "Enchufe 5"
-            },
-            "socket_6": {
-                "name": "Enchufe 6"
             },
             "sound": {
                 "name": "Son"

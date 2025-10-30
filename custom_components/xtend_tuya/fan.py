@@ -38,7 +38,7 @@ async def async_setup_entry(
     supported_descriptors, externally_managed_descriptors = cast(
         tuple[set[str], set[str]],
         XTEntityDescriptorManager.get_platform_descriptors(
-            XT_SUPPORT_TYPE, entry.runtime_data.multi_manager, this_platform
+            XT_SUPPORT_TYPE, entry.runtime_data.multi_manager, None, this_platform
         ),
     )
 

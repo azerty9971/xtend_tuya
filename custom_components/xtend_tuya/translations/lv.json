@@ -8,11 +8,6 @@
                 "name": "Aizkars"
             }
         },
-        "light": {
-            "light": {
-                "name": "Gaisma"
-            }
-        },
         "select": {
             "basic_anti_flicker": {
                 "state": {
@@ -22,9 +17,7 @@
             },
             "basic_nightvision": {
                 "state": {
-                    "0": "Autom\u0101tiski",
-                    "1": "Izsl\u0113gts",
-                    "2": "Iesl\u0113gts"
+                    "0": "Autom\u0101tiski"
                 }
             },
             "countdown": {
@@ -58,11 +51,6 @@
                     "1": "Nep\u0101rtraukts darba re\u017e\u012bms"
                 }
             },
-            "light_mode": {
-                "state": {
-                    "none": "Izsl\u0113gts"
-                }
-            },
             "record_mode": {
                 "state": {
                     "1": "Ierakst\u012bt tikai notikumus",
@@ -72,11 +60,7 @@
             "relay_status": {
                 "state": {
                     "last": "Atcer\u0113ties p\u0113d\u0113jo st\u0101vokli",
-                    "memory": "Atcer\u0113ties p\u0113d\u0113jo st\u0101vokli",
-                    "off": "Izsl\u0113gts",
-                    "on": "Iesl\u0113gts",
-                    "power_off": "Izsl\u0113gts",
-                    "power_on": "Iesl\u0113gts"
+                    "memory": "Atcer\u0113ties p\u0113d\u0113jo st\u0101vokli"
                 }
             }
         },
@@ -102,16 +86,8 @@
             "power": {
                 "name": "Jauda"
             },
-            "sous_vide_status": {
-                "state": {
-                    "standby": "Gaid\u012b\u0161anas re\u017e\u012bm\u0101"
-                }
-            },
             "temperature": {
                 "name": "Temperat\u016bra"
-            },
-            "voc": {
-                "name": "GOS"
             },
             "voltage": {
                 "name": "Spriegums"
@@ -129,24 +105,6 @@
             },
             "time_watermark": {
                 "name": "Laika \u016bdensz\u012bme"
-            },
-            "usb_1": {
-                "name": "USB 1"
-            },
-            "usb_2": {
-                "name": "USB 2"
-            },
-            "usb_3": {
-                "name": "USB 3"
-            },
-            "usb_4": {
-                "name": "USB 4"
-            },
-            "usb_5": {
-                "name": "USB\u00a05"
-            },
-            "usb_6": {
-                "name": "USB\u00a06"
             },
             "uv_sterilization": {
                 "name": "UV steriliz\u0101cija"

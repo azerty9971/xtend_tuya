@@ -6,11 +6,6 @@
         "error": {
             "invalid_auth": "Ongeldige authenticatie",
             "login_error": "Aanmeldingsfout ({code}): {msg}"
-        },
-        "step": {
-            "user": {
-                "description": "Voer je gebruikerscode van Smart Life of Tuya in.\n\nJe kunt deze code vinden in de Smart Life-app of de Tuya-app op het **Instellingen** > **Account en Beveiliging** scherm. Vul de getoonde code in bij **Gebruikerscode**. Het veld is hoofdlettergevoelig, let dus op dat je het exact zo invoert als het in de app getoond wordt."
-            }
         }
     },
     "entity": {
@@ -20,6 +15,9 @@
             },
             "carbon_monoxide": {
                 "name": "Koolmonoxide"
+            },
+            "defrost": {
+                "name": "Ontdooien"
             },
             "drop": {
                 "name": "Loslaten"
@@ -42,8 +40,14 @@
             "tilt": {
                 "name": "Kanteling"
             },
+            "valve": {
+                "name": "Klep"
+            },
             "voc": {
                 "name": "VOC's"
+            },
+            "wet": {
+                "name": "Nat"
             }
         },
         "button": {
@@ -72,21 +76,6 @@
             },
             "curtain": {
                 "name": "Gordijn"
-            },
-            "curtain_2": {
-                "name": "Gordijn 2"
-            },
-            "curtain_3": {
-                "name": "Gordijn 3"
-            },
-            "door": {
-                "name": "Deur"
-            },
-            "door_2": {
-                "name": "Deur 2"
-            },
-            "door_3": {
-                "name": "Deur 3"
             }
         },
         "light": {
@@ -96,25 +85,19 @@
             "light": {
                 "name": "Licht"
             },
-            "light_2": {
-                "name": "Licht 2"
-            },
-            "light_3": {
-                "name": "Licht 3"
-            },
             "night_light": {
                 "name": "Nachtlampje"
             }
         },
         "number": {
+            "alarm_maximum": {
+                "name": "Alarm maximum"
+            },
+            "alarm_minimum": {
+                "name": "Alarm minimum"
+            },
             "cloud_recipe": {
                 "name": "Cloud recept"
-            },
-            "cook_temperature": {
-                "name": "Kooktemperatuur"
-            },
-            "cook_time": {
-                "name": "Kooktijd"
             },
             "down_delay": {
                 "name": "Verminder vertraging"
@@ -128,23 +111,26 @@
             "heat_preservation_time": {
                 "name": "Warmtebesparingstijd"
             },
+            "indexed_cook_temperature": {
+                "name": "Kooktemperatuur {index}"
+            },
+            "indexed_irrigation_duration": {
+                "name": "Irrigatieduur {index}"
+            },
+            "indexed_temperature": {
+                "name": "Temperatuur {index}"
+            },
+            "installation_height": {
+                "name": "Installatiehoogte"
+            },
             "maximum_brightness": {
                 "name": "Maximale helderheid"
             },
-            "maximum_brightness_2": {
-                "name": "Maximale helderheid 2"
-            },
-            "maximum_brightness_3": {
-                "name": "Maximale helderheid 3"
+            "maximum_liquid_depth": {
+                "name": "Maximale vloeistofdiepte"
             },
             "minimum_brightness": {
                 "name": "Minimale helderheid"
-            },
-            "minimum_brightness_2": {
-                "name": "Minimale helderheid 2"
-            },
-            "minimum_brightness_3": {
-                "name": "Minimale helderheid 3"
             },
             "move_down": {
                 "name": "Omlaag"
@@ -200,7 +186,10 @@
             "blanket_level": {
                 "state": {
                     "level_1": "Laag",
-                    "level_10": "Hoog"
+                    "level_10": "Hoog",
+                    "level_3": "Niveau 3",
+                    "level_4": "Niveau 4",
+                    "level_6": "Niveau 6"
                 }
             },
             "brightness": {
@@ -243,6 +232,14 @@
                 "state": {
                     "0": "Lage gevoeligheid",
                     "1": "Hoge gevoeligheid"
+                }
+            },
+            "desk_up_down": {
+                "name": "Omhoog/Omlaag",
+                "state": {
+                    "down": "Omlaag",
+                    "stop": "Stop",
+                    "up": "Omhoog"
                 }
             },
             "fingerbot_mode": {
@@ -295,6 +292,22 @@
                     "work": "Werk"
                 }
             },
+            "indexed_blanket_level": {
+                "state": {
+                    "level_1": "Laag",
+                    "level_10": "Hoog",
+                    "level_3": "Niveau 3",
+                    "level_4": "Niveau 4",
+                    "level_6": "Niveau 6"
+                }
+            },
+            "indexed_led_type": {
+                "state": {
+                    "halogen": "Halogeen",
+                    "incandescent": "Gloeilamp",
+                    "led": "LED"
+                }
+            },
             "ipc_work_mode": {
                 "name": "IPC-mode",
                 "state": {
@@ -304,22 +317,6 @@
             },
             "led_type": {
                 "name": "Licht brontype",
-                "state": {
-                    "halogen": "Halogeen",
-                    "incandescent": "Gloeilamp",
-                    "led": "LED"
-                }
-            },
-            "led_type_2": {
-                "name": "Licht 2 brontype",
-                "state": {
-                    "halogen": "Halogeen",
-                    "incandescent": "Gloeilamp",
-                    "led": "LED"
-                }
-            },
-            "led_type_3": {
-                "name": "Licht 3 brontype",
                 "state": {
                     "halogen": "Halogeen",
                     "incandescent": "Gloeilamp",
@@ -415,9 +412,23 @@
             },
             "volume": {
                 "name": "Volume"
+            },
+            "weather_delay": {
+                "state": {
+                    "120h": "120 uur",
+                    "144h": "144 uur",
+                    "168h": "168 uur",
+                    "24h": "24 uur",
+                    "48h": "48 uur",
+                    "72h": "72 uur",
+                    "96h": "96 uur"
+                }
             }
         },
         "sensor": {
+            "air_pressure": {
+                "name": "Luchtdruk"
+            },
             "air_quality": {
                 "name": "Luchtkwaliteit",
                 "state": {
@@ -440,6 +451,9 @@
             "battery": {
                 "name": "Batterij"
             },
+            "battery_power": {
+                "name": "Batterijvermogen"
+            },
             "battery_state": {
                 "name": "Batterijstatus"
             },
@@ -448,6 +462,9 @@
             },
             "carbon_monoxide": {
                 "name": "Koolmonoxide"
+            },
+            "cat_weight": {
+                "name": "Gewicht van kat"
             },
             "cleaning_area": {
                 "name": "Schoonmaakgebied"
@@ -464,8 +481,14 @@
             "current_temperature": {
                 "name": "Huidige temperatuur"
             },
+            "dew_point_temperature": {
+                "name": "Dauwpunt"
+            },
             "duster_cloth_life": {
                 "name": "Levensduur stofdoek"
+            },
+            "feels_like_temperature": {
+                "name": "Voelt als"
             },
             "filter_life": {
                 "name": "Levensduur filter"
@@ -491,11 +514,31 @@
             "last_operation_duration": {
                 "name": "Duur laatste operatie"
             },
+            "liquid_depth": {
+                "name": "Vloeistofdiepte"
+            },
+            "liquid_level": {
+                "name": "Vloeistofniveau"
+            },
+            "liquid_state": {
+                "name": "Vloeistof toestand",
+                "state": {
+                    "lower_alarm": "Laag",
+                    "normal": "Normaal",
+                    "upper_alarm": "Hoog"
+                }
+            },
             "luminosity": {
                 "name": "Helderheid"
             },
             "methane": {
                 "name": "Methaan"
+            },
+            "odor_elimination_status": {
+                "state": {
+                    "charging": "Opladen",
+                    "standby": "Stand-by"
+                }
             },
             "phase_a_current": {
                 "name": "Fase A stroom"
@@ -535,6 +578,12 @@
             },
             "power": {
                 "name": "Vermogen"
+            },
+            "precipitation_intensity": {
+                "name": "Neerslagintensiteit"
+            },
+            "precipitation_today": {
+                "name": "Totale neerslag vandaag"
             },
             "remaining_time": {
                 "name": "Resterende tijd"
@@ -592,6 +641,9 @@
             "total_volatile_organic_compound": {
                 "name": "Totaal aan vluchtige organische stof"
             },
+            "uv_index": {
+                "name": "UV index"
+            },
             "voc": {
                 "name": "Vluchtige organische stoffen"
             },
@@ -600,21 +652,19 @@
             },
             "water_level": {
                 "name": "Waterniveau"
+            },
+            "water_level_state": {
+                "state": {
+                    "level_1": "Laag",
+                    "level_2": "Gemiddeld",
+                    "level_3": "Vol"
+                }
+            },
+            "wind_direction": {
+                "name": "Windrichting"
             }
         },
         "switch": {
-            "alarm_1": {
-                "name": "Alarm 1"
-            },
-            "alarm_2": {
-                "name": "Alarm 2"
-            },
-            "alarm_3": {
-                "name": "Alarm 3"
-            },
-            "alarm_4": {
-                "name": "Alarm 4"
-            },
             "anion": {
                 "name": "Anion"
             },
@@ -645,6 +695,9 @@
             "flip": {
                 "name": "Omdraaien"
             },
+            "frost_protection": {
+                "name": "Vorstbeveiliging"
+            },
             "heat_preservation": {
                 "name": "Warmtebesparing"
             },
@@ -662,6 +715,9 @@
             },
             "motion_tracking": {
                 "name": "Bewegingsdetectie"
+            },
+            "music": {
+                "name": "Muziek"
             },
             "mute": {
                 "name": "Dempen"
@@ -696,6 +752,9 @@
             "reverse": {
                 "name": "Omkeren"
             },
+            "siren": {
+                "name": "Sirene"
+            },
             "sleep": {
                 "name": "Slaap"
             },
@@ -705,26 +764,11 @@
             "slow_feed": {
                 "name": "Langzame voeding"
             },
+            "snooze": {
+                "name": "Snooze"
+            },
             "socket": {
                 "name": "Stopcontact"
-            },
-            "socket_1": {
-                "name": "Stopcontact 1"
-            },
-            "socket_2": {
-                "name": "Stopcontact 2"
-            },
-            "socket_3": {
-                "name": "Stopcontact 3"
-            },
-            "socket_4": {
-                "name": "Stopcontact 4"
-            },
-            "socket_5": {
-                "name": "Stopcontact 5"
-            },
-            "socket_6": {
-                "name": "Stopcontact 6"
             },
             "sound": {
                 "name": "Geluid"
@@ -744,50 +788,8 @@
             "switch": {
                 "name": "Schakelaar"
             },
-            "switch_1": {
-                "name": "Schakelaar 1"
-            },
-            "switch_2": {
-                "name": "Schakelaar 2"
-            },
-            "switch_3": {
-                "name": "Schakelaar 3"
-            },
-            "switch_4": {
-                "name": "Schakelaar 4"
-            },
-            "switch_5": {
-                "name": "Schakelaar 5"
-            },
-            "switch_6": {
-                "name": "Schakelaar 6"
-            },
-            "switch_7": {
-                "name": "Schakelaar 7"
-            },
-            "switch_8": {
-                "name": "Schakelaar 8"
-            },
             "time_watermark": {
                 "name": "Tijd watermerk"
-            },
-            "usb_1": {
-                "name": "USB 1"
-            },
-            "usb_2": {
-                "name": "USB 2"
-            },
-            "usb_3": {
-                "name": "USB 3"
-            },
-            "usb_4": {
-                "name": "USB 4"
-            },
-            "usb_5": {
-                "name": "USB 5"
-            },
-            "usb_6": {
-                "name": "USB 6"
             },
             "uv_sterilization": {
                 "name": "UV sterilisatie"
@@ -806,6 +808,14 @@
             },
             "wide_dynamic_range": {
                 "name": "Breed dynamisch bereik"
+            }
+        },
+        "valve": {
+            "indexed_valve": {
+                "name": "Klep {index}"
+            },
+            "valve": {
+                "name": "Klep"
             }
         }
     }

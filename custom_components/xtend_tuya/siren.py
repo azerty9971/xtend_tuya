@@ -62,7 +62,7 @@ async def async_setup_entry(
             dict[str, tuple[XTSirenEntityDescription, ...]],
         ],
         XTEntityDescriptorManager.get_platform_descriptors(
-            SIRENS, entry.runtime_data.multi_manager, this_platform
+            SIRENS, entry.runtime_data.multi_manager, XTSirenEntityDescription, this_platform
         ),
     )
 

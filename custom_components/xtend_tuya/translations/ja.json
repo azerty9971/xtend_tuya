@@ -11,14 +11,12 @@
             "reauth_user_code": {
                 "data": {
                     "user_code": "\u30e6\u30fc\u30b6\u30fc\u30b3\u30fc\u30c9"
-                },
-                "description": "Tuya \u7d71\u5408\u3067\u306f\u3001\u6539\u826f\u3055\u308c\u305f\u30ed\u30b0\u30a4\u30f3\u65b9\u6cd5\u304c\u4f7f\u7528\u3055\u308c\u308b\u3088\u3046\u306b\u306a\u308a\u307e\u3057\u305f\u3002 Smart Life \u307e\u305f\u306f Tuya Smart \u30a2\u30ab\u30a6\u30f3\u30c8\u3067\u518d\u8a8d\u8a3c\u3059\u308b\u306b\u306f\u3001\u30e6\u30fc\u30b6\u30fc \u30b3\u30fc\u30c9\u3092\u5165\u529b\u3059\u308b\u5fc5\u8981\u304c\u3042\u308a\u307e\u3059\u3002 \n\n\u3053\u306e\u30b3\u30fc\u30c9\u306f\u3001Smart Life \u30a2\u30d7\u30ea\u307e\u305f\u306f Tuya Smart \u30a2\u30d7\u30ea\u306e **\u8a2d\u5b9a** > **\u30a2\u30ab\u30a6\u30f3\u30c8\u3068\u30bb\u30ad\u30e5\u30ea\u30c6\u30a3** \u753b\u9762\u3067\u898b\u3064\u3051\u308b\u3053\u3068\u304c\u3067\u304d\u3001**\u30e6\u30fc\u30b6\u30fc \u30b3\u30fc\u30c9** \u30d5\u30a3\u30fc\u30eb\u30c9\u306b\u8868\u793a\u3055\u308c\u3066\u3044\u308b\u30b3\u30fc\u30c9\u3092\u5165\u529b\u3057\u307e\u3059\u3002\u30e6\u30fc\u30b6\u30fc\u30b3\u30fc\u30c9\u306f\u5927\u6587\u5b57\u3068\u5c0f\u6587\u5b57\u304c\u533a\u5225\u3055\u308c\u308b\u305f\u3081\u3001\u30a2\u30d7\u30ea\u306b\u8868\u793a\u3055\u308c\u3066\u3044\u308b\u3068\u304a\u308a\u306b\u6b63\u78ba\u306b\u5165\u529b\u3057\u3066\u304f\u3060\u3055\u3044\u3002"
+                }
             },
             "user": {
                 "data": {
                     "user_code": "\u30e6\u30fc\u30b6\u30fc\u30b3\u30fc\u30c9"
-                },
-                "description": "Smart Life \u307e\u305f\u306f Tuya Smart \u306e\u30e6\u30fc\u30b6\u30fc \u30b3\u30fc\u30c9\u3092\u5165\u529b\u3057\u307e\u3059\u3002 \n\n\u3053\u306e\u30b3\u30fc\u30c9\u306f\u3001Smart Life \u30a2\u30d7\u30ea\u307e\u305f\u306f Tuya Smart \u30a2\u30d7\u30ea\u306e **\u8a2d\u5b9a** > **\u30a2\u30ab\u30a6\u30f3\u30c8\u3068\u30bb\u30ad\u30e5\u30ea\u30c6\u30a3** \u753b\u9762\u3067\u898b\u3064\u3051\u308b\u3053\u3068\u304c\u3067\u304d\u3001**\u30e6\u30fc\u30b6\u30fc \u30b3\u30fc\u30c9** \u30d5\u30a3\u30fc\u30eb\u30c9\u306b\u8868\u793a\u3055\u308c\u3066\u3044\u308b\u30b3\u30fc\u30c9\u3092\u5165\u529b\u3057\u307e\u3059\u3002\u30e6\u30fc\u30b6\u30fc\u30b3\u30fc\u30c9\u306f\u5927\u6587\u5b57\u3068\u5c0f\u6587\u5b57\u304c\u533a\u5225\u3055\u308c\u308b\u305f\u3081\u3001\u30a2\u30d7\u30ea\u306b\u8868\u793a\u3055\u308c\u3066\u3044\u308b\u3068\u304a\u308a\u306b\u6b63\u78ba\u306b\u5165\u529b\u3057\u3066\u304f\u3060\u3055\u3044\u3002"
+                }
             }
         }
     },
@@ -81,21 +79,6 @@
             },
             "curtain": {
                 "name": "\u30ab\u30fc\u30c6\u30f3"
-            },
-            "curtain_2": {
-                "name": "\u30ab\u30fc\u30c6\u30f32"
-            },
-            "curtain_3": {
-                "name": "\u30ab\u30fc\u30c6\u30f33"
-            },
-            "door": {
-                "name": "\u30c9\u30a2"
-            },
-            "door_2": {
-                "name": "\u30c9\u30a22"
-            },
-            "door_3": {
-                "name": "\u30c9\u30a23"
             }
         },
         "light": {
@@ -104,12 +87,6 @@
             },
             "light": {
                 "name": "\u30e9\u30a4\u30c81"
-            },
-            "light_2": {
-                "name": "\u30e9\u30a4\u30c82"
-            },
-            "light_3": {
-                "name": "\u30e9\u30a4\u30c83"
             },
             "night_light": {
                 "name": "\u30ca\u30a4\u30c8\u30e9\u30a4\u30c8"
@@ -121,12 +98,6 @@
             },
             "cloud_recipe": {
                 "name": "\u30af\u30e9\u30a6\u30c9\u30ec\u30b7\u30d4"
-            },
-            "cook_temperature": {
-                "name": "\u8abf\u7406\u6e29\u5ea6"
-            },
-            "cook_time": {
-                "name": "\u8abf\u7406\u6642\u9593"
             },
             "down_delay": {
                 "name": "\u30c0\u30a6\u30f3\u30c7\u30a3\u30ec\u30a4"
@@ -143,20 +114,8 @@
             "maximum_brightness": {
                 "name": "\u6700\u5927\u8f1d\u5ea6"
             },
-            "maximum_brightness_2": {
-                "name": "\u6700\u5927\u8f1d\u5ea62"
-            },
-            "maximum_brightness_3": {
-                "name": "\u6700\u5927\u8f1d\u5ea63"
-            },
             "minimum_brightness": {
                 "name": "\u6700\u4f4e\u8f1d\u5ea6"
-            },
-            "minimum_brightness_2": {
-                "name": "\u6700\u4f4e\u8f1d\u5ea62"
-            },
-            "minimum_brightness_3": {
-                "name": "\u6700\u4f4e\u8f1d\u5ea63"
             },
             "move_down": {
                 "name": "\u4e0b\u306b\u79fb\u52d5"
@@ -172,9 +131,6 @@
             },
             "sensitivity": {
                 "name": "\u611f\u5ea6"
-            },
-            "target_dis_closest": {
-                "name": "\u6700\u3082\u8fd1\u3044\u30bf\u30fc\u30b2\u30c3\u30c8\u8ddd\u96e2"
             },
             "temperature": {
                 "name": "\u6e29\u5ea6"
@@ -318,22 +274,6 @@
                     "led": "LED"
                 }
             },
-            "led_type_2": {
-                "name": "2\u5149\u6e90\u30bf\u30a4\u30d7",
-                "state": {
-                    "halogen": "\u30cf\u30ed\u30b2\u30f3",
-                    "incandescent": "\u767d\u71b1\u706f",
-                    "led": "LED"
-                }
-            },
-            "led_type_3": {
-                "name": "3\u5149\u6e90\u30bf\u30a4\u30d7",
-                "state": {
-                    "halogen": "\u30cf\u30ed\u30b2\u30f3",
-                    "incandescent": "\u767d\u71b1\u706f",
-                    "led": "LED"
-                }
-            },
             "light_mode": {
                 "name": "\u30a4\u30f3\u30b8\u30b1\u30fc\u30bf\u30fc\u30e9\u30a4\u30c8\u30e2\u30fc\u30c9",
                 "state": {
@@ -349,7 +289,10 @@
                 "name": "\u30e2\u30fc\u30c9"
             },
             "motion_sensitivity": {
-                "name": "\u30e2\u30fc\u30b7\u30e7\u30f3\u691c\u77e5\u611f\u5ea6"
+                "name": "\u30e2\u30fc\u30b7\u30e7\u30f3\u691c\u77e5\u611f\u5ea6",
+                "state": {
+                    "1": "\u4e2d\u611f\u5ea6"
+                }
             },
             "record_mode": {
                 "name": "\u8a18\u9332\u30e2\u30fc\u30c9",
@@ -621,9 +564,6 @@
             "total_watering_time": {
                 "name": "\u7dcf\u6563\u6c34\u6642\u9593"
             },
-            "voc": {
-                "name": "\u63ee\u767a\u6027\u6709\u6a5f\u5316\u5408\u7269(VOCs)"
-            },
             "voltage": {
                 "name": "\u96fb\u5727"
             },
@@ -632,18 +572,6 @@
             }
         },
         "switch": {
-            "alarm_1": {
-                "name": "\u8b66\u5831 1"
-            },
-            "alarm_2": {
-                "name": "\u8b66\u5831 2"
-            },
-            "alarm_3": {
-                "name": "\u8b66\u5831 3"
-            },
-            "alarm_4": {
-                "name": "\u8b66\u5831 4"
-            },
             "anion": {
                 "name": "\u30a2\u30cb\u30aa\u30f3"
             },
@@ -740,24 +668,6 @@
             "socket": {
                 "name": "\u30bd\u30b1\u30c3\u30c8"
             },
-            "socket_1": {
-                "name": "\u30bd\u30b1\u30c3\u30c8 1"
-            },
-            "socket_2": {
-                "name": "\u30bd\u30b1\u30c3\u30c8 2"
-            },
-            "socket_3": {
-                "name": "\u30bd\u30b1\u30c3\u30c8 3"
-            },
-            "socket_4": {
-                "name": "\u30bd\u30b1\u30c3\u30c8 4"
-            },
-            "socket_5": {
-                "name": "\u30bd\u30b1\u30c3\u30c8 5"
-            },
-            "socket_6": {
-                "name": "\u30bd\u30b1\u30c3\u30c8 6"
-            },
             "sound": {
                 "name": "\u97f3"
             },
@@ -776,50 +686,8 @@
             "switch": {
                 "name": "\u30b9\u30a4\u30c3\u30c1"
             },
-            "switch_1": {
-                "name": "\u30b9\u30a4\u30c3\u30c1 1"
-            },
-            "switch_2": {
-                "name": "\u30b9\u30a4\u30c3\u30c1 2"
-            },
-            "switch_3": {
-                "name": "\u30b9\u30a4\u30c3\u30c1 3"
-            },
-            "switch_4": {
-                "name": "\u30b9\u30a4\u30c3\u30c1 4"
-            },
-            "switch_5": {
-                "name": "\u30b9\u30a4\u30c3\u30c1 5"
-            },
-            "switch_6": {
-                "name": "\u30b9\u30a4\u30c3\u30c1 6"
-            },
-            "switch_7": {
-                "name": "\u30b9\u30a4\u30c3\u30c1 7"
-            },
-            "switch_8": {
-                "name": "\u30b9\u30a4\u30c3\u30c1 8"
-            },
             "time_watermark": {
                 "name": "\u6642\u523b\u30a6\u30a9\u30fc\u30bf\u30fc\u30de\u30fc\u30af"
-            },
-            "usb_1": {
-                "name": "USB 1"
-            },
-            "usb_2": {
-                "name": "USB 2"
-            },
-            "usb_3": {
-                "name": "USB 3"
-            },
-            "usb_4": {
-                "name": "USB 4"
-            },
-            "usb_5": {
-                "name": "USB 5"
-            },
-            "usb_6": {
-                "name": "USB 6"
             },
             "uv_sterilization": {
                 "name": "\u7d2b\u5916\u7dda\u6bba\u83cc"

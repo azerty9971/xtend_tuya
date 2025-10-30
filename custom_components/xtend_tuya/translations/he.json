@@ -6,11 +6,6 @@
         "error": {
             "invalid_auth": "\u05d0\u05d9\u05de\u05d5\u05ea \u05dc\u05d0 \u05d7\u05d5\u05e7\u05d9",
             "login_error": "\u05e9\u05d2\u05d9\u05d0\u05ea \u05d4\u05ea\u05d7\u05d1\u05e8\u05d5\u05ea ({code}): {msg}"
-        },
-        "step": {
-            "user": {
-                "description": "\u05d9\u05e9 \u05dc\u05d4\u05d6\u05d9\u05df \u05d0\u05ea \u05e7\u05d5\u05d3 \u05d4\u05de\u05e9\u05ea\u05de\u05e9 \u05e9\u05dc Smart Life \u05d0\u05d5 Tuya Smart.\n\n\u05e0\u05d9\u05ea\u05df \u05dc\u05de\u05e6\u05d5\u05d0 \u05e7\u05d5\u05d3 \u05d6\u05d4 \u05d1\u05d9\u05d9\u05e9\u05d5\u05dd Smart Life \u05d0\u05d5 \u05d1\u05d9\u05d9\u05e9\u05d5\u05dd Tuya Smart \u05d1\u05de\u05e1\u05da **\u05d4\u05d2\u05d3\u05e8\u05d5\u05ea** > **\u05d7\u05e9\u05d1\u05d5\u05df \u05d5\u05d0\u05d1\u05d8\u05d7\u05d4**, \u05d5\u05dc\u05d4\u05d6\u05d9\u05df \u05d0\u05ea \u05d4\u05e7\u05d5\u05d3 \u05d4\u05de\u05d5\u05e6\u05d2 \u05d1\u05e9\u05d3\u05d4 **\u05e7\u05d5\u05d3 \u05de\u05e9\u05ea\u05de\u05e9**. \u05e7\u05d5\u05d3 \u05d4\u05de\u05e9\u05ea\u05de\u05e9 \u05ea\u05dc\u05d5\u05d9 \u05e8\u05d9\u05e9\u05d9\u05d5\u05ea, \u05d9\u05e9 \u05dc\u05d4\u05e7\u05e4\u05d9\u05d3 \u05d5\u05dc\u05d4\u05d6\u05d9\u05df \u05d0\u05d5\u05ea\u05d5 \u05d1\u05d3\u05d9\u05d5\u05e7 \u05db\u05e4\u05d9 \u05e9\u05de\u05d5\u05e6\u05d2 \u05d1\u05d9\u05d9\u05e9\u05d5\u05dd."
-            }
         }
     },
     "entity": {
@@ -72,21 +67,6 @@
             },
             "curtain": {
                 "name": "\u05d5\u05d9\u05dc\u05d5\u05df"
-            },
-            "curtain_2": {
-                "name": "\u05d5\u05d9\u05dc\u05d5\u05df 2"
-            },
-            "curtain_3": {
-                "name": "\u05d5\u05d9\u05dc\u05d5\u05df 3"
-            },
-            "door": {
-                "name": "\u05d3\u05dc\u05ea"
-            },
-            "door_2": {
-                "name": "\u05d3\u05dc\u05ea 2"
-            },
-            "door_3": {
-                "name": "\u05d3\u05dc\u05ea 3"
             }
         },
         "light": {
@@ -95,12 +75,6 @@
             },
             "light": {
                 "name": "\u05ea\u05d0\u05d5\u05e8\u05d4"
-            },
-            "light_2": {
-                "name": "\u05d0\u05d5\u05e8 2"
-            },
-            "light_3": {
-                "name": "\u05d0\u05d5\u05e8 3"
             },
             "night_light": {
                 "name": "\u05de\u05e0\u05d5\u05e8\u05ea \u05dc\u05d9\u05dc\u05d4"
@@ -131,20 +105,8 @@
             "maximum_brightness": {
                 "name": "\u05d1\u05d4\u05d9\u05e8\u05d5\u05ea \u05de\u05e8\u05d1\u05d9\u05ea"
             },
-            "maximum_brightness_2": {
-                "name": "\u05d1\u05d4\u05d9\u05e8\u05d5\u05ea \u05de\u05e8\u05d1\u05d9\u05ea 2"
-            },
-            "maximum_brightness_3": {
-                "name": "\u05d1\u05d4\u05d9\u05e8\u05d5\u05ea \u05de\u05e8\u05d1\u05d9\u05ea 3"
-            },
             "minimum_brightness": {
                 "name": "\u05d1\u05d4\u05d9\u05e8\u05d5\u05ea \u05de\u05d9\u05e0\u05d9\u05de\u05dc\u05d9\u05ea"
-            },
-            "minimum_brightness_2": {
-                "name": "\u05d1\u05d4\u05d9\u05e8\u05d5\u05ea \u05de\u05d9\u05e0\u05d9\u05de\u05dc\u05d9\u05ea 2"
-            },
-            "minimum_brightness_3": {
-                "name": "\u05d1\u05d4\u05d9\u05e8\u05d5\u05ea \u05de\u05d9\u05e0\u05d9\u05de\u05dc\u05d9\u05ea 3"
             },
             "move_down": {
                 "name": "\u05d4\u05d6\u05d6\u05d4 \u05dc\u05de\u05d8\u05d4"
@@ -197,6 +159,21 @@
                     "2": "\u05de\u05d5\u05e4\u05e2\u05dc"
                 }
             },
+            "blanket_level": {
+                "name": "\u05e8\u05de\u05d4",
+                "state": {
+                    "level_1": "\u05e0\u05de\u05d5\u05da",
+                    "level_10": "\u05d2\u05d1\u05d5\u05d4",
+                    "level_2": "\u05e8\u05de\u05d4 2",
+                    "level_3": "\u05e8\u05de\u05d4 3",
+                    "level_4": "\u05e8\u05de\u05d4 4",
+                    "level_5": "\u05e8\u05de\u05d4 5",
+                    "level_6": "\u05e8\u05de\u05d4 6",
+                    "level_7": "\u05e8\u05de\u05d4 7",
+                    "level_8": "\u05e8\u05de\u05d4 8",
+                    "level_9": "\u05e8\u05de\u05d4 9"
+                }
+            },
             "brightness": {
                 "name": "\u05d1\u05d4\u05d9\u05e8\u05d5\u05ea"
             },
@@ -237,6 +214,20 @@
                 "state": {
                     "0": "\u05e8\u05d2\u05d9\u05e9\u05d5\u05ea \u05e0\u05de\u05d5\u05db\u05d4",
                     "1": "\u05e8\u05d2\u05d9\u05e9\u05d5\u05ea \u05d2\u05d1\u05d5\u05d4\u05d4"
+                }
+            },
+            "desk_level": {
+                "name": "\u05e8\u05de\u05d4",
+                "state": {
+                    "level_1": "\u05e8\u05de\u05d4 1",
+                    "level_2": "\u05e8\u05de\u05d4 2",
+                    "level_3": "\u05e8\u05de\u05d4 3",
+                    "level_4": "\u05e8\u05de\u05d4 4"
+                }
+            },
+            "desk_up_down": {
+                "state": {
+                    "up": "\u05dc\u05de\u05e2\u05dc\u05d4"
                 }
             },
             "fingerbot_mode": {
@@ -289,6 +280,28 @@
                     "work": "\u05e2\u05d1\u05d5\u05d3\u05d4"
                 }
             },
+            "indexed_blanket_level": {
+                "name": "\u05e8\u05de\u05d4 {index}",
+                "state": {
+                    "level_1": "\u05e0\u05de\u05d5\u05da",
+                    "level_10": "\u05d2\u05d1\u05d5\u05d4",
+                    "level_2": "\u05e8\u05de\u05d4 2",
+                    "level_3": "\u05e8\u05de\u05d4 3",
+                    "level_4": "\u05e8\u05de\u05d4 4",
+                    "level_5": "\u05e8\u05de\u05d4 5",
+                    "level_6": "\u05e8\u05de\u05d4 6",
+                    "level_7": "\u05e8\u05de\u05d4 7",
+                    "level_8": "\u05e8\u05de\u05d4 8",
+                    "level_9": "\u05e8\u05de\u05d4 9"
+                }
+            },
+            "indexed_led_type": {
+                "state": {
+                    "halogen": "\u05d4\u05dc\u05d5\u05d2\u05df",
+                    "incandescent": "\u05dc\u05d9\u05d1\u05d5\u05df",
+                    "led": "\u05dc\u05d3"
+                }
+            },
             "ipc_work_mode": {
                 "name": "\u05de\u05e6\u05d1 IPC",
                 "state": {
@@ -298,21 +311,6 @@
             },
             "led_type": {
                 "name": "\u05e1\u05d5\u05d2 \u05de\u05e7\u05d5\u05e8 \u05d0\u05d5\u05e8",
-                "state": {
-                    "halogen": "\u05d4\u05dc\u05d5\u05d2\u05df",
-                    "incandescent": "\u05dc\u05d9\u05d1\u05d5\u05df",
-                    "led": "\u05dc\u05d3"
-                }
-            },
-            "led_type_2": {
-                "name": "\u05e1\u05d5\u05d2 \u05de\u05e7\u05d5\u05e8 \u05d0\u05d5\u05e8 2",
-                "state": {
-                    "halogen": "\u05d4\u05dc\u05d5\u05d2\u05df",
-                    "incandescent": "\u05dc\u05d9\u05d1\u05d5\u05df",
-                    "led": "\u05dc\u05d3"
-                }
-            },
-            "led_type_3": {
                 "state": {
                     "halogen": "\u05d4\u05dc\u05d5\u05d2\u05df",
                     "incandescent": "\u05dc\u05d9\u05d1\u05d5\u05df",
@@ -491,11 +489,24 @@
             "last_operation_duration": {
                 "name": "\u05de\u05e9\u05da \u05d4\u05e4\u05e2\u05d5\u05dc\u05d4 \u05d4\u05d0\u05d7\u05e8\u05d5\u05df"
             },
+            "liquid_state": {
+                "state": {
+                    "lower_alarm": "\u05e0\u05de\u05d5\u05da",
+                    "normal": "\u05e8\u05d2\u05d9\u05dc",
+                    "upper_alarm": "\u05d2\u05d1\u05d5\u05d4"
+                }
+            },
             "luminosity": {
                 "name": "\u05d1\u05d4\u05d9\u05e8\u05d5\u05ea"
             },
             "methane": {
                 "name": "\u05de\u05ea\u05d0\u05df"
+            },
+            "odor_elimination_status": {
+                "state": {
+                    "charging": "\u05d8\u05e2\u05d9\u05e0\u05d4",
+                    "standby": "\u05d1\u05d4\u05de\u05ea\u05e0\u05d4"
+                }
             },
             "phase_a_current": {
                 "name": "\u05d6\u05e8\u05dd \u05e4\u05d0\u05d6\u05d4 A"
@@ -535,6 +546,9 @@
             },
             "power": {
                 "name": "\u05db\u05d7"
+            },
+            "precipitation_intensity": {
+                "name": "\u05e2\u05d5\u05e6\u05de\u05ea \u05de\u05e9\u05e7\u05e2\u05d9\u05dd"
             },
             "remaining_time": {
                 "name": "\u05d6\u05de\u05df \u05e9\u05e0\u05d5\u05ea\u05e8"
@@ -597,21 +611,19 @@
             },
             "water_level": {
                 "name": "\u05de\u05e4\u05dc\u05e1 \u05d4\u05de\u05d9\u05dd"
+            },
+            "water_level_state": {
+                "state": {
+                    "level_1": "\u05e0\u05de\u05d5\u05da",
+                    "level_2": "\u05d1\u05d9\u05e0\u05d5\u05e0\u05d9",
+                    "level_3": "\u05de\u05dc\u05d0"
+                }
+            },
+            "wind_direction": {
+                "name": "\u05db\u05d9\u05d5\u05d5\u05df \u05d4\u05e8\u05d5\u05d7"
             }
         },
         "switch": {
-            "alarm_1": {
-                "name": "\u05d0\u05d6\u05e2\u05e7\u05d4 1"
-            },
-            "alarm_2": {
-                "name": "\u05d0\u05d6\u05e2\u05e7\u05d4 2"
-            },
-            "alarm_3": {
-                "name": "\u05d0\u05d6\u05e2\u05e7\u05d4 3"
-            },
-            "alarm_4": {
-                "name": "\u05d0\u05d6\u05e2\u05e7\u05d4 4"
-            },
             "anion": {
                 "name": "\u05d0\u05e0\u05d9\u05d5\u05df"
             },
@@ -647,6 +659,9 @@
             },
             "humidification": {
                 "name": "\u05dc\u05d7\u05d5\u05ea"
+            },
+            "indexed_usb": {
+                "name": "USB {index}"
             },
             "ionizer": {
                 "name": "\u05de\u05d9\u05d9\u05e0\u05df"
@@ -705,24 +720,6 @@
             "socket": {
                 "name": "\u05e9\u05e7\u05e2"
             },
-            "socket_1": {
-                "name": "\u05e9\u05e7\u05e2 1"
-            },
-            "socket_2": {
-                "name": "\u05e9\u05e7\u05e2 2"
-            },
-            "socket_3": {
-                "name": "\u05e9\u05e7\u05e2 3"
-            },
-            "socket_4": {
-                "name": "\u05e9\u05e7\u05e2 4"
-            },
-            "socket_5": {
-                "name": "\u05e9\u05e7\u05e2 5"
-            },
-            "socket_6": {
-                "name": "\u05e9\u05e7\u05e2 6"
-            },
             "sound": {
                 "name": "\u05e7\u05d5\u05dc"
             },
@@ -741,50 +738,8 @@
             "switch": {
                 "name": "\u05de\u05ea\u05d2"
             },
-            "switch_1": {
-                "name": "\u05de\u05ea\u05d2 1"
-            },
-            "switch_2": {
-                "name": "\u05de\u05ea\u05d2 2"
-            },
-            "switch_3": {
-                "name": "\u05de\u05ea\u05d2 3"
-            },
-            "switch_4": {
-                "name": "\u05de\u05ea\u05d2 4"
-            },
-            "switch_5": {
-                "name": "\u05de\u05ea\u05d2 5"
-            },
-            "switch_6": {
-                "name": "\u05de\u05ea\u05d2 6"
-            },
-            "switch_7": {
-                "name": "\u05de\u05ea\u05d2 7"
-            },
-            "switch_8": {
-                "name": "\u05de\u05ea\u05d2 8"
-            },
             "time_watermark": {
                 "name": "\u05e1\u05d9\u05de\u05df \u05de\u05d9\u05dd \u05e9\u05dc \u05d6\u05de\u05df"
-            },
-            "usb_1": {
-                "name": "USB 1"
-            },
-            "usb_2": {
-                "name": "USB 2"
-            },
-            "usb_3": {
-                "name": "USB 3"
-            },
-            "usb_4": {
-                "name": "USB 4"
-            },
-            "usb_5": {
-                "name": "USB 5"
-            },
-            "usb_6": {
-                "name": "USB 6"
             },
             "uv_sterilization": {
                 "name": "\u05e2\u05d9\u05e7\u05d5\u05e8 UV"
@@ -803,6 +758,11 @@
             },
             "wide_dynamic_range": {
                 "name": "\u05d8\u05d5\u05d5\u05d7 \u05d3\u05d9\u05e0\u05de\u05d9 \u05e8\u05d7\u05d1"
+            }
+        },
+        "valve": {
+            "valve": {
+                "name": "\u05e9\u05e1\u05ea\u05d5\u05dd"
             }
         }
     }

@@ -33,6 +33,9 @@
             "carbon_monoxide": {
                 "name": "Vingugaas"
             },
+            "defrost": {
+                "name": "Sulatamine"
+            },
             "drop": {
                 "name": "Kukkumine"
             },
@@ -51,11 +54,20 @@
             "pressure": {
                 "name": "\u00d5hur\u00f5hk"
             },
+            "tankfull": {
+                "name": "Paak t\u00e4is"
+            },
             "tilt": {
                 "name": "Kallutamine"
             },
+            "valve": {
+                "name": "Klapp"
+            },
             "voc": {
                 "name": "Lenduvad orgaanilised \u00fchendid"
+            },
+            "wet": {
+                "name": "M\u00e4rg"
             }
         },
         "button": {
@@ -85,20 +97,11 @@
             "curtain": {
                 "name": "Kardin"
             },
-            "curtain_2": {
-                "name": "Kardin 2"
+            "indexed_curtain": {
+                "name": "Kardin {index}"
             },
-            "curtain_3": {
-                "name": "Kardin 3"
-            },
-            "door": {
-                "name": "Uks"
-            },
-            "door_2": {
-                "name": "Uks 2"
-            },
-            "door_3": {
-                "name": "Uks 3"
+            "indexed_door": {
+                "name": "Uks {index}"
             }
         },
         "event": {
@@ -119,22 +122,34 @@
             "backlight": {
                 "name": "Taustvalgus"
             },
+            "indexed_light": {
+                "name": "Valgusti {index}"
+            },
             "light": {
                 "name": "Tuled"
-            },
-            "light_2": {
-                "name": "Valgusti 2"
-            },
-            "light_3": {
-                "name": "Valgusti 3"
             },
             "night_light": {
                 "name": "\u00d6\u00f6valgus"
             }
         },
         "number": {
+            "alarm_delay": {
+                "name": "H\u00e4ire viivitus"
+            },
             "alarm_duration": {
                 "name": "H\u00e4ire kestus"
+            },
+            "alarm_maximum": {
+                "name": "H\u00e4ire maksimum"
+            },
+            "alarm_minimum": {
+                "name": "H\u00e4ire miinimum"
+            },
+            "arm_delay": {
+                "name": "Valvestamise viivitus"
+            },
+            "battery_backup_reserve": {
+                "name": "Aku varureserv"
             },
             "cloud_recipe": {
                 "name": "Retsept pilveteenusest"
@@ -157,23 +172,35 @@
             "heat_preservation_time": {
                 "name": "Soojussalvestuse aeg"
             },
+            "indexed_cook_temperature": {
+                "name": "K\u00fcpsetamistemperatuur {index}"
+            },
+            "indexed_irrigation_duration": {
+                "name": "Kastmise kestus {index}"
+            },
+            "indexed_maximum_brightness": {
+                "name": "Maksimaalne heledus {index}"
+            },
+            "indexed_minimum_brightness": {
+                "name": "Minimaalne heledus {index}"
+            },
+            "indexed_temperature": {
+                "name": "Temperatuur {index}"
+            },
+            "installation_height": {
+                "name": "Paigalduse k\u00f5rgus"
+            },
+            "inverter_output_power_limit": {
+                "name": "Inverteri v\u00e4ljundv\u00f5imsuse piirang"
+            },
             "maximum_brightness": {
                 "name": "Maksimaalne heledus"
             },
-            "maximum_brightness_2": {
-                "name": "Maksimaalne heledus 2"
-            },
-            "maximum_brightness_3": {
-                "name": "Maksimaalne heledus 3"
+            "maximum_liquid_depth": {
+                "name": "Vedeliku maksimaalne s\u00fcgavus"
             },
             "minimum_brightness": {
                 "name": "Minimaalne heledus"
-            },
-            "minimum_brightness_2": {
-                "name": "Minimaalne heledus 2"
-            },
-            "minimum_brightness_3": {
-                "name": "Minimaalne heledus 3"
             },
             "move_down": {
                 "name": "Liiguta alla"
@@ -190,8 +217,14 @@
             "sensitivity": {
                 "name": "Tundlikkus"
             },
+            "siren_duration": {
+                "name": "Sireeni kestus"
+            },
             "target_dis_closest": {
                 "name": "L\u00e4him sihtm\u00e4rgi kaugus"
+            },
+            "temp_correction": {
+                "name": "Temperatuuri korrektsioon"
             },
             "temperature": {
                 "name": "Temperatuur"
@@ -230,6 +263,7 @@
                 }
             },
             "blanket_level": {
+                "name": "Tase",
                 "state": {
                     "level_1": "Madal",
                     "level_10": "K\u00f5rge",
@@ -285,6 +319,23 @@
                     "1": "K\u00f5rge tundlikkus"
                 }
             },
+            "desk_level": {
+                "name": "Tase",
+                "state": {
+                    "level_1": "Tase 1",
+                    "level_2": "Tase 2",
+                    "level_3": "Tase 3",
+                    "level_4": "Tase 4"
+                }
+            },
+            "desk_up_down": {
+                "name": "\u00dcles/alla",
+                "state": {
+                    "down": "Alla",
+                    "stop": "Peata",
+                    "up": "\u00dcles"
+                }
+            },
             "fingerbot_mode": {
                 "name": "Re\u017eiim",
                 "state": {
@@ -335,6 +386,37 @@
                     "work": "T\u00f6\u00f6aeg"
                 }
             },
+            "indexed_blanket_level": {
+                "name": "Tase {index}",
+                "state": {
+                    "level_1": "Madal",
+                    "level_10": "K\u00f5rge",
+                    "level_2": "Tase 2",
+                    "level_3": "Tase 3",
+                    "level_4": "Tase 4",
+                    "level_5": "Tase 5",
+                    "level_6": "Tase 6",
+                    "level_7": "Tase 7",
+                    "level_8": "Tase 8",
+                    "level_9": "Tase 9"
+                }
+            },
+            "indexed_led_type": {
+                "name": "Valgusallika {index} t\u00fc\u00fcp",
+                "state": {
+                    "halogen": "Halogeenlamp",
+                    "incandescent": "H\u00f5\u00f5glamp",
+                    "led": "LED"
+                }
+            },
+            "inverter_work_mode": {
+                "name": "Inverteri t\u00f6\u00f6re\u017eiim",
+                "state": {
+                    "manual": "K\u00e4sitsi re\u017eiim",
+                    "self_powered": "Autonoomse toitega",
+                    "time_of_use": "Kasutusaeg"
+                }
+            },
             "ipc_work_mode": {
                 "name": "IPC re\u017eiim",
                 "state": {
@@ -344,22 +426,6 @@
             },
             "led_type": {
                 "name": "Valgusti t\u00fc\u00fcp",
-                "state": {
-                    "halogen": "Halogeenlamp",
-                    "incandescent": "H\u00f5\u00f5glamp",
-                    "led": "LED"
-                }
-            },
-            "led_type_2": {
-                "name": "Valgusti 2 t\u00fc\u00fcp",
-                "state": {
-                    "halogen": "Halogeenlamp",
-                    "incandescent": "H\u00f5\u00f5glamp",
-                    "led": "LED"
-                }
-            },
-            "led_type_3": {
-                "name": "Valgusti 3 t\u00fc\u00fcp",
                 "state": {
                     "halogen": "Halogeenlamp",
                     "incandescent": "H\u00f5\u00f5glamp",
@@ -386,6 +452,13 @@
                     "0": "Madal",
                     "1": "Keskmine",
                     "2": "K\u00f5rge"
+                }
+            },
+            "odor_elimination_mode": {
+                "name": "L\u00f5hna eemaldamise re\u017eiim",
+                "state": {
+                    "interim": "Vahepealne",
+                    "smart": "Nutikas"
                 }
             },
             "record_mode": {
@@ -479,6 +552,9 @@
             }
         },
         "sensor": {
+            "air_pressure": {
+                "name": "\u00d5hur\u00f5hk"
+            },
             "air_quality": {
                 "name": "\u00d5hu kvaliteet",
                 "state": {
@@ -502,6 +578,12 @@
             "battery": {
                 "name": "Aku"
             },
+            "battery_power": {
+                "name": "Aku v\u00f5imsus"
+            },
+            "battery_soc": {
+                "name": "Aku laetus"
+            },
             "battery_state": {
                 "name": "Aku olek"
             },
@@ -510,6 +592,9 @@
             },
             "carbon_monoxide": {
                 "name": "Vingugaas"
+            },
+            "cat_weight": {
+                "name": "Kassi kaal"
             },
             "cleaning_area": {
                 "name": "Puhastusala"
@@ -526,8 +611,17 @@
             "current_temperature": {
                 "name": "Praegune temperatuur"
             },
+            "depth": {
+                "name": "S\u00fcgavus"
+            },
+            "dew_point_temperature": {
+                "name": "Kastepunkt"
+            },
             "duster_cloth_life": {
                 "name": "Tolmulapi kasutusiga"
+            },
+            "feels_like_temperature": {
+                "name": "Tundub nagu"
             },
             "filter_duration": {
                 "name": "Filtri t\u00f6\u00f6aeg"
@@ -544,11 +638,26 @@
             "gas": {
                 "name": "Gaas"
             },
+            "heat_index_temperature": {
+                "name": "Kuumaindeks"
+            },
             "humidity": {
                 "name": "Niiskus"
             },
+            "humidity_outdoor": {
+                "name": "V\u00e4lis\u00f5hu niiskus"
+            },
             "illuminance": {
                 "name": "Valgustatus"
+            },
+            "indexed_humidity_outdoor": {
+                "name": "V\u00e4lis\u00f5hu niiskuse kanal {index}"
+            },
+            "indexed_temperature_external": {
+                "name": "Sondi temperatuuri kanal {index}"
+            },
+            "inverter_output_power": {
+                "name": "Inverteri v\u00e4ljundv\u00f5imsus"
             },
             "last_amount": {
                 "name": "Viimatine kogus"
@@ -556,11 +665,49 @@
             "last_operation_duration": {
                 "name": "Viimatise tegevuse kestus"
             },
+            "lifetime_battery_charge_energy": {
+                "name": "Eluaegne aku laadimisenergia"
+            },
+            "lifetime_battery_discharge_energy": {
+                "name": "Eluaegne aku t\u00fchjenemise energia"
+            },
+            "lifetime_inverter_output_energy": {
+                "name": "Eluaegne inverteri v\u00e4ljundenergia"
+            },
+            "lifetime_offgrid_port_energy": {
+                "name": "Eluaegne v\u00f5rguv\u00e4line pordienergia"
+            },
+            "lifetime_pv_energy": {
+                "name": "Eluaegne PV energia"
+            },
+            "liquid_depth": {
+                "name": "Vedeliku s\u00fcgavus"
+            },
+            "liquid_level": {
+                "name": "Vedeliku tase"
+            },
+            "liquid_state": {
+                "name": "Vedeliku olek",
+                "state": {
+                    "lower_alarm": "Madal",
+                    "normal": "Tavaline",
+                    "upper_alarm": "K\u00f5rge"
+                }
+            },
             "luminosity": {
                 "name": "Heledus"
             },
             "methane": {
                 "name": "Metaan"
+            },
+            "odor_elimination_status": {
+                "name": "Olek",
+                "state": {
+                    "charge_done": "Laadimine l\u00f5petatud",
+                    "charging": "Laadimine",
+                    "standby": "Unere\u017eiimil",
+                    "work": "T\u00f6\u00f6tab"
+                }
             },
             "phase_a_current": {
                 "name": "Faas A vool"
@@ -601,8 +748,17 @@
             "power": {
                 "name": "V\u00f5imsus"
             },
+            "precipitation_intensity": {
+                "name": "Sademete intensiivsus"
+            },
+            "precipitation_today": {
+                "name": "T\u00e4nane sademete kogusumma"
+            },
             "pump_time": {
                 "name": "Veepumba t\u00f6\u00f6aeg"
+            },
+            "pv_channel_power": {
+                "name": "PV kanali {index} v\u00f5imsus"
             },
             "remaining_time": {
                 "name": "J\u00e4relej\u00e4\u00e4nud aeg"
@@ -633,6 +789,9 @@
             "status": {
                 "name": "Olek"
             },
+            "supply_frequency": {
+                "name": "Vooluallika sagedus"
+            },
             "temperature": {
                 "name": "Temperatuur"
             },
@@ -651,20 +810,32 @@
             "total_cleaning_times": {
                 "name": "Koristuskordi kokku"
             },
+            "total_dissolved_solids": {
+                "name": "Lahustunud tahkete ainete koguhulk"
+            },
             "total_energy": {
                 "name": "Energia kokku"
             },
             "total_operating_time": {
                 "name": "Kogu t\u00f6\u00f6aeg"
             },
+            "total_power": {
+                "name": "Koguv\u00f5imsus"
+            },
             "total_production": {
                 "name": "Kogutoodang"
+            },
+            "total_pv_power": {
+                "name": "PV koguv\u00f5imsus"
             },
             "total_volatile_organic_compound": {
                 "name": "Lenduvate orgaaniliste \u00fchendite \u00fcldsisaldus"
             },
             "total_watering_time": {
                 "name": "Kastmisaeg kokku"
+            },
+            "uv_index": {
+                "name": "UV-indeks"
             },
             "uv_runtime": {
                 "name": "UV-kiirguse t\u00f6\u00f6aeg"
@@ -678,25 +849,30 @@
             "water_level": {
                 "name": "Veetase"
             },
+            "water_level_state": {
+                "name": "Veetase",
+                "state": {
+                    "level_1": "Madal",
+                    "level_2": "Keskmine",
+                    "level_3": "T\u00e4ielik"
+                }
+            },
             "water_time": {
                 "name": "Vee kasutamise kestus"
+            },
+            "wind_chill_index_temperature": {
+                "name": "Tuulek\u00fclma indeks"
+            },
+            "wind_direction": {
+                "name": "Tuule suund"
             }
         },
         "switch": {
-            "alarm_1": {
-                "name": "H\u00e4ire 1"
-            },
-            "alarm_2": {
-                "name": "H\u00e4ire 2"
-            },
-            "alarm_3": {
-                "name": "H\u00e4ire 3"
-            },
-            "alarm_4": {
-                "name": "H\u00e4ire 4"
-            },
             "anion": {
                 "name": "Anioonid"
+            },
+            "arm_beep": {
+                "name": "Valvestamise heli"
             },
             "battery_lock": {
                 "name": "Aku lukustus"
@@ -725,11 +901,26 @@
             "flip": {
                 "name": "P\u00f6\u00f6ra"
             },
+            "frost_protection": {
+                "name": "K\u00fclmumiskaitse"
+            },
             "heat_preservation": {
                 "name": "Soojussalvestus"
             },
             "humidification": {
                 "name": "Niisutamine"
+            },
+            "indexed_alarm": {
+                "name": "H\u00e4ire {index}"
+            },
+            "indexed_socket": {
+                "name": "Pistikupesa {index}"
+            },
+            "indexed_switch": {
+                "name": "L\u00fcliti {index}"
+            },
+            "indexed_usb": {
+                "name": "USB {index}"
             },
             "ionizer": {
                 "name": "Ionisaator"
@@ -743,6 +934,9 @@
             "motion_tracking": {
                 "name": "Liikumise j\u00e4lgimine"
             },
+            "music": {
+                "name": "Muusika"
+            },
             "mute": {
                 "name": "Vaigista"
             },
@@ -754,6 +948,9 @@
             },
             "open_window_detection": {
                 "name": "Ava akna tuvastamine"
+            },
+            "output_power_limit": {
+                "name": "V\u00e4ljundv\u00f5imsuse piirang"
             },
             "oxygen_bar": {
                 "name": "Hapnikurikas"
@@ -779,6 +976,9 @@
             "reverse": {
                 "name": "Vastupidine"
             },
+            "siren": {
+                "name": "Sireen"
+            },
             "sleep": {
                 "name": "Uni"
             },
@@ -788,26 +988,11 @@
             "slow_feed": {
                 "name": "Aeglane rakendamine"
             },
+            "snooze": {
+                "name": "Edasil\u00fckkamine"
+            },
             "socket": {
                 "name": "Pistikupesa"
-            },
-            "socket_1": {
-                "name": "Pistikupesa 1"
-            },
-            "socket_2": {
-                "name": "Pistikupesa 2"
-            },
-            "socket_3": {
-                "name": "Pistikupesa 3"
-            },
-            "socket_4": {
-                "name": "Pistikupesa 4"
-            },
-            "socket_5": {
-                "name": "Pistikupesa 5"
-            },
-            "socket_6": {
-                "name": "Pistikupesa 6"
             },
             "sound": {
                 "name": "Heli"
@@ -827,50 +1012,8 @@
             "switch": {
                 "name": "L\u00fcliti"
             },
-            "switch_1": {
-                "name": "L\u00fcliti 1"
-            },
-            "switch_2": {
-                "name": "L\u00fcliti 2"
-            },
-            "switch_3": {
-                "name": "L\u00fcliti 3"
-            },
-            "switch_4": {
-                "name": "L\u00fcliti 4"
-            },
-            "switch_5": {
-                "name": "L\u00fcliti 5"
-            },
-            "switch_6": {
-                "name": "L\u00fcliti 6"
-            },
-            "switch_7": {
-                "name": "L\u00fcliti 7"
-            },
-            "switch_8": {
-                "name": "L\u00fcliti 8"
-            },
             "time_watermark": {
                 "name": "Ajatempel"
-            },
-            "usb_1": {
-                "name": "USB 1"
-            },
-            "usb_2": {
-                "name": "USB 2"
-            },
-            "usb_3": {
-                "name": "USB 3"
-            },
-            "usb_4": {
-                "name": "USB 4"
-            },
-            "usb_5": {
-                "name": "USB 5"
-            },
-            "usb_6": {
-                "name": "USB 6"
             },
             "uv_sterilization": {
                 "name": "UV-kiirgusega steriliseerimine"
@@ -890,6 +1033,25 @@
             "wide_dynamic_range": {
                 "name": "K\u00fcrge d\u00fcnaamiline ulatus"
             }
+        },
+        "valve": {
+            "indexed_valve": {
+                "name": "Klapp {index}"
+            },
+            "valve": {
+                "name": "Klapp"
+            }
+        }
+    },
+    "exceptions": {
+        "action_dpcode_not_found": {
+            "message": "Toimingut ei saa t\u00f6\u00f6delda kuna seade ei paku vastavat funktsioonikoodi (oodatav oli \u00fcks koodidest {expected} valikust {available} )."
+        }
+    },
+    "issues": {
+        "deprecated_entity_new_valve": {
+            "description": "Tuya \u00fcksus \"{entity}' on kasutuselt k\u00f5rvaldatud ja asendatud uue klapi\u00fcksusega.\nV\u00e4rskenda oma vaateid, automatiseerimisi ja skripte, keela `{entity}`  ja lae selle probleemi lahendamiseks sidumine uuesti / taask\u00e4ivita Home Assistant.",
+            "title": "{name} on aegunud"
         }
     }
 }

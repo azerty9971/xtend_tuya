@@ -275,6 +275,7 @@ async def async_setup_entry(
         XTEntityDescriptorManager.get_platform_descriptors(
             BINARY_SENSORS,
             entry.runtime_data.multi_manager,
+            XTBinarySensorEntityDescription,
             this_platform,
             COMPOUND_KEY,
         ),

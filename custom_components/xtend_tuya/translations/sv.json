@@ -11,8 +11,7 @@
             "reauth_user_code": {
                 "data": {
                     "user_code": "Anv\u00e4ndarkod"
-                },
-                "description": "Tuya-integrationen anv\u00e4nder nu en f\u00f6rb\u00e4ttrad inloggningsmetod. F\u00f6r att \u00e5terautentisera dig med ditt Smart Life- eller Tuya Smart-konto m\u00e5ste du ange din anv\u00e4ndarkod.\n\nDu hittar den h\u00e4r koden i Smart Life-appen eller Tuya Smart-appen under **Inst\u00e4llningar** > **Konto och s\u00e4kerhet** och anger koden som visas i f\u00e4ltet **Anv\u00e4ndarkod**. Anv\u00e4ndarkoden \u00e4r skiftl\u00e4gesk\u00e4nslig, s\u00e5 var noga med att ange den exakt som den visas i appen."
+                }
             },
             "scan": {
                 "description": "Anv\u00e4nd Smart Life-appen eller Tuya Smart-appen f\u00f6r att skanna f\u00f6ljande QR-kod f\u00f6r att slutf\u00f6ra inloggningen.\n\nForts\u00e4tt till n\u00e4sta steg n\u00e4r du har slutf\u00f6rt detta steg i appen."
@@ -20,8 +19,7 @@
             "user": {
                 "data": {
                     "user_code": "Anv\u00e4ndarkod"
-                },
-                "description": "Ange din Smart Life- eller Tuya Smart-anv\u00e4ndarkod.\n\nDu hittar den h\u00e4r koden i Smart Life-appen eller Tuya Smart-appen under **Inst\u00e4llningar** > **Konto och s\u00e4kerhet** och anger koden som visas i f\u00e4ltet **Anv\u00e4ndarkod**. Anv\u00e4ndarkoden \u00e4r skiftl\u00e4gesk\u00e4nslig, s\u00e5 var noga med att ange den exakt som den visas i appen."
+                }
             }
         }
     },
@@ -32,6 +30,9 @@
             },
             "carbon_monoxide": {
                 "name": "Kolmonoxid"
+            },
+            "defrost": {
+                "name": "Avfrostning"
             },
             "drop": {
                 "name": "Drop"
@@ -56,6 +57,9 @@
             },
             "voc": {
                 "name": "VOC"
+            },
+            "wet": {
+                "name": "V\u00e5t"
             }
         },
         "button": {
@@ -85,20 +89,11 @@
             "curtain": {
                 "name": "Gardin"
             },
-            "curtain_2": {
-                "name": "Gardin 2"
+            "indexed_curtain": {
+                "name": "Gardin {index}"
             },
-            "curtain_3": {
-                "name": "Gardin 3"
-            },
-            "door": {
-                "name": "D\u00f6rr"
-            },
-            "door_2": {
-                "name": "D\u00f6rr 2"
-            },
-            "door_3": {
-                "name": "D\u00f6rr 3"
+            "indexed_door": {
+                "name": "D\u00f6rr {index}"
             }
         },
         "event": {
@@ -119,31 +114,28 @@
             "backlight": {
                 "name": "Bakgrundsbelysning"
             },
+            "indexed_light": {
+                "name": "Lampa {index}"
+            },
             "light": {
                 "name": "Lampa"
-            },
-            "light_2": {
-                "name": "Lampa 2"
-            },
-            "light_3": {
-                "name": "Lampa 3"
             },
             "night_light": {
                 "name": "Nattlampa"
             }
         },
         "number": {
+            "alarm_delay": {
+                "name": "Larmf\u00f6rdr\u00f6jning"
+            },
             "alarm_duration": {
                 "name": "Larmets varaktighet"
             },
+            "battery_backup_reserve": {
+                "name": "Batteribackup reserv"
+            },
             "cloud_recipe": {
                 "name": "Moln recept"
-            },
-            "cook_temperature": {
-                "name": "Tillagningstemperatur"
-            },
-            "cook_time": {
-                "name": "Tillagningstid"
             },
             "down_delay": {
                 "name": "F\u00f6rdr\u00f6jning av nedg\u00e5ng"
@@ -157,23 +149,20 @@
             "heat_preservation_time": {
                 "name": "Tid f\u00f6r bevarande av v\u00e4rme"
             },
+            "indexed_cook_temperature": {
+                "name": "Tillagningstemperatur {index}"
+            },
+            "indexed_temperature": {
+                "name": "Temperatur {index}"
+            },
+            "inverter_output_power_limit": {
+                "name": "V\u00e4xelriktarens utg\u00e5ngseffektgr\u00e4ns"
+            },
             "maximum_brightness": {
                 "name": "Maximal ljusstyrka"
             },
-            "maximum_brightness_2": {
-                "name": "Maximal ljusstyrka 2"
-            },
-            "maximum_brightness_3": {
-                "name": "Maximal ljusstyrka 3"
-            },
             "minimum_brightness": {
                 "name": "Minsta ljusstyrka"
-            },
-            "minimum_brightness_2": {
-                "name": "Minsta ljusstyrka 2"
-            },
-            "minimum_brightness_3": {
-                "name": "Minsta ljusstyrka 3"
             },
             "move_down": {
                 "name": "Flytta ned\u00e5t"
@@ -190,8 +179,8 @@
             "sensitivity": {
                 "name": "K\u00e4nslighet"
             },
-            "target_dis_closest": {
-                "name": "N\u00e4rmaste avst\u00e5nd till m\u00e5l"
+            "temp_correction": {
+                "name": "Temperaturkorrigering"
             },
             "temperature": {
                 "name": "Temperatur"
@@ -230,9 +219,8 @@
                 }
             },
             "blanket_level": {
+                "name": "Niv\u00e5",
                 "state": {
-                    "level_1": "L\u00e5g",
-                    "level_10": "H\u00f6g",
                     "level_2": "Niv\u00e5 2",
                     "level_3": "Niv\u00e5 3",
                     "level_4": "Niv\u00e5 4",
@@ -285,6 +273,23 @@
                     "1": "H\u00f6g k\u00e4nslighet"
                 }
             },
+            "desk_level": {
+                "name": "Niv\u00e5",
+                "state": {
+                    "level_1": "Niv\u00e5 1",
+                    "level_2": "Niv\u00e5 2",
+                    "level_3": "Niv\u00e5 3",
+                    "level_4": "Niv\u00e5 4"
+                }
+            },
+            "desk_up_down": {
+                "name": "Upp/Ner",
+                "state": {
+                    "down": "Ner",
+                    "stop": "Stopp",
+                    "up": "Upp"
+                }
+            },
             "fingerbot_mode": {
                 "name": "L\u00e4ge",
                 "state": {
@@ -335,6 +340,36 @@
                     "work": "Arbetsl\u00e4ge"
                 }
             },
+            "indexed_blanket_level": {
+                "name": "Niv\u00e5 {index}",
+                "state": {
+                    "level_1": "L\u00e5g",
+                    "level_10": "H\u00f6g",
+                    "level_2": "Niv\u00e5 2",
+                    "level_3": "Niv\u00e5 3",
+                    "level_4": "Niv\u00e5 4",
+                    "level_5": "Niv\u00e5 5",
+                    "level_6": "Niv\u00e5 6",
+                    "level_7": "Niv\u00e5 7",
+                    "level_8": "Niv\u00e5 8",
+                    "level_9": "Niv\u00e5 9"
+                }
+            },
+            "indexed_led_type": {
+                "state": {
+                    "halogen": "Halogen",
+                    "incandescent": "Gl\u00f6dlampa",
+                    "led": "LED"
+                }
+            },
+            "inverter_work_mode": {
+                "name": "V\u00e4xelriktarens arbetsl\u00e4ge",
+                "state": {
+                    "manual": "Manuellt l\u00e4ge",
+                    "self_powered": "Sj\u00e4lvg\u00e5ende",
+                    "time_of_use": "Anv\u00e4ndningstid"
+                }
+            },
             "ipc_work_mode": {
                 "name": "IPC-l\u00e4ge",
                 "state": {
@@ -344,22 +379,6 @@
             },
             "led_type": {
                 "name": "Typ av ljusk\u00e4lla",
-                "state": {
-                    "halogen": "Halogen",
-                    "incandescent": "Gl\u00f6dlampa",
-                    "led": "LED"
-                }
-            },
-            "led_type_2": {
-                "name": "Typ av ljusk\u00e4lla 2",
-                "state": {
-                    "halogen": "Halogen",
-                    "incandescent": "Gl\u00f6dlampa",
-                    "led": "LED"
-                }
-            },
-            "led_type_3": {
-                "name": "Typ av ljusk\u00e4lla 3",
                 "state": {
                     "halogen": "Halogen",
                     "incandescent": "Gl\u00f6dlampa",
@@ -386,6 +405,12 @@
                     "0": "L\u00e5g",
                     "1": "Medel",
                     "2": "H\u00f6g"
+                }
+            },
+            "odor_elimination_mode": {
+                "state": {
+                    "interim": "Tillf\u00e4llig",
+                    "smart": "Smart"
                 }
             },
             "record_mode": {
@@ -479,6 +504,9 @@
             }
         },
         "sensor": {
+            "air_pressure": {
+                "name": "Lufttryck"
+            },
             "air_quality": {
                 "name": "Luftkvalitet",
                 "state": {
@@ -502,6 +530,12 @@
             "battery": {
                 "name": "Batteri"
             },
+            "battery_power": {
+                "name": "Batteridrift"
+            },
+            "battery_soc": {
+                "name": "Batteri SOC"
+            },
             "battery_state": {
                 "name": "Batteristatus"
             },
@@ -510,6 +544,9 @@
             },
             "carbon_monoxide": {
                 "name": "Kolmonoxid"
+            },
+            "cat_weight": {
+                "name": "Kattens vikt"
             },
             "cleaning_area": {
                 "name": "Reng\u00f6ringsomr\u00e5de"
@@ -526,8 +563,17 @@
             "current_temperature": {
                 "name": "Aktuell temperatur"
             },
+            "depth": {
+                "name": "Djup"
+            },
+            "dew_point_temperature": {
+                "name": "Daggpunkt"
+            },
             "duster_cloth_life": {
                 "name": "Dammduk livsl\u00e4ngd"
+            },
+            "feels_like_temperature": {
+                "name": "K\u00e4nns som"
             },
             "filter_duration": {
                 "name": "Filtertid"
@@ -544,11 +590,17 @@
             "gas": {
                 "name": "Gas"
             },
+            "heat_index_temperature": {
+                "name": "V\u00e4rme index"
+            },
             "humidity": {
                 "name": "Luftfuktighet"
             },
             "illuminance": {
                 "name": "Belysningsstyrka"
+            },
+            "inverter_output_power": {
+                "name": "V\u00e4xelriktarens utg\u00e5ngseffekt"
             },
             "last_amount": {
                 "name": "Senaste m\u00e4ngd"
@@ -556,11 +608,42 @@
             "last_operation_duration": {
                 "name": "Varaktighet f\u00f6r senaste drift"
             },
+            "lifetime_battery_charge_energy": {
+                "name": "Livsl\u00e4ngd batteriladdnings energi"
+            },
+            "lifetime_battery_discharge_energy": {
+                "name": "Livsl\u00e4ngd batteri urladdnings energi"
+            },
+            "lifetime_inverter_output_energy": {
+                "name": "Livsl\u00e4ngds v\u00e4xelriktarens uteffekt"
+            },
+            "lifetime_offgrid_port_energy": {
+                "name": "Livstids energi utanf\u00f6r eln\u00e4tet"
+            },
+            "lifetime_pv_energy": {
+                "name": "Livsl\u00e4ngd PV energi"
+            },
+            "liquid_state": {
+                "state": {
+                    "lower_alarm": "L\u00e5g",
+                    "normal": "Normal",
+                    "upper_alarm": "H\u00f6g"
+                }
+            },
             "luminosity": {
                 "name": "Ljusstyrka"
             },
             "methane": {
                 "name": "Metan"
+            },
+            "odor_elimination_status": {
+                "name": "Status",
+                "state": {
+                    "charge_done": "Laddning klar",
+                    "charging": "Laddar",
+                    "standby": "Vilol\u00e4ge",
+                    "work": "Arbetar"
+                }
             },
             "phase_a_current": {
                 "name": "Fas A str\u00f6m"
@@ -601,8 +684,14 @@
             "power": {
                 "name": "Effekt"
             },
+            "precipitation_intensity": {
+                "name": "Nederb\u00f6rdsintensitet"
+            },
             "pump_time": {
                 "name": "Vattenpumpens varaktighet"
+            },
+            "pv_channel_power": {
+                "name": "PV kanal {index} effekt"
             },
             "remaining_time": {
                 "name": "\u00c5terst\u00e5ende tid"
@@ -633,6 +722,9 @@
             "status": {
                 "name": "Status"
             },
+            "supply_frequency": {
+                "name": "Matningsfrekvens"
+            },
             "temperature": {
                 "name": "Temperatur"
             },
@@ -651,20 +743,32 @@
             "total_cleaning_times": {
                 "name": "Totalt antal st\u00e4dningar"
             },
+            "total_dissolved_solids": {
+                "name": "Totalt uppl\u00f6sta fasta \u00e4mnen"
+            },
             "total_energy": {
                 "name": "Total energi"
             },
             "total_operating_time": {
                 "name": "Total drifttid"
             },
+            "total_power": {
+                "name": "Total effekt"
+            },
             "total_production": {
                 "name": "Total produktion"
+            },
+            "total_pv_power": {
+                "name": "Total PV effekt"
             },
             "total_volatile_organic_compound": {
                 "name": "Total m\u00e4ngd flyktiga organiska f\u00f6reningar (VOC)"
             },
             "total_watering_time": {
                 "name": "Total bevattningstid"
+            },
+            "uv_index": {
+                "name": "UV-index"
             },
             "uv_runtime": {
                 "name": "UV-k\u00f6rtid"
@@ -678,23 +782,25 @@
             "water_level": {
                 "name": "Vattenniv\u00e5"
             },
+            "water_level_state": {
+                "name": "Vattenniv\u00e5",
+                "state": {
+                    "level_1": "L\u00e5g",
+                    "level_2": "Medel",
+                    "level_3": "Full"
+                }
+            },
             "water_time": {
                 "name": "Vattenf\u00f6rbrukningstid"
+            },
+            "wind_chill_index_temperature": {
+                "name": "Vindkylnings index"
+            },
+            "wind_direction": {
+                "name": "Vindriktning"
             }
         },
         "switch": {
-            "alarm_1": {
-                "name": "Larm 1"
-            },
-            "alarm_2": {
-                "name": "Larm 2"
-            },
-            "alarm_3": {
-                "name": "Larm 3"
-            },
-            "alarm_4": {
-                "name": "Larm 4"
-            },
             "anion": {
                 "name": "Anion"
             },
@@ -731,6 +837,18 @@
             "humidification": {
                 "name": "Befuktning"
             },
+            "indexed_alarm": {
+                "name": "Larm {index}"
+            },
+            "indexed_socket": {
+                "name": "Uttag {index}"
+            },
+            "indexed_switch": {
+                "name": "Brytare {index}"
+            },
+            "indexed_usb": {
+                "name": "USB {index}"
+            },
             "ionizer": {
                 "name": "Ionizer"
             },
@@ -743,6 +861,9 @@
             "motion_tracking": {
                 "name": "R\u00f6relsesp\u00e5rning"
             },
+            "music": {
+                "name": "Musik"
+            },
             "mute": {
                 "name": "Tysta"
             },
@@ -754,6 +875,9 @@
             },
             "open_window_detection": {
                 "name": "Detektering av \u00f6ppna f\u00f6nster"
+            },
+            "output_power_limit": {
+                "name": "Utg\u00e5ngseffekt gr\u00e4ns"
             },
             "oxygen_bar": {
                 "name": "Syre"
@@ -779,6 +903,9 @@
             "reverse": {
                 "name": "Omv\u00e4nd"
             },
+            "siren": {
+                "name": "Siren"
+            },
             "sleep": {
                 "name": "S\u00f6mn"
             },
@@ -788,26 +915,11 @@
             "slow_feed": {
                 "name": "L\u00e5ngsam matning"
             },
+            "snooze": {
+                "name": "Snooza"
+            },
             "socket": {
                 "name": "Uttag"
-            },
-            "socket_1": {
-                "name": "Uttag 1"
-            },
-            "socket_2": {
-                "name": "Uttag 2"
-            },
-            "socket_3": {
-                "name": "Uttag 3"
-            },
-            "socket_4": {
-                "name": "Uttag 4"
-            },
-            "socket_5": {
-                "name": "Uttag 5"
-            },
-            "socket_6": {
-                "name": "Uttag 6"
             },
             "sound": {
                 "name": "Ljud"
@@ -827,50 +939,8 @@
             "switch": {
                 "name": "Brytare"
             },
-            "switch_1": {
-                "name": "Brytare 1"
-            },
-            "switch_2": {
-                "name": "Brytare 2"
-            },
-            "switch_3": {
-                "name": "Brytare 3"
-            },
-            "switch_4": {
-                "name": "Brytare 4"
-            },
-            "switch_5": {
-                "name": "Brytare 5"
-            },
-            "switch_6": {
-                "name": "Brytare 6"
-            },
-            "switch_7": {
-                "name": "Brytare 7"
-            },
-            "switch_8": {
-                "name": "Brytare 8"
-            },
             "time_watermark": {
                 "name": "Tid vattenst\u00e4mpel"
-            },
-            "usb_1": {
-                "name": "USB 1"
-            },
-            "usb_2": {
-                "name": "USB 2"
-            },
-            "usb_3": {
-                "name": "USB 3"
-            },
-            "usb_4": {
-                "name": "USB 4"
-            },
-            "usb_5": {
-                "name": "USB 5"
-            },
-            "usb_6": {
-                "name": "USB 6"
             },
             "uv_sterilization": {
                 "name": "UV-sterilisering"
@@ -890,6 +960,20 @@
             "wide_dynamic_range": {
                 "name": "Brett dynamiskt omf\u00e5ng (WDR)"
             }
+        },
+        "valve": {
+            "indexed_valve": {
+                "name": "Ventil {index}"
+            },
+            "valve": {
+                "name": "Ventil"
+            }
+        }
+    },
+    "issues": {
+        "deprecated_entity_new_valve": {
+            "description": "Tuya entiteten `{entity}` \u00e4r f\u00f6r\u00e5ldrad och ersatt av en ny ventil entitet.\nUppdatera dina instrumentpaneler, automatiseringar och skript, inaktivera `{entity}` och ladda om integrationen/starta om Home Assistant f\u00f6r att \u00e5tg\u00e4rda problemet.",
+            "title": "{name} \u00e4r f\u00f6r\u00e5ldrat"
         }
     }
 }

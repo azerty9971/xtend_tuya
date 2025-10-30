@@ -91,7 +91,7 @@ async def async_setup_entry(
             dict[str, tuple[XTLightEntityDescription, ...]],
         ],
         XTEntityDescriptorManager.get_platform_descriptors(
-            LIGHTS, entry.runtime_data.multi_manager, this_platform
+            LIGHTS, entry.runtime_data.multi_manager, XTLightEntityDescription, this_platform
         ),
     )
 
@@ -209,7 +209,7 @@ class XTLightEntity(XTEntity, TuyaLightEntity):
         except Exception as e:
             if (
                 dpcode := self.find_dpcode(description.color_data, prefer_function=True)
-            ) and self.get_dptype(dpcode) == TuyaDPType.JSON:
+            ) and self.get_dptype(device, dpcode) == TuyaDPType.JSON:
                 if dpcode in self.device.function:
                     values = self.device.function[dpcode].values
                 else:
@@ -227,7 +227,7 @@ class XTLightEntity(XTEntity, TuyaLightEntity):
     def fix_color_data(self, device: XTDevice, description: XTLightEntityDescription):
         if (
             dpcode := self.find_dpcode(description.color_data, prefer_function=True)
-        ) and self.get_dptype(dpcode) == TuyaDPType.JSON:
+        ) and self.get_dptype(device, dpcode) == TuyaDPType.JSON:
             values = "{}"
             if dpcode in self.device.function:
                 values = self.device.function[dpcode].values

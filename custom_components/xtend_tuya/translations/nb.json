@@ -23,9 +23,6 @@
             },
             "curtain": {
                 "name": "Gardin"
-            },
-            "door": {
-                "name": "D\u00f8r"
             }
         },
         "light": {
@@ -136,20 +133,6 @@
                 }
             },
             "led_type": {
-                "state": {
-                    "halogen": "Halogen",
-                    "incandescent": "Gl\u00f8dende",
-                    "led": "LED"
-                }
-            },
-            "led_type_2": {
-                "state": {
-                    "halogen": "Halogen",
-                    "incandescent": "Gl\u00f8dende",
-                    "led": "LED"
-                }
-            },
-            "led_type_3": {
                 "state": {
                     "halogen": "Halogen",
                     "incandescent": "Gl\u00f8dende",
@@ -274,9 +257,6 @@
             "total_operating_time": {
                 "name": "Total driftstid"
             },
-            "voc": {
-                "name": "VOC"
-            },
             "voltage": {
                 "name": "Spenning"
             }
@@ -284,18 +264,6 @@
         "switch": {
             "start": {
                 "name": "Start"
-            },
-            "usb_1": {
-                "name": "USB 1"
-            },
-            "usb_2": {
-                "name": "USB 2"
-            },
-            "usb_3": {
-                "name": "USB 3"
-            },
-            "usb_6": {
-                "name": "USB 6"
             },
             "voice": {
                 "name": "Stemme"

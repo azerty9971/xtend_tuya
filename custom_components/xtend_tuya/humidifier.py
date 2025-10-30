@@ -59,7 +59,7 @@ async def async_setup_entry(
             dict[str, XTHumidifierEntityDescription],
         ],
         XTEntityDescriptorManager.get_platform_descriptors(
-            HUMIDIFIERS, entry.runtime_data.multi_manager, this_platform
+            HUMIDIFIERS, entry.runtime_data.multi_manager, XTHumidifierEntityDescription, this_platform
         ),
     )
 

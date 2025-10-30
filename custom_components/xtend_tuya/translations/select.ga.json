@@ -1,0 +1,94 @@
+{
+    "state": {
+        "tuya__countdown": {
+            "1h": "1 uair an chloig",
+            "2h": "2 uair an chloig",
+            "3h": "3 uair an chloig",
+            "4h": "4 uair an chloig",
+            "5h": "5 uair an chloig",
+            "6h": "6 uair an chloig",
+            "cancel": "Cealaigh"
+        },
+        "tuya__curtain_mode": {
+            "morning": "Maidin",
+            "night": "O\u00edche"
+        },
+        "tuya__curtain_motor_mode": {
+            "back": "Ar ais",
+            "forward": "Ar Aghaidh"
+        },
+        "tuya__fingerbot_mode": {
+            "click": "Br\u00faigh",
+            "switch": "Lasc"
+        },
+        "tuya__humidifier_level": {
+            "level_1": "Leibh\u00e9al 1",
+            "level_10": "Leibh\u00e9al 10",
+            "level_2": "Leibh\u00e9al 2",
+            "level_3": "Leibh\u00e9al 3",
+            "level_4": "Leibh\u00e9al 4",
+            "level_5": "Leibh\u00e9al 5",
+            "level_6": "Leibh\u00e9al 6",
+            "level_7": "Leibh\u00e9al 7",
+            "level_8": "Leibh\u00e9al 8",
+            "level_9": "Leibh\u00e9al 9"
+        },
+        "tuya__humidifier_spray_mode": {
+            "auto": "Uathoibr\u00edoch",
+            "health": "Sl\u00e1inte",
+            "humidity": "Taise",
+            "sleep": "Codladh",
+            "work": "Obair"
+        },
+        "tuya__led_type": {
+            "halogen": "Halaigin",
+            "incandescent": "Gealbhruthach",
+            "led": "LED"
+        },
+        "tuya__light_mode": {
+            "none": "As",
+            "pos": "L\u00e9irigh su\u00edomh an lasc",
+            "relay": "L\u00e9irigh staid an lasctha ar si\u00fal/as"
+        },
+        "tuya__relay_status": {
+            "last": "Cuimhnigh an st\u00e1t deireanach",
+            "memory": "Cuimhnigh an st\u00e1t deireanach",
+            "off": "As",
+            "on": "Ar si\u00fal",
+            "power_off": "As",
+            "power_on": "Ar si\u00fal"
+        },
+        "tuya__vacuum_cistern": {
+            "closed": "D\u00fanta",
+            "high": "Ard",
+            "low": "\u00cdseal",
+            "middle": "L\u00e1r"
+        },
+        "tuya__vacuum_collection": {
+            "large": "M\u00f3r",
+            "middle": "L\u00e1r",
+            "small": "Beag"
+        },
+        "tuya__vacuum_mode": {
+            "bow": "Bogha",
+            "chargego": "Fill ar ais chuig an duga",
+            "left_bow": "Bogha ar Chl\u00e9",
+            "left_spiral": "Sprial Ar Chl\u00e9",
+            "mop": "Mop",
+            "part": "Cuid",
+            "partial_bow": "Bogha go P\u00e1irteach",
+            "pick_zone": "Crios Pioc\u00e1la",
+            "point": "Pointe",
+            "pose": "Staidi\u00fair",
+            "random": "Randamach",
+            "right_bow": "Bogha ar dheis",
+            "right_spiral": "B\u00edseach ar Dheis",
+            "single": "Singil",
+            "smart": "Cliste",
+            "spiral": "B\u00edseach",
+            "standby": "Fuireachas",
+            "wall_follow": "Lean an Balla",
+            "zone": "Crios"
+        }
+    }
+}

@@ -11,14 +11,12 @@
             "reauth_user_code": {
                 "data": {
                     "user_code": "K\u00e4ytt\u00e4j\u00e4koodi"
-                },
-                "description": "Tuya-integraatio k\u00e4ytt\u00e4\u00e4 nyt parannettua kirjautumismenetelm\u00e4\u00e4. Jos haluat tunnistautua uudelleen Smart Life- tai Tuya Smart -tilill\u00e4si, sinun on annettava k\u00e4ytt\u00e4j\u00e4koodisi.\n\nL\u00f6yd\u00e4t t\u00e4m\u00e4n koodin Smart Life -sovelluksesta tai Tuya Smart -sovelluksesta **Asetukset** > **Tili ja turvallisuus** -n\u00e4yt\u00f6st\u00e4 ja sy\u00f6t\u00e4 **K\u00e4ytt\u00e4j\u00e4koodi** -kent\u00e4ss\u00e4 n\u00e4kyv\u00e4 koodi. K\u00e4ytt\u00e4j\u00e4koodi on suur- ja pienaakkoset huomioiva, joten muista sy\u00f6tt\u00e4\u00e4 se t\u00e4sm\u00e4lleen sovelluksessa n\u00e4ytetyn mukaisesti."
+                }
             },
             "user": {
                 "data": {
                     "user_code": "K\u00e4ytt\u00e4j\u00e4koodi"
-                },
-                "description": "Sy\u00f6t\u00e4 Smart Life- tai Tuya Smart -k\u00e4ytt\u00e4j\u00e4koodisi.\n\nL\u00f6yd\u00e4t t\u00e4m\u00e4n koodin Smart Life -sovelluksesta tai Tuya Smart -sovelluksesta **Asetukset** > **Tili ja turvallisuus** -n\u00e4yt\u00f6st\u00e4 ja sy\u00f6t\u00e4 **K\u00e4ytt\u00e4j\u00e4koodi** -kent\u00e4ss\u00e4 n\u00e4kyv\u00e4 koodi. K\u00e4ytt\u00e4j\u00e4koodi on suur- ja pienaakkoset huomioiva, joten muista sy\u00f6tt\u00e4\u00e4 se t\u00e4sm\u00e4lleen sovelluksessa n\u00e4ytetyn mukaisesti."
+                }
             }
         }
     },
@@ -81,21 +79,6 @@
             },
             "curtain": {
                 "name": "Verho"
-            },
-            "curtain_2": {
-                "name": "Verho 2"
-            },
-            "curtain_3": {
-                "name": "Verho 3"
-            },
-            "door": {
-                "name": "Ovi"
-            },
-            "door_2": {
-                "name": "Ovi 2"
-            },
-            "door_3": {
-                "name": "Ovi 3"
             }
         },
         "light": {
@@ -104,12 +87,6 @@
             },
             "light": {
                 "name": "Valo"
-            },
-            "light_2": {
-                "name": "Valo 2"
-            },
-            "light_3": {
-                "name": "Valo 3"
             },
             "night_light": {
                 "name": "Y\u00f6valo"
@@ -121,12 +98,6 @@
             },
             "cloud_recipe": {
                 "name": "Pilviresepti"
-            },
-            "cook_temperature": {
-                "name": "Kypsennysl\u00e4mp\u00f6tila"
-            },
-            "cook_time": {
-                "name": "Kypsennysaika"
             },
             "down_delay": {
                 "name": "Alas viive"
@@ -143,20 +114,8 @@
             "maximum_brightness": {
                 "name": "Suurin kirkkaus"
             },
-            "maximum_brightness_2": {
-                "name": "Suurin kirkkaus 2"
-            },
-            "maximum_brightness_3": {
-                "name": "Suurin kirkkaus 3"
-            },
             "minimum_brightness": {
                 "name": "V\u00e4himm\u00e4iskirkkaus"
-            },
-            "minimum_brightness_2": {
-                "name": "V\u00e4himm\u00e4iskirkkaus 2"
-            },
-            "minimum_brightness_3": {
-                "name": "V\u00e4himm\u00e4iskirkkaus 3"
             },
             "move_down": {
                 "name": "Siirr\u00e4 alasp\u00e4in"
@@ -309,22 +268,6 @@
             },
             "led_type": {
                 "name": "Valonl\u00e4hteen tyyppi",
-                "state": {
-                    "halogen": "Halogeeni",
-                    "incandescent": "Hehkulamppu",
-                    "led": "LED"
-                }
-            },
-            "led_type_2": {
-                "name": "Valonl\u00e4hteen tyyppi 2",
-                "state": {
-                    "halogen": "Halogeeni",
-                    "incandescent": "Hehkulamppu",
-                    "led": "LED"
-                }
-            },
-            "led_type_3": {
-                "name": "Valonl\u00e4hteen tyyppi 3",
                 "state": {
                     "halogen": "Halogeeni",
                     "incandescent": "Hehkulamppu",
@@ -600,9 +543,6 @@
             "total_watering_time": {
                 "name": "Kokonaiskasteluaika"
             },
-            "voc": {
-                "name": "VOC-yhdisteet"
-            },
             "voltage": {
                 "name": "J\u00e4nnite"
             },
@@ -611,18 +551,6 @@
             }
         },
         "switch": {
-            "alarm_1": {
-                "name": "H\u00e4lytys 1"
-            },
-            "alarm_2": {
-                "name": "H\u00e4lytys 2"
-            },
-            "alarm_3": {
-                "name": "H\u00e4lytys 3"
-            },
-            "alarm_4": {
-                "name": "H\u00e4lytys 4"
-            },
             "anion": {
                 "name": "Anioni"
             },
@@ -716,24 +644,6 @@
             "socket": {
                 "name": "Pistorasia"
             },
-            "socket_1": {
-                "name": "Pistorasia 1"
-            },
-            "socket_2": {
-                "name": "Pistorasia 2"
-            },
-            "socket_3": {
-                "name": "Pistorasia 3"
-            },
-            "socket_4": {
-                "name": "Pistorasia 4"
-            },
-            "socket_5": {
-                "name": "Pistorasia 5"
-            },
-            "socket_6": {
-                "name": "Pistorasia 6"
-            },
             "sound": {
                 "name": "\u00c4\u00e4ni"
             },
@@ -752,50 +662,8 @@
             "switch": {
                 "name": "Kytkin"
             },
-            "switch_1": {
-                "name": "Kytkin 1"
-            },
-            "switch_2": {
-                "name": "Kytkin 2"
-            },
-            "switch_3": {
-                "name": "Kytkin 3"
-            },
-            "switch_4": {
-                "name": "Kytkin 4"
-            },
-            "switch_5": {
-                "name": "Kytkin 5"
-            },
-            "switch_6": {
-                "name": "Kytkin 6"
-            },
-            "switch_7": {
-                "name": "Kytkin 7"
-            },
-            "switch_8": {
-                "name": "Kytkin 8"
-            },
             "time_watermark": {
                 "name": "Ajan vesileima"
-            },
-            "usb_1": {
-                "name": "USB 1"
-            },
-            "usb_2": {
-                "name": "USB 2"
-            },
-            "usb_3": {
-                "name": "USB 3"
-            },
-            "usb_4": {
-                "name": "USB 4"
-            },
-            "usb_5": {
-                "name": "USB 5"
-            },
-            "usb_6": {
-                "name": "USB 6"
             },
             "uv_sterilization": {
                 "name": "UV-sterilointi"
@@ -815,6 +683,11 @@
             "wide_dynamic_range": {
                 "name": "Laaja dynaaminen alue"
             }
+        }
+    },
+    "exceptions": {
+        "action_dpcode_not_found": {
+            "message": "Toimintaa ei voida k\u00e4sitell\u00e4, koska laite ei anna vastaavaa toimintokoodia (odotettu toimintokoodi {expected} {available}:ssa)."
         }
     }
 }

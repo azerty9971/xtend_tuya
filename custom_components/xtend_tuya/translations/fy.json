@@ -15,11 +15,23 @@
                     "humidity": "Fochtichheid"
                 }
             },
+            "motion_sensitivity": {
+                "state": {
+                    "0": "Leech",
+                    "1": "Gemiddeld",
+                    "2": "Heech"
+                }
+            },
             "vacuum_cistern": {
                 "state": {
                     "high": "Heech",
                     "low": "Leech"
                 }
+            }
+        },
+        "sensor": {
+            "cat_weight": {
+                "name": "Gewicht fan kat"
             }
         }
     }
