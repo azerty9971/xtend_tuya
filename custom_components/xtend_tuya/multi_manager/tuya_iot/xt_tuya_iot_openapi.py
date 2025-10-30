@@ -24,7 +24,7 @@ TO_C_CUSTOM_REFRESH_TOKEN_API = "/v1.0/iot-03/users/token/"
 TO_C_SMART_HOME_REFRESH_TOKEN_API = "/v1.0/token/"
 
 TO_C_CUSTOM_TOKEN_API = "/v1.0/iot-03/users/login"
-TO_C_SMART_HOME_TOKEN_API = "/v1.0/iot-01/associated-users/actions/authorized-loginSSSS"
+TO_C_SMART_HOME_TOKEN_API = "/v1.0/iot-01/associated-users/actions/authorized-login"
 TO_C_SMART_HOME_TOKEN_API_NEW = "/v1.0/token"
 
 
@@ -294,10 +294,10 @@ class XTIOTOpenAPI(TuyaOpenAPI):
         # if result.get("success", True) is False:
         time_taken = datetime.now() - start_time
         LOGGER.debug(
-            f"[IOT API][{time_taken}]Request: {method} {path} PARAMS: {json.dumps(params, ensure_ascii=False, indent=2) if params is not None else ''} BODY: {json.dumps(body, ensure_ascii=False, indent=2) if body is not None else ''}"
+            f"[IOT API][{time_taken}]Header time: {t} Request: {method} {path} PARAMS: {json.dumps(params, ensure_ascii=False, indent=2) if params is not None else ''} BODY: {json.dumps(body, ensure_ascii=False, indent=2) if body is not None else ''}"
         )
         LOGGER.debug(
-            f"[IOT API][{time_taken}]Response: {json.dumps(result, ensure_ascii=False, indent=2)}"
+            f"[IOT API][{time_taken}]Header time: {t} Response: {json.dumps(result, ensure_ascii=False, indent=2)}"
         )
 
         if result.get("code", -1) == TUYA_ERROR_CODE_TOKEN_INVALID:
