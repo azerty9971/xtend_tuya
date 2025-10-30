@@ -316,6 +316,8 @@ class XTEntityDescriptorManager:
         ):
             base_dict["translation_key"] = other.translation_key
             base_dict["translation_placeholders"] = other.translation_placeholders
+        if base.key == "add_ele":
+            LOGGER.warning(f"ADD_ELE: {base} <=> {other} <=> {real_type}")
         return real_type(**base_dict)
 
     @staticmethod
