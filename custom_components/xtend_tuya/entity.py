@@ -156,7 +156,7 @@ class XTEntityDescriptorManager:
                 key_part = getattr(entity, key)
                 if key_part is not None:
                     if compound_key is None:
-                        compound_key = key_part
+                        compound_key = str(key_part)
                     else:
                         compound_key = f"{compound_key}|{key_part}"
         return compound_key
