@@ -359,55 +359,65 @@ class XTIOTOpenAPI(TuyaOpenAPI):
         body: dict[str, Any] | None = None,
         first_pass: bool = True,
     ) -> dict[str, Any]:
-        start_time = datetime.now()
-        self.__refresh_access_token_if_need(path)
-        access_token = self.token_info.access_token if self.token_info else ""
-        sign, t = self._calculate_sign(method, path, params, body)
-        headers = {
-            "client_id": self.access_id,
-            "sign": sign,
-            "sign_method": "HMAC-SHA256",
-            "access_token": access_token,
-            "t": str(t),
-            "lang": self.lang,
-        }
+        try:
+            start_time = datetime.now()
+            self.__refresh_access_token_if_need(path)
+            access_token = self.token_info.access_token if self.token_info else ""
+            sign, t = self._calculate_sign(method, path, params, body)
+            headers = {
+                "client_id": self.access_id,
+                "sign": sign,
+                "sign_method": "HMAC-SHA256",
+                "access_token": access_token,
+                "t": str(t),
+                "lang": self.lang,
+            }
 
-        if (
-            path == self.__login_path
-            or path.startswith(TO_C_CUSTOM_REFRESH_TOKEN_API)
-            or path.startswith(TO_C_SMART_HOME_REFRESH_TOKEN_API)
-        ):
-            headers["dev_lang"] = "python"
-            headers["dev_version"] = VERSION
-            headers["dev_channel"] = self.dev_channel
+            if (
+                path == self.__login_path
+                or path.startswith(TO_C_CUSTOM_REFRESH_TOKEN_API)
+                or path.startswith(TO_C_SMART_HOME_REFRESH_TOKEN_API)
+            ):
+                headers["dev_lang"] = "python"
+                headers["dev_version"] = VERSION
+                headers["dev_channel"] = self.dev_channel
 
-        response = self.session.request(
-            method,
-            self.endpoint + path,
-            params=params,
-            json=body,
-            headers=headers,
-        )
-
-        if response.ok is False:
-            LOGGER.error(
-                f"[IOT API]Response error: code={response.status_code}, body={body if body is not None else ''}"
+            LOGGER.debug(
+                f"[IOT API][BEFORE CALL]Header time: {t} Request: {method} {path} PARAMS: {json.dumps(params, ensure_ascii=False, indent=2) if params is not None else ''} BODY: {json.dumps(body, ensure_ascii=False, indent=2) if body is not None else ''}"
             )
+
+            response = self.session.request(
+                method,
+                self.endpoint + path,
+                params=params,
+                json=body,
+                headers=headers,
+            )
+
+            LOGGER.debug(f"[IOT API][AFTER CALL]: {response}")
+
+            if response.ok is False:
+                LOGGER.error(
+                    f"[IOT API]Response error: code={response.status_code}, body={body if body is not None else ''}"
+                )
+                return {}
+
+            result: dict[str, Any] = response.json()
+
+            # if result.get("success", True) is False:
+            time_taken = datetime.now() - start_time
+            LOGGER.debug(
+                f"[IOT API][{time_taken}]Header time: {t} Request: {method} {path} PARAMS: {json.dumps(params, ensure_ascii=False, indent=2) if params is not None else ''} BODY: {json.dumps(body, ensure_ascii=False, indent=2) if body is not None else ''}"
+            )
+            LOGGER.debug(
+                f"[IOT API][{time_taken}]Header time: {t} Response: {json.dumps(result, ensure_ascii=False, indent=2)}"
+            )
+
+            if result.get("code", -1) == TUYA_ERROR_CODE_TOKEN_INVALID:
+                if self.reconnect() is True and first_pass is True:
+                    return self.__request(method, path, params, body, False)
+
+            return result
+        except Exception as e:
+            LOGGER.error(f"REQUEST ERROR: {e}")
             return {}
-
-        result: dict[str, Any] = response.json()
-
-        # if result.get("success", True) is False:
-        time_taken = datetime.now() - start_time
-        LOGGER.debug(
-            f"[IOT API][{time_taken}]Header time: {t} Request: {method} {path} PARAMS: {json.dumps(params, ensure_ascii=False, indent=2) if params is not None else ''} BODY: {json.dumps(body, ensure_ascii=False, indent=2) if body is not None else ''}"
-        )
-        LOGGER.debug(
-            f"[IOT API][{time_taken}]Header time: {t} Response: {json.dumps(result, ensure_ascii=False, indent=2)}"
-        )
-
-        if result.get("code", -1) == TUYA_ERROR_CODE_TOKEN_INVALID:
-            if self.reconnect() is True and first_pass is True:
-                return self.__request(method, path, params, body, False)
-
-        return result
