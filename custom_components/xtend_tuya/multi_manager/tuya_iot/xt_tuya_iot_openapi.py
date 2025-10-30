@@ -383,7 +383,7 @@ class XTIOTOpenAPI(TuyaOpenAPI):
                 headers["dev_channel"] = self.dev_channel
 
             LOGGER.debug(
-                f"[IOT API][BEFORE CALL]Header time: {t} Request: {method} {path} PARAMS: {json.dumps(params, ensure_ascii=False, indent=2) if params is not None else ''} BODY: {json.dumps(body, ensure_ascii=False, indent=2) if body is not None else ''}"
+                f"[IOT API][BEFORE CALL]Header time: {t} Request: {method} {self.endpoint}{path} PARAMS: {json.dumps(params, ensure_ascii=False, indent=2) if params is not None else ''} BODY: {json.dumps(body, ensure_ascii=False, indent=2) if body is not None else ''}"
             )
 
             response = self.session.request(
