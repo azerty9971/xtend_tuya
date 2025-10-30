@@ -24,7 +24,7 @@ TO_C_CUSTOM_REFRESH_TOKEN_API = "/v1.0/iot-03/users/token/"
 TO_C_SMART_HOME_REFRESH_TOKEN_API = "/v1.0/token/"
 
 TO_C_CUSTOM_TOKEN_API = "/v1.0/iot-03/users/login"
-TO_C_SMART_HOME_TOKEN_API = "/v1.0/iot-01/associated-users/actions/authorized-loginS"
+TO_C_SMART_HOME_TOKEN_API = "/v1.0/iot-01/associated-users/actions/authorized-loginSSSS"
 TO_C_SMART_HOME_TOKEN_API_NEW = "/v1.0/token"
 
 
