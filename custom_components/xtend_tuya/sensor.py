@@ -1655,7 +1655,7 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
             self._type_data = enum_type
             self._type = TuyaDPType.ENUM
         else:
-            self._type = self.get_dptype(description.key)  # type: ignore #This is modified from TuyaSensorEntity's constructor
+            self._type = self.get_dptype(device, description.key)  # type: ignore #This is modified from TuyaSensorEntity's constructor
 
         # Logic to ensure the set device class and API received Unit Of Measurement
         # match Home Assistants requirements.

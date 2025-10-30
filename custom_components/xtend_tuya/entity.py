@@ -530,6 +530,27 @@ class XTEntity(TuyaEntity):
                     return dpcode
 
         return None
+    
+    def get_dptype(self, device: sc.XTDevice, dpcode: XTDPCode | TuyaDPCode | None, *, prefer_function: bool = False) -> TuyaDPType | None:
+        """Find a matching DPType type information for this device DPCode."""
+        if dpcode is None:
+            return None
+        lookup_tuple = (
+            (device.function, device.status_range)
+            if prefer_function
+            else (device.status_range, device.function)
+        )
+        for device_specs in lookup_tuple:
+            if current_definition := device_specs.get(dpcode):
+                current_type = current_definition.type
+                if current_type is not None:
+                    try:
+                        return TuyaDPType(current_type)
+                    except ValueError:
+                        # Sometimes, we get ill-formed DPTypes from the cloud,
+                        # this fixes them and maps them to the correct DPType.
+                        return TUYA_DPTYPE_MAPPING.get(current_type)
+        return None
 
     @staticmethod
     def determine_dptype(type) -> TuyaDPType | None:
