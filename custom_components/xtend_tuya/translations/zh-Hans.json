@@ -33,6 +33,9 @@
             "carbon_monoxide": {
                 "name": "\u4e00\u6c27\u5316\u78b3"
             },
+            "defrost": {
+                "name": "\u9664\u971c"
+            },
             "drop": {
                 "name": "\u6389\u843d"
             },
@@ -51,11 +54,20 @@
             "pressure": {
                 "name": "\u538b\u529b"
             },
+            "tankfull": {
+                "name": "\u7bb1\u5df2\u6ee1"
+            },
             "tilt": {
                 "name": "\u503e\u659c"
             },
+            "valve": {
+                "name": "\u9600\u95e8"
+            },
             "voc": {
                 "name": "VOCs"
+            },
+            "wet": {
+                "name": "\u6f6e\u6e7f"
             }
         },
         "button": {
@@ -85,20 +97,11 @@
             "curtain": {
                 "name": "\u7a97\u5e18"
             },
-            "curtain_2": {
-                "name": "\u7a97\u5e18 2"
+            "indexed_curtain": {
+                "name": "\u7a97\u5e18 {index}"
             },
-            "curtain_3": {
-                "name": "\u7a97\u5e18 3"
-            },
-            "door": {
-                "name": "\u95e8"
-            },
-            "door_2": {
-                "name": "\u95e8 2"
-            },
-            "door_3": {
-                "name": "\u95e8 3"
+            "indexed_door": {
+                "name": "\u95e8 {index}"
             }
         },
         "event": {
@@ -119,28 +122,40 @@
             "backlight": {
                 "name": "\u80cc\u5149"
             },
+            "indexed_light": {
+                "name": "\u706f {index}"
+            },
             "light": {
                 "name": "\u706f\u5149"
-            },
-            "light_2": {
-                "name": "\u706f\u5149 2"
-            },
-            "light_3": {
-                "name": "\u706f\u5149 3"
             },
             "night_light": {
                 "name": "\u591c\u706f"
             }
         },
         "number": {
+            "alarm_delay": {
+                "name": "\u62a5\u8b66\u5ef6\u8fdf"
+            },
             "alarm_duration": {
                 "name": "\u8b66\u62a5\u65f6\u957f"
+            },
+            "alarm_maximum": {
+                "name": "\u62a5\u8b66\u6700\u5927\u503c"
+            },
+            "alarm_minimum": {
+                "name": "\u62a5\u8b66\u6700\u5c0f\u503c"
+            },
+            "arm_delay": {
+                "name": "\u5e03\u9632\u5ef6\u8fdf"
+            },
+            "battery_backup_reserve": {
+                "name": "\u7535\u6c60\u5907\u7528\u50a8\u5907"
             },
             "cloud_recipe": {
                 "name": "\u4e91\u98df\u8c31"
             },
             "cook_temperature": {
-                "name": "\u70f9\u8c03\u6e29\u5ea6"
+                "name": "\u70f9\u996a\u6e29\u5ea6"
             },
             "cook_time": {
                 "name": "\u70f9\u996a\u65f6\u95f4"
@@ -157,23 +172,35 @@
             "heat_preservation_time": {
                 "name": "\u4fdd\u6e29\u65f6\u95f4"
             },
+            "indexed_cook_temperature": {
+                "name": "\u70f9\u996a\u6e29\u5ea6 {index}"
+            },
+            "indexed_irrigation_duration": {
+                "name": "\u704c\u6e89\u65f6\u957f {index}"
+            },
+            "indexed_maximum_brightness": {
+                "name": "\u6700\u9ad8\u4eae\u5ea6 {index}"
+            },
+            "indexed_minimum_brightness": {
+                "name": "\u6700\u4f4e\u4eae\u5ea6 {index}"
+            },
+            "indexed_temperature": {
+                "name": "\u6e29\u5ea6 {index}"
+            },
+            "installation_height": {
+                "name": "\u5b89\u88c5\u9ad8\u5ea6"
+            },
+            "inverter_output_power_limit": {
+                "name": "\u9006\u53d8\u5668\u8f93\u51fa\u529f\u7387\u9650\u5236"
+            },
             "maximum_brightness": {
                 "name": "\u6700\u9ad8\u4eae\u5ea6"
             },
-            "maximum_brightness_2": {
-                "name": "\u6700\u9ad8\u4eae\u5ea62"
-            },
-            "maximum_brightness_3": {
-                "name": "\u6700\u9ad8\u4eae\u5ea63"
+            "maximum_liquid_depth": {
+                "name": "\u6700\u5927\u6db2\u6df1"
             },
             "minimum_brightness": {
                 "name": "\u6700\u4f4e\u4eae\u5ea6"
-            },
-            "minimum_brightness_2": {
-                "name": "\u6700\u4f4e\u4eae\u5ea62"
-            },
-            "minimum_brightness_3": {
-                "name": "\u6700\u4f4e\u4eae\u5ea63"
             },
             "move_down": {
                 "name": "\u4e0b\u79fb"
@@ -190,8 +217,14 @@
             "sensitivity": {
                 "name": "\u7075\u654f\u5ea6"
             },
+            "siren_duration": {
+                "name": "\u8b66\u7b1b\u65f6\u957f"
+            },
             "target_dis_closest": {
                 "name": "\u6700\u8fd1\u76ee\u6807\u8ddd\u79bb"
+            },
+            "temp_correction": {
+                "name": "\u6e29\u5ea6\u6821\u6b63"
             },
             "temperature": {
                 "name": "\u6e29\u5ea6"
@@ -230,6 +263,7 @@
                 }
             },
             "blanket_level": {
+                "name": "\u7ea7\u522b",
                 "state": {
                     "level_1": "\u4f4e",
                     "level_10": "\u9ad8",
@@ -285,6 +319,23 @@
                     "1": "\u9ad8\u7075\u654f\u5ea6"
                 }
             },
+            "desk_level": {
+                "name": "\u7ea7\u522b",
+                "state": {
+                    "level_1": "1 \u7ea7",
+                    "level_2": "2 \u7ea7",
+                    "level_3": "3 \u7ea7",
+                    "level_4": "4 \u7ea7"
+                }
+            },
+            "desk_up_down": {
+                "name": "\u4e0a/\u4e0b",
+                "state": {
+                    "down": "\u4e0b",
+                    "stop": "\u505c\u6b62",
+                    "up": "\u4e0a"
+                }
+            },
             "fingerbot_mode": {
                 "name": "\u6a21\u5f0f",
                 "state": {
@@ -335,6 +386,37 @@
                     "work": "\u5de5\u4f5c\u6a21\u5f0f"
                 }
             },
+            "indexed_blanket_level": {
+                "name": "{index} \u7ea7",
+                "state": {
+                    "level_1": "\u4f4e",
+                    "level_10": "\u9ad8",
+                    "level_2": "2 \u7ea7",
+                    "level_3": "3 \u7ea7",
+                    "level_4": "4 \u7ea7",
+                    "level_5": "5 \u7ea7",
+                    "level_6": "6 \u7ea7",
+                    "level_7": "7 \u7ea7",
+                    "level_8": "8 \u7ea7",
+                    "level_9": "9 \u7ea7"
+                }
+            },
+            "indexed_led_type": {
+                "name": "\u706f {index} \u6e90\u7c7b\u578b",
+                "state": {
+                    "halogen": "\u5364\u7d20\u706f",
+                    "incandescent": "\u767d\u70bd\u706f",
+                    "led": "LED"
+                }
+            },
+            "inverter_work_mode": {
+                "name": "\u9006\u53d8\u5668\u5de5\u4f5c\u6a21\u5f0f",
+                "state": {
+                    "manual": "\u624b\u52a8\u6a21\u5f0f",
+                    "self_powered": "\u81ea\u4f9b\u7535",
+                    "time_of_use": "\u4f7f\u7528\u65f6\u95f4"
+                }
+            },
             "ipc_work_mode": {
                 "name": "IPC \u6a21\u5f0f",
                 "state": {
@@ -344,22 +426,6 @@
             },
             "led_type": {
                 "name": "\u706f\u5149\u5149\u6e90\u7c7b\u578b",
-                "state": {
-                    "halogen": "\u5364\u7d20\u706f",
-                    "incandescent": "\u767d\u70bd\u706f",
-                    "led": "LED"
-                }
-            },
-            "led_type_2": {
-                "name": "\u706f\u5149 2 \u5149\u6e90\u7c7b\u578b",
-                "state": {
-                    "halogen": "\u5364\u7d20\u706f",
-                    "incandescent": "\u767d\u70bd\u706f",
-                    "led": "LED"
-                }
-            },
-            "led_type_3": {
-                "name": "\u706f\u5149 3 \u5149\u6e90\u7c7b\u578b",
                 "state": {
                     "halogen": "\u5364\u7d20\u706f",
                     "incandescent": "\u767d\u70bd\u706f",
@@ -386,6 +452,13 @@
                     "0": "\u4f4e",
                     "1": "\u4e2d",
                     "2": "\u9ad8"
+                }
+            },
+            "odor_elimination_mode": {
+                "name": "\u9664\u81ed\u6a21\u5f0f",
+                "state": {
+                    "interim": "\u4e34\u65f6",
+                    "smart": "\u667a\u80fd"
                 }
             },
             "record_mode": {
@@ -479,6 +552,9 @@
             }
         },
         "sensor": {
+            "air_pressure": {
+                "name": "\u5927\u6c14\u538b"
+            },
             "air_quality": {
                 "name": "\u7a7a\u6c14\u8d28\u91cf",
                 "state": {
@@ -502,6 +578,12 @@
             "battery": {
                 "name": "\u7535\u6c60"
             },
+            "battery_power": {
+                "name": "\u7535\u6c60\u529f\u7387"
+            },
+            "battery_soc": {
+                "name": "\u7535\u6c60 SOC"
+            },
             "battery_state": {
                 "name": "\u7535\u6c60\u72b6\u6001"
             },
@@ -510,6 +592,9 @@
             },
             "carbon_monoxide": {
                 "name": "\u4e00\u6c27\u5316\u78b3"
+            },
+            "cat_weight": {
+                "name": "\u732b\u4f53\u91cd"
             },
             "cleaning_area": {
                 "name": "\u6e05\u6d01\u533a\u57df"
@@ -526,8 +611,17 @@
             "current_temperature": {
                 "name": "\u5f53\u524d\u6e29\u5ea6"
             },
+            "depth": {
+                "name": "\u6df1\u5ea6"
+            },
+            "dew_point_temperature": {
+                "name": "\u9732\u70b9"
+            },
             "duster_cloth_life": {
                 "name": "\u9664\u5c18\u5e03\u5bff\u547d"
+            },
+            "feels_like_temperature": {
+                "name": "\u4f53\u611f"
             },
             "filter_duration": {
                 "name": "\u8fc7\u6ee4\u65f6\u957f"
@@ -544,11 +638,26 @@
             "gas": {
                 "name": "\u71c3\u6c14"
             },
+            "heat_index_temperature": {
+                "name": "\u70ed\u5ea6\u6307\u6570"
+            },
             "humidity": {
                 "name": "\u6e7f\u5ea6"
             },
+            "humidity_outdoor": {
+                "name": "\u5ba4\u5916\u6e7f\u5ea6"
+            },
             "illuminance": {
                 "name": "\u7167\u5ea6"
+            },
+            "indexed_humidity_outdoor": {
+                "name": "\u5ba4\u5916\u6e7f\u5ea6\u901a\u9053 {index}"
+            },
+            "indexed_temperature_external": {
+                "name": "\u63a2\u5934\u6e29\u5ea6\u901a\u9053 {index}"
+            },
+            "inverter_output_power": {
+                "name": "\u9006\u53d8\u5668\u8f93\u51fa\u529f\u7387"
             },
             "last_amount": {
                 "name": "\u4e0a\u6b21\u6570\u91cf"
@@ -556,11 +665,49 @@
             "last_operation_duration": {
                 "name": "\u4e0a\u6b21\u64cd\u4f5c\u65f6\u957f"
             },
+            "lifetime_battery_charge_energy": {
+                "name": "\u7ec8\u8eab\u7535\u6c60\u5145\u7535\u80fd\u91cf"
+            },
+            "lifetime_battery_discharge_energy": {
+                "name": "\u7ec8\u8eab\u7535\u6c60\u653e\u7535\u80fd\u91cf"
+            },
+            "lifetime_inverter_output_energy": {
+                "name": "\u7ec8\u8eab\u9006\u53d8\u5668\u8f93\u51fa\u80fd\u91cf"
+            },
+            "lifetime_offgrid_port_energy": {
+                "name": "\u7ec8\u8eab\u79bb\u7f51\u7aef\u53e3\u80fd\u6e90"
+            },
+            "lifetime_pv_energy": {
+                "name": "\u7ec8\u8eab\u5149\u4f0f\u80fd\u6e90"
+            },
+            "liquid_depth": {
+                "name": "\u6db2\u6df1"
+            },
+            "liquid_level": {
+                "name": "\u6db2\u4f4d"
+            },
+            "liquid_state": {
+                "name": "\u6db2\u6001",
+                "state": {
+                    "lower_alarm": "\u4f4e",
+                    "normal": "\u6b63\u5e38",
+                    "upper_alarm": "\u9ad8"
+                }
+            },
             "luminosity": {
                 "name": "\u5149\u5ea6"
             },
             "methane": {
                 "name": "\u7532\u70f7"
+            },
+            "odor_elimination_status": {
+                "name": "\u72b6\u6001",
+                "state": {
+                    "charge_done": "\u5145\u7535\u5b8c\u6210",
+                    "charging": "\u5145\u7535\u4e2d",
+                    "standby": "\u5f85\u673a",
+                    "work": "\u5de5\u4f5c\u4e2d"
+                }
             },
             "phase_a_current": {
                 "name": "\u76f8\u4f4d A \u7535\u6d41"
@@ -601,8 +748,17 @@
             "power": {
                 "name": "\u7535\u6e90"
             },
+            "precipitation_intensity": {
+                "name": "\u964d\u6c34\u5f3a\u5ea6"
+            },
+            "precipitation_today": {
+                "name": "\u4eca\u65e5\u603b\u964d\u6c34\u91cf"
+            },
             "pump_time": {
                 "name": "\u6c34\u6cf5\u65f6\u957f"
+            },
+            "pv_channel_power": {
+                "name": "\u5149\u4f0f\u901a\u9053 {index} \u529f\u7387"
             },
             "remaining_time": {
                 "name": "\u5269\u4f59\u65f6\u95f4"
@@ -633,6 +789,9 @@
             "status": {
                 "name": "\u72b6\u6001"
             },
+            "supply_frequency": {
+                "name": "\u4f9b\u7535\u9891\u7387"
+            },
             "temperature": {
                 "name": "\u6e29\u5ea6"
             },
@@ -651,20 +810,32 @@
             "total_cleaning_times": {
                 "name": "\u603b\u6e05\u626b\u6b21\u6570"
             },
+            "total_dissolved_solids": {
+                "name": "\u603b\u6eb6\u89e3\u56fa\u4f53"
+            },
             "total_energy": {
                 "name": "\u603b\u80fd\u91cf"
             },
             "total_operating_time": {
                 "name": "\u603b\u8fd0\u884c\u65f6\u95f4"
             },
+            "total_power": {
+                "name": "\u603b\u529f\u7387"
+            },
             "total_production": {
                 "name": "\u603b\u4ea7\u51fa"
+            },
+            "total_pv_power": {
+                "name": "\u5149\u4f0f\u603b\u529f\u7387"
             },
             "total_volatile_organic_compound": {
                 "name": "\u603b\u6325\u53d1\u6027\u6709\u673a\u5316\u5408\u7269"
             },
             "total_watering_time": {
                 "name": "\u603b\u6d47\u6c34\u65f6\u95f4"
+            },
+            "uv_index": {
+                "name": "\u7d2b\u5916\u7ebf\u6307\u6570"
             },
             "uv_runtime": {
                 "name": "UV \u8fd0\u884c\u65f6"
@@ -678,25 +849,30 @@
             "water_level": {
                 "name": "\u6c34\u4f4d"
             },
+            "water_level_state": {
+                "name": "\u6c34\u4f4d",
+                "state": {
+                    "level_1": "\u4f4e",
+                    "level_2": "\u4e2d",
+                    "level_3": "\u6ee1"
+                }
+            },
             "water_time": {
                 "name": "\u7528\u6c34\u65f6\u957f"
+            },
+            "wind_chill_index_temperature": {
+                "name": "\u98ce\u5bd2\u6307\u6570"
+            },
+            "wind_direction": {
+                "name": "\u98ce\u5411"
             }
         },
         "switch": {
-            "alarm_1": {
-                "name": "\u8b66\u62a51"
-            },
-            "alarm_2": {
-                "name": "\u8b66\u62a52"
-            },
-            "alarm_3": {
-                "name": "\u8b66\u62a53"
-            },
-            "alarm_4": {
-                "name": "\u8b66\u62a54"
-            },
             "anion": {
                 "name": "\u8d1f\u79bb\u5b50"
+            },
+            "arm_beep": {
+                "name": "\u5e03\u9632\u8702\u9e23"
             },
             "battery_lock": {
                 "name": "\u7535\u6c60\u9501"
@@ -725,11 +901,26 @@
             "flip": {
                 "name": "\u7ffb\u8f6c"
             },
+            "frost_protection": {
+                "name": "\u9632\u971c\u51bb"
+            },
             "heat_preservation": {
                 "name": "\u4fdd\u6e29"
             },
             "humidification": {
                 "name": "\u52a0\u6e7f"
+            },
+            "indexed_alarm": {
+                "name": "\u8b66\u62a5 {index}"
+            },
+            "indexed_socket": {
+                "name": "\u63d2\u5ea7 {index}"
+            },
+            "indexed_switch": {
+                "name": "\u5f00\u5173 {index}"
+            },
+            "indexed_usb": {
+                "name": "USB {index}"
             },
             "ionizer": {
                 "name": "\u8d1f\u79bb\u5b50\u53d1\u751f\u5668"
@@ -743,6 +934,9 @@
             "motion_tracking": {
                 "name": "\u8fd0\u52a8\u8ffd\u8e2a"
             },
+            "music": {
+                "name": "\u97f3\u4e50"
+            },
             "mute": {
                 "name": "\u9759\u97f3"
             },
@@ -754,6 +948,9 @@
             },
             "open_window_detection": {
                 "name": "\u5f00\u7a97\u68c0\u6d4b"
+            },
+            "output_power_limit": {
+                "name": "\u8f93\u51fa\u529f\u7387\u9650\u5236"
             },
             "oxygen_bar": {
                 "name": "\u6c27\u5427"
@@ -779,6 +976,9 @@
             "reverse": {
                 "name": "\u53cd\u5411"
             },
+            "siren": {
+                "name": "\u8b66\u7b1b"
+            },
             "sleep": {
                 "name": "\u7761\u7720"
             },
@@ -788,26 +988,11 @@
             "slow_feed": {
                 "name": "\u7f13\u6162\u6295\u5582"
             },
+            "snooze": {
+                "name": "\u6253\u76f9"
+            },
             "socket": {
                 "name": "\u63d2\u5ea7"
-            },
-            "socket_1": {
-                "name": "\u63d2\u5ea71"
-            },
-            "socket_2": {
-                "name": "\u63d2\u5ea72"
-            },
-            "socket_3": {
-                "name": "\u63d2\u5ea73"
-            },
-            "socket_4": {
-                "name": "\u63d2\u5ea74"
-            },
-            "socket_5": {
-                "name": "\u63d2\u5ea75"
-            },
-            "socket_6": {
-                "name": "\u63d2\u5ea76"
             },
             "sound": {
                 "name": "\u58f0\u97f3"
@@ -827,50 +1012,8 @@
             "switch": {
                 "name": "\u5f00\u5173"
             },
-            "switch_1": {
-                "name": "\u5f00\u51731"
-            },
-            "switch_2": {
-                "name": "\u5f00\u51732"
-            },
-            "switch_3": {
-                "name": "\u5f00\u51733"
-            },
-            "switch_4": {
-                "name": "\u5f00\u51734"
-            },
-            "switch_5": {
-                "name": "\u5f00\u51735"
-            },
-            "switch_6": {
-                "name": "\u5f00\u51736"
-            },
-            "switch_7": {
-                "name": "\u5f00\u51737"
-            },
-            "switch_8": {
-                "name": "\u5f00\u51738"
-            },
             "time_watermark": {
                 "name": "\u65f6\u95f4\u6c34\u5370"
-            },
-            "usb_1": {
-                "name": "USB 1"
-            },
-            "usb_2": {
-                "name": "USB 2"
-            },
-            "usb_3": {
-                "name": "USB 3"
-            },
-            "usb_4": {
-                "name": "USB 4"
-            },
-            "usb_5": {
-                "name": "USB 5"
-            },
-            "usb_6": {
-                "name": "USB 6"
             },
             "uv_sterilization": {
                 "name": "\u7d2b\u5916\u7ebf\u6740\u83cc"
@@ -890,6 +1033,25 @@
             "wide_dynamic_range": {
                 "name": "\u5bbd\u52a8\u6001\u8303\u56f4"
             }
+        },
+        "valve": {
+            "indexed_valve": {
+                "name": "\u9600\u95e8 {index}"
+            },
+            "valve": {
+                "name": "\u9600\u95e8"
+            }
+        }
+    },
+    "exceptions": {
+        "action_dpcode_not_found": {
+            "message": "\u65e0\u6cd5\u5904\u7406\u52a8\u4f5c\uff0c\u56e0\u4e3a\u8bbe\u5907\u672a\u63d0\u4f9b\u76f8\u5e94\u7684\u529f\u80fd\u4ee3\u7801\uff08\u5e94\u5f53\u662f {available} \u4e2d\u7684 {expected} \u4e4b\u4e00\uff09 \u3002"
+        }
+    },
+    "issues": {
+        "deprecated_entity_new_valve": {
+            "description": "Tuya \u5b9e\u4f53 \u201c{entity}\u201d \u5df2\u5f03\u7528\uff0c\u7531\u65b0\u7684\u9600\u95e8\u5b9e\u4f53\u53d6\u4ee3\u3002\n\u8bf7\u66f4\u65b0\u60a8\u7684\u4eea\u8868\u677f\u3001\u81ea\u52a8\u5316\u548c\u811a\u672c\uff0c\u7981\u7528 \u201c{entity}\u201d \u5e76\u91cd\u65b0\u52a0\u8f7d\u96c6\u6210/\u91cd\u65b0\u542f\u52a8 Home Assistant \u4ee5\u89e3\u51b3\u6b64\u95ee\u9898\u3002",
+            "title": "\u201c{name}\u201d\u5df2\u5f03\u7528"
         }
     }
 }

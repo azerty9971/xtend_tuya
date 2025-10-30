@@ -6,11 +6,6 @@
         "error": {
             "invalid_auth": "Autenticazione non valida",
             "login_error": "Errore di accesso ({code}): {msg}"
-        },
-        "step": {
-            "user": {
-                "description": "Inserisci il tuo codice utente Smart Life o Tuya Smart.\n\nPuoi trovare questo codice nell'app Smart Life o nell'app Tuya Smart nella schermata **Impostazioni** > **Account e sicurezza** e inserisci il codice mostrato nel campo **Codice utente**. Il codice utente fa distinzione tra maiuscole e minuscole, assicurati di inserirlo esattamente come mostrato nell'app."
-            }
         }
     },
     "entity": {
@@ -20,6 +15,9 @@
             },
             "carbon_monoxide": {
                 "name": "Monossido di carbonio"
+            },
+            "defrost": {
+                "name": "Sbrinamento"
             },
             "drop": {
                 "name": "Caduta"
@@ -39,11 +37,20 @@
             "pressure": {
                 "name": "Pressione"
             },
+            "tankfull": {
+                "name": "Serbatoio pieno"
+            },
             "tilt": {
                 "name": "Inclinazione"
             },
+            "valve": {
+                "name": "Valvola"
+            },
             "voc": {
                 "name": "COV"
+            },
+            "wet": {
+                "name": "Bagnato"
             }
         },
         "button": {
@@ -72,21 +79,6 @@
             },
             "curtain": {
                 "name": "Tenda"
-            },
-            "curtain_2": {
-                "name": "Tenda 2"
-            },
-            "curtain_3": {
-                "name": "Tenda 3"
-            },
-            "door": {
-                "name": "Porta"
-            },
-            "door_2": {
-                "name": "Porta 2"
-            },
-            "door_3": {
-                "name": "Porta 3"
             }
         },
         "light": {
@@ -96,25 +88,22 @@
             "light": {
                 "name": "Luce"
             },
-            "light_2": {
-                "name": "Luce 2"
-            },
-            "light_3": {
-                "name": "Luce 3"
-            },
             "night_light": {
                 "name": "Luce notturna"
             }
         },
         "number": {
+            "alarm_maximum": {
+                "name": "Allarme massimo"
+            },
+            "alarm_minimum": {
+                "name": "Allarme minimo"
+            },
+            "battery_backup_reserve": {
+                "name": "Riserva di backup della batteria"
+            },
             "cloud_recipe": {
                 "name": "Ricetta Cloud"
-            },
-            "cook_temperature": {
-                "name": "Temperatura di cottura"
-            },
-            "cook_time": {
-                "name": "Tempo di cottura"
             },
             "down_delay": {
                 "name": "Ritardo di discesa"
@@ -128,23 +117,26 @@
             "heat_preservation_time": {
                 "name": "Tempo di conservazione del calore"
             },
+            "indexed_cook_temperature": {
+                "name": "Temperatura cottura {index}"
+            },
+            "indexed_temperature": {
+                "name": "Temperatura {index}"
+            },
+            "installation_height": {
+                "name": "Altezza di installazione"
+            },
+            "inverter_output_power_limit": {
+                "name": "Limite di potenza in uscita dell'inverter"
+            },
             "maximum_brightness": {
                 "name": "Luminosit\u00e0 massima"
             },
-            "maximum_brightness_2": {
-                "name": "Luminosit\u00e0 massima 2"
-            },
-            "maximum_brightness_3": {
-                "name": "Luminosit\u00e0 massima 3"
+            "maximum_liquid_depth": {
+                "name": "Profondit\u00e0 massima del liquido"
             },
             "minimum_brightness": {
                 "name": "Luminosit\u00e0 minima"
-            },
-            "minimum_brightness_2": {
-                "name": "Luminosit\u00e0 minima 2"
-            },
-            "minimum_brightness_3": {
-                "name": "Luminosit\u00e0 minima 3"
             },
             "move_down": {
                 "name": "Scendi"
@@ -184,7 +176,7 @@
             "basic_anti_flicker": {
                 "name": "Anti-sfarfallio",
                 "state": {
-                    "0": "Disabilitato",
+                    "0": "Disabilitato/a",
                     "1": "50 Hz",
                     "2": "60 Hz"
                 }
@@ -193,8 +185,20 @@
                 "name": "Visione notturna",
                 "state": {
                     "0": "Automatico",
-                    "1": "Spento/a",
-                    "2": "Acceso/a"
+                    "1": "Spento",
+                    "2": "Acceso"
+                }
+            },
+            "blanket_level": {
+                "name": "Livello",
+                "state": {
+                    "level_2": "Livello 2",
+                    "level_3": "Livello 3",
+                    "level_4": "Livello 4",
+                    "level_5": "Livello 5",
+                    "level_6": "Livello 6",
+                    "level_7": "Livello 7",
+                    "level_8": "Livello 8"
                 }
             },
             "brightness": {
@@ -237,6 +241,23 @@
                 "state": {
                     "0": "Bassa sensibilit\u00e0",
                     "1": "Alta sensibilit\u00e0"
+                }
+            },
+            "desk_level": {
+                "name": "Livello",
+                "state": {
+                    "level_1": "Livello 1",
+                    "level_2": "Livello 2",
+                    "level_3": "Livello 3",
+                    "level_4": "Livello 4"
+                }
+            },
+            "desk_up_down": {
+                "name": "Su/gi\u00f9",
+                "state": {
+                    "down": "Gi\u00f9",
+                    "stop": "Ferma",
+                    "up": "Su"
                 }
             },
             "fingerbot_mode": {
@@ -282,10 +303,34 @@
             "humidifier_spray_mode": {
                 "name": "Modalit\u00e0 spray",
                 "state": {
+                    "auto": "Automatico",
                     "health": "Salute",
                     "humidity": "Umidit\u00e0",
                     "sleep": "Sonno",
                     "work": "Lavoro"
+                }
+            },
+            "indexed_blanket_level": {
+                "name": "Livello {index}",
+                "state": {
+                    "level_1": "Basso",
+                    "level_10": "Alto",
+                    "level_2": "Livello 2",
+                    "level_3": "Livello 3",
+                    "level_4": "Livello 4",
+                    "level_5": "Livello 5",
+                    "level_6": "Livello 6",
+                    "level_7": "Livello 7",
+                    "level_8": "Livello 8",
+                    "level_9": "Livello 9"
+                }
+            },
+            "inverter_work_mode": {
+                "name": "Modalit\u00e0 di lavoro dell'inverter",
+                "state": {
+                    "manual": "Modalit\u00e0 manuale",
+                    "self_powered": "Autoalimentato",
+                    "time_of_use": "Tempo di utilizzo"
                 }
             },
             "ipc_work_mode": {
@@ -303,26 +348,10 @@
                     "led": "LED"
                 }
             },
-            "led_type_2": {
-                "name": "Tipo di sorgente luminosa 2",
-                "state": {
-                    "halogen": "Alogena",
-                    "incandescent": "Incandescenza",
-                    "led": "LED"
-                }
-            },
-            "led_type_3": {
-                "name": "Tipo di sorgente luminosa 3",
-                "state": {
-                    "halogen": "Alogena",
-                    "incandescent": "Incandescenza",
-                    "led": "LED"
-                }
-            },
             "light_mode": {
                 "name": "Modalit\u00e0 spia luminosa",
                 "state": {
-                    "none": "Spento/a",
+                    "none": "Spento",
                     "relay": "Indica lo stato di accensione/spegnimento dell'interruttore"
                 }
             },
@@ -333,7 +362,12 @@
                 "name": "Modalit\u00e0"
             },
             "motion_sensitivity": {
-                "name": "Sensibilit\u00e0 di rilevamento del movimento"
+                "name": "Sensibilit\u00e0 di rilevamento del movimento",
+                "state": {
+                    "0": "Basso/a",
+                    "1": "Medio/a",
+                    "2": "Alto/a"
+                }
             },
             "record_mode": {
                 "name": "Modalit\u00e0 di registrazione",
@@ -347,10 +381,10 @@
                 "state": {
                     "last": "Ricorda l'ultimo stato",
                     "memory": "Ricorda l'ultimo stato",
-                    "off": "Spento/a",
-                    "on": "Acceso/a",
-                    "power_off": "Spento/a",
-                    "power_on": "Acceso/a"
+                    "off": "Spento",
+                    "on": "Acceso",
+                    "power_off": "Spento",
+                    "power_on": "Acceso"
                 }
             },
             "target_humidity": {
@@ -363,6 +397,8 @@
                 "name": "Regolazione del serbatoio dell'acqua",
                 "state": {
                     "closed": "Chiuso/a",
+                    "high": "Alto/a",
+                    "low": "Basso/a",
                     "middle": "Medio"
                 }
             },
@@ -410,6 +446,7 @@
                 "name": "Volume"
             },
             "weather_delay": {
+                "name": "Ritardo per maltempo",
                 "state": {
                     "120h": "120h",
                     "144h": "144h",
@@ -423,6 +460,9 @@
             }
         },
         "sensor": {
+            "air_pressure": {
+                "name": "Pressione dell'aria"
+            },
             "air_quality": {
                 "name": "Qualit\u00e0 dell'aria",
                 "state": {
@@ -454,6 +494,9 @@
             },
             "carbon_monoxide": {
                 "name": "Monossido di carbonio"
+            },
+            "cat_weight": {
+                "name": "Peso del gatto"
             },
             "cleaning_area": {
                 "name": "Area di pulizia"
@@ -488,14 +531,37 @@
             "humidity": {
                 "name": "Umidit\u00e0"
             },
+            "humidity_outdoor": {
+                "name": "Umidit\u00e0 esterna"
+            },
             "illuminance": {
                 "name": "Illuminamento"
+            },
+            "indexed_humidity_outdoor": {
+                "name": "Canale di umidit\u00e0 esterna {index}"
+            },
+            "indexed_temperature_external": {
+                "name": "Canale di temperatura della sonda {index}"
             },
             "last_amount": {
                 "name": "Ultima quantit\u00e0"
             },
             "last_operation_duration": {
                 "name": "Durata dell'ultima operazione"
+            },
+            "liquid_depth": {
+                "name": "Profondit\u00e0 del liquido"
+            },
+            "liquid_level": {
+                "name": "Livello del liquido"
+            },
+            "liquid_state": {
+                "name": "Stato liquido",
+                "state": {
+                    "lower_alarm": "Basso/a",
+                    "normal": "Normale",
+                    "upper_alarm": "Alto/a"
+                }
             },
             "luminosity": {
                 "name": "Luminosit\u00e0"
@@ -595,14 +661,14 @@
             "total_operating_time": {
                 "name": "Tempo totale di funzionamento"
             },
+            "total_power": {
+                "name": "Potenza totale"
+            },
             "total_volatile_organic_compound": {
                 "name": "Composti organici volatili totali"
             },
             "total_watering_time": {
                 "name": "Tempo totale di irrigazione"
-            },
-            "voc": {
-                "name": "COV"
             },
             "voltage": {
                 "name": "Tensione"
@@ -612,18 +678,6 @@
             }
         },
         "switch": {
-            "alarm_1": {
-                "name": "Allarme 1"
-            },
-            "alarm_2": {
-                "name": "Allarme 2"
-            },
-            "alarm_3": {
-                "name": "Allarme 3"
-            },
-            "alarm_4": {
-                "name": "Allarme 4"
-            },
             "anion": {
                 "name": "Anione"
             },
@@ -654,6 +708,9 @@
             "flip": {
                 "name": "Capovolgi"
             },
+            "frost_protection": {
+                "name": "Protezione antigelo"
+            },
             "heat_preservation": {
                 "name": "Conservazione del calore"
             },
@@ -672,6 +729,9 @@
             "motion_tracking": {
                 "name": "Tracciamento del movimento"
             },
+            "music": {
+                "name": "Musica"
+            },
             "mute": {
                 "name": "Muto"
             },
@@ -683,6 +743,9 @@
             },
             "open_window_detection": {
                 "name": "Rilevamento finestra aperta"
+            },
+            "output_power_limit": {
+                "name": "Limite di potenza in uscita"
             },
             "oxygen_bar": {
                 "name": "Bar ossigeno"
@@ -717,26 +780,11 @@
             "slow_feed": {
                 "name": "Alimentazione lenta"
             },
+            "snooze": {
+                "name": "Posticipa"
+            },
             "socket": {
                 "name": "Presa"
-            },
-            "socket_1": {
-                "name": "Presa 1"
-            },
-            "socket_2": {
-                "name": "Presa 2"
-            },
-            "socket_3": {
-                "name": "Presa 3"
-            },
-            "socket_4": {
-                "name": "Presa 4"
-            },
-            "socket_5": {
-                "name": "Presa 5"
-            },
-            "socket_6": {
-                "name": "Presa 6"
             },
             "sound": {
                 "name": "Suono"
@@ -756,50 +804,8 @@
             "switch": {
                 "name": "Interruttore"
             },
-            "switch_1": {
-                "name": "Interruttore 1"
-            },
-            "switch_2": {
-                "name": "Interruttore 2"
-            },
-            "switch_3": {
-                "name": "Interruttore 3"
-            },
-            "switch_4": {
-                "name": "Interruttore 4"
-            },
-            "switch_5": {
-                "name": "Interruttore 5"
-            },
-            "switch_6": {
-                "name": "Interruttore 6"
-            },
-            "switch_7": {
-                "name": "Interruttore 7"
-            },
-            "switch_8": {
-                "name": "Interruttore 8"
-            },
             "time_watermark": {
                 "name": "Filigrana temporale"
-            },
-            "usb_1": {
-                "name": "USB 1"
-            },
-            "usb_2": {
-                "name": "USB 2"
-            },
-            "usb_3": {
-                "name": "USB 3"
-            },
-            "usb_4": {
-                "name": "USB 4"
-            },
-            "usb_5": {
-                "name": "USB 5"
-            },
-            "usb_6": {
-                "name": "USB 6"
             },
             "uv_sterilization": {
                 "name": "Sterilizzazione UV"

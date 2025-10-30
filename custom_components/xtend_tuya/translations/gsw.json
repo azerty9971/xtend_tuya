@@ -8,38 +8,18 @@
             },
             "basic_nightvision": {
                 "state": {
-                    "1": "Us",
                     "2": "Anne"
-                }
-            },
-            "light_mode": {
-                "state": {
-                    "none": "Us"
                 }
             },
             "relay_status": {
                 "state": {
-                    "off": "Us",
                     "on": "Anne",
-                    "power_off": "Us",
                     "power_on": "Anne"
                 }
             },
             "vacuum_cistern": {
                 "state": {
                     "closed": "Zue"
-                }
-            },
-            "vacuum_mode": {
-                "state": {
-                    "standby": "Standby"
-                }
-            }
-        },
-        "sensor": {
-            "sous_vide_status": {
-                "state": {
-                    "standby": "Standby"
                 }
             }
         }

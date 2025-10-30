@@ -11,13 +11,10 @@
     "entity": {
         "cover": {
             "blind": {
-                "name": "\u017baluzje"
+                "name": "\u017baluzja"
             },
             "curtain": {
                 "name": "Zas\u0142ona"
-            },
-            "door": {
-                "name": "Drzwi"
             }
         },
         "light": {
@@ -26,12 +23,6 @@
             },
             "light": {
                 "name": "\u015awiat\u0142o"
-            },
-            "light_2": {
-                "name": "\u015awiat\u0142o 2"
-            },
-            "light_3": {
-                "name": "\u015awiat\u0142o 3"
             }
         },
         "number": {
@@ -152,20 +143,6 @@
                     "led": "LED"
                 }
             },
-            "led_type_2": {
-                "state": {
-                    "halogen": "halogen",
-                    "incandescent": "jarzeni\u00f3wka",
-                    "led": "LED"
-                }
-            },
-            "led_type_3": {
-                "state": {
-                    "halogen": "halogen",
-                    "incandescent": "jarzeni\u00f3wka",
-                    "led": "LED"
-                }
-            },
             "light_mode": {
                 "state": {
                     "none": "wy\u0142\u0105czono",
@@ -214,7 +191,7 @@
                     "single": "pojedyncze",
                     "smart": "smart",
                     "spiral": "spirala",
-                    "standby": "Tryb czuwania",
+                    "standby": "tryb czuwania",
                     "zone": "strefa"
                 }
             },
@@ -250,6 +227,15 @@
             "current": {
                 "name": "Nat\u0119\u017cenie pr\u0105du"
             },
+            "dew_point_temperature": {
+                "name": "Punkt rosy"
+            },
+            "feels_like_temperature": {
+                "name": "odczuwalna"
+            },
+            "heat_index_temperature": {
+                "name": "Wska\u017anik ciep\u0142a"
+            },
             "humidity": {
                 "name": "Wilgotno\u015b\u0107"
             },
@@ -279,7 +265,7 @@
             },
             "sous_vide_status": {
                 "state": {
-                    "standby": "Tryb czuwania"
+                    "standby": "tryb czuwania"
                 }
             },
             "status": {

@@ -5,6 +5,14 @@
         }
     },
     "entity": {
+        "cover": {
+            "blind": {
+                "name": "Persienne"
+            },
+            "curtain": {
+                "name": "Gardin"
+            }
+        },
         "select": {
             "basic_nightvision": {
                 "state": {

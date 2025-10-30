@@ -61,21 +61,6 @@
             },
             "curtain": {
                 "name": "Perdea"
-            },
-            "curtain_2": {
-                "name": "Cortina 2"
-            },
-            "curtain_3": {
-                "name": "Cortina 3"
-            },
-            "door": {
-                "name": "U\u0219\u0103"
-            },
-            "door_2": {
-                "name": "U\u0219a 2"
-            },
-            "door_3": {
-                "name": "U\u0219a 3"
             }
         },
         "light": {
@@ -85,23 +70,11 @@
             "light": {
                 "name": "Lumin\u0103"
             },
-            "light_2": {
-                "name": "Lumina 2"
-            },
-            "light_3": {
-                "name": "Lumina 3"
-            },
             "night_light": {
                 "name": "Lumin\u0103 de noapte"
             }
         },
         "number": {
-            "cook_temperature": {
-                "name": "Temperatura de g\u0103tire"
-            },
-            "cook_time": {
-                "name": "Timp de g\u0103tire"
-            },
             "down_delay": {
                 "name": "\u00cent\u00e2rziere \u00een jos"
             },
@@ -114,20 +87,8 @@
             "maximum_brightness": {
                 "name": "Luminozitate maxim\u0103"
             },
-            "maximum_brightness_2": {
-                "name": "Luminozitate maxim\u0103 2"
-            },
-            "maximum_brightness_3": {
-                "name": "Luminozitate maxim\u0103 3"
-            },
             "minimum_brightness": {
                 "name": "Luminozitate minim\u0103"
-            },
-            "minimum_brightness_2": {
-                "name": "Luminozitate minim\u0103 2"
-            },
-            "minimum_brightness_3": {
-                "name": "Luminozitate minim\u0103 3"
             },
             "move_down": {
                 "name": "Deplasare \u00een jos"
@@ -273,22 +234,6 @@
             },
             "led_type": {
                 "name": "Tipul sursei de lumin\u0103",
-                "state": {
-                    "halogen": "Halogen",
-                    "incandescent": "Incandescent",
-                    "led": "LED"
-                }
-            },
-            "led_type_2": {
-                "name": "Tipul sursei de lumin\u0103 2",
-                "state": {
-                    "halogen": "Halogen",
-                    "incandescent": "Incandescent",
-                    "led": "LED"
-                }
-            },
-            "led_type_3": {
-                "name": "Tipul sursei de lumin\u0103 3",
                 "state": {
                     "halogen": "Halogen",
                     "incandescent": "Incandescent",
@@ -537,9 +482,6 @@
             "total_volatile_organic_compound": {
                 "name": "Total compu\u0219i organici volatili"
             },
-            "voc": {
-                "name": "Compu\u0219i organici volatili"
-            },
             "voltage": {
                 "name": "Tensiune"
             },
@@ -548,18 +490,6 @@
             }
         },
         "switch": {
-            "alarm_1": {
-                "name": "Alarma 1"
-            },
-            "alarm_2": {
-                "name": "Alarma 2"
-            },
-            "alarm_3": {
-                "name": "Alarma 3"
-            },
-            "alarm_4": {
-                "name": "Alarma 4"
-            },
             "anion": {
                 "name": "Anion"
             },
@@ -653,24 +583,6 @@
             "socket": {
                 "name": "Priz\u0103"
             },
-            "socket_1": {
-                "name": "Priza 1"
-            },
-            "socket_2": {
-                "name": "Priza 2"
-            },
-            "socket_3": {
-                "name": "Priza 3"
-            },
-            "socket_4": {
-                "name": "Priza 4"
-            },
-            "socket_5": {
-                "name": "Priza 5"
-            },
-            "socket_6": {
-                "name": "Priza 6"
-            },
             "sound": {
                 "name": "Sunet"
             },
@@ -689,50 +601,8 @@
             "switch": {
                 "name": "Comutator"
             },
-            "switch_1": {
-                "name": "Comutatorul 1"
-            },
-            "switch_2": {
-                "name": "Comutatorul 2"
-            },
-            "switch_3": {
-                "name": "Comutatorul 3"
-            },
-            "switch_4": {
-                "name": "Comutatorul 4"
-            },
-            "switch_5": {
-                "name": "Comutatorul 5"
-            },
-            "switch_6": {
-                "name": "Comutatorul 6"
-            },
-            "switch_7": {
-                "name": "Comutatorul 7"
-            },
-            "switch_8": {
-                "name": "Comutatorul 8"
-            },
             "time_watermark": {
                 "name": "Filigran de timp"
-            },
-            "usb_1": {
-                "name": "USB 1"
-            },
-            "usb_2": {
-                "name": "USB 2"
-            },
-            "usb_3": {
-                "name": "USB 3"
-            },
-            "usb_4": {
-                "name": "USB 4"
-            },
-            "usb_5": {
-                "name": "USB 5"
-            },
-            "usb_6": {
-                "name": "USB 6"
             },
             "uv_sterilization": {
                 "name": "Sterilizare UV"

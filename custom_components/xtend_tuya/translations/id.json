@@ -11,14 +11,12 @@
             "reauth_user_code": {
                 "data": {
                     "user_code": "Kode pengguna"
-                },
-                "description": "Integrasi Tuya kini menggunakan metode masuk yang ditingkatkan. Untuk mengautentikasi ulang dengan akun Smart Life atau Tuya Smart Anda, Anda perlu memasukkan kode pengguna Anda.\n\nAnda dapat menemukan kodenya di aplikasi Smart Life atau Tuya Smart pada bagian **Settings** > **Account and Security**, lalu masukan kode yang ditampilkan pada bagian **User Code**. Kode pengguna peka terhadap huruf besar/kecil, pastikan untuk memasukkannya persis seperti yang ada di aplikasi."
+                }
             },
             "user": {
                 "data": {
                     "user_code": "Kode pengguna"
-                },
-                "description": "Masukkan kode pengguna Smart Life atau Tuya Smart Anda.\n\nAnda dapat menemukan kode ini di aplikasi Smart Life atau aplikasi Tuya Smart di layar **Pengaturan** > **Akun dan Keamanan**, dan masukkan kode yang ditunjukkan pada bidang **Kode Pengguna**. Kode pengguna peka terhadap huruf besar/kecil, pastikan untuk memasukkannya persis seperti yang ditunjukkan di aplikasi."
+                }
             }
         }
     },
@@ -60,21 +58,6 @@
             },
             "curtain": {
                 "name": "Tirai"
-            },
-            "curtain_2": {
-                "name": "Tirai 2"
-            },
-            "curtain_3": {
-                "name": "Tirai 3"
-            },
-            "door": {
-                "name": "Pintu"
-            },
-            "door_2": {
-                "name": "Pintu 2"
-            },
-            "door_3": {
-                "name": "Pintu 3"
             }
         },
         "light": {
@@ -84,12 +67,6 @@
             "light": {
                 "name": "Lampu"
             },
-            "light_2": {
-                "name": "Lampu 2"
-            },
-            "light_3": {
-                "name": "Lampu 3"
-            },
             "night_light": {
                 "name": "Lampu tidur"
             }
@@ -98,29 +75,11 @@
             "cloud_recipe": {
                 "name": "Resep cloud"
             },
-            "cook_temperature": {
-                "name": "Suhu masak"
-            },
-            "cook_time": {
-                "name": "Waktu masak"
-            },
             "maximum_brightness": {
                 "name": "Kecerahan maksimum"
             },
-            "maximum_brightness_2": {
-                "name": "Kecerahan maksimum 2"
-            },
-            "maximum_brightness_3": {
-                "name": "Kecerahan maksimum 3"
-            },
             "minimum_brightness": {
                 "name": "Kecerahan minimum"
-            },
-            "minimum_brightness_2": {
-                "name": "Kecerahan minimum 2"
-            },
-            "minimum_brightness_3": {
-                "name": "Kecerahan minimum 3"
             },
             "move_down": {
                 "name": "Pindahkan ke bawah"
@@ -162,6 +121,12 @@
                     "0": "Otomatis",
                     "1": "Mati",
                     "2": "Nyala"
+                }
+            },
+            "blanket_level": {
+                "state": {
+                    "level_1": "Rendah",
+                    "level_10": "Tinggi"
                 }
             },
             "brightness": {
@@ -254,6 +219,12 @@
                     "work": "Bekerja"
                 }
             },
+            "indexed_blanket_level": {
+                "state": {
+                    "level_1": "Rendah",
+                    "level_10": "Tinggi"
+                }
+            },
             "ipc_work_mode": {
                 "state": {
                     "0": "Mode daya rendah",
@@ -261,20 +232,6 @@
                 }
             },
             "led_type": {
-                "state": {
-                    "halogen": "Halogen",
-                    "incandescent": "Pijar",
-                    "led": "LED"
-                }
-            },
-            "led_type_2": {
-                "state": {
-                    "halogen": "Halogen",
-                    "incandescent": "Pijar",
-                    "led": "LED"
-                }
-            },
-            "led_type_3": {
                 "state": {
                     "halogen": "Halogen",
                     "incandescent": "Pijar",
@@ -447,11 +404,24 @@
             "last_operation_duration": {
                 "name": "Durasi pengoperasian terakhir"
             },
+            "liquid_state": {
+                "state": {
+                    "lower_alarm": "Rendah",
+                    "normal": "Normal",
+                    "upper_alarm": "Tinggi"
+                }
+            },
             "luminosity": {
                 "name": "Luminositas"
             },
             "methane": {
                 "name": "Metana"
+            },
+            "odor_elimination_status": {
+                "state": {
+                    "charging": "Mengisi daya",
+                    "standby": "Siaga"
+                }
             },
             "pm1": {
                 "name": "PM1"
@@ -510,21 +480,16 @@
             },
             "water_level": {
                 "name": "Tingkat air"
+            },
+            "water_level_state": {
+                "state": {
+                    "level_1": "Rendah",
+                    "level_2": "Sedang",
+                    "level_3": "Penuh"
+                }
             }
         },
         "switch": {
-            "alarm_1": {
-                "name": "Alarm 1"
-            },
-            "alarm_2": {
-                "name": "Alarm 2"
-            },
-            "alarm_3": {
-                "name": "Alarm 3"
-            },
-            "alarm_4": {
-                "name": "Alarm 4"
-            },
             "battery_lock": {
                 "name": "Kunci baterai"
             },
@@ -600,24 +565,6 @@
             "socket": {
                 "name": "Stop kontak"
             },
-            "socket_1": {
-                "name": "Stop kontak 1"
-            },
-            "socket_2": {
-                "name": "Stop kontak 2"
-            },
-            "socket_3": {
-                "name": "Stop kontak 3"
-            },
-            "socket_4": {
-                "name": "Stop kontak 4"
-            },
-            "socket_5": {
-                "name": "Stop kontak 5"
-            },
-            "socket_6": {
-                "name": "Stop kontak 6"
-            },
             "sound": {
                 "name": "Suara"
             },
@@ -636,50 +583,8 @@
             "switch": {
                 "name": "Sakelar"
             },
-            "switch_1": {
-                "name": "Sakelar 1"
-            },
-            "switch_2": {
-                "name": "Sakelar 2"
-            },
-            "switch_3": {
-                "name": "Sakelar 3"
-            },
-            "switch_4": {
-                "name": "Sakelar 4"
-            },
-            "switch_5": {
-                "name": "Sakelar 5"
-            },
-            "switch_6": {
-                "name": "Sakelar 6"
-            },
-            "switch_7": {
-                "name": "Sakelar 7"
-            },
-            "switch_8": {
-                "name": "Sakelar 8"
-            },
             "time_watermark": {
                 "name": "Tanda air waktu"
-            },
-            "usb_1": {
-                "name": "USB 1"
-            },
-            "usb_2": {
-                "name": "USB 2"
-            },
-            "usb_3": {
-                "name": "USB 3"
-            },
-            "usb_4": {
-                "name": "USB 4"
-            },
-            "usb_5": {
-                "name": "USB 5"
-            },
-            "usb_6": {
-                "name": "USB 6"
             },
             "uv_sterilization": {
                 "name": "Sterilisasi UV"

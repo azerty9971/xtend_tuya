@@ -46,17 +46,17 @@
             "led": "LED"
         },
         "tuya__light_mode": {
-            "none": "Spento/a",
+            "none": "Spento",
             "pos": "Indica la posizione dell'interruttore",
             "relay": "Indica lo stato di accensione/spegnimento dell'interruttore"
         },
         "tuya__relay_status": {
             "last": "Ricorda l'ultimo stato",
             "memory": "Ricorda l'ultimo stato",
-            "off": "Spento/a",
-            "on": "Acceso/a",
-            "power_off": "Spento/a",
-            "power_on": "Acceso/a"
+            "off": "Spento",
+            "on": "Acceso",
+            "power_off": "Spento",
+            "power_on": "Acceso"
         },
         "tuya__vacuum_cistern": {
             "closed": "Chiusa",

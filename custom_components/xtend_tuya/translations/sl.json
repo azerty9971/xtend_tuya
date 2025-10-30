@@ -21,7 +21,7 @@
                 "data": {
                     "user_code": "Uporabni\u0161ka koda"
                 },
-                "description": "Vnesite svojo uporabni\u0161ko kodo Smart Life ali Tuya Smart.\n\nTo kodo najdete v aplikaciji Smart Life ali aplikaciji Tuya Smart na zaslonu **Nastavitve** > **Ra\u010dun in varnost** in vnesite kodo, prikazano v polju **Uporabni\u0161ka koda**. Uporabni\u0161ka koda razlikuje med velikimi in malimi \u010drkami, zato jo vnesite to\u010dno tako, kot je prikazano v aplikaciji."
+                "description": "Vnesite svojo uporabni\u0161ko kodo za Smart Life ali Tuya Smart.\n\nTo kodo najdete v aplikaciji Smart Life ali Tuya Smart na zaslonu **Nastavitve** > **Ra\u010dun in varnost** in vnesite kodo, prikazano v polju **Uporabni\u0161ka koda**. Uporabni\u0161ka koda razlikuje med velikimi in malimi \u010drkami, zato jo vnesite natan\u010dno tako, kot je prikazano v aplikaciji."
             }
         }
     },
@@ -48,6 +48,9 @@
             "tilt": {
                 "name": "Nagib"
             },
+            "valve": {
+                "name": "Ventil"
+            },
             "voc": {
                 "name": "Hlapne organske spojine"
             }
@@ -58,9 +61,20 @@
             },
             "curtain": {
                 "name": "Zavesa"
-            },
-            "door": {
-                "name": "Vrata"
+            }
+        },
+        "event": {
+            "numbered_button": {
+                "name": "Gumb {button_number}",
+                "state_attributes": {
+                    "event_type": {
+                        "state": {
+                            "click": "Kliknjeno",
+                            "double_click": "Dvakrat kliknjeno",
+                            "press": "Dolgo pritisnjeno"
+                        }
+                    }
+                }
             }
         },
         "number": {
@@ -79,20 +93,11 @@
             "maximum_brightness": {
                 "name": "Najmanj\u0161a svetlost"
             },
-            "maximum_brightness_2": {
-                "name": "Najmanj\u0161a svetlost 2"
-            },
-            "maximum_brightness_3": {
-                "name": "Najmanj\u0161a svetlost 3"
+            "maximum_liquid_depth": {
+                "name": "Najve\u010dja globina teko\u010dine"
             },
             "minimum_brightness": {
                 "name": "Najmanj\u0161a svetlost"
-            },
-            "minimum_brightness_2": {
-                "name": "Najmanj\u0161a svetlost 2"
-            },
-            "minimum_brightness_3": {
-                "name": "Najmanj\u0161a svetlost 3"
             },
             "move_down": {
                 "name": "Premakni dol"
@@ -133,6 +138,21 @@
                     "2": "Vklopljeno"
                 }
             },
+            "blanket_level": {
+                "name": "Nivo",
+                "state": {
+                    "level_1": "Nizko",
+                    "level_10": "Visoko",
+                    "level_2": "Nivo 2",
+                    "level_3": "Nivo 3",
+                    "level_4": "Nivo 4",
+                    "level_5": "Nivo 5",
+                    "level_6": "Nivo 6",
+                    "level_7": "Nivo 7",
+                    "level_8": "Nivo 8",
+                    "level_9": "Nivo 9"
+                }
+            },
             "brightness": {
                 "name": "Svetlost"
             },
@@ -171,6 +191,15 @@
                     "1": "Visoka ob\u010dutljivost"
                 }
             },
+            "desk_level": {
+                "name": "Nivo",
+                "state": {
+                    "level_1": "Nivo 1",
+                    "level_2": "Nivo 2",
+                    "level_3": "Nivo 3",
+                    "level_4": "Nivo 4"
+                }
+            },
             "fingerbot_mode": {
                 "name": "Na\u010din"
             },
@@ -206,6 +235,28 @@
                     "work": "Delo"
                 }
             },
+            "indexed_blanket_level": {
+                "name": "Nivo {index}",
+                "state": {
+                    "level_1": "Nizko",
+                    "level_10": "Visoko",
+                    "level_2": "Nivo 2",
+                    "level_3": "Nivo 3",
+                    "level_4": "Nivo 4",
+                    "level_5": "Nivo 5",
+                    "level_6": "Nivo 6",
+                    "level_7": "Nivo 7",
+                    "level_8": "Nivo 8",
+                    "level_9": "Nivo 9"
+                }
+            },
+            "indexed_led_type": {
+                "state": {
+                    "halogen": "Halogenska \u017earnica",
+                    "incandescent": "\u017darnica z \u017earilno nitko",
+                    "led": "LED"
+                }
+            },
             "ipc_work_mode": {
                 "name": "Na\u010din IPC",
                 "state": {
@@ -215,22 +266,6 @@
             },
             "led_type": {
                 "name": "Vrsta vira svetlobe",
-                "state": {
-                    "halogen": "Halogenska \u017earnica",
-                    "incandescent": "\u017darnica z \u017earilno nitko",
-                    "led": "LED"
-                }
-            },
-            "led_type_2": {
-                "name": "Vrsta vira svetlobe 2",
-                "state": {
-                    "halogen": "Halogenska \u017earnica",
-                    "incandescent": "\u017darnica z \u017earilno nitko",
-                    "led": "LED"
-                }
-            },
-            "led_type_3": {
-                "name": "Vrsta vira svetlobe 2",
                 "state": {
                     "halogen": "Halogenska \u017earnica",
                     "incandescent": "\u017darnica z \u017earilno nitko",
@@ -281,7 +316,9 @@
             "vacuum_cistern": {
                 "name": "Nastavitev rezervoarja za vodo",
                 "state": {
-                    "closed": "Zaprto"
+                    "closed": "Zaprto",
+                    "high": "Visoko",
+                    "low": "Nizko"
                 }
             },
             "vacuum_collection": {
@@ -314,6 +351,9 @@
             }
         },
         "sensor": {
+            "air_pressure": {
+                "name": "Zra\u010dni pritisk"
+            },
             "air_quality": {
                 "name": "Kakovost zraka"
             },
@@ -355,6 +395,15 @@
             "current_temperature": {
                 "name": "Trenutna temperatura"
             },
+            "filter_duration": {
+                "name": "Trajanje filtra"
+            },
+            "filter_life": {
+                "name": "\u017divljenjska doba filtra"
+            },
+            "filter_utilization": {
+                "name": "Izkori\u0161\u010denost filtra"
+            },
             "formaldehyde": {
                 "name": "Formaldehid"
             },
@@ -364,8 +413,25 @@
             "humidity": {
                 "name": "Vla\u017enost"
             },
+            "humidity_outdoor": {
+                "name": "Zunanja vla\u017enost"
+            },
             "illuminance": {
                 "name": "Osvetljenost"
+            },
+            "liquid_depth": {
+                "name": "Globina teko\u010dine"
+            },
+            "liquid_level": {
+                "name": "Nivo teko\u010dine"
+            },
+            "liquid_state": {
+                "name": "Stanje teko\u010dine",
+                "state": {
+                    "lower_alarm": "Nizko",
+                    "normal": "Normalno",
+                    "upper_alarm": "Visoko"
+                }
             },
             "luminosity": {
                 "name": "Svetilnost"
@@ -384,6 +450,9 @@
             },
             "power": {
                 "name": "Mo\u010d"
+            },
+            "pump_time": {
+                "name": "Trajanje vodne \u010drpalke"
             },
             "remaining_time": {
                 "name": "Preostali \u010das"
@@ -435,6 +504,9 @@
             "total_watering_time": {
                 "name": "Skupni \u010das zalivanja"
             },
+            "uv_runtime": {
+                "name": "\u010cas delovanja UV-ja"
+            },
             "voc": {
                 "name": "Hlapne organske spojine"
             },
@@ -443,21 +515,19 @@
             },
             "water_level": {
                 "name": "Nivo vode"
+            },
+            "water_level_state": {
+                "name": "Nivo vode",
+                "state": {
+                    "level_1": "Nizko",
+                    "level_2": "Srednje"
+                }
+            },
+            "water_time": {
+                "name": "Trajanje porabe vode"
             }
         },
         "switch": {
-            "alarm_1": {
-                "name": "Alarm 1"
-            },
-            "alarm_2": {
-                "name": "Alarm 2"
-            },
-            "alarm_3": {
-                "name": "Alarm 3"
-            },
-            "alarm_4": {
-                "name": "Alarm 4"
-            },
             "anion": {
                 "name": "Anion"
             },
@@ -488,11 +558,20 @@
             "flip": {
                 "name": "Obrni sliko"
             },
+            "frost_protection": {
+                "name": "Za\u0161\u010dita pred zmrzaljo"
+            },
             "heat_preservation": {
                 "name": "Ohranjanje toplote"
             },
             "humidification": {
                 "name": "Vla\u017eenje"
+            },
+            "indexed_switch": {
+                "name": "Stikalo {index}"
+            },
+            "indexed_usb": {
+                "name": "USB {index}"
             },
             "ionizer": {
                 "name": "Ionizator"
@@ -536,24 +615,6 @@
             "socket": {
                 "name": "Vti\u010dnica"
             },
-            "socket_1": {
-                "name": "Vti\u010dnica 1"
-            },
-            "socket_2": {
-                "name": "Vti\u010dnica 2"
-            },
-            "socket_3": {
-                "name": "Vti\u010dnica 3"
-            },
-            "socket_4": {
-                "name": "Vti\u010dnica 4"
-            },
-            "socket_5": {
-                "name": "Vti\u010dnica 5"
-            },
-            "socket_6": {
-                "name": "Vti\u010dnica 6"
-            },
             "sound": {
                 "name": "Zvok"
             },
@@ -565,48 +626,6 @@
             },
             "switch": {
                 "name": "Stikalo"
-            },
-            "switch_1": {
-                "name": "Stikalo 1"
-            },
-            "switch_2": {
-                "name": "Stikalo 2"
-            },
-            "switch_3": {
-                "name": "Stikalo 3"
-            },
-            "switch_4": {
-                "name": "Stikalo 4"
-            },
-            "switch_5": {
-                "name": "Stikalo 5"
-            },
-            "switch_6": {
-                "name": "Stikalo 6"
-            },
-            "switch_7": {
-                "name": "Stikalo 7"
-            },
-            "switch_8": {
-                "name": "Stikalo 8"
-            },
-            "usb_1": {
-                "name": "USB 1"
-            },
-            "usb_2": {
-                "name": "USB 2"
-            },
-            "usb_3": {
-                "name": "USB 3"
-            },
-            "usb_4": {
-                "name": "USB 4"
-            },
-            "usb_5": {
-                "name": "USB 5"
-            },
-            "usb_6": {
-                "name": "USB 6"
             },
             "uv_sterilization": {
                 "name": "UV sterilizacija"
