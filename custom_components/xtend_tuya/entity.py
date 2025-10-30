@@ -260,12 +260,15 @@ class XTEntityDescriptorManager:
                                 compound_key is not None
                                 and compound_key not in base_descr_keys
                             ):
+                                return_list.append(entity)
+                            elif compound_key is not None and compound_key in base_descr_keys:
                                 if other_entity := base_descr_keys[compound_key]:
                                     if entity_type is not None and other_entity.translation_placeholders is not None:
                                         old_dict = entity.__dict__
                                         LOGGER.warning(f"Old dict: {old_dict}")
-                                        entity = entity_type(**old_dict)
-                                return_list.append(entity)
+                                        return_list.remove(entity)
+                                        return_list.append(entity_type(**old_dict))
+                        
                         case XTEntityDescriptorManager.XTEntityDescriptorType.STRING:
                             if descriptor not in base_descr_keys:
                                 return_list.append(descriptor)
