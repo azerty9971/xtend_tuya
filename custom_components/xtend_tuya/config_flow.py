@@ -7,7 +7,7 @@ from enum import StrEnum
 from tuya_sharing import LoginControl
 from tuya_iot import AuthType
 import voluptuous as vol
-from homeassistant.core import callback
+from homeassistant.core import callback, HomeAssistant
 from homeassistant.config_entries import (
     ConfigEntry,
     ConfigFlow,
@@ -84,6 +84,7 @@ class XTConfigFlows:
     @staticmethod
     def _try_login_open_api(
         user_input: dict[str, Any],
+        hass: HomeAssistant
     ) -> tuple[dict[Any, Any], dict[str, Any]]:
         """Try login."""
         response = {}
@@ -118,11 +119,8 @@ class XTConfigFlows:
             else:
                 data[CONF_AUTH_TYPE] = AuthType.SMART_HOME
 
-            if XTConcurrencyManager.hass is None:
-                continue
-
             api = XTIOTOpenAPI(
-                hass=XTConcurrencyManager.hass,
+                hass=hass,
                 endpoint=data[CONF_ENDPOINT_OT],
                 access_id=data[CONF_ACCESS_ID_OT],
                 access_secret=data[CONF_ACCESS_SECRET_OT],
@@ -152,7 +150,7 @@ class XTConfigFlows:
         if user_input is not None:
             response, data = (
                 await XTEventLoopProtector.execute_out_of_event_loop_and_return(
-                    self._try_login_open_api, user_input
+                    self._try_login_open_api, user_input, self.parent.hass
                 )
             )
 
