@@ -252,6 +252,7 @@ class XTEntityDescriptorManager:
             case XTEntityDescriptorManager.XTEntityDescriptorType.LIST:
                 return_list: list = []
                 var_type = XTEntityDescriptorManager.XTEntityDescriptorType.UNKNOWN
+                added_compound_keys: list[str] = []
                 if descriptors_to_add:
                     var_type = XTEntityDescriptorManager._get_param_type(
                         descriptors_to_add[0]
@@ -272,8 +273,10 @@ class XTEntityDescriptorManager:
                                 continue
                             if compound_key not in base_descr_keys:
                                 return_list.append(entity_to_add)
+                                added_compound_keys.append(compound_key)
                             else:
                                 if base_entity := base_descr_keys[compound_key]:
+                                    added_compound_keys.append(compound_key)
                                     return_list.append(
                                         XTEntityDescriptorManager.merge_descriptor(
                                             base_entity, entity_to_add, entity_type
@@ -283,6 +286,13 @@ class XTEntityDescriptorManager:
                         case XTEntityDescriptorManager.XTEntityDescriptorType.STRING:
                             if descriptor not in base_descr_keys:
                                 return_list.append(descriptor)
+                for compound_key, base_descriptor in base_descr_keys.items():
+                    match var_type:
+                        case XTEntityDescriptorManager.XTEntityDescriptorType.ENTITY:
+                            if compound_key not in added_compound_keys:
+                                return_list.append(base_descriptor)
+                        case XTEntityDescriptorManager.XTEntityDescriptorType.STRING:
+                            return_list.append(base_descriptor)
                 return return_list
             case XTEntityDescriptorManager.XTEntityDescriptorType.TUPLE:
                 return tuple(
