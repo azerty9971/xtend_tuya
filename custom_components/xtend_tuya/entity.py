@@ -618,14 +618,16 @@ class XTEntity(TuyaEntity):
 
     def get_dptype(
         self,
-        device: sc.XTDevice,
         dpcode: XTDPCode | TuyaDPCode | None,
+        device: sc.XTDevice | None = None,
         *,
         prefer_function: bool = False,
     ) -> TuyaDPType | None:
         """Find a matching DPType type information for this device DPCode."""
         if dpcode is None:
             return None
+        if device is None:
+            return self.get_dptype_old(dpcode, prefer_function=prefer_function)
         lookup_tuple = (
             (device.function, device.status_range)
             if prefer_function
@@ -641,6 +643,28 @@ class XTEntity(TuyaEntity):
                         # Sometimes, we get ill-formed DPTypes from the cloud,
                         # this fixes them and maps them to the correct DPType.
                         return TUYA_DPTYPE_MAPPING.get(current_type)
+        return None
+    
+    def get_dptype_old(
+        self, dpcode: XTDPCode | TuyaDPCode | None, *, prefer_function: bool = False
+    ) -> TuyaDPType | None:
+        """Find a matching DPCode data type available on for this device."""
+        if dpcode is None:
+            return None
+
+        order = ["status_range", "function"]
+        if prefer_function:
+            order = ["function", "status_range"]
+        for key in order:
+            if dpcode in getattr(self.device, key):
+                current_type = getattr(self.device, key)[dpcode].type
+                try:
+                    return TuyaDPType(current_type)
+                except ValueError:
+                    # Sometimes, we get ill-formed DPTypes from the cloud,
+                    # this fixes them and maps them to the correct DPType.
+                    return TUYA_DPTYPE_MAPPING.get(current_type)
+
         return None
 
     @staticmethod
