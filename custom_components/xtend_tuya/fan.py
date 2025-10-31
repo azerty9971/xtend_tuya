@@ -11,7 +11,7 @@ from .multi_manager.multi_manager import (
     MultiManager,
     XTDevice,
 )
-from .const import TUYA_DISCOVERY_NEW, LOGGER
+from .const import TUYA_DISCOVERY_NEW
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaFanEntity,
 )
@@ -41,7 +41,6 @@ async def async_setup_entry(
             XT_SUPPORT_TYPE, entry.runtime_data.multi_manager, None, this_platform
         ),
     )
-    LOGGER.warning(f"Supported fans: {supported_descriptors}")
 
     @callback
     def async_discover_device(device_map, restrict_dpcode: str | None = None) -> None:
