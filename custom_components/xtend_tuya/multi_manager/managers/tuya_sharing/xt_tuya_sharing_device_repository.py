@@ -7,15 +7,15 @@ from tuya_sharing.device import (
     CustomerDevice,
     DeviceRepository,
 )
-import custom_components.xtend_tuya.multi_manager.tuya_sharing.xt_tuya_sharing_manager as sm
-from ..multi_manager import (
+import custom_components.xtend_tuya.multi_manager.managers.tuya_sharing.xt_tuya_sharing_manager as sm
+from ...multi_manager import (
     MultiManager,
 )
-from ..shared.shared_classes import (
+from ...shared.shared_classes import (
     XTDeviceFunction,
     XTDeviceStatusRange,
 )
-from ..shared.threading import (
+from ...shared.threading import (
     XTThreadingManager,
 )
 

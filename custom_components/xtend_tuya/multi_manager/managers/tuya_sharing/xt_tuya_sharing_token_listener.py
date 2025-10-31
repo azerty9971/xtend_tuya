@@ -3,7 +3,7 @@ from typing import Any
 from tuya_sharing.customerapi import (
     SharingTokenListener,
 )
-from ...const import (
+from ....const import (
     CONF_TOKEN_INFO,
 )
 from homeassistant.core import HomeAssistant, callback

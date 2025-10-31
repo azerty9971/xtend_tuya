@@ -1,17 +1,17 @@
 from __future__ import annotations
 from typing import Any
 from homeassistant.core import HomeAssistant
-from ....ha_tuya_integration.tuya_integration_imports import (
+from .....ha_tuya_integration.tuya_integration_imports import (
     tuya_integration,
     TuyaCustomerDevice,
 )
-from ...multi_manager import (
+from ....multi_manager import (
     XTConfigEntry,
 )
 from ..xt_tuya_sharing_manager import (
     XTSharingDeviceManager,
 )
-from ...shared.shared_classes import (
+from ....shared.shared_classes import (
     XTDeviceMap,
 )
 

@@ -16,7 +16,7 @@ from homeassistant.core import (
 )
 from tuya_iot.tuya_enums import AuthType
 from tuya_iot.version import VERSION
-from ...const import (
+from ....const import (
     LOGGER,
 )
 

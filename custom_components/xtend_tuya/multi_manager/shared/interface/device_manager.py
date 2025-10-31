@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 from typing import Optional, Literal, Any
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
+from paho.mqtt import client as mqtt
 from webrtc_models import (
     RTCIceCandidateInit,
 )
@@ -209,6 +210,9 @@ class XTDeviceManagerMQTTManagementInterface(ABC):
     @abstractmethod
     def on_message(self, msg: dict):
         pass
+
+    def get_mqtt_client(self) -> mqtt.Client | None:
+        return None
 
 class XTDeviceManagerLockManagementInterface(ABC):
     def send_lock_unlock_command(self, device: shared.XTDevice, lock: bool) -> bool:

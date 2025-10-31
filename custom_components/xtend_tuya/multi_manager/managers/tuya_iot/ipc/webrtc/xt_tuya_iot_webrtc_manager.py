@@ -13,11 +13,11 @@ from homeassistant.components.camera.webrtc import (
     WebRTCCandidate,
     WebRTCAnswer,
 )
-import custom_components.xtend_tuya.multi_manager.tuya_iot.ipc.xt_tuya_iot_ipc_manager as ipc_man
-from ....shared.shared_classes import (
+import custom_components.xtend_tuya.multi_manager.managers.tuya_iot.ipc.xt_tuya_iot_ipc_manager as ipc_man
+from .....shared.shared_classes import (
     XTDevice,
 )
-from ....shared.threading import (
+from .....shared.threading import (
     XTEventLoopProtector,
 )
 

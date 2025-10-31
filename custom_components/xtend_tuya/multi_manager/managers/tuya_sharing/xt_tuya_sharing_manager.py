@@ -18,19 +18,19 @@ from tuya_sharing.home import (
     SmartLifeHome,
     HomeRepository,
 )
-from ...const import (
+from ....const import (
     MESSAGE_SOURCE_TUYA_SHARING,
     XTDeviceSourcePriority,
 )
-from ..multi_manager import (
+from ...multi_manager import (
     MultiManager,
 )
-from ..shared.shared_classes import (
+from ...shared.shared_classes import (
     XTDevice,
     XTDeviceMap,
 )
-import custom_components.xtend_tuya.multi_manager.tuya_sharing.xt_tuya_sharing_device_repository as dr
-import custom_components.xtend_tuya.multi_manager.tuya_sharing.xt_tuya_sharing_mq as mq
+import custom_components.xtend_tuya.multi_manager.managers.tuya_sharing.xt_tuya_sharing_device_repository as dr
+import custom_components.xtend_tuya.multi_manager.managers.tuya_sharing.xt_tuya_sharing_mq as mq
 
 
 class XTSharingDeviceManager(Manager):  # noqa: F811

@@ -20,10 +20,10 @@ from tuya_sharing.customerapi import (
 from .xt_tuya_sharing_manager import (
     XTSharingDeviceManager,
 )
-from ..shared.interface.device_manager import (
+from ...shared.interface.device_manager import (
     XTDeviceManagerInterface,
 )
-from ..shared.shared_classes import (
+from ...shared.shared_classes import (
     XTConfigEntry,
     XTDeviceMap,
     XTDevice,
@@ -60,13 +60,13 @@ from .util import (
     get_overriden_tuya_integration_runtime_data,
 )
 from .ha_tuya_integration.platform_descriptors import get_tuya_platform_descriptors
-from ..multi_manager import (
+from ...multi_manager import (
     MultiManager,
 )
-from ..shared.threading import (
+from ...shared.threading import (
     XTEventLoopProtector,
 )
-from ...const import (
+from ....const import (
     DOMAIN,
     MESSAGE_SOURCE_TUYA_SHARING,
     MESSAGE_SOURCE_TUYA_IOT,

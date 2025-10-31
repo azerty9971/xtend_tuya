@@ -14,7 +14,7 @@ from tuya_iot.openmq import (
     CONNECT_FAILED_NOT_AUTHORISED,
     time,
 )
-from ...const import (
+from ....const import (
     LOGGER,
 )
 from .xt_tuya_iot_openapi import (
