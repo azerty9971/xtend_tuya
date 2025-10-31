@@ -5,9 +5,9 @@ from collections.abc import Mapping
 from typing import Any, cast
 from enum import StrEnum
 from tuya_sharing import LoginControl
-from tuya_iot import AuthType, TuyaOpenAPI
+from tuya_iot import AuthType
 import voluptuous as vol
-from homeassistant.core import callback
+from homeassistant.core import callback, HomeAssistant
 from homeassistant.config_entries import (
     ConfigEntry,
     ConfigFlow,
@@ -53,6 +53,7 @@ from .multi_manager.shared.threading import (
     XTEventLoopProtector,
     XTConcurrencyManager,
 )
+from .multi_manager.tuya_iot.xt_tuya_iot_openapi import XTIOTOpenAPI
 import custom_components.xtend_tuya.util as util
 import custom_components.xtend_tuya.multi_manager.multi_manager as mm
 import custom_components.xtend_tuya.multi_manager.shared.data_entry.shared_data_entry as data_entry
@@ -83,6 +84,7 @@ class XTConfigFlows:
     @staticmethod
     def _try_login_open_api(
         user_input: dict[str, Any],
+        hass: HomeAssistant
     ) -> tuple[dict[Any, Any], dict[str, Any]]:
         """Try login."""
         response = {}
@@ -117,7 +119,8 @@ class XTConfigFlows:
             else:
                 data[CONF_AUTH_TYPE] = AuthType.SMART_HOME
 
-            api = TuyaOpenAPI(
+            api = XTIOTOpenAPI(
+                hass=hass,
                 endpoint=data[CONF_ENDPOINT_OT],
                 access_id=data[CONF_ACCESS_ID_OT],
                 access_secret=data[CONF_ACCESS_SECRET_OT],
@@ -147,7 +150,7 @@ class XTConfigFlows:
         if user_input is not None:
             response, data = (
                 await XTEventLoopProtector.execute_out_of_event_loop_and_return(
-                    self._try_login_open_api, user_input
+                    self._try_login_open_api, user_input, self.parent.hass
                 )
             )
 

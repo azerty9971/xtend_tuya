@@ -292,7 +292,7 @@ class XTEntityDescriptorManager:
                             if compound_key not in added_compound_keys:
                                 return_list.append(base_descriptor)
                         case XTEntityDescriptorManager.XTEntityDescriptorType.STRING:
-                            return_list.append(base_descriptor)
+                            return_list.append(compound_key)
                 return return_list
             case XTEntityDescriptorManager.XTEntityDescriptorType.TUPLE:
                 return tuple(
