@@ -65,4 +65,4 @@ After that, if you are still missing some entities, you can perform the [followi
 
 ## Want to discuss?
 
-Feel free to come and say hi on the [Discord server](https://discord.com/channels/1414423547144699916/1414423548524630210)
+Feel free to come and say hi on the [Discord server](https://discord.gg/3EgfG5sZ4Y)
