@@ -262,6 +262,8 @@ class XTEntityDescriptorManager:
                         base_descriptors, key_fields
                     )
                 )
+                if entity_type is None:
+                    LOGGER.warning(f"base_descr_keys: {base_descr_keys}")
                 for descriptor in descriptors_to_add:
                     match var_type:
                         case XTEntityDescriptorManager.XTEntityDescriptorType.ENTITY:
