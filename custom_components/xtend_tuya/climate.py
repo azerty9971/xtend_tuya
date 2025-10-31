@@ -164,7 +164,7 @@ CLIMATE_DESCRIPTIONS: dict[str, XTClimateEntityDescription] = {
         key="cs",
         switch_only_hvac_mode=HVACMode.DRY,
     ),
-    "xfj": XTClimateEntityDescription(
+    "xfjDISABLED": XTClimateEntityDescription(
         key="xfj",
         switch_only_hvac_mode=HVACMode.AUTO,
     ),
