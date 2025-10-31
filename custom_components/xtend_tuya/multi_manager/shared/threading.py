@@ -94,7 +94,6 @@ class XTEventLoopProtector:
                 )
                 return await callback(*args, **kwargs)
             else:
-                LOGGER.debug("Calling execute_out_of_event_loop_and_return in watched case")
                 return await XTEventLoopProtector.hass.async_add_executor_job(
                     partial(callback, *args, **kwargs)
                 )

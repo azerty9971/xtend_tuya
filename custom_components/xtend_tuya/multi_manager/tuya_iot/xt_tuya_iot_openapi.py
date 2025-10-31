@@ -400,10 +400,10 @@ class XTIOTOpenAPI(TuyaOpenAPI):
         # if result.get("success", True) is False:
         time_taken = datetime.now() - start_time
         LOGGER.debug(
-            f"[IOT API][{time_taken}]Header time: {t} Request: {method} {path} PARAMS: {json.dumps(params, ensure_ascii=False, indent=2) if params is not None else ''} BODY: {json.dumps(body, ensure_ascii=False, indent=2) if body is not None else ''}"
+            f"[IOT API][{time_taken}]Request: {method} {path} PARAMS: {json.dumps(params, ensure_ascii=False, indent=2) if params is not None else ''} BODY: {json.dumps(body, ensure_ascii=False, indent=2) if body is not None else ''}"
         )
         LOGGER.debug(
-            f"[IOT API][{time_taken}]Header time: {t} Response: {json.dumps(result, ensure_ascii=False, indent=2)}"
+            f"[IOT API][{time_taken}]Response: {json.dumps(result, ensure_ascii=False, indent=2)}"
         )
 
         if result.get("code", -1) == TUYA_ERROR_CODE_TOKEN_INVALID:
