@@ -11,7 +11,7 @@ from homeassistant.core import callback, HomeAssistant
 from homeassistant.config_entries import (
     ConfigEntry,
     ConfigFlow,
-    OptionsFlowWithReload,
+    OptionsFlow,
     ConfigEntryBaseFlow,
 )
 from homeassistant.config_entries import ConfigFlowResult
@@ -253,7 +253,7 @@ class XTConfigFlows:
         )
 
 
-class TuyaOptionFlow(OptionsFlowWithReload):
+class TuyaOptionFlow(OptionsFlow):
     def __init__(self, config_entry: ConfigEntry) -> None:
         """Initialize options flow."""
         self.handler = config_entry.entry_id
