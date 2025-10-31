@@ -110,10 +110,11 @@ class XTSharingAPI(CustomerApi):
         secret = _secret_generating(rid, sid, hash_key)
 
         query_encdata = ""
+        params_enc = params
         if params is not None and len(params.keys()) > 0:
             query_encdata = _form_to_json(params)
             query_encdata = _aes_gcm_encrypt(query_encdata, secret)
-            params = {
+            params_enc = {
                 "encdata": query_encdata
             }
             query_encdata = str(query_encdata, encoding="utf8")
@@ -143,7 +144,7 @@ class XTSharingAPI(CustomerApi):
         headers["X-sign"] = sign
 
         response = self.session.request(
-            method, self.endpoint + path, params=params, json=body, headers=headers
+            method, self.endpoint + path, params=params_enc, json=body, headers=headers
         )
 
         if response.ok is False:
