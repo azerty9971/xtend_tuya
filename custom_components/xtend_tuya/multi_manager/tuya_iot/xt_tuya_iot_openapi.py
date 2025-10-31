@@ -3,6 +3,8 @@
 from __future__ import annotations
 import time
 import json  # noqa: F401
+import hashlib
+import hmac
 from typing import Any
 from datetime import datetime
 from tuya_iot import (
@@ -88,7 +90,7 @@ class XTIOTOpenAPI(TuyaOpenAPI):
             self.__login_path = TO_C_SMART_HOME_TOKEN_API
             self.__refresh_path = TO_C_SMART_HOME_REFRESH_TOKEN_API
 
-        self.token_info: TuyaTokenInfo | None = None
+        self.token_info: XTTokenInfo | None = None
         self.__username = ""
         self.__password = ""
         self.__country_code = ""
@@ -159,13 +161,60 @@ class XTIOTOpenAPI(TuyaOpenAPI):
         if self.non_user_specific_api:
             return_value = self.connect_non_user_specific()
         else:
-            return_value = super().connect(
+            return_value = self.connect_user_specific(
                 username=username,
                 password=password,
                 country_code=country_code,
                 schema=schema,
             )
         return return_value
+
+    def connect_user_specific(
+        self,
+        username: str = "",
+        password: str = "",
+        country_code: str = "",
+        schema: str = "",
+    ) -> dict[str, Any]:
+        """Connect to Tuya Cloud.
+
+        Args:
+            username (str): user name in to C
+            password (str): user password in to C
+            country_code (str): country code in SMART_HOME
+            schema (str): app schema in SMART_HOME
+
+        Returns:
+            response: connect response
+        """
+        if self.auth_type == AuthType.CUSTOM:
+            response = self.post(
+                TO_C_CUSTOM_TOKEN_API,
+                {
+                    "username": username,
+                    "password": hashlib.sha256(password.encode("utf8"))
+                    .hexdigest()
+                    .lower(),
+                },
+            )
+        else:
+            response = self.post(
+                TO_C_SMART_HOME_TOKEN_API,
+                {
+                    "username": username,
+                    "password": hashlib.md5(password.encode("utf8")).hexdigest(),
+                    "country_code": country_code,
+                    "schema": schema,
+                },
+            )
+
+        if not response["success"]:
+            return response
+
+        # Cache token info.
+        self.token_info = XTTokenInfo(response)
+
+        return response
 
     def reconnect(self) -> bool:
         if (
@@ -244,6 +293,63 @@ class XTIOTOpenAPI(TuyaOpenAPI):
             response: response body
         """
         return self.__request("DELETE", path, params, None)
+
+    def _calculate_sign(
+        self,
+        method: str,
+        path: str,
+        params: dict[str, Any] | None = None,
+        body: dict[str, Any] | None = None,
+    ) -> tuple[str, int]:
+
+        # HTTPMethod
+        str_to_sign = method
+        str_to_sign += "\n"
+
+        # Content-SHA256
+        content_to_sha256 = (
+            "" if body is None or len(body.keys()) == 0 else json.dumps(body)
+        )
+
+        str_to_sign += (
+            hashlib.sha256(content_to_sha256.encode("utf8")).hexdigest().lower()
+        )
+        str_to_sign += "\n"
+
+        # Header
+        str_to_sign += "\n"
+
+        # URL
+        str_to_sign += path
+
+        if params is not None and len(params.keys()) > 0:
+            str_to_sign += "?"
+
+            params_keys = sorted(params.keys())
+            query_builder = "".join(f"{key}={params[key]}&" for key in params_keys)
+            str_to_sign += query_builder[:-1]
+
+        # Sign
+        t = int(time.time() * 1000)
+        t2 = int(datetime.now().timestamp() * 1000)
+        LOGGER.debug(f"Times: {t} <=> {t2}")
+        if t2 > t:
+            t = t2
+
+        message = self.access_id
+        if self.token_info is not None:
+            message += self.token_info.access_token
+        message += str(t) + str_to_sign
+        sign = (
+            hmac.new(
+                self.access_secret.encode("utf8"),
+                msg=message.encode("utf8"),
+                digestmod=hashlib.sha256,
+            )
+            .hexdigest()
+            .upper()
+        )
+        return sign, t
 
     def __request(
         self,
