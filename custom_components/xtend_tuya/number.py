@@ -433,8 +433,30 @@ NUMBERS: dict[str, tuple[XTNumberEntityDescription, ...]] = {
     ),
     "msp": (
         XTNumberEntityDescription(
+            key=XTDPCode.DEO_END_TIME,
+            translation_key="deo_end_time",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        XTNumberEntityDescription(
+            key=XTDPCode.DEO_START_TIME,
+            translation_key="deo_start_time",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        XTNumberEntityDescription(
             key=XTDPCode.DELAY_CLEAN_TIME,
             translation_key="delay_clean_time",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        XTNumberEntityDescription(
+            key=XTDPCode.INDUCTION_DELAY,
+            translation_key="induction_delay",
+            device_class=NumberDeviceClass.DURATION,
+            entity_category=EntityCategory.CONFIG,
+        ),
+        XTNumberEntityDescription(
+            key=XTDPCode.INDUCTION_INTERVAL,
+            translation_key="induction_interval",
+            device_class=NumberDeviceClass.DURATION,
             entity_category=EntityCategory.CONFIG,
         ),
         XTNumberEntityDescription(
@@ -448,18 +470,13 @@ NUMBERS: dict[str, tuple[XTNumberEntityDescription, ...]] = {
             entity_category=EntityCategory.CONFIG,
         ),
         XTNumberEntityDescription(
-            key=XTDPCode.SLEEP_START_TIME,
-            translation_key="sleep_start_time",
-            entity_category=EntityCategory.CONFIG,
-        ),
-        XTNumberEntityDescription(
             key=XTDPCode.SLEEP_END_TIME,
             translation_key="sleep_end_time",
             entity_category=EntityCategory.CONFIG,
         ),
         XTNumberEntityDescription(
-            key=XTDPCode.UV_START_TIME,
-            translation_key="uv_start_time",
+            key=XTDPCode.SLEEP_START_TIME,
+            translation_key="sleep_start_time",
             entity_category=EntityCategory.CONFIG,
         ),
         XTNumberEntityDescription(
@@ -468,25 +485,8 @@ NUMBERS: dict[str, tuple[XTNumberEntityDescription, ...]] = {
             entity_category=EntityCategory.CONFIG,
         ),
         XTNumberEntityDescription(
-            key=XTDPCode.DEO_START_TIME,
-            translation_key="deo_start_time",
-            entity_category=EntityCategory.CONFIG,
-        ),
-        XTNumberEntityDescription(
-            key=XTDPCode.DEO_END_TIME,
-            translation_key="deo_end_time",
-            entity_category=EntityCategory.CONFIG,
-        ),
-        XTNumberEntityDescription(
-            key=XTDPCode.INDUCTION_DELAY,
-            translation_key="induction_delay",
-            device_class=NumberDeviceClass.DURATION,
-            entity_category=EntityCategory.CONFIG,
-        ),
-        XTNumberEntityDescription(
-            key=XTDPCode.INDUCTION_INTERVAL,
-            translation_key="induction_interval",
-            device_class=NumberDeviceClass.DURATION,
+            key=XTDPCode.UV_START_TIME,
+            translation_key="uv_start_time",
             entity_category=EntityCategory.CONFIG,
         ),
     ),
