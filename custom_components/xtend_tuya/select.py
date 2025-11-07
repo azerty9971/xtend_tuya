@@ -175,6 +175,11 @@ SELECTS: dict[str, tuple[XTSelectEntityDescription, ...]] = {
     ),
     "msp": (
         XTSelectEntityDescription(
+            key=XTDPCode.CHOOSE_CAT_LITTER,
+            translation_key="cat_litter_type",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        XTSelectEntityDescription(
             key=XTDPCode.CLEAN,
             translation_key="cat_litter_box_clean",
             entity_category=EntityCategory.CONFIG,
@@ -182,11 +187,6 @@ SELECTS: dict[str, tuple[XTSelectEntityDescription, ...]] = {
         XTSelectEntityDescription(
             key=XTDPCode.EMPTY,
             translation_key="cat_litter_box_empty",
-            entity_category=EntityCategory.CONFIG,
-        ),
-        XTSelectEntityDescription(
-            key=XTDPCode.CHOOSE_CAT_LITTER,
-            translation_key="cat_litter_type",
             entity_category=EntityCategory.CONFIG,
         ),
         XTSelectEntityDescription(

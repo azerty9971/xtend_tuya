@@ -246,6 +246,11 @@ SWITCHES: dict[str, tuple[XTSwitchEntityDescription, ...]] = {
             entity_category=EntityCategory.CONFIG,
         ),
         XTSwitchEntityDescription(
+            key=XTDPCode.CLEANING,
+            translation_key="one_click_cleanup",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        XTSwitchEntityDescription(
             key=XTDPCode.DEEP_CLEAN,
             translation_key="deep_clean",
             entity_category=EntityCategory.CONFIG,
@@ -288,18 +293,8 @@ SWITCHES: dict[str, tuple[XTSwitchEntityDescription, ...]] = {
             entity_category=EntityCategory.CONFIG,
         ),
         XTSwitchEntityDescription(
-            key=XTDPCode.CLEANING,
-            translation_key="one_click_cleanup",
-            entity_category=EntityCategory.CONFIG,
-        ),
-        XTSwitchEntityDescription(
             key=XTDPCode.QUIET_TIMING_ON,
             translation_key="quiet_timing_on",
-            entity_category=EntityCategory.CONFIG,
-        ),
-        XTSwitchEntityDescription(
-            key=XTDPCode.THIN_FECES,
-            translation_key="thin_feces",
             entity_category=EntityCategory.CONFIG,
         ),
         XTSwitchEntityDescription(
@@ -336,6 +331,11 @@ SWITCHES: dict[str, tuple[XTSwitchEntityDescription, ...]] = {
             entity_registry_enabled_default=False,
         ),
         XTSwitchEntityDescription(
+            key=XTDPCode.THIN_FECES,
+            translation_key="thin_feces",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        XTSwitchEntityDescription(
             key=XTDPCode.TOILET_NOTICE,
             translation_key="toilet_notice",
             entity_category=EntityCategory.CONFIG,
@@ -356,13 +356,13 @@ SWITCHES: dict[str, tuple[XTSwitchEntityDescription, ...]] = {
     "mzj": (),
     "qccdz": (
         XTSwitchEntityDescription(
-            key=XTDPCode.RFID,
-            translation_key="rfid",
+            key=XTDPCode.IDVERIFICATIONSET,
+            translation_key="id_verification_set",
             entity_category=EntityCategory.CONFIG,
         ),
         XTSwitchEntityDescription(
-            key=XTDPCode.IDVERIFICATIONSET,
-            translation_key="id_verification_set",
+            key=XTDPCode.RFID,
+            translation_key="rfid",
             entity_category=EntityCategory.CONFIG,
         ),
     ),

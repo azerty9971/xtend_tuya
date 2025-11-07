@@ -1111,17 +1111,17 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
             entity_registry_enabled_default=True,
         ),
         XTSensorEntityDescription(
-            key=XTDPCode.EXCRETION_TIMES_DAY,
-            translation_key="excretion_times_day",
-            state_class=SensorStateClass.MEASUREMENT,
-            entity_registry_enabled_default=True,
-        ),
-        XTSensorEntityDescription(
             key=XTDPCode.EXCRETION_TIME_DAY,
             translation_key="excretion_time_day",
             device_class=SensorDeviceClass.DURATION,
             state_class=SensorStateClass.MEASUREMENT,
             native_unit_of_measurement=UnitOfTime.SECONDS,
+            entity_registry_enabled_default=True,
+        ),
+        XTSensorEntityDescription(
+            key=XTDPCode.EXCRETION_TIMES_DAY,
+            translation_key="excretion_times_day",
+            state_class=SensorStateClass.MEASUREMENT,
             entity_registry_enabled_default=True,
         ),
         XTSensorEntityDescription(
@@ -1261,26 +1261,26 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
     ),
     "mzj": (
         XTSensorEntityDescription(
-            key=XTDPCode.WORK_STATUS,
-            translation_key="mzj_work_status",
+            key=XTDPCode.REMAININGTIME,
+            translation_key="remaining_time",
             entity_registry_enabled_default=True,
         ),
         XTSensorEntityDescription(
-            key=XTDPCode.REMAININGTIME,
-            translation_key="remaining_time",
+            key=XTDPCode.WORK_STATUS,
+            translation_key="mzj_work_status",
             entity_registry_enabled_default=True,
         ),
         *TEMPERATURE_SENSORS,
     ),
     "qccdz": (
         XTSensorEntityDescription(
-            key=XTDPCode.WORK_STATE,
-            translation_key="qccdz_work_state",
+            key=XTDPCode.CONNECTION_STATE,
+            translation_key="qccdz_connection_state",
             entity_registry_enabled_default=True,
         ),
         XTSensorEntityDescription(
-            key=XTDPCode.CONNECTION_STATE,
-            translation_key="qccdz_connection_state",
+            key=XTDPCode.DEVICESTATE,
+            translation_key="qccdz_devicestate",
             entity_registry_enabled_default=True,
         ),
         XTSensorEntityDescription(
@@ -1290,8 +1290,8 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
             entity_registry_visible_default=False,
         ),
         XTSensorEntityDescription(
-            key=XTDPCode.DEVICESTATE,
-            translation_key="qccdz_devicestate",
+            key=XTDPCode.WORK_STATE,
+            translation_key="qccdz_work_state",
             entity_registry_enabled_default=True,
         ),
         *CONSUMPTION_SENSORS,
