@@ -4,7 +4,7 @@ from __future__ import annotations
 from typing import cast, Any
 import json
 from dataclasses import dataclass
-from homeassistant.const import Platform
+from homeassistant.const import EntityCategory,Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -70,6 +70,13 @@ LIGHTS: dict[str, tuple[XTLightEntityDescription, ...]] = {
             key=XTDPCode.LIGHT,
             translation_key="light",
             brightness=XTDPCode.BRIGHT_VALUE,
+        ),
+    ),
+    "msp": (
+        XTLightEntityDescription(
+            key=XTDPCode.LIGHT,
+            translation_key="light",
+            entity_category=EntityCategory.CONFIG,
         ),
     ),
 }

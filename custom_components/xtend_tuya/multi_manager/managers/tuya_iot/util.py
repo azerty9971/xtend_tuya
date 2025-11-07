@@ -1,5 +1,5 @@
 from __future__ import annotations
-from ...ha_tuya_integration.tuya_integration_imports import (
+from ....ha_tuya_integration.tuya_integration_imports import (
     TuyaDPType,
 )
 

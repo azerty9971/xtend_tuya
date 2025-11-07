@@ -53,7 +53,7 @@ from .multi_manager.shared.threading import (
     XTEventLoopProtector,
     XTConcurrencyManager,
 )
-from .multi_manager.tuya_iot.xt_tuya_iot_openapi import XTIOTOpenAPI
+from .multi_manager.managers.tuya_iot.xt_tuya_iot_openapi import XTIOTOpenAPI
 import custom_components.xtend_tuya.util as util
 import custom_components.xtend_tuya.multi_manager.multi_manager as mm
 import custom_components.xtend_tuya.multi_manager.shared.data_entry.shared_data_entry as data_entry

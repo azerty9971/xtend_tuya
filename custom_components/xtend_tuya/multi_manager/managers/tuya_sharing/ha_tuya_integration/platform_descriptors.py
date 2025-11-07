@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import Any
 from homeassistant.const import Platform
-from ....ha_tuya_integration.tuya_integration_imports import (
+from .....ha_tuya_integration.tuya_integration_imports import (
     ALARM_TUYA,
     BINARY_SENSORS_TUYA,
     BUTTONS_TUYA,

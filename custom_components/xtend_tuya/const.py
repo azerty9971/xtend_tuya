@@ -241,6 +241,7 @@ class XTDPCode(StrEnum):
     """
 
     # DPCODES FROM TUYA
+    ADD_ELE = "add_ele"  # energy
     AIR_QUALITY = "air_quality"
     AIR_QUALITY_INDEX = "air_quality_index"
     ALARM_DELAY_TIME = "alarm_delay_time"
@@ -255,6 +256,7 @@ class XTDPCode(StrEnum):
     ARM_DOWN_PERCENT = "arm_down_percent"
     ARM_UP_PERCENT = "arm_up_percent"
     ATMOSPHERIC_PRESSTURE = "atmospheric_pressture"  # Typo is in Tuya API
+    BACKUP_RESERVE = "backup_reserve"
     BASIC_ANTI_FLICKER = "basic_anti_flicker"
     BASIC_DEVICE_VOLUME = "basic_device_volume"
     BASIC_FLIP = "basic_flip"
@@ -265,6 +267,7 @@ class XTDPCode(StrEnum):
     BASIC_WDR = "basic_wdr"
     BATTERY = "battery"  # Used by non-standard contact sensor implementations
     BATTERY_PERCENTAGE = "battery_percentage"  # Battery percentage
+    BATTERY_POWER = "battery_power"
     BATTERY_STATE = "battery_state"  # Battery state
     BATTERY_VALUE = "battery_value"  # Battery value
     BRIGHT_CONTROLLER = "bright_controller"
@@ -281,10 +284,12 @@ class XTDPCode(StrEnum):
     BRIGHTNESS_MIN_2 = "brightness_min_2"
     BRIGHTNESS_MIN_3 = "brightness_min_3"
     C_F = "c_f"  # Temperature unit switching
+    CAT_WEIGHT = "cat_weight"
     CH2O_STATE = "ch2o_state"
     CH2O_VALUE = "ch2o_value"
     CH4_SENSOR_STATE = "ch4_sensor_state"
     CH4_SENSOR_VALUE = "ch4_sensor_value"
+    CHARGE_STATE = "charge_state"
     CHILD_LOCK = "child_lock"  # Child lock
     CISTERN = "cistern"
     CLEAN_AREA = "clean_area"
@@ -309,6 +314,7 @@ class XTDPCode(StrEnum):
     CONTROL_BACK = "control_back"
     CONTROL_BACK_MODE = "control_back_mode"
     COOK_TEMPERATURE = "cook_temperature"
+    COOK_TEMPERATURE_2 = "cook_temperature_2"
     COOK_TIME = "cook_time"
     COUNTDOWN = "countdown"  # Countdown
     COUNTDOWN_1 = "countdown_1"
@@ -322,16 +328,23 @@ class XTDPCode(StrEnum):
     COUNTDOWN_LEFT = "countdown_left"
     COUNTDOWN_SET = "countdown_set"  # Countdown setting
     CRY_DETECTION_SWITCH = "cry_detection_switch"
+    CUML_E_EXPORT_OFFGRID1 = "cuml_e_export_offgrid1"
+    CUMULATIVE_ENERGY_CHARGED = "cumulative_energy_charged"
+    CUMULATIVE_ENERGY_DISCHARGED = "cumulative_energy_discharged"
+    CUMULATIVE_ENERGY_GENERATED_PV = "cumulative_energy_generated_pv"
+    CUMULATIVE_ENERGY_OUTPUT_INV = "cumulative_energy_output_inv"
     CUP_NUMBER = "cup_number"  # NUmber of cups
     CUR_CURRENT = "cur_current"  # Actual current
     CUR_NEUTRAL = "cur_neutral"  # Total reverse energy
     CUR_POWER = "cur_power"  # Actual power
     CUR_VOLTAGE = "cur_voltage"  # Actual voltage
+    CURRENT_SOC = "current_soc"
     DECIBEL_SENSITIVITY = "decibel_sensitivity"
     DECIBEL_SWITCH = "decibel_switch"
     DEHUMIDITY_SET_ENUM = "dehumidify_set_enum"
     DEHUMIDITY_SET_VALUE = "dehumidify_set_value"
     DELAY_SET = "delay_set"
+    DEW_POINT_TEMP = "dew_point_temp"
     DISINFECTION = "disinfection"
     DO_NOT_DISTURB = "do_not_disturb"
     DOORCONTACT_STATE = "doorcontact_state"  # Status of door window sensor
@@ -341,6 +354,8 @@ class XTDPCode(StrEnum):
     ECO2 = "eco2"
     EDGE_BRUSH = "edge_brush"
     ELECTRICITY_LEFT = "electricity_left"
+    EXCRETION_TIME_DAY = "excretion_time_day"
+    EXCRETION_TIMES_DAY = "excretion_times_day"
     FAN_BEEP = "fan_beep"  # Sound
     FAN_COOL = "fan_cool"  # Cool wind
     FAN_DIRECTION = "fan_direction"  # Fan direction
@@ -355,6 +370,8 @@ class XTDPCode(StrEnum):
     FAULT = "fault"
     FEED_REPORT = "feed_report"
     FEED_STATE = "feed_state"
+    FEEDIN_POWER_LIMIT_ENABLE = "feedin_power_limit_enable"
+    FEELLIKE_TEMP = "feellike_temp"
     FILTER = "filter"
     FILTER_DURATION = "filter_life"  # Filter duration (hours)
     FILTER_LIFE = "filter"  # Filter life (percentage)
@@ -366,6 +383,7 @@ class XTDPCode(StrEnum):
     GAS_SENSOR_STATE = "gas_sensor_state"
     GAS_SENSOR_STATUS = "gas_sensor_status"
     GAS_SENSOR_VALUE = "gas_sensor_value"
+    HEAT_INDEX = "heat_index"
     HUMIDIFIER = "humidifier"  # Humidification
     HUMIDITY = "humidity"  # Humidity
     HUMIDITY_CURRENT = "humidity_current"  # Current humidity
@@ -377,6 +395,7 @@ class XTDPCode(StrEnum):
     HUMIDITY_SET = "humidity_set"  # Humidity setting
     HUMIDITY_VALUE = "humidity_value"  # Humidity
     INSTALLATION_HEIGHT = "installation_height"
+    INVERTER_OUTPUT_POWER = "inverter_output_power"
     IPC_WORK_MODE = "ipc_work_mode"
     LED_TYPE_1 = "led_type_1"
     LED_TYPE_2 = "led_type_2"
@@ -409,6 +428,7 @@ class XTDPCode(StrEnum):
     MUFFLING = "muffling"  # Muffling
     NEAR_DETECTION = "near_detection"
     OPPOSITE = "opposite"
+    OUTPUT_POWER_LIMIT = "output_power_limit"
     OXYGEN = "oxygen"  # Oxygen bar
     PAUSE = "pause"
     PERCENT_CONTROL = "percent_control"
@@ -437,9 +457,13 @@ class XTDPCode(StrEnum):
     PRESENCE_STATE = "presence_state"
     PRESSURE_STATE = "pressure_state"
     PRESSURE_VALUE = "pressure_value"
+    PRO_ADD_ELE = "pro_add_ele"  # Produce energy
     PUMP = "pump"
     PUMP_RESET = "pump_reset"  # Water pump reset
     PUMP_TIME = "pump_time"  # Water pump duration
+    PV_POWER_CHANNEL_1 = "pv_power_channel_1"
+    PV_POWER_CHANNEL_2 = "pv_power_channel_2"
+    PV_POWER_TOTAL = "pv_power_total"
     RAIN_24H = "rain_24h"  # Total daily rainfall in mm
     RAIN_RATE = "rain_rate"  # Rain intensity in mm/h
     RECORD_MODE = "record_mode"
@@ -466,6 +490,7 @@ class XTDPCode(StrEnum):
     SMOKE_SENSOR_STATE = "smoke_sensor_state"
     SMOKE_SENSOR_STATUS = "smoke_sensor_status"
     SMOKE_SENSOR_VALUE = "smoke_sensor_value"
+    SNOOZE = "snooze"
     SOS = "sos"  # Emergency State
     SOS_STATE = "sos_state"  # Emergency mode
     SPEED = "speed"  # Speed level
@@ -506,6 +531,7 @@ class XTDPCode(StrEnum):
     SWITCH_MODE7 = "switch_mode7"
     SWITCH_MODE8 = "switch_mode8"
     SWITCH_MODE9 = "switch_mode9"
+    SWITCH_MUSIC = "switch_music"
     SWITCH_NIGHT_LIGHT = "switch_night_light"
     SWITCH_SAVE_ENERGY = "switch_save_energy"
     SWITCH_SOUND = "switch_sound"  # Voice switch
@@ -519,12 +545,14 @@ class XTDPCode(StrEnum):
     SWITCH_VERTICAL = "switch_vertical"  # Vertical swing flap switch
     SWITCH_VOICE = "switch_voice"  # Voice switch
     TARGET_DIS_CLOSEST = "target_dis_closest"  # Closest target distance
+    TDS_IN = "tds_in"  # Total dissolved solids
     TEMP = "temp"  # Temperature setting
     TEMP_BOILING_C = "temp_boiling_c"
     TEMP_BOILING_F = "temp_boiling_f"
     TEMP_CONTROLLER = "temp_controller"
     TEMP_CORRECTION = "temp_correction"
     TEMP_CURRENT = "temp_current"  # Current temperature in °C
+    TEMP_CURRENT_2 = "temp_current_2"
     TEMP_CURRENT_EXTERNAL = (
         "temp_current_external"  # Current external temperature in Celsius
     )
@@ -558,6 +586,7 @@ class XTDPCode(StrEnum):
     TOTAL_POWER = "total_power"
     TOTAL_TIME = "total_time"
     TVOC = "tvoc"
+    UP_DOWN = "up_down"
     UPPER_TEMP = "upper_temp"
     UPPER_TEMP_F = "upper_temp_f"
     UV = "uv"  # UV sterilization
@@ -584,6 +613,7 @@ class XTDPCode(StrEnum):
     WET = "wet"  # Humidification
     WINDOW_CHECK = "window_check"
     WINDOW_STATE = "window_state"
+    WINDCHILL_INDEX = "windchill_index"
     WINDSPEED = "windspeed"
     WINDSPEED_AVG = "windspeed_avg"
     WIND_DIRECT = "wind_direct"
@@ -603,7 +633,6 @@ class XTDPCode(StrEnum):
     ACTIVEPOWERB = "ActivePowerB"
     ACTIVEPOWERC = "ActivePowerC"
     ACV = "ACV"
-    ADD_ELE = "add_ele"  # Added watt since last heartbeat
     ADD_ELE_THIS_MONTH = "add_ele_this_month"
     ADD_ELE_THIS_YEAR = "add_ele_this_year"
     ADD_ELE_TODAY = "add_ele_today"
@@ -620,8 +649,8 @@ class XTDPCode(StrEnum):
     A_CURRENT = "A_Current"
     A_VOLTAGE = "A_Voltage"
     BACKLIGHT_SWITCH = "backlight_switch"
+    BAG_CHANGE_MODE = "bag_change_mode"
     BALANCE_ENERGY = "balance_energy"
-    BATTERY_POWER = "battery_power"
     BEEP = "beep"
     BEEP_VOLUME = "beep_volume"
     BLUETOOTH_UNLOCK = "bluetooth_unlock"
@@ -637,7 +666,6 @@ class XTDPCode(StrEnum):
     CALIBRATION = "calibration"
     CAPACITY_CALIBRATION = "capacity_calibration"
     CAPACITY_UNIT = "capacity_unit"
-    CAT_WEIGHT = "cat_weight"
     CDS = "cds"
     # Channel data points for multi-sensor devices
     CH_0 = "ch_0"  # Channel 0 sensor data
@@ -656,6 +684,7 @@ class XTDPCode(StrEnum):
     CHARGE_ENERGY = "charge_energy"
     CHARGE_ENERGY_ONCE = "charge_energy_once"
     CHARGINGOPERATION = "ChargingOperation"
+    CHOOSE_CAT_LITTER = "choose_cat_litter"
     CLEAN = "clean"
     CLEAN_NOTICE = "Clean_notice"
     CLEAN_TASTE = "Clean_taste"
@@ -683,6 +712,7 @@ class XTDPCode(StrEnum):
     CYC_NUM = "cyc_num"
     C_CURRENT = "C_Current"
     C_VOLTAGE = "C_Voltage"
+    DEEP_CLEAN = "deep_clean"
     DELAY_CLEAN_TIME = "delay_clean_time"
     DELAY_TASK = "delay_task"
     DEODORIZATION = "deodorization"
@@ -714,8 +744,6 @@ class XTDPCode(StrEnum):
     ENERGYCONSUMEDA = "EnergyConsumedA"
     ENERGYCONSUMEDB = "EnergyConsumedB"
     ENERGYCONSUMEDC = "EnergyConsumedC"
-    EXCRETION_TIME_DAY = "excretion_time_day"
-    EXCRETION_TIMES_DAY = "excretion_times_day"
     FACTORY_RESET = "factory_reset"
     FAULT2 = "Fault"
     FLOW_VELOCITY = "flow_velocity"
@@ -736,10 +764,12 @@ class XTDPCode(StrEnum):
     INDUCTION_CLEAN = "Induction_Clean"
     INDUCTION_DELAY = "induction_delay"
     INDUCTION_INTERVAL = "induction_interval"
+    INFRARED_SENSOR_SWITCH = "infrared_sensor_switch"
     IR_CONTROL = "ir_control"
     KEY_REC = "key_rec"
     KEY_TONE = "key_tone"
     KILL = "kill"
+    LEVEL_CAT_LITTER = "level_cat_litter"
     LDR = "ldr"
     LOCK_MOTOR_STATE = "lock_motor_state"
     LOCK_RECORD = "lock_record"
@@ -876,6 +906,7 @@ class XTDPCode(StrEnum):
     TEMP_SET_1 = "temp_set_1"  # Set the warm temperature in °C
     TEMP_TOP = "temp_top"
     TEMP_UNIT = "temp_unit"
+    THIN_FECES = "thin_feces"
     TIME = "time"
     TOILET_NOTICE = "toilet_notice"
     TIME_GET_IN_BED = "time_get_in_bed"

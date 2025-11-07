@@ -4,7 +4,7 @@ from homeassistant.config_entries import ConfigEntry
 from .const import (
     DOMAIN_ORIG,
 )
-from ...util import (
+from ....util import (
     ConfigEntryRuntimeData,
     get_overriden_config_entry,
     get_config_entry_runtime_data,

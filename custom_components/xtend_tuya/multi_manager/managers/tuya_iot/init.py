@@ -17,16 +17,16 @@ from .xt_tuya_iot_openapi import (
 from .xt_tuya_iot_manager import (
     XTIOTDeviceManager,
 )
-from ..shared.interface.device_manager import (
+from ...shared.interface.device_manager import (
     XTDeviceManagerInterface,
     IssueSeverity,
     WebRTCSendMessage,
 )
-from ..shared.shared_classes import (
+from ...shared.shared_classes import (
     XTConfigEntry,
     XTDeviceMap,
 )
-from ..shared.threading import (
+from ...shared.threading import (
     XTEventLoopProtector,
 )
 from .const import (
@@ -49,11 +49,11 @@ from .xt_tuya_iot_mq import (
 from .xt_tuya_iot_home_manager import (
     XTIOTHomeManager,
 )
-from ..multi_manager import (
+from ...multi_manager import (
     MultiManager,
     XTDevice,
 )
-from ...const import (
+from ....const import (
     DOMAIN,
     MESSAGE_SOURCE_TUYA_IOT,
     LOGGER,

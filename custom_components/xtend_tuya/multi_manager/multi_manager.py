@@ -66,7 +66,6 @@ from ..entity_parser.entity_parser import (
 )
 import custom_components.xtend_tuya.multi_manager.shared.data_entry.shared_data_entry as shared_data_entry
 
-
 class MultiManager:  # noqa: F811
     def __init__(self, hass: HomeAssistant, config_entry: XTConfigEntry) -> None:
         self.config_entry = config_entry
@@ -121,7 +120,7 @@ class MultiManager:  # noqa: F811
         concurrency_manager = XTConcurrencyManager()
         for directory in subdirs:
             if os.path.isdir(os.path.dirname(__file__) + os.sep + directory):
-                load_path = f".{directory}.init"
+                load_path = f".managers.{directory}.init"
                 try:
                     plugin = (
                         await XTEventLoopProtector.execute_out_of_event_loop_and_return(

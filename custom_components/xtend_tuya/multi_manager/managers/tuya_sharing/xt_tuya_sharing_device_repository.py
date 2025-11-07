@@ -1,21 +1,21 @@
 from __future__ import annotations
 from typing import Any
-from tuya_sharing.customerapi import (
-    CustomerApi,
-)
 from tuya_sharing.device import (
     CustomerDevice,
     DeviceRepository,
 )
-import custom_components.xtend_tuya.multi_manager.tuya_sharing.xt_tuya_sharing_manager as sm
-from ..multi_manager import (
+import custom_components.xtend_tuya.multi_manager.managers.tuya_sharing.xt_tuya_sharing_manager as sm
+from .xt_tuya_sharing_api import (
+    XTSharingAPI,
+)
+from ...multi_manager import (
     MultiManager,
 )
-from ..shared.shared_classes import (
+from ...shared.shared_classes import (
     XTDeviceFunction,
     XTDeviceStatusRange,
 )
-from ..shared.threading import (
+from ...shared.threading import (
     XTThreadingManager,
 )
 
@@ -23,13 +23,14 @@ from ..shared.threading import (
 class XTSharingDeviceRepository(DeviceRepository):
     def __init__(
         self,
-        customer_api: CustomerApi,
+        customer_api: XTSharingAPI,
         manager: sm.XTSharingDeviceManager,
         multi_manager: MultiManager,
     ):
         super().__init__(customer_api)
         self.manager = manager
         self.multi_manager = multi_manager
+        self.api = customer_api
 
     def update_device_specification(self, device: CustomerDevice):
         super().update_device_specification(device)

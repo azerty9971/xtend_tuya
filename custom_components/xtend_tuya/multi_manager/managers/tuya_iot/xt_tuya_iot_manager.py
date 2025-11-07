@@ -18,7 +18,7 @@ from tuya_iot.tuya_enums import (
     AuthType,
 )
 from typing import Any, cast
-from ...const import (
+from ....const import (
     LOGGER,
     MESSAGE_SOURCE_TUYA_IOT,
     XTDeviceSourcePriority,
@@ -27,23 +27,23 @@ from ...const import (
     XTIRRemoteInformation,
     XTIRRemoteKeysInformation,
 )
-from ..shared.shared_classes import (
+from ...shared.shared_classes import (
     XTDevice,
     XTDeviceFunction,
     XTDeviceStatusRange,
     XTDeviceMap,
 )
-from ..shared.threading import (
+from ...shared.threading import (
     XTConcurrencyManager,
     XTEventLoopProtector,
 )
-from ..shared.merging_manager import (
+from ...shared.merging_manager import (
     XTMergingManager,
 )
-from ..multi_manager import (
+from ...multi_manager import (
     MultiManager,  # noqa: F811
 )
-from ...entity import XTEntity
+from ....entity import XTEntity
 from .ipc.xt_tuya_iot_ipc_manager import XTIOTIPCManager
 from .xt_tuya_iot_openapi import (
     XTIOTOpenAPI,

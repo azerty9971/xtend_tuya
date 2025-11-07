@@ -1,15 +1,15 @@
 from __future__ import annotations
-from ...multi_manager import (
+from ....multi_manager import (
     MultiManager,
 )
 from ..xt_tuya_iot_openapi import (
     XTIOTOpenAPI,
 )
-import custom_components.xtend_tuya.multi_manager.tuya_iot.ipc.xt_tuya_iot_ipc_listener as ipc
+import custom_components.xtend_tuya.multi_manager.managers.tuya_iot.ipc.xt_tuya_iot_ipc_listener as ipc
 from .xt_tuya_iot_ipc_mq import (
     XTIOTOpenMQIPC,
 )
-import custom_components.xtend_tuya.multi_manager.tuya_iot.ipc.webrtc.xt_tuya_iot_webrtc_manager as webrtc_man
+import custom_components.xtend_tuya.multi_manager.managers.tuya_iot.ipc.webrtc.xt_tuya_iot_webrtc_manager as webrtc_man
 
 
 class XTIOTIPCManager:  # noqa: F811

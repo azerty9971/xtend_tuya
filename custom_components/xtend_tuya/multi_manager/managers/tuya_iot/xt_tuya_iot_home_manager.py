@@ -6,10 +6,10 @@ from tuya_iot import (
 )
 from tuya_iot.asset import TuyaAssetManager
 from tuya_iot.tuya_enums import AuthType
-from ..multi_manager import (
+from ...multi_manager import (
     MultiManager,
 )
-from ..shared.threading import (
+from ...shared.threading import (
     XTConcurrencyManager,
     XTEventLoopProtector,
 )

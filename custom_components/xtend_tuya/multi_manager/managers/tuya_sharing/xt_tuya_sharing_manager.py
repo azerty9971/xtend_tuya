@@ -9,7 +9,6 @@ from tuya_sharing.manager import (
     Manager,
     SceneRepository,
     UserRepository,
-    CustomerApi,
     BIZCODE_OFFLINE,
     BIZCODE_ONLINE,
     BIZCODE_BIND_USER,
@@ -18,19 +17,22 @@ from tuya_sharing.home import (
     SmartLifeHome,
     HomeRepository,
 )
-from ...const import (
+from .xt_tuya_sharing_api import (
+    XTSharingAPI,
+)
+from ....const import (
     MESSAGE_SOURCE_TUYA_SHARING,
     XTDeviceSourcePriority,
 )
-from ..multi_manager import (
+from ...multi_manager import (
     MultiManager,
 )
-from ..shared.shared_classes import (
+from ...shared.shared_classes import (
     XTDevice,
     XTDeviceMap,
 )
-import custom_components.xtend_tuya.multi_manager.tuya_sharing.xt_tuya_sharing_device_repository as dr
-import custom_components.xtend_tuya.multi_manager.tuya_sharing.xt_tuya_sharing_mq as mq
+import custom_components.xtend_tuya.multi_manager.managers.tuya_sharing.xt_tuya_sharing_device_repository as dr
+import custom_components.xtend_tuya.multi_manager.managers.tuya_sharing.xt_tuya_sharing_mq as mq
 
 
 class XTSharingDeviceManager(Manager):  # noqa: F811
@@ -43,7 +45,7 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
         self.multi_manager = multi_manager
         self.terminal_id: str | None = None
         self.mq = None
-        self.customer_api: CustomerApi | None = None
+        self.customer_api: XTSharingAPI | None = None
         self.home_repository: HomeRepository | None = None
         self.device_repository: dr.XTSharingDeviceRepository | None = None
         self.scene_repository: SceneRepository | None = None
