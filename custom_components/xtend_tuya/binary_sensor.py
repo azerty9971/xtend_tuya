@@ -152,6 +152,14 @@ BINARY_SENSORS: dict[str, tuple[XTBinarySensorEntityDescription, ...]] = {
             translation_key="power",
             entity_registry_enabled_default=False,
         ),
+        XTBinarySensorEntityDescription(
+            key=XTDPCode.MONITORING,
+            device_class=BinarySensorDeviceClass.PRESENCE,
+            entity_category=EntityCategory.DIAGNOSTIC,
+            translation_key="litter_occupied",
+            entity_registry_enabled_default=False,
+        ),
+
     ),
     # QT-08W Solar Intelligent Water Valve
     "sfkzq": (

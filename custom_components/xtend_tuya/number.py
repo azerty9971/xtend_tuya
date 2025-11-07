@@ -477,6 +477,18 @@ NUMBERS: dict[str, tuple[XTNumberEntityDescription, ...]] = {
             translation_key="deo_end_time",
             entity_category=EntityCategory.CONFIG,
         ),
+        XTNumberEntityDescription(
+            key=XTDPCode.INDUCTION_DELAY,
+            translation_key="induction_delay",
+            device_class=NumberDeviceClass.DURATION,
+            entity_category=EntityCategory.CONFIG,
+        ),
+        XTNumberEntityDescription(
+            key=XTDPCode.INDUCTION_INTERVAL,
+            translation_key="induction_interval",
+            device_class=NumberDeviceClass.DURATION,
+            entity_category=EntityCategory.CONFIG,
+        ),
     ),
     "mzj": (
         XTNumberEntityDescription(

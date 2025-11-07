@@ -185,9 +185,9 @@ SELECTS: dict[str, tuple[XTSelectEntityDescription, ...]] = {
             entity_category=EntityCategory.CONFIG,
         ),
         XTSelectEntityDescription(
-            key=XTDPCode.STATUS,
-            translation_key="cat_litter_box_status",
-            entity_category=EntityCategory.DIAGNOSTIC,
+            key=XTDPCode.CHOOSE_CAT_LITTER,
+            translation_key="cat_litter_type",
+            entity_category=EntityCategory.CONFIG,
         ),
         XTSelectEntityDescription(
             key=XTDPCode.WORK_MODE,
