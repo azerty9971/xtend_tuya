@@ -142,10 +142,11 @@ BINARY_SENSORS: dict[str, tuple[XTBinarySensorEntityDescription, ...]] = {
             translation_key="cleaning_num",
         ),
         XTBinarySensorEntityDescription(
-            key=XTDPCode.TRASH_STATUS,
-            translation_key="trash_status",
-            entity_registry_enabled_default=True,
-            on_value="1",
+            key=XTDPCode.MONITORING,
+            device_class=BinarySensorDeviceClass.PRESENCE,
+            entity_category=EntityCategory.DIAGNOSTIC,
+            translation_key="litter_occupied",
+            entity_registry_enabled_default=False,
         ),
         XTBinarySensorEntityDescription(
             key=XTDPCode.POWER,
@@ -153,23 +154,15 @@ BINARY_SENSORS: dict[str, tuple[XTBinarySensorEntityDescription, ...]] = {
             entity_registry_enabled_default=False,
         ),
         XTBinarySensorEntityDescription(
-            key=XTDPCode.MONITORING,
-            device_class=BinarySensorDeviceClass.PRESENCE,
-            entity_category=EntityCategory.DIAGNOSTIC,
-            translation_key="litter_occupied",
-            entity_registry_enabled_default=False,
+            key=XTDPCode.TRASH_STATUS,
+            translation_key="trash_status",
+            entity_registry_enabled_default=True,
+            on_value="1",
         ),
 
     ),
     # QT-08W Solar Intelligent Water Valve
     "sfkzq": (
-        XTBinarySensorEntityDescription(
-            key=XTDPCode.VBAT_STATE,
-            translation_key="battery_charging",
-            device_class=BinarySensorDeviceClass.BATTERY_CHARGING,
-            entity_category=EntityCategory.DIAGNOSTIC,
-            is_on=lambda x: x > 127,
-        ),
         XTBinarySensorEntityDescription(
             key=XTDPCode.MALFUNCTION,
             translation_key="error",
@@ -225,8 +218,19 @@ BINARY_SENSORS: dict[str, tuple[XTBinarySensorEntityDescription, ...]] = {
             entity_category=EntityCategory.DIAGNOSTIC,
             is_on=lambda x: (x >> 5) & 1,
         ),
+        XTBinarySensorEntityDescription(
+            key=XTDPCode.VBAT_STATE,
+            translation_key="battery_charging",
+            device_class=BinarySensorDeviceClass.BATTERY_CHARGING,
+            entity_category=EntityCategory.DIAGNOSTIC,
+            is_on=lambda x: x > 127,
+        ),
     ),
     "smd": (
+        XTBinarySensorEntityDescription(
+            key=XTDPCode.OFF,
+            translation_key="off",
+        ),
         XTBinarySensorEntityDescription(
             key=XTDPCode.OFF_BED,
             translation_key="off_bed",
@@ -234,10 +238,6 @@ BINARY_SENSORS: dict[str, tuple[XTBinarySensorEntityDescription, ...]] = {
         XTBinarySensorEntityDescription(
             key=XTDPCode.WAKEUP,
             translation_key="wakeup",
-        ),
-        XTBinarySensorEntityDescription(
-            key=XTDPCode.OFF,
-            translation_key="off",
         ),
     ),
 }

@@ -956,11 +956,32 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
             entity_registry_enabled_default=True,
         ),
     ),
-    "pir": (
+    # Formaldehyde Detector
+    # Note: Not documented
+    "jqbj": (
         XTSensorEntityDescription(
-            key=XTDPCode.ILLUMINANCE_VALUE,
-            translation_key="illuminance_value",
-            device_class=SensorDeviceClass.ILLUMINANCE,
+            key=XTDPCode.CH2O_STATE,
+            translation_key="air_quality",
+            entity_registry_enabled_default=True,
+        ),
+        XTSensorEntityDescription(
+            key=XTDPCode.PM25_VALUE,
+            translation_key="pm25",
+            device_class=SensorDeviceClass.PM25,
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_registry_enabled_default=True,
+        ),
+        XTSensorEntityDescription(
+            key=XTDPCode.CO2_VALUE,
+            translation_key="carbon_dioxide",
+            device_class=SensorDeviceClass.CO2,
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_registry_enabled_default=True,
+        ),
+        XTSensorEntityDescription(
+            key=XTDPCode.PM10,
+            translation_key="pm10",
+            device_class=SensorDeviceClass.PM10,
             state_class=SensorStateClass.MEASUREMENT,
             entity_registry_enabled_default=True,
         ),
@@ -1020,36 +1041,6 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
     "ms": (
         *BATTERY_SENSORS,
         *LOCK_SENSORS,
-    ),
-    # Formaldehyde Detector
-    # Note: Not documented
-    "jqbj": (
-        XTSensorEntityDescription(
-            key=XTDPCode.CH2O_STATE,
-            translation_key="air_quality",
-            entity_registry_enabled_default=True,
-        ),
-        XTSensorEntityDescription(
-            key=XTDPCode.PM25_VALUE,
-            translation_key="pm25",
-            device_class=SensorDeviceClass.PM25,
-            state_class=SensorStateClass.MEASUREMENT,
-            entity_registry_enabled_default=True,
-        ),
-        XTSensorEntityDescription(
-            key=XTDPCode.CO2_VALUE,
-            translation_key="carbon_dioxide",
-            device_class=SensorDeviceClass.CO2,
-            state_class=SensorStateClass.MEASUREMENT,
-            entity_registry_enabled_default=True,
-        ),
-        XTSensorEntityDescription(
-            key=XTDPCode.PM10,
-            translation_key="pm10",
-            device_class=SensorDeviceClass.PM10,
-            state_class=SensorStateClass.MEASUREMENT,
-            entity_registry_enabled_default=True,
-        ),
     ),
     # Automatic cat litter box
     # Note: Undocumented
@@ -1111,17 +1102,17 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
             entity_registry_enabled_default=True,
         ),
         XTSensorEntityDescription(
-            key=XTDPCode.EXCRETION_TIMES_DAY,
-            translation_key="excretion_times_day",
-            state_class=SensorStateClass.MEASUREMENT,
-            entity_registry_enabled_default=True,
-        ),
-        XTSensorEntityDescription(
             key=XTDPCode.EXCRETION_TIME_DAY,
             translation_key="excretion_time_day",
             device_class=SensorDeviceClass.DURATION,
             state_class=SensorStateClass.MEASUREMENT,
             native_unit_of_measurement=UnitOfTime.SECONDS,
+            entity_registry_enabled_default=True,
+        ),
+        XTSensorEntityDescription(
+            key=XTDPCode.EXCRETION_TIMES_DAY,
+            translation_key="excretion_times_day",
+            state_class=SensorStateClass.MEASUREMENT,
             entity_registry_enabled_default=True,
         ),
         XTSensorEntityDescription(
@@ -1261,26 +1252,35 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
     ),
     "mzj": (
         XTSensorEntityDescription(
-            key=XTDPCode.WORK_STATUS,
-            translation_key="mzj_work_status",
-            entity_registry_enabled_default=True,
-        ),
-        XTSensorEntityDescription(
             key=XTDPCode.REMAININGTIME,
             translation_key="remaining_time",
             entity_registry_enabled_default=True,
         ),
+        XTSensorEntityDescription(
+            key=XTDPCode.WORK_STATUS,
+            translation_key="mzj_work_status",
+            entity_registry_enabled_default=True,
+        ),
         *TEMPERATURE_SENSORS,
+    ),
+    "pir": (
+        XTSensorEntityDescription(
+            key=XTDPCode.ILLUMINANCE_VALUE,
+            translation_key="illuminance_value",
+            device_class=SensorDeviceClass.ILLUMINANCE,
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_registry_enabled_default=True,
+        ),
     ),
     "qccdz": (
         XTSensorEntityDescription(
-            key=XTDPCode.WORK_STATE,
-            translation_key="qccdz_work_state",
+            key=XTDPCode.CONNECTION_STATE,
+            translation_key="qccdz_connection_state",
             entity_registry_enabled_default=True,
         ),
         XTSensorEntityDescription(
-            key=XTDPCode.CONNECTION_STATE,
-            translation_key="qccdz_connection_state",
+            key=XTDPCode.DEVICESTATE,
+            translation_key="qccdz_devicestate",
             entity_registry_enabled_default=True,
         ),
         XTSensorEntityDescription(
@@ -1290,8 +1290,8 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
             entity_registry_visible_default=False,
         ),
         XTSensorEntityDescription(
-            key=XTDPCode.DEVICESTATE,
-            translation_key="qccdz_devicestate",
+            key=XTDPCode.WORK_STATE,
+            translation_key="qccdz_work_state",
             entity_registry_enabled_default=True,
         ),
         *CONSUMPTION_SENSORS,
