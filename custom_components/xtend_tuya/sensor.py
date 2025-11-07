@@ -15,6 +15,7 @@ from homeassistant.components.sensor.const import (
 )
 from homeassistant.const import (
     UnitOfEnergy,
+    UnitOfTime,
     Platform,
     PERCENTAGE,
     EntityCategory,
@@ -1120,6 +1121,7 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
             translation_key="excretion_time_day",
             device_class=SensorDeviceClass.DURATION,
             state_class=SensorStateClass.MEASUREMENT,
+            native_unit_of_measurement=UnitOfTime.SECONDS,
             entity_registry_enabled_default=True,
         ),
         XTSensorEntityDescription(
@@ -1206,6 +1208,13 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
             key=XTDPCode.SMART_CLEAN,
             translation_key="smart_clean",
             state_class=SensorStateClass.MEASUREMENT,
+            entity_registry_enabled_default=True,
+        ),
+        XTSensorEntityDescription(
+            key=XTDPCode.STATUS,
+            translation_key="cat_litter_box_status",
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_category=EntityCategory.DIAGNOSTIC,
             entity_registry_enabled_default=True,
         ),
         XTSensorEntityDescription(

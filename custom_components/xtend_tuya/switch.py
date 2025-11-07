@@ -246,16 +246,15 @@ SWITCHES: dict[str, tuple[XTSwitchEntityDescription, ...]] = {
             entity_category=EntityCategory.CONFIG,
         ),
         XTSwitchEntityDescription(
+            key=XTDPCode.DEEP_CLEAN,
+            translation_key="deep_clean",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        XTSwitchEntityDescription(
             key=XTDPCode.DEODORIZATION,
             translation_key="deodorization",
             entity_category=EntityCategory.CONFIG,
             icon="mdi:bacteria",
-        ),
-        XTSwitchEntityDescription(
-            key=XTDPCode.FACTORY_RESET,
-            translation_key="factory_reset",
-            entity_category=EntityCategory.CONFIG,
-            entity_registry_enabled_default=False,
         ),
         XTSwitchEntityDescription(
             key=XTDPCode.INDICATOR_LIGHT,
@@ -268,13 +267,8 @@ SWITCHES: dict[str, tuple[XTSwitchEntityDescription, ...]] = {
             entity_category=EntityCategory.CONFIG,
         ),
         XTSwitchEntityDescription(
-            key=XTDPCode.LIGHT,
-            translation_key="light",
-            entity_category=EntityCategory.CONFIG,
-        ),
-        XTSwitchEntityDescription(
-            key=XTDPCode.MANUAL_CLEAN,
-            translation_key="manual_clean",
+            key=XTDPCode.INFRARED_SENSOR_SWITCH,
+            translation_key="infrared_sensor_switch",
             entity_category=EntityCategory.CONFIG,
         ),
         XTSwitchEntityDescription(
@@ -304,8 +298,13 @@ SWITCHES: dict[str, tuple[XTSwitchEntityDescription, ...]] = {
             entity_category=EntityCategory.CONFIG,
         ),
         XTSwitchEntityDescription(
+            key=XTDPCode.THIN_FECES,
+            translation_key="thin_feces",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        XTSwitchEntityDescription(
             key=XTDPCode.REBOOT,
-            translation_key="child_lock",
+            translation_key="reboot",
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False,
         ),
