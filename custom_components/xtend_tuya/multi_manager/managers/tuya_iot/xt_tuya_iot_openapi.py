@@ -7,15 +7,15 @@ import hashlib
 import hmac
 from typing import Any
 from datetime import datetime
-from tuya_iot import (
+from ....lib.tuya_iot import (
     TuyaOpenAPI,
     TuyaTokenInfo,
 )
 from homeassistant.core import (
     HomeAssistant,
 )
-from tuya_iot.tuya_enums import AuthType
-from tuya_iot.version import VERSION
+from ....lib.tuya_iot.tuya_enums import AuthType
+from ....lib.tuya_iot.version import VERSION
 from ....const import (
     LOGGER,
 )

@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import time
-from abc import ABCMeta, abstractclassmethod
+from abc import ABCMeta, abstractmethod
 from types import SimpleNamespace
 from typing import Any, Literal, Optional
 
@@ -111,7 +111,7 @@ class TuyaDevice(SimpleNamespace):
 class TuyaDeviceListener(metaclass=ABCMeta):
     """Tuya device listener."""
 
-    @abstractclassmethod
+    @abstractmethod
     def update_device(self, device: TuyaDevice):
         """Update device info.
 
@@ -120,7 +120,7 @@ class TuyaDeviceListener(metaclass=ABCMeta):
         """
         pass
 
-    @abstractclassmethod
+    @abstractmethod
     def add_device(self, device: TuyaDevice):
         """Device Added.
 
@@ -129,7 +129,7 @@ class TuyaDeviceListener(metaclass=ABCMeta):
         """
         pass
 
-    @abstractclassmethod
+    @abstractmethod
     def remove_device(self, device_id: str):
         """Device removed.
 
@@ -164,7 +164,7 @@ class TuyaDeviceManager:
         """Remove mqtt listener after object del."""
         self.mq.remove_message_listener(self.on_message)
 
-    def on_message(self, msg: str):
+    def on_message(self, msg: dict):
         logger.debug(f"mq receive-> {msg}")
         protocol = msg.get("protocol", 0)
         data = msg.get("data", {})
@@ -241,7 +241,8 @@ class TuyaDeviceManager:
             for item in response["result"]:
                 device = TuyaDevice(**item)
                 status = {}
-                for item_status in device.status:
+                response_status = item.get("status", [])
+                for item_status in response_status:
                     if "code" in item_status and "value" in item_status:
                         code = item_status["code"]
                         value = item_status["value"]
@@ -380,7 +381,7 @@ class TuyaDeviceManager:
         """
         return self.device_manage.remove_device_list(devIds)
 
-    def get_factory_info(self, device_id: str) -> dict[str, Any]:
+    def get_factory_info(self, device_id: list[str]) -> dict[str, Any]:
         """Get device's factory info.
 
         Args:
@@ -456,7 +457,7 @@ class TuyaDeviceManager:
         """
         return self.device_manage.get_category_functions(categoryId)
 
-    def get_device_specification(self, device_id: str) -> dict[str, str]:
+    def get_device_specification(self, device_id: str) -> dict[str, Any]:
         """Get device specification attributes.
 
         Obtain device specification attributes according to device ID, including command set and status set.
@@ -512,67 +513,67 @@ class DeviceManage(metaclass=ABCMeta):
     def __init__(self, api: TuyaOpenAPI):
         self.api = api
 
-    @abstractclassmethod
-    def update_device_caches(self, devIds: list[str]):
+    @abstractmethod
+    def update_device_caches(self, device_ids: list[str]):
         pass
 
-    @abstractclassmethod
+    @abstractmethod
     def get_device_info(self, device_id: str) -> dict[str, Any]:
         pass
 
-    @abstractclassmethod
-    def get_device_list_info(self, devIds: list[str]) -> dict[str, Any]:
+    @abstractmethod
+    def get_device_list_info(self, device_ids: list[str]) -> dict[str, Any]:
         pass
 
-    @abstractclassmethod
+    @abstractmethod
     def get_device_status(self, device_id: str) -> dict[str, Any]:
         pass
 
-    @abstractclassmethod
-    def get_device_list_status(self, devIds: list[str]) -> dict[str, Any]:
+    @abstractmethod
+    def get_device_list_status(self, device_ids: list[str]) -> dict[str, Any]:
         pass
 
-    @abstractclassmethod
-    def get_factory_info(self, device_id: str) -> dict[str, Any]:
+    @abstractmethod
+    def get_factory_info(self, device_ids: list[str]) -> dict[str, Any]:
         pass
 
-    @abstractclassmethod
+    @abstractmethod
     def factory_reset(self, device_id: str) -> dict[str, Any]:
         pass
 
-    @abstractclassmethod
+    @abstractmethod
     def remove_device(self, device_id: str) -> dict[str, Any]:
         pass
 
-    @abstractclassmethod
-    def remove_device_list(self, devIds: list[str]) -> dict[str, Any]:
+    @abstractmethod
+    def remove_device_list(self, device_ids: list[str]) -> dict[str, Any]:
         pass
 
-    @abstractclassmethod
+    @abstractmethod
     def get_device_functions(self, device_id: str) -> dict[str, Any]:
         pass
 
-    @abstractclassmethod
+    @abstractmethod
     def get_category_functions(self, categoryId: str) -> dict[str, Any]:
         pass
 
-    @abstractclassmethod
+    @abstractmethod
     def get_device_specification(self, device_id: str) -> dict[str, str]:
         pass
 
-    @abstractclassmethod
+    @abstractmethod
     def get_device_stream_allocate(
         self, device_id: str, stream_type: Literal["flv", "hls", "rtmp", "rtsp"]
     ) -> Optional[str]:
         pass
 
-    @abstractclassmethod
-    def send_commands(self, device_id: str, commands: list[str]) -> dict[str, Any]:
+    @abstractmethod
+    def send_commands(self, device_id: str, commands: list[dict[str, Any]]) -> dict[str, Any]:
         pass
 
 
 class SmartHomeDeviceManage(DeviceManage):
-    def update_device_caches(self, devIds: list[str]):
+    def update_device_caches(self, device_ids: list[str]):
         pass
 
     def get_device_info(self, device_id: str) -> dict[str, Any]:
@@ -603,9 +604,9 @@ class SmartHomeDeviceManage(DeviceManage):
         response["result"] = status_list
         return response
 
-    def get_factory_info(self, devIds: str) -> dict[str, Any]:
+    def get_factory_info(self, device_ids: list[str]) -> dict[str, Any]:
         return self.api.get(
-            "/v1.0/devices/factory-infos", {"device_ids": ",".join(devIds)}
+            "/v1.0/devices/factory-infos", {"device_ids": ",".join(device_ids)}
         )
 
     def factory_reset(self, device_id: str) -> dict[str, Any]:
@@ -614,7 +615,7 @@ class SmartHomeDeviceManage(DeviceManage):
     def remove_device(self, device_id: str) -> dict[str, Any]:
         return self.api.delete(f"/v1.0/devices/{device_id}")
 
-    def remove_device_list(self, devIds: list[str]) -> dict[str, Any]:
+    def remove_device_list(self, device_ids: list[str]) -> dict[str, Any]:
         raise Exception("Api not support.")
 
     def get_device_functions(self, device_id: str) -> dict[str, Any]:
@@ -624,7 +625,7 @@ class SmartHomeDeviceManage(DeviceManage):
         return self.api.get(f"/v1.0/functions/{categoryId}")
 
     # https://developer.tuya.com/en/docs/cloud/device-control?id=K95zu01ksols7#title-27-Get%20the%20specifications%20and%20properties%20of%20the%20device%2C%20including%20the%20instruction%20set%20and%20status%20set
-    def get_device_specification(self, device_id: str) -> dict[str, str]:
+    def get_device_specification(self, device_id: str) -> dict[str, Any]:
         return self.api.get(f"/v1.0/devices/{device_id}/specifications")
 
     def get_device_stream_allocate(
@@ -652,7 +653,7 @@ class SmartHomeDeviceManage(DeviceManage):
 
 
 class IndustrySolutionDeviceManage(DeviceManage):
-    def update_device_caches(self, devIds: list[str]):
+    def update_device_caches(self, device_ids: list[str]):
         pass
 
     def get_device_info(self, device_id: str) -> dict[str, Any]:
@@ -666,13 +667,13 @@ class IndustrySolutionDeviceManage(DeviceManage):
     def get_device_status(self, device_id: str) -> dict[str, Any]:
         return self.api.get(f"/v1.0/iot-03/devices/{device_id}/status")
 
-    def get_device_list_status(self, devIds: list[str]) -> dict[str, Any]:
+    def get_device_list_status(self, device_ids: list[str]) -> dict[str, Any]:
         return self.api.get(
-            "/v1.0/iot-03/devices/status", {"device_ids": ",".join(devIds)}
+            "/v1.0/iot-03/devices/status", {"device_ids": ",".join(device_ids)}
         )
 
-    def get_factory_info(self, device_id: str) -> dict[str, Any]:
-        return self.api.get("/v1.0/iot-03/devices/factory-infos", device_id)
+    def get_factory_info(self, device_ids: list[str]) -> dict[str, Any]:
+        return self.api.get("/v1.0/iot-03/devices/factory-infos", {"device_ids": ",".join(device_ids)})
 
     def factory_reset(self, device_id: str) -> dict[str, Any]:
         return self.api.delete(f"/v1.0/iot-03/devices/{device_id}/actions/reset")

@@ -1,12 +1,12 @@
 from __future__ import annotations
-from typing import Optional, Any
+from typing import Any
 import uuid
 from paho.mqtt import client as mqtt
 from urllib.parse import urlsplit
-from tuya_iot import (
+from ....lib.tuya_iot import (
     TuyaOpenMQ,
 )
-from tuya_iot.openmq import (
+from ....lib.tuya_iot.openmq import (
     TuyaMQConfig,
     TO_C_CUSTOM_MQTT_CONFIG_API,
     AuthType,
@@ -63,13 +63,13 @@ class XTIOTOpenMQ(TuyaOpenMQ):
             # reconnect every 2 hours required.
             time.sleep(self.mq_config.expire_time - 60)
 
-    def _get_mqtt_config(self, first_pass=True) -> Optional[XTIOTTuyaMQConfig]:
+    def _get_mqtt_config(self, first_pass=True) -> XTIOTTuyaMQConfig:
         # LOGGER.debug(f"[{self.class_id}]Calling _get_mqtt_config")
         if self.api.is_connect() is False and self.api.reconnect() is False:
             # LOGGER.debug(f"_get_mqtt_config failed: not connected", stack_info=True)
-            return None
+            return XTIOTTuyaMQConfig()
         if self.api.token_info is None:
-            return None
+            return XTIOTTuyaMQConfig()
 
         path = (
             TO_C_CUSTOM_MQTT_CONFIG_API
@@ -91,7 +91,7 @@ class XTIOTOpenMQ(TuyaOpenMQ):
             if first_pass:
                 self.api.reconnect()
                 return self._get_mqtt_config(first_pass=False)
-            return None
+            return XTIOTTuyaMQConfig()
 
         return XTIOTTuyaMQConfig(response)
 
@@ -145,7 +145,7 @@ class XTIOTOpenMQ(TuyaOpenMQ):
 
     def __run_mqtt(self):
         mq_config = self._get_mqtt_config()
-        if mq_config is None:
+        if mq_config.is_valid() is False:
             LOGGER.error("error while get mqtt config", stack_info=True)
             return
 

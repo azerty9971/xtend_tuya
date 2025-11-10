@@ -7,7 +7,7 @@ import asyncio
 from typing import Any, Literal, Optional, Callable
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
-from tuya_iot.device import (
+from ..lib.tuya_iot.device import (
     PROTOCOL_DEVICE_REPORT,
     PROTOCOL_OTHER,
 )

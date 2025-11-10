@@ -4,7 +4,7 @@ from typing import (
     Any,
 )
 
-from tuya_iot.device import (
+from ....lib.tuya_iot.device import (
     SmartHomeDeviceManage,
     IndustrySolutionDeviceManage,
 )

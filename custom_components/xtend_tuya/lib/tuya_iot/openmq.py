@@ -8,13 +8,12 @@ import time
 import uuid
 from typing import Any, Callable
 from urllib.parse import urlsplit
-from typing import Optional
 
 from Crypto.Cipher import AES
 from paho.mqtt import client as mqtt
 from requests.exceptions import RequestException
 
-from .openapi import TO_C_SMART_HOME_REFRESH_TOKEN_API, TuyaOpenAPI
+from .openapi import TuyaOpenAPI
 from .openlogging import logger
 from .tuya_enums import AuthType
 
@@ -39,6 +38,12 @@ class TuyaMQConfig:
         self.source_topic = result.get("source_topic", {})
         self.sink_topic = result.get("sink_topic", {})
         self.expire_time = result.get("expire_time", 0)
+    
+    def is_valid(self) -> bool:
+        if self.url != "":
+            return True
+        else:
+            return False
 
 
 class TuyaOpenMQ(threading.Thread):
@@ -56,10 +61,10 @@ class TuyaOpenMQ(threading.Thread):
         self.api: TuyaOpenAPI = api
         self._stop_event = threading.Event()
         self.client = None
-        self.mq_config = None
+        self.mq_config = TuyaMQConfig()
         self.message_listeners = set()
 
-    def _get_mqtt_config(self) -> Optional[TuyaMQConfig]:
+    def _get_mqtt_config(self) -> TuyaMQConfig:
         response = self.api.post(
             TO_C_CUSTOM_MQTT_CONFIG_API
             if (self.api.auth_type == AuthType.CUSTOM)
@@ -76,7 +81,7 @@ class TuyaOpenMQ(threading.Thread):
         )
 
         if response.get("success", False) is False:
-            return None
+            return TuyaMQConfig()
 
         return TuyaMQConfig(response)
 
@@ -173,7 +178,7 @@ class TuyaOpenMQ(threading.Thread):
 
     def __run_mqtt(self):
         mq_config = self._get_mqtt_config()
-        if mq_config is None:
+        if mq_config.is_valid() is False:
             logger.error("error while get mqtt config")
             return
 
@@ -220,14 +225,15 @@ class TuyaOpenMQ(threading.Thread):
         """
         logger.debug("stop")
         self.message_listeners = set()
-        self.client.disconnect()
+        if self.client is not None:
+            self.client.disconnect()
         self.client = None
         self._stop_event.set()
 
-    def add_message_listener(self, listener: Callable[[str], None]):
+    def add_message_listener(self, listener: Callable[[dict], None]):
         """Add mqtt message listener."""
         self.message_listeners.add(listener)
 
-    def remove_message_listener(self, listener: Callable[[str], None]):
+    def remove_message_listener(self, listener: Callable[[dict], None]):
         """Remvoe mqtt message listener."""
         self.message_listeners.discard(listener)

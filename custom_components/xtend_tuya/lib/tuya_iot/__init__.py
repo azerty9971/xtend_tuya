@@ -1,7 +1,7 @@
 from .asset import TuyaAssetManager
 from .device import TuyaDevice, TuyaDeviceListener, TuyaDeviceManager
 from .home import TuyaHomeManager, TuyaScene
-from .infrared import TuyaRemote
+from .infrared import TuyaRemote  # noqa: F401
 from .openapi import TuyaOpenAPI, TuyaTokenInfo
 from .openlogging import TUYA_LOGGER
 from .openmq import TuyaOpenMQ

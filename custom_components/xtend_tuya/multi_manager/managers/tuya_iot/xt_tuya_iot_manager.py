@@ -7,14 +7,14 @@ from __future__ import annotations
 import json
 import datetime
 import time
-from tuya_iot import (
+from ....lib.tuya_iot import (
     TuyaDeviceManager,
     TuyaOpenMQ,
 )
-from tuya_iot.device import (
+from ....lib.tuya_iot.device import (
     BIZCODE_BIND_USER,
 )
-from tuya_iot.tuya_enums import (
+from ....lib.tuya_iot.tuya_enums import (
     AuthType,
 )
 from typing import Any, cast
@@ -239,7 +239,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                 XTMergingManager.merge_devices(device, device_open_api, self.multi_manager)
                 self.multi_manager.virtual_state_handler.apply_init_virtual_states(device)
 
-    def on_message(self, msg: str):
+    def on_message(self, msg: dict):
         super().on_message(msg)
 
     def _on_device_other(self, device_id: str, biz_code: str, data: dict[str, Any]):

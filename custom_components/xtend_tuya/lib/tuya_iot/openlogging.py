@@ -31,7 +31,7 @@ FILTER_LIST = [
 STAR = "***"
 
 
-def filter_logger(result_info: dict[str, Any]):
+def filter_logger(result_info: dict[str, Any] | None):
     """Filter log, hide sensitive info."""
     if result_info is None:
         return result_info

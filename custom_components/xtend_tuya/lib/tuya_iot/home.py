@@ -130,7 +130,7 @@ class TuyaHomeManager:
                 if not keys_response.get("success", False):
                     continue
 
-                keys_result = keys_response.get("result")
+                keys_result = keys_response.get("result", {})
                 key_values = keys_result.get("key_list", [])
 
                 tuya_remote_device_keys = [
@@ -154,7 +154,7 @@ class TuyaHomeManager:
     def trigger_infrared_commands(self, remote_id, device_id, key) -> None:
         """Send infrared commands, only in SMART_HOME project type."""
         if self.api.auth_type == AuthType.CUSTOM:
-            return []
+            return None
 
         self.api.post(
             f"/v1.0/infrareds/{remote_id}/remotes/{device_id}/command",

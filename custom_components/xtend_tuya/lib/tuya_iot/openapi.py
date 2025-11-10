@@ -33,7 +33,7 @@ class TuyaTokenInfo:
         platform_url: user region platform url
     """
 
-    def __init__(self, token_response: dict[str, Any] = None):
+    def __init__(self, token_response: dict[str, Any] = {}):
         """Init TuyaTokenInfo."""
         result = token_response.get("result", {})
 
@@ -77,7 +77,7 @@ class TuyaOpenAPI:
         else:
             self.__login_path = TO_C_SMART_HOME_TOKEN_API
 
-        self.token_info: TuyaTokenInfo = None
+        self.token_info: TuyaTokenInfo = TuyaTokenInfo()
 
         self.dev_channel: str = ""
 
@@ -149,7 +149,10 @@ class TuyaOpenAPI:
 
         # should use refresh token?
         now = int(time.time() * 1000)
-        expired_time = self.token_info.expire_time
+        if self.token_info is not None:
+            expired_time = self.token_info.expire_time
+        else:
+            expired_time = now
 
         if expired_time - 60 * 1000 > now:  # 1min
             return
@@ -269,9 +272,9 @@ class TuyaOpenAPI:
 
         if response.ok is False:
             logger.error(
-                f"Response error: code={response.status_code}, body={response.body}"
+                f"Response error: code={response.status_code}, body={response.raw}"
             )
-            return None
+            return {}
 
         result = response.json()
 
@@ -280,7 +283,7 @@ class TuyaOpenAPI:
         )
 
         if result.get("code", -1) == TUYA_ERROR_CODE_TOKEN_INVALID:
-            self.token_info = None
+            self.token_info = TuyaTokenInfo()
             self.connect(
                 self.__username, self.__password, self.__country_code, self.__schema
             )

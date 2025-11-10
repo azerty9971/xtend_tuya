@@ -1,11 +1,11 @@
 from __future__ import annotations
-from tuya_iot import (
+from ....lib.tuya_iot import (
     TuyaHomeManager,
     TuyaOpenAPI,
     TuyaOpenMQ,
 )
-from tuya_iot.asset import TuyaAssetManager
-from tuya_iot.tuya_enums import AuthType
+from ....lib.tuya_iot.asset import TuyaAssetManager
+from ....lib.tuya_iot.tuya_enums import AuthType
 from ...multi_manager import (
     MultiManager,
 )

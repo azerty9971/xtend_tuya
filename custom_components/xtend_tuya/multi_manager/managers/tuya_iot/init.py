@@ -8,7 +8,7 @@ from webrtc_models import (
 )
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
-from tuya_iot import (
+from ....lib.tuya_iot import (
     AuthType,
 )
 from .xt_tuya_iot_openapi import (
