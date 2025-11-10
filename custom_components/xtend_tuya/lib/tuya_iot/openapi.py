@@ -47,7 +47,8 @@ class TuyaTokenInfo:
         self.platform_url = result.get("platform_url", "")
     
     def is_valid(self) -> bool:
-        if self.platform_url == "":
+        now = int(time.time() * 1000)
+        if self.expire_time <= now + 60 * 1000:
             return False
         
         return True
@@ -154,13 +155,7 @@ class TuyaOpenAPI:
             return
 
         # should use refresh token?
-        now = int(time.time() * 1000)
         if self.token_info.is_valid() is True:
-            expired_time = self.token_info.expire_time
-        else:
-            expired_time = now
-
-        if expired_time - 60 * 1000 > now:  # 1min
             return
 
         self.token_info.access_token = ""
