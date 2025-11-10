@@ -331,10 +331,6 @@ class XTIOTOpenAPI(TuyaOpenAPI):
 
         # Sign
         t = int(time.time() * 1000)
-        t2 = int(datetime.now().timestamp() * 1000)
-        LOGGER.debug(f"Times: {t} <=> {t2}")
-        if t2 > t:
-            t = t2
 
         message = self.access_id
         if self.token_info is not None:
