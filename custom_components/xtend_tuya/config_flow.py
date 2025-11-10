@@ -120,7 +120,6 @@ class XTConfigFlows:
                 data[CONF_AUTH_TYPE] = AuthType.SMART_HOME
 
             api = XTIOTOpenAPI(
-                hass=hass,
                 endpoint=data[CONF_ENDPOINT_OT],
                 access_id=data[CONF_ACCESS_ID_OT],
                 access_secret=data[CONF_ACCESS_SECRET_OT],
