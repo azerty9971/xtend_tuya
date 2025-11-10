@@ -87,28 +87,14 @@ class XTIOTOpenAPI(TuyaOpenAPI):
         self.__country_code = ""
         self.__schema = ""
 
-    def is_token_expired(self) -> bool:
-        if self.token_info.is_valid() is False:
-            return True
-        # should use refresh token?
-        now = int(time.time() * 1000)
-        expired_time = self.token_info.expire_time
-
-        if expired_time - 60 * 1000 <= now:  # 1min
-            return True
-        return False
-
     def __refresh_access_token_if_need(self, path: str):
         if self.is_connect() is False:
             return
 
-        if self.token_info.is_valid() is False:
+        if self.token_info.is_valid() is True:
             return
 
         if path.startswith(self.__refresh_path):
-            return
-
-        if self.is_token_expired() is False:
             return
 
         self.token_info.access_token = ""
@@ -217,13 +203,6 @@ class XTIOTOpenAPI(TuyaOpenAPI):
                 self.__username, self.__password, self.__country_code, self.__schema
             )
         return self.is_connect()
-
-    def is_connect(self) -> bool:
-        """Is connect to tuya cloud."""
-        is_connected = super().is_connect()
-        is_token_expired = self.is_token_expired()
-        return_value = is_connected is True and is_token_expired is False
-        return return_value
 
     def test_validity(self) -> dict[str, Any]:
         return self.get("/v2.0/cloud/space/child")

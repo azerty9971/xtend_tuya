@@ -1,4 +1,5 @@
 """Tuya Open API."""
+
 from __future__ import annotations
 
 import hashlib
@@ -45,12 +46,17 @@ class TuyaTokenInfo:
         self.refresh_token = result.get("refresh_token", "")
         self.uid = result.get("uid", "")
         self.platform_url = result.get("platform_url", "")
-    
+        if self.is_valid():
+            logger.debug(f"Token acquired: {self}")
+
+    def __repr__(self) -> str:
+        return f"{type(self)}(valid: {self.is_valid()}, expire_time: {self.expire_time}, access_token: {self.access_token}, refresh_token: {self.refresh_token}, uid: {self.uid}, platform_url: {self.platform_url})"
+
     def is_valid(self) -> bool:
         now = int(time.time() * 1000)
         if self.expire_time <= now + 60 * 1000:
             return False
-        
+
         return True
 
 
@@ -241,7 +247,9 @@ class TuyaOpenAPI:
 
         self.__refresh_access_token_if_need(path)
 
-        access_token = self.token_info.access_token if self.token_info.is_valid() else ""
+        access_token = (
+            self.token_info.access_token if self.token_info.is_valid() else ""
+        )
         sign, t = self._calculate_sign(method, path, params, body)
         headers = {
             "client_id": self.access_id,
@@ -252,9 +260,11 @@ class TuyaOpenAPI:
             "lang": self.lang,
         }
 
-        if path == self.__login_path or \
-            path.startswith(TO_C_CUSTOM_REFRESH_TOKEN_API) or\
-            path.startswith(TO_C_SMART_HOME_REFRESH_TOKEN_API):
+        if (
+            path == self.__login_path
+            or path.startswith(TO_C_CUSTOM_REFRESH_TOKEN_API)
+            or path.startswith(TO_C_SMART_HOME_REFRESH_TOKEN_API)
+        ):
             headers["dev_lang"] = "python"
             headers["dev_version"] = VERSION
             headers["dev_channel"] = self.dev_channel
