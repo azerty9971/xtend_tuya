@@ -271,7 +271,7 @@ class TuyaOpenAPI:
                 },
             )
 
-        if not response["success"]:
+        if not response.get("success", False):
             return response
 
         # Cache token info.
@@ -340,7 +340,6 @@ class TuyaOpenAPI:
 
         result: dict[str, Any] = response.json()
 
-        # if result.get("success", True) is False:
         time_taken = time.time() - start_time
         logger.debug(
             f"[IOT API][{time_taken}]Request: {method} {path} PARAMS: {json.dumps(params, ensure_ascii=False, indent=2) if params is not None else ''} BODY: {json.dumps(body, ensure_ascii=False, indent=2) if body is not None else ''}"
