@@ -332,21 +332,25 @@ class TuyaOpenAPI:
             headers=headers,
         )
 
-        if response.ok is False:
-            logger.error(
-                f"[IOT API]Response error: code={response.status_code}, body={body if body is not None else ''}"
-            )
-            return {}
-
         result: dict[str, Any] = response.json()
 
         time_taken = time.time() - start_time
-        logger.debug(
-            f"[IOT API][{time_taken}]Request: {method} {path} PARAMS: {json.dumps(params, ensure_ascii=False, indent=2) if params is not None else ''} BODY: {json.dumps(body, ensure_ascii=False, indent=2) if body is not None else ''}"
-        )
-        logger.debug(
-            f"[IOT API][{time_taken}]Response: {json.dumps(result, ensure_ascii=False, indent=2)}"
-        )
+
+        if response.ok is False:
+            logger.warning(
+                f"[IOT API][{time_taken}]Request: {method} {path} PARAMS: {json.dumps(params, ensure_ascii=False, indent=2) if params is not None else ''} BODY: {json.dumps(body, ensure_ascii=False, indent=2) if body is not None else ''}"
+            )
+            logger.warning(
+                f"[IOT API][{time_taken}]Response: {json.dumps(result, ensure_ascii=False, indent=2)}"
+            )
+            return {}
+        else:
+            logger.debug(
+                f"[IOT API][{time_taken}]Request: {method} {path} PARAMS: {json.dumps(params, ensure_ascii=False, indent=2) if params is not None else ''} BODY: {json.dumps(body, ensure_ascii=False, indent=2) if body is not None else ''}"
+            )
+            logger.debug(
+                f"[IOT API][{time_taken}]Response: {json.dumps(result, ensure_ascii=False, indent=2)}"
+            )
 
         if result.get("code", -1) == TUYA_ERROR_CODE_TOKEN_INVALID:
             if self.reconnect() is True and first_pass is True:
