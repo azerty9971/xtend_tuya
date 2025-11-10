@@ -41,18 +41,9 @@ class XTTokenInfo(TuyaTokenInfo):
         platform_url: user region platform url
     """
 
-    def __init__(self, token_response: dict[str, Any]):
+    def __init__(self, token_response: dict[str, Any] = {}):
         """Init TuyaTokenInfo."""
-        result = token_response.get("result", {})
-
-        self.expire_time = (
-            token_response.get("t", 0)
-            + result.get("expire", result.get("expire_time", 0)) * 1000
-        )
-        self.access_token = result.get("access_token", "")
-        self.refresh_token = result.get("refresh_token", "")
-        self.uid = result.get("uid", "")
-        self.platform_url = result.get("platform_url", "")
+        super().__init__(token_response = token_response)
 
 
 class XTIOTOpenAPI(TuyaOpenAPI):
@@ -90,14 +81,14 @@ class XTIOTOpenAPI(TuyaOpenAPI):
             self.__login_path = TO_C_SMART_HOME_TOKEN_API
             self.__refresh_path = TO_C_SMART_HOME_REFRESH_TOKEN_API
 
-        self.token_info: XTTokenInfo | None = None
+        self.token_info = XTTokenInfo()
         self.__username = ""
         self.__password = ""
         self.__country_code = ""
         self.__schema = ""
 
     def is_token_expired(self) -> bool:
-        if self.token_info is None:
+        if self.token_info.is_valid() is False:
             return True
         # should use refresh token?
         now = int(time.time() * 1000)
@@ -111,7 +102,7 @@ class XTIOTOpenAPI(TuyaOpenAPI):
         if self.is_connect() is False:
             return
 
-        if self.token_info is None:
+        if self.token_info.is_valid() is False:
             return
 
         if path.startswith(self.__refresh_path):
@@ -222,7 +213,6 @@ class XTIOTOpenAPI(TuyaOpenAPI):
             and self.__password != ""
             and self.__country_code != ""
         ):
-            self.token_info = None  # type: ignore
             self.connect(
                 self.__username, self.__password, self.__country_code, self.__schema
             )
@@ -333,7 +323,7 @@ class XTIOTOpenAPI(TuyaOpenAPI):
         t = int(time.time() * 1000)
 
         message = self.access_id
-        if self.token_info is not None:
+        if self.token_info.is_valid() is True:
             message += self.token_info.access_token
         message += str(t) + str_to_sign
         sign = (
@@ -357,7 +347,7 @@ class XTIOTOpenAPI(TuyaOpenAPI):
     ) -> dict[str, Any]:
         start_time = datetime.now()
         self.__refresh_access_token_if_need(path)
-        access_token = self.token_info.access_token if self.token_info else ""
+        access_token = self.token_info.access_token if self.token_info.is_valid() else ""
         sign, t = self._calculate_sign(method, path, params, body)
         headers = {
             "client_id": self.access_id,

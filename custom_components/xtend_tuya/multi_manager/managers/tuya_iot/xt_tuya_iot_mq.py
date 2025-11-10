@@ -68,7 +68,7 @@ class XTIOTOpenMQ(TuyaOpenMQ):
         if self.api.is_connect() is False and self.api.reconnect() is False:
             # LOGGER.debug(f"_get_mqtt_config failed: not connected", stack_info=True)
             return XTIOTTuyaMQConfig()
-        if self.api.token_info is None:
+        if self.api.token_info.is_valid() is False:
             return XTIOTTuyaMQConfig()
 
         path = (

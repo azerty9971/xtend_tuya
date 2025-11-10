@@ -116,7 +116,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         return {}
 
     async def async_update_device_list_in_smart_home_mod(self):
-        if self.api.token_info is None:  # CHANGED
+        if self.api.token_info.is_valid() is False:  # CHANGED
             return None  # CHANGED
         response = await XTEventLoopProtector.execute_out_of_event_loop_and_return(
             self.api.get, f"/v1.0/users/{self.api.token_info.uid}/devices"
@@ -146,7 +146,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
 
     # Copy of the Tuya original method with some minor modifications
     def update_device_list_in_smart_home_mod(self):
-        if self.api.token_info is None:  # CHANGED
+        if self.api.token_info.is_valid() is False:  # CHANGED
             return None  # CHANGED
         response = self.api.get(f"/v1.0/users/{self.api.token_info.uid}/devices")
         if response["success"]:
@@ -187,7 +187,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
 
     def get_devices_from_sharing(self) -> dict[str, XTDevice]:
         return_dict: dict[str, XTDevice] = {}
-        if self.api.token_info is None:
+        if self.api.token_info.is_valid() is False:
             return {}
         response = self.api.get(
             f"/v1.0/users/{self.api.token_info.uid}/devices?from=sharing"

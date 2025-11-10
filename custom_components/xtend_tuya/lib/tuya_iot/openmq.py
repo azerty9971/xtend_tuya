@@ -40,10 +40,9 @@ class TuyaMQConfig:
         self.expire_time = result.get("expire_time", 0)
     
     def is_valid(self) -> bool:
-        if self.url != "":
-            return True
-        else:
+        if self.url == "":
             return False
+        return True
 
 
 class TuyaOpenMQ(threading.Thread):

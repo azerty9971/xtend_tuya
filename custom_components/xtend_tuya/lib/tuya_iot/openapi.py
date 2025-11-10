@@ -45,6 +45,12 @@ class TuyaTokenInfo:
         self.refresh_token = result.get("refresh_token", "")
         self.uid = result.get("uid", "")
         self.platform_url = result.get("platform_url", "")
+    
+    def is_valid(self) -> bool:
+        if self.platform_url == "":
+            return False
+        
+        return True
 
 
 class TuyaOpenAPI:
@@ -126,7 +132,7 @@ class TuyaOpenAPI:
         t = int(time.time() * 1000)
 
         message = self.access_id
-        if self.token_info is not None:
+        if self.token_info.is_valid() is True:
             message += self.token_info.access_token
         message += str(t) + str_to_sign
         sign = (
@@ -149,7 +155,7 @@ class TuyaOpenAPI:
 
         # should use refresh token?
         now = int(time.time() * 1000)
-        if self.token_info is not None:
+        if self.token_info.is_valid() is True:
             expired_time = self.token_info.expire_time
         else:
             expired_time = now
@@ -228,7 +234,7 @@ class TuyaOpenAPI:
 
     def is_connect(self) -> bool:
         """Is connect to tuya cloud."""
-        return self.token_info is not None and len(self.token_info.access_token) > 0
+        return self.token_info.is_valid()
 
     def __request(
         self,
@@ -240,7 +246,7 @@ class TuyaOpenAPI:
 
         self.__refresh_access_token_if_need(path)
 
-        access_token = self.token_info.access_token if self.token_info else ""
+        access_token = self.token_info.access_token if self.token_info.is_valid() else ""
         sign, t = self._calculate_sign(method, path, params, body)
         headers = {
             "client_id": self.access_id,
