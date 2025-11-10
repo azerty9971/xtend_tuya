@@ -6,7 +6,7 @@ import hashlib
 import hmac
 import json
 import time
-from typing import Any
+from typing import Any, cast
 
 import requests
 
@@ -36,7 +36,7 @@ class TuyaTokenInfo:
 
     def __init__(self, token_response: dict[str, Any] = {}):
         """Init TuyaTokenInfo."""
-        result = token_response.get("result", {})
+        result = cast(dict[str, Any], token_response.get("result", {}))
 
         self.expire_time = (
             token_response.get("t", 0)
@@ -45,11 +45,9 @@ class TuyaTokenInfo:
         self.access_token = result.get("access_token", "")
         self.refresh_token = result.get("refresh_token", "")
         self.uid = result.get("uid", "")
-        if self.is_valid():
-            logger.debug(f"Token acquired: {self}")
 
     def __repr__(self) -> str:
-        return f"{type(self)}(valid: {self.is_valid()}, expire_time: {self.expire_time}, access_token: {self.access_token}, refresh_token: {self.refresh_token}, uid: {self.uid})"
+        return f"TuyaTokenInfo(valid: {self.is_valid()}, expire_time: {self.expire_time}, access_token: {self.access_token}, refresh_token: {self.refresh_token}, uid: {self.uid})"
 
     def is_valid(self) -> bool:
         now = int(time.time() * 1000)
