@@ -152,13 +152,14 @@ class TuyaOpenMQ(threading.Thread):
             return
 
         msg_dict["data"] = decrypted_data
-        logger.warning(f"on_message: {msg_dict}")
+        #logger.debug(f"on_message: {msg_dict}")
 
         for listener in self.message_listeners:
             listener(msg_dict)
 
     def _on_log(self, mqttc: mqtt.Client, user_data: Any, level, string):
-        logger.warning(f"_on_log: {string}")
+        #logger.debug(f"_on_log: {string}")
+        pass
 
     def run(self):
         """Method representing the thread's activity which should not be used directly."""
@@ -190,7 +191,7 @@ class TuyaOpenMQ(threading.Thread):
             self.client.disconnect()
             self.client = None
 
-        logger.warning(f"connecting {mq_config.url}")
+        #logger.debug(f"connecting {mq_config.url}")
         mqttc = self._start(mq_config)
         if mqttc is None:
             return None
@@ -205,7 +206,7 @@ class TuyaOpenMQ(threading.Thread):
         #    logger.debug("disconnect")
     
     def _on_connect(self, mqttc: mqtt.Client, user_data: Any, flags, rc: mqtt_ReasonCode, properties: mqtt_Properties | None = None):
-        logger.debug(f"connect flags->{flags}, rc->{rc}")
+        #logger.debug(f"connect flags->{flags}, rc->{rc}")
         if rc == 0:
             for (key, value) in self.mq_config.source_topic.items():
                 mqttc.subscribe(value)
@@ -213,7 +214,8 @@ class TuyaOpenMQ(threading.Thread):
             self.__run_mqtt()
     
     def _on_subscribe(self, mqttc: mqtt.Client, user_data: Any, mid: int, reason_codes: list[mqtt_ReasonCode] = [], properties: mqtt_Properties | None = None):
-        logger.warning(f"_on_subscribe: mid: {mid}, reason_codes: {reason_codes}, properties: {properties}")
+        #logger.debug(f"_on_subscribe: mid: {mid}, reason_codes: {reason_codes}, properties: {properties}")
+        pass
     
     def _on_publish(self, mqttc: mqtt.Client, user_data: Any, mid: int, reason_code: mqtt_ReasonCode, properties: mqtt_Properties):
         pass

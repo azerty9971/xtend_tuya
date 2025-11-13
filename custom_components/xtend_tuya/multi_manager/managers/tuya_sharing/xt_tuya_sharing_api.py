@@ -171,5 +171,4 @@ class XTSharingAPI(CustomerApi):
         except json.decoder.JSONDecodeError:
             ret["result"] = result
 
-        LOGGER.debug("response ret = %s", ret)
         return ret

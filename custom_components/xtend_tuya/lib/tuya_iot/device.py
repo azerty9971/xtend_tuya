@@ -585,7 +585,8 @@ class SmartHomeDeviceManage(DeviceManage):
         response = self.api.get("/v1.0/devices/", {"device_ids": ",".join(device_ids)})
         if response["success"]:
             for info in response["result"]["devices"]:
-                info.pop("status")
+                if "status" in info:
+                    info.pop("status")
         response["result"]["list"] = response["result"]["devices"]
         return response
 
@@ -599,7 +600,7 @@ class SmartHomeDeviceManage(DeviceManage):
         status_list = []
         if response["success"]:
             for info in response["result"]["devices"]:
-                status_list.append({"id": info["id"], "status": info["status"]})
+                status_list.append({"id": info["id"], "status": info.get("status", [])})
 
         response["result"] = status_list
         return response
