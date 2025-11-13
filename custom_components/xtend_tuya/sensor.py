@@ -1603,6 +1603,7 @@ async def async_setup_entry(
                             True,
                             externally_managed_dpcodes,
                             COMPOUND_KEY,
+                            hass_data.manager
                         )
                     )
                     entities.extend(
@@ -1617,6 +1618,7 @@ async def async_setup_entry(
                             False,
                             externally_managed_dpcodes,
                             COMPOUND_KEY,
+                            hass_data.manager
                         )
                     )
         async_add_entities(entities)

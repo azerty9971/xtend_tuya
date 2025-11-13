@@ -781,6 +781,7 @@ class XTEntity(TuyaEntity):
         first_pass: bool,
         externally_managed_dpcodes: list[str] = [],
         key_fields: list[str] | None = None,
+        multi_manager: mm.MultiManager | None = None
     ) -> bool:
         result, dpcode = XTEntity._supports_description(
             device,
@@ -790,6 +791,8 @@ class XTEntity(TuyaEntity):
             externally_managed_dpcodes,
             key_fields,
         )
+        if multi_manager is not None and description.key == XTDPCode.ADD_ELE:
+            multi_manager.device_watcher.report_message(device.id, f"ADD ELE support: {result}, dpcode: {dpcode}, externally manager: {externally_managed_dpcodes}")
         if result is True:
             # Register the code as being handled by the device
             XTEntity.register_handled_dpcode(device, platform, dpcode)
