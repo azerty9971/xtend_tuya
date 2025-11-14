@@ -424,6 +424,9 @@ class XTEntity(TuyaEntity):
         READ_ONLY = "ro"
         READ_WRITE = "rw"
         WRITE_ONLY = "wr"
+    
+    class XTEntitySharedAttributes(StrEnum):
+        IGNORE_OTHER_DP_CODE_HANDLER = "ignore_other_dp_code_handler"
 
     def __init__(self, *args, **kwargs) -> None:
         # This is to catch the super call in case the next class in parent's MRO doesn't have an init method
@@ -825,11 +828,12 @@ class XTEntity(TuyaEntity):
     ) -> tuple[bool, str]:
         dpcode = XTEntity._get_description_dpcode(description)
         compound_key = None
+        ignore_other_dp_code_handler: bool = getattr(description, XTEntity.XTEntitySharedAttributes.IGNORE_OTHER_DP_CODE_HANDLER, False)
         if key_fields is not None:
             compound_key = XTEntityDescriptorManager.get_compound_key(
                 description, key_fields
             )
-        if XTEntity.is_dpcode_handled(device, platform, dpcode) is True:
+        if XTEntity.is_dpcode_handled(device, platform, dpcode) is True and ignore_other_dp_code_handler is False:
             if (
                 compound_key is None
                 or XTEntity.is_dpcode_handled(device, platform, compound_key) is True

@@ -51,6 +51,9 @@ class XTLightEntityDescription(TuyaLightEntityDescription):
         TuyaDPCode | tuple[TuyaDPCode, ...] | XTDPCode | tuple[XTDPCode, ...] | None
     ) = None
 
+    # duplicate the entity if handled by another integration
+    ignore_other_dp_code_handler: bool = False
+
     def get_entity_instance(
         self,
         device: XTDevice,

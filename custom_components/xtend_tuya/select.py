@@ -32,7 +32,11 @@ from .ha_tuya_integration.tuya_integration_imports import (
 class XTSelectEntityDescription(TuyaSelectEntityDescription):
     """Describe an Tuya select entity."""
 
-    options: list[str] | None = None  # Custom options
+    # Custom options
+    options: list[str] | None = None
+
+    # duplicate the entity if handled by another integration
+    ignore_other_dp_code_handler: bool = False
 
     def get_entity_instance(
         self,
@@ -267,7 +271,10 @@ async def async_setup_entry(
             dict[str, tuple[XTSelectEntityDescription, ...]],
         ],
         XTEntityDescriptorManager.get_platform_descriptors(
-            SELECTS, entry.runtime_data.multi_manager, XTSelectEntityDescription, this_platform
+            SELECTS,
+            entry.runtime_data.multi_manager,
+            XTSelectEntityDescription,
+            this_platform,
         ),
     )
 
@@ -308,11 +315,8 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if (
-                    category_descriptions
-                    := XTEntityDescriptorManager.get_category_descriptors(
-                        supported_descriptors, device.category
-                    )
+                if category_descriptions := XTEntityDescriptorManager.get_category_descriptors(
+                    supported_descriptors, device.category
                 ):
                     externally_managed_dpcodes = (
                         XTEntityDescriptorManager.get_category_keys(

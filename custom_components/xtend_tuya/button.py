@@ -55,6 +55,9 @@ class XTButtonEntityDescription(TuyaButtonEntityDescription):
     ir_remote_information: XTIRRemoteInformation | None = None
     ir_key_information: XTIRRemoteKeysInformation | None = None
 
+    # duplicate the entity if handled by another integration
+    ignore_other_dp_code_handler: bool = False
+
     def get_entity_instance(
         self,
         device: XTDevice,

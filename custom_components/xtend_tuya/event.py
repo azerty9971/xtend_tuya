@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 from typing import Any, cast
+from dataclasses import dataclass
 from homeassistant.components.event import (
     EventEntityDescription,
 )
@@ -30,12 +31,15 @@ from .entity import (
     XTEntityDescriptorManager,
 )
 
-
+@dataclass(frozen=True)
 class XTEventEntityDescription(EventEntityDescription, frozen_or_thawed=True):
     override_tuya: bool = False
     dont_send_to_cloud: bool = False
     on_value: Any = None
     off_value: Any = None
+
+    # duplicate the entity if handled by another integration
+    ignore_other_dp_code_handler: bool = False
 
     def get_entity_instance(
         self,

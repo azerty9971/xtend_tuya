@@ -88,11 +88,15 @@ class XTSensorEntityDescription(TuyaSensorEntityDescription, frozen=True):
     restoredata: bool = False
     refresh_device_after_load: bool = False
     recalculate_scale_for_percentage: bool = False
-    recalculate_scale_for_percentage_threshold: int = (
-        100  # Maximum percentage that the sensor can display (default = 100%)
-    )
 
-    native_value: Callable | None = None  # Custom native_value function
+    # Maximum percentage that the sensor can display (default = 100%)
+    recalculate_scale_for_percentage_threshold: int = 999
+
+    # Custom native_value function
+    native_value: Callable | None = None
+
+    # duplicate the entity if handled by another integration
+    ignore_other_dp_code_handler: bool = False
 
     def get_entity_instance(
         self,
@@ -182,6 +186,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         entity_registry_enabled_default=True,
         restoredata=True,
+        ignore_other_dp_code_handler=True,
     ),
     XTSensorEntityDescription(
         key=XTDPCode.ADD_ELE2,
@@ -1534,7 +1539,11 @@ async def async_setup_entry(
             dict[str, tuple[XTSensorEntityDescription, ...]],
         ],
         XTEntityDescriptorManager.get_platform_descriptors(
-            SENSORS, entry.runtime_data.multi_manager, XTSensorEntityDescription, this_platform, COMPOUND_KEY
+            SENSORS,
+            entry.runtime_data.multi_manager,
+            XTSensorEntityDescription,
+            this_platform,
+            COMPOUND_KEY,
         ),
     )
 
@@ -1578,7 +1587,7 @@ async def async_setup_entry(
                 if category_descriptions := XTEntityDescriptorManager.get_category_descriptors(
                     supported_descriptors, device.category
                 ):
-                    #hass_data.manager.device_watcher.report_message(device.id, f"Descriptions of {device.name}: {category_descriptions}")
+                    # hass_data.manager.device_watcher.report_message(device.id, f"Descriptions of {device.name}: {category_descriptions}")
                     externally_managed_dpcodes = (
                         XTEntityDescriptorManager.get_category_keys(
                             externally_managed_descriptors.get(device.category)
@@ -1603,7 +1612,7 @@ async def async_setup_entry(
                             True,
                             externally_managed_dpcodes,
                             COMPOUND_KEY,
-                            hass_data.manager
+                            hass_data.manager,
                         )
                     )
                     entities.extend(
@@ -1618,7 +1627,7 @@ async def async_setup_entry(
                             False,
                             externally_managed_dpcodes,
                             COMPOUND_KEY,
-                            hass_data.manager
+                            hass_data.manager,
                         )
                     )
         async_add_entities(entities)
@@ -1769,7 +1778,10 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
                     if self.entity_description.key in device.status:
                         default_value = get_default_value(self._type)
                         if now.hour != 0 or now.minute != 0:
-                            LOGGER.error(f"Resetting {device.name}'s status {self.entity_description.key} to {default_value} at unexpected time", stack_info=True)
+                            LOGGER.error(
+                                f"Resetting {device.name}'s status {self.entity_description.key} to {default_value} at unexpected time",
+                                stack_info=True,
+                            )
                         else:
                             device.status[self.entity_description.key] = default_value
                             self.async_write_ha_state()
@@ -1827,7 +1839,9 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
             if self.cancel_reset_after_x_seconds:
                 self.cancel_reset_after_x_seconds()
             self.cancel_reset_after_x_seconds = async_call_later(
-                self.hass, self.entity_description.reset_after_x_seconds, self.reset_value
+                self.hass,
+                self.entity_description.reset_after_x_seconds,
+                self.reset_value,
             )
 
     @staticmethod

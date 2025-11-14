@@ -27,6 +27,9 @@ from .entity import (
 class XTHumidifierEntityDescription(TuyaHumidifierEntityDescription):
     """Describe an XT (de)humidifier entity."""
 
+    # duplicate the entity if handled by another integration
+    ignore_other_dp_code_handler: bool = False
+
     def get_entity_instance(
         self,
         device: XTDevice,

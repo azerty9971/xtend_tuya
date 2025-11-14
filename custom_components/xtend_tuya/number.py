@@ -38,7 +38,11 @@ from .entity import (
 class XTNumberEntityDescription(TuyaNumberEntityDescription):
     """Describe an Tuya number entity."""
 
-    native_max_value: float | None = None  # Custom native_max_value
+    # Custom native_max_value
+    native_max_value: float | None = None
+
+    # duplicate the entity if handled by another integration
+    ignore_other_dp_code_handler: bool = False
 
     def get_entity_instance(
         self,

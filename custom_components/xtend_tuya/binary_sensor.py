@@ -45,11 +45,17 @@ COMPOUND_KEY: list[str] = ["key", "subkey"]
 class XTBinarySensorEntityDescription(TuyaBinarySensorEntityDescription):
     """Describes an XT binary sensor."""
 
-    device_online: bool = False  # This DPCode represent the online status of a device
-    subkey: str | None = (
-        None  # Subkey to create multiple entities with the same key/dpcode
-    )
-    is_on: Callable | None = None  # Custom is_on function
+    # This DPCode represent the online status of a device
+    device_online: bool = False
+
+    # Subkey to create multiple entities with the same key/dpcode
+    subkey: str | None = None
+
+    # Custom is_on function
+    is_on: Callable | None = None
+
+    # duplicate the entity if handled by another integration
+    ignore_other_dp_code_handler: bool = False
 
     def get_entity_instance(
         self,
@@ -159,7 +165,6 @@ BINARY_SENSORS: dict[str, tuple[XTBinarySensorEntityDescription, ...]] = {
             entity_registry_enabled_default=True,
             on_value="1",
         ),
-
     ),
     # QT-08W Solar Intelligent Water Valve
     "sfkzq": (
@@ -351,11 +356,8 @@ async def async_setup_entry(
             return
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id, None):
-                if (
-                    category_descriptions
-                    := XTEntityDescriptorManager.get_category_descriptors(
-                        supported_descriptors, device.category
-                    )
+                if category_descriptions := XTEntityDescriptorManager.get_category_descriptors(
+                    supported_descriptors, device.category
                 ):
                     externally_managed_dpcodes = (
                         XTEntityDescriptorManager.get_category_keys(
@@ -429,7 +431,7 @@ class XTBinarySensorEntity(XTEntity, TuyaBinarySensorEntity):
         super(XTBinarySensorEntity, self).__init__(device, device_manager, description)
         super(XTEntity, self).__init__(
             device,
-            device_manager, # type: ignore
+            device_manager,  # type: ignore
             description,
             _get_bitmap_bit_mask(
                 device, description.dpcode or description.key, description.bitmap_key

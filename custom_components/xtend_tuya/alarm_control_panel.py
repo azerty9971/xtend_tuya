@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 from typing import cast
+from dataclasses import dataclass
 from homeassistant.const import (
     Platform,
 )
@@ -27,9 +28,10 @@ from .entity import (
 )
 
 
+@dataclass(frozen=True)
 class XTAlarmEntityDescription(TuyaAlarmControlPanelEntityDescription):
-    def __init__(self, *args, **kwargs):
-        super(XTAlarmEntityDescription, self).__init__(*args, **kwargs)
+    # duplicate the entity if handled by another integration
+    ignore_other_dp_code_handler: bool = False
 
     def get_entity_instance(
         self,

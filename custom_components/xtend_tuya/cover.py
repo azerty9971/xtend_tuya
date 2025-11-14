@@ -50,6 +50,9 @@ class XTCoverEntityDescription(TuyaCoverEntityDescription):
     ) = None
     set_position: TuyaDPCode | XTDPCode | None = None  # type: ignore
 
+    # duplicate the entity if handled by another integration
+    ignore_other_dp_code_handler: bool = False
+
     # Additional attributes for XT specific functionality
     control_back_mode: str | None = None
 
