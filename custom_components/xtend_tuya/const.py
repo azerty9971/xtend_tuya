@@ -824,6 +824,7 @@ class XTDPCode(StrEnum):
     REMAININGTIME = "RemainingTime"
     REMOTE_NO_DP_KEY = "remote_no_dp_key"
     REPORT_SENSITIVITY = "report_sensitivity"
+    REPLACE_TRASH_BAG = "119"
     RESET_ADD_ELE = "reset_add_ele"
     RESIDUAL_ELECTRICITY = "residual_electricity"
     RESPIRATORY_RATE = "respiratory_rate"
