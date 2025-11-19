@@ -20,6 +20,7 @@ from .multi_manager.multi_manager import (
 from .const import (
     TUYA_DISCOVERY_NEW,
     LOGGER,
+    XTDPCode,
 )
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaEventEntity,
@@ -54,7 +55,17 @@ class XTEventEntityDescription(EventEntityDescription, frozen_or_thawed=True):
 # default status set of each category (that don't have a set instruction)
 # end up being events.
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
-EVENTS: dict[str, tuple[XTEventEntityDescription, ...]] = {}
+EVENTS: dict[str, tuple[XTEventEntityDescription, ...]] = {
+    "msp": (
+        XTEventEntityDescription(
+            key=XTDPCode.REPLACE_TRASH_BAG,
+            name="Replace Trash Bag",
+            on_value="Replace Trash Bag",
+            off_value="off",
+            device_class=None,
+        ),
+    ),
+}
 
 
 async def async_setup_entry(
