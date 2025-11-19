@@ -1212,7 +1212,7 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
             key=XTDPCode.STORE_FULL_NOTIFY,
             translation_key="store_full_notify",
             state_class=SensorStateClass.MEASUREMENT,
-            entity_registry_enabled_default=True,
+            entity_registry_enabled_default=False,
         ),
         XTSensorEntityDescription(
             key=XTDPCode.TOILET_NOTICE,
