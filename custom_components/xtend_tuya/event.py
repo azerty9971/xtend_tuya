@@ -20,7 +20,6 @@ from .multi_manager.multi_manager import (
 from .const import (
     TUYA_DISCOVERY_NEW,
     LOGGER,
-    XTDPCode,
 )
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaEventEntity,
