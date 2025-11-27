@@ -303,8 +303,8 @@ async def async_setup_entry(
                         entity_registry_visible_default=False,
                     )
                     if dpcode_wrapper := TuyaDPCodeEnumWrapper.find_dpcode(
-                            device, descriptor.key, prefer_function=True
-                        ):
+                        device, descriptor.key, prefer_function=True
+                    ):
                         entities.append(
                             XTSelectEntity.get_entity_instance(
                                 descriptor, device, hass_data.manager, dpcode_wrapper
