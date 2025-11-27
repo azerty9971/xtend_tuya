@@ -24,6 +24,7 @@ from .const import (
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaSwitchEntity,
     TuyaSwitchEntityDescription,
+    TuyaDPCodeBooleanWrapper,
 )
 from .entity import (
     XTEntity,
@@ -45,11 +46,13 @@ class XTSwitchEntityDescription(TuyaSwitchEntityDescription, frozen_or_thawed=Tr
         device: XTDevice,
         device_manager: MultiManager,
         description: XTSwitchEntityDescription,
+        dpcode_wrapper: TuyaDPCodeBooleanWrapper,
     ) -> XTSwitchEntity:
         return XTSwitchEntity(
             device=device,
             device_manager=device_manager,
             description=XTSwitchEntityDescription(**description.__dict__),
+            dpcode_wrapper=dpcode_wrapper
         )
 
 
@@ -459,11 +462,16 @@ async def async_setup_entry(
                         entity_registry_enabled_default=False,
                         entity_registry_visible_default=False,
                     )
-                    entities.append(
-                        XTSwitchEntity.get_entity_instance(
-                            descriptor, device, hass_data.manager
+                    if (
+                        dpcode_wrapper := TuyaDPCodeBooleanWrapper.find_dpcode(
+                            device, descriptor.key, prefer_function=True
                         )
-                    )
+                    ):
+                        entities.append(
+                            XTSwitchEntity.get_entity_instance(
+                                descriptor, device, hass_data.manager, dpcode_wrapper
+                            )
+                        )
         async_add_entities(entities)
 
     @callback
@@ -495,29 +503,35 @@ async def async_setup_entry(
                         )
                     entities.extend(
                         XTSwitchEntity.get_entity_instance(
-                            description, device, hass_data.manager
+                            description, device, hass_data.manager, dpcode_wrapper
                         )
                         for description in category_descriptions
-                        if XTEntity.supports_description(
+                        if (XTEntity.supports_description(
                             device,
                             this_platform,
                             description,
                             True,
                             externally_managed_dpcodes,
                         )
+                        and (dpcode_wrapper := TuyaDPCodeBooleanWrapper.find_dpcode(
+                            device, description.key, prefer_function=True
+                        )))
                     )
                     entities.extend(
                         XTSwitchEntity.get_entity_instance(
-                            description, device, hass_data.manager
+                            description, device, hass_data.manager, dpcode_wrapper
                         )
                         for description in category_descriptions
-                        if XTEntity.supports_description(
+                        if (XTEntity.supports_description(
                             device,
                             this_platform,
                             description,
                             False,
                             externally_managed_dpcodes,
                         )
+                        and (dpcode_wrapper := TuyaDPCodeBooleanWrapper.find_dpcode(
+                            device, description.key, prefer_function=True
+                        )))
                     )
 
         async_add_entities(entities)
@@ -546,6 +560,7 @@ class XTSwitchEntity(XTEntity, TuyaSwitchEntity):
         device: XTDevice,
         device_manager: MultiManager,
         description: XTSwitchEntityDescription,
+        dpcode_wrapper: TuyaDPCodeBooleanWrapper,
     ) -> None:
         """Init TuyaHaSwitch."""
         super(XTSwitchEntity, self).__init__(device, device_manager, description)
@@ -614,11 +629,15 @@ class XTSwitchEntity(XTEntity, TuyaSwitchEntity):
         description: XTSwitchEntityDescription,
         device: XTDevice,
         device_manager: MultiManager,
+        dpcode_wrapper: TuyaDPCodeBooleanWrapper,
     ) -> XTSwitchEntity:
         if hasattr(description, "get_entity_instance") and callable(
             getattr(description, "get_entity_instance")
         ):
-            return description.get_entity_instance(device, device_manager, description)
+            return description.get_entity_instance(device, device_manager, description, dpcode_wrapper)
         return XTSwitchEntity(
-            device, device_manager, XTSwitchEntityDescription(**description.__dict__)
-        )
+            device, 
+            device_manager, 
+            XTSwitchEntityDescription(**description.__dict__), 
+            dpcode_wrapper
+            )
