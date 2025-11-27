@@ -10,9 +10,6 @@ from homeassistant.components.sensor import (
     SensorExtraStoredData,
     RestoreSensor,
 )
-from homeassistant.components.sensor.const import (
-    DEVICE_CLASS_UNITS as SENSOR_DEVICE_CLASS_UNITS,
-)
 from homeassistant.const import (
     UnitOfEnergy,
     UnitOfTime,
@@ -23,17 +20,11 @@ from homeassistant.const import (
 from homeassistant.core import (
     HomeAssistant,
     callback,
-    Event,
-    EventStateChangedData,
-    State,
-    CALLBACK_TYPE,
 )
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.event import (
     async_track_time_change,
-    async_call_later,
-    async_track_state_change_event,
 )
 from homeassistant.helpers.typing import (
     StateType,
@@ -65,9 +56,8 @@ from .ha_tuya_integration.tuya_integration_imports import (
     TuyaSensorEntity,
     TuyaSensorEntityDescription,
     TuyaIntegerTypeData,
-    TuyaDOMAIN,
-    TuyaDEVICE_CLASS_UNITS,
-    TuyaDPType,
+    TuyaDPCodeWrapper,
+    tuya_sensor_get_dpcode_wrapper,
 )
 
 COMPOUND_KEY: list[str] = ["key", "subkey"]
@@ -103,11 +93,13 @@ class XTSensorEntityDescription(TuyaSensorEntityDescription, frozen=True):
         device: XTDevice,
         device_manager: MultiManager,
         description: XTSensorEntityDescription,
+        dpcode_wrapper: TuyaDPCodeWrapper,
     ) -> XTSensorEntity:
         return XTSensorEntity(
             device=device,
             device_manager=device_manager,
             description=XTSensorEntityDescription(**description.__dict__),
+            dpcode_wrapper=dpcode_wrapper,
         )
 
 
@@ -1568,11 +1560,12 @@ async def async_setup_entry(
                         entity_registry_enabled_default=False,
                         entity_registry_visible_default=False,
                     )
-                    entities.append(
-                        XTSensorEntity.get_entity_instance(
-                            descriptor, device, hass_data.manager
+                    if dpcode_wrapper := tuya_sensor_get_dpcode_wrapper(device, descriptor):
+                        entities.append(
+                            XTSensorEntity.get_entity_instance(
+                                descriptor, device, hass_data.manager, dpcode_wrapper
+                            )
                         )
-                    )
         async_add_entities(entities)
 
     @callback
@@ -1602,10 +1595,10 @@ async def async_setup_entry(
                         )
                     entities.extend(
                         XTSensorEntity.get_entity_instance(
-                            description, device, hass_data.manager
+                            description, device, hass_data.manager, dpcode_wrapper
                         )
                         for description in category_descriptions
-                        if XTEntity.supports_description(
+                        if (XTEntity.supports_description(
                             device,
                             this_platform,
                             description,
@@ -1613,14 +1606,15 @@ async def async_setup_entry(
                             externally_managed_dpcodes,
                             COMPOUND_KEY,
                             hass_data.manager,
-                        )
+                        ) and
+                        (dpcode_wrapper := tuya_sensor_get_dpcode_wrapper(device, description)))
                     )
                     entities.extend(
                         XTSensorEntity.get_entity_instance(
-                            description, device, hass_data.manager
+                            description, device, hass_data.manager, dpcode_wrapper
                         )
                         for description in category_descriptions
-                        if XTEntity.supports_description(
+                        if (XTEntity.supports_description(
                             device,
                             this_platform,
                             description,
@@ -1628,7 +1622,8 @@ async def async_setup_entry(
                             externally_managed_dpcodes,
                             COMPOUND_KEY,
                             hass_data.manager,
-                        )
+                        ) and
+                        (dpcode_wrapper := tuya_sensor_get_dpcode_wrapper(device, description)))
                     )
         async_add_entities(entities)
         if restrict_dpcode is None:
@@ -1651,79 +1646,13 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
 
     entity_description: XTSensorEntityDescription
     _restored_data: SensorExtraStoredData | None = None
-    cancel_reset_after_x_seconds: CALLBACK_TYPE | None = None
-
-    def _replaced_constructor(
-        self,
-        device: XTDevice,
-        device_manager: MultiManager,
-        description: XTSensorEntityDescription,
-    ) -> None:
-        """Init Tuya sensor."""
-        self.entity_description = description
-        self._attr_unique_id = (
-            f"{super().unique_id}{description.key}{description.subkey or ''}"
-        )
-
-        if int_type := self.find_dpcode(description.key, dptype=TuyaDPType.INTEGER):
-            self._type_data = int_type
-            self._type = TuyaDPType.INTEGER
-            if description.native_unit_of_measurement is None:
-                self._attr_native_unit_of_measurement = int_type.unit
-        elif enum_type := self.find_dpcode(
-            description.key, dptype=TuyaDPType.ENUM, prefer_function=True
-        ):
-            self._type_data = enum_type
-            self._type = TuyaDPType.ENUM
-        else:
-            self._type = self.get_dptype(description.key, device)  # type: ignore #This is modified from TuyaSensorEntity's constructor
-
-        # Logic to ensure the set device class and API received Unit Of Measurement
-        # match Home Assistants requirements.
-        if (
-            self.device_class is not None
-            and not self.device_class.startswith(TuyaDOMAIN)
-            and description.native_unit_of_measurement is None
-            # we do not need to check mappings if the API UOM is allowed
-            and self.native_unit_of_measurement
-            not in SENSOR_DEVICE_CLASS_UNITS[self.device_class]
-        ):
-            # We cannot have a device class, if the UOM isn't set or the
-            # device class cannot be found in the validation mapping.
-            if (
-                self.native_unit_of_measurement is None
-                or self.device_class not in TuyaDEVICE_CLASS_UNITS
-            ):
-                LOGGER.debug(
-                    "Device class %s ignored for incompatible unit %s in sensor entity %s",
-                    self.device_class,
-                    self.native_unit_of_measurement,
-                    self.unique_id,
-                )
-                self._attr_device_class = None
-                self._attr_suggested_unit_of_measurement = None
-                return
-
-            uoms = TuyaDEVICE_CLASS_UNITS[self.device_class]
-            uom = uoms.get(self.native_unit_of_measurement) or uoms.get(
-                self.native_unit_of_measurement.lower()
-            )
-
-            # Unknown unit of measurement, device class should not be used.
-            if uom is None:
-                self._attr_device_class = None
-                self._attr_suggested_unit_of_measurement = None
-                return
-
-            # Found unit of measurement, use the standardized Unit
-            # Use the target conversion unit (if set)
-            self._attr_native_unit_of_measurement = uom.unit
 
     def __init__(
         self,
         device: XTDevice,
         device_manager: MultiManager,
         description: XTSensorEntityDescription,
+        dpcode_wrapper: TuyaDPCodeWrapper,
     ) -> None:
         if description.recalculate_scale_for_percentage:
             device_manager.execute_device_entity_function(
@@ -1734,25 +1663,19 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
             )
 
         """Init XT sensor."""
-        super(XTSensorEntity, self).__init__(device, device_manager, description)
-        try:
-            super(XTEntity, self).__init__(device, device_manager, description)  # type: ignore
-        except Exception:
-            self._replaced_constructor(
-                device=device, device_manager=device_manager, description=description
-            )
+        super(XTSensorEntity, self).__init__(device, device_manager, description, dpcode_wrapper=dpcode_wrapper)
+        super(XTEntity, self).__init__(device, device_manager, description, dpcode_wrapper) # type: ignore
 
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description  # type: ignore
-        self.cancel_reset_after_x_seconds = None
 
     def reset_value(self, _: datetime | None, manual_call: bool = False) -> None:
-        if manual_call and self.cancel_reset_after_x_seconds:
+        if manual_call and self.cancel_reset_after_x_seconds is not None:
             self.cancel_reset_after_x_seconds()
         self.cancel_reset_after_x_seconds = None
         value = self.device.status.get(self.entity_description.key)
-        default_value = get_default_value(self._type)
+        default_value = get_default_value(self.get_dptype_from_dpcode_wrapper())
         if value is None or value == default_value:
             return
         self.device.status[self.entity_description.key] = default_value
@@ -1776,7 +1699,7 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
             if should_reset:
                 if device := self.device_manager.device_map.get(self.device.id, None):
                     if self.entity_description.key in device.status:
-                        default_value = get_default_value(self._type)
+                        default_value = get_default_value(self.get_dptype_from_dpcode_wrapper())
                         if now.hour != 0 or now.minute != 0:
                             LOGGER.error(
                                 f"Resetting {device.name}'s status {self.entity_description.key} to {default_value} at unexpected time",
@@ -1796,15 +1719,6 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
                     self.hass, reset_status_daily, hour=0, minute=0, second=0
                 )
             )
-        if self.entity_description.reset_after_x_seconds:
-            self.reset_value(None, True)
-            self.async_on_remove(
-                async_track_state_change_event(
-                    self.hass,
-                    self.entity_id,
-                    self._on_state_change_event,
-                )
-            )
 
         if self.entity_description.restoredata:
             self._restored_data = await self.async_get_last_sensor_data()
@@ -1813,8 +1727,9 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
                 and self._restored_data.native_value is not None
             ):
                 # Scale integer/float value
-                if isinstance(self._type_data, TuyaIntegerTypeData):
-                    scaled_value_back = self._type_data.scale_value_back(
+                type_information = self.get_type_information()
+                if isinstance(type_information, TuyaIntegerTypeData):
+                    scaled_value_back = type_information.scale_value_back(
                         self._restored_data.native_value  # type: ignore
                     )
                     self._restored_data.native_value = scaled_value_back
@@ -1829,33 +1744,19 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
                 self.device, [self.entity_description.key]
             )
 
-    @callback
-    async def _on_state_change_event(self, event: Event[EventStateChangedData]):
-        new_state: State | None = event.data.get("new_state")
-        default_value = get_default_value(self._type)
-        if new_state is None or not new_state.state or new_state.state == default_value:
-            return
-        if self.entity_description.reset_after_x_seconds:
-            if self.cancel_reset_after_x_seconds:
-                self.cancel_reset_after_x_seconds()
-            self.cancel_reset_after_x_seconds = async_call_later(
-                self.hass,
-                self.entity_description.reset_after_x_seconds,
-                self.reset_value,
-            )
-
     @staticmethod
     def get_entity_instance(
         description: XTSensorEntityDescription,
         device: XTDevice,
         device_manager: MultiManager,
+        dpcode_wrapper: TuyaDPCodeWrapper,
     ) -> XTSensorEntity:
         if hasattr(description, "get_entity_instance") and callable(
             getattr(description, "get_entity_instance")
         ):
-            return description.get_entity_instance(device, device_manager, description)
+            return description.get_entity_instance(device, device_manager, description, dpcode_wrapper)
         return XTSensorEntity(
-            device, device_manager, XTSensorEntityDescription(**description.__dict__)
+            device, device_manager, XTSensorEntityDescription(**description.__dict__), dpcode_wrapper
         )
 
     # Use custom native_value function

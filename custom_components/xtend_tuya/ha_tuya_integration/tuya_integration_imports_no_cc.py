@@ -9,7 +9,7 @@ from homeassistant.components.tuya.binary_sensor import (
     BINARY_SENSORS as BINARY_SENSORS_TUYA,  # noqa: F401
     TuyaBinarySensorEntity as TuyaBinarySensorEntity,
     TuyaBinarySensorEntityDescription as TuyaBinarySensorEntityDescription,
-    # _get_bitmap_bit_mask as get_bitmap_bit_mask_tuya_binary_sensor  # noqa: F401
+    _get_dpcode_wrapper as tuya_binary_sensor_get_dpcode_wrapper,  # noqa: F401
 )
 from homeassistant.components.button import (
     ButtonEntityDescription as TuyaButtonEntityDescription,  # noqa: F401
@@ -79,6 +79,7 @@ from homeassistant.components.tuya.sensor import (
     SENSORS as SENSORS_TUYA,  # noqa: F401
     TuyaSensorEntity as TuyaSensorEntity,
     TuyaSensorEntityDescription as TuyaSensorEntityDescription,
+    _get_dpcode_wrapper as tuya_sensor_get_dpcode_wrapper,  # noqa: F401
 )
 from homeassistant.components.siren import (
     SirenEntityDescription as TuyaSirenEntityDescription,  # noqa: F401
@@ -128,12 +129,16 @@ try:
     from homeassistant.components.tuya.models import (
         EnumTypeData as TuyaEnumTypeData,  # noqa: F401
         IntegerTypeData as TuyaIntegerTypeData,  # noqa: F401
+        DPCodeWrapper as TuyaDPCodeWrapper,  # noqa: F401
+        DPCodeTypeInformationWrapper as TuyaDPCodeTypeInformationWrapper,  # noqa: F401
+        find_dpcode as tuya_find_dpcode,  # noqa: F401
     )
 except Exception:
     from homeassistant.components.tuya.entity import (
         EnumTypeData as TuyaEnumTypeData,  # noqa: F401 # type: ignore
         IntegerTypeData as TuyaIntegerTypeData,  # noqa: F401 # type: ignore
     )
+
 from tuya_sharing.scenes import (
     SharingScene as TuyaScene,  # noqa: F401
 )

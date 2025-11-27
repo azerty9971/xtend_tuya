@@ -3,9 +3,13 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
 from enum import StrEnum, IntFlag, IntEnum
+from typing import Any
 import logging
 from homeassistant.const import (
     Platform,
+)
+from .ha_tuya_integration.tuya_integration_imports import (
+    TuyaDPCode,
 )
 
 DOMAIN = "xtend_tuya"
@@ -964,6 +968,13 @@ class XTDPCode(StrEnum):
     XT_COVER_INVERT_CONTROL = "xt_cover_invert_control"
     XT_COVER_INVERT_STATUS = "xt_cover_invert_status"
     # END OF DPCODES FROM XT
+
+    @staticmethod
+    def get_dpcode(dpcode: Any) -> XTDPCode | TuyaDPCode:
+        try:
+            return TuyaDPCode(dpcode)
+        except Exception:
+            return XTDPCode(dpcode)
 
 
 @dataclass

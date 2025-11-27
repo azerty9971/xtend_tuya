@@ -555,7 +555,7 @@ class XTSwitchEntity(XTEntity, TuyaSwitchEntity):
         self.entity_description = description  # type: ignore
 
     @property
-    def is_on(self) -> bool:
+    def is_on(self) -> bool | None:
         """Return true if switch is on."""
         current_value = self.device.status.get(self.entity_description.key, False)
         if (

@@ -166,7 +166,7 @@ class XTEventEntity(XTEntity, TuyaEventEntity):
         self.device_manager = device_manager
         self.entity_description = description  # type: ignore
 
-        if dpcode := self.find_dpcode(description.key, dptype=TuyaDPType.ENUM):
+        if dpcode := self.find_dpcode(device, description.key, dptype=TuyaDPType.ENUM):
             self._attr_event_types: list[str] = dpcode.range
 
     async def _handle_state_update(

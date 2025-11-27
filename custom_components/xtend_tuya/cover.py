@@ -115,9 +115,6 @@ COVERS: dict[str, tuple[XTCoverEntityDescription, ...]] = {
             current_position=XTDPCode.POSITION,
             set_position=XTDPCode.POSITION,
             device_class=CoverDeviceClass.CURTAIN,
-            open_instruction_value="FZ",
-            close_instruction_value="ZZ",
-            stop_instruction_value="STOP",
             control_back_mode=XTDPCode.CONTROL_BACK_MODE,
         ),
         # switch_1 is an undocumented code that behaves identically to control
@@ -314,7 +311,7 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         if current_cover_position is not None:
             if self.is_cover_status_inverted and self._current_position is not None:
                 return round(
-                    self._current_position.remap_value_to(
+                    self._current_position.type_information.remap_value_to(
                         current_cover_position, 0, 100, reverse=True
                     )
                 )
@@ -330,7 +327,7 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
             return None
 
         return round(
-            self._current_position.remap_value_to(position, 0, 100, reverse=True)
+            self._current_position.type_information.remap_value_to(position, 0, 100, reverse=True)
         )
 
     @property
@@ -355,88 +352,26 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
             return position == computed_position
         return None
 
-    def open_cover(self, **kwargs: Any) -> None:
+    async def async_open_cover(self, **kwargs: Any) -> None:
         """Open the cover."""
-        value: bool | str = True
-        computed_position = 100
         if self.is_cover_control_inverted:
-            computed_position = 0
-        if self.find_dpcode(
-            self.entity_description.key, dptype=TuyaDPType.ENUM, prefer_function=True
-        ):
-            value = self.entity_description.open_instruction_value
+            await super().async_close_cover(**kwargs)
+        else:
+            await super().async_open_cover(**kwargs)
 
-        commands: list[dict[str, str | int]] = [
-            {"code": self.entity_description.key, "value": value}
-        ]
-
-        if self._set_position is not None:
-            # LOGGER.warning(f"Sending cover open: {self._set_position.remap_value_from(computed_position, 0, 100, reverse=True)}")
-            commands.append(
-                {
-                    "code": self._set_position.dpcode,
-                    "value": round(
-                        self._set_position.remap_value_from(
-                            computed_position, 0, 100, reverse=True
-                        ),
-                    ),
-                }
-            )
-
-        self._send_command(commands)
-
-    def close_cover(self, **kwargs: Any) -> None:
-        """Close cover."""
-        value: bool | str = False
-        computed_position = 0
+    async def async_close_cover(self, **kwargs: Any) -> None:
         if self.is_cover_control_inverted:
-            computed_position = 100
-        if self.find_dpcode(
-            self.entity_description.key, dptype=TuyaDPType.ENUM, prefer_function=True
-        ):
-            value = self.entity_description.close_instruction_value
+            await super().async_open_cover(**kwargs)
+        else:
+            await super().async_close_cover(**kwargs)
 
-        commands: list[dict[str, str | int]] = [
-            {"code": self.entity_description.key, "value": value}
-        ]
-
-        if self._set_position is not None:
-            # LOGGER.warning(f"Sending cover close: {self._set_position.remap_value_from(computed_position, 0, 100, reverse=True)}")
-            commands.append(
-                {
-                    "code": self._set_position.dpcode,
-                    "value": round(
-                        self._set_position.remap_value_from(
-                            computed_position, 0, 100, reverse=True
-                        ),
-                    ),
-                }
-            )
-
-        self._send_command(commands)
-
-    def set_cover_position(self, **kwargs: Any) -> None:
+    async def async_set_cover_position(self, **kwargs: Any) -> None:
         """Move the cover to a specific position."""
         computed_position = kwargs[ATTR_POSITION]
         if self.is_cover_control_inverted:
             computed_position = 100 - computed_position
-        if self._set_position is None:
-            raise RuntimeError(
-                "Cannot set position, device doesn't provide methods to set it"
-            )
-
-        self._send_command(
-            [
-                {
-                    "code": self._set_position.dpcode,
-                    "value": round(
-                        self._set_position.remap_value_from(
-                            computed_position, 0, 100, reverse=True
-                        )
-                    ),
-                }
-            ]
-        )
+            kwargs[ATTR_POSITION] = computed_position
+        await super().async_set_cover_position(**kwargs)
 
     @staticmethod
     def get_entity_instance(

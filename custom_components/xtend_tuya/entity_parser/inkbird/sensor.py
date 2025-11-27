@@ -18,6 +18,7 @@ from ...const import LOGGER
 from ...sensor import (
     XTSensorEntity,
     XTSensorEntityDescription,
+    TuyaDPCodeWrapper,
 )
 from ...multi_manager.multi_manager import (
     XTDevice,
@@ -104,9 +105,10 @@ class InkbirdSensorEntityDescription(XTSensorEntityDescription):
         device: XTDevice,
         device_manager: MultiManager,
         description: XTSensorEntityDescription,
+        dpcode_wrapper: TuyaDPCodeWrapper,
     ) -> XTSensorEntity:
         return InkbirdSensorEntity(
-            device=device, device_manager=device_manager, description=description
+            device=device, device_manager=device_manager, description=description, dpcode_wrapper=dpcode_wrapper
         )
 
 
@@ -180,13 +182,14 @@ class InkbirdSensorEntity(XTSensorEntity):
         device: XTDevice,
         device_manager: MultiManager,
         description: XTSensorEntityDescription,
+        dpcode_wrapper: TuyaDPCodeWrapper,
     ) -> None:
         self.entity_description = description  # type: ignore
 
         """Initialize Inkbird channel sensor."""
         # LOGGER.info("🐦 Initializing InkbirdChannelSensorEntity for device %s, key %s, data_key %s",
         #           device.id, description.key, self.entity_description.data_key)
-        super().__init__(device, device_manager, description)
+        super().__init__(device, device_manager, description, dpcode_wrapper)
         # Override unique_id to include data_key for uniqueness
         self._attr_unique_id = (
             f"{self.device.id}_{description.key}_{self.entity_description.data_key}"

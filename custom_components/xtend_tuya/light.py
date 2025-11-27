@@ -218,7 +218,7 @@ class XTLightEntity(XTEntity, TuyaLightEntity):
             super(XTEntity, self).__init__(device, device_manager, description)  # type: ignore
         except Exception as e:
             if (
-                dpcode := self.find_dpcode(description.color_data, prefer_function=True)
+                dpcode := self.find_dpcode(device, description.color_data, prefer_function=True)
             ) and self.get_dptype(dpcode, device) == TuyaDPType.JSON:
                 if dpcode in self.device.function:
                     values = self.device.function[dpcode].values
@@ -236,7 +236,7 @@ class XTLightEntity(XTEntity, TuyaLightEntity):
 
     def fix_color_data(self, device: XTDevice, description: XTLightEntityDescription):
         if (
-            dpcode := self.find_dpcode(description.color_data, prefer_function=True)
+            dpcode := self.find_dpcode(device, description.color_data, prefer_function=True)
         ) and self.get_dptype(dpcode, device) == TuyaDPType.JSON:
             values = "{}"
             if dpcode in self.device.function:
