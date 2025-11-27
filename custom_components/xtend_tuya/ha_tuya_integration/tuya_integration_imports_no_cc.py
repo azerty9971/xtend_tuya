@@ -133,6 +133,7 @@ try:
         DPCodeTypeInformationWrapper as TuyaDPCodeTypeInformationWrapper,  # noqa: F401
         DPCodeBooleanWrapper as TuyaDPCodeBooleanWrapper,  # noqa: F401
         DPCodeEnumWrapper as TuyaDPCodeEnumWrapper,  # noqa: F401
+        DPCodeIntegerWrapper as TuyaDPCodeIntegerWrapper,  # noqa: F401
         find_dpcode as tuya_find_dpcode,  # noqa: F401
     )
 except Exception:
