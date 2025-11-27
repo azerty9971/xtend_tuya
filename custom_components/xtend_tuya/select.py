@@ -26,6 +26,7 @@ from .entity import (
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaSelectEntity,
     TuyaSelectEntityDescription,
+    TuyaDPCodeEnumWrapper,
 )
 
 
@@ -43,11 +44,13 @@ class XTSelectEntityDescription(TuyaSelectEntityDescription):
         device: XTDevice,
         device_manager: MultiManager,
         description: XTSelectEntityDescription,
+        dpcode_wrapper: TuyaDPCodeEnumWrapper,
     ) -> XTSelectEntity:
         return XTSelectEntity(
             device=device,
             device_manager=device_manager,
             description=XTSelectEntityDescription(**description.__dict__),
+            dpcode_wrapper=dpcode_wrapper,
         )
 
 
@@ -299,11 +302,14 @@ async def async_setup_entry(
                         entity_registry_enabled_default=False,
                         entity_registry_visible_default=False,
                     )
-                    entities.append(
-                        XTSelectEntity.get_entity_instance(
-                            descriptor, device, hass_data.manager
+                    if dpcode_wrapper := TuyaDPCodeEnumWrapper.find_dpcode(
+                            device, descriptor.key, prefer_function=True
+                        ):
+                        entities.append(
+                            XTSelectEntity.get_entity_instance(
+                                descriptor, device, hass_data.manager, dpcode_wrapper
+                            )
                         )
-                    )
         async_add_entities(entities)
 
     @callback
@@ -332,28 +338,42 @@ async def async_setup_entry(
                         )
                     entities.extend(
                         XTSelectEntity.get_entity_instance(
-                            description, device, hass_data.manager
+                            description, device, hass_data.manager, dpcode_wrapper
                         )
                         for description in category_descriptions
-                        if XTEntity.supports_description(
-                            device,
-                            this_platform,
-                            description,
-                            True,
-                            externally_managed_dpcodes,
+                        if (
+                            XTEntity.supports_description(
+                                device,
+                                this_platform,
+                                description,
+                                True,
+                                externally_managed_dpcodes,
+                            )
+                            and (
+                                dpcode_wrapper := TuyaDPCodeEnumWrapper.find_dpcode(
+                                    device, description.key, prefer_function=True
+                                )
+                            )
                         )
                     )
                     entities.extend(
                         XTSelectEntity.get_entity_instance(
-                            description, device, hass_data.manager
+                            description, device, hass_data.manager, dpcode_wrapper
                         )
                         for description in category_descriptions
-                        if XTEntity.supports_description(
-                            device,
-                            this_platform,
-                            description,
-                            False,
-                            externally_managed_dpcodes,
+                        if (
+                            XTEntity.supports_description(
+                                device,
+                                this_platform,
+                                description,
+                                False,
+                                externally_managed_dpcodes,
+                            )
+                            and (
+                                dpcode_wrapper := TuyaDPCodeEnumWrapper.find_dpcode(
+                                    device, description.key, prefer_function=True
+                                )
+                            )
                         )
                     )
 
@@ -381,10 +401,13 @@ class XTSelectEntity(XTEntity, TuyaSelectEntity):
         device: XTDevice,
         device_manager: MultiManager,
         description: XTSelectEntityDescription,
+        dpcode_wrapper: TuyaDPCodeEnumWrapper,
     ) -> None:
         """Init XT select."""
-        super(XTSelectEntity, self).__init__(device, device_manager, description)
-        super(XTEntity, self).__init__(device, device_manager, description)  # type: ignore
+        super(XTSelectEntity, self).__init__(
+            device, device_manager, description, dpcode_wrapper=dpcode_wrapper
+        )
+        super(XTEntity, self).__init__(device, device_manager, description, dpcode_wrapper)  # type: ignore
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description
@@ -400,11 +423,17 @@ class XTSelectEntity(XTEntity, TuyaSelectEntity):
         description: XTSelectEntityDescription,
         device: XTDevice,
         device_manager: MultiManager,
+        dpcode_wrapper: TuyaDPCodeEnumWrapper,
     ) -> XTSelectEntity:
         if hasattr(description, "get_entity_instance") and callable(
             getattr(description, "get_entity_instance")
         ):
-            return description.get_entity_instance(device, device_manager, description)
+            return description.get_entity_instance(
+                device, device_manager, description, dpcode_wrapper
+            )
         return XTSelectEntity(
-            device, device_manager, XTSelectEntityDescription(**description.__dict__)
+            device,
+            device_manager,
+            XTSelectEntityDescription(**description.__dict__),
+            dpcode_wrapper,
         )
