@@ -33,7 +33,7 @@ from .ha_tuya_integration.tuya_integration_imports import (
     TuyaBinarySensorEntityDescription,
     TuyaDPType,
     TuyaDPCodeWrapper,
-    tuya_binary_sensor_get_dpcode_wrapper,
+    binary_sensor,
 )
 from .entity import (
     XTEntity,
@@ -330,7 +330,7 @@ async def async_setup_entry(
                                     entity_registry_enabled_default=False,
                                     entity_registry_visible_default=False,
                                 )
-                                if dpcode_wrapper := tuya_binary_sensor_get_dpcode_wrapper(device, descriptor):
+                                if dpcode_wrapper := binary_sensor._get_dpcode_wrapper(device, descriptor):
                                     entities.append(
                                         XTBinarySensorEntity.get_entity_instance(
                                             descriptor, device, hass_data.manager, dpcode_wrapper
@@ -346,7 +346,7 @@ async def async_setup_entry(
                                 entity_registry_enabled_default=False,
                                 entity_registry_visible_default=False,
                             )
-                            if dpcode_wrapper := tuya_binary_sensor_get_dpcode_wrapper(device, descriptor):
+                            if dpcode_wrapper := binary_sensor._get_dpcode_wrapper(device, descriptor):
                                 entities.append(
                                     XTBinarySensorEntity.get_entity_instance(
                                         descriptor, device, hass_data.manager, dpcode_wrapper
@@ -392,7 +392,7 @@ async def async_setup_entry(
                             COMPOUND_KEY,
                         )
                         and
-                        (dpcode_wrapper := tuya_binary_sensor_get_dpcode_wrapper(device, description)))
+                        (dpcode_wrapper := binary_sensor._get_dpcode_wrapper(device, description)))
                     )
                     entities.extend(
                         XTBinarySensorEntity.get_entity_instance(
@@ -408,7 +408,7 @@ async def async_setup_entry(
                             COMPOUND_KEY,
                         )
                         and
-                        (dpcode_wrapper := tuya_binary_sensor_get_dpcode_wrapper(device, description)))
+                        (dpcode_wrapper := binary_sensor._get_dpcode_wrapper(device, description)))
                     )
         async_add_entities(entities)
         if restrict_dpcode is None:

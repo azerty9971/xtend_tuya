@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import homeassistant.components.tuya.models as tuya_model
+
 from ....ha_tuya_integration.tuya_integration_imports import (
     TuyaCustomerDevice,
     TuyaDPCode,
@@ -12,7 +14,6 @@ from ....ha_tuya_integration.tuya_integration_imports import (
 from ..decorator import (
     XTDecorator,
 )
-import homeassistant.components.tuya.models as tuya_model
 
 class XTTuyaModelPatcher:
 

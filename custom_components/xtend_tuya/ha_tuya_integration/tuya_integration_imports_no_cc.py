@@ -9,9 +9,9 @@ from homeassistant.components.tuya.binary_sensor import (
     BINARY_SENSORS as BINARY_SENSORS_TUYA,  # noqa: F401
     TuyaBinarySensorEntity as TuyaBinarySensorEntity,
     TuyaBinarySensorEntityDescription as TuyaBinarySensorEntityDescription,
-    _get_dpcode_wrapper as tuya_binary_sensor_get_dpcode_wrapper,  # noqa: F401
     _CustomDPCodeWrapper as TuyaBinarySensorCustomDPCodeWrapper,  # noqa: F401
 )
+import homeassistant.components.tuya.binary_sensor as binary_sensor  # noqa: F401
 from homeassistant.components.button import (
     ButtonEntityDescription as TuyaButtonEntityDescription,  # noqa: F401
 )
