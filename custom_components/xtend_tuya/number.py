@@ -778,6 +778,8 @@ class XTNumberEntity(XTEntity, TuyaNumberEntity):
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description
+        self._attr_unique_id = f"xt.{self._attr_unique_id}.{description.key}"
+        
         # Use custom native_max_value
         if description.native_max_value is not None:
             self._attr_native_max_value = description.native_max_value

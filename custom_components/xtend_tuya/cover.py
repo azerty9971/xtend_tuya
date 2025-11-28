@@ -311,6 +311,7 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         )
         self.device = device
         self.local_hass = hass
+        self._attr_unique_id = f"xt.{self._attr_unique_id}.{description.key}"
         device_manager.add_post_setup_callback(
             XTMultiManagerPostSetupCallbackPriority.PRIORITY1,
             self.add_cover_open_close_option,
