@@ -33,6 +33,10 @@ from .ha_tuya_integration.tuya_integration_imports import (
     TuyaCoverEntityDescription,
     TuyaDPCode,
     TuyaDPType,
+    TuyaCoverDPCodePercentageMappingWrapper,
+    TuyaCoverIsClosedWrapper,
+    TuyaCoverInstructionWrapper,
+    tuya_cover_get_instruction_wrapper,
 )
 from .entity import (
     XTEntity,
@@ -45,7 +49,7 @@ class XTCoverEntityDescription(TuyaCoverEntityDescription):
     """Describes XT cover entity."""
 
     current_state: TuyaDPCode | XTDPCode | None = None  # type: ignore
-    current_position: ( # type: ignore
+    current_position: (  # type: ignore
         TuyaDPCode | tuple[TuyaDPCode, ...] | XTDPCode | tuple[XTDPCode, ...] | None
     ) = None
     set_position: TuyaDPCode | XTDPCode | None = None  # type: ignore
@@ -62,12 +66,23 @@ class XTCoverEntityDescription(TuyaCoverEntityDescription):
         device_manager: MultiManager,
         description: XTCoverEntityDescription,
         hass: HomeAssistant,
+        *,
+        current_position: TuyaCoverDPCodePercentageMappingWrapper | None,
+        current_state_wrapper: TuyaCoverIsClosedWrapper | None,
+        instruction_wrapper: TuyaCoverInstructionWrapper | None,
+        set_position: TuyaCoverDPCodePercentageMappingWrapper | None,
+        tilt_position: TuyaCoverDPCodePercentageMappingWrapper | None,
     ) -> XTCoverEntity:
         return XTCoverEntity(
             device=device,
             device_manager=device_manager,
             description=XTCoverEntityDescription(**description.__dict__),
             hass=hass,
+            current_position=current_position,
+            current_state_wrapper=current_state_wrapper,
+            instruction_wrapper=instruction_wrapper,
+            set_position=set_position,
+            tilt_position=tilt_position,
         )
 
 
@@ -149,7 +164,10 @@ async def async_setup_entry(
             dict[str, tuple[XTCoverEntityDescription, ...]],
         ],
         XTEntityDescriptorManager.get_platform_descriptors(
-            COVERS, entry.runtime_data.multi_manager, XTCoverEntityDescription, this_platform
+            COVERS,
+            entry.runtime_data.multi_manager,
+            XTCoverEntityDescription,
+            this_platform,
         ),
     )
 
@@ -162,11 +180,8 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if (
-                    category_descriptions
-                    := XTEntityDescriptorManager.get_category_descriptors(
-                        supported_descriptors, device.category
-                    )
+                if category_descriptions := XTEntityDescriptorManager.get_category_descriptors(
+                    supported_descriptors, device.category
                 ):
                     externally_managed_dpcodes = (
                         XTEntityDescriptorManager.get_category_keys(
@@ -182,7 +197,30 @@ async def async_setup_entry(
                         )
                     entities.extend(
                         XTCoverEntity.get_entity_instance(
-                            description, device, hass_data.manager, hass
+                            description,
+                            device,
+                            hass_data.manager,
+                            hass,
+                            current_position=description.position_wrapper.find_dpcode(
+                                device, description.current_position  # type: ignore
+                            ),
+                            instruction_wrapper=tuya_cover_get_instruction_wrapper(
+                                device, description
+                            ),
+                            current_state_wrapper=description.current_state_wrapper.find_dpcode(
+                                device, description.current_state
+                            ),
+                            set_position=description.position_wrapper.find_dpcode(
+                                device, description.set_position, prefer_function=True
+                            ),
+                            tilt_position=description.position_wrapper.find_dpcode(
+                                device,
+                                (
+                                    TuyaDPCode.ANGLE_HORIZONTAL,
+                                    TuyaDPCode.ANGLE_VERTICAL,
+                                ),
+                                prefer_function=True,
+                            ),
                         )
                         for description in category_descriptions
                         if XTEntity.supports_description(
@@ -195,7 +233,30 @@ async def async_setup_entry(
                     )
                     entities.extend(
                         XTCoverEntity.get_entity_instance(
-                            description, device, hass_data.manager, hass
+                            description,
+                            device,
+                            hass_data.manager,
+                            hass,
+                            current_position=description.position_wrapper.find_dpcode(
+                                device, description.current_position  # type: ignore
+                            ),
+                            instruction_wrapper=tuya_cover_get_instruction_wrapper(
+                                device, description
+                            ),
+                            current_state_wrapper=description.current_state_wrapper.find_dpcode(
+                                device, description.current_state
+                            ),
+                            set_position=description.position_wrapper.find_dpcode(
+                                device, description.set_position, prefer_function=True
+                            ),
+                            tilt_position=description.position_wrapper.find_dpcode(
+                                device,
+                                (
+                                    TuyaDPCode.ANGLE_HORIZONTAL,
+                                    TuyaDPCode.ANGLE_VERTICAL,
+                                ),
+                                prefer_function=True,
+                            ),
                         )
                         for description in category_descriptions
                         if XTEntity.supports_description(
@@ -228,11 +289,26 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         device_manager: MultiManager,
         description: XTCoverEntityDescription,
         hass: HomeAssistant,
+        *,
+        current_position: TuyaCoverDPCodePercentageMappingWrapper | None,
+        current_state_wrapper: TuyaCoverIsClosedWrapper | None,
+        instruction_wrapper: TuyaCoverInstructionWrapper | None,
+        set_position: TuyaCoverDPCodePercentageMappingWrapper | None,
+        tilt_position: TuyaCoverDPCodePercentageMappingWrapper | None,
     ) -> None:
         """Initialize the cover entity."""
 
         super(XTCoverEntity, self).__init__(device, device_manager, description)
-        super(XTEntity, self).__init__(device, device_manager, description)  # type: ignore
+        super(XTEntity, self).__init__(
+            device,
+            device_manager,  # type: ignore
+            description,
+            current_position=current_position,
+            current_state_wrapper=current_state_wrapper,
+            instruction_wrapper=instruction_wrapper,
+            set_position=set_position,
+            tilt_position=tilt_position,
+        )
         self.device = device
         self.local_hass = hass
         device_manager.add_post_setup_callback(
@@ -327,7 +403,9 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
             return None
 
         return round(
-            self._current_position.type_information.remap_value_to(position, 0, 100, reverse=True)
+            self._current_position.type_information.remap_value_to(
+                position, 0, 100, reverse=True
+            )
         )
 
     @property
@@ -379,16 +457,35 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         device: XTDevice,
         device_manager: MultiManager,
         hass: HomeAssistant,
+        *,
+        current_position: TuyaCoverDPCodePercentageMappingWrapper | None,
+        current_state_wrapper: TuyaCoverIsClosedWrapper | None,
+        instruction_wrapper: TuyaCoverInstructionWrapper | None,
+        set_position: TuyaCoverDPCodePercentageMappingWrapper | None,
+        tilt_position: TuyaCoverDPCodePercentageMappingWrapper | None,
     ) -> XTCoverEntity:
         if hasattr(description, "get_entity_instance") and callable(
             getattr(description, "get_entity_instance")
         ):
             return description.get_entity_instance(
-                device, device_manager, description, hass
+                device,
+                device_manager,
+                description,
+                hass,
+                current_position=current_position,
+                current_state_wrapper=current_state_wrapper,
+                instruction_wrapper=instruction_wrapper,
+                set_position=set_position,
+                tilt_position=tilt_position,
             )
         return XTCoverEntity(
             device,
             device_manager,
             XTCoverEntityDescription(**description.__dict__),
             hass,
+            current_position=current_position,
+            current_state_wrapper=current_state_wrapper,
+            instruction_wrapper=instruction_wrapper,
+            set_position=set_position,
+            tilt_position=tilt_position,
         )

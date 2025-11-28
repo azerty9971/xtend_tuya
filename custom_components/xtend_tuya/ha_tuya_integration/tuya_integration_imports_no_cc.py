@@ -35,6 +35,10 @@ from homeassistant.components.tuya.cover import (
     COVERS as COVERS_TUYA,  # noqa: F401
     TuyaCoverEntity as TuyaCoverEntity,
     TuyaCoverEntityDescription as TuyaCoverEntityDescription,
+    _DPCodePercentageMappingWrapper as TuyaCoverDPCodePercentageMappingWrapper,  # noqa: F401
+    _IsClosedWrapper as TuyaCoverIsClosedWrapper,  # noqa: F401
+    _InstructionWrapper as TuyaCoverInstructionWrapper,  # noqa: F401
+    _get_instruction_wrapper as tuya_cover_get_instruction_wrapper,  # noqa: F401
 )
 from homeassistant.components.event import (
     EventEntityDescription,
