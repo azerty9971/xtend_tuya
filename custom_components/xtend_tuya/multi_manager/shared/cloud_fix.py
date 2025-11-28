@@ -9,8 +9,8 @@ from .shared_classes import (
 )
 from ...ha_tuya_integration.tuya_integration_imports import (
     TuyaDPType,
+    tuya_util_parse_dptype,
 )
-import custom_components.xtend_tuya.entity as entity
 
 
 class CloudFixes:
@@ -238,21 +238,21 @@ class CloudFixes:
                         device.status_range[key]
                     )
                 )
-            device.status_range[key].type = entity.XTEntity.determine_dptype(
-                device.status_range[key].type
+            device.status_range[key].type = tuya_util_parse_dptype(
+                str(device.status_range[key].type)
             )
         for key in device.function:
             if not isinstance(device.function[key], XTDeviceFunction):
                 device.function[key] = XTDeviceFunction.from_compatible_function(
                     device.function[key]
                 )
-            device.function[key].type = entity.XTEntity.determine_dptype(
-                device.function[key].type
+            device.function[key].type = tuya_util_parse_dptype(
+                str(device.function[key].type)
             )
         for dpId in device.local_strategy:
             if config_item := device.local_strategy[dpId].get("config_item"):
                 if "valueType" in config_item and "valueDesc" in config_item:
-                    config_item["valueType"] = entity.XTEntity.determine_dptype(
+                    config_item["valueType"] = tuya_util_parse_dptype(
                         config_item["valueType"]
                     )
                     if code := device.local_strategy[dpId].get("status_code"):
@@ -721,13 +721,13 @@ class CloudFixes:
                 return 1
             if (
                 value1[key] == TuyaDPType.RAW
-                and entity.XTEntity.determine_dptype(value2[key]) is not None
+                and tuya_util_parse_dptype(value2[key]) is not None
                 and isinstance(value1[key], TuyaDPType)
             ):
                 return 2
             if (
                 value2[key] == TuyaDPType.RAW
-                and entity.XTEntity.determine_dptype(value1[key]) is not None
+                and tuya_util_parse_dptype(value1[key]) is not None
                 and isinstance(value2[key], TuyaDPType)
             ):
                 return 1

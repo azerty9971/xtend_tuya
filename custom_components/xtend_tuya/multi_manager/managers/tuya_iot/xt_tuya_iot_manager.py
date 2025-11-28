@@ -43,7 +43,6 @@ from ...shared.merging_manager import (
 from ...multi_manager import (
     MultiManager,  # noqa: F811
 )
-from ....entity import XTEntity
 from .ipc.xt_tuya_iot_ipc_manager import XTIOTIPCManager
 from .xt_tuya_iot_openapi import (
     XTIOTOpenAPI,
@@ -51,6 +50,9 @@ from .xt_tuya_iot_openapi import (
 from .xt_tuya_iot_device import (
     XTIndustrySolutionDeviceManage,
     XTSmartHomeDeviceManage,
+)
+from ....ha_tuya_integration.tuya_integration_imports import (
+    tuya_util_parse_dptype,
 )
 
 
@@ -331,7 +333,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                         dp_id = int(property["abilityId"])
                         code = property["code"]
                         typeSpec = property["typeSpec"]
-                        real_type = XTEntity.determine_dptype(typeSpec["type"])
+                        real_type = tuya_util_parse_dptype(typeSpec["type"])
                         access_mode = property["accessMode"]
                         typeSpec.pop("type")
                         typeSpec_json = json.dumps(typeSpec)
@@ -379,7 +381,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                             property_update = False
                         else:
                             property_update = True
-                        real_type = XTEntity.determine_dptype(dp_type)
+                        real_type = tuya_util_parse_dptype(dp_type)
                         device_properties.local_strategy[dp_id] = {
                             "value_convert": "default",
                             "status_code": code,

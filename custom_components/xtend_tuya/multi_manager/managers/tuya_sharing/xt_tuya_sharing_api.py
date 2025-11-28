@@ -119,10 +119,11 @@ class XTSharingAPI(CustomerApi):
             }
             query_encdata = str(query_encdata, encoding="utf8")
         body_encdata = ""
+        body_encrypted = body
         if body is not None and len(body.keys()) > 0:
             body_encdata = _form_to_json(body)
             body_encdata = _aes_gcm_encrypt(body_encdata, secret)
-            body = {
+            body_encrypted = {
                 "encdata": str(body_encdata, encoding="utf8")
             }
             body_encdata = str(body_encdata, encoding="utf8")
@@ -144,7 +145,7 @@ class XTSharingAPI(CustomerApi):
         headers["X-sign"] = sign
 
         response = self.session.request(
-            method, self.endpoint + path, params=params_enc, json=body, headers=headers
+            method, self.endpoint + path, params=params_enc, json=body_encrypted, headers=headers
         )
 
         if response.ok is False:
@@ -154,13 +155,6 @@ class XTSharingAPI(CustomerApi):
             return None
 
         ret = response.json()
-        time_taken = datetime.now() - start_time
-        LOGGER.debug(
-            f"[SHARING API][{time_taken}]Request: {method} {path} PARAMS: {json.dumps(params, ensure_ascii=False, indent=2) if params is not None else ''} BODY: {json.dumps(body, ensure_ascii=False, indent=2) if body is not None else ''}"
-        )
-        LOGGER.debug(
-            f"[SHARING API][{time_taken}]Response: {json.dumps(ret, ensure_ascii=False, indent=2)}"
-        )
 
         if not ret.get("success"):
             raise Exception(f"network error:({ret['code']}) {ret['msg']}")
@@ -170,5 +164,12 @@ class XTSharingAPI(CustomerApi):
             ret["result"] = json.loads(result)
         except json.decoder.JSONDecodeError:
             ret["result"] = result
-
+        
+        time_taken = datetime.now() - start_time
+        LOGGER.debug(
+            f"[SHARING API][{time_taken}]Request: {method} {path} PARAMS: {json.dumps(params, ensure_ascii=False, indent=2) if params is not None else ''} BODY: {json.dumps(body, ensure_ascii=False, indent=2) if body is not None else ''}"
+        )
+        LOGGER.debug(
+            f"[SHARING API][{time_taken}]Response: {json.dumps(ret, ensure_ascii=False, indent=2)}"
+        )
         return ret

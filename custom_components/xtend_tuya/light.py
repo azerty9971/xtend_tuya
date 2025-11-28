@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 from typing import cast
-import json
 from dataclasses import dataclass
 from homeassistant.const import EntityCategory, Platform
 from homeassistant.core import HomeAssistant, callback
@@ -19,14 +18,12 @@ from .multi_manager.multi_manager import (
 from .const import (
     TUYA_DISCOVERY_NEW,
     XTDPCode,
-    LOGGER,
     XTMultiManagerPostSetupCallbackPriority,
 )
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaLightEntity,
     TuyaLightEntityDescription,
     TuyaDPCode,
-    TuyaDPType,
     TuyaDPCodeEnumWrapper,
     TuyaDPCodeBooleanWrapper,
     TuyaLightBrightnessWrapper,
@@ -304,34 +301,17 @@ class XTLightEntity(XTEntity, TuyaLightEntity):
         color_temp_wrapper: TuyaLightColorTempWrapper | None,
         switch_wrapper: TuyaDPCodeBooleanWrapper,
     ) -> None:
-        try:
-            super(XTLightEntity, self).__init__(device, device_manager, description)
-            super(XTEntity, self).__init__(
-                device,
-                device_manager,  # type: ignore
-                description,
-                brightness_wrapper=brightness_wrapper,
-                color_data_wrapper=color_data_wrapper,
-                color_mode_wrapper=color_mode_wrapper,
-                color_temp_wrapper=color_temp_wrapper,
-                switch_wrapper=switch_wrapper,
-            )
-        except Exception as e:
-            if (
-                dpcode := self.find_dpcode(
-                    device, description.color_data, prefer_function=True
-                )
-            ) and self.get_dptype(dpcode, device) == TuyaDPType.JSON:
-                if dpcode in self.device.function:
-                    values = self.device.function[dpcode].values
-                else:
-                    values = self.device.status_range[dpcode].values
-                values_status = self.device.status.get(dpcode, "{}")
-                values_status_json = json.loads(values_status)
-                if function_data := json.loads(values):
-                    LOGGER.warning(
-                        f"Failed light: {device.name} => {function_data} <=> {values_status_json} <=> {e}"
-                    )
+        super(XTLightEntity, self).__init__(device, device_manager, description)
+        super(XTEntity, self).__init__(
+            device,
+            device_manager,  # type: ignore
+            description,
+            brightness_wrapper=brightness_wrapper,
+            color_data_wrapper=color_data_wrapper,
+            color_mode_wrapper=color_mode_wrapper,
+            color_temp_wrapper=color_temp_wrapper,
+            switch_wrapper=switch_wrapper,
+        )
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description

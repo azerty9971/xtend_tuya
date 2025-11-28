@@ -16,6 +16,10 @@ from .const import TUYA_DISCOVERY_NEW
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaHumidifierEntity,
     TuyaHumidifierEntityDescription,
+    TuyaHumidifierRoundedIntegerWrapper,
+    TuyaDPCodeEnumWrapper,
+    TuyaDPCodeBooleanWrapper,
+    TuyaDPCode,
 )
 from .entity import (
     XTEntity,
@@ -35,11 +39,20 @@ class XTHumidifierEntityDescription(TuyaHumidifierEntityDescription):
         device: XTDevice,
         device_manager: MultiManager,
         description: XTHumidifierEntityDescription,
+        *,
+        current_humidity_wrapper: TuyaHumidifierRoundedIntegerWrapper | None = None,
+        mode_wrapper: TuyaDPCodeEnumWrapper | None = None,
+        switch_wrapper: TuyaDPCodeBooleanWrapper | None = None,
+        target_humidity_wrapper: TuyaHumidifierRoundedIntegerWrapper | None = None,
     ) -> XTHumidifierEntity:
         return XTHumidifierEntity(
             device=device,
             device_manager=device_manager,
             description=XTHumidifierEntityDescription(**description.__dict__),
+            current_humidity_wrapper=current_humidity_wrapper,
+            mode_wrapper=mode_wrapper,
+            switch_wrapper=switch_wrapper,
+            target_humidity_wrapper=target_humidity_wrapper,
         )
 
 
@@ -62,7 +75,10 @@ async def async_setup_entry(
             dict[str, XTHumidifierEntityDescription],
         ],
         XTEntityDescriptorManager.get_platform_descriptors(
-            HUMIDIFIERS, entry.runtime_data.multi_manager, XTHumidifierEntityDescription, this_platform
+            HUMIDIFIERS,
+            entry.runtime_data.multi_manager,
+            XTHumidifierEntityDescription,
+            this_platform,
         ),
     )
 
@@ -77,12 +93,28 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if description := XTEntityDescriptorManager.get_category_descriptors(
+                if description := cast(XTHumidifierEntityDescription, XTEntityDescriptorManager.get_category_descriptors(
                     supported_descriptors, device.category
-                ):
+                )):
                     entities.append(
                         XTHumidifierEntity.get_entity_instance(
-                            description, device, hass_data.manager
+                            description,
+                            device,
+                            hass_data.manager,
+                            current_humidity_wrapper=TuyaHumidifierRoundedIntegerWrapper.find_dpcode(
+                                device, description.current_humidity
+                            ),
+                            mode_wrapper=TuyaDPCodeEnumWrapper.find_dpcode(
+                                device, TuyaDPCode.MODE, prefer_function=True
+                            ),
+                            switch_wrapper=TuyaDPCodeBooleanWrapper.find_dpcode(
+                                device,
+                                description.dpcode or description.key,
+                                prefer_function=True,
+                            ),
+                            target_humidity_wrapper=TuyaHumidifierRoundedIntegerWrapper.find_dpcode(
+                                device, description.humidity, prefer_function=True
+                            ),
                         )
                     )
         async_add_entities(entities)
@@ -103,9 +135,22 @@ class XTHumidifierEntity(XTEntity, TuyaHumidifierEntity):
         device: XTDevice,
         device_manager: MultiManager,
         description: XTHumidifierEntityDescription,
+        *,
+        current_humidity_wrapper: TuyaHumidifierRoundedIntegerWrapper | None = None,
+        mode_wrapper: TuyaDPCodeEnumWrapper | None = None,
+        switch_wrapper: TuyaDPCodeBooleanWrapper | None = None,
+        target_humidity_wrapper: TuyaHumidifierRoundedIntegerWrapper | None = None,
     ) -> None:
         super(XTHumidifierEntity, self).__init__(device, device_manager, description)
-        super(XTEntity, self).__init__(device, device_manager, description)  # type: ignore
+        super(XTEntity, self).__init__(
+            device,
+            device_manager,  # type: ignore
+            description,
+            current_humidity_wrapper=current_humidity_wrapper,
+            mode_wrapper=mode_wrapper,
+            switch_wrapper=switch_wrapper,
+            target_humidity_wrapper=target_humidity_wrapper,
+        )
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description
@@ -115,13 +160,30 @@ class XTHumidifierEntity(XTEntity, TuyaHumidifierEntity):
         description: XTHumidifierEntityDescription,
         device: XTDevice,
         device_manager: MultiManager,
+        *,
+        current_humidity_wrapper: TuyaHumidifierRoundedIntegerWrapper | None = None,
+        mode_wrapper: TuyaDPCodeEnumWrapper | None = None,
+        switch_wrapper: TuyaDPCodeBooleanWrapper | None = None,
+        target_humidity_wrapper: TuyaHumidifierRoundedIntegerWrapper | None = None,
     ) -> XTHumidifierEntity:
         if hasattr(description, "get_entity_instance") and callable(
             getattr(description, "get_entity_instance")
         ):
-            return description.get_entity_instance(device, device_manager, description)
+            return description.get_entity_instance(
+                device,
+                device_manager,
+                description,
+                current_humidity_wrapper=current_humidity_wrapper,
+                mode_wrapper=mode_wrapper,
+                switch_wrapper=switch_wrapper,
+                target_humidity_wrapper=target_humidity_wrapper,
+            )
         return XTHumidifierEntity(
             device,
             device_manager,
             XTHumidifierEntityDescription(**description.__dict__),
+            current_humidity_wrapper=current_humidity_wrapper,
+            mode_wrapper=mode_wrapper,
+            switch_wrapper=switch_wrapper,
+            target_humidity_wrapper=target_humidity_wrapper,
         )
