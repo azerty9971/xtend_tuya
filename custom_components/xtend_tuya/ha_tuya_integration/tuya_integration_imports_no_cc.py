@@ -52,6 +52,14 @@ except Exception:
 from homeassistant.components.tuya.fan import (
     TUYA_SUPPORT_TYPE as FANS_TUYA,  # noqa: F401
     TuyaFanEntity as TuyaFanEntity,
+    _DirectionEnumWrapper as TuyaFanDirectionEnumWrapper,  # noqa: F401
+    _FanSpeedEnumWrapper as TuyaFanFanSpeedEnumWrapper,  # noqa: F401
+    _FanSpeedIntegerWrapper as TuyaFanFanSpeedIntegerWrapper,  # noqa: F401
+    _DIRECTION_DPCODES as TUYA_FAN_DIRECTION_DPCODES,  # noqa: F401
+    _MODE_DPCODES as TUYA_FAN_MODE_DPCODES,  # noqa: F401
+    _OSCILLATE_DPCODES as TUYA_FAN_OSCILLATE_DPCODES,  # noqa: F401
+    _SWITCH_DPCODES as TUYA_FAN_SWITCH_DPCODES,  # noqa: F401
+    _get_speed_wrapper as tuya_fan_get_speed_wrapper,  # noqa: F401
 )
 from homeassistant.components.tuya.humidifier import (
     HUMIDIFIERS as HUMIDIFIERS_TUYA,  # noqa: F401
@@ -116,17 +124,19 @@ from homeassistant.components.tuya.const import (
     DEVICE_CLASS_UNITS as TuyaDEVICE_CLASS_UNITS,  # noqa: F401
     CELSIUS_ALIASES as TuyaCELSIUS_ALIASES,  # noqa: F401
     FAHRENHEIT_ALIASES as TuyaFAHRENHEIT_ALIASES,  # noqa: F401
+    DeviceCategory as TuyaDeviceCategory,  # noqa: F401
 )
 from homeassistant.components.tuya.entity import (
     TuyaEntity as TuyaEntity,
 )
+
 try:
     from homeassistant.components.tuya.util import (
         _DPTYPE_MAPPING as TUYA_DPTYPE_MAPPING,  # noqa: F401 # type: ignore
     )
 except Exception:
     from homeassistant.components.tuya.entity import (
-        _DPTYPE_MAPPING as TUYA_DPTYPE_MAPPING, # noqa: F401 # type: ignore
+        _DPTYPE_MAPPING as TUYA_DPTYPE_MAPPING,  # noqa: F401 # type: ignore
     )
 
 try:

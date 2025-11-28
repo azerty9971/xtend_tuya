@@ -12,6 +12,7 @@ from .ha_tuya_integration.tuya_integration_imports import (
     TuyaDPCode,
     TuyaCELSIUS_ALIASES,
     TuyaFAHRENHEIT_ALIASES,
+    TuyaDeviceCategory as XTDeviceCategory  # noqa: F401
 )
 
 XT_CELSIUS_ALIASES = TuyaCELSIUS_ALIASES.union(set())
