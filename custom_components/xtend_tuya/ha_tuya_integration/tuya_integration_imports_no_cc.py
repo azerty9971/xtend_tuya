@@ -70,6 +70,12 @@ from homeassistant.components.tuya.light import (
     LIGHTS as LIGHTS_TUYA,  # noqa: F401
     TuyaLightEntity as TuyaLightEntity,
     TuyaLightEntityDescription as TuyaLightEntityDescription,
+    _BrightnessWrapper as TuyaLightBrightnessWrapper,  # noqa: F401
+    _ColorDataWrapper as TuyaLightColorDataWrapper,  # noqa: F401
+    _ColorTempWrapper as TuyaLightColorTempWrapper,  # noqa: F401
+    _get_brightness_wrapper as tuya_light_get_brightness_wrapper,  # noqa: F401
+    _get_color_data_wrapper as tuya_light_get_color_data_wrapper,  # noqa: F401
+
 )
 from homeassistant.components.number import (
     NumberEntityDescription as TuyaNumberEntityDescription,  # noqa: F401
