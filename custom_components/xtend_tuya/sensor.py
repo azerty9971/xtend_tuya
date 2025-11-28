@@ -1625,6 +1625,8 @@ async def async_setup_entry(
                         ) and
                         (dpcode_wrapper := tuya_sensor_get_dpcode_wrapper(device, description)))
                     )
+        for entity in entities:
+            LOGGER.warning(f"SENSOR {entity._attr_unique_id} added")
         async_add_entities(entities)
         if restrict_dpcode is None:
             hass_data.manager.add_post_setup_callback(
