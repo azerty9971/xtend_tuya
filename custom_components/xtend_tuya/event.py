@@ -22,7 +22,6 @@ from .const import (
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaEventEntity,
     TuyaEventEntityDescription,
-    TuyaDPType,
     TuyaEventDPCodeEventWrapper,
 )
 from .entity import (
@@ -193,25 +192,6 @@ class XTEventEntity(XTEntity, TuyaEventEntity):
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description  # type: ignore
-
-        if dpcode := self.find_dpcode(device, description.key, dptype=TuyaDPType.ENUM):
-            self._attr_event_types: list[str] = dpcode.range
-
-    async def _handle_state_update(
-        self,
-        updated_status_properties: list[str] | None,
-        dp_timestamps: dict | None = None,
-    ) -> None:
-        if (
-            updated_status_properties is None
-            or self.entity_description.key not in updated_status_properties
-        ):
-            return
-
-        value = self.device.status.get(self.entity_description.key)
-        if value is not None and isinstance(value, str):
-            self._trigger_event(value)
-        self.async_write_ha_state()
 
     @staticmethod
     def get_entity_instance(

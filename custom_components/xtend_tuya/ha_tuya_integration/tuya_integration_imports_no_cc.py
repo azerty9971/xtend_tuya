@@ -49,7 +49,7 @@ try:
         EVENTS as EVENTS_TUYA,  # noqa: F401 # type: ignore
         TuyaEventEntity as TuyaEventEntity,
         TuyaEventEntityDescription as TuyaEventEntityDescription,
-        _DPCodeEventWrapper as TuyaEventDPCodeEventWrapper,
+        _DPCodeEventWrapper as TuyaEventDPCodeEventWrapper,  # noqa: F401
     )
 except Exception:
     EVENTS_TUYA: dict[str, tuple[EventEntityDescription, ...]] = {}
