@@ -48,6 +48,8 @@ try:
     from homeassistant.components.tuya.event import (
         EVENTS as EVENTS_TUYA,  # noqa: F401 # type: ignore
         TuyaEventEntity as TuyaEventEntity,
+        TuyaEventEntityDescription as TuyaEventEntityDescription,
+        _DPCodeEventWrapper as TuyaEventDPCodeEventWrapper,
     )
 except Exception:
     EVENTS_TUYA: dict[str, tuple[EventEntityDescription, ...]] = {}
