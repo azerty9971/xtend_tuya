@@ -32,7 +32,7 @@ from .entity import (
 
 
 @dataclass(frozen=True)
-class XTEventEntityDescription(TuyaEventEntityDescription, frozen_or_thawed=True):
+class XTEventEntityDescription(TuyaEventEntityDescription):
     override_tuya: bool = False
     dont_send_to_cloud: bool = False
     on_value: Any = None
