@@ -8,7 +8,7 @@ from webrtc_models import (
 )
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
-from tuya_iot import (
+from ....lib.tuya_iot import (
     AuthType,
 )
 from .xt_tuya_iot_openapi import (
@@ -131,7 +131,6 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
             return None
         auth_type = AuthType(config_entry.options[CONF_AUTH_TYPE])
         api = XTIOTOpenAPI(
-            hass=hass,
             endpoint=config_entry.options[CONF_ENDPOINT_OT],
             access_id=config_entry.options[CONF_ACCESS_ID],
             access_secret=config_entry.options[CONF_ACCESS_SECRET],
@@ -139,7 +138,6 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
             non_user_specific_api=False,
         )
         non_user_api = XTIOTOpenAPI(
-            hass=hass,
             endpoint=config_entry.options[CONF_ENDPOINT_OT],
             access_id=config_entry.options[CONF_ACCESS_ID],
             access_secret=config_entry.options[CONF_ACCESS_SECRET],
@@ -149,28 +147,24 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
         api.set_dev_channel("hass")
         try:
             if auth_type == AuthType.CUSTOM:
-                response1 = await XTEventLoopProtector.execute_out_of_event_loop_and_return(
+                connect_user_api = await XTEventLoopProtector.execute_out_of_event_loop_and_return(
                     api.connect,
                     config_entry.options[CONF_USERNAME],
                     config_entry.options[CONF_PASSWORD],
                 )
             else:
-                response1 = await XTEventLoopProtector.execute_out_of_event_loop_and_return(
+                connect_user_api = await XTEventLoopProtector.execute_out_of_event_loop_and_return(
                     api.connect,
                     config_entry.options[CONF_USERNAME],
                     config_entry.options[CONF_PASSWORD],
                     config_entry.options[CONF_COUNTRY_CODE],
                     config_entry.options[CONF_APP_TYPE],
                 )
-            response2 = await XTEventLoopProtector.execute_out_of_event_loop_and_return(
-                non_user_api.connect,
-                config_entry.options[CONF_USERNAME],
-                config_entry.options[CONF_PASSWORD],
-                config_entry.options[CONF_COUNTRY_CODE],
-                config_entry.options[CONF_APP_TYPE],
+            connect_non_user_api = await XTEventLoopProtector.execute_out_of_event_loop_and_return(
+                non_user_api.connect
             )
-            response3 = await XTEventLoopProtector.execute_out_of_event_loop_and_return(api.test_validity)
-            response4 = await XTEventLoopProtector.execute_out_of_event_loop_and_return(non_user_api.test_validity)
+            user_api_valid = await XTEventLoopProtector.execute_out_of_event_loop_and_return(api.test_validity)
+            non_user_api_valid = await XTEventLoopProtector.execute_out_of_event_loop_and_return(non_user_api.test_validity)
         except requests.exceptions.RequestException as e:
             LOGGER.error(f"Tuya IOT request didn't work: {e}")
             await self.raise_issue(
@@ -187,19 +181,19 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
             return None
 
         if (
-            response1.get("success", False) is False
-            or response2.get("success", False) is False
-            or response3.get("success", False) is False
-            or response4.get("success", False) is False
+            connect_user_api.get("success", False) is False
+            or connect_non_user_api.get("success", False) is False
+            or user_api_valid is False
+            or non_user_api_valid is False
         ):
-            if response1.get("success", False) is False:
-                LOGGER.error(f"Error connecting the USER api: {response1}")
-            if response2.get("success", False) is False:
-                LOGGER.error(f"Error connecting the NON-USER api: {response2}")
-            if response3.get("success", False) is False:
-                LOGGER.error(f"Error validating the USER api: {response3}")
-            if response4.get("success", False) is False:
-                LOGGER.error(f"Error validating the NON-USER api: {response4}")
+            if connect_user_api.get("success", False) is False:
+                LOGGER.error(f"Error connecting the USER api: {connect_user_api}")
+            if connect_non_user_api.get("success", False) is False:
+                LOGGER.error(f"Error connecting the NON-USER api: {connect_non_user_api}")
+            if user_api_valid is False:
+                LOGGER.error(f"Error validating the USER api: {user_api_valid}")
+            if non_user_api_valid is False:
+                LOGGER.error(f"Error validating the NON-USER api: {non_user_api_valid}")
             await self.raise_issue(
                 hass=hass,
                 config_entry=config_entry,

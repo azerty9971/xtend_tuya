@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 from typing import cast
+from dataclasses import dataclass
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
@@ -26,8 +27,12 @@ from .ha_tuya_integration.tuya_integration_imports import (
     TuyaSirenEntityDescription,
 )
 
-
+@dataclass(frozen=True)
 class XTSirenEntityDescription(TuyaSirenEntityDescription, frozen_or_thawed=True):
+
+    # duplicate the entity if handled by another integration
+    ignore_other_dp_code_handler: bool = False
+
     def get_entity_instance(
         self,
         device: XTDevice,

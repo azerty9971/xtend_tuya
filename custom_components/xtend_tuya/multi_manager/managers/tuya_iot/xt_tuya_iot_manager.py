@@ -7,14 +7,14 @@ from __future__ import annotations
 import json
 import datetime
 import time
-from tuya_iot import (
+from ....lib.tuya_iot import (
     TuyaDeviceManager,
     TuyaOpenMQ,
 )
-from tuya_iot.device import (
+from ....lib.tuya_iot.device import (
     BIZCODE_BIND_USER,
 )
-from tuya_iot.tuya_enums import (
+from ....lib.tuya_iot.tuya_enums import (
     AuthType,
 )
 from typing import Any, cast
@@ -116,7 +116,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         return {}
 
     async def async_update_device_list_in_smart_home_mod(self):
-        if self.api.token_info is None:  # CHANGED
+        if self.api.token_info.is_valid() is False:  # CHANGED
             return None  # CHANGED
         response = await XTEventLoopProtector.execute_out_of_event_loop_and_return(
             self.api.get, f"/v1.0/users/{self.api.token_info.uid}/devices"
@@ -146,7 +146,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
 
     # Copy of the Tuya original method with some minor modifications
     def update_device_list_in_smart_home_mod(self):
-        if self.api.token_info is None:  # CHANGED
+        if self.api.token_info.is_valid() is False:  # CHANGED
             return None  # CHANGED
         response = self.api.get(f"/v1.0/users/{self.api.token_info.uid}/devices")
         if response["success"]:
@@ -187,7 +187,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
 
     def get_devices_from_sharing(self) -> dict[str, XTDevice]:
         return_dict: dict[str, XTDevice] = {}
-        if self.api.token_info is None:
+        if self.api.token_info.is_valid() is False:
             return {}
         response = self.api.get(
             f"/v1.0/users/{self.api.token_info.uid}/devices?from=sharing"
@@ -239,7 +239,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                 XTMergingManager.merge_devices(device, device_open_api, self.multi_manager)
                 self.multi_manager.virtual_state_handler.apply_init_virtual_states(device)
 
-    def on_message(self, msg: str):
+    def on_message(self, msg: dict):
         super().on_message(msg)
 
     def _on_device_other(self, device_id: str, biz_code: str, data: dict[str, Any]):

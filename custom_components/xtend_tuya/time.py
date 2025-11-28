@@ -31,6 +31,9 @@ from .entity import (
 class XTTimeEntityDescription(TimeEntityDescription):
     """Describes a Tuya time."""
 
+    # duplicate the entity if handled by another integration
+    ignore_other_dp_code_handler: bool = False
+
     def get_entity_instance(
         self,
         device: XTDevice,

@@ -3,10 +3,20 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
 from enum import StrEnum, IntFlag, IntEnum
+from typing import Any
 import logging
 from homeassistant.const import (
     Platform,
 )
+from .ha_tuya_integration.tuya_integration_imports import (
+    TuyaDPCode,
+    TuyaCELSIUS_ALIASES,
+    TuyaFAHRENHEIT_ALIASES,
+    TuyaDeviceCategory as XTDeviceCategory  # noqa: F401
+)
+
+XT_CELSIUS_ALIASES = TuyaCELSIUS_ALIASES.union(set())
+XT_FAHRENHEIT_ALIASES = TuyaFAHRENHEIT_ALIASES.union(set())
 
 DOMAIN = "xtend_tuya"
 DOMAIN_ORIG = "tuya"
@@ -964,6 +974,13 @@ class XTDPCode(StrEnum):
     XT_COVER_INVERT_CONTROL = "xt_cover_invert_control"
     XT_COVER_INVERT_STATUS = "xt_cover_invert_status"
     # END OF DPCODES FROM XT
+
+    @staticmethod
+    def get_dpcode(dpcode: Any) -> XTDPCode | TuyaDPCode:
+        try:
+            return TuyaDPCode(dpcode)
+        except Exception:
+            return XTDPCode(dpcode)
 
 
 @dataclass

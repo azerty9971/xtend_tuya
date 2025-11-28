@@ -27,6 +27,7 @@ class CloudFixes:
         CloudFixes._fix_missing_aliases_using_status_format(device)
         CloudFixes._remove_status_that_are_local_strategy_aliases(device)
         CloudFixes._fix_unaligned_function_or_status_range(device)
+        CloudFixes._strip_valuedescr_of_non_label_fields_for_bitmaps(device)
 
     @staticmethod
     def fix_incorrect_percent_scale_forced(
@@ -89,6 +90,36 @@ class CloudFixes:
                     device.function[recomputed_function_code].values = json.dumps(value)
                 except Exception:
                     pass
+
+    @staticmethod
+    def _strip_valuedescr_of_non_label_fields_for_bitmaps(device: XTDevice):
+        for _, status in device.status_range.items():
+            if status.type == TuyaDPType.BITMAP:
+                values_dict = json.loads(status.values)
+                if "label" in values_dict:
+                    values_dict = {"label": values_dict["label"]}
+                else:
+                    values_dict = {}
+                status.values = json.dumps(values_dict)
+        for _, function in device.function.items():
+            if function.type == TuyaDPType.BITMAP:
+                values_dict = json.loads(function.values)
+                if "label" in values_dict:
+                    values_dict = {"label": values_dict["label"]}
+                else:
+                    values_dict = {}
+                function.values = json.dumps(values_dict)
+        for _, ls in device.local_strategy.items():
+            if config_item := ls.get("config_item"):
+                ls_type = config_item.get("valueType")
+                if ls_type == TuyaDPType.BITMAP:
+                    if value_descr := config_item.get("valueDesc"):
+                        values_dict = json.loads(value_descr)
+                        if "label" in values_dict:
+                            values_dict = {"label": values_dict["label"]}
+                        else:
+                            values_dict = {}
+                        config_item["valueDesc"] = json.dumps(values_dict)
 
     @staticmethod
     def _fix_unaligned_function_or_status_range(device: XTDevice):

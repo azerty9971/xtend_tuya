@@ -2,9 +2,7 @@
 
 from __future__ import annotations
 from typing import Any, cast
-from homeassistant.components.event import (
-    EventEntityDescription,
-)
+from dataclasses import dataclass
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
@@ -23,7 +21,8 @@ from .const import (
 )
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaEventEntity,
-    TuyaDPType,
+    TuyaEventEntityDescription,
+    TuyaEventDPCodeEventWrapper,
 )
 from .entity import (
     XTEntity,
@@ -31,22 +30,28 @@ from .entity import (
 )
 
 
-class XTEventEntityDescription(EventEntityDescription, frozen_or_thawed=True):
+@dataclass(frozen=True)
+class XTEventEntityDescription(TuyaEventEntityDescription):
     override_tuya: bool = False
     dont_send_to_cloud: bool = False
     on_value: Any = None
     off_value: Any = None
+
+    # duplicate the entity if handled by another integration
+    ignore_other_dp_code_handler: bool = False
 
     def get_entity_instance(
         self,
         device: XTDevice,
         device_manager: MultiManager,
         description: XTEventEntityDescription,
+        dpcode_wrapper: TuyaEventDPCodeEventWrapper,
     ) -> XTEventEntity:
         return XTEventEntity(
             device=device,
             device_manager=device_manager,
             description=XTEventEntityDescription(**description.__dict__),
+            dpcode_wrapper=dpcode_wrapper,
         )
 
 
@@ -73,7 +78,10 @@ async def async_setup_entry(
             dict[str, tuple[XTEventEntityDescription, ...]],
         ],
         XTEntityDescriptorManager.get_platform_descriptors(
-            EVENTS, entry.runtime_data.multi_manager, XTEventEntityDescription, this_platform
+            EVENTS,
+            entry.runtime_data.multi_manager,
+            XTEventEntityDescription,
+            this_platform,
         ),
     )
 
@@ -86,11 +94,8 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if (
-                    category_descriptions
-                    := XTEntityDescriptorManager.get_category_descriptors(
-                        supported_descriptors, device.category
-                    )
+                if category_descriptions := XTEntityDescriptorManager.get_category_descriptors(
+                    supported_descriptors, device.category
                 ):
                     externally_managed_dpcodes = (
                         XTEntityDescriptorManager.get_category_keys(
@@ -106,28 +111,48 @@ async def async_setup_entry(
                         )
                     entities.extend(
                         XTEventEntity.get_entity_instance(
-                            description, device, hass_data.manager
+                            description,
+                            device,
+                            hass_data.manager,
+                            dpcode_wrapper,
                         )
                         for description in category_descriptions
-                        if XTEntity.supports_description(
-                            device,
-                            this_platform,
-                            description,
-                            True,
-                            externally_managed_dpcodes,
+                        if (
+                            XTEntity.supports_description(
+                                device,
+                                this_platform,
+                                description,
+                                True,
+                                externally_managed_dpcodes,
+                            )
+                            and (
+                                dpcode_wrapper := description.wrapper_class.find_dpcode(
+                                    device, description.key
+                                )
+                            )
                         )
                     )
                     entities.extend(
                         XTEventEntity.get_entity_instance(
-                            description, device, hass_data.manager
+                            description,
+                            device,
+                            hass_data.manager,
+                            dpcode_wrapper,
                         )
                         for description in category_descriptions
-                        if XTEntity.supports_description(
-                            device,
-                            this_platform,
-                            description,
-                            False,
-                            externally_managed_dpcodes,
+                        if (
+                            XTEntity.supports_description(
+                                device,
+                                this_platform,
+                                description,
+                                False,
+                                externally_managed_dpcodes,
+                            )
+                            and (
+                                dpcode_wrapper := description.wrapper_class.find_dpcode(
+                                    device, description.key
+                                )
+                            )
                         )
                     )
 
@@ -144,53 +169,49 @@ async def async_setup_entry(
 class XTEventEntity(XTEntity, TuyaEventEntity):
     """Tuya Event Entity."""
 
-    entity_description: EventEntityDescription
+    entity_description: XTEventEntityDescription
 
     def __init__(
         self,
         device: XTDevice,
         device_manager: MultiManager,
-        description: EventEntityDescription,
+        description: XTEventEntityDescription,
+        dpcode_wrapper: TuyaEventDPCodeEventWrapper,
     ) -> None:
         """Init Tuya event entity."""
         try:
             super(XTEventEntity, self).__init__(device, device_manager, description)
-            super(XTEntity, self).__init__(device, device_manager, description)  # type: ignore
+            super(XTEntity, self).__init__(
+                device,
+                device_manager,  # type: ignore
+                description,
+                dpcode_wrapper=dpcode_wrapper,
+            )
         except Exception as e:
             LOGGER.warning(f"Events failed to initialize, is your HA up to date? ({e})")
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description  # type: ignore
 
-        if dpcode := self.find_dpcode(description.key, dptype=TuyaDPType.ENUM):
-            self._attr_event_types: list[str] = dpcode.range
-
-    async def _handle_state_update(
-        self,
-        updated_status_properties: list[str] | None,
-        dp_timestamps: dict | None = None,
-    ) -> None:
-        if (
-            updated_status_properties is None
-            or self.entity_description.key not in updated_status_properties
-        ):
-            return
-
-        value = self.device.status.get(self.entity_description.key)
-        if value is not None and isinstance(value, str):
-            self._trigger_event(value)
-        self.async_write_ha_state()
-
     @staticmethod
     def get_entity_instance(
         description: XTEventEntityDescription,
         device: XTDevice,
         device_manager: MultiManager,
+        dpcode_wrapper: TuyaEventDPCodeEventWrapper,
     ) -> XTEventEntity:
         if hasattr(description, "get_entity_instance") and callable(
             getattr(description, "get_entity_instance")
         ):
-            return description.get_entity_instance(device, device_manager, description)
+            return description.get_entity_instance(
+                device,
+                device_manager,
+                description,
+                dpcode_wrapper,
+            )
         return XTEventEntity(
-            device, device_manager, XTEventEntityDescription(**description.__dict__)
+            device,
+            device_manager,
+            XTEventEntityDescription(**description.__dict__),
+            dpcode_wrapper,
         )

@@ -26,6 +26,9 @@ from .ha_tuya_integration.tuya_integration_imports import (
     TuyaEntity,
     TuyaDPCode,
     TuyaDPType,
+    TuyaDPCodeWrapper,
+    TuyaDPCodeTypeInformationWrapper,
+    tuya_find_dpcode,
 )
 
 
@@ -424,9 +427,15 @@ class XTEntity(TuyaEntity):
         READ_ONLY = "ro"
         READ_WRITE = "rw"
         WRITE_ONLY = "wr"
+    
+    class XTEntitySharedAttributes(StrEnum):
+        IGNORE_OTHER_DP_CODE_HANDLER = "ignore_other_dp_code_handler"
 
     def __init__(self, *args, **kwargs) -> None:
         # This is to catch the super call in case the next class in parent's MRO doesn't have an init method
+        self.dpcode_wrapper: TuyaDPCodeWrapper | None = kwargs.get("dpcode_wrapper")
+        if "dpcode_wrapper" in kwargs:
+            kwargs.pop("dpcode_wrapper")
         try:
             super().__init__(*args, **kwargs)
         except Exception:
@@ -436,6 +445,7 @@ class XTEntity(TuyaEntity):
     @overload
     def find_dpcode(
         self,
+        device: sc.XTDevice,
         dpcodes: (
             str
             | XTDPCode
@@ -453,6 +463,7 @@ class XTEntity(TuyaEntity):
     @overload
     def find_dpcode(
         self,
+        device: sc.XTDevice,
         dpcodes: (
             str
             | XTDPCode
@@ -470,6 +481,7 @@ class XTEntity(TuyaEntity):
     @overload
     def find_dpcode(
         self,
+        device: sc.XTDevice,
         dpcodes: (
             str
             | XTDPCode
@@ -486,6 +498,7 @@ class XTEntity(TuyaEntity):
     @overload
     def find_dpcode(
         self,
+        device: sc.XTDevice,
         dpcodes: (
             str
             | XTDPCode
@@ -502,12 +515,12 @@ class XTEntity(TuyaEntity):
 
     def find_dpcode(
         self,
+        device: sc.XTDevice,
         dpcodes: (
             str
             | XTDPCode
-            | tuple[XTDPCode, ...]
+            | tuple[XTDPCode | TuyaDPCode, ...]
             | TuyaDPCode
-            | tuple[TuyaDPCode, ...]
             | None
         ),
         *,
@@ -523,23 +536,33 @@ class XTEntity(TuyaEntity):
                 only_function=only_function,
             )
         try:
-            if dpcodes is None:
+            if dpcodes is None or len(dpcodes) == 0:
                 return None
             elif not isinstance(dpcodes, tuple):
-                dpcodes = (TuyaDPCode(dpcodes),)
+                dpcodes = (XTDPCode.get_dpcode(dpcodes),)
             else:
                 dpcodes = (TuyaDPCode(dpcodes),)
-            if dptype is TuyaDPType.ENUM:
-                return super(XTEntity, self).find_dpcode(
-                    dpcodes=dpcodes, prefer_function=prefer_function, dptype=dptype
-                )
-            elif dptype is TuyaDPType.INTEGER:
-                return super(XTEntity, self).find_dpcode(
-                    dpcodes=dpcodes, prefer_function=prefer_function, dptype=dptype
-                )
-            else:
-                return dpcodes[0]
+            if isinstance(dpcodes[0], TuyaDPCode):
+                dpcodes = cast(tuple[TuyaDPCode, ...], dpcodes)
+                if dptype is TuyaDPType.ENUM:
+                    return tuya_find_dpcode(
+                        device=device,
+                        dpcodes=dpcodes, 
+                        prefer_function=prefer_function, 
+                        dptype=dptype
+                    )
+                elif dptype is TuyaDPType.INTEGER:
+                    return tuya_find_dpcode(
+                        device=device,
+                        dpcodes=dpcodes, 
+                        prefer_function=prefer_function, 
+                        dptype=dptype
+                    )
+                else:
+                    return dpcodes[0]
         except Exception:
+            pass
+        finally:
             """Find a matching DP code available on for this device."""
             return self._find_dpcode(
                 dpcodes=dpcodes,
@@ -614,6 +637,22 @@ class XTEntity(TuyaEntity):
                 if dptype not in (TuyaDPType.ENUM, TuyaDPType.INTEGER):
                     return dpcode
 
+        return None
+
+    def get_type_information(self) -> TuyaDPCodeTypeInformationWrapper | None:
+        if self.dpcode_wrapper is None:
+            return None
+        try:
+            type_information = getattr(self.dpcode_wrapper, "type_information")
+            if type_information is not None:
+                return type_information
+        except Exception:
+            pass
+        return None
+    
+    def get_dptype_from_dpcode_wrapper(self) -> TuyaDPType | None:
+        if type_information := self.get_type_information():
+            return type_information.DPTYPE
         return None
 
     def get_dptype(
@@ -781,6 +820,7 @@ class XTEntity(TuyaEntity):
         first_pass: bool,
         externally_managed_dpcodes: list[str] = [],
         key_fields: list[str] | None = None,
+        multi_manager: mm.MultiManager | None = None
     ) -> bool:
         result, dpcode = XTEntity._supports_description(
             device,
@@ -822,11 +862,12 @@ class XTEntity(TuyaEntity):
     ) -> tuple[bool, str]:
         dpcode = XTEntity._get_description_dpcode(description)
         compound_key = None
+        ignore_other_dp_code_handler: bool = getattr(description, XTEntity.XTEntitySharedAttributes.IGNORE_OTHER_DP_CODE_HANDLER, False)
         if key_fields is not None:
             compound_key = XTEntityDescriptorManager.get_compound_key(
                 description, key_fields
             )
-        if XTEntity.is_dpcode_handled(device, platform, dpcode) is True:
+        if XTEntity.is_dpcode_handled(device, platform, dpcode) is True and ignore_other_dp_code_handler is False:
             if (
                 compound_key is None
                 or XTEntity.is_dpcode_handled(device, platform, compound_key) is True
