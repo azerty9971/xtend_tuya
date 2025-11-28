@@ -640,13 +640,11 @@ class XTEntity(TuyaEntity):
         return None
 
     def get_type_information(self) -> TuyaDPCodeTypeInformationWrapper | None:
-        LOGGER.warning(f"DEBUG: Trying to find type information of: {self.dpcode_wrapper}")
         if self.dpcode_wrapper is None:
             return None
         try:
             type_information = getattr(self.dpcode_wrapper, "type_information")
             if type_information is not None:
-                LOGGER.warning(f"DEBUG: Found type information {type_information}")
                 return type_information
         except Exception:
             pass
