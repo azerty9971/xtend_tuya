@@ -26,6 +26,7 @@ from .const import (
     XTDPCode,
     CROSS_CATEGORY_DEVICE_DESCRIPTOR,
     XTMultiManagerPostSetupCallbackPriority,
+    LOGGER, 
 )
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaBinarySensorEntity,
@@ -316,6 +317,7 @@ async def async_setup_entry(
                             dpcode_information.dptype is TuyaDPType.BITMAP
                             and len(dpcode_information.label) > 0
                         ):
+                            LOGGER.warning(f"Bitmap labels: {dpcode_information.label}")
                             for label_value in dpcode_information.label:
                                 descriptor = XTBinarySensorEntityDescription(
                                     key=dpcode,
