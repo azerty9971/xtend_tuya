@@ -154,13 +154,6 @@ class XTSharingAPI(CustomerApi):
             return None
 
         ret = response.json()
-        time_taken = datetime.now() - start_time
-        LOGGER.debug(
-            f"[SHARING API][{time_taken}]Request: {method} {path} PARAMS: {json.dumps(params, ensure_ascii=False, indent=2) if params is not None else ''} BODY: {json.dumps(body, ensure_ascii=False, indent=2) if body is not None else ''}"
-        )
-        LOGGER.debug(
-            f"[SHARING API][{time_taken}]Response: {json.dumps(ret, ensure_ascii=False, indent=2)}"
-        )
 
         if not ret.get("success"):
             raise Exception(f"network error:({ret['code']}) {ret['msg']}")
@@ -170,5 +163,12 @@ class XTSharingAPI(CustomerApi):
             ret["result"] = json.loads(result)
         except json.decoder.JSONDecodeError:
             ret["result"] = result
-
+        
+        time_taken = datetime.now() - start_time
+        LOGGER.debug(
+            f"[SHARING API][{time_taken}]Request: {method} {path} PARAMS: {json.dumps(params, ensure_ascii=False, indent=2) if params is not None else ''} BODY: {json.dumps(body, ensure_ascii=False, indent=2) if body is not None else ''}"
+        )
+        LOGGER.debug(
+            f"[SHARING API][{time_taken}]Response: {json.dumps(ret, ensure_ascii=False, indent=2)}"
+        )
         return ret
