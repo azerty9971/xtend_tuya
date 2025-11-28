@@ -119,10 +119,11 @@ class XTSharingAPI(CustomerApi):
             }
             query_encdata = str(query_encdata, encoding="utf8")
         body_encdata = ""
+        body_encrypted = body
         if body is not None and len(body.keys()) > 0:
             body_encdata = _form_to_json(body)
             body_encdata = _aes_gcm_encrypt(body_encdata, secret)
-            body = {
+            body_encrypted = {
                 "encdata": str(body_encdata, encoding="utf8")
             }
             body_encdata = str(body_encdata, encoding="utf8")
@@ -144,7 +145,7 @@ class XTSharingAPI(CustomerApi):
         headers["X-sign"] = sign
 
         response = self.session.request(
-            method, self.endpoint + path, params=params_enc, json=body, headers=headers
+            method, self.endpoint + path, params=params_enc, json=body_encrypted, headers=headers
         )
 
         if response.ok is False:
