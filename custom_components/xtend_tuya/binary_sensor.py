@@ -321,6 +321,7 @@ async def async_setup_entry(
                             for label_value in dpcode_information.label:
                                 descriptor = XTBinarySensorEntityDescription(
                                     key=dpcode,
+                                    dpcode=dpcode, # type: ignore
                                     subkey=label_value,
                                     bitmap_key=label_value,
                                     translation_key="xt_generic_binary_sensor",
