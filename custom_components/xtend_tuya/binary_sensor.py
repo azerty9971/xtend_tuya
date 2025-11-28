@@ -317,7 +317,7 @@ async def async_setup_entry(
                             dpcode_information.dptype is TuyaDPType.BITMAP
                             and len(dpcode_information.label) > 0
                         ):
-                            LOGGER.warning(f"Bitmap labels: {dpcode_information.label}")
+                            LOGGER.warning(f"Device {device.name} <=> Bitmap labels: {dpcode_information.label} <=> {device}")
                             for label_value in dpcode_information.label:
                                 descriptor = XTBinarySensorEntityDescription(
                                     key=dpcode,
