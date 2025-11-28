@@ -10,6 +10,7 @@ from homeassistant.components.tuya.binary_sensor import (
     TuyaBinarySensorEntity as TuyaBinarySensorEntity,
     TuyaBinarySensorEntityDescription as TuyaBinarySensorEntityDescription,
     _get_dpcode_wrapper as tuya_binary_sensor_get_dpcode_wrapper,  # noqa: F401
+    _CustomDPCodeWrapper as TuyaBinarySensorCustomDPCodeWrapper,  # noqa: F401
 )
 from homeassistant.components.button import (
     ButtonEntityDescription as TuyaButtonEntityDescription,  # noqa: F401
@@ -155,6 +156,7 @@ try:
         DPCodeBooleanWrapper as TuyaDPCodeBooleanWrapper,  # noqa: F401
         DPCodeEnumWrapper as TuyaDPCodeEnumWrapper,  # noqa: F401
         DPCodeIntegerWrapper as TuyaDPCodeIntegerWrapper,  # noqa: F401
+        DPCodeBitmapBitWrapper as TuyaDPCodeBitmapBitWrapper,  # noqa: F401
         find_dpcode as tuya_find_dpcode,  # noqa: F401
         TypeInformation as TuyaTypeInformation,  # noqa: F401
         _TYPE_INFORMATION_MAPPINGS as TUYA_TYPE_INFORMATION_MAPPINGS,  # noqa: F401

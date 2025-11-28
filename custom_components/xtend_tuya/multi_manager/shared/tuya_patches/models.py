@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from .ha_tuya_integration.tuya_integration_imports import (
+from ....ha_tuya_integration.tuya_integration_imports import (
     TuyaCustomerDevice,
     TuyaDPCode,
     TuyaDPType,
@@ -9,18 +9,15 @@ from .ha_tuya_integration.tuya_integration_imports import (
     tuya_util_parse_dptype,
 )
 
-from .multi_manager.shared.decorator import (
+from ..decorator import (
     XTDecorator,
 )
 import homeassistant.components.tuya.models as tuya_model
 
 class XTTuyaModelPatcher:
-    already_patched: bool = False
 
     @staticmethod
-    def patch_tuya_models():
-        if XTTuyaModelPatcher.already_patched is True:
-            return
+    def patch_tuya():
         decorator, tuya_model.find_dpcode = XTDecorator.get_decorator(
             base_object=tuya_model,
             callback=XTTuyaModelPatcher.on_find_dpcode,

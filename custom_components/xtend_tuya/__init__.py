@@ -31,8 +31,8 @@ from .multi_manager.shared.services.services import (
 from .entity import (
     XTEntity,
 )
-from .models import (
-    XTTuyaModelPatcher,
+from .multi_manager.shared.tuya_patches.tuya_patches import (
+    XTTuyaPatcher,
 )
 
 # Suppress logs from the library, it logs unneeded on error
@@ -52,7 +52,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
     """Async setup hass config entry."""
     XTEventLoopProtector.hass = hass
     XTConcurrencyManager.hass = hass
-    XTTuyaModelPatcher.patch_tuya_models()
+    XTTuyaPatcher.patch_tuya_code()
     start_time = datetime.now()
     last_time = start_time
     multi_manager = MultiManager(hass, entry)
