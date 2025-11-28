@@ -72,6 +72,7 @@ from homeassistant.components.tuya.humidifier import (
     HUMIDIFIERS as HUMIDIFIERS_TUYA,  # noqa: F401
     TuyaHumidifierEntity as TuyaHumidifierEntity,
     TuyaHumidifierEntityDescription as TuyaHumidifierEntityDescription,
+    _RoundedIntegerWrapper as TuyaHumidifierRoundedIntegerWrapper,  # noqa: F401
 )
 from homeassistant.components.tuya.light import (
     LIGHTS as LIGHTS_TUYA,  # noqa: F401
