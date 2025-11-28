@@ -10,7 +10,12 @@ from homeassistant.const import (
 )
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaDPCode,
+    TuyaCELSIUS_ALIASES,
+    TuyaFAHRENHEIT_ALIASES,
 )
+
+XT_CELSIUS_ALIASES = TuyaCELSIUS_ALIASES.union(set())
+XT_FAHRENHEIT_ALIASES = TuyaFAHRENHEIT_ALIASES.union(set())
 
 DOMAIN = "xtend_tuya"
 DOMAIN_ORIG = "tuya"

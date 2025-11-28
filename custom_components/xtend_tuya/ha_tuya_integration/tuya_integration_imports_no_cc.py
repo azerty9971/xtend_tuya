@@ -27,6 +27,8 @@ from homeassistant.components.tuya.climate import (
     TuyaClimateEntity as TuyaClimateEntity,
     TuyaClimateEntityDescription as TuyaClimateEntityDescription,
     TUYA_HVAC_TO_HA as TuyaClimateHVACToHA,  # noqa: F401
+    _RoundedIntegerWrapper as TuyaClimateRoundedIntegerWrapper,  # noqa: F401
+    _get_temperature_wrapper as tuya_climate_get_temperature_wrapper,  # noqa: F401
 )
 from homeassistant.components.tuya.cover import (
     COVERS as COVERS_TUYA,  # noqa: F401
@@ -112,6 +114,8 @@ from homeassistant.components.tuya.const import (
     DPType as TuyaDPType,  # noqa: F401
     DOMAIN as TuyaDOMAIN,  # noqa: F401
     DEVICE_CLASS_UNITS as TuyaDEVICE_CLASS_UNITS,  # noqa: F401
+    CELSIUS_ALIASES as TuyaCELSIUS_ALIASES,  # noqa: F401
+    FAHRENHEIT_ALIASES as TuyaFAHRENHEIT_ALIASES,  # noqa: F401
 )
 from homeassistant.components.tuya.entity import (
     TuyaEntity as TuyaEntity,
