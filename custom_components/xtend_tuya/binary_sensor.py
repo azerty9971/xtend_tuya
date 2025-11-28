@@ -450,8 +450,6 @@ class XTBinarySensorEntity(XTEntity, TuyaBinarySensorEntity):
         self.device = device
         self.device_manager = device_manager
         self._entity_description = description
-        self._attr_unique_id = f"xt.{self._attr_unique_id}.{description.key}"
-        
         # Append subkey to unique ID
         if description.subkey is not None and self._attr_unique_id is not None:
             self._attr_unique_id += f"{description.subkey}"

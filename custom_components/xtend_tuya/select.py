@@ -411,7 +411,6 @@ class XTSelectEntity(XTEntity, TuyaSelectEntity):
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description
-        self._attr_unique_id = f"xt.{self._attr_unique_id}.{description.key}"
 
         # Use custom options
         if description.options is not None:
