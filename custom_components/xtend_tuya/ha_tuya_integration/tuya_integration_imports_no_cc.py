@@ -139,6 +139,7 @@ from homeassistant.components.tuya.entity import (
 try:
     from homeassistant.components.tuya.util import (
         _DPTYPE_MAPPING as TUYA_DPTYPE_MAPPING,  # noqa: F401 # type: ignore
+        parse_dptype as tuya_util_parse_dptype,  # noqa: F401
     )
 except Exception:
     from homeassistant.components.tuya.entity import (
@@ -155,6 +156,8 @@ try:
         DPCodeEnumWrapper as TuyaDPCodeEnumWrapper,  # noqa: F401
         DPCodeIntegerWrapper as TuyaDPCodeIntegerWrapper,  # noqa: F401
         find_dpcode as tuya_find_dpcode,  # noqa: F401
+        TypeInformation as TuyaTypeInformation,  # noqa: F401
+        _TYPE_INFORMATION_MAPPINGS as TUYA_TYPE_INFORMATION_MAPPINGS,  # noqa: F401
     )
 except Exception:
     from homeassistant.components.tuya.entity import (
