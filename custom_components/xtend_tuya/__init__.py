@@ -105,6 +105,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
             manufacturer="Tuya",
             name=device.name,
             model=f"{device.product_name} (unsupported)",
+            disabled_by=None,
         )
     LOGGER.debug(f"Xtended Tuya {entry.title} {datetime.now() - last_time} for create device")
 
