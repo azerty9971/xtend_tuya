@@ -153,7 +153,7 @@ BINARY_SENSORS: dict[str, tuple[XTBinarySensorEntityDescription, ...]] = {
         ),
         XTBinarySensorEntityDescription(
             key=XTDPCode.MONITORING,
-            device_class=BinarySensorDeviceClass.PRESENCE,
+            device_class=BinarySensorDeviceClass.OCCUPANCY,
             entity_category=EntityCategory.DIAGNOSTIC,
             translation_key="litter_occupied",
             entity_registry_enabled_default=False,
@@ -164,10 +164,9 @@ BINARY_SENSORS: dict[str, tuple[XTBinarySensorEntityDescription, ...]] = {
             entity_registry_enabled_default=False,
         ),
         XTBinarySensorEntityDescription(
-            key=XTDPCode.TRASH_STATUS,
-            translation_key="trash_status",
+            key=XTDPCode.STORE_FULL_NOTIFY,
+            translation_key="store_full_notify",
             entity_registry_enabled_default=True,
-            on_value="1",
         ),
     ),
     # QT-08W Solar Intelligent Water Valve

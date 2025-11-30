@@ -296,6 +296,9 @@
             "pressure": {
                 "name": "Pressure"
             },
+            "store_full_notify": {
+                "name": "Replace trash bag"
+            },
             "tankfull": {
                 "name": "Tank full"
             },
