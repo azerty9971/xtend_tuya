@@ -164,6 +164,11 @@ BINARY_SENSORS: dict[str, tuple[XTBinarySensorEntityDescription, ...]] = {
             entity_registry_enabled_default=False,
         ),
         XTBinarySensorEntityDescription(
+            key=XTDPCode.TRASH_STATUS,
+            translation_key="trash_status",
+            entity_registry_enabled_default=True,
+        ),
+        XTBinarySensorEntityDescription(
             key=XTDPCode.STORE_FULL_NOTIFY,
             translation_key="store_full_notify",
             entity_registry_enabled_default=True,
