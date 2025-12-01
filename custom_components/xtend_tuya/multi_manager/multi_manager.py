@@ -116,13 +116,11 @@ class MultiManager:  # noqa: F811
 
     async def setup_entry(self) -> None:
         # Load all the plugins
-        LOGGER.debug("Calling setup_entry")
         subdirs = AllowedPlugins.get_plugins_to_load()
         concurrency_manager = XTConcurrencyManager()
         for directory in subdirs:
             if os.path.isdir(os.path.dirname(__file__) + os.sep + "managers" + os.sep + directory):
                 load_path = f".managers.{directory}.init"
-                LOGGER.debug(f"Trying to load module {load_path}")
                 try:
                     plugin = (
                         await XTEventLoopProtector.execute_out_of_event_loop_and_return(
