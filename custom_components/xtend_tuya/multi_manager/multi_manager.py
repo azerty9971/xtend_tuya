@@ -1,4 +1,5 @@
 from __future__ import annotations
+from functools import partial
 import copy
 import importlib
 import os
@@ -65,6 +66,7 @@ from ..entity_parser.entity_parser import (
 )
 import custom_components.xtend_tuya.multi_manager.shared.data_entry.shared_data_entry as shared_data_entry
 
+
 class MultiManager:  # noqa: F811
     def __init__(self, hass: HomeAssistant, config_entry: XTConfigEntry) -> None:
         self.config_entry = config_entry
@@ -122,7 +124,13 @@ class MultiManager:  # noqa: F811
                 load_path = f".managers.{directory}.init"
                 LOGGER.warning(f"Trying to load module {load_path}")
                 try:
-                    plugin = importlib.import_module(name=load_path, package=__package__,)
+                    plugin = (
+                        await XTEventLoopProtector.execute_out_of_event_loop_and_return(
+                            importlib.import_module,
+                            name=load_path,
+                            package=__package__,
+                        )
+                    )
                     LOGGER.debug(f"Plugin {load_path} loaded")
                     instance: XTDeviceManagerInterface = plugin.get_plugin_instance()
                     concurrency_manager.add_coroutine(
@@ -204,13 +212,13 @@ class MultiManager:  # noqa: F811
         for manager in self.accounts.values():
             for device_map in manager.get_available_device_maps():
                 for device_id in device_map:
-                    
+
                     # New devices have been created in their own device maps
                     # let's convert them to XTDevice
                     device_map[device_id] = manager.convert_to_xt_device(
                         device_map[device_id], device_map.device_source_priority
                     )
-                    
+
                     if device_id not in self.master_device_map:
                         self.master_device_map[device_id] = device_map[device_id]
 
@@ -586,19 +594,19 @@ class MultiManager:  # noqa: F811
         hub: XTIRHubInformation,
         key: str,
         key_name: str,
-        timeout: int | None = None
+        timeout: int | None = None,
     ) -> bool:
         for account in self.accounts.values():
             if account.learn_ir_key(device, remote, hub, key, key_name, timeout):
                 return True
         return False
-    
+
     def delete_ir_key(
         self,
         device: XTDevice,
         key: XTIRRemoteKeysInformation,
         remote: XTIRRemoteInformation,
-        hub: XTIRHubInformation
+        hub: XTIRHubInformation,
     ):
         for account in self.accounts.values():
             if account.delete_ir_key(device, key, remote, hub):
