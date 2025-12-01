@@ -1,5 +1,4 @@
 from __future__ import annotations
-from functools import partial
 import copy
 import importlib
 import os
@@ -121,16 +120,9 @@ class MultiManager:  # noqa: F811
         for directory in subdirs:
             if os.path.isdir(os.path.dirname(__file__) + os.sep + directory):
                 load_path = f".managers.{directory}.init"
+                LOGGER.warning(f"Trying to load module {load_path}")
                 try:
-                    plugin = (
-                        await XTEventLoopProtector.execute_out_of_event_loop_and_return(
-                            partial(
-                                importlib.import_module,
-                                name=load_path,
-                                package=__package__,
-                            )
-                        )
-                    )
+                    plugin = importlib.import_module(name=load_path, package=__package__,)
                     LOGGER.debug(f"Plugin {load_path} loaded")
                     instance: XTDeviceManagerInterface = plugin.get_plugin_instance()
                     concurrency_manager.add_coroutine(
