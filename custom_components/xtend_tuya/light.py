@@ -1,10 +1,9 @@
 """Support for the XT lights."""
 
 from __future__ import annotations
-from typing import cast, Any
-import json
+from typing import cast
 from dataclasses import dataclass
-from homeassistant.const import EntityCategory,Platform
+from homeassistant.const import EntityCategory, Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -19,14 +18,19 @@ from .multi_manager.multi_manager import (
 from .const import (
     TUYA_DISCOVERY_NEW,
     XTDPCode,
-    LOGGER,
     XTMultiManagerPostSetupCallbackPriority,
 )
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaLightEntity,
     TuyaLightEntityDescription,
     TuyaDPCode,
-    TuyaDPType,
+    TuyaDPCodeEnumWrapper,
+    TuyaDPCodeBooleanWrapper,
+    TuyaLightBrightnessWrapper,
+    TuyaLightColorDataWrapper,
+    TuyaLightColorTempWrapper,
+    tuya_light_get_brightness_wrapper,
+    tuya_light_get_color_data_wrapper,
 )
 from .entity import (
     XTEntity,
@@ -40,27 +44,41 @@ class XTLightEntityDescription(TuyaLightEntityDescription):
 
     brightness_max: TuyaDPCode | XTDPCode | None = None  # type: ignore
     brightness_min: TuyaDPCode | XTDPCode | None = None  # type: ignore
-    brightness: ( # type: ignore
+    brightness: (  # type: ignore
         TuyaDPCode | tuple[TuyaDPCode, ...] | XTDPCode | tuple[XTDPCode, ...] | None
     ) = None
-    color_data: ( # type: ignore
+    color_data: (  # type: ignore
         TuyaDPCode | tuple[TuyaDPCode, ...] | XTDPCode | tuple[XTDPCode, ...] | None
     ) = None
     color_mode: TuyaDPCode | XTDPCode | None = None  # type: ignore
-    color_temp: ( # type: ignore
+    color_temp: (  # type: ignore
         TuyaDPCode | tuple[TuyaDPCode, ...] | XTDPCode | tuple[XTDPCode, ...] | None
     ) = None
+
+    # duplicate the entity if handled by another integration
+    ignore_other_dp_code_handler: bool = False
 
     def get_entity_instance(
         self,
         device: XTDevice,
         device_manager: MultiManager,
         description: XTLightEntityDescription,
+        *,
+        brightness_wrapper: TuyaLightBrightnessWrapper | None,
+        color_data_wrapper: TuyaLightColorDataWrapper | None,
+        color_mode_wrapper: TuyaDPCodeEnumWrapper | None,
+        color_temp_wrapper: TuyaLightColorTempWrapper | None,
+        switch_wrapper: TuyaDPCodeBooleanWrapper,
     ) -> XTLightEntity:
         return XTLightEntity(
             device=device,
             device_manager=device_manager,
             description=XTLightEntityDescription(**description.__dict__),
+            brightness_wrapper=brightness_wrapper,
+            color_data_wrapper=color_data_wrapper,
+            color_mode_wrapper=color_mode_wrapper,
+            color_temp_wrapper=color_temp_wrapper,
+            switch_wrapper=switch_wrapper,
         )
 
 
@@ -98,7 +116,10 @@ async def async_setup_entry(
             dict[str, tuple[XTLightEntityDescription, ...]],
         ],
         XTEntityDescriptorManager.get_platform_descriptors(
-            LIGHTS, entry.runtime_data.multi_manager, XTLightEntityDescription, this_platform
+            LIGHTS,
+            entry.runtime_data.multi_manager,
+            XTLightEntityDescription,
+            this_platform,
         ),
     )
 
@@ -123,11 +144,31 @@ async def async_setup_entry(
                         entity_registry_enabled_default=False,
                         entity_registry_visible_default=False,
                     )
-                    entities.append(
-                        XTLightEntity.get_entity_instance(
-                            descriptor, device, hass_data.manager
+                    if switch_wrapper := TuyaDPCodeBooleanWrapper.find_dpcode(
+                        device, descriptor.key, prefer_function=True
+                    ):
+                        entities.append(
+                            XTLightEntity.get_entity_instance(
+                                descriptor,
+                                device,
+                                hass_data.manager,
+                                brightness_wrapper=(
+                                    brightness_wrapper := tuya_light_get_brightness_wrapper(
+                                        device, descriptor
+                                    )
+                                ),
+                                color_data_wrapper=tuya_light_get_color_data_wrapper(
+                                    device, descriptor, brightness_wrapper
+                                ),
+                                color_mode_wrapper=TuyaDPCodeEnumWrapper.find_dpcode(
+                                    device, descriptor.color_mode, prefer_function=True
+                                ),
+                                color_temp_wrapper=TuyaLightColorTempWrapper.find_dpcode(
+                                    device, descriptor.color_temp, prefer_function=True  # type: ignore
+                                ),
+                                switch_wrapper=switch_wrapper,
+                            )
                         )
-                    )
         async_add_entities(entities)
 
     @callback
@@ -139,11 +180,8 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if (
-                    category_descriptions
-                    := XTEntityDescriptorManager.get_category_descriptors(
-                        supported_descriptors, device.category
-                    )
+                if category_descriptions := XTEntityDescriptorManager.get_category_descriptors(
+                    supported_descriptors, device.category
                 ):
                     externally_managed_dpcodes = (
                         XTEntityDescriptorManager.get_category_keys(
@@ -159,28 +197,76 @@ async def async_setup_entry(
                         )
                     entities.extend(
                         XTLightEntity.get_entity_instance(
-                            description, device, hass_data.manager
+                            description,
+                            device,
+                            hass_data.manager,
+                            brightness_wrapper=(
+                                brightness_wrapper := tuya_light_get_brightness_wrapper(
+                                    device, description
+                                )
+                            ),
+                            color_data_wrapper=tuya_light_get_color_data_wrapper(
+                                device, description, brightness_wrapper
+                            ),
+                            color_mode_wrapper=TuyaDPCodeEnumWrapper.find_dpcode(
+                                device, description.color_mode, prefer_function=True
+                            ),
+                            color_temp_wrapper=TuyaLightColorTempWrapper.find_dpcode(
+                                device, description.color_temp, prefer_function=True  # type: ignore
+                            ),
+                            switch_wrapper=switch_wrapper,
                         )
                         for description in category_descriptions
-                        if XTEntity.supports_description(
-                            device,
-                            this_platform,
-                            description,
-                            True,
-                            externally_managed_dpcodes,
+                        if (
+                            XTEntity.supports_description(
+                                device,
+                                this_platform,
+                                description,
+                                True,
+                                externally_managed_dpcodes,
+                            )
+                            and (
+                                switch_wrapper := TuyaDPCodeBooleanWrapper.find_dpcode(
+                                    device, description.key, prefer_function=True
+                                )
+                            )
                         )
                     )
                     entities.extend(
                         XTLightEntity.get_entity_instance(
-                            description, device, hass_data.manager
+                            description,
+                            device,
+                            hass_data.manager,
+                            brightness_wrapper=(
+                                brightness_wrapper := tuya_light_get_brightness_wrapper(
+                                    device, description
+                                )
+                            ),
+                            color_data_wrapper=tuya_light_get_color_data_wrapper(
+                                device, description, brightness_wrapper
+                            ),
+                            color_mode_wrapper=TuyaDPCodeEnumWrapper.find_dpcode(
+                                device, description.color_mode, prefer_function=True
+                            ),
+                            color_temp_wrapper=TuyaLightColorTempWrapper.find_dpcode(
+                                device, description.color_temp, prefer_function=True  # type: ignore
+                            ),
+                            switch_wrapper=switch_wrapper,
                         )
                         for description in category_descriptions
-                        if XTEntity.supports_description(
-                            device,
-                            this_platform,
-                            description,
-                            False,
-                            externally_managed_dpcodes,
+                        if (
+                            XTEntity.supports_description(
+                                device,
+                                this_platform,
+                                description,
+                                False,
+                                externally_managed_dpcodes,
+                            )
+                            and (
+                                switch_wrapper := TuyaDPCodeBooleanWrapper.find_dpcode(
+                                    device, description.key, prefer_function=True
+                                )
+                            )
                         )
                     )
 
@@ -208,59 +294,60 @@ class XTLightEntity(XTEntity, TuyaLightEntity):
         device: XTDevice,
         device_manager: MultiManager,
         description: XTLightEntityDescription,
+        *,
+        brightness_wrapper: TuyaLightBrightnessWrapper | None,
+        color_data_wrapper: TuyaLightColorDataWrapper | None,
+        color_mode_wrapper: TuyaDPCodeEnumWrapper | None,
+        color_temp_wrapper: TuyaLightColorTempWrapper | None,
+        switch_wrapper: TuyaDPCodeBooleanWrapper,
     ) -> None:
-        try:
-            super(XTLightEntity, self).__init__(device, device_manager, description)
-            self.fix_color_data(device, description)
-            super(XTEntity, self).__init__(device, device_manager, description)  # type: ignore
-        except Exception as e:
-            if (
-                dpcode := self.find_dpcode(description.color_data, prefer_function=True)
-            ) and self.get_dptype(dpcode, device) == TuyaDPType.JSON:
-                if dpcode in self.device.function:
-                    values = self.device.function[dpcode].values
-                else:
-                    values = self.device.status_range[dpcode].values
-                values_status = self.device.status.get(dpcode, "{}")
-                values_status_json = json.loads(values_status)
-                if function_data := json.loads(values):
-                    LOGGER.warning(
-                        f"Failed light: {device.name} => {function_data} <=> {values_status_json} <=> {e}"
-                    )
+        super(XTLightEntity, self).__init__(device, device_manager, description)
+        super(XTEntity, self).__init__(
+            device,
+            device_manager,  # type: ignore
+            description,
+            brightness_wrapper=brightness_wrapper,
+            color_data_wrapper=color_data_wrapper,
+            color_mode_wrapper=color_mode_wrapper,
+            color_temp_wrapper=color_temp_wrapper,
+            switch_wrapper=switch_wrapper,
+        )
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description
-
-    def fix_color_data(self, device: XTDevice, description: XTLightEntityDescription):
-        if (
-            dpcode := self.find_dpcode(description.color_data, prefer_function=True)
-        ) and self.get_dptype(dpcode, device) == TuyaDPType.JSON:
-            values = "{}"
-            if dpcode in self.device.function:
-                values = self.device.function[dpcode].values
-            else:
-                values = self.device.status_range[dpcode].values
-            if function_data := cast(dict[str, Any], json.loads(values)):
-                if (
-                    function_data.get("h") is None
-                    or function_data.get("s") is None
-                    or function_data.get("v") is None
-                ):
-                    if dpcode in self.device.function:
-                        self.device.function[dpcode].values = "{}"
-                    if dpcode in self.device.status_range:
-                        self.device.status_range[dpcode].values = "{}"
 
     @staticmethod
     def get_entity_instance(
         description: XTLightEntityDescription,
         device: XTDevice,
         device_manager: MultiManager,
+        *,
+        brightness_wrapper: TuyaLightBrightnessWrapper | None,
+        color_data_wrapper: TuyaLightColorDataWrapper | None,
+        color_mode_wrapper: TuyaDPCodeEnumWrapper | None,
+        color_temp_wrapper: TuyaLightColorTempWrapper | None,
+        switch_wrapper: TuyaDPCodeBooleanWrapper,
     ) -> XTLightEntity:
         if hasattr(description, "get_entity_instance") and callable(
             getattr(description, "get_entity_instance")
         ):
-            return description.get_entity_instance(device, device_manager, description)
+            return description.get_entity_instance(
+                device,
+                device_manager,
+                description,
+                brightness_wrapper=brightness_wrapper,
+                color_data_wrapper=color_data_wrapper,
+                color_mode_wrapper=color_mode_wrapper,
+                color_temp_wrapper=color_temp_wrapper,
+                switch_wrapper=switch_wrapper,
+            )
         return XTLightEntity(
-            device, device_manager, XTLightEntityDescription(**description.__dict__)
+            device,
+            device_manager,
+            XTLightEntityDescription(**description.__dict__),
+            brightness_wrapper=brightness_wrapper,
+            color_data_wrapper=color_data_wrapper,
+            color_mode_wrapper=color_mode_wrapper,
+            color_temp_wrapper=color_temp_wrapper,
+            switch_wrapper=switch_wrapper,
         )

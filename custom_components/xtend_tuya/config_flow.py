@@ -5,7 +5,7 @@ from collections.abc import Mapping
 from typing import Any, cast
 from enum import StrEnum
 from tuya_sharing import LoginControl
-from tuya_iot import AuthType
+from .lib.tuya_iot import AuthType
 import voluptuous as vol
 from homeassistant.core import callback, HomeAssistant
 from homeassistant.config_entries import (
@@ -53,7 +53,7 @@ from .multi_manager.shared.threading import (
     XTEventLoopProtector,
     XTConcurrencyManager,
 )
-from .multi_manager.tuya_iot.xt_tuya_iot_openapi import XTIOTOpenAPI
+from .multi_manager.managers.tuya_iot.xt_tuya_iot_openapi import XTIOTOpenAPI
 import custom_components.xtend_tuya.util as util
 import custom_components.xtend_tuya.multi_manager.multi_manager as mm
 import custom_components.xtend_tuya.multi_manager.shared.data_entry.shared_data_entry as data_entry
@@ -120,7 +120,6 @@ class XTConfigFlows:
                 data[CONF_AUTH_TYPE] = AuthType.SMART_HOME
 
             api = XTIOTOpenAPI(
-                hass=hass,
                 endpoint=data[CONF_ENDPOINT_OT],
                 access_id=data[CONF_ACCESS_ID_OT],
                 access_secret=data[CONF_ACCESS_SECRET_OT],

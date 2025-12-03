@@ -82,9 +82,9 @@ class XTEventLoopProtector:
         if XTEventLoopProtector.hass.loop_thread_id != threading.get_ident():
             # Not in the event loop
             if is_coroutine:
-                return await callback(*args)
+                return await callback(*args, **kwargs)
             else:
-                return callback(*args)
+                return callback(*args, **kwargs)
         else:
             # In the event loop
             if is_coroutine:

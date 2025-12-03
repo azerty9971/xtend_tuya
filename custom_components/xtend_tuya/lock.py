@@ -33,6 +33,9 @@ class XTLockEntityDescription(LockEntityDescription):
     temporary_unlock: bool = False
     manual_unlock_command: list[XTDPCode] = field(default_factory=list)
 
+    # duplicate the entity if handled by another integration
+    ignore_other_dp_code_handler: bool = False
+
     def get_entity_instance(
         self,
         device: XTDevice,

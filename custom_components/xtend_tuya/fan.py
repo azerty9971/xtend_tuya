@@ -11,9 +11,19 @@ from .multi_manager.multi_manager import (
     MultiManager,
     XTDevice,
 )
-from .const import TUYA_DISCOVERY_NEW
+from .const import TUYA_DISCOVERY_NEW, XTDeviceCategory
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaFanEntity,
+    TuyaDPCodeEnumWrapper,
+    TuyaDPCodeBooleanWrapper,
+    TuyaFanDirectionEnumWrapper,
+    TuyaFanFanSpeedEnumWrapper,
+    TuyaFanFanSpeedIntegerWrapper,
+    TUYA_FAN_DIRECTION_DPCODES,
+    TUYA_FAN_MODE_DPCODES,
+    TUYA_FAN_OSCILLATE_DPCODES,
+    TUYA_FAN_SWITCH_DPCODES,
+    tuya_fan_get_speed_wrapper,
 )
 from .entity import (
     XTEntity,
@@ -21,7 +31,7 @@ from .entity import (
 )
 
 XT_SUPPORT_TYPE = {
-    "xfj",
+    XTDeviceCategory.XFJ,
 }
 
 
@@ -54,7 +64,25 @@ async def async_setup_entry(
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
                 if device and device.category in supported_descriptors:
-                    entities.append(XTFanEntity(device, hass_data.manager))
+                    entities.append(
+                        XTFanEntity(
+                            device,
+                            hass_data.manager,
+                            direction_wrapper=TuyaFanDirectionEnumWrapper.find_dpcode(
+                                device, TUYA_FAN_DIRECTION_DPCODES, prefer_function=True
+                            ),
+                            mode_wrapper=TuyaDPCodeEnumWrapper.find_dpcode(
+                                device, TUYA_FAN_MODE_DPCODES, prefer_function=True
+                            ),
+                            oscillate_wrapper=TuyaDPCodeBooleanWrapper.find_dpcode(
+                                device, TUYA_FAN_OSCILLATE_DPCODES, prefer_function=True
+                            ),
+                            speed_wrapper=tuya_fan_get_speed_wrapper(device),
+                            switch_wrapper=TuyaDPCodeBooleanWrapper.find_dpcode(
+                                device, TUYA_FAN_SWITCH_DPCODES, prefer_function=True
+                            ),
+                        )
+                    )
         async_add_entities(entities)
 
     async_discover_device([*hass_data.manager.device_map])
@@ -71,9 +99,25 @@ class XTFanEntity(XTEntity, TuyaFanEntity):
         self,
         device: XTDevice,
         device_manager: MultiManager,
+        *,
+        direction_wrapper: TuyaFanDirectionEnumWrapper | None,
+        mode_wrapper: TuyaDPCodeEnumWrapper | None,
+        oscillate_wrapper: TuyaDPCodeBooleanWrapper | None,
+        speed_wrapper: (
+            TuyaFanFanSpeedEnumWrapper | TuyaFanFanSpeedIntegerWrapper | None
+        ),
+        switch_wrapper: TuyaDPCodeBooleanWrapper | None,
     ) -> None:
         """Init XT Fan Device."""
         super(XTFanEntity, self).__init__(device, device_manager)
-        super(XTEntity, self).__init__(device, device_manager)  # type: ignore
+        super(XTEntity, self).__init__(
+            device,
+            device_manager,  # type: ignore
+            direction_wrapper=direction_wrapper,
+            mode_wrapper=mode_wrapper,
+            oscillate_wrapper=oscillate_wrapper,
+            speed_wrapper=speed_wrapper,
+            switch_wrapper=switch_wrapper,
+        )
         self.device = device
         self.device_manager = device_manager

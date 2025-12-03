@@ -17,6 +17,7 @@ import custom_components.xtend_tuya.util as util
 import custom_components.xtend_tuya.entity as entity
 from ...ha_tuya_integration.tuya_integration_imports import (
     TuyaDPType,
+    tuya_util_parse_dptype,
 )
 from ...const import (
     LOGGER,
@@ -27,7 +28,7 @@ from ...const import (
 class DeviceWatcher:
     def __init__(self, multi_manager: mm.MultiManager) -> None:
         self.watched_dev_id: list[str] = [
-            
+            ""
         ]
         self.multi_manager = multi_manager
 
@@ -420,7 +421,7 @@ class XTDevice(TuyaDevice):
                 if config_item := local_strategy.get("config_item"):
                     if dp_info.dptype is None:
                         if ls_dptype := config_item.get("valueType"):
-                            dp_info.dptype = entity.XTEntity.determine_dptype(ls_dptype)
+                            dp_info.dptype = tuya_util_parse_dptype(ls_dptype)
                     if ls_value_descr := config_item.get("valueDesc"):
                         try:
                             value_descr_dict = cast(

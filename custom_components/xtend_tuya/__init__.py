@@ -31,6 +31,9 @@ from .multi_manager.shared.services.services import (
 from .entity import (
     XTEntity,
 )
+from .multi_manager.shared.tuya_patches.tuya_patches import (
+    XTTuyaPatcher,
+)
 
 # Suppress logs from the library, it logs unneeded on error
 logging.getLogger("tuya_sharing").setLevel(logging.CRITICAL)
@@ -49,6 +52,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
     """Async setup hass config entry."""
     XTEventLoopProtector.hass = hass
     XTConcurrencyManager.hass = hass
+    XTTuyaPatcher.patch_tuya_code()
     start_time = datetime.now()
     last_time = start_time
     multi_manager = MultiManager(hass, entry)
@@ -79,7 +83,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
     device_registry = dr.async_get(hass)
     aggregated_device_map = multi_manager.device_map
     for device in aggregated_device_map.values():
-        XTEntity.mark_overriden_entities_as_disables(hass, device)
+        XTEntity.mark_overriden_entities_as_disabled(hass, device)
         XTEntity.register_current_entities_as_handled_dpcode(hass, device)
         multi_manager.virtual_state_handler.apply_init_virtual_states(device)
     LOGGER.debug(f"Xtended Tuya {entry.title} {datetime.now() - last_time} for device id registration")
@@ -101,6 +105,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
             manufacturer="Tuya",
             name=device.name,
             model=f"{device.product_name} (unsupported)",
+            disabled_by=None,
         )
     LOGGER.debug(f"Xtended Tuya {entry.title} {datetime.now() - last_time} for create device")
 

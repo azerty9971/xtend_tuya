@@ -28,6 +28,7 @@ from .multi_manager.multi_manager import (
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaNumberEntity,
     TuyaNumberEntityDescription,
+    TuyaDPCodeIntegerWrapper,
 )
 from .entity import (
     XTEntity,
@@ -38,18 +39,24 @@ from .entity import (
 class XTNumberEntityDescription(TuyaNumberEntityDescription):
     """Describe an Tuya number entity."""
 
-    native_max_value: float | None = None  # Custom native_max_value
+    # Custom native_max_value
+    native_max_value: float | None = None
+
+    # duplicate the entity if handled by another integration
+    ignore_other_dp_code_handler: bool = False
 
     def get_entity_instance(
         self,
         device: XTDevice,
         device_manager: MultiManager,
         description: XTNumberEntityDescription,
+        dpcode_wrapper: TuyaDPCodeIntegerWrapper,
     ) -> XTNumberEntity:
         return XTNumberEntity(
             device=device,
             device_manager=device_manager,
             description=XTNumberEntityDescription(**description.__dict__),
+            dpcode_wrapper=dpcode_wrapper,
         )
 
 
@@ -634,7 +641,10 @@ async def async_setup_entry(
             dict[str, tuple[XTNumberEntityDescription, ...]],
         ],
         XTEntityDescriptorManager.get_platform_descriptors(
-            NUMBERS, entry.runtime_data.multi_manager, XTNumberEntityDescription, this_platform
+            NUMBERS,
+            entry.runtime_data.multi_manager,
+            XTNumberEntityDescription,
+            this_platform,
         ),
     )
 
@@ -659,11 +669,14 @@ async def async_setup_entry(
                         entity_registry_enabled_default=False,
                         entity_registry_visible_default=False,
                     )
-                    entities.append(
-                        XTNumberEntity.get_entity_instance(
-                            descriptor, device, hass_data.manager
+                    if dpcode_wrapper := TuyaDPCodeIntegerWrapper.find_dpcode(
+                        device, descriptor.key, prefer_function=True
+                    ):
+                        entities.append(
+                            XTNumberEntity.get_entity_instance(
+                                descriptor, device, hass_data.manager, dpcode_wrapper
+                            )
                         )
-                    )
         async_add_entities(entities)
 
     @callback
@@ -675,11 +688,8 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if (
-                    category_descriptions
-                    := XTEntityDescriptorManager.get_category_descriptors(
-                        supported_descriptors, device.category
-                    )
+                if category_descriptions := XTEntityDescriptorManager.get_category_descriptors(
+                    supported_descriptors, device.category
                 ):
                     externally_managed_dpcodes = (
                         XTEntityDescriptorManager.get_category_keys(
@@ -695,28 +705,42 @@ async def async_setup_entry(
                         )
                     entities.extend(
                         XTNumberEntity.get_entity_instance(
-                            description, device, hass_data.manager
+                            description, device, hass_data.manager, dpcode_wrapper
                         )
                         for description in category_descriptions
-                        if XTEntity.supports_description(
-                            device,
-                            this_platform,
-                            description,
-                            True,
-                            externally_managed_dpcodes,
+                        if (
+                            XTEntity.supports_description(
+                                device,
+                                this_platform,
+                                description,
+                                True,
+                                externally_managed_dpcodes,
+                            )
+                            and (
+                                dpcode_wrapper := TuyaDPCodeIntegerWrapper.find_dpcode(
+                                    device, description.key, prefer_function=True
+                                )
+                            )
                         )
                     )
                     entities.extend(
                         XTNumberEntity.get_entity_instance(
-                            description, device, hass_data.manager
+                            description, device, hass_data.manager, dpcode_wrapper
                         )
                         for description in category_descriptions
-                        if XTEntity.supports_description(
-                            device,
-                            this_platform,
-                            description,
-                            False,
-                            externally_managed_dpcodes,
+                        if (
+                            XTEntity.supports_description(
+                                device,
+                                this_platform,
+                                description,
+                                False,
+                                externally_managed_dpcodes,
+                            )
+                            and (
+                                dpcode_wrapper := TuyaDPCodeIntegerWrapper.find_dpcode(
+                                    device, description.key, prefer_function=True
+                                )
+                            )
                         )
                     )
 
@@ -744,10 +768,13 @@ class XTNumberEntity(XTEntity, TuyaNumberEntity):
         device: XTDevice,
         device_manager: MultiManager,
         description: XTNumberEntityDescription,
+        dpcode_wrapper: TuyaDPCodeIntegerWrapper,
     ) -> None:
         """Init XT number."""
-        super(XTNumberEntity, self).__init__(device, device_manager, description)
-        super(XTEntity, self).__init__(device, device_manager, description)  # type: ignore
+        super(XTNumberEntity, self).__init__(
+            device, device_manager, description, dpcode_wrapper=dpcode_wrapper
+        )
+        super(XTEntity, self).__init__(device, device_manager, description, dpcode_wrapper)  # type: ignore
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description
@@ -760,11 +787,17 @@ class XTNumberEntity(XTEntity, TuyaNumberEntity):
         description: XTNumberEntityDescription,
         device: XTDevice,
         device_manager: MultiManager,
+        dpcode_wrapper: TuyaDPCodeIntegerWrapper,
     ) -> XTNumberEntity:
         if hasattr(description, "get_entity_instance") and callable(
             getattr(description, "get_entity_instance")
         ):
-            return description.get_entity_instance(device, device_manager, description)
+            return description.get_entity_instance(
+                device, device_manager, description, dpcode_wrapper
+            )
         return XTNumberEntity(
-            device, device_manager, XTNumberEntityDescription(**description.__dict__)
+            device,
+            device_manager,
+            XTNumberEntityDescription(**description.__dict__),
+            dpcode_wrapper,
         )

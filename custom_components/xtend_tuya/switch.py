@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 from typing import Any, cast
+from dataclasses import dataclass
 from homeassistant.const import EntityCategory, Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
@@ -23,29 +24,35 @@ from .const import (
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaSwitchEntity,
     TuyaSwitchEntityDescription,
+    TuyaDPCodeBooleanWrapper,
 )
 from .entity import (
     XTEntity,
     XTEntityDescriptorManager,
 )
 
-
+@dataclass(frozen=True)
 class XTSwitchEntityDescription(TuyaSwitchEntityDescription, frozen_or_thawed=True):
     override_tuya: bool = False
     dont_send_to_cloud: bool = False
     on_value: Any = None
     off_value: Any = None
 
+    # duplicate the entity if handled by another integration
+    ignore_other_dp_code_handler: bool = False
+
     def get_entity_instance(
         self,
         device: XTDevice,
         device_manager: MultiManager,
         description: XTSwitchEntityDescription,
+        dpcode_wrapper: TuyaDPCodeBooleanWrapper,
     ) -> XTSwitchEntity:
         return XTSwitchEntity(
             device=device,
             device_manager=device_manager,
             description=XTSwitchEntityDescription(**description.__dict__),
+            dpcode_wrapper=dpcode_wrapper
         )
 
 
@@ -455,11 +462,16 @@ async def async_setup_entry(
                         entity_registry_enabled_default=False,
                         entity_registry_visible_default=False,
                     )
-                    entities.append(
-                        XTSwitchEntity.get_entity_instance(
-                            descriptor, device, hass_data.manager
+                    if (
+                        dpcode_wrapper := TuyaDPCodeBooleanWrapper.find_dpcode(
+                            device, descriptor.key, prefer_function=True
                         )
-                    )
+                    ):
+                        entities.append(
+                            XTSwitchEntity.get_entity_instance(
+                                descriptor, device, hass_data.manager, dpcode_wrapper
+                            )
+                        )
         async_add_entities(entities)
 
     @callback
@@ -491,29 +503,35 @@ async def async_setup_entry(
                         )
                     entities.extend(
                         XTSwitchEntity.get_entity_instance(
-                            description, device, hass_data.manager
+                            description, device, hass_data.manager, dpcode_wrapper
                         )
                         for description in category_descriptions
-                        if XTEntity.supports_description(
+                        if (XTEntity.supports_description(
                             device,
                             this_platform,
                             description,
                             True,
                             externally_managed_dpcodes,
                         )
+                        and (dpcode_wrapper := TuyaDPCodeBooleanWrapper.find_dpcode(
+                            device, description.key, prefer_function=True
+                        )))
                     )
                     entities.extend(
                         XTSwitchEntity.get_entity_instance(
-                            description, device, hass_data.manager
+                            description, device, hass_data.manager, dpcode_wrapper
                         )
                         for description in category_descriptions
-                        if XTEntity.supports_description(
+                        if (XTEntity.supports_description(
                             device,
                             this_platform,
                             description,
                             False,
                             externally_managed_dpcodes,
                         )
+                        and (dpcode_wrapper := TuyaDPCodeBooleanWrapper.find_dpcode(
+                            device, description.key, prefer_function=True
+                        )))
                     )
 
         async_add_entities(entities)
@@ -542,16 +560,17 @@ class XTSwitchEntity(XTEntity, TuyaSwitchEntity):
         device: XTDevice,
         device_manager: MultiManager,
         description: XTSwitchEntityDescription,
+        dpcode_wrapper: TuyaDPCodeBooleanWrapper,
     ) -> None:
         """Init TuyaHaSwitch."""
-        super(XTSwitchEntity, self).__init__(device, device_manager, description)
-        super(XTEntity, self).__init__(device, device_manager, description)  # type: ignore
+        super(XTSwitchEntity, self).__init__(device, device_manager, description, dpcode_wrapper=dpcode_wrapper)
+        super(XTEntity, self).__init__(device, device_manager, description, dpcode_wrapper)  # type: ignore
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description  # type: ignore
 
     @property
-    def is_on(self) -> bool:
+    def is_on(self) -> bool | None:
         """Return true if switch is on."""
         current_value = self.device.status.get(self.entity_description.key, False)
         if (
@@ -610,11 +629,15 @@ class XTSwitchEntity(XTEntity, TuyaSwitchEntity):
         description: XTSwitchEntityDescription,
         device: XTDevice,
         device_manager: MultiManager,
+        dpcode_wrapper: TuyaDPCodeBooleanWrapper,
     ) -> XTSwitchEntity:
         if hasattr(description, "get_entity_instance") and callable(
             getattr(description, "get_entity_instance")
         ):
-            return description.get_entity_instance(device, device_manager, description)
+            return description.get_entity_instance(device, device_manager, description, dpcode_wrapper)
         return XTSwitchEntity(
-            device, device_manager, XTSwitchEntityDescription(**description.__dict__)
-        )
+            device, 
+            device_manager, 
+            XTSwitchEntityDescription(**description.__dict__), 
+            dpcode_wrapper
+            )

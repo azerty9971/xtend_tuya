@@ -9,8 +9,9 @@ from homeassistant.components.tuya.binary_sensor import (
     BINARY_SENSORS as BINARY_SENSORS_TUYA,  # noqa: F401
     TuyaBinarySensorEntity as TuyaBinarySensorEntity,
     TuyaBinarySensorEntityDescription as TuyaBinarySensorEntityDescription,
-    # _get_bitmap_bit_mask as get_bitmap_bit_mask_tuya_binary_sensor  # noqa: F401
+    _CustomDPCodeWrapper as TuyaBinarySensorCustomDPCodeWrapper,  # noqa: F401
 )
+import homeassistant.components.tuya.binary_sensor as binary_sensor  # noqa: F401
 from homeassistant.components.button import (
     ButtonEntityDescription as TuyaButtonEntityDescription,  # noqa: F401
 )
@@ -27,11 +28,17 @@ from homeassistant.components.tuya.climate import (
     TuyaClimateEntity as TuyaClimateEntity,
     TuyaClimateEntityDescription as TuyaClimateEntityDescription,
     TUYA_HVAC_TO_HA as TuyaClimateHVACToHA,  # noqa: F401
+    _RoundedIntegerWrapper as TuyaClimateRoundedIntegerWrapper,  # noqa: F401
+    _get_temperature_wrapper as tuya_climate_get_temperature_wrapper,  # noqa: F401
 )
 from homeassistant.components.tuya.cover import (
     COVERS as COVERS_TUYA,  # noqa: F401
     TuyaCoverEntity as TuyaCoverEntity,
     TuyaCoverEntityDescription as TuyaCoverEntityDescription,
+    _DPCodePercentageMappingWrapper as TuyaCoverDPCodePercentageMappingWrapper,  # noqa: F401
+    _IsClosedWrapper as TuyaCoverIsClosedWrapper,  # noqa: F401
+    _InstructionWrapper as TuyaCoverInstructionWrapper,  # noqa: F401
+    _get_instruction_wrapper as tuya_cover_get_instruction_wrapper,  # noqa: F401
 )
 from homeassistant.components.event import (
     EventEntityDescription,
@@ -41,6 +48,8 @@ try:
     from homeassistant.components.tuya.event import (
         EVENTS as EVENTS_TUYA,  # noqa: F401 # type: ignore
         TuyaEventEntity as TuyaEventEntity,
+        TuyaEventEntityDescription as TuyaEventEntityDescription,
+        _DPCodeEventWrapper as TuyaEventDPCodeEventWrapper,  # noqa: F401
     )
 except Exception:
     EVENTS_TUYA: dict[str, tuple[EventEntityDescription, ...]] = {}
@@ -50,16 +59,31 @@ except Exception:
 from homeassistant.components.tuya.fan import (
     TUYA_SUPPORT_TYPE as FANS_TUYA,  # noqa: F401
     TuyaFanEntity as TuyaFanEntity,
+    _DirectionEnumWrapper as TuyaFanDirectionEnumWrapper,  # noqa: F401
+    _FanSpeedEnumWrapper as TuyaFanFanSpeedEnumWrapper,  # noqa: F401
+    _FanSpeedIntegerWrapper as TuyaFanFanSpeedIntegerWrapper,  # noqa: F401
+    _DIRECTION_DPCODES as TUYA_FAN_DIRECTION_DPCODES,  # noqa: F401
+    _MODE_DPCODES as TUYA_FAN_MODE_DPCODES,  # noqa: F401
+    _OSCILLATE_DPCODES as TUYA_FAN_OSCILLATE_DPCODES,  # noqa: F401
+    _SWITCH_DPCODES as TUYA_FAN_SWITCH_DPCODES,  # noqa: F401
+    _get_speed_wrapper as tuya_fan_get_speed_wrapper,  # noqa: F401
 )
 from homeassistant.components.tuya.humidifier import (
     HUMIDIFIERS as HUMIDIFIERS_TUYA,  # noqa: F401
     TuyaHumidifierEntity as TuyaHumidifierEntity,
     TuyaHumidifierEntityDescription as TuyaHumidifierEntityDescription,
+    _RoundedIntegerWrapper as TuyaHumidifierRoundedIntegerWrapper,  # noqa: F401
 )
 from homeassistant.components.tuya.light import (
     LIGHTS as LIGHTS_TUYA,  # noqa: F401
     TuyaLightEntity as TuyaLightEntity,
     TuyaLightEntityDescription as TuyaLightEntityDescription,
+    _BrightnessWrapper as TuyaLightBrightnessWrapper,  # noqa: F401
+    _ColorDataWrapper as TuyaLightColorDataWrapper,  # noqa: F401
+    _ColorTempWrapper as TuyaLightColorTempWrapper,  # noqa: F401
+    _get_brightness_wrapper as tuya_light_get_brightness_wrapper,  # noqa: F401
+    _get_color_data_wrapper as tuya_light_get_color_data_wrapper,  # noqa: F401
+
 )
 from homeassistant.components.number import (
     NumberEntityDescription as TuyaNumberEntityDescription,  # noqa: F401
@@ -79,6 +103,7 @@ from homeassistant.components.tuya.sensor import (
     SENSORS as SENSORS_TUYA,  # noqa: F401
     TuyaSensorEntity as TuyaSensorEntity,
     TuyaSensorEntityDescription as TuyaSensorEntityDescription,
+    _get_dpcode_wrapper as tuya_sensor_get_dpcode_wrapper,  # noqa: F401
 )
 from homeassistant.components.siren import (
     SirenEntityDescription as TuyaSirenEntityDescription,  # noqa: F401
@@ -111,29 +136,44 @@ from homeassistant.components.tuya.const import (
     DPType as TuyaDPType,  # noqa: F401
     DOMAIN as TuyaDOMAIN,  # noqa: F401
     DEVICE_CLASS_UNITS as TuyaDEVICE_CLASS_UNITS,  # noqa: F401
+    CELSIUS_ALIASES as TuyaCELSIUS_ALIASES,  # noqa: F401
+    FAHRENHEIT_ALIASES as TuyaFAHRENHEIT_ALIASES,  # noqa: F401
+    DeviceCategory as TuyaDeviceCategory,  # noqa: F401
 )
 from homeassistant.components.tuya.entity import (
     TuyaEntity as TuyaEntity,
 )
+
 try:
     from homeassistant.components.tuya.util import (
         _DPTYPE_MAPPING as TUYA_DPTYPE_MAPPING,  # noqa: F401 # type: ignore
+        parse_dptype as tuya_util_parse_dptype,  # noqa: F401
     )
 except Exception:
     from homeassistant.components.tuya.entity import (
-        _DPTYPE_MAPPING as TUYA_DPTYPE_MAPPING, # noqa: F401 # type: ignore
+        _DPTYPE_MAPPING as TUYA_DPTYPE_MAPPING,  # noqa: F401 # type: ignore
     )
 
 try:
     from homeassistant.components.tuya.models import (
         EnumTypeData as TuyaEnumTypeData,  # noqa: F401
         IntegerTypeData as TuyaIntegerTypeData,  # noqa: F401
+        DPCodeWrapper as TuyaDPCodeWrapper,  # noqa: F401
+        DPCodeTypeInformationWrapper as TuyaDPCodeTypeInformationWrapper,  # noqa: F401
+        DPCodeBooleanWrapper as TuyaDPCodeBooleanWrapper,  # noqa: F401
+        DPCodeEnumWrapper as TuyaDPCodeEnumWrapper,  # noqa: F401
+        DPCodeIntegerWrapper as TuyaDPCodeIntegerWrapper,  # noqa: F401
+        DPCodeBitmapBitWrapper as TuyaDPCodeBitmapBitWrapper,  # noqa: F401
+        find_dpcode as tuya_find_dpcode,  # noqa: F401
+        TypeInformation as TuyaTypeInformation,  # noqa: F401
+        _TYPE_INFORMATION_MAPPINGS as TUYA_TYPE_INFORMATION_MAPPINGS,  # noqa: F401
     )
 except Exception:
     from homeassistant.components.tuya.entity import (
         EnumTypeData as TuyaEnumTypeData,  # noqa: F401 # type: ignore
         IntegerTypeData as TuyaIntegerTypeData,  # noqa: F401 # type: ignore
     )
+
 from tuya_sharing.scenes import (
     SharingScene as TuyaScene,  # noqa: F401
 )
