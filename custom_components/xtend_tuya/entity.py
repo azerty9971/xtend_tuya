@@ -44,7 +44,7 @@ class XTEntityDescriptorManager:
         multi_manager: mm.MultiManager,
         descriptor_type: type[Any] | None,
         platform: Platform | None,
-        key_fields: list[str] = ["key"],
+        key_fields: list[str | tuple[str, ...]] = ["key"],
     ) -> tuple[Any, Any]:
         include_descriptors = platform_descriptors
         exclude_descriptors = XTEntityDescriptorManager.get_empty_descriptor(
@@ -80,7 +80,7 @@ class XTEntityDescriptorManager:
 
     @staticmethod
     def get_category_keys(
-        category_content: Any, key_fields: list[str] = ["key"]
+        category_content: Any, key_fields: list[str | tuple[str, ...]] = ["key"]
     ) -> list[str]:
         return_list: list[str] = []
         if not category_content:
@@ -114,7 +114,8 @@ class XTEntityDescriptorManager:
 
     @staticmethod
     def get_category_dict(
-        category_content: Any, key_fields: list[str] = ["key"]
+        category_content: Any,
+        key_fields: list[str | tuple[str, ...]] = ["key"],
     ) -> dict[str, EntityDescription | None]:
         return_dict: dict[str, EntityDescription | None] = {}
         if not category_content:
@@ -148,17 +149,28 @@ class XTEntityDescriptorManager:
 
     @staticmethod
     def get_compound_key(
-        entity: EntityDescription, key_fields: list[str]
+        entity: EntityDescription,
+        key_fields: list[str | tuple[str, ...]],
     ) -> str | None:
         compound_key: str | None = None
         for key in key_fields:
-            if hasattr(entity, key):
-                key_part = getattr(entity, key)
-                if key_part is not None:
-                    if compound_key is None:
-                        compound_key = str(key_part)
-                    else:
-                        compound_key = f"{compound_key}|{key_part}"
+            if isinstance(key, tuple):
+                for sub_key in key:
+                    if hasattr(entity, sub_key):
+                        key_part = getattr(entity, sub_key)
+                        if key_part is not None:
+                            if compound_key is None:
+                                compound_key = str(key_part)
+                            else:
+                                compound_key = f"{compound_key}|{key_part}"
+            else:
+                if hasattr(entity, key):
+                    key_part = getattr(entity, key)
+                    if key_part is not None:
+                        if compound_key is None:
+                            compound_key = str(key_part)
+                        else:
+                            compound_key = f"{compound_key}|{key_part}"
         return compound_key
 
     @staticmethod
@@ -182,7 +194,7 @@ class XTEntityDescriptorManager:
     def merge_descriptors(
         base_descriptors: Any,
         descriptors_to_add: Any,
-        key_fields: list[str],
+        key_fields: list[str | tuple[str, ...]],
         entity_type: type[Any] | None,
     ) -> Any:
         descr1_type = XTEntityDescriptorManager._get_param_type(base_descriptors)
@@ -421,7 +433,7 @@ class XTEntity(TuyaEntity):
         READ_ONLY = "ro"
         READ_WRITE = "rw"
         WRITE_ONLY = "wr"
-    
+
     class XTEntitySharedAttributes(StrEnum):
         IGNORE_OTHER_DP_CODE_HANDLER = "ignore_other_dp_code_handler"
 
@@ -446,7 +458,7 @@ class XTEntity(TuyaEntity):
         except Exception:
             pass
         return None
-    
+
     def get_dptype_from_dpcode_wrapper(self) -> TuyaDPType | None:
         if type_information := self.get_type_information():
             return type_information.DPTYPE
@@ -553,8 +565,8 @@ class XTEntity(TuyaEntity):
         description: EntityDescription,
         first_pass: bool,
         externally_managed_dpcodes: list[str] = [],
-        key_fields: list[str] | None = None,
-        multi_manager: mm.MultiManager | None = None
+        key_fields: list[str | tuple[str, ...]] | None = None,
+        multi_manager: mm.MultiManager | None = None,
     ) -> bool:
         result, dpcode = XTEntity._supports_description(
             device,
@@ -577,12 +589,12 @@ class XTEntity(TuyaEntity):
 
     @staticmethod
     def _get_description_dpcode(description: EntityDescription) -> str:
-        import custom_components.xtend_tuya.binary_sensor as XTBinarySensor
-
         dpcode = description.key
-        if isinstance(description, XTBinarySensor.XTBinarySensorEntityDescription):
-            if dpcode is None and description.dpcode is not None:
-                dpcode = description.dpcode
+        if hasattr(description, "dpcode"):
+            new_dpcode = getattr(description, "dpcode")
+            if new_dpcode is not None:
+                dpcode = new_dpcode
+
         return dpcode
 
     @staticmethod
@@ -592,16 +604,23 @@ class XTEntity(TuyaEntity):
         description: EntityDescription,
         first_pass: bool,
         externally_managed_dpcodes: list[str],
-        key_fields: list[str] | None = None,
+        key_fields: list[str | tuple[str, ...]] | None = None,
     ) -> tuple[bool, str]:
         dpcode = XTEntity._get_description_dpcode(description)
         compound_key = None
-        ignore_other_dp_code_handler: bool = getattr(description, XTEntity.XTEntitySharedAttributes.IGNORE_OTHER_DP_CODE_HANDLER, False)
+        ignore_other_dp_code_handler: bool = getattr(
+            description,
+            XTEntity.XTEntitySharedAttributes.IGNORE_OTHER_DP_CODE_HANDLER,
+            False,
+        )
         if key_fields is not None:
             compound_key = XTEntityDescriptorManager.get_compound_key(
                 description, key_fields
             )
-        if XTEntity.is_dpcode_handled(device, platform, dpcode) is True and ignore_other_dp_code_handler is False:
+        if (
+            XTEntity.is_dpcode_handled(device, platform, dpcode) is True
+            and ignore_other_dp_code_handler is False
+        ):
             if (
                 compound_key is None
                 or XTEntity.is_dpcode_handled(device, platform, compound_key) is True
