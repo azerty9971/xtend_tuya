@@ -1593,6 +1593,7 @@ async def async_setup_entry(
                                 category_descriptions, [restrict_dpcode]
                             ),
                         )
+                        hass_data.manager.device_watcher.report_message(device.id, f"Descriptions of {device.name}: {category_descriptions} AFTER FILTERING")
                     entities.extend(
                         XTSensorEntity.get_entity_instance(
                             description, device, hass_data.manager, dpcode_wrapper
