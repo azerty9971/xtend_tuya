@@ -358,7 +358,7 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
                 )
                 send_update = True
             if XTDPCode.XT_COVER_INVERT_STATUS not in self.device.status:
-                self.device.status[XTDPCode.XT_COVER_INVERT_STATUS] = "no"
+                self.device.status[XTDPCode.XT_COVER_INVERT_STATUS] = False
                 self.device.status_range[XTDPCode.XT_COVER_INVERT_STATUS] = (
                     XTDeviceStatusRange(
                         code=XTDPCode.XT_COVER_INVERT_STATUS,
