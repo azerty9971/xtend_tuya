@@ -57,6 +57,7 @@ from .ha_tuya_integration.tuya_integration_imports import (
     TuyaSensorEntityDescription,
     TuyaIntegerTypeData,
     TuyaDPCodeWrapper,
+    TuyaDPCodeBooleanWrapper,
     tuya_sensor_get_dpcode_wrapper,
 )
 
@@ -913,6 +914,7 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
             translation_key="xt_cover_invert_control",
             entity_registry_visible_default=False,
             restoredata=True,
+            wrapper_class=(TuyaDPCodeBooleanWrapper,)
         ),
         XTSensorEntityDescription(
             key=XTDPCode.XT_COVER_INVERT_STATUS,
@@ -920,6 +922,7 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
             entity_registry_visible_default=False,
             restoredata=True,
             refresh_device_after_load=True,
+            wrapper_class=(TuyaDPCodeBooleanWrapper,)
         ),
     ),
     "cl": (*BATTERY_SENSORS,),
