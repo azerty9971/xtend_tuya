@@ -26,6 +26,7 @@ from .entity import (
     XTEntityDescriptorManager,
 )
 
+COMPOUND_KEY: list[str | tuple[str, ...]] = [("dpcode", "key")]
 
 @dataclass(frozen=True)
 class XTHumidifierEntityDescription(TuyaHumidifierEntityDescription):
@@ -79,6 +80,7 @@ async def async_setup_entry(
             entry.runtime_data.multi_manager,
             XTHumidifierEntityDescription,
             this_platform,
+            COMPOUND_KEY,
         ),
     )
 
