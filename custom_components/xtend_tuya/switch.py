@@ -568,7 +568,7 @@ class XTSwitchEntity(XTEntity, TuyaSwitchEntity):
     @property
     def is_on(self) -> bool | None:
         """Return true if switch is on."""
-        current_value = self.device.status.get(self.entity_description.key, False)
+        current_value = self.device.status.get(self.entity_description.key)
         if (
             self.entity_description.on_value is not None
             and self.entity_description.off_value is not None
@@ -590,7 +590,7 @@ class XTSwitchEntity(XTEntity, TuyaSwitchEntity):
 
         return super().is_on
 
-    def turn_on(self, **kwargs: Any) -> None:
+    async def async_turn_on(self, **kwargs: Any) -> None:
         """Turn the switch on."""
         if self.entity_description.dont_send_to_cloud:
             if self.entity_description.on_value is not None:
@@ -603,9 +603,9 @@ class XTSwitchEntity(XTEntity, TuyaSwitchEntity):
                 self.device, [self.entity_description.key]
             )
         else:
-            super().turn_on(**kwargs)
+            await super().async_turn_on(**kwargs)
 
-    def turn_off(self, **kwargs: Any) -> None:
+    async def async_turn_off(self, **kwargs: Any) -> None:
         """Turn the switch off."""
         if self.entity_description.dont_send_to_cloud:
             if self.entity_description.off_value is not None:
@@ -618,7 +618,7 @@ class XTSwitchEntity(XTEntity, TuyaSwitchEntity):
                 self.device, [self.entity_description.key]
             )
         else:
-            super().turn_off(**kwargs)
+            await super().async_turn_off(**kwargs)
 
     @staticmethod
     def get_entity_instance(
