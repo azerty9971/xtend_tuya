@@ -66,8 +66,6 @@ SWITCHES: dict[str, tuple[XTSwitchEntityDescription, ...]] = {
             translation_key="xt_cover_invert_control",
             entity_category=EntityCategory.CONFIG,
             dont_send_to_cloud=True,
-            on_value="yes",
-            off_value="no",
             entity_registry_visible_default=False,
         ),
         XTSwitchEntityDescription(
@@ -75,8 +73,6 @@ SWITCHES: dict[str, tuple[XTSwitchEntityDescription, ...]] = {
             translation_key="xt_cover_invert_status",
             entity_category=EntityCategory.CONFIG,
             dont_send_to_cloud=True,
-            on_value="yes",
-            off_value="no",
             entity_registry_visible_default=False,
         ),
         XTSwitchEntityDescription(
