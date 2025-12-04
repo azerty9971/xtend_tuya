@@ -1580,7 +1580,7 @@ async def async_setup_entry(
                 if category_descriptions := XTEntityDescriptorManager.get_category_descriptors(
                     supported_descriptors, device.category
                 ):
-                    # hass_data.manager.device_watcher.report_message(device.id, f"Descriptions of {device.name}: {category_descriptions}")
+                    hass_data.manager.device_watcher.report_message(device.id, f"Descriptions of {device.name}: {category_descriptions}")
                     externally_managed_dpcodes = (
                         XTEntityDescriptorManager.get_category_keys(
                             externally_managed_descriptors.get(device.category)
