@@ -163,6 +163,7 @@ class XTEntityDescriptorManager:
                                 compound_key = str(key_part)
                             else:
                                 compound_key = f"{compound_key}|{key_part}"
+                            break
             else:
                 if hasattr(entity, key):
                     key_part = getattr(entity, key)
