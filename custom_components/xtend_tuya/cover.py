@@ -238,7 +238,8 @@ async def async_setup_entry(
                             hass_data.manager,
                             hass,
                             current_position=description.position_wrapper.find_dpcode(
-                                device, description.current_position  # type: ignore
+                                device,
+                                description.current_position,
                             ),
                             instruction_wrapper=tuya_cover_get_instruction_wrapper(
                                 device, description
