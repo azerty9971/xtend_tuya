@@ -26,7 +26,7 @@ from .entity import (
     XTEntityDescriptorManager,
 )
 
-COMPOUND_KEY: list[str | tuple[str, ...]] = [("dpcode", "key")]
+COMPOUND_KEY: list[str | tuple[str, ...]] = ["key", "dpcode"]
 
 @dataclass(frozen=True)
 class XTHumidifierEntityDescription(TuyaHumidifierEntityDescription):

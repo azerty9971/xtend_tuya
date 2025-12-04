@@ -31,6 +31,7 @@ from .entity import (
     XTEntityDescriptorManager,
 )
 
+
 @dataclass(frozen=True)
 class XTSwitchEntityDescription(TuyaSwitchEntityDescription, frozen_or_thawed=True):
     override_tuya: bool = False
@@ -52,7 +53,7 @@ class XTSwitchEntityDescription(TuyaSwitchEntityDescription, frozen_or_thawed=Tr
             device=device,
             device_manager=device_manager,
             description=XTSwitchEntityDescription(**description.__dict__),
-            dpcode_wrapper=dpcode_wrapper
+            dpcode_wrapper=dpcode_wrapper,
         )
 
 
@@ -433,7 +434,10 @@ async def async_setup_entry(
             dict[str, tuple[XTSwitchEntityDescription, ...]],
         ],
         XTEntityDescriptorManager.get_platform_descriptors(
-            SWITCHES, entry.runtime_data.multi_manager, XTSwitchEntityDescription, this_platform
+            SWITCHES,
+            entry.runtime_data.multi_manager,
+            XTSwitchEntityDescription,
+            this_platform,
         ),
     )
 
@@ -458,10 +462,8 @@ async def async_setup_entry(
                         entity_registry_enabled_default=False,
                         entity_registry_visible_default=False,
                     )
-                    if (
-                        dpcode_wrapper := TuyaDPCodeBooleanWrapper.find_dpcode(
-                            device, descriptor.key, prefer_function=True
-                        )
+                    if dpcode_wrapper := TuyaDPCodeBooleanWrapper.find_dpcode(
+                        device, descriptor.key, prefer_function=True
                     ):
                         entities.append(
                             XTSwitchEntity.get_entity_instance(
@@ -479,11 +481,8 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if (
-                    category_descriptions
-                    := XTEntityDescriptorManager.get_category_descriptors(
-                        supported_descriptors, device.category
-                    )
+                if category_descriptions := XTEntityDescriptorManager.get_category_descriptors(
+                    supported_descriptors, device.category
                 ):
                     externally_managed_dpcodes = (
                         XTEntityDescriptorManager.get_category_keys(
@@ -502,32 +501,40 @@ async def async_setup_entry(
                             description, device, hass_data.manager, dpcode_wrapper
                         )
                         for description in category_descriptions
-                        if (XTEntity.supports_description(
-                            device,
-                            this_platform,
-                            description,
-                            True,
-                            externally_managed_dpcodes,
+                        if (
+                            XTEntity.supports_description(
+                                device,
+                                this_platform,
+                                description,
+                                True,
+                                externally_managed_dpcodes,
+                            )
+                            and (
+                                dpcode_wrapper := TuyaDPCodeBooleanWrapper.find_dpcode(
+                                    device, description.key, prefer_function=True
+                                )
+                            )
                         )
-                        and (dpcode_wrapper := TuyaDPCodeBooleanWrapper.find_dpcode(
-                            device, description.key, prefer_function=True
-                        )))
                     )
                     entities.extend(
                         XTSwitchEntity.get_entity_instance(
                             description, device, hass_data.manager, dpcode_wrapper
                         )
                         for description in category_descriptions
-                        if (XTEntity.supports_description(
-                            device,
-                            this_platform,
-                            description,
-                            False,
-                            externally_managed_dpcodes,
+                        if (
+                            XTEntity.supports_description(
+                                device,
+                                this_platform,
+                                description,
+                                False,
+                                externally_managed_dpcodes,
+                            )
+                            and (
+                                dpcode_wrapper := TuyaDPCodeBooleanWrapper.find_dpcode(
+                                    device, description.key, prefer_function=True
+                                )
+                            )
                         )
-                        and (dpcode_wrapper := TuyaDPCodeBooleanWrapper.find_dpcode(
-                            device, description.key, prefer_function=True
-                        )))
                     )
 
         async_add_entities(entities)
@@ -559,7 +566,9 @@ class XTSwitchEntity(XTEntity, TuyaSwitchEntity):
         dpcode_wrapper: TuyaDPCodeBooleanWrapper,
     ) -> None:
         """Init TuyaHaSwitch."""
-        super(XTSwitchEntity, self).__init__(device, device_manager, description, dpcode_wrapper=dpcode_wrapper)
+        super(XTSwitchEntity, self).__init__(
+            device, device_manager, description, dpcode_wrapper=dpcode_wrapper
+        )
         super(XTEntity, self).__init__(device, device_manager, description, dpcode_wrapper)  # type: ignore
         self.device = device
         self.device_manager = device_manager
@@ -568,7 +577,9 @@ class XTSwitchEntity(XTEntity, TuyaSwitchEntity):
     @property
     def is_on(self) -> bool | None:
         """Return true if switch is on."""
-        current_value = self.device.status.get(self.entity_description.key)
+        current_value = self._dpcode_wrapper.read_device_status(
+            self.device,
+        )
         if (
             self.entity_description.on_value is not None
             and self.entity_description.off_value is not None
@@ -630,10 +641,12 @@ class XTSwitchEntity(XTEntity, TuyaSwitchEntity):
         if hasattr(description, "get_entity_instance") and callable(
             getattr(description, "get_entity_instance")
         ):
-            return description.get_entity_instance(device, device_manager, description, dpcode_wrapper)
-        return XTSwitchEntity(
-            device, 
-            device_manager, 
-            XTSwitchEntityDescription(**description.__dict__), 
-            dpcode_wrapper
+            return description.get_entity_instance(
+                device, device_manager, description, dpcode_wrapper
             )
+        return XTSwitchEntity(
+            device,
+            device_manager,
+            XTSwitchEntityDescription(**description.__dict__),
+            dpcode_wrapper,
+        )

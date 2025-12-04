@@ -61,7 +61,7 @@ from .ha_tuya_integration.tuya_integration_imports import (
     tuya_sensor_get_dpcode_wrapper,
 )
 
-COMPOUND_KEY: list[str | tuple[str, ...]] = [("dpcode", "key"), "subkey"]
+COMPOUND_KEY: list[str | tuple[str, ...]] = ["key", "dpcode"]
 
 
 @dataclass(frozen=True)

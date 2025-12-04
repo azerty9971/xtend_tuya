@@ -40,7 +40,7 @@ from .entity import (
     XTEntityDescriptorManager,
 )
 
-COMPOUND_KEY: list[str | tuple[str, ...]] = [("dpcode", "key"), "subkey"]
+COMPOUND_KEY: list[str | tuple[str, ...]] = ["key", "dpcode"]
 
 
 @dataclass(frozen=True)
