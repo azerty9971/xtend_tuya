@@ -238,7 +238,8 @@ async def async_setup_entry(
                             hass_data.manager,
                             hass,
                             current_position=description.position_wrapper.find_dpcode(
-                                device, description.current_position  # type: ignore
+                                device,
+                                description.current_position,
                             ),
                             instruction_wrapper=tuya_cover_get_instruction_wrapper(
                                 device, description
@@ -319,18 +320,18 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
     @property
     def is_cover_control_inverted(self) -> bool | None:
         if is_reversed := self.device.status.get(XTDPCode.XT_COVER_INVERT_CONTROL):
-            if is_reversed == "no":
+            if is_reversed is False:
                 return False
-            elif is_reversed == "yes":
+            elif is_reversed is True:
                 return True
         return None
 
     @property
     def is_cover_status_inverted(self) -> bool | None:
         if is_reversed := self.device.status.get(XTDPCode.XT_COVER_INVERT_STATUS):
-            if is_reversed == "no":
+            if is_reversed is False:
                 return False
-            elif is_reversed == "yes":
+            elif is_reversed is True:
                 return True
         return None
 
@@ -346,22 +347,22 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
             )
             send_update = False
             if XTDPCode.XT_COVER_INVERT_CONTROL not in self.device.status:
-                self.device.status[XTDPCode.XT_COVER_INVERT_CONTROL] = "no"
+                self.device.status[XTDPCode.XT_COVER_INVERT_CONTROL] = False
                 self.device.status_range[XTDPCode.XT_COVER_INVERT_CONTROL] = (
                     XTDeviceStatusRange(
                         code=XTDPCode.XT_COVER_INVERT_CONTROL,
-                        type=TuyaDPType.STRING,
+                        type=TuyaDPType.BOOLEAN,
                         values="{}",
                         dp_id=0,
                     )
                 )
                 send_update = True
             if XTDPCode.XT_COVER_INVERT_STATUS not in self.device.status:
-                self.device.status[XTDPCode.XT_COVER_INVERT_STATUS] = "no"
+                self.device.status[XTDPCode.XT_COVER_INVERT_STATUS] = False
                 self.device.status_range[XTDPCode.XT_COVER_INVERT_STATUS] = (
                     XTDeviceStatusRange(
                         code=XTDPCode.XT_COVER_INVERT_STATUS,
-                        type=TuyaDPType.STRING,
+                        type=TuyaDPType.BOOLEAN,
                         values="{}",
                         dp_id=0,
                     )

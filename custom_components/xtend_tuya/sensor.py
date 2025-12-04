@@ -57,6 +57,7 @@ from .ha_tuya_integration.tuya_integration_imports import (
     TuyaSensorEntityDescription,
     TuyaIntegerTypeData,
     TuyaDPCodeWrapper,
+    TuyaDPCodeBooleanWrapper,
     tuya_sensor_get_dpcode_wrapper,
 )
 
@@ -913,6 +914,7 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
             translation_key="xt_cover_invert_control",
             entity_registry_visible_default=False,
             restoredata=True,
+            wrapper_class=(TuyaDPCodeBooleanWrapper,)
         ),
         XTSensorEntityDescription(
             key=XTDPCode.XT_COVER_INVERT_STATUS,
@@ -920,6 +922,7 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
             entity_registry_visible_default=False,
             restoredata=True,
             refresh_device_after_load=True,
+            wrapper_class=(TuyaDPCodeBooleanWrapper,)
         ),
     ),
     "cl": (*BATTERY_SENSORS,),
@@ -1580,7 +1583,7 @@ async def async_setup_entry(
                 if category_descriptions := XTEntityDescriptorManager.get_category_descriptors(
                     supported_descriptors, device.category
                 ):
-                    # hass_data.manager.device_watcher.report_message(device.id, f"Descriptions of {device.name}: {category_descriptions}")
+                    hass_data.manager.device_watcher.report_message(device.id, f"Descriptions of {device.name}: {category_descriptions}")
                     externally_managed_dpcodes = (
                         XTEntityDescriptorManager.get_category_keys(
                             externally_managed_descriptors.get(device.category)
@@ -1593,6 +1596,7 @@ async def async_setup_entry(
                                 category_descriptions, [restrict_dpcode]
                             ),
                         )
+                        hass_data.manager.device_watcher.report_message(device.id, f"Descriptions of {device.name}: {category_descriptions} AFTER FILTERING")
                     entities.extend(
                         XTSensorEntity.get_entity_instance(
                             description, device, hass_data.manager, dpcode_wrapper

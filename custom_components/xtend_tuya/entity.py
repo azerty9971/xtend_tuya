@@ -163,6 +163,7 @@ class XTEntityDescriptorManager:
                                 compound_key = str(key_part)
                             else:
                                 compound_key = f"{compound_key}|{key_part}"
+                            break
             else:
                 if hasattr(entity, key):
                     key_part = getattr(entity, key)
@@ -576,6 +577,10 @@ class XTEntity(TuyaEntity):
             externally_managed_dpcodes,
             key_fields,
         )
+        if description.key == "xt_cover_invert_control":
+            LOGGER.warning(
+                f"Support check for {device.name} ({device.id}) on platform {platform} for dpcode {dpcode}: {result}"
+            )
         if result is True:
             # Register the code as being handled by the device
             XTEntity.register_handled_dpcode(device, platform, dpcode)
