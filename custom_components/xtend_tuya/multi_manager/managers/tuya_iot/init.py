@@ -164,7 +164,6 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
                 non_user_api.connect
             )
             user_api_valid = await XTEventLoopProtector.execute_out_of_event_loop_and_return(api.test_validity)
-            non_user_api_valid = await XTEventLoopProtector.execute_out_of_event_loop_and_return(non_user_api.test_validity)
         except requests.exceptions.RequestException as e:
             LOGGER.error(f"Tuya IOT request didn't work: {e}")
             await self.raise_issue(
@@ -184,7 +183,6 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
             connect_user_api.get("success", False) is False
             or connect_non_user_api.get("success", False) is False
             or user_api_valid is False
-            or non_user_api_valid is False
         ):
             if connect_user_api.get("success", False) is False:
                 LOGGER.error(f"Error connecting the USER api: {connect_user_api}")
@@ -192,8 +190,6 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
                 LOGGER.error(f"Error connecting the NON-USER api: {connect_non_user_api}")
             if user_api_valid is False:
                 LOGGER.error(f"Error validating the USER api: {user_api_valid}")
-            if non_user_api_valid is False:
-                LOGGER.error(f"Error validating the NON-USER api: {non_user_api_valid}")
             await self.raise_issue(
                 hass=hass,
                 config_entry=config_entry,
