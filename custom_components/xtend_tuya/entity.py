@@ -462,7 +462,10 @@ class XTEntity(TuyaEntity):
 
     def get_dptype_from_dpcode_wrapper(self) -> TuyaDPType | None:
         if type_information := self.get_type_information():
-            return type_information.DPTYPE
+            if hasattr(type_information, "DPTYPE"):
+                return type_information.DPTYPE
+        if hasattr(self.dpcode_wrapper, "DPTYPE"):
+            return getattr(self.dpcode_wrapper, "DPTYPE")
         return None
 
     @staticmethod
