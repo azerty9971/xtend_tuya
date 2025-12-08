@@ -18,6 +18,9 @@ from ...shared.shared_classes import (
 from ...shared.threading import (
     XTThreadingManager,
 )
+from ....const import (
+    LOGGER,
+)
 
 
 class XTSharingDeviceRepository(DeviceRepository):
@@ -34,6 +37,9 @@ class XTSharingDeviceRepository(DeviceRepository):
 
     def update_device_specification(self, device: CustomerDevice):
         super().update_device_specification(device)
+
+        if device.category.startswith("infrared_"):
+            LOGGER.warning(f"Infrared device status range: {device.status_range} <=> function: {device.function}")
 
         # Now convert the status_range and function to XT format
         for code in device.status_range:
