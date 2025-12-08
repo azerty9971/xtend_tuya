@@ -103,7 +103,6 @@ async def async_setup_entry(
                             hass_data.manager.get_ir_hub_information, hub_device
                         )
                     )
-                    LOGGER.warning(f"Found IR Hub Information: {hub_information}")
                     if hub_information is None:
                         continue
 
@@ -190,7 +189,7 @@ async def async_setup_entry(
         async_add_entities(entities)
         if restrict_dpcode is None:
             hass_data.manager.add_post_setup_callback(
-                XTMultiManagerPostSetupCallbackPriority.PRIORITY_LAST,
+                XTMultiManagerPostSetupCallbackPriority.PRIORITY2,
                 async_add_IR_entities,
                 device_map,
             )
