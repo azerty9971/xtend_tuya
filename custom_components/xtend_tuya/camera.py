@@ -108,7 +108,7 @@ async def async_setup_entry(
                         and await entity.stream_source() is None
                     ):
                         # this device doesn't support webrtc or rtsp, skip it...
-                        pass
+                        continue
                     entities.append(entity)
                     if entity.has_multiple_streams:
                         entities.append(
@@ -301,7 +301,11 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
                 ),
             )
         return await self.iot_manager.async_handle_async_webrtc_offer(
-            offer_sdp, session_id, send_message, self.device, self._hass
+            offer_sdp,
+            session_id,
+            send_message,
+            self.device,
+            self._hass,
         )
 
     @callback
@@ -349,5 +353,8 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         try:
             return await super().stream_source()
         except Exception as e:
-            LOGGER.error(f"Error getting stream source for device {self.device.id}: {e}", stack_info=True)
+            LOGGER.error(
+                f"Error getting stream source for device {self.device.id}: {e}",
+                stack_info=True,
+            )
             return None
