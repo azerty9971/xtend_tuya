@@ -33,6 +33,7 @@ from .const import (
     MESSAGE_SOURCE_TUYA_IOT,
     XTMultiManagerProperties,
     XTMultiManagerPostSetupCallbackPriority,
+    LOGGER,
 )
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaCameraEntity,
@@ -86,6 +87,7 @@ async def async_setup_entry(
                 if XTCameraEntity.should_entity_be_added(
                     hass, device, hass_data.manager, supported_descriptors
                 ):
+                    LOGGER.warning(f"Adding camera device {device.id} - {device.name}")
                     entity = XTCameraEntity(
                         device,
                         hass_data.manager,
@@ -130,7 +132,7 @@ async def async_setup_entry(
     def async_discover_device(device_map, restrict_dpcode: str | None = None) -> None:
         """Discover and add a discovered Tuya camera."""
         if hass_data.manager is None:
-            return
+            return None
         if restrict_dpcode is not None:
             return None
         hass_data.manager.add_post_setup_callback(
