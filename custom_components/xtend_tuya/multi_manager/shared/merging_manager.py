@@ -47,6 +47,25 @@ class XTMergingManager:
         #    multi_manager.device_watcher.report_message(device1.id, f"About to merge {device1.source}:{device1}\r\n\r\nand\r\n\r\n{device2.source}:{device2}", device1)
         higher_bak = copy.deepcopy(higher_priority)
         lower_bak = copy.deepcopy(lower_priority)
+        found_201 = False
+        found_101 = False
+        if 201 in lower_bak.local_strategy and lower_bak.local_strategy[201].get(
+            "status_code") == "ir_send":
+            found_201 = True
+        if 201 in higher_bak.local_strategy and higher_bak.local_strategy[201].get(
+            "status_code") == "ir_send":
+            found_201 = True
+        if 101 in lower_bak.local_strategy and lower_bak.local_strategy[101].get(
+            "status_code"
+        ) == "basic_indicator":
+            found_101 = True
+        if 101 in higher_bak.local_strategy and higher_bak.local_strategy[101].get(
+            "status_code"
+        ) == "basic_indicator":
+            found_101 = True
+        if found_201 and found_101:
+            LOGGER.warning(f"DEBUG Merging {higher_bak} and {lower_bak}", stack_info=True)
+        
 
         # Make both devices compliant
         XTMergingManager._fix_incorrect_valuedescr(higher_priority, lower_priority)

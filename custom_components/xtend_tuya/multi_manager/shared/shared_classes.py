@@ -24,14 +24,6 @@ from ...const import (
     XTDeviceSourcePriority,
 )
 
-class WatchedDict[K, V](UserDict[K, V]):
-    def __setitem__(self, key: K, value: V) -> None:
-        super().__setitem__(key, value)
-        if isinstance(value, dict):
-            if status_code := value.get("status_code", None):
-                if status_code == "basic_indicator":
-                    LOGGER.debug(f"WatchedDict: Set item {key} to {value}", stack_info=True)
-
 class DeviceWatcher:
     def __init__(self, multi_manager: mm.MultiManager) -> None:
         self.watched_dev_id: list[str] = [
@@ -163,7 +155,7 @@ class XTDevice(TuyaDevice):
     update_time: int
     set_up: Optional[bool] = False
     support_local: Optional[bool] = False
-    local_strategy: WatchedDict[int, dict[str, Any]] = WatchedDict()
+    local_strategy: dict[int, dict[str, Any]] = {}
     source: str
     online_states: dict[str, bool]
     data_model: dict[str, Any]
