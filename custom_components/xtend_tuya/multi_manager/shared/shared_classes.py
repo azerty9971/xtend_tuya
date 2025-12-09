@@ -27,7 +27,7 @@ from ...const import (
 class DeviceWatcher:
     def __init__(self, multi_manager: mm.MultiManager) -> None:
         self.watched_dev_id: list[str] = [
-            "bfa21f95b5641b0203byum"
+            ""
         ]
         self.multi_manager = multi_manager
 
@@ -263,8 +263,6 @@ class XTDevice(TuyaDevice):
 
     def __setattr__(self, attr, value):
         super().__setattr__(attr, value)
-        if attr == "local_strategy":
-            LOGGER.debug(f"XTDevice: Set attribute {attr} to {value}", stack_info=True)
         if attr not in XTDevice.FIELDS_TO_EXCLUDE_FROM_SYNC:
             if (
                 self.original_device is not None
