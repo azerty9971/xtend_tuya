@@ -109,7 +109,7 @@ async def async_setup_entry(
                         and await entity.stream_source() is None
                     ):
                         # this device doesn't support webrtc or rtsp, skip it...
-                        continue
+                        pass
                     entities.append(entity)
                     if entity.has_multiple_streams:
                         entities.append(
