@@ -87,7 +87,7 @@ async def async_setup_entry(
                 if XTCameraEntity.should_entity_be_added(
                     hass, device, hass_data.manager, supported_descriptors
                 ):
-                    LOGGER.warning(f"Adding camera device {device.id} - {device.name}")
+                    LOGGER.warning(f"Adding camera device {device.id} - {device.name}", stack_info=True)
                     entity = XTCameraEntity(
                         device,
                         hass_data.manager,
