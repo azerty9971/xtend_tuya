@@ -29,6 +29,7 @@ from .const import (
     XTIRRemoteKeysInformation,
     XTMultiManagerProperties,
     XTDiscoverySource,
+    LOGGER,  # noqa: F401
 )
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaButtonEntity,
@@ -276,7 +277,7 @@ async def async_setup_entry(
                                     entity_registry_visible_default=True,
                                 )
                                 if dpcode_wrapper := TuyaDPCodeBooleanWrapper.find_dpcode(
-                                    remote_device, descriptor.key, prefer_function=True
+                                    remote_device, remote_key.key, prefer_function=True
                                 ):
                                     entities.append(
                                         XTButtonEntity.get_entity_instance(

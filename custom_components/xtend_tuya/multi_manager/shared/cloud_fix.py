@@ -11,11 +11,16 @@ from ...ha_tuya_integration.tuya_integration_imports import (
     TuyaDPType,
     tuya_util_parse_dptype,
 )
+import custom_components.xtend_tuya.multi_manager.multi_manager as mm
 
 
 class CloudFixes:
     @staticmethod
-    def apply_fixes(device: XTDevice):
+    def apply_fixes(device: XTDevice, multi_manager: mm.MultiManager | None = None):
+        if multi_manager is not None:
+            multi_manager.device_watcher.report_message(
+                device.id, f"CloudFixes for source {device.source} BEFORE: {device}", device=device
+            )
         CloudFixes._unify_data_types(device)
         CloudFixes._unify_added_attributes(device)
         CloudFixes._map_dpid_to_codes(device)
@@ -28,6 +33,10 @@ class CloudFixes:
         CloudFixes._remove_status_that_are_local_strategy_aliases(device)
         CloudFixes._fix_unaligned_function_or_status_range(device)
         CloudFixes._strip_valuedescr_of_non_label_fields_for_bitmaps(device)
+        if multi_manager is not None:
+            multi_manager.device_watcher.report_message(
+                device.id, f"CloudFixes for source {device.source} AFTER: {device}", device=device
+            )
 
     @staticmethod
     def fix_incorrect_percent_scale_forced(

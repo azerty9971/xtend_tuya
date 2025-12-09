@@ -1,5 +1,6 @@
 from __future__ import annotations
 from typing import Any
+import json
 from tuya_sharing.device import (
     CustomerDevice,
     DeviceRepository,
@@ -18,6 +19,9 @@ from ...shared.shared_classes import (
 from ...shared.threading import (
     XTThreadingManager,
 )
+from ....const import (
+    LOGGER,  # noqa: F401
+)
 
 
 class XTSharingDeviceRepository(DeviceRepository):
@@ -32,8 +36,40 @@ class XTSharingDeviceRepository(DeviceRepository):
         self.multi_manager = multi_manager
         self.api = customer_api
 
+    def _fix_infrared_device_specification(self, device: CustomerDevice):
+        if device.category.startswith("infrared_"):
+            for key, value in device.status_range.items():
+                dpcode = None
+                if hasattr(value, "code"):
+                    dpcode = str(getattr(value, "code"))
+                if hasattr(value, "type") and isinstance(getattr(value, "type"), str):
+                    setattr(device.status_range[key], "type", "Boolean")
+                values = None
+                if hasattr(value, "values"):
+                    values = getattr(value, "values")
+                    if dpcode is not None and dpcode == key:
+                        #This is an infrared dpcode, fix the values to be proper json
+                        setattr(device.status_range[key], "values", json.dumps({"original_content": values}))
+                        #device.status[key] = False
+            
+            for key, value in device.function.items():
+                dpcode = None
+                if hasattr(value, "code"):
+                    dpcode = str(getattr(value, "code"))
+                if hasattr(value, "type") and isinstance(getattr(value, "type"), str):
+                    setattr(device.function[key], "type", "Boolean")
+                values = None
+                if hasattr(value, "values"):
+                    values = getattr(value, "values")
+                    if dpcode is not None and dpcode == key:
+                        #This is an infrared dpcode, fix the values to be proper json
+                        setattr(device.function[key], "values", json.dumps({"original_content": values}))
+                        #device.status[key] = False
+
     def update_device_specification(self, device: CustomerDevice):
         super().update_device_specification(device)
+        
+        self._fix_infrared_device_specification(device)
 
         # Now convert the status_range and function to XT format
         for code in device.status_range:

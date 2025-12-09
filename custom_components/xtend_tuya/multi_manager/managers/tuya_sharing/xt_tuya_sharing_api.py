@@ -157,7 +157,7 @@ class XTSharingAPI(CustomerApi):
         ret = response.json()
 
         if not ret.get("success"):
-            raise Exception(f"network error:({ret['code']}) {ret['msg']}")
+            raise Exception(f"[SHARING API]network error:({ret['code']}) {ret['msg']}, full returned payload: {ret}")
 
         result = _aex_gcm_decrypt(ret.get("result"), secret)
         try:
@@ -167,9 +167,6 @@ class XTSharingAPI(CustomerApi):
         
         time_taken = datetime.now() - start_time
         LOGGER.debug(
-            f"[SHARING API][{time_taken}]Request: {method} {path} PARAMS: {json.dumps(params, ensure_ascii=False, indent=2) if params is not None else ''} BODY: {json.dumps(body, ensure_ascii=False, indent=2) if body is not None else ''}"
-        )
-        LOGGER.debug(
-            f"[SHARING API][{time_taken}]Response: {json.dumps(ret, ensure_ascii=False, indent=2)}"
+            f"[SHARING API][{time_taken}]Request: {method} {path} PARAMS: {json.dumps(params, ensure_ascii=False, indent=2) if params is not None else ''} BODY: {json.dumps(body, ensure_ascii=False, indent=2) if body is not None else ''}, Response: {json.dumps(ret, ensure_ascii=False, indent=2)}"
         )
         return ret

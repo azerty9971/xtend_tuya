@@ -89,12 +89,23 @@ async def async_setup_entry(
                     await entity.get_webrtc_config()
                     if entity.webrtc_configuration is None:
                         entity.disable_webrtc()
-                    if entity.supports_webrtc() is False and await entity.stream_source() is None:
-                        #this device doesn't support webrtc or rtsp, skip it...
+                    if (
+                        entity.supports_webrtc() is False
+                        and await entity.stream_source() is None
+                    ):
+                        # this device doesn't support webrtc or rtsp, skip it...
                         continue
                     entities.append(entity)
                     if entity.has_multiple_streams:
-                        entities.append(XTCameraEntity(device, hass_data.manager, hass, entity.webrtc_configuration, WebRTCStreamQuality.LOW_QUALITY))
+                        entities.append(
+                            XTCameraEntity(
+                                device,
+                                hass_data.manager,
+                                hass,
+                                entity.webrtc_configuration,
+                                WebRTCStreamQuality.LOW_QUALITY,
+                            )
+                        )
 
         async_add_entities(entities)
 
@@ -131,7 +142,12 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
     ) -> None:
         """Init XT Camera."""
         super(XTCameraEntity, self).__init__(device, device_manager)
-        super(XTEntity, self).__init__(device, device_manager)  # type: ignore
+        super(XTEntity, self).__init__(
+            device,
+            device_manager, # type: ignore
+            motion_detection_switch=None,
+            recording_status=None,
+        )
         if stream_quality != WebRTCStreamQuality.HIGH_QUALITY:
             self._attr_unique_id = f"tuya.{device.id}_{stream_quality}"
         self.device = device
@@ -176,7 +192,7 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
     def disable_webrtc(self):
         self._supports_native_sync_webrtc = False
         self._supports_native_async_webrtc = False
-    
+
     def supports_webrtc(self) -> bool:
         return StreamType.WEB_RTC in self.camera_capabilities.frontend_stream_types
 
@@ -303,7 +319,7 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         if self.iot_manager is None or self.webrtc_configuration is None:
             return super()._async_get_webrtc_client_configuration()
         return self.webrtc_configuration
-    
+
     async def stream_source(self) -> str | None:
         """Return the source of the stream."""
         try:

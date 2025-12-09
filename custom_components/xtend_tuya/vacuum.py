@@ -12,14 +12,24 @@ from .multi_manager.multi_manager import (
     XTConfigEntry,
     XTDevice,
 )
-from .const import TUYA_DISCOVERY_NEW
+from .const import TUYA_DISCOVERY_NEW, XTDPCode
 from .entity import (
     XTEntity,
     XTEntityDescriptorManager,
 )
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaVacuumEntity,
+    TuyaDPCodeEnumWrapper,
+    TuyaDPCodeBooleanWrapper,
 )
+
+CHARGE_DPCODE = (XTDPCode.SWITCH_CHARGE,)
+FAN_SPEED_DPCODE = (XTDPCode.SUCTION,)
+LOCATE_DPCODE = (XTDPCode.SEEK,)
+MODE_DPCODE = (XTDPCode.MODE,)
+PAUSE_DPCODE = (XTDPCode.PAUSE,)
+STATUS_DPCODE = (XTDPCode.STATUS,)
+SWITCH_DPCODE = (XTDPCode.POWER_GO,)
 
 VACUUMS: list[str] = []
 
@@ -56,7 +66,33 @@ async def async_setup_entry(
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
                 if device.category in supported_descriptors:
-                    entities.append(XTVacuumEntity(device, hass_data.manager))
+                    entities.append(
+                        XTVacuumEntity(
+                            device,
+                            hass_data.manager,
+                            charge_wrapper=TuyaDPCodeBooleanWrapper.find_dpcode(
+                                device, CHARGE_DPCODE, prefer_function=True
+                            ),
+                            fan_speed_wrapper=TuyaDPCodeEnumWrapper.find_dpcode(
+                                device, FAN_SPEED_DPCODE, prefer_function=True
+                            ),
+                            locate_wrapper=TuyaDPCodeBooleanWrapper.find_dpcode(
+                                device, LOCATE_DPCODE, prefer_function=True
+                            ),
+                            mode_wrapper=TuyaDPCodeEnumWrapper.find_dpcode(
+                                device, MODE_DPCODE, prefer_function=True
+                            ),
+                            pause_wrapper=TuyaDPCodeBooleanWrapper.find_dpcode(
+                                device, PAUSE_DPCODE
+                            ),
+                            status_wrapper=TuyaDPCodeEnumWrapper.find_dpcode(
+                                device, STATUS_DPCODE
+                            ),
+                            switch_wrapper=TuyaDPCodeBooleanWrapper.find_dpcode(
+                                device, SWITCH_DPCODE, prefer_function=True
+                            ),
+                        )
+                    )
         async_add_entities(entities)
 
     async_discover_device([*hass_data.manager.device_map])
@@ -69,9 +105,31 @@ async def async_setup_entry(
 class XTVacuumEntity(XTEntity, TuyaVacuumEntity):
     """XT Vacuum Device."""
 
-    def __init__(self, device: XTDevice, device_manager: MultiManager) -> None:
+    def __init__(
+        self,
+        device: XTDevice,
+        device_manager: MultiManager,
+        *,
+        charge_wrapper: TuyaDPCodeBooleanWrapper | None,
+        fan_speed_wrapper: TuyaDPCodeEnumWrapper | None,
+        locate_wrapper: TuyaDPCodeBooleanWrapper | None,
+        mode_wrapper: TuyaDPCodeEnumWrapper | None,
+        pause_wrapper: TuyaDPCodeBooleanWrapper | None,
+        status_wrapper: TuyaDPCodeEnumWrapper | None,
+        switch_wrapper: TuyaDPCodeBooleanWrapper | None,
+    ) -> None:
         """Init Tuya vacuum."""
         super(XTVacuumEntity, self).__init__(device, device_manager)
-        super(XTEntity, self).__init__(device, device_manager)  # type: ignore
+        super(XTEntity, self).__init__(
+            device,
+            device_manager,  # type: ignore
+            charge_wrapper=charge_wrapper,
+            fan_speed_wrapper=fan_speed_wrapper,
+            locate_wrapper=locate_wrapper,
+            mode_wrapper=mode_wrapper,
+            pause_wrapper=pause_wrapper,
+            status_wrapper=status_wrapper,
+            switch_wrapper=switch_wrapper,
+        )
         self.device = device
         self.device_manager = device_manager
