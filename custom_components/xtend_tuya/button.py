@@ -29,7 +29,7 @@ from .const import (
     XTIRRemoteKeysInformation,
     XTMultiManagerProperties,
     XTDiscoverySource,
-    LOGGER,
+    LOGGER,  # noqa: F401
 )
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaButtonEntity,
@@ -202,7 +202,6 @@ async def async_setup_entry(
                             hass_data.manager.get_ir_hub_information, hub_device
                         )
                     )
-                    LOGGER.warning(f"Found IR Hub Information: {hub_information}")
                     if hub_information is None:
                         continue
 
