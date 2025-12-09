@@ -33,7 +33,7 @@ from .const import (
     MESSAGE_SOURCE_TUYA_IOT,
     XTMultiManagerProperties,
     XTMultiManagerPostSetupCallbackPriority,
-    LOGGER,
+    LOGGER,  # noqa: F401
 )
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaCameraEntity,
@@ -87,7 +87,6 @@ async def async_setup_entry(
                 if XTCameraEntity.should_entity_be_added(
                     hass, device, hass_data.manager, supported_descriptors
                 ):
-                    LOGGER.warning(f"Adding camera device {device.id} - {device.name}", stack_info=True)
                     entity = XTCameraEntity(
                         device,
                         hass_data.manager,
@@ -159,7 +158,6 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         recording_status: TuyaDPCodeBooleanWrapper | None = None,
     ) -> None:
         """Init XT Camera."""
-        LOGGER.warning(f"Initializing XTCameraEntity for device {device.id} - {device.name} with stream quality {stream_quality}", stack_info=True)
         super(XTCameraEntity, self).__init__(device, device_manager)
         super(XTEntity, self).__init__(
             device,
