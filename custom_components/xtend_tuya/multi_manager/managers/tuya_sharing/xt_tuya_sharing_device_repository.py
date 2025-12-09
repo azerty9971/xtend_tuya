@@ -20,7 +20,7 @@ from ...shared.threading import (
     XTThreadingManager,
 )
 from ....const import (
-    LOGGER,
+    LOGGER,  # noqa: F401
 )
 
 
@@ -38,7 +38,6 @@ class XTSharingDeviceRepository(DeviceRepository):
 
     def _fix_infrared_device_specification(self, device: CustomerDevice):
         if device.category.startswith("infrared_"):
-            LOGGER.warning(f"Infrared device status range: {device.status_range} <=> function: {device.function}")
             for key, value in device.status_range.items():
                 dpcode = None
                 if hasattr(value, "code"):
