@@ -177,6 +177,7 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         self.device_manager = device_manager
         self.iot_manager: XTDeviceManagerInterface | None = None
         self._hass = hass
+        self.hass = hass
         self.webrtc_configuration: WebRTCClientConfiguration | None = webrtc_config
         self.wait_for_candidates = None
         self.supports_2way_audio: bool = False
