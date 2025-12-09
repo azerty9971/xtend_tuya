@@ -92,6 +92,8 @@ async def async_setup_entry(
                         device,
                         hass_data.manager,
                         hass,
+                        None,
+                        WebRTCStreamQuality.HIGH_QUALITY,
                         motion_detection_switch=TuyaDPCodeBooleanWrapper.find_dpcode(
                             device, XTDPCode.MOTION_SWITCH, prefer_function=True
                         ),
@@ -163,6 +165,7 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         recording_status: TuyaDPCodeBooleanWrapper | None = None,
     ) -> None:
         """Init XT Camera."""
+        LOGGER.warning(f"Initializing XTCameraEntity for device {device.id} - {device.name} with stream quality {stream_quality}", stack_info=True)
         super(XTCameraEntity, self).__init__(device, device_manager)
         super(XTEntity, self).__init__(
             device,
