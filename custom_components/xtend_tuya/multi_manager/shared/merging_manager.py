@@ -535,32 +535,37 @@ class XTMergingManager:
             )
             return left
         elif isinstance(left, dict) and isinstance(right, dict):
+            # Merge entries into a fresh detached dict to avoid sharing
+            merged = {}
             for key in left:
                 if key in right:
-                    left[key] = XTMergingManager.smart_merge(
+                    merged_value = XTMergingManager.smart_merge(
                         left[key], right[key], msg_queue, f"{path}[{key}]"
                     )
-                    right[key] = left[key]
+                    merged[key] = copy.deepcopy(merged_value)
                 else:
-                    right[key] = left[key]
+                    merged[key] = copy.deepcopy(left[key])
             for key in right:
-                if key not in left:
-                    left[key] = right[key]
-            return left
+                if key not in merged:
+                    merged[key] = copy.deepcopy(right[key])
+            return merged
         elif isinstance(left, list) and isinstance(right, list):
-            for key in left:
-                if key not in right:
-                    right.append(key)
-            for key in right:
-                if key not in left:
-                    left.append(key)
-            return left
+            # Merge lists into a new list without creating shared references
+            merged_list = list(left)
+            for item in right:
+                if item not in merged_list:
+                    merged_list.append(copy.deepcopy(item))
+            return merged_list
         elif isinstance(left, tuple) and isinstance(right, tuple):
             left_list = list(left)
             right_list = list(right)
-            return tuple(XTMergingManager.smart_merge(left_list, right_list, msg_queue))
+            merged_list = XTMergingManager.smart_merge(
+                left_list, right_list, msg_queue, path
+            )
+            return tuple(copy.deepcopy(merged_list))
         elif isinstance(left, set) and isinstance(right, set):
-            return left.update(right)
+            # Return a new set union (do not return None as set.update does)
+            return copy.deepcopy(left.union(right))
         elif isinstance(left, str) and isinstance(right, str):
             # Strings could be strings or represent a json subtree
             try:
