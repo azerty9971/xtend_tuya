@@ -43,7 +43,7 @@ class XTSharingDeviceRepository(DeviceRepository):
                 if hasattr(value, "code"):
                     dpcode = str(getattr(value, "code"))
                 if hasattr(value, "type") and isinstance(getattr(value, "type"), str):
-                    setattr(device.status_range[key], "type", str(getattr(value, "type")).lower())
+                    setattr(device.status_range[key], "type", "Boolean")
                 values = None
                 if hasattr(value, "values"):
                     values = getattr(value, "values")
@@ -56,7 +56,7 @@ class XTSharingDeviceRepository(DeviceRepository):
                 if hasattr(value, "code"):
                     dpcode = str(getattr(value, "code"))
                 if hasattr(value, "type") and isinstance(getattr(value, "type"), str):
-                    setattr(device.function[key], "type", str(getattr(value, "type")).lower())
+                    setattr(device.function[key], "type", "Boolean")
                 values = None
                 if hasattr(value, "values"):
                     values = getattr(value, "values")
