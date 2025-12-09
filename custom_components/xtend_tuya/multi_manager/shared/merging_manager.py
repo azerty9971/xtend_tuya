@@ -32,6 +32,11 @@ class XTMergingManager:
         else:
             higher_priority = device1
             lower_priority = device2
+        
+        if multi_manager is not None and multi_manager.device_watcher.is_watched(device1.id):
+            multi_manager.device_watcher.report_message(
+                device1.id, f"About to merge {higher_priority.source}:{higher_priority}\r\n\r\nand\r\n\r\n{lower_priority.source}:{lower_priority}", higher_priority
+            )
 
         # if multi_manager:
         #    multi_manager.device_watcher.report_message(device1.id, f"About to merge {device1.source}:{device1}\r\n\r\nand\r\n\r\n{device2.source}:{device2}", device1)
