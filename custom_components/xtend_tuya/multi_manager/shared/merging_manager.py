@@ -41,8 +41,8 @@ class XTMergingManager:
         # Make both devices compliant
         XTMergingManager._fix_incorrect_valuedescr(higher_priority, lower_priority)
         XTMergingManager._fix_incorrect_valuedescr(lower_priority, higher_priority)
-        cf.CloudFixes.apply_fixes(higher_priority)
-        cf.CloudFixes.apply_fixes(lower_priority)
+        cf.CloudFixes.apply_fixes(higher_priority, multi_manager)
+        cf.CloudFixes.apply_fixes(lower_priority, multi_manager)
 
         # Now decide between each device which on has "the truth" and set it in both
         XTMergingManager._align_device_properties(

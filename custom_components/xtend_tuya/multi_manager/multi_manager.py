@@ -195,8 +195,8 @@ class MultiManager:  # noqa: F811
         self._merge_devices_from_multiple_sources()
         for device in self.device_map.values():
             # Applied twice because some parts at the end of apply_fix would change values of previous calls
-            CloudFixes.apply_fixes(device)
-            CloudFixes.apply_fixes(device)
+            CloudFixes.apply_fixes(device, self)
+            CloudFixes.apply_fixes(device, self)
         self._enable_multi_map_device_alignment()
         self._process_pending_messages()
 
