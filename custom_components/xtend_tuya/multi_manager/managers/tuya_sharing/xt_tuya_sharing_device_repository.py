@@ -42,6 +42,8 @@ class XTSharingDeviceRepository(DeviceRepository):
                 dpcode = None
                 if hasattr(value, "code"):
                     dpcode = str(getattr(value, "code"))
+                if hasattr(value, "type") and isinstance(getattr(value, "type"), str):
+                    setattr(device.status_range[key], "type", str(getattr(value, "type")).lower())
                 values = None
                 if hasattr(value, "values"):
                     values = getattr(value, "values")
