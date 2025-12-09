@@ -106,6 +106,11 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
                 {}, XTDeviceSourcePriority.REGULAR_TUYA
             )
             for device in self.__other_device_manager.device_map.values():
+                self.multi_manager.device_watcher.report_message(
+                    device.id,
+                    f"Overriden device from regular Tuya: {device}",
+                    device=device, # type: ignore
+                )
                 new_device_map[device.id] = XTDevice.from_compatible_device(
                     device, "RT", XTDeviceSourcePriority.REGULAR_TUYA, True
                 )
