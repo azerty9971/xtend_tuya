@@ -58,11 +58,33 @@ from .ha_tuya_integration.tuya_integration_imports import (
     TuyaIntegerTypeData,
     TuyaDPCodeWrapper,
     TuyaDPCodeBooleanWrapper,
+    TuyaDPCodeIntegerWrapper,
+    TuyaDPCodeEnumWrapper,
+    TuyaDPCodeStringWrapper,
     tuya_sensor_get_dpcode_wrapper,
 )
 
 COMPOUND_KEY: list[str | tuple[str, ...]] = ["key", "dpcode"]
 
+def xt_get_dpcode_wrapper(
+    device: XTDevice,
+    description: TuyaSensorEntityDescription,
+) -> TuyaDPCodeWrapper | None:
+    """Get DPCode wrapper for an entity description."""
+    dpcode = description.dpcode or description.key
+    wrapper: TuyaDPCodeWrapper | None
+
+    if description.wrapper_class:
+        for cls in description.wrapper_class:
+            if wrapper := cls.find_dpcode(device, dpcode):
+                return wrapper
+        return None
+
+    for cls in (TuyaDPCodeIntegerWrapper, TuyaDPCodeEnumWrapper, TuyaDPCodeStringWrapper):
+        if wrapper := cls.find_dpcode(device, dpcode):
+            return wrapper
+
+    return None
 
 @dataclass(frozen=True)
 class XTSensorEntityDescription(TuyaSensorEntityDescription, frozen=True):
@@ -1563,7 +1585,7 @@ async def async_setup_entry(
                         entity_registry_enabled_default=False,
                         entity_registry_visible_default=False,
                     )
-                    if dpcode_wrapper := tuya_sensor_get_dpcode_wrapper(device, descriptor):
+                    if dpcode_wrapper := xt_get_dpcode_wrapper(device, descriptor):
                         entities.append(
                             XTSensorEntity.get_entity_instance(
                                 descriptor, device, hass_data.manager, dpcode_wrapper
