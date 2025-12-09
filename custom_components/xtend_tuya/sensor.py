@@ -98,13 +98,14 @@ def xt_get_dpcode_wrapper(
     device_manager: MultiManager,
 ) -> TuyaDPCodeWrapper | None:
     """Get DPCode wrapper for an entity description."""
-    if isinstance(description, XTSensorEntityDescription) and description.recalculate_scale_for_percentage:
-        device_manager.execute_device_entity_function(
-            XTDeviceEntityFunctions.RECALCULATE_PERCENT_SCALE,
-            device,
-            description.key,
-            description.recalculate_scale_for_percentage_threshold,
-        )
+    if isinstance(description, XTSensorEntityDescription):
+        if description.recalculate_scale_for_percentage:
+            device_manager.execute_device_entity_function(
+                XTDeviceEntityFunctions.RECALCULATE_PERCENT_SCALE,
+                device,
+                description.key,
+                description.recalculate_scale_for_percentage_threshold,
+            )
     return tuya_sensor_get_dpcode_wrapper(device, description)
 
 
