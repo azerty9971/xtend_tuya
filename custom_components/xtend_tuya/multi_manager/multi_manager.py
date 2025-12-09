@@ -481,7 +481,6 @@ class MultiManager:  # noqa: F811
             if stream_allocate := account.get_device_stream_allocate(
                 device_id, stream_type
             ):
-                LOGGER.warning(f"Stream allocate for device {device_id} from account {account.get_type_name()}: {stream_allocate}", stack_info=True)
                 return stream_allocate
 
     def send_lock_unlock_command(self, device: XTDevice, lock: bool) -> bool:
