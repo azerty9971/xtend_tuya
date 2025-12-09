@@ -80,7 +80,7 @@ class XTDeviceStatusRange:
         else:
             code = ""
         if hasattr(status_range, "type"):
-            type = status_range.type
+            type = tuya_util_parse_dptype(status_range.type)
         else:
             type = None
         if hasattr(status_range, "values"):
@@ -113,7 +113,7 @@ class XTDeviceFunction:
         else:
             code = ""
         if hasattr(function, "type"):
-            type = function.type
+            type = tuya_util_parse_dptype(function.type)
         else:
             type = None
         if hasattr(function, "values"):
