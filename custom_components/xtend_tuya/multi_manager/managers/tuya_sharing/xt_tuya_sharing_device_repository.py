@@ -107,7 +107,7 @@ class XTSharingDeviceRepository(DeviceRepository):
                 thread_manager.add_thread(_query_devices_thread, item=item)
         thread_manager.start_and_wait(max_concurrency=9)
         for cur_device in _devices:
-            self.multi_manager.device_watcher.report_message(cur_device.id, f"{cur_device}",device=cur_device)
+            self.multi_manager.device_watcher.report_message(cur_device.id, f"_query_devices result: {cur_device}",device=cur_device)
         return _devices
 
     def _update_device_strategy_info_mod(self, device: CustomerDevice):
