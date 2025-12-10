@@ -43,9 +43,6 @@ from .const import (
 from .xt_tuya_iot_data import (
     TuyaIOTData,
 )
-from .xt_tuya_iot_mq import (
-    XTIOTOpenMQ,
-)
 from .xt_tuya_iot_home_manager import (
     XTIOTHomeManager,
 )
@@ -203,15 +200,13 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
                 learn_more_url="https://github.com/azerty9971/xtend_tuya/blob/main/docs/renew_cloud_credentials.md",
             )
             return None
-        mq = XTIOTOpenMQ(api)
-        mq.start()
-        device_manager = XTIOTDeviceManager(self.multi_manager, api, non_user_api, mq)
+        device_manager = XTIOTDeviceManager(self.multi_manager, api, non_user_api)
         device_ids: list[str] = list()
-        home_manager = XTIOTHomeManager(api, mq, device_manager, self.multi_manager)
+        home_manager = XTIOTHomeManager(api, device_manager, self.multi_manager)
         device_manager.add_device_listener(self.multi_manager.multi_device_listener)  # type: ignore
         return TuyaIOTData(
             device_manager=device_manager,
-            mq=mq,
+            mq=device_manager.mq,
             device_ids=device_ids,
             home_manager=home_manager,
         )

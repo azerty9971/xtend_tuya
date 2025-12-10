@@ -2,7 +2,6 @@ from __future__ import annotations
 from ....lib.tuya_iot import (
     TuyaHomeManager,
     TuyaOpenAPI,
-    TuyaOpenMQ,
 )
 from ....lib.tuya_iot.asset import TuyaAssetManager
 from ....lib.tuya_iot.tuya_enums import AuthType
@@ -22,11 +21,10 @@ class XTIOTHomeManager(TuyaHomeManager):
     def __init__(
         self,
         api: TuyaOpenAPI,
-        mq: TuyaOpenMQ,
         device_manager: XTIOTDeviceManager,
         multi_manager: MultiManager,
     ):
-        super().__init__(api, mq, device_manager)
+        super().__init__(api, device_manager.mq, device_manager)
         self.multi_manager = multi_manager
         self.device_manager = device_manager
 
