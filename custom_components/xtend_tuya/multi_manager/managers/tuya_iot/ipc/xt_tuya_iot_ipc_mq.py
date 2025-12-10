@@ -11,13 +11,11 @@ from ..xt_tuya_iot_mq import (
 from ..xt_tuya_iot_openapi import (
     XTIOTOpenAPI,
 )
-from .xt_tuya_iot_ipc_manager import (
-    XTIOTIPCManager,
-)
+import custom_components.xtend_tuya.multi_manager.managers.tuya_iot.ipc.xt_tuya_iot_ipc_manager as ipc_man
 
 
 class XTIOTOpenMQIPC(XTIOTOpenMQ):
-    def __init__(self, api: XTIOTOpenAPI, manager: XTIOTIPCManager, class_id: str = "IPC", topics: str = "ipc", link_id: str | None = None) -> None:
+    def __init__(self, api: XTIOTOpenAPI, manager: ipc_man.XTIOTIPCManager, class_id: str = "IPC", topics: str = "ipc", link_id: str | None = None) -> None:
         current_link_id: str = link_id if link_id is not None else f"tuya.ipc.{uuid.uuid1()}"
         super().__init__(api, manager, class_id="IPC", topics="ipc", link_id=current_link_id)
 
