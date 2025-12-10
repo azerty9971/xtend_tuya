@@ -12,16 +12,14 @@ from ...shared.threading import (
     XTConcurrencyManager,
     XTEventLoopProtector,
 )
-from .xt_tuya_iot_manager import (
-    XTIOTDeviceManager,
-)
+import custom_components.xtend_tuya.multi_manager.managers.tuya_iot.xt_tuya_iot_manager as man
 
 
 class XTIOTHomeManager(TuyaHomeManager):
     def __init__(
         self,
         api: TuyaOpenAPI,
-        device_manager: XTIOTDeviceManager,
+        device_manager: man.XTIOTDeviceManager,
         multi_manager: MultiManager,
     ):
         super().__init__(api, device_manager.mq, device_manager)
