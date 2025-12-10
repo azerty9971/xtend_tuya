@@ -20,9 +20,7 @@ from ....lib.tuya_iot.openmq import (
 from .xt_tuya_iot_openapi import (
     XTIOTOpenAPI,
 )
-from .xt_tuya_iot_manager import (
-    XTIOTDeviceManager,
-)
+import custom_components.xtend_tuya.multi_manager.managers.tuya_iot.xt_tuya_iot_manager as man
 import custom_components.xtend_tuya.multi_manager.managers.tuya_iot.ipc.xt_tuya_iot_ipc_manager as ipc_man
 from ....const import (
     LOGGER,  # noqa: F401
@@ -37,7 +35,7 @@ class XTIOTOpenMQ(TuyaOpenMQ):
     def __init__(
         self,
         api: XTIOTOpenAPI,
-        manager: XTIOTDeviceManager | ipc_man.XTIOTIPCManager | None = None,
+        manager: man.XTIOTDeviceManager | ipc_man.XTIOTIPCManager | None = None,
         class_id: str = "IOT",
         topics: str = "device",
         link_id: str | None = None,
