@@ -58,5 +58,5 @@ class XTIOTOpenMQ(TuyaOpenMQ):
     ):
         if rc != 0:
             if self.manager is not None:
-                LOGGER.info("MQ disconnected unexpectedly, reconnecting...")
+                LOGGER.warning("MQ disconnected unexpectedly, reconnecting...")
                 self.manager.refresh_mq()
