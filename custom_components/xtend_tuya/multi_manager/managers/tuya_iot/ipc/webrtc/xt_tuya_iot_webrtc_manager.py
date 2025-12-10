@@ -341,11 +341,11 @@ class XTIOTWebRTCManager:
             sdp_offer = sdp_offer.replace("a=end-of-candidates" + ENDLINE, "")
             self.set_sdp_offer(session_id, sdp_offer)
             if (
-                self.ipc_manager.ipc_mq.mq_config is not None
-                and self.ipc_manager.ipc_mq.mq_config.sink_topic is not None
+                self.ipc_manager.mq.mq_config is not None
+                and self.ipc_manager.mq.mq_config.sink_topic is not None
                 and moto_id is not None
             ):
-                for topic in self.ipc_manager.ipc_mq.mq_config.sink_topic.values():
+                for topic in self.ipc_manager.mq.mq_config.sink_topic.values():
                     topic = topic.replace("{device_id}", device_id)
                     topic = topic.replace("moto_id", moto_id)
                     payload = {
@@ -455,10 +455,10 @@ class XTIOTWebRTCManager:
                     "msg": {"mode": "webrtc"},
                 },
             }
-            if self.ipc_manager.ipc_mq.mq_config is None:
+            if self.ipc_manager.mq.mq_config is None:
                 return None
-            if self.ipc_manager.ipc_mq.mq_config.sink_topic is not None:
-                for topic in self.ipc_manager.ipc_mq.mq_config.sink_topic.values():
+            if self.ipc_manager.mq.mq_config.sink_topic is not None:
+                for topic in self.ipc_manager.mq.mq_config.sink_topic.values():
                     self.ipc_manager.publish_to_ipc_mqtt(topic, json.dumps(payload))
                 return ""
         return None
@@ -485,10 +485,10 @@ class XTIOTWebRTCManager:
                     "msg": {"mode": "webrtc", "candidate": candidate},
                 },
             }
-            if self.ipc_manager.ipc_mq.mq_config is None:
+            if self.ipc_manager.mq.mq_config is None:
                 return None
-            if self.ipc_manager.ipc_mq.mq_config.sink_topic is not None:
-                for topic in self.ipc_manager.ipc_mq.mq_config.sink_topic.values():
+            if self.ipc_manager.mq.mq_config.sink_topic is not None:
+                for topic in self.ipc_manager.mq.mq_config.sink_topic.values():
                     self.ipc_manager.publish_to_ipc_mqtt(topic, json.dumps(payload))
                 return ""
         return None
@@ -818,12 +818,12 @@ class XTIOTWebRTCManager:
     def send_to_ipc_mqtt(self, session_id: str, device: XTDevice, payload: str):
         webrtc_config = self.get_config(device.id, session_id)
         if (
-            self.ipc_manager.ipc_mq.mq_config is None
-            or self.ipc_manager.ipc_mq.mq_config.sink_topic is None
+            self.ipc_manager.mq.mq_config is None
+            or self.ipc_manager.mq.mq_config.sink_topic is None
             or webrtc_config is None
         ):
             return None
-        for topic in self.ipc_manager.ipc_mq.mq_config.sink_topic.values():
+        for topic in self.ipc_manager.mq.mq_config.sink_topic.values():
             topic = topic.replace("{device_id}", device.id)
             topic = topic.replace(
                 "moto_id", webrtc_config.get("moto_id", "!!!MOTO_ID_NOT_FOUND!!!")

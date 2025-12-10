@@ -55,7 +55,6 @@ from ....ha_tuya_integration.tuya_integration_imports import (
     tuya_util_parse_dptype,
 )
 
-
 class XTIOTDeviceManager(TuyaDeviceManager):
     device_map: XTDeviceMap = XTDeviceMap({}, XTDeviceSourcePriority.TUYA_IOT)
 
