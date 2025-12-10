@@ -11,12 +11,15 @@ from ..xt_tuya_iot_mq import (
 from ..xt_tuya_iot_openapi import (
     XTIOTOpenAPI,
 )
+from .xt_tuya_iot_ipc_manager import (
+    XTIOTIPCManager,
+)
 
 
 class XTIOTOpenMQIPC(XTIOTOpenMQ):
-    def __init__(self, api: XTIOTOpenAPI, class_id: str = "IPC", topics: str = "ipc", link_id: str | None = None) -> None:
+    def __init__(self, api: XTIOTOpenAPI, manager: XTIOTIPCManager, class_id: str = "IPC", topics: str = "ipc", link_id: str | None = None) -> None:
         current_link_id: str = link_id if link_id is not None else f"tuya.ipc.{uuid.uuid1()}"
-        super().__init__(api, class_id="IPC", topics="ipc", link_id=current_link_id)
+        super().__init__(api, manager, class_id="IPC", topics="ipc", link_id=current_link_id)
 
     def _on_message(self, mqttc: mqtt.Client, user_data: Any, msg: mqtt.MQTTMessage):
         msg_dict = json.loads(msg.payload.decode("utf8"))

@@ -23,6 +23,9 @@ from .xt_tuya_iot_openapi import (
 from .xt_tuya_iot_manager import (
     XTIOTDeviceManager,
 )
+from .ipc.xt_tuya_iot_ipc_manager import (
+    XTIOTIPCManager,
+)
 from ....const import (
     LOGGER,  # noqa: F401
 )
@@ -36,7 +39,7 @@ class XTIOTOpenMQ(TuyaOpenMQ):
     def __init__(
         self,
         api: XTIOTOpenAPI,
-        manager: XTIOTDeviceManager,
+        manager: XTIOTDeviceManager | XTIOTIPCManager | None = None,
         class_id: str = "IOT",
         topics: str = "device",
         link_id: str | None = None,
@@ -58,5 +61,6 @@ class XTIOTOpenMQ(TuyaOpenMQ):
         properties: mqtt_Properties | None = None,
     ):
         if rc != 0:
-            LOGGER.info("MQ disconnected unexpectedly, reconnecting...")
-            self.manager.refresh_mq()
+            if self.manager is not None:
+                LOGGER.info("MQ disconnected unexpectedly, reconnecting...")
+                self.manager.refresh_mq()
