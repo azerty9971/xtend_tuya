@@ -1,4 +1,5 @@
 """Tuya Open IOT HUB which base on MQTT."""
+
 from __future__ import annotations
 
 import base64
@@ -50,7 +51,7 @@ class TuyaMQConfig:
         self.source_topic: dict[str, str] = result.get("source_topic", {})
         self.sink_topic: dict[str, str] = result.get("sink_topic", {})
         self.expire_time: int = result.get("expire_time", 0)
-    
+
     def is_valid(self) -> bool:
         if self.url == "":
             return False
@@ -66,7 +67,13 @@ class TuyaOpenMQ(threading.Thread):
       openapi: tuya openapi
     """
 
-    def __init__(self, api: TuyaOpenAPI, class_id: str = "IOT", topics: str = "device", link_id: str | None = None) -> None:
+    def __init__(
+        self,
+        api: TuyaOpenAPI,
+        class_id: str = "IOT",
+        topics: str = "device",
+        link_id: str | None = None,
+    ) -> None:
         """Init TuyaOpenMQ."""
         threading.Thread.__init__(self)
         self.api: TuyaOpenAPI = api
@@ -123,16 +130,16 @@ class TuyaOpenMQ(threading.Thread):
 
             # get iv buffer
             iv_length = int.from_bytes(buffer[0:4], byteorder="big")
-            iv_buffer = buffer[4: iv_length + 4]
+            iv_buffer = buffer[4 : iv_length + 4]
 
             # get data buffer
-            data_buffer = buffer[iv_length + 4: len(buffer) - GCM_TAG_LENGTH]
+            data_buffer = buffer[iv_length + 4 : len(buffer) - GCM_TAG_LENGTH]
 
             # aad
             aad_buffer = str(t).encode("utf8")
 
             # tag
-            tag_buffer = buffer[len(buffer) - GCM_TAG_LENGTH:]
+            tag_buffer = buffer[len(buffer) - GCM_TAG_LENGTH :]
 
             cipher = AES.new(key.encode("utf8"), AES.MODE_GCM, nonce=iv_buffer)
             cipher.update(aad_buffer)
@@ -152,13 +159,13 @@ class TuyaOpenMQ(threading.Thread):
             return
 
         msg_dict["data"] = decrypted_data
-        #logger.debug(f"on_message: {msg_dict}")
+        # logger.debug(f"on_message: {msg_dict}")
 
         for listener in self.message_listeners:
             listener(msg_dict)
 
     def _on_log(self, mqttc: mqtt.Client, user_data: Any, level, string):
-        #logger.debug(f"_on_log: {string}")
+        # logger.debug(f"_on_log: {string}")
         pass
 
     def run(self):
@@ -173,11 +180,14 @@ class TuyaOpenMQ(threading.Thread):
                 time.sleep(self.mq_config.expire_time - 60)
             except RequestException as e:
                 logger.exception(e)
-                logger.error(f"failed to refresh mqtt server, retrying in {backoff_seconds} seconds.")
+                logger.error(
+                    f"failed to refresh mqtt server, retrying in {backoff_seconds} seconds."
+                )
 
                 time.sleep(backoff_seconds)
-                backoff_seconds = min(backoff_seconds * 2 , 60) # Try at most every 60 seconds to refresh
-
+                backoff_seconds = min(
+                    backoff_seconds * 2, 60
+                )  # Try at most every 60 seconds to refresh
 
     def __run_mqtt(self):
         mq_config = self._get_mqtt_config()
@@ -191,37 +201,68 @@ class TuyaOpenMQ(threading.Thread):
             self.client.disconnect()
             self.client = None
 
-        #logger.debug(f"connecting {mq_config.url}")
+        # logger.debug(f"connecting {mq_config.url}")
         mqttc = self._start(mq_config)
         if mqttc is None:
             return None
-        
+
         self.client = mqttc
 
     # This block will be useful when we'll use Paho MQTT 3.x or above
-    def _on_disconnect(self, client: mqtt.Client, userdata: Any, flags: mqtt_DisconnectFlags, rc: mqtt_ReasonCode, properties: mqtt_Properties | None = None):
+    def _on_disconnect(
+        self,
+        client: mqtt.Client,
+        userdata: Any,
+        flags: mqtt_DisconnectFlags,
+        rc: mqtt_ReasonCode,
+        properties: mqtt_Properties | None = None,
+    ):
         if rc != 0:
             logger.error(f"Unexpected disconnection.{rc}")
-        #else:
+        # else:
         #    logger.debug("disconnect")
-    
-    def _on_connect(self, mqttc: mqtt.Client, user_data: Any, flags, rc: mqtt_ReasonCode, properties: mqtt_Properties | None = None):
-        #logger.debug(f"connect flags->{flags}, rc->{rc}")
+
+    def _on_connect(
+        self,
+        mqttc: mqtt.Client,
+        user_data: Any,
+        flags,
+        rc: mqtt_ReasonCode,
+        properties: mqtt_Properties | None = None,
+    ):
+        # logger.debug(f"connect flags->{flags}, rc->{rc}")
         if rc == 0:
-            for (key, value) in self.mq_config.source_topic.items():
+            for key, value in self.mq_config.source_topic.items():
                 mqttc.subscribe(value)
         elif rc == CONNECT_FAILED_NOT_AUTHORISED:
             self.__run_mqtt()
-    
-    def _on_subscribe(self, mqttc: mqtt.Client, user_data: Any, mid: int, reason_codes: list[mqtt_ReasonCode] = [], properties: mqtt_Properties | None = None):
-        #logger.debug(f"_on_subscribe: mid: {mid}, reason_codes: {reason_codes}, properties: {properties}")
+
+    def _on_subscribe(
+        self,
+        mqttc: mqtt.Client,
+        user_data: Any,
+        mid: int,
+        reason_codes: list[mqtt_ReasonCode] = [],
+        properties: mqtt_Properties | None = None,
+    ):
+        # logger.debug(f"_on_subscribe: mid: {mid}, reason_codes: {reason_codes}, properties: {properties}")
         pass
-    
-    def _on_publish(self, mqttc: mqtt.Client, user_data: Any, mid: int, reason_code: mqtt_ReasonCode, properties: mqtt_Properties):
+
+    def _on_publish(
+        self,
+        mqttc: mqtt.Client,
+        user_data: Any,
+        mid: int,
+        reason_code: mqtt_ReasonCode,
+        properties: mqtt_Properties,
+    ):
         pass
 
     def _start(self, mq_config: TuyaMQConfig) -> mqtt.Client | None:
-        mqttc = mqtt.Client(callback_api_version=mqtt_CallbackAPIVersion.VERSION2, client_id=mq_config.client_id)
+        mqttc = mqtt.Client(
+            callback_api_version=mqtt_CallbackAPIVersion.VERSION2,
+            client_id=mq_config.client_id,
+        )
         mqttc.username_pw_set(mq_config.username, mq_config.password)
         mqttc.user_data_set({"mqConfig": mq_config})
         mqttc.on_connect = self._on_connect

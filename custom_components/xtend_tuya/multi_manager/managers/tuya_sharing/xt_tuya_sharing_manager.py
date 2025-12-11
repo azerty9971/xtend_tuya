@@ -50,7 +50,7 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
         self.device_repository: dr.XTSharingDeviceRepository | None = None
         self.scene_repository: SceneRepository | None = None
         self.user_repository: UserRepository | None = None
-        self.device_map: XTDeviceMap = XTDeviceMap( # type: ignore
+        self.device_map: XTDeviceMap = XTDeviceMap(  # type: ignore
             {}, XTDeviceSourcePriority.TUYA_SHARED
         )
         self.user_homes: list[SmartLifeHome] = []
@@ -93,7 +93,12 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
         ]
 
         if self.customer_api is not None:
-            self.mq = mq.XTSharingMQ(self.customer_api, home_ids, device)  # type: ignore
+            self.mq = mq.XTSharingMQ(
+                self.customer_api,
+                home_ids,
+                device,
+                self,
+            )
             self.mq.start()
             self.mq.add_message_listener(self.forward_message_to_multi_manager)
 
@@ -106,6 +111,11 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
                 {}, XTDeviceSourcePriority.REGULAR_TUYA
             )
             for device in self.__other_device_manager.device_map.values():
+                self.multi_manager.device_watcher.report_message(
+                    device.id,
+                    f"Overriden device from regular Tuya: {device}",
+                    device=device,  # type: ignore
+                )
                 new_device_map[device.id] = XTDevice.from_compatible_device(
                     device, "RT", XTDeviceSourcePriority.REGULAR_TUYA, True
                 )
@@ -156,7 +166,7 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
             super()._on_device_other(device_id, biz_code, data)
         if biz_code in [BIZCODE_ONLINE, BIZCODE_OFFLINE]:
             self.multi_manager.update_device_online_status(device_id)
-    
+
     def add_device_by_id(self, device_id: str):
         device_ids = [device_id]
         # wait for es sync

@@ -32,6 +32,7 @@ from .ha_tuya_integration.tuya_integration_imports import (
     TuyaBinarySensorEntity,
     TuyaBinarySensorEntityDescription,
     TuyaDPType,
+    TuyaDPCode,
     TuyaDPCodeWrapper,
     binary_sensor,
 )
@@ -47,11 +48,11 @@ COMPOUND_KEY: list[str | tuple[str, ...]] = ["key", "dpcode"]
 class XTBinarySensorEntityDescription(TuyaBinarySensorEntityDescription):
     """Describes an XT binary sensor."""
 
+    # DPCode, to use. If None, the key will be used as DPCode
+    dpcode: XTDPCode | TuyaDPCode | None = None # type: ignore
+
     # This DPCode represent the online status of a device
     device_online: bool = False
-
-    # Subkey to create multiple entities with the same key/dpcode
-    subkey: str | None = None
 
     # Custom is_on function
     is_on: Callable | None = None
@@ -184,48 +185,48 @@ BINARY_SENSORS: dict[str, tuple[XTBinarySensorEntityDescription, ...]] = {
             is_on=lambda x: x != 0,
         ),
         XTBinarySensorEntityDescription(
-            key=XTDPCode.MALFUNCTION,
-            subkey="0",
+            key=f"{XTDPCode.MALFUNCTION}_0",
+            dpcode=XTDPCode.MALFUNCTION,
             translation_key="error_flow_meter",
             device_class=BinarySensorDeviceClass.PROBLEM,
             entity_category=EntityCategory.DIAGNOSTIC,
             is_on=lambda x: (x >> 0) & 1,
         ),
         XTBinarySensorEntityDescription(
-            key=XTDPCode.MALFUNCTION,
-            subkey="1",
+            key=f"{XTDPCode.MALFUNCTION}_1",
+            dpcode=XTDPCode.MALFUNCTION,
             translation_key="error_valve_low_battery",
             device_class=BinarySensorDeviceClass.BATTERY,
             entity_category=EntityCategory.DIAGNOSTIC,
             is_on=lambda x: (x >> 1) & 1,
         ),
         XTBinarySensorEntityDescription(
-            key=XTDPCode.MALFUNCTION,
-            subkey="2",
+            key=f"{XTDPCode.MALFUNCTION}_2",
+            dpcode=XTDPCode.MALFUNCTION,
             translation_key="error_sensor_low_battery",
             device_class=BinarySensorDeviceClass.BATTERY,
             entity_category=EntityCategory.DIAGNOSTIC,
             is_on=lambda x: (x >> 2) & 1,
         ),
         XTBinarySensorEntityDescription(
-            key=XTDPCode.MALFUNCTION,
-            subkey="3",
+            key=f"{XTDPCode.MALFUNCTION}_3",
+            dpcode=XTDPCode.MALFUNCTION,
             translation_key="error_sensor_offline",
             device_class=BinarySensorDeviceClass.PROBLEM,
             entity_category=EntityCategory.DIAGNOSTIC,
             is_on=lambda x: (x >> 3) & 1,
         ),
         XTBinarySensorEntityDescription(
-            key=XTDPCode.MALFUNCTION,
-            subkey="4",
+            key=f"{XTDPCode.MALFUNCTION}_4",
+            dpcode=XTDPCode.MALFUNCTION,
             translation_key="error_water_shortage",
             device_class=BinarySensorDeviceClass.PROBLEM,
             entity_category=EntityCategory.DIAGNOSTIC,
             is_on=lambda x: (x >> 4) & 1,
         ),
         XTBinarySensorEntityDescription(
-            key=XTDPCode.MALFUNCTION,
-            subkey="5",
+            key=f"{XTDPCode.MALFUNCTION}_5",
+            dpcode=XTDPCode.MALFUNCTION,
             translation_key="error_other",
             device_class=BinarySensorDeviceClass.PROBLEM,
             entity_category=EntityCategory.DIAGNOSTIC,
@@ -323,9 +324,8 @@ async def async_setup_entry(
                         ):
                             for label_value in dpcode_information.label:
                                 descriptor = XTBinarySensorEntityDescription(
-                                    key=dpcode,
+                                    key=f"{dpcode}_{label_value}",
                                     dpcode=dpcode, # type: ignore
-                                    subkey=label_value,
                                     bitmap_key=label_value,
                                     translation_key="xt_generic_binary_sensor",
                                     translation_placeholders={
@@ -454,9 +454,6 @@ class XTBinarySensorEntity(XTEntity, TuyaBinarySensorEntity):
         self.device = device
         self.device_manager = device_manager
         self._entity_description = description
-        # Append subkey to unique ID
-        if description.subkey is not None and self._attr_unique_id is not None:
-            self._attr_unique_id += f"{description.subkey}"
 
     @property
     def is_on(self) -> bool | None:

@@ -9,7 +9,6 @@ import datetime
 import time
 from ....lib.tuya_iot import (
     TuyaDeviceManager,
-    TuyaOpenMQ,
 )
 from ....lib.tuya_iot.device import (
     BIZCODE_BIND_USER,
@@ -54,7 +53,12 @@ from .xt_tuya_iot_device import (
 from ....ha_tuya_integration.tuya_integration_imports import (
     tuya_util_parse_dptype,
 )
-
+from .xt_tuya_iot_mq import (
+    XTIOTOpenMQ,
+)
+from .xt_tuya_iot_home_manager import (
+    TuyaHomeManager,
+)
 
 class XTIOTDeviceManager(TuyaDeviceManager):
     device_map: XTDeviceMap = XTDeviceMap({}, XTDeviceSourcePriority.TUYA_IOT)
@@ -63,24 +67,38 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         self,
         multi_manager: MultiManager,
         api: XTIOTOpenAPI,
-        non_user_api: XTIOTOpenAPI,
-        mq: TuyaOpenMQ,
+        non_user_api: XTIOTOpenAPI
     ) -> None:
+        mq = XTIOTOpenMQ(api, self)
         super().__init__(api, mq)
+        mq.start()
+        mq.remove_message_listener(self.on_message)
+        mq.add_message_listener(self.forward_message_to_multi_manager)
         if api.auth_type == AuthType.SMART_HOME:
             self.device_manage = XTSmartHomeDeviceManage(api)
         else:
             self.device_manage = XTIndustrySolutionDeviceManage(api)
         self.device_map = XTDeviceMap({}, XTDeviceSourcePriority.TUYA_IOT)  # type: ignore
-        mq.remove_message_listener(self.on_message)
-        mq.add_message_listener(self.forward_message_to_multi_manager)  # type: ignore
         self.multi_manager = multi_manager
         self.ipc_manager = XTIOTIPCManager(api, multi_manager)
         self.non_user_api = non_user_api
         self.api = api
+        self.mq = mq
+        self.home_manager: TuyaHomeManager | None = None
+
+    def register_home_manager(self, home_manager: TuyaHomeManager):
+        self.home_manager = home_manager
 
     def forward_message_to_multi_manager(self, msg: dict):
         self.multi_manager.on_message(MESSAGE_SOURCE_TUYA_IOT, msg)
+
+    def refresh_mq(self):
+        self.mq.stop()
+        self.mq = XTIOTOpenMQ(self.api, self)
+        self.mq.add_message_listener(self.forward_message_to_multi_manager)
+        self.mq.start()
+        if self.home_manager is not None:
+            self.home_manager.mq = self.mq
 
     def get_device_info(self, device_id: str) -> dict[str, Any]:
         """Get device info.

@@ -175,9 +175,8 @@ async def cleanup_duplicated_devices(
                         remaining_devices = remaining_devices - 1
                         try:
                             device_registry.async_remove_device(hass_dev_id)
-                        except Exception:
-                            # Discard any exception in device cleanup...
-                            pass
+                        except Exception as e:
+                            LOGGER.warning(f"Failed to remove duplicate device {hass_dev_id}: {e}")
                 else:
                     break
 
@@ -198,7 +197,10 @@ async def cleanup_device_registry(
             if not is_device_in_domain_device_maps(
                 hass, [DOMAIN_ORIG, DOMAIN], item, None, True
             ):
-                device_registry.async_remove_device(dev_id)
+                try:
+                    device_registry.async_remove_device(dev_id)
+                except Exception as e:
+                    LOGGER.warning(f"Failed to remove device {dev_id} from registry: {e}")
                 break
 
 

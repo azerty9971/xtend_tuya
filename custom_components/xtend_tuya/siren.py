@@ -25,7 +25,9 @@ from .entity import (
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaSirenEntity,
     TuyaSirenEntityDescription,
+    TuyaDPCodeBooleanWrapper,
 )
+
 
 @dataclass(frozen=True)
 class XTSirenEntityDescription(TuyaSirenEntityDescription, frozen_or_thawed=True):
@@ -38,11 +40,13 @@ class XTSirenEntityDescription(TuyaSirenEntityDescription, frozen_or_thawed=True
         device: XTDevice,
         device_manager: MultiManager,
         description: XTSirenEntityDescription,
+        dpcode_wrapper: TuyaDPCodeBooleanWrapper,
     ) -> XTSirenEntity:
         return XTSirenEntity(
             device=device,
             device_manager=device_manager,
             description=XTSirenEntityDescription(**description.__dict__),
+            dpcode_wrapper=dpcode_wrapper,
         )
 
 
@@ -67,7 +71,10 @@ async def async_setup_entry(
             dict[str, tuple[XTSirenEntityDescription, ...]],
         ],
         XTEntityDescriptorManager.get_platform_descriptors(
-            SIRENS, entry.runtime_data.multi_manager, XTSirenEntityDescription, this_platform
+            SIRENS,
+            entry.runtime_data.multi_manager,
+            XTSirenEntityDescription,
+            this_platform,
         ),
     )
 
@@ -80,11 +87,8 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if (
-                    category_descriptions
-                    := XTEntityDescriptorManager.get_category_descriptors(
-                        supported_descriptors, device.category
-                    )
+                if category_descriptions := XTEntityDescriptorManager.get_category_descriptors(
+                    supported_descriptors, device.category
                 ):
                     externally_managed_dpcodes = (
                         XTEntityDescriptorManager.get_category_keys(
@@ -100,28 +104,42 @@ async def async_setup_entry(
                         )
                     entities.extend(
                         XTSirenEntity.get_entity_instance(
-                            description, device, hass_data.manager
+                            description, device, hass_data.manager, dpcode_wrapper
                         )
                         for description in category_descriptions
-                        if XTEntity.supports_description(
-                            device,
-                            this_platform,
-                            description,
-                            True,
-                            externally_managed_dpcodes,
+                        if (
+                            XTEntity.supports_description(
+                                device,
+                                this_platform,
+                                description,
+                                True,
+                                externally_managed_dpcodes,
+                            )
+                            and (
+                                dpcode_wrapper := TuyaDPCodeBooleanWrapper.find_dpcode(
+                                    device, description.key, prefer_function=True
+                                )
+                            )
                         )
                     )
                     entities.extend(
                         XTSirenEntity.get_entity_instance(
-                            description, device, hass_data.manager
+                            description, device, hass_data.manager, dpcode_wrapper
                         )
                         for description in category_descriptions
-                        if XTEntity.supports_description(
-                            device,
-                            this_platform,
-                            description,
-                            False,
-                            externally_managed_dpcodes,
+                        if (
+                            XTEntity.supports_description(
+                                device,
+                                this_platform,
+                                description,
+                                False,
+                                externally_managed_dpcodes,
+                            )
+                            and (
+                                dpcode_wrapper := TuyaDPCodeBooleanWrapper.find_dpcode(
+                                    device, description.key, prefer_function=True
+                                )
+                            )
                         )
                     )
 
@@ -142,10 +160,16 @@ class XTSirenEntity(XTEntity, TuyaSirenEntity):
         device: XTDevice,
         device_manager: MultiManager,
         description: XTSirenEntityDescription,
+        dpcode_wrapper: TuyaDPCodeBooleanWrapper,
     ) -> None:
         """Init XT Siren."""
         super(XTSirenEntity, self).__init__(device, device_manager, description)
-        super(XTEntity, self).__init__(device, device_manager, description)  # type: ignore
+        super(XTEntity, self).__init__(
+            device,
+            device_manager,  # type: ignore
+            description,
+            dpcode_wrapper,
+        )
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description
@@ -155,11 +179,20 @@ class XTSirenEntity(XTEntity, TuyaSirenEntity):
         description: XTSirenEntityDescription,
         device: XTDevice,
         device_manager: MultiManager,
+        dpcode_wrapper: TuyaDPCodeBooleanWrapper,
     ) -> XTSirenEntity:
         if hasattr(description, "get_entity_instance") and callable(
             getattr(description, "get_entity_instance")
         ):
-            return description.get_entity_instance(device, device_manager, description)
+            return description.get_entity_instance(
+                device,
+                device_manager,
+                description,
+                dpcode_wrapper,
+            )
         return XTSirenEntity(
-            device, device_manager, XTSirenEntityDescription(**description.__dict__)
+            device,
+            device_manager,
+            XTSirenEntityDescription(**description.__dict__),
+            dpcode_wrapper,
         )

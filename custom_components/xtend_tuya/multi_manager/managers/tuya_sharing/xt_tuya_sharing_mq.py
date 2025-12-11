@@ -1,6 +1,14 @@
 from __future__ import annotations
-from tuya_sharing.mq import SharingMQ, SharingMQConfig
+from tuya_sharing.mq import (
+    SharingMQ,
+    SharingMQConfig,
+    CustomerApi,
+)
 from paho.mqtt import client as mqtt
+import custom_components.xtend_tuya.multi_manager.managers.tuya_sharing.xt_tuya_sharing_manager as sm
+from ....const import (
+    LOGGER,
+)
 
 # from paho.mqtt.enums import (
 #     CallbackAPIVersion as mqtt_CallbackAPIVersion,
@@ -31,6 +39,21 @@ class XTSharingMQ(SharingMQ):
     # def _on_publish(self, mqttc: mqtt.Client, user_data: Any, mid: int, reason_code: mqtt_ReasonCode = None, properties: mqtt_Properties = None):
     #     pass
 
+    def __init__(
+        self,
+        customer_api: CustomerApi,
+        owner_ids: list,
+        device: list[sm.XTDevice],
+        manager: sm.XTSharingDeviceManager,
+    ):
+        super().__init__(
+            customer_api,
+            owner_ids,
+            device, # type: ignore
+        )
+        self.manager = manager
+        self.shutting_down = False
+
     def _start(self, mq_config: SharingMQConfig) -> mqtt.Client:
         # mqttc = mqtt.Client(callback_api_version=mqtt_CallbackAPIVersion.VERSION2, client_id=mq_config.client_id)
         mqttc = mqtt.Client(client_id=mq_config.client_id)
@@ -51,3 +74,12 @@ class XTSharingMQ(SharingMQ):
 
         mqttc.loop_start()
         return mqttc
+
+    def _on_disconnect(self, client, userdata, rc):
+        if rc != 0:
+            if self.shutting_down is False:
+                self.shutting_down = True
+                LOGGER.warning("Unexpected disconnection. Reconnecting...")
+                self.manager.refresh_mq()
+        else:
+            LOGGER.debug("disconnect")

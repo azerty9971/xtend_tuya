@@ -33,9 +33,11 @@ from .const import (
     MESSAGE_SOURCE_TUYA_IOT,
     XTMultiManagerProperties,
     XTMultiManagerPostSetupCallbackPriority,
+    LOGGER,  # noqa: F401
 )
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaCameraEntity,
+    TuyaDPCodeBooleanWrapper,
 )
 from .entity import (
     XTEntity,
@@ -85,16 +87,45 @@ async def async_setup_entry(
                 if XTCameraEntity.should_entity_be_added(
                     hass, device, hass_data.manager, supported_descriptors
                 ):
-                    entity = XTCameraEntity(device, hass_data.manager, hass)
+                    entity = XTCameraEntity(
+                        device,
+                        hass_data.manager,
+                        hass,
+                        None,
+                        WebRTCStreamQuality.HIGH_QUALITY,
+                        motion_detection_switch=TuyaDPCodeBooleanWrapper.find_dpcode(
+                            device, XTDPCode.MOTION_SWITCH, prefer_function=True
+                        ),
+                        recording_status=TuyaDPCodeBooleanWrapper.find_dpcode(
+                            device, XTDPCode.RECORD_SWITCH
+                        ),
+                    )
                     await entity.get_webrtc_config()
                     if entity.webrtc_configuration is None:
                         entity.disable_webrtc()
-                    if entity.supports_webrtc() is False and await entity.stream_source() is None:
-                        #this device doesn't support webrtc or rtsp, skip it...
+                    if (
+                        entity.supports_webrtc() is False
+                        and await entity.stream_source() is None
+                    ):
+                        # this device doesn't support webrtc or rtsp, skip it...
                         continue
                     entities.append(entity)
                     if entity.has_multiple_streams:
-                        entities.append(XTCameraEntity(device, hass_data.manager, hass, entity.webrtc_configuration, WebRTCStreamQuality.LOW_QUALITY))
+                        entities.append(
+                            XTCameraEntity(
+                                device,
+                                hass_data.manager,
+                                hass,
+                                entity.webrtc_configuration,
+                                WebRTCStreamQuality.LOW_QUALITY,
+                                motion_detection_switch=TuyaDPCodeBooleanWrapper.find_dpcode(
+                                    device, XTDPCode.MOTION_SWITCH, prefer_function=True
+                                ),
+                                recording_status=TuyaDPCodeBooleanWrapper.find_dpcode(
+                                    device, XTDPCode.RECORD_SWITCH
+                                ),
+                            )
+                        )
 
         async_add_entities(entities)
 
@@ -102,7 +133,7 @@ async def async_setup_entry(
     def async_discover_device(device_map, restrict_dpcode: str | None = None) -> None:
         """Discover and add a discovered Tuya camera."""
         if hass_data.manager is None:
-            return
+            return None
         if restrict_dpcode is not None:
             return None
         hass_data.manager.add_post_setup_callback(
@@ -128,16 +159,25 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         hass: HomeAssistant,
         webrtc_config: WebRTCClientConfiguration | None = None,
         stream_quality: WebRTCStreamQuality = WebRTCStreamQuality.HIGH_QUALITY,
+        *,
+        motion_detection_switch: TuyaDPCodeBooleanWrapper | None = None,
+        recording_status: TuyaDPCodeBooleanWrapper | None = None,
     ) -> None:
         """Init XT Camera."""
         super(XTCameraEntity, self).__init__(device, device_manager)
-        super(XTEntity, self).__init__(device, device_manager)  # type: ignore
+        super(XTEntity, self).__init__(
+            device,
+            device_manager,  # type: ignore
+            motion_detection_switch=None,
+            recording_status=None,
+        )
         if stream_quality != WebRTCStreamQuality.HIGH_QUALITY:
             self._attr_unique_id = f"tuya.{device.id}_{stream_quality}"
         self.device = device
         self.device_manager = device_manager
         self.iot_manager: XTDeviceManagerInterface | None = None
         self._hass = hass
+        self.hass = hass
         self.webrtc_configuration: WebRTCClientConfiguration | None = webrtc_config
         self.wait_for_candidates = None
         self.supports_2way_audio: bool = False
@@ -176,7 +216,7 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
     def disable_webrtc(self):
         self._supports_native_sync_webrtc = False
         self._supports_native_async_webrtc = False
-    
+
     def supports_webrtc(self) -> bool:
         return StreamType.WEB_RTC in self.camera_capabilities.frontend_stream_types
 
@@ -261,7 +301,11 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
                 ),
             )
         return await self.iot_manager.async_handle_async_webrtc_offer(
-            offer_sdp, session_id, send_message, self.device, self._hass
+            offer_sdp,
+            session_id,
+            send_message,
+            self.device,
+            self._hass,
         )
 
     @callback
@@ -303,10 +347,14 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         if self.iot_manager is None or self.webrtc_configuration is None:
             return super()._async_get_webrtc_client_configuration()
         return self.webrtc_configuration
-    
+
     async def stream_source(self) -> str | None:
         """Return the source of the stream."""
         try:
             return await super().stream_source()
-        except Exception:
+        except Exception as e:
+            LOGGER.error(
+                f"Error getting stream source for device {self.device.id}: {e}",
+                stack_info=True,
+            )
             return None

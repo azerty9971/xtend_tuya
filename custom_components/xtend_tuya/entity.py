@@ -461,8 +461,14 @@ class XTEntity(TuyaEntity):
         return None
 
     def get_dptype_from_dpcode_wrapper(self) -> TuyaDPType | None:
+        #Probably not working. Just kept for backward compatibility
         if type_information := self.get_type_information():
-            return type_information.DPTYPE
+            if hasattr(type_information, "DPTYPE"):
+                return type_information.DPTYPE
+        
+        #This is the one that should work
+        if hasattr(self.dpcode_wrapper, "DPTYPE"):
+            return getattr(self.dpcode_wrapper, "DPTYPE")
         return None
 
     @staticmethod
@@ -522,16 +528,6 @@ class XTEntity(TuyaEntity):
                             XTEntity.register_handled_dpcode(
                                 device, entity_instance_platform, dpcode
                             )
-                            if hasattr(entity_description, "subkey"):
-                                compound_key = (
-                                    XTEntityDescriptorManager.get_compound_key(
-                                        entity_description, ["key", "subkey"]
-                                    )
-                                )
-                                if compound_key is not None:
-                                    XTEntity.register_handled_dpcode(
-                                        device, entity_instance_platform, compound_key
-                                    )
 
     @staticmethod
     def register_handled_dpcode(device: sc.XTDevice, platform: Platform, dpcode: str):
