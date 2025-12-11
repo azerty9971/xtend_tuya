@@ -15,19 +15,25 @@ import custom_components.xtend_tuya.multi_manager.managers.tuya_iot.ipc.webrtc.x
 class XTIOTIPCManager:  # noqa: F811
     def __init__(self, api: XTIOTOpenAPI, multi_manager: MultiManager) -> None:
         self.multi_manager = multi_manager
-        self.ipc_mq: XTIOTOpenMQIPC = XTIOTOpenMQIPC(api)
+        self.mq: XTIOTOpenMQIPC = XTIOTOpenMQIPC(api, self)
         self.ipc_listener: ipc.XTIOTIPCListener = ipc.XTIOTIPCListener(self)
-        self.ipc_mq.start()
-        self.ipc_mq.add_message_listener(self.ipc_listener.handle_message)  # type: ignore
+        self.mq.start()
+        self.mq.add_message_listener(self.ipc_listener.handle_message)
         self.api = api
         self.webrtc_manager = webrtc_man.XTIOTWebRTCManager(self)
 
     def get_from(self) -> str | None:
-        if self.ipc_mq.mq_config is None or self.ipc_mq.mq_config.username is None:
+        if self.mq.mq_config is None or self.mq.mq_config.username is None:
             return None
-        return self.ipc_mq.mq_config.username.split("cloud_")[1]
+        return self.mq.mq_config.username.split("cloud_")[1]
 
     def publish_to_ipc_mqtt(self, topic: str, msg: str):
-        if self.ipc_mq.client is not None:
-            publish_result = self.ipc_mq.client.publish(topic=topic, payload=msg)
+        if self.mq.client is not None:
+            publish_result = self.mq.client.publish(topic=topic, payload=msg)
             publish_result.wait_for_publish(10)
+    
+    def refresh_mq(self):
+        self.mq.stop()
+        self.mq = XTIOTOpenMQIPC(self.api, self)
+        self.mq.add_message_listener(self.ipc_listener.handle_message)
+        self.mq.start()

@@ -528,16 +528,6 @@ class XTEntity(TuyaEntity):
                             XTEntity.register_handled_dpcode(
                                 device, entity_instance_platform, dpcode
                             )
-                            if hasattr(entity_description, "subkey"):
-                                compound_key = (
-                                    XTEntityDescriptorManager.get_compound_key(
-                                        entity_description, ["key", "subkey"]
-                                    )
-                                )
-                                if compound_key is not None:
-                                    XTEntity.register_handled_dpcode(
-                                        device, entity_instance_platform, compound_key
-                                    )
 
     @staticmethod
     def register_handled_dpcode(device: sc.XTDevice, platform: Platform, dpcode: str):

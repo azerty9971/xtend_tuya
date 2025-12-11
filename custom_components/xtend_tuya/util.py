@@ -298,8 +298,11 @@ def delete_all_device_entities(hass: HomeAssistant, device_ids: list[str], platf
 
 # Decodes a b64-encoded timestamp
 def b64todatetime(value):
-    decoded_value = b64decode(value)
     try:
+        decoded_value = b64decode(value)
+        if len(decoded_value) < 6:
+            LOGGER.debug(f"b64todatetime: insufficient bytes (expected 6, got {len(decoded_value)}) from value {value}")
+            return None
         return datetime(
             year=2000 + decoded_value[0],
             month=decoded_value[1],
@@ -309,5 +312,6 @@ def b64todatetime(value):
             second=decoded_value[5],
             tzinfo=DEFAULT_TIME_ZONE,
         )
-    except Exception:
+    except (IndexError, ValueError, TypeError) as e:
+        LOGGER.debug(f"Failed to decode b64 datetime from value {value}: {e}")
         return None

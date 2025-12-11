@@ -58,10 +58,55 @@ from .ha_tuya_integration.tuya_integration_imports import (
     TuyaIntegerTypeData,
     TuyaDPCodeWrapper,
     TuyaDPCodeBooleanWrapper,
+    TuyaDPCodeIntegerWrapper,
+    TuyaDPCodeEnumWrapper,
+    TuyaDPCodeStringWrapper,
     tuya_sensor_get_dpcode_wrapper,
 )
 
 COMPOUND_KEY: list[str | tuple[str, ...]] = ["key", "dpcode"]
+
+
+def xt_get__generic_dpcode_wrapper(
+    device: XTDevice,
+    description: TuyaSensorEntityDescription,
+) -> TuyaDPCodeWrapper | None:
+    """Get DPCode wrapper for an entity description."""
+    dpcode = description.dpcode or description.key
+    wrapper: TuyaDPCodeWrapper | None
+
+    if description.wrapper_class:
+        for cls in description.wrapper_class:
+            if wrapper := cls.find_dpcode(device, dpcode):
+                return wrapper
+        return None
+
+    for cls in (
+        TuyaDPCodeIntegerWrapper,
+        TuyaDPCodeEnumWrapper,
+        TuyaDPCodeStringWrapper,
+    ):
+        if wrapper := cls.find_dpcode(device, dpcode):
+            return wrapper
+
+    return None
+
+
+def xt_get_dpcode_wrapper(
+    device: XTDevice,
+    description: TuyaSensorEntityDescription,
+    device_manager: MultiManager,
+) -> TuyaDPCodeWrapper | None:
+    """Get DPCode wrapper for an entity description."""
+    if isinstance(description, XTSensorEntityDescription):
+        if description.recalculate_scale_for_percentage:
+            device_manager.execute_device_entity_function(
+                XTDeviceEntityFunctions.RECALCULATE_PERCENT_SCALE,
+                device,
+                description.key,
+                description.recalculate_scale_for_percentage_threshold,
+            )
+    return tuya_sensor_get_dpcode_wrapper(device, description)
 
 
 @dataclass(frozen=True)
@@ -914,7 +959,7 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
             translation_key="xt_cover_invert_control",
             entity_registry_visible_default=False,
             restoredata=True,
-            wrapper_class=(TuyaDPCodeBooleanWrapper,)
+            wrapper_class=(TuyaDPCodeBooleanWrapper,),
         ),
         XTSensorEntityDescription(
             key=XTDPCode.XT_COVER_INVERT_STATUS,
@@ -922,7 +967,7 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
             entity_registry_visible_default=False,
             restoredata=True,
             refresh_device_after_load=True,
-            wrapper_class=(TuyaDPCodeBooleanWrapper,)
+            wrapper_class=(TuyaDPCodeBooleanWrapper,),
         ),
     ),
     "cl": (*BATTERY_SENSORS,),
@@ -1563,7 +1608,9 @@ async def async_setup_entry(
                         entity_registry_enabled_default=False,
                         entity_registry_visible_default=False,
                     )
-                    if dpcode_wrapper := tuya_sensor_get_dpcode_wrapper(device, descriptor):
+                    if dpcode_wrapper := xt_get__generic_dpcode_wrapper(
+                        device, descriptor
+                    ):
                         entities.append(
                             XTSensorEntity.get_entity_instance(
                                 descriptor, device, hass_data.manager, dpcode_wrapper
@@ -1583,7 +1630,10 @@ async def async_setup_entry(
                 if category_descriptions := XTEntityDescriptorManager.get_category_descriptors(
                     supported_descriptors, device.category
                 ):
-                    hass_data.manager.device_watcher.report_message(device.id, f"Descriptions of {device.name}: {category_descriptions}")
+                    hass_data.manager.device_watcher.report_message(
+                        device.id,
+                        f"Descriptions of {device.name}: {category_descriptions}",
+                    )
                     externally_managed_dpcodes = (
                         XTEntityDescriptorManager.get_category_keys(
                             externally_managed_descriptors.get(device.category)
@@ -1596,38 +1646,57 @@ async def async_setup_entry(
                                 category_descriptions, [restrict_dpcode]
                             ),
                         )
-                        hass_data.manager.device_watcher.report_message(device.id, f"Descriptions of {device.name}: {category_descriptions} AFTER FILTERING")
+                        hass_data.manager.device_watcher.report_message(
+                            device.id,
+                            f"Descriptions of {device.name}: {category_descriptions} AFTER FILTERING",
+                        )
                     entities.extend(
                         XTSensorEntity.get_entity_instance(
                             description, device, hass_data.manager, dpcode_wrapper
                         )
                         for description in category_descriptions
-                        if (XTEntity.supports_description(
-                            device,
-                            this_platform,
-                            description,
-                            True,
-                            externally_managed_dpcodes,
-                            COMPOUND_KEY,
-                            hass_data.manager,
-                        ) and
-                        (dpcode_wrapper := tuya_sensor_get_dpcode_wrapper(device, description)))
+                        if (
+                            XTEntity.supports_description(
+                                device,
+                                this_platform,
+                                description,
+                                True,
+                                externally_managed_dpcodes,
+                                COMPOUND_KEY,
+                                hass_data.manager,
+                            )
+                            and (
+                                dpcode_wrapper := xt_get_dpcode_wrapper(
+                                    device,
+                                    description,
+                                    hass_data.manager,
+                                )
+                            )
+                        )
                     )
                     entities.extend(
                         XTSensorEntity.get_entity_instance(
                             description, device, hass_data.manager, dpcode_wrapper
                         )
                         for description in category_descriptions
-                        if (XTEntity.supports_description(
-                            device,
-                            this_platform,
-                            description,
-                            False,
-                            externally_managed_dpcodes,
-                            COMPOUND_KEY,
-                            hass_data.manager,
-                        ) and
-                        (dpcode_wrapper := tuya_sensor_get_dpcode_wrapper(device, description)))
+                        if (
+                            XTEntity.supports_description(
+                                device,
+                                this_platform,
+                                description,
+                                False,
+                                externally_managed_dpcodes,
+                                COMPOUND_KEY,
+                                hass_data.manager,
+                            )
+                            and (
+                                dpcode_wrapper := xt_get_dpcode_wrapper(
+                                    device,
+                                    description,
+                                    hass_data.manager,
+                                )
+                            )
+                        )
                     )
         async_add_entities(entities)
         if restrict_dpcode is None:
@@ -1658,17 +1727,11 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
         description: XTSensorEntityDescription,
         dpcode_wrapper: TuyaDPCodeWrapper,
     ) -> None:
-        if description.recalculate_scale_for_percentage:
-            device_manager.execute_device_entity_function(
-                XTDeviceEntityFunctions.RECALCULATE_PERCENT_SCALE,
-                device,
-                description.key,
-                description.recalculate_scale_for_percentage_threshold,
-            )
-
         """Init XT sensor."""
-        super(XTSensorEntity, self).__init__(device, device_manager, description, dpcode_wrapper=dpcode_wrapper)
-        super(XTEntity, self).__init__(device, device_manager, description, dpcode_wrapper) # type: ignore
+        super(XTSensorEntity, self).__init__(
+            device, device_manager, description, dpcode_wrapper=dpcode_wrapper
+        )
+        super(XTEntity, self).__init__(device, device_manager, description, dpcode_wrapper)  # type: ignore
 
         self.device = device
         self.device_manager = device_manager
@@ -1703,7 +1766,9 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
             if should_reset:
                 if device := self.device_manager.device_map.get(self.device.id, None):
                     if self.entity_description.key in device.status:
-                        default_value = get_default_value(self.get_dptype_from_dpcode_wrapper())
+                        default_value = get_default_value(
+                            self.get_dptype_from_dpcode_wrapper()
+                        )
                         if now.hour != 0 or now.minute != 0:
                             LOGGER.error(
                                 f"Resetting {device.name}'s status {self.entity_description.key} to {default_value} at unexpected time",
@@ -1758,16 +1823,21 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
         if hasattr(description, "get_entity_instance") and callable(
             getattr(description, "get_entity_instance")
         ):
-            return description.get_entity_instance(device, device_manager, description, dpcode_wrapper)
+            return description.get_entity_instance(
+                device, device_manager, description, dpcode_wrapper
+            )
         return XTSensorEntity(
-            device, device_manager, XTSensorEntityDescription(**description.__dict__), dpcode_wrapper
+            device,
+            device_manager,
+            XTSensorEntityDescription(**description.__dict__),
+            dpcode_wrapper,
         )
 
     # Use custom native_value function
     @property
     def native_value(self) -> StateType:  # type: ignore
         if self.entity_description.native_value is not None:
-            value = self.device.status.get(self.entity_description.key)
+            value = self._dpcode_wrapper.read_device_status(self.device)
             value = self.entity_description.native_value(value)
         else:
             value = super().native_value
