@@ -79,7 +79,7 @@ class XTSharingMQ(SharingMQ):
         if rc != 0:
             if self.shutting_down is False:
                 self.shutting_down = True
-                LOGGER.debug("Unexpected disconnection. Reconnecting...")
+                LOGGER.warning("Unexpected disconnection. Reconnecting...")
                 self.manager.refresh_mq()
         else:
             LOGGER.debug("disconnect")
