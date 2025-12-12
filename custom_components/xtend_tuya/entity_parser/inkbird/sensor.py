@@ -15,7 +15,13 @@ from homeassistant.const import (
     EntityCategory,
 )
 from ...sensor import (
+    XTSensorEntity,
     XTSensorEntityDescription,
+    TuyaDPCodeWrapper,
+)
+from ...multi_manager.multi_manager import (
+    XTDevice,
+    MultiManager,
 )
 from ...ha_tuya_integration.tuya_integration_imports import (
     TuyaCustomerDevice,
@@ -141,3 +147,17 @@ class InkbirdSensorEntityDescription(XTSensorEntityDescription):
 
     # Key for which data to extract (temperature, humidity, battery)
     data_key: str | None = None
+
+    def get_entity_instance(
+        self,
+        device: XTDevice,
+        device_manager: MultiManager,
+        description: XTSensorEntityDescription,
+        dpcode_wrapper: TuyaDPCodeWrapper,
+    ) -> XTSensorEntity:
+        return XTSensorEntity(
+            device=device,
+            device_manager=device_manager,
+            description=description,
+            dpcode_wrapper=dpcode_wrapper,
+        )
