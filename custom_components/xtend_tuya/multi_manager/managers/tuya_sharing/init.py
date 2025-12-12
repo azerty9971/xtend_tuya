@@ -426,5 +426,11 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
     def trigger_scene(self, home_id: str, scene_id: str) -> bool:
         if self.sharing_account is None:
             return False
-        self.sharing_account.device_manager.trigger_scene(home_id, scene_id)
+        try:
+            self.sharing_account.device_manager.trigger_scene(home_id, scene_id)
+        except Exception as e:
+            LOGGER.warning(
+                f"[Sharing]Trigger scene failed, home id: {home_id}, scene id: {scene_id}, exception: {e}"
+            )
+            return False
         return True
