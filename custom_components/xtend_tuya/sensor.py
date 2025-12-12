@@ -55,6 +55,7 @@ from .entity import (
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaSensorEntity,
     TuyaSensorEntityDescription,
+    TuyaDPCode,
     TuyaIntegerTypeData,
     TuyaDPCodeWrapper,
     TuyaDPCodeBooleanWrapper,
@@ -112,6 +113,8 @@ def xt_get_dpcode_wrapper(
 @dataclass(frozen=True)
 class XTSensorEntityDescription(TuyaSensorEntityDescription, frozen=True):
     """Describes XT sensor entity."""
+
+    dpcode: XTDPCode | TuyaDPCode | str | None = None # type: ignore
 
     virtual_state: VirtualStates | None = None
     vs_copy_to_state: list[XTDPCode] | None = field(default_factory=list)

@@ -44,7 +44,8 @@ class InkbirdSensor:
             if temperature:
                 inkbird_channel_sensors.append(
                     InkbirdSensorEntityDescription(
-                        key=key,
+                        key=f"{key}_temperature",
+                        dpcode=key,
                         data_key="temperature",
                         translation_key=f"{label}_temperature",
                         device_class=SensorDeviceClass.TEMPERATURE,
@@ -56,7 +57,8 @@ class InkbirdSensor:
             if humidity:
                 inkbird_channel_sensors.append(
                     InkbirdSensorEntityDescription(
-                        key=key,
+                        key=f"{key}_humidity",
+                        dpcode=key,
                         data_key="humidity",
                         translation_key=f"{label}_humidity",
                         device_class=SensorDeviceClass.HUMIDITY,
@@ -68,7 +70,8 @@ class InkbirdSensor:
             if battery:
                 inkbird_channel_sensors.append(
                     InkbirdSensorEntityDescription(
-                        key=key,
+                        key=f"{key}_battery",
+                        dpcode=key,
                         data_key="battery",
                         translation_key=f"{label}_battery",
                         device_class=SensorDeviceClass.BATTERY,
@@ -208,7 +211,7 @@ class InkbirdSensorEntity(XTSensorEntity):
         super().__init__(device, device_manager, description, dpcode_wrapper)
         # Override unique_id to include data_key for uniqueness
         self._attr_unique_id = (
-            f"{self.device.id}_{description.key}_{self.entity_description.data_key}"
+            f"{self.device.id}_{description.key}"
         )
         LOGGER.info(
             "🐦 Created InkbirdChannelSensorEntity with unique_id: %s",
