@@ -9,6 +9,7 @@ from homeassistant.components.sensor import (
     SensorDeviceClass,
     SensorStateClass,
 )
+from homeassistant.components.tuya.models import TypeInformation
 from homeassistant.const import (
     UnitOfTemperature,
     PERCENTAGE,
@@ -24,7 +25,51 @@ from ...multi_manager.multi_manager import (
     XTDevice,
     MultiManager,
 )
+from ...ha_tuya_integration.tuya_integration_imports import (
+    TuyaCustomerDevice,
+    TuyaDPCodeBase64Wrapper,
+)
 from .const import INKBIRD_CHANNELS
+
+
+class DPCodeInkbirdWrapper(TuyaDPCodeBase64Wrapper):
+    """DPCode wrapper for Inkbird base64-encoded data."""
+
+    def __init__(self, dpcode: str, type_information: TypeInformation) -> None:
+        super().__init__(dpcode, type_information)
+        self.temperature_unit: UnitOfTemperature = UnitOfTemperature.CELSIUS
+        self.temperature: float | None = None
+        self.humidity: float | None = None
+        self.battery: int | None = None
+
+    def update_data(self, device: TuyaCustomerDevice) -> None:
+        if decoded_data := self.read_bytes(device):
+            _temperature, _humidity, _, self.battery = struct.Struct("<hHIb").unpack(
+                decoded_data[1:11]
+            )
+            self.temperature = _temperature / 10.0
+            self.humidity = _humidity / 10.0
+
+
+class DPCodeInkbirdTemperatureWrapper(DPCodeInkbirdWrapper):
+
+    def read_device_status(self, device: TuyaCustomerDevice) -> Any | None:
+        self.update_data(device)
+        return self.temperature
+
+
+class DPCodeInkbirdHumidityWrapper(DPCodeInkbirdWrapper):
+
+    def read_device_status(self, device: TuyaCustomerDevice) -> Any | None:
+        self.update_data(device)
+        return self.humidity
+
+
+class DPCodeInkbirdBatteryWrapper(DPCodeInkbirdWrapper):
+
+    def read_device_status(self, device: TuyaCustomerDevice) -> Any | None:
+        self.update_data(device)
+        return self.battery
 
 
 class InkbirdSensor:
@@ -52,6 +97,7 @@ class InkbirdSensor:
                         state_class=SensorStateClass.MEASUREMENT,
                         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
                         entity_registry_enabled_default=enabled_by_default,
+                        wrapper_class=(DPCodeInkbirdTemperatureWrapper,),
                     )
                 )
             if humidity:
@@ -65,6 +111,7 @@ class InkbirdSensor:
                         state_class=SensorStateClass.MEASUREMENT,
                         native_unit_of_measurement=PERCENTAGE,
                         entity_registry_enabled_default=enabled_by_default,
+                        wrapper_class=(DPCodeInkbirdHumidityWrapper,),
                     )
                 )
             if battery:
@@ -79,6 +126,7 @@ class InkbirdSensor:
                         native_unit_of_measurement=PERCENTAGE,
                         entity_category=EntityCategory.DIAGNOSTIC,
                         entity_registry_enabled_default=enabled_by_default,
+                        wrapper_class=(DPCodeInkbirdBatteryWrapper,),
                     )
                 )
         INKBIRD_CHANNEL_SENSORS: tuple[InkbirdSensorEntityDescription, ...] = tuple(
@@ -110,7 +158,7 @@ class InkbirdSensorEntityDescription(XTSensorEntityDescription):
         description: XTSensorEntityDescription,
         dpcode_wrapper: TuyaDPCodeWrapper,
     ) -> XTSensorEntity:
-        return InkbirdSensorEntity(
+        return XTSensorEntity(
             device=device,
             device_manager=device_manager,
             description=description,
@@ -185,6 +233,7 @@ class InkbirdB64TypeData:
         return result
 
 
+##TODELETE
 class InkbirdSensorEntity(XTSensorEntity):
     """Inkbird Channel Sensor Entity with base64 data parsing."""
 
@@ -210,9 +259,7 @@ class InkbirdSensorEntity(XTSensorEntity):
         )
         super().__init__(device, device_manager, description, dpcode_wrapper)
         # Override unique_id to include data_key for uniqueness
-        self._attr_unique_id = (
-            f"{self.device.id}_{description.key}"
-        )
+        self._attr_unique_id = f"{self.device.id}_{description.key}"
         LOGGER.info(
             "🐦 Created InkbirdChannelSensorEntity with unique_id: %s",
             self._attr_unique_id,
