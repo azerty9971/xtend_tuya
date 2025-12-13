@@ -4,6 +4,9 @@ from __future__ import annotations
 import struct
 from dataclasses import dataclass
 from typing import Any
+from enum import (
+    StrEnum,
+)
 from homeassistant.components.sensor import (
     SensorDeviceClass,
     SensorStateClass,
@@ -73,6 +76,11 @@ class DPCodeInkbirdBatteryWrapper(DPCodeInkbirdWrapper):
 class InkbirdSensor:
     INKBIRD_SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {}
 
+    class DataKeys(StrEnum):
+        TEMPERATURE = "temperature"
+        HUMIDITY    = "humidity"
+        BATTERY     = "battery"
+
     @staticmethod
     def initialize_sensor() -> None:
         inkbird_channel_sensors: list[InkbirdSensorEntityDescription] = []
@@ -87,10 +95,10 @@ class InkbirdSensor:
             if temperature:
                 inkbird_channel_sensors.append(
                     InkbirdSensorEntityDescription(
-                        key=f"{key}_temperature",
+                        key=f"{key}_{InkbirdSensor.DataKeys.TEMPERATURE}",
                         dpcode=key,
-                        data_key="temperature",
-                        translation_key=f"{label}_temperature",
+                        data_key=InkbirdSensor.DataKeys.TEMPERATURE,
+                        translation_key=f"{label}_{InkbirdSensor.DataKeys.TEMPERATURE}",
                         device_class=SensorDeviceClass.TEMPERATURE,
                         state_class=SensorStateClass.MEASUREMENT,
                         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
@@ -101,10 +109,10 @@ class InkbirdSensor:
             if humidity:
                 inkbird_channel_sensors.append(
                     InkbirdSensorEntityDescription(
-                        key=f"{key}_humidity",
+                        key=f"{key}_{InkbirdSensor.DataKeys.HUMIDITY}",
                         dpcode=key,
-                        data_key="humidity",
-                        translation_key=f"{label}_humidity",
+                        data_key=InkbirdSensor.DataKeys.HUMIDITY,
+                        translation_key=f"{label}_{InkbirdSensor.DataKeys.HUMIDITY}",
                         device_class=SensorDeviceClass.HUMIDITY,
                         state_class=SensorStateClass.MEASUREMENT,
                         native_unit_of_measurement=PERCENTAGE,
@@ -115,10 +123,10 @@ class InkbirdSensor:
             if battery:
                 inkbird_channel_sensors.append(
                     InkbirdSensorEntityDescription(
-                        key=f"{key}_battery",
+                        key=f"{key}_{InkbirdSensor.DataKeys.BATTERY}",
                         dpcode=key,
-                        data_key="battery",
-                        translation_key=f"{label}_battery",
+                        data_key="InkbirdSensor.DataKeys.BATTERY",
+                        translation_key=f"{label}_{InkbirdSensor.DataKeys.BATTERY}",
                         device_class=SensorDeviceClass.BATTERY,
                         state_class=SensorStateClass.MEASUREMENT,
                         native_unit_of_measurement=PERCENTAGE,
