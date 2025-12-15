@@ -672,7 +672,7 @@ class XTIOTWebRTCManager:
 
         if (
             webrtc_session.offer is not None
-            and webrtc_session.offer.find("mozilla") != -1
+            # and webrtc_session.offer.find("mozilla") != -1
         ):
             # Firefox has a much more strict SDP checking mecanism than Chrome, fix the answer so that it accepts it
 
