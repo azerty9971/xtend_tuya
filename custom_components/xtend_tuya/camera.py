@@ -292,7 +292,7 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         if self.has_multiple_streams:
             self.wait_for_candidates = async_call_later(
                 self._hass,
-                2,
+                5,
                 HassJob(
                     functools.partial(
                         self.send_resolution_update,
@@ -358,6 +358,9 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
     async def stream_source(self) -> str | None:
         """Return the source of the stream."""
         try:
+            LOGGER.warning(
+                f"Getting stream source for device {self.device.name}", stack_info=True
+            )
             return await super().stream_source()
         except Exception as e:
             LOGGER.error(
