@@ -672,11 +672,8 @@ class XTIOTWebRTCManager:
 
         if (
             webrtc_session.offer is not None
-            # and webrtc_session.offer.find("mozilla") != -1
         ):
-            # Firefox has a much more strict SDP checking mecanism than Chrome, fix the answer so that it accepts it
-
-            # Fix send/receive mode for Firefox
+            # Fix send/receive mode based on the offer
             searched_offset = 0
             has_more_m_sections = True
             modes_to_search: dict[str, str] = {
