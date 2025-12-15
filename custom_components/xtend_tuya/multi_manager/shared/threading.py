@@ -50,7 +50,6 @@ class XTEventLoopProtector:
         if XTEventLoopProtector.hass.loop_thread_id != threading.get_ident():
             # Not in the event loop
             if is_coroutine:
-                LOGGER.warning(f"Calling coroutine thread safe {callback}")
                 asyncio.run_coroutine_threadsafe(
                     callback(*args, **kwargs), XTEventLoopProtector.hass.loop
                 )
