@@ -214,6 +214,9 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         return False
 
     def disable_webrtc(self):
+        LOGGER.warning(
+            f"Disabling WebRTC for device {self.device.name} as it is not supported."
+        )
         self._supports_native_sync_webrtc = False
         self._supports_native_async_webrtc = False
 
