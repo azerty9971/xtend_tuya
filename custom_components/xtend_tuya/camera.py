@@ -111,12 +111,11 @@ async def async_setup_entry(
                         continue
                     entities.append(entity)
                     if entity.has_multiple_streams:
-                        entities.append(
-                            XTCameraEntity(
+                        low_quality_entity = XTCameraEntity(
                                 device,
                                 hass_data.manager,
                                 hass,
-                                entity.webrtc_configuration,
+                                None,
                                 WebRTCStreamQuality.LOW_QUALITY,
                                 motion_detection_switch=TuyaDPCodeBooleanWrapper.find_dpcode(
                                     device, XTDPCode.MOTION_SWITCH, prefer_function=True
@@ -125,6 +124,11 @@ async def async_setup_entry(
                                     device, XTDPCode.RECORD_SWITCH
                                 ),
                             )
+                        await low_quality_entity.get_webrtc_config()
+                        if low_quality_entity.webrtc_configuration is None:
+                            low_quality_entity.disable_webrtc()
+                        entities.append(
+                            low_quality_entity
                         )
 
         async_add_entities(entities)
