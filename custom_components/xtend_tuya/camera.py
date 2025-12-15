@@ -215,7 +215,8 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
 
     def disable_webrtc(self):
         LOGGER.warning(
-            f"Disabling WebRTC for device {self.device.name} as it is not supported.", stack_info=True
+            f"Disabling WebRTC for device {self.device.name} as it is not supported.",
+            stack_info=True,
         )
         self._supports_native_sync_webrtc = False
         self._supports_native_async_webrtc = False
@@ -338,6 +339,9 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         self, session_id: str, candidate: RTCIceCandidateInit
     ) -> None:
         """Handle a WebRTC candidate."""
+        LOGGER.warning(
+            f"Received WebRTC candidate for device {self.device.name}: {candidate}"
+        )
         if self.iot_manager is None:
             return await super().async_on_webrtc_candidate(session_id, candidate)
         return await self.iot_manager.async_on_webrtc_candidate(
