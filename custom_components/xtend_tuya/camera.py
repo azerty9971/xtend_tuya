@@ -358,8 +358,6 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
     async def stream_source(self) -> str | None:
         """Return the source of the stream."""
         try:
-            if self.supports_webrtc():
-                return None
             return await super().stream_source()
         except Exception as e:
             LOGGER.error(
