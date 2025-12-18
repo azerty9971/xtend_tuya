@@ -7,6 +7,7 @@ from datetime import datetime
 from homeassistant.config_entries import ConfigEntry, ConfigEntryState
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import device_registry as dr, entity_registry as er
+from homeassistant.helpers.device_registry import ( DeviceEntryDisabler, )
 from .const import (
     DOMAIN,
     DOMAIN_ORIG,
@@ -99,14 +100,19 @@ async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
 
         for domain_identifier in domain_identifiers:
             identifiers.add((domain_identifier, device.id))
-        device_registry.async_get_or_create(
+        device_entry = device_registry.async_get_or_create(
             config_entry_id=entry.entry_id,
             identifiers=identifiers,
             manufacturer="Tuya",
             name=device.name,
             model=f"{device.product_name} (unsupported)",
-            disabled_by=None,
         )
+        # Enable the device if it was disabled by the integration
+        if device_entry.disabled_by is not None and device_entry.disabled_by != DeviceEntryDisabler.USER:
+            device_registry.async_update_device(
+                device_entry.id,
+                disabled_by=None,
+            )
     LOGGER.debug(f"Xtended Tuya {entry.title} {datetime.now() - last_time} for create device")
 
     last_time = datetime.now()
