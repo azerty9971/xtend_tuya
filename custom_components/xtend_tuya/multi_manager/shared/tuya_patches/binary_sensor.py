@@ -15,21 +15,24 @@ from ..decorator import (
     XTDecorator,
 )
 
-class XTTuyaBinarySensorPatcher:
 
+class XTTuyaBinarySensorPatcher:
     @staticmethod
     def patch_tuya():
         decorator, binary_sensor._get_dpcode_wrapper = XTDecorator.get_decorator(
             base_object=binary_sensor,
             callback=XTTuyaBinarySensorPatcher.on_get_dpcode_wrapper,
             method_name="_get_dpcode_wrapper",
-            skip_call=True
+            skip_call=True,
         )
 
     @staticmethod
-    def on_get_dpcode_wrapper(before_call: bool, base_object, *args, **kwargs)-> TuyaDPCodeWrapper | None:
+    def on_get_dpcode_wrapper(
+        before_call: bool, base_object, *args, **kwargs
+    ) -> TuyaDPCodeWrapper | None:
         if before_call is True:
             return _get_dpcode_wrapper(*args, **kwargs)
+
 
 def _get_dpcode_wrapper(
     device: TuyaCustomerDevice,
@@ -49,7 +52,7 @@ def _get_dpcode_wrapper(
     if dpcode not in device.status:
         return None
     return TuyaBinarySensorCustomDPCodeWrapper(
-        dpcode, # type: ignore
+        dpcode,  # type: ignore
         description.on_value
         if isinstance(description.on_value, set)
         else {description.on_value},

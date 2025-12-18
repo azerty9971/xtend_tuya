@@ -6,8 +6,8 @@ from .binary_sensor import (
     XTTuyaBinarySensorPatcher,
 )
 
-class XTTuyaPatcher:
 
+class XTTuyaPatcher:
     already_patched: bool = False
 
     @staticmethod

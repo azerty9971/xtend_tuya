@@ -43,7 +43,7 @@ class XTSceneEntity(TuyaSceneEntity):
     def __init__(self, multi_manager: MultiManager, scene: XTScene) -> None:
         """Init Tuya Scene."""
         super(XTSceneEntity, self).__init__(
-            multi_manager, # type: ignore
+            multi_manager,  # type: ignore
             scene,
         )
         self.home_manager = multi_manager

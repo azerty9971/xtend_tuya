@@ -60,14 +60,12 @@ from .xt_tuya_iot_home_manager import (
     TuyaHomeManager,
 )
 
+
 class XTIOTDeviceManager(TuyaDeviceManager):
     device_map: XTDeviceMap = XTDeviceMap({}, XTDeviceSourcePriority.TUYA_IOT)
 
     def __init__(
-        self,
-        multi_manager: MultiManager,
-        api: XTIOTOpenAPI,
-        non_user_api: XTIOTOpenAPI
+        self, multi_manager: MultiManager, api: XTIOTOpenAPI, non_user_api: XTIOTOpenAPI
     ) -> None:
         mq = XTIOTOpenMQ(api, self)
         super().__init__(api, mq)
@@ -256,8 +254,12 @@ class XTIOTDeviceManager(TuyaDeviceManager):
             if device_id in devIds or not devIds:
                 super().update_device_function_cache(devIds=[device_id])
                 device_open_api = self.get_open_api_device(device)
-                XTMergingManager.merge_devices(device, device_open_api, self.multi_manager)
-                self.multi_manager.virtual_state_handler.apply_init_virtual_states(device)
+                XTMergingManager.merge_devices(
+                    device, device_open_api, self.multi_manager
+                )
+                self.multi_manager.virtual_state_handler.apply_init_virtual_states(
+                    device
+                )
 
     def on_message(self, msg: dict):
         super().on_message(msg)

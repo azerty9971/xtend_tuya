@@ -227,8 +227,10 @@ class XTMergingManager:
                         code
                     ].values
                 else:
-                    device1.status_range[code].values = (
-                        cf.CloudFixes.get_fixed_value_descr(value1_raw, value2_raw)
+                    device1.status_range[
+                        code
+                    ].values = cf.CloudFixes.get_fixed_value_descr(
+                        value1_raw, value2_raw
                     )
                     device2.status_range[code].values = device1.status_range[
                         code
@@ -452,8 +454,9 @@ class XTMergingManager:
             if left is not None:
                 return left
             return right
-        if type(left) is not type(right) and not (
-            isinstance(left, str) and isinstance(right, str)
+        if (
+            type(left) is not type(right)
+            and not (isinstance(left, str) and isinstance(right, str))
         ):  # Used to prevent warning on classes that represent a string (DPType and TuyaDPType)
             if msg_queue is not None:
                 msg_queue.append(

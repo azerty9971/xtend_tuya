@@ -461,12 +461,12 @@ class XTEntity(TuyaEntity):
         return None
 
     def get_dptype_from_dpcode_wrapper(self) -> TuyaDPType | None:
-        #Probably not working. Just kept for backward compatibility
+        # Probably not working. Just kept for backward compatibility
         if type_information := self.get_type_information():
             if hasattr(type_information, "DPTYPE"):
                 return type_information.DPTYPE
-        
-        #This is the one that should work
+
+        # This is the one that should work
         if hasattr(self.dpcode_wrapper, "DPTYPE"):
             return getattr(self.dpcode_wrapper, "DPTYPE")
         return None

@@ -31,7 +31,7 @@ class XTIOTIPCManager:  # noqa: F811
         if self.mq.client is not None:
             publish_result = self.mq.client.publish(topic=topic, payload=msg)
             publish_result.wait_for_publish(10)
-    
+
     def refresh_mq(self):
         self.mq.stop()
         self.mq = XTIOTOpenMQIPC(self.api, self)

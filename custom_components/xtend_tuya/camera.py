@@ -288,7 +288,7 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         if self.has_multiple_streams:
             self.wait_for_candidates = async_call_later(
                 self._hass,
-                2,
+                5,
                 HassJob(
                     functools.partial(
                         self.send_resolution_update,

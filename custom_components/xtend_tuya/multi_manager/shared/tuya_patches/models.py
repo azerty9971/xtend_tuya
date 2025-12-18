@@ -15,22 +15,23 @@ from ..decorator import (
     XTDecorator,
 )
 
-class XTTuyaModelPatcher:
 
+class XTTuyaModelPatcher:
     @staticmethod
     def patch_tuya():
         decorator, tuya_model.find_dpcode = XTDecorator.get_decorator(
             base_object=tuya_model,
             callback=XTTuyaModelPatcher.on_find_dpcode,
             method_name="find_dpcode",
-            skip_call=True
+            skip_call=True,
         )
 
     @staticmethod
-    def on_find_dpcode(before_call: bool, base_object, *args, **kwargs)-> TuyaTypeInformation | None:
+    def on_find_dpcode(
+        before_call: bool, base_object, *args, **kwargs
+    ) -> TuyaTypeInformation | None:
         if before_call is True:
             return find_dpcode(*args, **kwargs)
-
 
 
 def find_dpcode(
@@ -65,7 +66,8 @@ def find_dpcode(
                 and tuya_util_parse_dptype(current_definition.type) is dptype
                 and (
                     type_information := type_information_cls.from_json(
-                        dpcode=dpcode, type_data=current_definition.values # type: ignore
+                        dpcode=dpcode,
+                        type_data=current_definition.values,  # type: ignore
                     )
                 )
             ):

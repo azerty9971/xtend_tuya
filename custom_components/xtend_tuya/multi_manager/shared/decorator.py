@@ -1,6 +1,7 @@
 from __future__ import annotations
 import functools
 
+
 class XTDecorator:
     def __init__(self) -> None:
         self.orig_object = None

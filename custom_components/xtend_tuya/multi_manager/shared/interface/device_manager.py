@@ -36,11 +36,11 @@ class XTDeviceManagerAPIInterface(ABC):
 
     def send_commands(self, device_id: str, commands: list[dict[str, Any]]) -> bool:
         return False
-    
+
     @abstractmethod
     def query_scenes(self) -> list:
         pass
-    
+
     def trigger_scene(self, home_id: str, scene_id: str) -> bool:
         return False
 
@@ -58,10 +58,10 @@ class XTDeviceManagerInfraRedInterface(ABC):
         hub: XTIRHubInformation,
         key: str,
         key_name: str,
-        timeout: int | None = None
+        timeout: int | None = None,
     ) -> bool:
         return False
-    
+
     def send_ir_command(
         self,
         device: shared.XTDevice,
@@ -70,23 +70,24 @@ class XTDeviceManagerInfraRedInterface(ABC):
         hub: XTIRHubInformation,
     ) -> bool:
         return False
-    
+
     def delete_ir_key(
         self,
         device: shared.XTDevice,
         key: XTIRRemoteKeysInformation,
         remote: XTIRRemoteInformation,
-        hub: XTIRHubInformation
+        hub: XTIRHubInformation,
     ) -> bool:
         return False
-    
+
     def get_ir_category_list(self, device: shared.XTDevice) -> dict[int, str]:
         return {}
-    
 
-    def get_ir_brand_list(self, device: shared.XTDevice, category_id: int) -> dict[int, str]:
+    def get_ir_brand_list(
+        self, device: shared.XTDevice, category_id: int
+    ) -> dict[int, str]:
         return {}
-    
+
     def create_ir_device(
         self,
         device: shared.XTDevice,
@@ -96,6 +97,7 @@ class XTDeviceManagerInfraRedInterface(ABC):
         brand_name: str,
     ) -> str | None:
         return None
+
 
 class XTDeviceManagerIPCameraInterface(ABC):
     def get_webrtc_sdp_answer(
@@ -151,12 +153,13 @@ class XTDeviceManagerIPCameraInterface(ABC):
         self, device: shared.XTDevice, format: str, hass: HomeAssistant
     ) -> tuple[str, dict] | None:
         return None
-    
+
     @abstractmethod
     def get_device_stream_allocate(
         self, device_id: str, stream_type: Literal["flv", "hls", "rtmp", "rtsp"]
     ) -> Optional[str]:
         pass
+
 
 class XTDeviceManagerDeviceManagementInterface(ABC):
     def get_platform_descriptors_to_merge(self, platform: Platform) -> Any:
@@ -183,7 +186,7 @@ class XTDeviceManagerDeviceManagementInterface(ABC):
         for device_map in self.get_available_device_maps():
             if device_id in device_map:
                 device_map[device_id].set_up = True
-    
+
     @abstractmethod
     def get_domain_identifiers_of_device(self, device_id: str) -> list:
         pass
@@ -193,9 +196,10 @@ class XTDeviceManagerDeviceManagementInterface(ABC):
 
     def get_add_device_signal_list(self, device_id: str) -> list[str] | None:
         return None
-    
+
     def add_device_by_id(self, device_id: str):
         return None
+
 
 class XTDeviceManagerMQTTManagementInterface(ABC):
     def on_mqtt_stop(self):
@@ -214,9 +218,11 @@ class XTDeviceManagerMQTTManagementInterface(ABC):
     def get_mqtt_client(self) -> mqtt.Client | None:
         return None
 
+
 class XTDeviceManagerLockManagementInterface(ABC):
     def send_lock_unlock_command(self, device: shared.XTDevice, lock: bool) -> bool:
         return False
+
 
 class XTDeviceManagerMultiManagerManagementInterface(ABC):
     def unload(self):
@@ -262,6 +268,7 @@ class XTDeviceManagerMultiManagerManagementInterface(ABC):
         except Exception as e:
             # Prevent failure for any reason on this method
             LOGGER.error(f"Exception raised during raise_issue: {e}")
+
 
 class XTDeviceManagerInterface(
     XTDeviceManagerMultiManagerManagementInterface,

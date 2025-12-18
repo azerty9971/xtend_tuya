@@ -197,10 +197,10 @@ async def async_setup_entry(
         for device_id in device_ids:
             if hub_device := hass_data.manager.device_map.get(device_id):
                 if hub_device.category in IR_HUB_CATEGORY_LIST:
-                    hub_information: XTIRHubInformation | None = (
-                        await XTEventLoopProtector.execute_out_of_event_loop_and_return(
-                            hass_data.manager.get_ir_hub_information, hub_device
-                        )
+                    hub_information: (
+                        XTIRHubInformation | None
+                    ) = await XTEventLoopProtector.execute_out_of_event_loop_and_return(
+                        hass_data.manager.get_ir_hub_information, hub_device
                     )
                     if hub_information is None:
                         continue
@@ -276,8 +276,13 @@ async def async_setup_entry(
                                     entity_registry_enabled_default=True,
                                     entity_registry_visible_default=True,
                                 )
-                                if dpcode_wrapper := TuyaDPCodeBooleanWrapper.find_dpcode(
-                                    remote_device, remote_key.key, prefer_function=True
+                                if (
+                                    dpcode_wrapper
+                                    := TuyaDPCodeBooleanWrapper.find_dpcode(
+                                        remote_device,
+                                        remote_key.key,
+                                        prefer_function=True,
+                                    )
                                 ):
                                     entities.append(
                                         XTButtonEntity.get_entity_instance(
@@ -302,8 +307,11 @@ async def async_setup_entry(
                     hass_data.manager.set_general_property(
                         XTMultiManagerProperties.IR_DEVICE_ID, device.id
                     )
-                if category_descriptions := XTEntityDescriptorManager.get_category_descriptors(
-                    supported_descriptors, device.category
+                if (
+                    category_descriptions
+                    := XTEntityDescriptorManager.get_category_descriptors(
+                        supported_descriptors, device.category
+                    )
                 ):
                     externally_managed_dpcodes = (
                         XTEntityDescriptorManager.get_category_keys(
@@ -364,12 +372,20 @@ async def async_setup_entry(
                         ):
                             for reset_state in description.vf_reset_state:
                                 if reset_state in device.status:
-                                    if dpcode_wrapper := TuyaDPCodeBooleanWrapper.find_dpcode(
-                                        device, description.key, prefer_function=True
+                                    if (
+                                        dpcode_wrapper
+                                        := TuyaDPCodeBooleanWrapper.find_dpcode(
+                                            device,
+                                            description.key,
+                                            prefer_function=True,
+                                        )
                                     ):
                                         entities.append(
                                             XTButtonEntity.get_entity_instance(
-                                                description, device, hass_data.manager, dpcode_wrapper
+                                                description,
+                                                device,
+                                                hass_data.manager,
+                                                dpcode_wrapper,
                                             )
                                         )
                                 break
@@ -407,9 +423,9 @@ class XTButtonEntity(XTEntity, TuyaButtonEntity):
             device, device_manager, description, dpcode_wrapper=dpcode_wrapper
         )
         super(XTEntity, self).__init__(
-            device, 
+            device,
             device_manager,  # type: ignore
-            description, 
+            description,
             dpcode_wrapper,
         )
         self.device = device

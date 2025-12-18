@@ -119,7 +119,9 @@ class MultiManager:  # noqa: F811
         subdirs = AllowedPlugins.get_plugins_to_load()
         concurrency_manager = XTConcurrencyManager()
         for directory in subdirs:
-            if os.path.isdir(os.path.dirname(__file__) + os.sep + "managers" + os.sep + directory):
+            if os.path.isdir(
+                os.path.dirname(__file__) + os.sep + "managers" + os.sep + directory
+            ):
                 load_path = f".managers.{directory}.init"
                 try:
                     plugin = (
@@ -210,7 +212,6 @@ class MultiManager:  # noqa: F811
         for manager in self.accounts.values():
             for device_map in manager.get_available_device_maps():
                 for device_id in device_map:
-
                     # New devices have been created in their own device maps
                     # let's convert them to XTDevice
                     device_map[device_id] = manager.convert_to_xt_device(
@@ -503,9 +504,7 @@ class MultiManager:  # noqa: F811
             old_online_status = device.online
             for online_status in device.online_states:
                 device.online = device.online_states[online_status]
-                if (
-                    device.online
-                ):  # Prefer to be more On than Off if multiple state are not in accordance
+                if device.online:  # Prefer to be more On than Off if multiple state are not in accordance
                     break
             if device.online != old_online_status:
                 self.multi_device_listener.update_device(device, None)

@@ -5,5 +5,6 @@ from ....lib.tuya_iot import (
     TuyaOpenAPI,
 )
 
+
 class XTIOTOpenAPI(TuyaOpenAPI):
     pass

@@ -153,7 +153,8 @@ async def async_setup_entry(
                                 device,
                                 hass_data.manager,
                                 brightness_wrapper=(
-                                    brightness_wrapper := tuya_light_get_brightness_wrapper(
+                                    brightness_wrapper
+                                    := tuya_light_get_brightness_wrapper(
                                         device, descriptor
                                     )
                                 ),
@@ -164,7 +165,9 @@ async def async_setup_entry(
                                     device, descriptor.color_mode, prefer_function=True
                                 ),
                                 color_temp_wrapper=TuyaLightColorTempWrapper.find_dpcode(
-                                    device, descriptor.color_temp, prefer_function=True  # type: ignore
+                                    device,
+                                    descriptor.color_temp,
+                                    prefer_function=True,  # type: ignore
                                 ),
                                 switch_wrapper=switch_wrapper,
                             )
@@ -180,8 +183,11 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if category_descriptions := XTEntityDescriptorManager.get_category_descriptors(
-                    supported_descriptors, device.category
+                if (
+                    category_descriptions
+                    := XTEntityDescriptorManager.get_category_descriptors(
+                        supported_descriptors, device.category
+                    )
                 ):
                     externally_managed_dpcodes = (
                         XTEntityDescriptorManager.get_category_keys(
@@ -212,7 +218,9 @@ async def async_setup_entry(
                                 device, description.color_mode, prefer_function=True
                             ),
                             color_temp_wrapper=TuyaLightColorTempWrapper.find_dpcode(
-                                device, description.color_temp, prefer_function=True  # type: ignore
+                                device,
+                                description.color_temp,
+                                prefer_function=True,  # type: ignore
                             ),
                             switch_wrapper=switch_wrapper,
                         )
@@ -249,7 +257,9 @@ async def async_setup_entry(
                                 device, description.color_mode, prefer_function=True
                             ),
                             color_temp_wrapper=TuyaLightColorTempWrapper.find_dpcode(
-                                device, description.color_temp, prefer_function=True  # type: ignore
+                                device,
+                                description.color_temp,
+                                prefer_function=True,  # type: ignore
                             ),
                             switch_wrapper=switch_wrapper,
                         )

@@ -114,7 +114,7 @@ def xt_get_dpcode_wrapper(
 class XTSensorEntityDescription(TuyaSensorEntityDescription, frozen=True):
     """Describes XT sensor entity."""
 
-    dpcode: XTDPCode | TuyaDPCode | str | None = None # type: ignore
+    dpcode: XTDPCode | TuyaDPCode | str | None = None  # type: ignore
 
     virtual_state: VirtualStates | None = None
     vs_copy_to_state: list[XTDPCode] | None = field(default_factory=list)
@@ -1734,7 +1734,12 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
         super(XTSensorEntity, self).__init__(
             device, device_manager, description, dpcode_wrapper=dpcode_wrapper
         )
-        super(XTEntity, self).__init__(device, device_manager, description, dpcode_wrapper)  # type: ignore
+        super(XTEntity, self).__init__(
+            device,
+            device_manager,  # type: ignore
+            description,
+            dpcode_wrapper,
+        )
 
         self.device = device
         self.device_manager = device_manager
