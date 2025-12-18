@@ -1630,11 +1630,8 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if (
-                    category_descriptions
-                    := XTEntityDescriptorManager.get_category_descriptors(
-                        supported_descriptors, device.category
-                    )
+                if category_descriptions := XTEntityDescriptorManager.get_category_descriptors(
+                    supported_descriptors, device.category
                 ):
                     hass_data.manager.device_watcher.report_message(
                         device.id,
@@ -1738,8 +1735,11 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
             device, device_manager, description, dpcode_wrapper=dpcode_wrapper
         )
         super(XTEntity, self).__init__(
-            device, device_manager, description, dpcode_wrapper
-        )  # type: ignore
+            device,
+            device_manager,  # type: ignore
+            description,
+            dpcode_wrapper,
+        )
 
         self.device = device
         self.device_manager = device_manager
