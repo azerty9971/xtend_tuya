@@ -520,8 +520,11 @@ class XTIOTWebRTCManager:
         self.send_to_ipc_mqtt(session_id, device, json.dumps(sdp_offer_payload))
         session_data.offer_sent = True
         for candidate in session_data.offer_candidate:
-            if candidate_payload := await XTEventLoopProtector.execute_out_of_event_loop_and_return(
-                self.format_offer_candidate, session_id, candidate, device
+            if (
+                candidate_payload
+                := await XTEventLoopProtector.execute_out_of_event_loop_and_return(
+                    self.format_offer_candidate, session_id, candidate, device
+                )
             ):
                 self.send_to_ipc_mqtt(session_id, device, json.dumps(candidate_payload))
 
@@ -670,9 +673,7 @@ class XTIOTWebRTCManager:
             fingerprint_new_str = fingerprint_orig_str.upper()
             answer_sdp = answer_sdp.replace(fingerprint_orig_str, fingerprint_new_str)
 
-        if (
-            webrtc_session.offer is not None
-        ):
+        if webrtc_session.offer is not None:
             # Fix send/receive mode based on the offer
             searched_offset = 0
             has_more_m_sections = True
@@ -905,9 +906,9 @@ class XTIOTWebRTCRTPMap:
     def __init__(self, rtpmap_line: str, m_line: str) -> None:
         self.rtpmap = rtpmap_line
         self.m_line = m_line
-        self.a_lines: dict[str, XTIOTWebRTCRTPMapALineGroup] = (
-            {}
-        )  # dict[a=...:, tokens]
+        self.a_lines: dict[
+            str, XTIOTWebRTCRTPMapALineGroup
+        ] = {}  # dict[a=...:, tokens]
 
     def __repr__(self) -> str:
         return_str = self.rtpmap + ENDLINE

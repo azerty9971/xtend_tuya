@@ -180,8 +180,11 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if category_descriptions := XTEntityDescriptorManager.get_category_descriptors(
-                    supported_descriptors, device.category
+                if (
+                    category_descriptions
+                    := XTEntityDescriptorManager.get_category_descriptors(
+                        supported_descriptors, device.category
+                    )
                 ):
                     externally_managed_dpcodes = (
                         XTEntityDescriptorManager.get_category_keys(
@@ -202,7 +205,8 @@ async def async_setup_entry(
                             hass_data.manager,
                             hass,
                             current_position=description.position_wrapper.find_dpcode(
-                                device, description.current_position  # type: ignore
+                                device,
+                                description.current_position,  # type: ignore
                             ),
                             instruction_wrapper=tuya_cover_get_instruction_wrapper(
                                 device, description

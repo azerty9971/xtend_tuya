@@ -276,7 +276,9 @@ def is_device_in_domain_device_maps(
     return False
 
 
-def delete_all_device_entities(hass: HomeAssistant, device_ids: list[str], platform: Platform | None = None):
+def delete_all_device_entities(
+    hass: HomeAssistant, device_ids: list[str], platform: Platform | None = None
+):
     device_registry = dr.async_get(hass)
     entity_registry = er.async_get(hass)
     hass_devices: list[DeviceEntry] = []
@@ -301,7 +303,9 @@ def b64todatetime(value):
     try:
         decoded_value = b64decode(value)
         if len(decoded_value) < 6:
-            LOGGER.debug(f"b64todatetime: insufficient bytes (expected 6, got {len(decoded_value)}) from value {value}")
+            LOGGER.debug(
+                f"b64todatetime: insufficient bytes (expected 6, got {len(decoded_value)}) from value {value}"
+            )
             return None
         return datetime(
             year=2000 + decoded_value[0],

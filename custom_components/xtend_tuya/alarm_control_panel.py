@@ -67,7 +67,10 @@ async def async_setup_entry(
             dict[str, tuple[XTAlarmEntityDescription, ...]],
         ],
         XTEntityDescriptorManager.get_platform_descriptors(
-            ALARM, entry.runtime_data.multi_manager, XTAlarmEntityDescription, this_platform
+            ALARM,
+            entry.runtime_data.multi_manager,
+            XTAlarmEntityDescription,
+            this_platform,
         ),
     )
 

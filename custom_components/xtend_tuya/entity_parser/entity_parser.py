@@ -35,9 +35,13 @@ class XTCustomEntityParser:
             if os.path.isdir(os.path.dirname(__file__) + os.sep + directory):
                 load_path = f".{directory}.init"
                 try:
-                    plugin = await XTEventLoopProtector.execute_out_of_event_loop_and_return(
-                        partial(
-                            importlib.import_module, name=load_path, package=__package__
+                    plugin = (
+                        await XTEventLoopProtector.execute_out_of_event_loop_and_return(
+                            partial(
+                                importlib.import_module,
+                                name=load_path,
+                                package=__package__,
+                            )
                         )
                     )
                     instance: XTCustomEntityParser | None = plugin.get_plugin_instance()

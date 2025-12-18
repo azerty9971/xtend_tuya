@@ -14,7 +14,6 @@ from ...const import (
 
 
 class XTConcurrencyManager:
-
     hass: HomeAssistant | None = None
 
     def __init__(self, max_concurrency: int = 9999) -> None:
@@ -37,7 +36,6 @@ class XTConcurrencyManager:
 
 
 class XTEventLoopProtector:
-
     hass: HomeAssistant | None = None
 
     @staticmethod

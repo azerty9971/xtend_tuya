@@ -481,8 +481,11 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if category_descriptions := XTEntityDescriptorManager.get_category_descriptors(
-                    supported_descriptors, device.category
+                if (
+                    category_descriptions
+                    := XTEntityDescriptorManager.get_category_descriptors(
+                        supported_descriptors, device.category
+                    )
                 ):
                     externally_managed_dpcodes = (
                         XTEntityDescriptorManager.get_category_keys(
@@ -569,7 +572,9 @@ class XTSwitchEntity(XTEntity, TuyaSwitchEntity):
         super(XTSwitchEntity, self).__init__(
             device, device_manager, description, dpcode_wrapper=dpcode_wrapper
         )
-        super(XTEntity, self).__init__(device, device_manager, description, dpcode_wrapper)  # type: ignore
+        super(XTEntity, self).__init__(
+            device, device_manager, description, dpcode_wrapper
+        )  # type: ignore
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description  # type: ignore

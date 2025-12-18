@@ -114,7 +114,7 @@ def xt_get_dpcode_wrapper(
 class XTSensorEntityDescription(TuyaSensorEntityDescription, frozen=True):
     """Describes XT sensor entity."""
 
-    dpcode: XTDPCode | TuyaDPCode | str | None = None # type: ignore
+    dpcode: XTDPCode | TuyaDPCode | str | None = None  # type: ignore
 
     virtual_state: VirtualStates | None = None
     vs_copy_to_state: list[XTDPCode] | None = field(default_factory=list)
@@ -1630,8 +1630,11 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if category_descriptions := XTEntityDescriptorManager.get_category_descriptors(
-                    supported_descriptors, device.category
+                if (
+                    category_descriptions
+                    := XTEntityDescriptorManager.get_category_descriptors(
+                        supported_descriptors, device.category
+                    )
                 ):
                     hass_data.manager.device_watcher.report_message(
                         device.id,
@@ -1734,7 +1737,9 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
         super(XTSensorEntity, self).__init__(
             device, device_manager, description, dpcode_wrapper=dpcode_wrapper
         )
-        super(XTEntity, self).__init__(device, device_manager, description, dpcode_wrapper)  # type: ignore
+        super(XTEntity, self).__init__(
+            device, device_manager, description, dpcode_wrapper
+        )  # type: ignore
 
         self.device = device
         self.device_manager = device_manager

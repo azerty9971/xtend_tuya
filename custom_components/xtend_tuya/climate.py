@@ -198,22 +198,31 @@ CLIMATE_DESCRIPTIONS: dict[str, XTClimateEntityDescription] = {
     ),
 }
 
+
 def _get_temperature_wrappers(
     device: XTDevice, system_temperature_unit: UnitOfTemperature
-) -> tuple[TuyaDPCodeIntegerWrapper | None, TuyaDPCodeIntegerWrapper | None, UnitOfTemperature]:
+) -> tuple[
+    TuyaDPCodeIntegerWrapper | None, TuyaDPCodeIntegerWrapper | None, UnitOfTemperature
+]:
     """Get temperature wrappers for current and set temperatures."""
     # Get all possible temperature dpcodes
     temp_current = TuyaDPCodeIntegerWrapper.find_dpcode(
-        device, XT_CLIMATE_CURRENT_CELSIUS_TEMPERATURE_DPCODES # type: ignore
+        device,
+        XT_CLIMATE_CURRENT_CELSIUS_TEMPERATURE_DPCODES,  # type: ignore
     )
     temp_current_f = TuyaDPCodeIntegerWrapper.find_dpcode(
-        device, XT_CLIMATE_CURRENT_FAHRENHEIT_TEMPERATURE_DPCODES # type: ignore
+        device,
+        XT_CLIMATE_CURRENT_FAHRENHEIT_TEMPERATURE_DPCODES,  # type: ignore
     )
     temp_set = TuyaDPCodeIntegerWrapper.find_dpcode(
-        device, XT_CLIMATE_SET_CELSIUS_TEMPERATURE_DPCODES, prefer_function=True # type: ignore
+        device,
+        XT_CLIMATE_SET_CELSIUS_TEMPERATURE_DPCODES,
+        prefer_function=True,  # type: ignore
     )
     temp_set_f = TuyaDPCodeIntegerWrapper.find_dpcode(
-        device, XT_CLIMATE_SET_FAHRENHEIT_TEMPERATURE_DPCODES, prefer_function=True # type: ignore
+        device,
+        XT_CLIMATE_SET_FAHRENHEIT_TEMPERATURE_DPCODES,
+        prefer_function=True,  # type: ignore
     )
 
     # Get wrappers for celsius and fahrenheit
@@ -224,7 +233,9 @@ def _get_temperature_wrappers(
     current_fahrenheit = tuya_climate_get_temperature_wrapper(
         [temp_current_f, temp_current], XT_FAHRENHEIT_ALIASES
     )
-    set_celsius = tuya_climate_get_temperature_wrapper([temp_set, temp_set_f], XT_CELSIUS_ALIASES)
+    set_celsius = tuya_climate_get_temperature_wrapper(
+        [temp_set, temp_set_f], XT_CELSIUS_ALIASES
+    )
     set_fahrenheit = tuya_climate_get_temperature_wrapper(
         [temp_set_f, temp_set], XT_FAHRENHEIT_ALIASES
     )
@@ -259,6 +270,7 @@ def _get_temperature_wrappers(
         UnitOfTemperature.CELSIUS,
     )
 
+
 async def async_setup_entry(
     hass: HomeAssistant, entry: XTConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
@@ -292,8 +304,11 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if device_descriptor := XTEntityDescriptorManager.get_category_descriptors(
-                    supported_descriptors, device.category
+                if (
+                    device_descriptor
+                    := XTEntityDescriptorManager.get_category_descriptors(
+                        supported_descriptors, device.category
+                    )
                 ):
                     temperature_wrappers = _get_temperature_wrappers(
                         device, hass.config.units.temperature_unit
@@ -304,44 +319,45 @@ async def async_setup_entry(
                             device,
                             hass_data.manager,
                             current_humidity_wrapper=TuyaClimateRoundedIntegerWrapper.find_dpcode(
-                                device, XT_CLIMATE_CURRENT_HUMIDITY_DPCODES # type: ignore
+                                device,
+                                XT_CLIMATE_CURRENT_HUMIDITY_DPCODES,  # type: ignore
                             ),
                             current_temperature_wrapper=temperature_wrappers[0],
                             fan_mode_wrapper=TuyaDPCodeEnumWrapper.find_dpcode(
                                 device,
-                                XT_CLIMATE_FAN_SPEED_DPCODES, # type: ignore
+                                XT_CLIMATE_FAN_SPEED_DPCODES,  # type: ignore
                                 prefer_function=True,
                             ),
                             hvac_mode_wrapper=TuyaDPCodeEnumWrapper.find_dpcode(
-                                device, 
+                                device,
                                 XT_CLIMATE_MODE_DPCODES,  # type: ignore
-                                prefer_function=True
+                                prefer_function=True,
                             ),
                             set_temperature_wrapper=temperature_wrappers[1],
                             swing_wrapper=TuyaDPCodeBooleanWrapper.find_dpcode(
                                 device,
-                                XT_CLIMATE_SWING_MODE_ON_DPCODES, # type: ignore
+                                XT_CLIMATE_SWING_MODE_ON_DPCODES,  # type: ignore
                                 prefer_function=True,
                             ),
                             swing_h_wrapper=TuyaDPCodeBooleanWrapper.find_dpcode(
-                                device, 
+                                device,
                                 XT_CLIMATE_SWING_MODE_HORIZONTAL_DPCODES,  # type: ignore
-                                prefer_function=True
+                                prefer_function=True,
                             ),
                             swing_v_wrapper=TuyaDPCodeBooleanWrapper.find_dpcode(
-                                device, 
+                                device,
                                 XT_CLIMATE_SWING_MODE_VERTICAL_DPCODES,  # type: ignore
-                                prefer_function=True
+                                prefer_function=True,
                             ),
                             switch_wrapper=TuyaDPCodeBooleanWrapper.find_dpcode(
-                                device, 
+                                device,
                                 XT_CLIMATE_SWITCH_DPCODES,  # type: ignore
-                                prefer_function=True
+                                prefer_function=True,
                             ),
                             target_humidity_wrapper=TuyaClimateRoundedIntegerWrapper.find_dpcode(
-                                device, 
+                                device,
                                 XT_CLIMATE_SET_HUMIDITY_DPCODES,  # type: ignore
-                                prefer_function=True
+                                prefer_function=True,
                             ),
                             temperature_unit=temperature_wrappers[2],
                         )

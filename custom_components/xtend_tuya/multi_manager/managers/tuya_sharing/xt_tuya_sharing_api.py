@@ -18,14 +18,21 @@ from ....const import (
     LOGGER,
 )
 
+
 class XTSharingTokenInfo(CustomerTokenInfo):
     pass
 
-class XTSharingAPI(CustomerApi):
 
+class XTSharingAPI(CustomerApi):
     @staticmethod
     def get_api_from_customer_api(other_api: CustomerApi) -> XTSharingAPI:
-        new_api = XTSharingAPI(token_info=other_api.token_info, client_id=other_api.client_id, user_code=other_api.user_code, end_point=other_api.endpoint, listener=other_api.token_listener)
+        new_api = XTSharingAPI(
+            token_info=other_api.token_info,
+            client_id=other_api.client_id,
+            user_code=other_api.user_code,
+            end_point=other_api.endpoint,
+            listener=other_api.token_listener,
+        )
         new_api.session = other_api.session
         return new_api
 
@@ -41,11 +48,15 @@ class XTSharingAPI(CustomerApi):
         Returns:
             response: response body
         """
-        request_result =  self.__request("GET", path, params, None)
+        request_result = self.__request("GET", path, params, None)
         return request_result if request_result is not None else {}
 
-    def post(self, path: str, params: dict[str, Any] | None = None, body: dict[str, Any] | None = None) -> dict[
-        str, Any]:
+    def post(
+        self,
+        path: str,
+        params: dict[str, Any] | None = None,
+        body: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
         """Http Post.
 
         Requests the server to update specified resources.
@@ -60,7 +71,7 @@ class XTSharingAPI(CustomerApi):
         """
         request_result = self.__request("POST", path, params, body)
         return request_result if request_result is not None else {}
-    
+
     def put(self, path: str, body: dict[str, Any] | None = None) -> dict[str, Any]:
         """Http Put.
 
@@ -90,13 +101,13 @@ class XTSharingAPI(CustomerApi):
         """
         request_result = self.__request("DELETE", path, params, None)
         return request_result if request_result is not None else {}
-    
+
     def __request(
-            self,
-            method: str,
-            path: str,
-            params: dict[str, Any] | None = None,
-            body: dict[str, Any] | None = None,
+        self,
+        method: str,
+        path: str,
+        params: dict[str, Any] | None = None,
+        body: dict[str, Any] | None = None,
     ) -> dict[str, Any] | None:
         start_time = datetime.now()
         self.refresh_access_token_if_need()
@@ -105,7 +116,7 @@ class XTSharingAPI(CustomerApi):
         sid = ""
         md5 = hashlib.md5()
         rid_refresh_token = rid + self.token_info.refresh_token
-        md5.update(rid_refresh_token.encode('utf-8'))
+        md5.update(rid_refresh_token.encode("utf-8"))
         hash_key = md5.hexdigest()
         secret = _secret_generating(rid, sid, hash_key)
 
@@ -114,18 +125,14 @@ class XTSharingAPI(CustomerApi):
         if params is not None and len(params.keys()) > 0:
             query_encdata = _form_to_json(params)
             query_encdata = _aes_gcm_encrypt(query_encdata, secret)
-            params_enc = {
-                "encdata": query_encdata
-            }
+            params_enc = {"encdata": query_encdata}
             query_encdata = str(query_encdata, encoding="utf8")
         body_encdata = ""
         body_encrypted = body
         if body is not None and len(body.keys()) > 0:
             body_encdata = _form_to_json(body)
             body_encdata = _aes_gcm_encrypt(body_encdata, secret)
-            body_encrypted = {
-                "encdata": str(body_encdata, encoding="utf8")
-            }
+            body_encrypted = {"encdata": str(body_encdata, encoding="utf8")}
             body_encdata = str(body_encdata, encoding="utf8")
 
         t = int(time.time() * 1000)
@@ -138,14 +145,15 @@ class XTSharingAPI(CustomerApi):
         if self.token_info is not None and len(self.token_info.access_token) > 0:
             headers["X-token"] = self.token_info.access_token
 
-        sign = _restful_sign(hash_key,
-                             query_encdata,
-                             body_encdata,
-                             headers)
+        sign = _restful_sign(hash_key, query_encdata, body_encdata, headers)
         headers["X-sign"] = sign
 
         response = self.session.request(
-            method, self.endpoint + path, params=params_enc, json=body_encrypted, headers=headers
+            method,
+            self.endpoint + path,
+            params=params_enc,
+            json=body_encrypted,
+            headers=headers,
         )
 
         if response.ok is False:
@@ -157,14 +165,16 @@ class XTSharingAPI(CustomerApi):
         ret = response.json()
 
         if not ret.get("success"):
-            raise Exception(f"[SHARING API]API call error: Request: {method} {path} PARAMS: {json.dumps(params, ensure_ascii=False, indent=2) if params is not None else ''} BODY: {json.dumps(body, ensure_ascii=False, indent=2) if body is not None else ''}, Response: {json.dumps(ret, ensure_ascii=False, indent=2)}")
+            raise Exception(
+                f"[SHARING API]API call error: Request: {method} {path} PARAMS: {json.dumps(params, ensure_ascii=False, indent=2) if params is not None else ''} BODY: {json.dumps(body, ensure_ascii=False, indent=2) if body is not None else ''}, Response: {json.dumps(ret, ensure_ascii=False, indent=2)}"
+            )
 
         result = _aex_gcm_decrypt(ret.get("result"), secret)
         try:
             ret["result"] = json.loads(result)
         except json.decoder.JSONDecodeError:
             ret["result"] = result
-        
+
         time_taken = datetime.now() - start_time
         LOGGER.debug(
             f"[SHARING API][{time_taken}]Request: {method} {path} PARAMS: {json.dumps(params, ensure_ascii=False, indent=2) if params is not None else ''} BODY: {json.dumps(body, ensure_ascii=False, indent=2) if body is not None else ''}, Response: {json.dumps(ret, ensure_ascii=False, indent=2)}"

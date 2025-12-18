@@ -49,12 +49,14 @@ class MultiDeviceListener:
 
     def add_device(self, device: sh.XTDevice):
         self.add_device_by_id(device.id)
-    
+
     def add_device_by_id(self, device_id: str):
         self.hass.add_job(self.async_remove_device, device_id)
         signal_list: list[str] = []
         for account in self.multi_manager.accounts.values():
-            signal_list = util.append_lists(signal_list, account.get_add_device_signal_list(device_id))
+            signal_list = util.append_lists(
+                signal_list, account.get_add_device_signal_list(device_id)
+            )
         for signal in signal_list:
             dispatcher_send(self.hass, signal, [device_id])
 

@@ -19,7 +19,9 @@ class CloudFixes:
     def apply_fixes(device: XTDevice, multi_manager: mm.MultiManager | None = None):
         if multi_manager is not None:
             multi_manager.device_watcher.report_message(
-                device.id, f"CloudFixes for source {device.source} BEFORE: {device}", device=device
+                device.id,
+                f"CloudFixes for source {device.source} BEFORE: {device}",
+                device=device,
             )
         CloudFixes._unify_data_types(device)
         CloudFixes._unify_added_attributes(device)
@@ -35,7 +37,9 @@ class CloudFixes:
         CloudFixes._strip_valuedescr_of_non_label_fields_for_bitmaps(device)
         if multi_manager is not None:
             multi_manager.device_watcher.report_message(
-                device.id, f"CloudFixes for source {device.source} AFTER: {device}", device=device
+                device.id,
+                f"CloudFixes for source {device.source} AFTER: {device}",
+                device=device,
             )
 
     @staticmethod

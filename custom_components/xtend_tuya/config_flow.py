@@ -60,7 +60,6 @@ import custom_components.xtend_tuya.multi_manager.shared.data_entry.shared_data_
 
 
 class XTConfigFlows:
-
     class XTStepResultType(StrEnum):
         RESULT = "RESULT"
         SHOW_FORM = "SHOW_FORM"
@@ -83,8 +82,7 @@ class XTConfigFlows:
 
     @staticmethod
     def _try_login_open_api(
-        user_input: dict[str, Any],
-        hass: HomeAssistant
+        user_input: dict[str, Any], hass: HomeAssistant
     ) -> tuple[dict[Any, Any], dict[str, Any]]:
         """Try login."""
         response = {}
@@ -147,10 +145,11 @@ class XTConfigFlows:
         placeholders = {}
 
         if user_input is not None:
-            response, data = (
-                await XTEventLoopProtector.execute_out_of_event_loop_and_return(
-                    self._try_login_open_api, user_input, self.parent.hass
-                )
+            (
+                response,
+                data,
+            ) = await XTEventLoopProtector.execute_out_of_event_loop_and_return(
+                self._try_login_open_api, user_input, self.parent.hass
             )
 
             if response.get(TUYA_RESPONSE_SUCCESS, False):

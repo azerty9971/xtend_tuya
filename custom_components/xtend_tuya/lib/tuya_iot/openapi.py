@@ -108,7 +108,6 @@ class TuyaOpenAPI:
         params: dict[str, Any] | None = None,
         body: dict[str, Any] | None = None,
     ) -> tuple[str, int]:
-
         # HTTPMethod
         str_to_sign = method
         str_to_sign += "\n"
@@ -304,7 +303,9 @@ class TuyaOpenAPI:
     ) -> dict[str, Any]:
         start_time = time.time()
         self.__refresh_access_token_if_need(path)
-        access_token = self.token_info.access_token if self.token_info.is_valid() else ""
+        access_token = (
+            self.token_info.access_token if self.token_info.is_valid() else ""
+        )
         sign, t = self._calculate_sign(method, path, params, body)
         headers = {
             "client_id": self.access_id,

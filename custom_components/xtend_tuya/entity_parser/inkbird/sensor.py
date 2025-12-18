@@ -53,21 +53,18 @@ class DPCodeInkbirdWrapper(TuyaDPCodeBase64Wrapper):
 
 
 class DPCodeInkbirdTemperatureWrapper(DPCodeInkbirdWrapper):
-
     def read_device_status(self, device: TuyaCustomerDevice) -> Any | None:
         self.update_data(device)
         return self.temperature
 
 
 class DPCodeInkbirdHumidityWrapper(DPCodeInkbirdWrapper):
-
     def read_device_status(self, device: TuyaCustomerDevice) -> Any | None:
         self.update_data(device)
         return self.humidity
 
 
 class DPCodeInkbirdBatteryWrapper(DPCodeInkbirdWrapper):
-
     def read_device_status(self, device: TuyaCustomerDevice) -> Any | None:
         self.update_data(device)
         return self.battery
@@ -78,8 +75,8 @@ class InkbirdSensor:
 
     class DataKeys(StrEnum):
         TEMPERATURE = "temperature"
-        HUMIDITY    = "humidity"
-        BATTERY     = "battery"
+        HUMIDITY = "humidity"
+        BATTERY = "battery"
 
     @staticmethod
     def initialize_sensor() -> None:

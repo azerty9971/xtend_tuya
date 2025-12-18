@@ -49,7 +49,7 @@ class XTSharingMQ(SharingMQ):
         super().__init__(
             customer_api,
             owner_ids,
-            device, # type: ignore
+            device,  # type: ignore
         )
         self.manager = manager
         self.shutting_down = False
