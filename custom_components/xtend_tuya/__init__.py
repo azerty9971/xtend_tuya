@@ -267,7 +267,7 @@ def is_config_entry_master(
 ) -> bool:
     config_entries = hass.config_entries.async_entries(domain, False, False)
     for config_entry in config_entries:
-        if config_entry.state != ConfigEntryState.SETUP_IN_PROGRESS:
+        if config_entry.state != ConfigEntryState.LOADED:
             return config_entry.entry_id == current_entry.entry_id
     if len(config_entries) > 0:
         return config_entries[0].entry_id == current_entry.entry_id
