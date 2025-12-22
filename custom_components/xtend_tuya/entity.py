@@ -664,6 +664,7 @@ class XTEntity(TuyaEntity):
                     TuyaDPType.ENUM,
                     TuyaDPType.INTEGER,
                     TuyaDPType.STRING,
+                    TuyaDPType.JSON,
                 ]:
                     return False
                 if dpcode_info.read_only is True:
