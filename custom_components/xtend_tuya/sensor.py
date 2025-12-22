@@ -1861,7 +1861,7 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
 
     # Use custom native_value function
     @property
-    def native_value(self) -> StateType: # type: ignore
+    def native_value(self) -> StateType:  # type: ignore
         if self.entity_description.native_value is not None:
             value = self._dpcode_wrapper.read_device_status(self.device)
             value = self.entity_description.native_value(value)
