@@ -266,8 +266,11 @@ def is_config_entry_master(
     hass: HomeAssistant, domain: str, current_entry: ConfigEntry
 ) -> bool:
     config_entries = hass.config_entries.async_entries(domain, False, False)
+    for config_entry in config_entries:
+        if config_entry.state != ConfigEntryState.LOADED:
+            return config_entry.entry_id == current_entry.entry_id
     if len(config_entries) > 0:
-        return config_entries[0] == current_entry
+        return config_entries[0].entry_id == current_entry.entry_id
     return False
 
 
