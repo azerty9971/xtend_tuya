@@ -239,7 +239,7 @@ class XTIOTWebRTCManager:
     ) -> tuple[str, dict] | None:
         if config := self.get_config(device_id, session_id):
             p2p_config: dict = config.get("p2p_config", {})
-            ice_str = p2p_config.get("ices", "{}")
+            ice_str: str = cast(str, p2p_config.get("ices", "{}"))
             match format:
                 case "GO2RTC":
                     return ice_str, config
@@ -267,6 +267,7 @@ class XTIOTWebRTCManager:
                             temp_str += " -S " + url.replace("stun:", "stun://")
                             pass
                     return temp_str.strip(), config
+        return None
 
     def _get_stream_type(
         self, device_id: str, session_id: str, requested_channel: str
