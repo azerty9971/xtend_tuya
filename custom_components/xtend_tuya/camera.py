@@ -168,8 +168,8 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         super(XTEntity, self).__init__(
             device,
             device_manager,  # type: ignore
-            motion_detection_switch=None,
-            recording_status=None,
+            motion_detection_switch=motion_detection_switch,
+            recording_status=recording_status,
         )
         if stream_quality != WebRTCStreamQuality.HIGH_QUALITY:
             self._attr_unique_id = f"tuya.{device.id}_{stream_quality}"
