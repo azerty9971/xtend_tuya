@@ -457,12 +457,14 @@ class XTBinarySensorEntity(XTEntity, TuyaBinarySensorEntity):
 
     @property
     def is_on(self) -> bool | None:
-        # Use custom is_on function
         if self._entity_description.is_on is not None:
-            is_on = self._entity_description.is_on(
-                self.device.status[self.entity_description.key]
-            )
+            # Use custom is_on function
+            if (is_on := self._entity_description.is_on(
+                self._dpcode_wrapper._read_device_status_raw(self.device)
+            )) is not None:
+                is_on = is_on in self._dpcode_wrapper._valid_values
         else:
+            # Use default is_on function
             is_on = super().is_on
         if is_on is not None and self._entity_description.device_online:
             dpcode = self.entity_description.dpcode or self.entity_description.key
