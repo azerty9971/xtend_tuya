@@ -1,5 +1,8 @@
 from __future__ import annotations
 import functools
+from ...const import (
+    LOGGER,
+)
 
 
 class XTDecorator:
@@ -16,8 +19,13 @@ class XTDecorator:
         self.callback = callback
         self.method_name = method_name
         self.skip_call = skip_call
-        if base_object and hasattr(base_object, method_name):
-            self.orig_method = getattr(base_object, method_name)
+        if base_object:
+            if hasattr(base_object, method_name):
+                self.orig_method = getattr(base_object, method_name)
+            else:
+                LOGGER.warning(
+                    "XTDecorator: Method %s not found in %s", method_name, base_object
+                )
 
         @functools.wraps(base_object)
         async def wrapped(*args, **kwargs):
