@@ -182,7 +182,7 @@ BINARY_SENSORS: dict[str, tuple[XTBinarySensorEntityDescription, ...]] = {
             translation_key="error",
             device_class=BinarySensorDeviceClass.PROBLEM,
             entity_category=EntityCategory.DIAGNOSTIC,
-            is_on=lambda x: x != 0,
+            is_on=lambda x: None if x is None else x != 0,
         ),
         XTBinarySensorEntityDescription(
             key=f"{XTDPCode.MALFUNCTION}_0",
@@ -190,7 +190,7 @@ BINARY_SENSORS: dict[str, tuple[XTBinarySensorEntityDescription, ...]] = {
             translation_key="error_flow_meter",
             device_class=BinarySensorDeviceClass.PROBLEM,
             entity_category=EntityCategory.DIAGNOSTIC,
-            is_on=lambda x: (x >> 0) & 1,
+            is_on=lambda x: None if x is None else (x >> 0) & 1,
         ),
         XTBinarySensorEntityDescription(
             key=f"{XTDPCode.MALFUNCTION}_1",
@@ -198,7 +198,7 @@ BINARY_SENSORS: dict[str, tuple[XTBinarySensorEntityDescription, ...]] = {
             translation_key="error_valve_low_battery",
             device_class=BinarySensorDeviceClass.BATTERY,
             entity_category=EntityCategory.DIAGNOSTIC,
-            is_on=lambda x: (x >> 1) & 1,
+            is_on=lambda x: None if x is None else (x >> 1) & 1,
         ),
         XTBinarySensorEntityDescription(
             key=f"{XTDPCode.MALFUNCTION}_2",
@@ -206,7 +206,7 @@ BINARY_SENSORS: dict[str, tuple[XTBinarySensorEntityDescription, ...]] = {
             translation_key="error_sensor_low_battery",
             device_class=BinarySensorDeviceClass.BATTERY,
             entity_category=EntityCategory.DIAGNOSTIC,
-            is_on=lambda x: (x >> 2) & 1,
+            is_on=lambda x: None if x is None else (x >> 2) & 1,
         ),
         XTBinarySensorEntityDescription(
             key=f"{XTDPCode.MALFUNCTION}_3",
@@ -214,7 +214,7 @@ BINARY_SENSORS: dict[str, tuple[XTBinarySensorEntityDescription, ...]] = {
             translation_key="error_sensor_offline",
             device_class=BinarySensorDeviceClass.PROBLEM,
             entity_category=EntityCategory.DIAGNOSTIC,
-            is_on=lambda x: (x >> 3) & 1,
+            is_on=lambda x: None if x is None else (x >> 3) & 1,
         ),
         XTBinarySensorEntityDescription(
             key=f"{XTDPCode.MALFUNCTION}_4",
@@ -222,7 +222,7 @@ BINARY_SENSORS: dict[str, tuple[XTBinarySensorEntityDescription, ...]] = {
             translation_key="error_water_shortage",
             device_class=BinarySensorDeviceClass.PROBLEM,
             entity_category=EntityCategory.DIAGNOSTIC,
-            is_on=lambda x: (x >> 4) & 1,
+            is_on=lambda x: None if x is None else (x >> 4) & 1,
         ),
         XTBinarySensorEntityDescription(
             key=f"{XTDPCode.MALFUNCTION}_5",
@@ -230,14 +230,14 @@ BINARY_SENSORS: dict[str, tuple[XTBinarySensorEntityDescription, ...]] = {
             translation_key="error_other",
             device_class=BinarySensorDeviceClass.PROBLEM,
             entity_category=EntityCategory.DIAGNOSTIC,
-            is_on=lambda x: (x >> 5) & 1,
+            is_on=lambda x: None if x is None else (x >> 5) & 1,
         ),
         XTBinarySensorEntityDescription(
             key=XTDPCode.VBAT_STATE,
             translation_key="battery_charging",
             device_class=BinarySensorDeviceClass.BATTERY_CHARGING,
             entity_category=EntityCategory.DIAGNOSTIC,
-            is_on=lambda x: x > 127,
+            is_on=lambda x: None if x is None else x > 127,
         ),
     ),
     "smd": (
@@ -457,12 +457,14 @@ class XTBinarySensorEntity(XTEntity, TuyaBinarySensorEntity):
 
     @property
     def is_on(self) -> bool | None:
-        # Use custom is_on function
         if self._entity_description.is_on is not None:
-            is_on = self._entity_description.is_on(
-                self.device.status[self.entity_description.key]
-            )
+            # Use custom is_on function
+            if (is_on := self._entity_description.is_on(
+                self._dpcode_wrapper._read_device_status_raw(self.device)
+            )) is not None:
+                is_on = is_on in self._dpcode_wrapper._valid_values
         else:
+            # Use default is_on function
             is_on = super().is_on
         if is_on is not None and self._entity_description.device_online:
             dpcode = self.entity_description.dpcode or self.entity_description.key
