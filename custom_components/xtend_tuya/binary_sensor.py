@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import cast, Callable
+from typing import cast, Callable, Any
 from homeassistant.components.binary_sensor import (
     BinarySensorDeviceClass,
 )
@@ -34,7 +34,10 @@ from .ha_tuya_integration.tuya_integration_imports import (
     TuyaDPType,
     TuyaDPCode,
     TuyaDPCodeWrapper,
-    binary_sensor,
+    TuyaBinarySensorCustomDPCodeWrapper,
+    TuyaDPCodeBooleanWrapper,
+    TuyaDPCodeBitmapBitWrapper,
+    TuyaDPCodeIntegerWrapper,
 )
 from .entity import (
     XTEntity,
@@ -55,7 +58,7 @@ class XTBinarySensorEntityDescription(TuyaBinarySensorEntityDescription):
     device_online: bool = False
 
     # Custom is_on function
-    is_on: Callable | None = None
+    is_on: Callable[[Any], bool | None] | None = None
 
     # duplicate the entity if handled by another integration
     ignore_other_dp_code_handler: bool = False
@@ -261,6 +264,34 @@ BINARY_SENSORS["videolock"] = BINARY_SENSORS["jtmspro"]
 BINARY_SENSORS["jtmsbh"] = BINARY_SENSORS["jtmspro"]
 
 
+def _get_dpcode_wrapper(
+    device: XTDevice,
+    description: XTBinarySensorEntityDescription,
+) -> TuyaDPCodeWrapper | None:
+    """Get DPCode wrapper for an entity description."""
+    dpcode = description.dpcode or description.key
+    if description.bitmap_key is not None:
+        return TuyaDPCodeBitmapBitWrapper.find_dpcode(
+            device, dpcode, bitmap_key=description.bitmap_key
+        )
+
+    if bool_type := TuyaDPCodeBooleanWrapper.find_dpcode(device, dpcode):
+        return bool_type
+    
+    if description.is_on is not None:
+        if int_type := TuyaDPCodeIntegerWrapper.find_dpcode(device, dpcode):
+            return int_type
+
+    # Legacy / compatibility
+    if dpcode not in device.status:
+        return None
+    return TuyaBinarySensorCustomDPCodeWrapper(
+        dpcode,
+        description.on_value
+        if isinstance(description.on_value, set)
+        else {description.on_value},
+    )
+
 def _get_bitmap_bit_mask(
     device: XTDevice, dpcode: str, bitmap_key: str | None
 ) -> int | None:
@@ -334,7 +365,7 @@ async def async_setup_entry(
                                     entity_registry_enabled_default=False,
                                     entity_registry_visible_default=False,
                                 )
-                                if dpcode_wrapper := binary_sensor._get_dpcode_wrapper(
+                                if dpcode_wrapper := _get_dpcode_wrapper(
                                     device, descriptor
                                 ):
                                     entities.append(
@@ -355,7 +386,7 @@ async def async_setup_entry(
                                 entity_registry_enabled_default=False,
                                 entity_registry_visible_default=False,
                             )
-                            if dpcode_wrapper := binary_sensor._get_dpcode_wrapper(
+                            if dpcode_wrapper := _get_dpcode_wrapper(
                                 device, descriptor
                             ):
                                 entities.append(
@@ -410,7 +441,7 @@ async def async_setup_entry(
                                 COMPOUND_KEY,
                             )
                             and (
-                                dpcode_wrapper := binary_sensor._get_dpcode_wrapper(
+                                dpcode_wrapper := _get_dpcode_wrapper(
                                     device, description
                                 )
                             )
@@ -431,7 +462,7 @@ async def async_setup_entry(
                                 COMPOUND_KEY,
                             )
                             and (
-                                dpcode_wrapper := binary_sensor._get_dpcode_wrapper(
+                                dpcode_wrapper := _get_dpcode_wrapper(
                                     device, description
                                 )
                             )
@@ -482,10 +513,9 @@ class XTBinarySensorEntity(XTEntity, TuyaBinarySensorEntity):
     def is_on(self) -> bool | None:
         if self._entity_description.is_on is not None:
             # Use custom is_on function
-            if (is_on := self._entity_description.is_on(
-                self._dpcode_wrapper._read_device_status_raw(self.device)
-            )) is not None:
-                is_on = is_on in self._dpcode_wrapper._valid_values
+            is_on = self._entity_description.is_on(
+                self._dpcode_wrapper.read_device_status(self.device)
+            )
         else:
             # Use default is_on function
             is_on = super().is_on
