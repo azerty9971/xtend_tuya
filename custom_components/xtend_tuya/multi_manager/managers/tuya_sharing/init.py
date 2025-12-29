@@ -144,6 +144,9 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
                     tuya_integration_runtime_data.device_manager.customer_api
                 )
             )
+            tuya_integration_runtime_data.device_manager.customer_api = sharing_device_manager.customer_api
+            tuya_integration_runtime_data.device_manager.device_repository.api = sharing_device_manager.customer_api
+            tuya_integration_runtime_data.device_manager.home_repository.api = sharing_device_manager.customer_api
             # tuya_integration_runtime_data.device_manager.device_listeners.clear()
             # self.convert_tuya_devices_to_xt(tuya_integration_runtime_data.device_manager)
         else:
@@ -220,8 +223,7 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
         if self.sharing_account is None or self.sharing_account.device_manager is None:
             return return_list
         if (
-            other_device_map
-            := self.sharing_account.device_manager.get_overriden_device_map()
+            other_device_map := self.sharing_account.device_manager.get_overriden_device_map()
         ):
             return_list.append(other_device_map)
         return_list.append(self.sharing_account.device_manager.device_map)
@@ -431,7 +433,8 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
             self.sharing_account.device_manager.trigger_scene(home_id, scene_id)
         except Exception as e:
             LOGGER.warning(
-                f"[Sharing]Trigger scene failed, home id: {home_id}, scene id: {scene_id}, exception: {e}"
+                f"[Sharing]Trigger scene failed, home id: {home_id}, scene id: {scene_id}, exception: {e}",
+                stack_info=True,
             )
             return False
         return True

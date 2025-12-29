@@ -1,9 +1,9 @@
 from __future__ import annotations
 from .models import (
-    XTTuyaModelPatcher,
+    XTTuyaModelPatcher,  # noqa: F401
 )
 from .binary_sensor import (
-    XTTuyaBinarySensorPatcher,
+    XTTuyaBinarySensorPatcher,  # noqa: F401
 )
 
 
@@ -14,5 +14,6 @@ class XTTuyaPatcher:
     def patch_tuya_code():
         if XTTuyaPatcher.already_patched is True:
             return
-        XTTuyaModelPatcher.patch_tuya()
-        XTTuyaBinarySensorPatcher.patch_tuya()
+        XTTuyaPatcher.already_patched = True
+        #XTTuyaModelPatcher.patch_tuya()
+        #XTTuyaBinarySensorPatcher.patch_tuya()
