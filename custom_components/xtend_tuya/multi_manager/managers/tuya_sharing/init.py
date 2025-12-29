@@ -220,8 +220,7 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
         if self.sharing_account is None or self.sharing_account.device_manager is None:
             return return_list
         if (
-            other_device_map
-            := self.sharing_account.device_manager.get_overriden_device_map()
+            other_device_map := self.sharing_account.device_manager.get_overriden_device_map()
         ):
             return_list.append(other_device_map)
         return_list.append(self.sharing_account.device_manager.device_map)
@@ -431,7 +430,8 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
             self.sharing_account.device_manager.trigger_scene(home_id, scene_id)
         except Exception as e:
             LOGGER.warning(
-                f"[Sharing]Trigger scene failed, home id: {home_id}, scene id: {scene_id}, exception: {e}"
+                f"[Sharing]Trigger scene failed, home id: {home_id}, scene id: {scene_id}, exception: {e}",
+                stack_info=True,
             )
             return False
         return True
