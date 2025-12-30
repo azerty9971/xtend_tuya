@@ -163,6 +163,7 @@ from homeassistant.components.tuya.type_information import (
     StringTypeInformation as TuyaStringTypeInformation,  # noqa: F401
     JsonTypeInformation as TuyaJsonTypeInformation,  # noqa: F401
     RawTypeInformation as TuyaRawTypeInformation,  # noqa: F401
+    _should_log_warning as tuya_type_information_should_log_warning,  # noqa: F401
 )
 
 try:
