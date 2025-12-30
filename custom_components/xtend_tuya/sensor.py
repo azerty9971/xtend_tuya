@@ -56,7 +56,7 @@ from .ha_tuya_integration.tuya_integration_imports import (
     TuyaSensorEntity,
     TuyaSensorEntityDescription,
     TuyaDPCode,
-    TuyaIntegerTypeData,
+    TuyaIntegerTypeInformation,
     TuyaDPCodeWrapper,
     TuyaDPCodeBooleanWrapper,
     TuyaDPCodeIntegerWrapper,
@@ -1767,6 +1767,8 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description  # type: ignore
+        if self.device.category == "dlq":
+            LOGGER.warning(f"Added DLQ device: {self.device.name}")
 
     def reset_value(self, _: datetime | None, manual_call: bool = False) -> None:
         if manual_call and self.cancel_reset_after_x_seconds is not None:
@@ -1828,7 +1830,7 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
             ):
                 # Scale integer/float value
                 type_information = self.get_type_information()
-                if isinstance(type_information, TuyaIntegerTypeData):
+                if isinstance(type_information, TuyaIntegerTypeInformation):
                     scaled_value_back = type_information.scale_value_back(
                         self._restored_data.native_value  # type: ignore
                     )

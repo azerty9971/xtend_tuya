@@ -442,7 +442,7 @@ async def async_setup_entry(
                             )
                             and (
                                 dpcode_wrapper := _get_dpcode_wrapper(
-                                    device, description
+                                    device, XTBinarySensorEntityDescription(**description.__dict__)
                                 )
                             )
                         )
@@ -463,7 +463,7 @@ async def async_setup_entry(
                             )
                             and (
                                 dpcode_wrapper := _get_dpcode_wrapper(
-                                    device, description
+                                    device, XTBinarySensorEntityDescription(**description.__dict__)
                                 )
                             )
                         )

@@ -1,7 +1,4 @@
 from __future__ import annotations
-from .models import (
-    XTTuyaModelPatcher,  # noqa: F401
-)
 from .binary_sensor import (
     XTTuyaBinarySensorPatcher,  # noqa: F401
 )
