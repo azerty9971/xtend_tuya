@@ -14,6 +14,9 @@ from ..xt_tuya_sharing_manager import (
 from ....shared.shared_classes import (
     XTDeviceMap,
 )
+from .....const import (
+    LOGGER,
+)
 
 
 class XTHATuyaIntegrationConfigEntryManager:
@@ -26,6 +29,9 @@ class XTHATuyaIntegrationConfigEntryManager:
     def on_tuya_refresh_mq(self, before_call: bool, base_object):
         if not before_call:
             self.manager.on_external_refresh_mq()
+    
+    def on_tuya_on_message(self, msg: dict):
+        LOGGER.warning("Received UNEXPECTED Tuya MQ Message: %s", msg)
 
     def on_tuya_device_attribute_change(
         self, before_call: bool, base_object: TuyaCustomerDevice, attr, value

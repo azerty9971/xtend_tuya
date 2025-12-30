@@ -47,7 +47,7 @@ class XTIOTOpenMQ(TuyaOpenMQ):
             link_id=link_id,
         )
         self.manager = manager
-    
+
     def _on_disconnect(
         self,
         client: mqtt.Client,

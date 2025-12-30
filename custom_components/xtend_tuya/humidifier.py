@@ -28,6 +28,7 @@ from .entity import (
 
 COMPOUND_KEY: list[str | tuple[str, ...]] = ["key", "dpcode"]
 
+
 @dataclass(frozen=True)
 class XTHumidifierEntityDescription(TuyaHumidifierEntityDescription):
     """Describe an XT (de)humidifier entity."""
@@ -95,9 +96,12 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if description := cast(XTHumidifierEntityDescription, XTEntityDescriptorManager.get_category_descriptors(
-                    supported_descriptors, device.category
-                )):
+                if description := cast(
+                    XTHumidifierEntityDescription,
+                    XTEntityDescriptorManager.get_category_descriptors(
+                        supported_descriptors, device.category
+                    ),
+                ):
                     entities.append(
                         XTHumidifierEntity.get_entity_instance(
                             description,

@@ -92,7 +92,9 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
         self.iot_account = await self._init_from_entry(hass, config_entry)
         if self.iot_account:
             self.multi_manager.register_account(self)
-        LOGGER.debug(f"Xtended Tuya {config_entry.title} {datetime.now() - last_time} for setup_from_entry {self.get_type_name()}")
+        LOGGER.debug(
+            f"Xtended Tuya {config_entry.title} {datetime.now() - last_time} for setup_from_entry {self.get_type_name()}"
+        )
 
     async def _init_from_entry(
         self, hass: HomeAssistant, config_entry: XTConfigEntry
@@ -144,23 +146,33 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
         api.set_dev_channel("hass")
         try:
             if auth_type == AuthType.CUSTOM:
-                connect_user_api = await XTEventLoopProtector.execute_out_of_event_loop_and_return(
-                    api.connect,
-                    config_entry.options[CONF_USERNAME],
-                    config_entry.options[CONF_PASSWORD],
+                connect_user_api = (
+                    await XTEventLoopProtector.execute_out_of_event_loop_and_return(
+                        api.connect,
+                        config_entry.options[CONF_USERNAME],
+                        config_entry.options[CONF_PASSWORD],
+                    )
                 )
             else:
-                connect_user_api = await XTEventLoopProtector.execute_out_of_event_loop_and_return(
-                    api.connect,
-                    config_entry.options[CONF_USERNAME],
-                    config_entry.options[CONF_PASSWORD],
-                    config_entry.options[CONF_COUNTRY_CODE],
-                    config_entry.options[CONF_APP_TYPE],
+                connect_user_api = (
+                    await XTEventLoopProtector.execute_out_of_event_loop_and_return(
+                        api.connect,
+                        config_entry.options[CONF_USERNAME],
+                        config_entry.options[CONF_PASSWORD],
+                        config_entry.options[CONF_COUNTRY_CODE],
+                        config_entry.options[CONF_APP_TYPE],
+                    )
                 )
-            connect_non_user_api = await XTEventLoopProtector.execute_out_of_event_loop_and_return(
-                non_user_api.connect
+            connect_non_user_api = (
+                await XTEventLoopProtector.execute_out_of_event_loop_and_return(
+                    non_user_api.connect
+                )
             )
-            user_api_valid = await XTEventLoopProtector.execute_out_of_event_loop_and_return(api.test_validity)
+            user_api_valid = (
+                await XTEventLoopProtector.execute_out_of_event_loop_and_return(
+                    api.test_validity
+                )
+            )
         except requests.exceptions.RequestException as e:
             LOGGER.error(f"Tuya IOT request didn't work: {e}")
             await self.raise_issue(
@@ -184,7 +196,9 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
             if connect_user_api.get("success", False) is False:
                 LOGGER.error(f"Error connecting the USER api: {connect_user_api}")
             if connect_non_user_api.get("success", False) is False:
-                LOGGER.error(f"Error connecting the NON-USER api: {connect_non_user_api}")
+                LOGGER.error(
+                    f"Error connecting the NON-USER api: {connect_non_user_api}"
+                )
             if user_api_valid is False:
                 LOGGER.error(f"Error validating the USER api: {user_api_valid}")
             await self.raise_issue(
@@ -278,7 +292,7 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
         if device_id in self.iot_account.device_ids:
             return [TUYA_DISCOVERY_NEW]
         return None
-    
+
     def add_device_by_id(self, device_id: str):
         if self.iot_account is None:
             return None
@@ -312,8 +326,11 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
         ):
             # Verify if we are subscribed to the lock service
             if device := multi_manager.device_map.get(lock_device_id, None):
-                test_api = await XTEventLoopProtector.execute_out_of_event_loop_and_return(
-                    self.iot_account.device_manager.test_lock_api_subscription, device
+                test_api = (
+                    await XTEventLoopProtector.execute_out_of_event_loop_and_return(
+                        self.iot_account.device_manager.test_lock_api_subscription,
+                        device,
+                    )
                 )
                 if not test_api:
                     await self.raise_issue(
@@ -334,8 +351,11 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
         ):
             # Verify if we are subscribed to the lock service
             if device := multi_manager.device_map.get(camera_device_id, None):
-                test_api = await XTEventLoopProtector.execute_out_of_event_loop_and_return(
-                    self.iot_account.device_manager.test_camera_api_subscription, device
+                test_api = (
+                    await XTEventLoopProtector.execute_out_of_event_loop_and_return(
+                        self.iot_account.device_manager.test_camera_api_subscription,
+                        device,
+                    )
                 )
                 if not test_api:
                     await self.raise_issue(
@@ -357,8 +377,10 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
         ):
             # Verify if we are subscribed to the lock service
             if device := multi_manager.device_map.get(ir_hub_device_id, None):
-                test_api = await XTEventLoopProtector.execute_out_of_event_loop_and_return(
-                    self.iot_account.device_manager.test_ir_api_subscription, device
+                test_api = (
+                    await XTEventLoopProtector.execute_out_of_event_loop_and_return(
+                        self.iot_account.device_manager.test_ir_api_subscription, device
+                    )
                 )
                 if not test_api:
                     await self.raise_issue(
@@ -395,12 +417,12 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
         if self.iot_account is None:
             return {}
         return self.iot_account.device_manager.get_ir_category_list(device)
-    
+
     def get_ir_brand_list(self, device: XTDevice, category_id: int) -> dict[int, str]:
         if self.iot_account is None:
             return {}
         return self.iot_account.device_manager.get_ir_brand_list(device, category_id)
-    
+
     def create_ir_device(
         self,
         device: XTDevice,
@@ -411,7 +433,9 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
     ) -> str | None:
         if self.iot_account is None:
             return None
-        return self.iot_account.device_manager.create_ir_device(device, remote_name, category_id, brand_id, brand_name)
+        return self.iot_account.device_manager.create_ir_device(
+            device, remote_name, category_id, brand_id, brand_name
+        )
 
     def learn_ir_key(
         self,
@@ -420,20 +444,20 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
         hub: XTIRHubInformation,
         key: str,
         key_name: str,
-        timeout: int | None = None
+        timeout: int | None = None,
     ) -> bool:
         if self.iot_account is None:
             return False
         return self.iot_account.device_manager.learn_ir_key(
             device, remote, hub, key, key_name, timeout
         )
-    
+
     def delete_ir_key(
         self,
         device: XTDevice,
         key: XTIRRemoteKeysInformation,
         remote: XTIRRemoteInformation,
-        hub: XTIRHubInformation
+        hub: XTIRHubInformation,
     ) -> bool:
         if self.iot_account is None:
             return False

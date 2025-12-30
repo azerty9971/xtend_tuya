@@ -407,7 +407,12 @@ class XTSelectEntity(XTEntity, TuyaSelectEntity):
         super(XTSelectEntity, self).__init__(
             device, device_manager, description, dpcode_wrapper=dpcode_wrapper
         )
-        super(XTEntity, self).__init__(device, device_manager, description, dpcode_wrapper)  # type: ignore
+        super(XTEntity, self).__init__(
+            device,
+            device_manager,  # type: ignore
+            description,
+            dpcode_wrapper,
+        )
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description

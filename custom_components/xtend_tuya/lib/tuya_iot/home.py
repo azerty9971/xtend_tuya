@@ -1,4 +1,5 @@
 """Tuya home's api base on asset and device api."""
+
 from __future__ import annotations
 
 from types import SimpleNamespace

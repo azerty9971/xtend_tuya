@@ -168,8 +168,8 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         super(XTEntity, self).__init__(
             device,
             device_manager,  # type: ignore
-            motion_detection_switch=None,
-            recording_status=None,
+            motion_detection_switch=motion_detection_switch,
+            recording_status=recording_status,
         )
         if stream_quality != WebRTCStreamQuality.HIGH_QUALITY:
             self._attr_unique_id = f"tuya.{device.id}_{stream_quality}"
@@ -288,7 +288,7 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         if self.has_multiple_streams:
             self.wait_for_candidates = async_call_later(
                 self._hass,
-                2,
+                5,
                 HassJob(
                     functools.partial(
                         self.send_resolution_update,

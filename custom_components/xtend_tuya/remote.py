@@ -85,7 +85,10 @@ async def async_setup_entry(
             dict[str, tuple[XTRemoteEntityDescription, ...]],
         ],
         XTEntityDescriptorManager.get_platform_descriptors(
-            REMOTES, entry.runtime_data.multi_manager, XTRemoteEntityDescription, this_platform
+            REMOTES,
+            entry.runtime_data.multi_manager,
+            XTRemoteEntityDescription,
+            this_platform,
         ),
     )
 
@@ -98,10 +101,10 @@ async def async_setup_entry(
         for device_id in device_ids:
             if hub_device := hass_data.manager.device_map.get(device_id):
                 if hub_device.category in IR_HUB_CATEGORY_LIST:
-                    hub_information: XTIRHubInformation | None = (
-                        await XTEventLoopProtector.execute_out_of_event_loop_and_return(
-                            hass_data.manager.get_ir_hub_information, hub_device
-                        )
+                    hub_information: (
+                        XTIRHubInformation | None
+                    ) = await XTEventLoopProtector.execute_out_of_event_loop_and_return(
+                        hass_data.manager.get_ir_hub_information, hub_device
                     )
                     if hub_information is None:
                         continue
@@ -144,8 +147,11 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if category_descriptions := XTEntityDescriptorManager.get_category_descriptors(
-                    supported_descriptors, device.category
+                if (
+                    category_descriptions
+                    := XTEntityDescriptorManager.get_category_descriptors(
+                        supported_descriptors, device.category
+                    )
                 ):
                     externally_managed_dpcodes = (
                         XTEntityDescriptorManager.get_category_keys(

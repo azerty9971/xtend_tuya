@@ -1,4 +1,5 @@
 """Tuya device api."""
+
 from __future__ import annotations
 
 import time
@@ -266,7 +267,6 @@ class TuyaDeviceManager:
         self.update_device_function_cache(devIds)
 
     def _update_device_list_info_cache(self, devIds: list[str]):
-
         response = self.get_device_list_info(devIds)
         result = response.get("result", {})
         for item in result.get("list", []):
@@ -274,7 +274,6 @@ class TuyaDeviceManager:
             self.device_map[device_id] = TuyaDevice(**item)
 
     def _update_device_list_status_cache(self, devIds: list[str]):
-
         response = self.get_device_list_status(devIds)
         for item in response.get("result", []):
             device_id = item["id"]
@@ -473,7 +472,6 @@ class TuyaDeviceManager:
     def send_commands(
         self, device_id: str, commands: list[dict[str, Any]]
     ) -> dict[str, Any]:
-
         """Send commands.
 
         Send command to the device.For example:
@@ -568,7 +566,9 @@ class DeviceManage(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def send_commands(self, device_id: str, commands: list[dict[str, Any]]) -> dict[str, Any]:
+    def send_commands(
+        self, device_id: str, commands: list[dict[str, Any]]
+    ) -> dict[str, Any]:
         pass
 
 
@@ -674,7 +674,9 @@ class IndustrySolutionDeviceManage(DeviceManage):
         )
 
     def get_factory_info(self, device_ids: list[str]) -> dict[str, Any]:
-        return self.api.get("/v1.0/iot-03/devices/factory-infos", {"device_ids": ",".join(device_ids)})
+        return self.api.get(
+            "/v1.0/iot-03/devices/factory-infos", {"device_ids": ",".join(device_ids)}
+        )
 
     def factory_reset(self, device_id: str) -> dict[str, Any]:
         return self.api.delete(f"/v1.0/iot-03/devices/{device_id}/actions/reset")
@@ -709,7 +711,6 @@ class IndustrySolutionDeviceManage(DeviceManage):
     def send_commands(
         self, device_id: str, commands: list[dict[str, Any]]
     ) -> dict[str, Any]:
-
         return self.api.post(
             f"/v1.0/iot-03/devices/{device_id}/commands", {"commands": commands}
         )

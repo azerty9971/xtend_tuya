@@ -48,10 +48,14 @@ class XTSharingDeviceRepository(DeviceRepository):
                 if hasattr(value, "values"):
                     values = getattr(value, "values")
                     if dpcode is not None and dpcode == key:
-                        #This is an infrared dpcode, fix the values to be proper json
-                        setattr(device.status_range[key], "values", json.dumps({"original_content": values}))
-                        #device.status[key] = False
-            
+                        # This is an infrared dpcode, fix the values to be proper json
+                        setattr(
+                            device.status_range[key],
+                            "values",
+                            json.dumps({"original_content": values}),
+                        )
+                        # device.status[key] = False
+
             for key, value in device.function.items():
                 dpcode = None
                 if hasattr(value, "code"):
@@ -62,13 +66,17 @@ class XTSharingDeviceRepository(DeviceRepository):
                 if hasattr(value, "values"):
                     values = getattr(value, "values")
                     if dpcode is not None and dpcode == key:
-                        #This is an infrared dpcode, fix the values to be proper json
-                        setattr(device.function[key], "values", json.dumps({"original_content": values}))
-                        #device.status[key] = False
+                        # This is an infrared dpcode, fix the values to be proper json
+                        setattr(
+                            device.function[key],
+                            "values",
+                            json.dumps({"original_content": values}),
+                        )
+                        # device.status[key] = False
 
     def update_device_specification(self, device: CustomerDevice):
         super().update_device_specification(device)
-        
+
         self._fix_infrared_device_specification(device)
 
         # Now convert the status_range and function to XT format

@@ -168,8 +168,10 @@ class ServiceManager:
             return None
         if multi_manager := self._get_correct_multi_manager(source, device_id):
             if account := multi_manager.get_account_by_name(source):
-                response = await XTEventLoopProtector.execute_out_of_event_loop_and_return(
-                    account.get_device_stream_allocate, device_id, stream_type
+                response = (
+                    await XTEventLoopProtector.execute_out_of_event_loop_and_return(
+                        account.get_device_stream_allocate, device_id, stream_type
+                    )
                 )
                 return response
         return None
@@ -184,8 +186,11 @@ class ServiceManager:
         if source is not None and method is not None and url is not None:
             if account := self.multi_manager.get_account_by_name(source):
                 try:
-                    if response := await XTEventLoopProtector.execute_out_of_event_loop_and_return(
-                        account.call_api, method, url, payload
+                    if (
+                        response
+                        := await XTEventLoopProtector.execute_out_of_event_loop_and_return(
+                            account.call_api, method, url, payload
+                        )
                     ):
                         LOGGER.debug(f"API call response: {response}")
                         return response
@@ -203,12 +208,15 @@ class ServiceManager:
             return None
         if multi_manager := self._get_correct_multi_manager(source, device_id):
             if account := multi_manager.get_account_by_name(source):
-                if ice_servers := await XTEventLoopProtector.execute_out_of_event_loop_and_return(
-                    account.get_webrtc_ice_servers,
-                    device_id,
-                    session_id,
-                    format,
-                    self.hass,
+                if (
+                    ice_servers
+                    := await XTEventLoopProtector.execute_out_of_event_loop_and_return(
+                        account.get_webrtc_ice_servers,
+                        device_id,
+                        session_id,
+                        format,
+                        self.hass,
+                    )
                 ):
                     return ice_servers
         return None
@@ -223,8 +231,11 @@ class ServiceManager:
         multi_manager_list = get_all_multi_managers(self.hass)
         for multi_manager in multi_manager_list:
             if account := multi_manager.get_account_by_name(source):
-                if debug_output := await XTEventLoopProtector.execute_out_of_event_loop_and_return(
-                    account.get_webrtc_exchange_debug, session_id
+                if (
+                    debug_output
+                    := await XTEventLoopProtector.execute_out_of_event_loop_and_return(
+                        account.get_webrtc_exchange_debug, session_id
+                    )
                 ):
                     return debug_output
         return None
@@ -287,8 +298,10 @@ class ServiceManager:
                         return None
             case "DELETE":
                 if account := multi_manager.get_account_by_name(source):
-                    delete_answer = await XTEventLoopProtector.execute_out_of_event_loop_and_return(
-                        account.delete_webrtc_session, device_id, session_id
+                    delete_answer = (
+                        await XTEventLoopProtector.execute_out_of_event_loop_and_return(
+                            account.delete_webrtc_session, device_id, session_id
+                        )
                     )
                     if delete_answer is not None:
                         response = web.Response(

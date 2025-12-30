@@ -38,7 +38,7 @@ class XTFlowDataAddIRDevice(XTFlowDataBase):
     device_brand_dict: dict[int, str] | None = None
 
     def __repr__(self) -> str:
-        return f"hub_device: {self.hub_device.name if self.hub_device is not None else "None"}, step: {self.step}, device_name: {self.device_name}, device_category: {self.device_category}, device_category_dict: {self.device_category_dict}, device_brand_id: {self.device_brand_id}, device_brand_name: {self.device_brand_name}, device_brand_dict: {self.device_brand_dict}"
+        return f"hub_device: {self.hub_device.name if self.hub_device is not None else 'None'}, step: {self.step}, device_name: {self.device_name}, device_category: {self.device_category}, device_category_dict: {self.device_category_dict}, device_brand_id: {self.device_brand_id}, device_brand_name: {self.device_brand_name}, device_brand_dict: {self.device_brand_dict}"
 
 
 @dataclass
@@ -259,7 +259,9 @@ class XTDataEntryAddIRDeviceKey(XTDataEntryManager):
     def get_translation_placeholders(self) -> dict[str, str]:
         return super().get_translation_placeholders() | {
             "key_name": (
-                self.flow_data.human_key_name if self.flow_data.human_key_name is not None else ""
+                self.flow_data.human_key_name
+                if self.flow_data.human_key_name is not None
+                else ""
             ),
             "device_name": self.flow_data.device.name,
             "name": f"Add IR Key for {self.device.name}",

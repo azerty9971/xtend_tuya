@@ -83,7 +83,6 @@ from homeassistant.components.tuya.light import (
     _ColorTempWrapper as TuyaLightColorTempWrapper,  # noqa: F401
     _get_brightness_wrapper as tuya_light_get_brightness_wrapper,  # noqa: F401
     _get_color_data_wrapper as tuya_light_get_color_data_wrapper,  # noqa: F401
-
 )
 from homeassistant.components.number import (
     NumberEntityDescription as TuyaNumberEntityDescription,  # noqa: F401
@@ -165,6 +164,7 @@ try:
         DPCodeIntegerWrapper as TuyaDPCodeIntegerWrapper,  # noqa: F401
         DPCodeBitmapBitWrapper as TuyaDPCodeBitmapBitWrapper,  # noqa: F401
         DPCodeStringWrapper as TuyaDPCodeStringWrapper,  # noqa: F401
+        DPCodeBase64Wrapper as TuyaDPCodeBase64Wrapper,  # noqa: F401
         find_dpcode as tuya_find_dpcode,  # noqa: F401
         TypeInformation as TuyaTypeInformation,  # noqa: F401
         _TYPE_INFORMATION_MAPPINGS as TUYA_TYPE_INFORMATION_MAPPINGS,  # noqa: F401

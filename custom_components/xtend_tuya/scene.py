@@ -29,7 +29,9 @@ async def async_setup_entry(
     if hass_data.manager is None:
         return
 
-    scenes = await XTEventLoopProtector.execute_out_of_event_loop_and_return(hass_data.manager.query_scenes)
+    scenes = await XTEventLoopProtector.execute_out_of_event_loop_and_return(
+        hass_data.manager.query_scenes
+    )
     async_add_entities(
         XTSceneEntity(hass_data.manager, XTScene(**scene.__dict__)) for scene in scenes
     )
@@ -40,7 +42,10 @@ class XTSceneEntity(TuyaSceneEntity):
 
     def __init__(self, multi_manager: MultiManager, scene: XTScene) -> None:
         """Init Tuya Scene."""
-        super(XTSceneEntity, self).__init__(multi_manager, scene)  # type: ignore
+        super(XTSceneEntity, self).__init__(
+            multi_manager,  # type: ignore
+            scene,
+        )
         self.home_manager = multi_manager
         self.scene = scene
         if (

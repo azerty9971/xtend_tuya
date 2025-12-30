@@ -27,7 +27,7 @@ def decorate_tuya_manager(
 
     decorator, tuya_manager.on_message = XTDecorator.get_decorator(
         base_object=tuya_manager,
-        callback=None,
+        callback=ha_tuya_integration_config_manager.on_tuya_on_message,
         method_name="on_message",
         skip_call=True,
     )

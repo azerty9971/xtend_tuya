@@ -239,7 +239,7 @@ class XTIOTWebRTCManager:
     ) -> tuple[str, dict] | None:
         if config := self.get_config(device_id, session_id):
             p2p_config: dict = config.get("p2p_config", {})
-            ice_str = p2p_config.get("ices", "{}")
+            ice_str: str = cast(str, p2p_config.get("ices", "{}"))
             match format:
                 case "GO2RTC":
                     return ice_str, config
@@ -267,6 +267,7 @@ class XTIOTWebRTCManager:
                             temp_str += " -S " + url.replace("stun:", "stun://")
                             pass
                     return temp_str.strip(), config
+        return None
 
     def _get_stream_type(
         self, device_id: str, session_id: str, requested_channel: str
@@ -520,8 +521,11 @@ class XTIOTWebRTCManager:
         self.send_to_ipc_mqtt(session_id, device, json.dumps(sdp_offer_payload))
         session_data.offer_sent = True
         for candidate in session_data.offer_candidate:
-            if candidate_payload := await XTEventLoopProtector.execute_out_of_event_loop_and_return(
-                self.format_offer_candidate, session_id, candidate, device
+            if (
+                candidate_payload
+                := await XTEventLoopProtector.execute_out_of_event_loop_and_return(
+                    self.format_offer_candidate, session_id, candidate, device
+                )
             ):
                 self.send_to_ipc_mqtt(session_id, device, json.dumps(candidate_payload))
 
@@ -670,13 +674,8 @@ class XTIOTWebRTCManager:
             fingerprint_new_str = fingerprint_orig_str.upper()
             answer_sdp = answer_sdp.replace(fingerprint_orig_str, fingerprint_new_str)
 
-        if (
-            webrtc_session.offer is not None
-            and webrtc_session.offer.find("mozilla") != -1
-        ):
-            # Firefox has a much more strict SDP checking mecanism than Chrome, fix the answer so that it accepts it
-
-            # Fix send/receive mode for Firefox
+        if webrtc_session.offer is not None:
+            # Fix send/receive mode based on the offer
             searched_offset = 0
             has_more_m_sections = True
             modes_to_search: dict[str, str] = {
@@ -908,9 +907,9 @@ class XTIOTWebRTCRTPMap:
     def __init__(self, rtpmap_line: str, m_line: str) -> None:
         self.rtpmap = rtpmap_line
         self.m_line = m_line
-        self.a_lines: dict[str, XTIOTWebRTCRTPMapALineGroup] = (
-            {}
-        )  # dict[a=...:, tokens]
+        self.a_lines: dict[
+            str, XTIOTWebRTCRTPMapALineGroup
+        ] = {}  # dict[a=...:, tokens]
 
     def __repr__(self) -> str:
         return_str = self.rtpmap + ENDLINE

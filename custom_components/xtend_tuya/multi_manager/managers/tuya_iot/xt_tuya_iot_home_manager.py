@@ -30,11 +30,21 @@ class XTIOTHomeManager(TuyaHomeManager):
         self, asset_manager: TuyaAssetManager, asset_id: str, device_ids: list
     ) -> list:
         if asset_id != "-1":
-            device_ids += await XTEventLoopProtector.execute_out_of_event_loop_and_return(asset_manager.get_device_list, asset_id)
-        assets = await XTEventLoopProtector.execute_out_of_event_loop_and_return(asset_manager.get_asset_list, asset_id)
+            device_ids += (
+                await XTEventLoopProtector.execute_out_of_event_loop_and_return(
+                    asset_manager.get_device_list, asset_id
+                )
+            )
+        assets = await XTEventLoopProtector.execute_out_of_event_loop_and_return(
+            asset_manager.get_asset_list, asset_id
+        )
         concurrency_manager = XTConcurrencyManager(max_concurrency=9)
         for asset in assets:
-            concurrency_manager.add_coroutine(self.async_query_device_ids(asset_manager, asset["asset_id"], device_ids))
+            concurrency_manager.add_coroutine(
+                self.async_query_device_ids(
+                    asset_manager, asset["asset_id"], device_ids
+                )
+            )
         await concurrency_manager.gather()
         return device_ids
 

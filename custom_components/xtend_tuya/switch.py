@@ -569,7 +569,12 @@ class XTSwitchEntity(XTEntity, TuyaSwitchEntity):
         super(XTSwitchEntity, self).__init__(
             device, device_manager, description, dpcode_wrapper=dpcode_wrapper
         )
-        super(XTEntity, self).__init__(device, device_manager, description, dpcode_wrapper)  # type: ignore
+        super(XTEntity, self).__init__(
+            device,
+            device_manager,  # type: ignore
+            description,
+            dpcode_wrapper,
+        )
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description  # type: ignore
@@ -605,13 +610,13 @@ class XTSwitchEntity(XTEntity, TuyaSwitchEntity):
         """Turn the switch on."""
         if self.entity_description.dont_send_to_cloud is True:
             if self.entity_description.on_value is not None:
-                self.device.status[self.entity_description.key] = (
+                self.device.status[self._dpcode_wrapper.dpcode] = (
                     self.entity_description.on_value
                 )
             else:
-                self.device.status[self.entity_description.key] = True
+                self.device.status[self._dpcode_wrapper.dpcode] = True
             self.device_manager.multi_device_listener.update_device(
-                self.device, [self.entity_description.key]
+                self.device, [self._dpcode_wrapper.dpcode]
             )
         else:
             await super().async_turn_on(**kwargs)
@@ -620,13 +625,13 @@ class XTSwitchEntity(XTEntity, TuyaSwitchEntity):
         """Turn the switch off."""
         if self.entity_description.dont_send_to_cloud is True:
             if self.entity_description.off_value is not None:
-                self.device.status[self.entity_description.key] = (
+                self.device.status[self._dpcode_wrapper.dpcode] = (
                     self.entity_description.off_value
                 )
             else:
-                self.device.status[self.entity_description.key] = False
+                self.device.status[self._dpcode_wrapper.dpcode] = False
             self.device_manager.multi_device_listener.update_device(
-                self.device, [self.entity_description.key]
+                self.device, [self._dpcode_wrapper.dpcode]
             )
         else:
             await super().async_turn_off(**kwargs)
