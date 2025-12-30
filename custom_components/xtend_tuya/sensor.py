@@ -56,7 +56,7 @@ from .ha_tuya_integration.tuya_integration_imports import (
     TuyaSensorEntity,
     TuyaSensorEntityDescription,
     TuyaDPCode,
-    TuyaIntegerTypeData,
+    TuyaIntegerTypeInformation,
     TuyaDPCodeWrapper,
     TuyaDPCodeBooleanWrapper,
     TuyaDPCodeIntegerWrapper,
@@ -1828,7 +1828,7 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
             ):
                 # Scale integer/float value
                 type_information = self.get_type_information()
-                if isinstance(type_information, TuyaIntegerTypeData):
+                if isinstance(type_information, TuyaIntegerTypeInformation):
                     scaled_value_back = type_information.scale_value_back(
                         self._restored_data.native_value  # type: ignore
                     )

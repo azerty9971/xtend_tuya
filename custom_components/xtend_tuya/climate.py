@@ -3,9 +3,13 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import cast
+from typing import cast, Self
 from homeassistant.components.climate.const import (
     HVACMode,
+    SWING_OFF,
+    SWING_ON,
+    SWING_HORIZONTAL,
+    SWING_VERTICAL,
 )
 from homeassistant.const import UnitOfTemperature, Platform
 from homeassistant.core import HomeAssistant, callback
@@ -35,6 +39,8 @@ from .ha_tuya_integration.tuya_integration_imports import (
     TuyaDPCodeBooleanWrapper,
     TuyaClimateRoundedIntegerWrapper,
     tuya_climate_get_temperature_wrapper,
+    TuyaClimateSwingModeWrapper,
+    TuyaCustomerDevice,
 )
 from .entity import (
     XTEntity,
@@ -158,9 +164,7 @@ class XTClimateEntityDescription(TuyaClimateEntityDescription):
         fan_mode_wrapper: TuyaDPCodeEnumWrapper | None,
         hvac_mode_wrapper: TuyaDPCodeEnumWrapper | None,
         set_temperature_wrapper: TuyaDPCodeIntegerWrapper | None,
-        swing_wrapper: TuyaDPCodeBooleanWrapper | None,
-        swing_h_wrapper: TuyaDPCodeBooleanWrapper | None,
-        swing_v_wrapper: TuyaDPCodeBooleanWrapper | None,
+        swing_wrapper: TuyaClimateSwingModeWrapper | None,
         switch_wrapper: TuyaDPCodeBooleanWrapper | None,
         target_humidity_wrapper: TuyaClimateRoundedIntegerWrapper | None,
         temperature_unit: UnitOfTemperature,
@@ -175,8 +179,6 @@ class XTClimateEntityDescription(TuyaClimateEntityDescription):
             hvac_mode_wrapper=hvac_mode_wrapper,
             set_temperature_wrapper=set_temperature_wrapper,
             swing_wrapper=swing_wrapper,
-            swing_h_wrapper=swing_h_wrapper,
-            swing_v_wrapper=swing_v_wrapper,
             switch_wrapper=switch_wrapper,
             target_humidity_wrapper=target_humidity_wrapper,
             temperature_unit=temperature_unit,
@@ -198,6 +200,34 @@ CLIMATE_DESCRIPTIONS: dict[str, XTClimateEntityDescription] = {
     ),
 }
 
+class XTClimateSwingModeWrapper(TuyaClimateSwingModeWrapper):
+    @classmethod
+    def find_dpcode(cls, device: TuyaCustomerDevice) -> Self | None:
+        """Find and return a _SwingModeWrapper for the given DP codes."""
+        on_off = TuyaDPCodeBooleanWrapper.find_dpcode(
+            device, XT_CLIMATE_SWING_MODE_ON_DPCODES, prefer_function=True
+        )
+        horizontal = TuyaDPCodeBooleanWrapper.find_dpcode(
+            device, XT_CLIMATE_SWING_MODE_HORIZONTAL_DPCODES, prefer_function=True
+        )
+        vertical = TuyaDPCodeBooleanWrapper.find_dpcode(
+            device, XT_CLIMATE_SWING_MODE_VERTICAL_DPCODES, prefer_function=True
+        )
+        if on_off or horizontal or vertical:
+            options = [SWING_OFF]
+            if on_off:
+                options.append(SWING_ON)
+            if horizontal:
+                options.append(SWING_HORIZONTAL)
+            if vertical:
+                options.append(SWING_VERTICAL)
+            return cls(
+                on_off=on_off,
+                horizontal=horizontal,
+                vertical=vertical,
+                options=options,
+            )
+        return None
 
 def _get_temperature_wrappers(
     device: XTDevice, system_temperature_unit: UnitOfTemperature
@@ -334,20 +364,8 @@ async def async_setup_entry(
                                 prefer_function=True,
                             ),
                             set_temperature_wrapper=temperature_wrappers[1],
-                            swing_wrapper=TuyaDPCodeBooleanWrapper.find_dpcode(
+                            swing_wrapper=XTClimateSwingModeWrapper.find_dpcode(
                                 device,
-                                XT_CLIMATE_SWING_MODE_ON_DPCODES,  # type: ignore
-                                prefer_function=True,
-                            ),
-                            swing_h_wrapper=TuyaDPCodeBooleanWrapper.find_dpcode(
-                                device,
-                                XT_CLIMATE_SWING_MODE_HORIZONTAL_DPCODES,  # type: ignore
-                                prefer_function=True,
-                            ),
-                            swing_v_wrapper=TuyaDPCodeBooleanWrapper.find_dpcode(
-                                device,
-                                XT_CLIMATE_SWING_MODE_VERTICAL_DPCODES,  # type: ignore
-                                prefer_function=True,
                             ),
                             switch_wrapper=TuyaDPCodeBooleanWrapper.find_dpcode(
                                 device,
@@ -399,9 +417,7 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
         fan_mode_wrapper: TuyaDPCodeEnumWrapper | None,
         hvac_mode_wrapper: TuyaDPCodeEnumWrapper | None,
         set_temperature_wrapper: TuyaDPCodeIntegerWrapper | None,
-        swing_wrapper: TuyaDPCodeBooleanWrapper | None,
-        swing_h_wrapper: TuyaDPCodeBooleanWrapper | None,
-        swing_v_wrapper: TuyaDPCodeBooleanWrapper | None,
+        swing_wrapper: TuyaClimateSwingModeWrapper | None,
         switch_wrapper: TuyaDPCodeBooleanWrapper | None,
         target_humidity_wrapper: TuyaClimateRoundedIntegerWrapper | None,
         temperature_unit: UnitOfTemperature,
@@ -418,8 +434,6 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
             hvac_mode_wrapper=hvac_mode_wrapper,
             set_temperature_wrapper=set_temperature_wrapper,
             swing_wrapper=swing_wrapper,
-            swing_h_wrapper=swing_h_wrapper,
-            swing_v_wrapper=swing_v_wrapper,
             switch_wrapper=switch_wrapper,
             target_humidity_wrapper=target_humidity_wrapper,
             temperature_unit=temperature_unit,
@@ -439,9 +453,7 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
         fan_mode_wrapper: TuyaDPCodeEnumWrapper | None,
         hvac_mode_wrapper: TuyaDPCodeEnumWrapper | None,
         set_temperature_wrapper: TuyaDPCodeIntegerWrapper | None,
-        swing_wrapper: TuyaDPCodeBooleanWrapper | None,
-        swing_h_wrapper: TuyaDPCodeBooleanWrapper | None,
-        swing_v_wrapper: TuyaDPCodeBooleanWrapper | None,
+        swing_wrapper: TuyaClimateSwingModeWrapper | None,
         switch_wrapper: TuyaDPCodeBooleanWrapper | None,
         target_humidity_wrapper: TuyaClimateRoundedIntegerWrapper | None,
         temperature_unit: UnitOfTemperature,
@@ -459,8 +471,6 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
                 hvac_mode_wrapper=hvac_mode_wrapper,
                 set_temperature_wrapper=set_temperature_wrapper,
                 swing_wrapper=swing_wrapper,
-                swing_h_wrapper=swing_h_wrapper,
-                swing_v_wrapper=swing_v_wrapper,
                 switch_wrapper=switch_wrapper,
                 target_humidity_wrapper=target_humidity_wrapper,
                 temperature_unit=temperature_unit,
@@ -475,8 +485,6 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
             hvac_mode_wrapper=hvac_mode_wrapper,
             set_temperature_wrapper=set_temperature_wrapper,
             swing_wrapper=swing_wrapper,
-            swing_h_wrapper=swing_h_wrapper,
-            swing_v_wrapper=swing_v_wrapper,
             switch_wrapper=switch_wrapper,
             target_humidity_wrapper=target_humidity_wrapper,
             temperature_unit=temperature_unit,

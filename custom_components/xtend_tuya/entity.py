@@ -22,7 +22,7 @@ from .ha_tuya_integration.tuya_integration_imports import (
     TuyaEntity,
     TuyaDPType,
     TuyaDPCodeWrapper,
-    TuyaDPCodeTypeInformationWrapper,
+    TuyaTypeInformation,
 )
 
 
@@ -449,7 +449,7 @@ class XTEntity(TuyaEntity):
             # In case we have an error, do nothing
             pass
 
-    def get_type_information(self) -> TuyaDPCodeTypeInformationWrapper | None:
+    def get_type_information(self) -> TuyaTypeInformation | None:
         if self.dpcode_wrapper is None:
             return None
         try:
@@ -463,12 +463,12 @@ class XTEntity(TuyaEntity):
     def get_dptype_from_dpcode_wrapper(self) -> TuyaDPType | None:
         # Probably not working. Just kept for backward compatibility
         if type_information := self.get_type_information():
-            if hasattr(type_information, "DPTYPE"):
-                return type_information.DPTYPE
+            if hasattr(type_information, "_DPTYPE"):
+                return type_information._DPTYPE
 
         # This is the one that should work
-        if hasattr(self.dpcode_wrapper, "DPTYPE"):
-            return getattr(self.dpcode_wrapper, "DPTYPE")
+        if hasattr(self.dpcode_wrapper, "_DPTYPE"):
+            return getattr(self.dpcode_wrapper, "_DPTYPE")
         return None
 
     @staticmethod

@@ -11,7 +11,6 @@ from homeassistant.components.sensor import (
     SensorDeviceClass,
     SensorStateClass,
 )
-from homeassistant.components.tuya.models import TypeInformation
 from homeassistant.const import (
     UnitOfTemperature,
     PERCENTAGE,
@@ -28,15 +27,16 @@ from ...multi_manager.multi_manager import (
 )
 from ...ha_tuya_integration.tuya_integration_imports import (
     TuyaCustomerDevice,
-    TuyaDPCodeBase64Wrapper,
+    TuyaDPCodeRawWrapper,
+    TuyaRawTypeInformation,
 )
 from .const import INKBIRD_CHANNELS
 
 
-class DPCodeInkbirdWrapper(TuyaDPCodeBase64Wrapper):
+class DPCodeInkbirdWrapper(TuyaDPCodeRawWrapper):
     """DPCode wrapper for Inkbird base64-encoded data."""
 
-    def __init__(self, dpcode: str, type_information: TypeInformation) -> None:
+    def __init__(self, dpcode: str, type_information: TuyaRawTypeInformation) -> None:
         super().__init__(dpcode, type_information)
         self.temperature_unit: UnitOfTemperature = UnitOfTemperature.CELSIUS
         self.temperature: float | None = None
@@ -44,7 +44,7 @@ class DPCodeInkbirdWrapper(TuyaDPCodeBase64Wrapper):
         self.battery: int | None = None
 
     def update_data(self, device: TuyaCustomerDevice) -> None:
-        if decoded_data := self.read_bytes(device):
+        if decoded_data := self.read_device_status(device):
             _temperature, _humidity, _, self.battery = struct.Struct("<hHIb").unpack(
                 decoded_data[1:11]
             )
