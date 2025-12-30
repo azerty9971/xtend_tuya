@@ -44,7 +44,7 @@ class DPCodeInkbirdWrapper(TuyaDPCodeRawWrapper):
         self.battery: int | None = None
 
     def update_data(self, device: TuyaCustomerDevice) -> None:
-        if decoded_data := self.read_device_status(device):
+        if decoded_data := super().read_device_status(device):
             _temperature, _humidity, _, self.battery = struct.Struct("<hHIb").unpack(
                 decoded_data[1:11]
             )
