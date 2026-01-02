@@ -347,7 +347,7 @@ class XTDevice(TuyaDevice):
         self, orig_status_code: str, new_status_code: str, skip_force_compatibility: bool = False
     ):
         if self.force_compatibility is True and skip_force_compatibility is False:
-            LOGGER.warning(f"Device {self.name} is set to force compatibility. Cannot replace status code {orig_status_code} with {new_status_code}.")
+            LOGGER.debug(f"Device {self.name} is set to force compatibility. Cannot replace status code {orig_status_code} with {new_status_code}.")
             return
         # LOGGER.debug(f"Replacing {orig_status} with {new_status} in {device.name}")
         if orig_status_code in self.status_range:
