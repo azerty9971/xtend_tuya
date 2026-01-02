@@ -628,8 +628,8 @@ class XTEntity(TuyaEntity):
                 return True, dpcode
             return False, dpcode
         else:
-            # if device.force_compatibility is True:
-            #    return False, dpcode
+            if device.force_compatibility is True:
+               return False, dpcode
 
             all_aliases = device.get_all_status_code_aliases()
             if current_status := all_aliases.get(dpcode):
