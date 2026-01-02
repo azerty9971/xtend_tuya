@@ -82,7 +82,7 @@ class XTMergingManager:
                 for msg in msg_queue:
                     multi_manager.device_watcher.report_message(device1.id, msg)
             else:
-                LOGGER.warning(f"Messages for merging of {higher_bak} and {lower_bak}:")
+                LOGGER.warning(f"Messages for merging of {higher_bak.name}({higher_bak.source}) and {lower_bak.name}({lower_bak.source}):")
                 for msg in msg_queue:
                     LOGGER.warning(msg)
 
