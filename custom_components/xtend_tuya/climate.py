@@ -425,6 +425,10 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
         temperature_unit: UnitOfTemperature,
     ) -> None:
         """Determine which values to use."""
+        device_manager.device_watcher.report_message(
+            device.id,
+            f"Creating XTClimateEntity for device {device.name} ({device.id}), wrappers: cur_temp({current_temperature_wrapper.dpcode if current_temperature_wrapper else 'None'}), set_temp({set_temperature_wrapper.dpcode if set_temperature_wrapper else 'None'}), hvac_mode({hvac_mode_wrapper.dpcode if hvac_mode_wrapper else 'None'}), fan_mode({fan_mode_wrapper.dpcode if fan_mode_wrapper else 'None'})",
+        )
         super(XTClimateEntity, self).__init__(device, device_manager, description)
         super(XTEntity, self).__init__(
             device,
