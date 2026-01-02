@@ -77,7 +77,7 @@ class XTMergingManager:
         if msg_queue:
             if multi_manager is not None:
                 multi_manager.device_watcher.report_message(
-                    device1.id, f"Messages for merging of {higher_bak} and {lower_bak}:"
+                    device1.id, f"Messages for merging of {higher_bak.name}({higher_bak.source}) and {lower_bak.name}({lower_bak.source}):"
                 )
                 for msg in msg_queue:
                     multi_manager.device_watcher.report_message(device1.id, msg)
