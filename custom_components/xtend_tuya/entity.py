@@ -637,7 +637,7 @@ class XTEntity(TuyaEntity):
                     XTEntity.is_dpcode_handled(device, platform, current_status)
                     is False
                 ):
-                    device.replace_status_code_with_another(current_status, dpcode)
+                    device.replace_status_code_with_another(current_status, dpcode, False)
                     return True, dpcode
         return False, dpcode
 
