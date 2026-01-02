@@ -103,11 +103,12 @@ class XTIRActionDPCodeWrapper(TuyaDPCodeWrapper):
             and self.description.ir_remote_information is not None
             and self.description.ir_hub_information is not None
         ):
-            self.multi_manager.send_ir_command(
+            XTEventLoopProtector.execute_out_of_event_loop(
+                self.multi_manager.send_ir_command,
                 device,
                 self.description.ir_key_information,
                 self.description.ir_remote_information,
-                self.description.ir_hub_information,
+                self.description.ir_hub_information
             )
         elif self.button_press_handler is not None:
             self.button_press_handler.fire_event()
