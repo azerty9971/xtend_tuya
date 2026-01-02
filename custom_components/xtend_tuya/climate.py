@@ -87,7 +87,10 @@ XT_CLIMATE_CURRENT_TEMPERATURE_DPCODES: tuple[XTDPCode, ...] = append_tuples(
     ),
     XT_CLIMATE_CURRENT_NON_UNIT_TEMPERATURE_DPCODES,
 )
-XT_CLIMATE_SET_CELSIUS_TEMPERATURE_DPCODES: tuple[XTDPCode, ...] = (XTDPCode.TEMP_SET,)
+XT_CLIMATE_SET_CELSIUS_TEMPERATURE_DPCODES: tuple[XTDPCode, ...] = (
+    XTDPCode.TEMP_SET,
+    XTDPCode.TEMPSET,
+)
 XT_CLIMATE_SET_FAHRENHEIT_TEMPERATURE_DPCODES: tuple[XTDPCode, ...] = (
     XTDPCode.TEMP_SET_F,
 )
@@ -200,6 +203,7 @@ CLIMATE_DESCRIPTIONS: dict[str, XTClimateEntityDescription] = {
     ),
 }
 
+
 class XTClimateSwingModeWrapper(TuyaClimateSwingModeWrapper):
     @classmethod
     def find_dpcode(cls, device: TuyaCustomerDevice) -> Self | None:
@@ -228,6 +232,7 @@ class XTClimateSwingModeWrapper(TuyaClimateSwingModeWrapper):
                 options=options,
             )
         return None
+
 
 def _get_temperature_wrappers(
     device: XTDevice, system_temperature_unit: UnitOfTemperature
@@ -334,11 +339,8 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if (
-                    device_descriptor
-                    := XTEntityDescriptorManager.get_category_descriptors(
-                        supported_descriptors, device.category
-                    )
+                if device_descriptor := XTEntityDescriptorManager.get_category_descriptors(
+                    supported_descriptors, device.category
                 ):
                     temperature_wrappers = _get_temperature_wrappers(
                         device, hass.config.units.temperature_unit
