@@ -637,7 +637,9 @@ class XTEntity(TuyaEntity):
                     XTEntity.is_dpcode_handled(device, platform, current_status)
                     is False
                 ):
-                    device.replace_status_code_with_another(current_status, dpcode)
+                    # Remapping DPCode is not allowed in the new DPCode wrapper paradigm, this might cause issues
+                    # but for now I don't see a better way to handle this
+                    # device.replace_status_code_with_another(current_status, dpcode, False)
                     return True, dpcode
         return False, dpcode
 
