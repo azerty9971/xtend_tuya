@@ -27,6 +27,7 @@ from .const import (
     TUYA_DISCOVERY_NEW,
     XTDPCode,
     XTMultiManagerPostSetupCallbackPriority,
+    LOGGER,  # noqa: F401
 )
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaCoverEntity,
@@ -400,49 +401,12 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         current_cover_position = super().current_cover_position
         if current_cover_position is not None:
             if self.is_cover_status_inverted and self._current_position is not None:
-                return round(
+                current_cover_position = round(
                     self._current_position.get_remap_helper().remap_value_to(
                         current_cover_position, reverse=True
                     )
                 )
         return current_cover_position
-
-    @property
-    def real_current_cover_position(self) -> int | None:
-        """Return cover current position."""
-        if self._current_position is None:
-            return None
-
-        if (position := self.device.status.get(self._current_position.dpcode)) is None:
-            return None
-
-        return round(
-            self._current_position.get_remap_helper().remap_value_to(
-                position, reverse=True
-            )
-        )
-
-    @property
-    def is_closed(self) -> bool | None:
-        """Return true if cover is closed."""
-        computed_position = 0
-        if self.is_cover_status_inverted:
-            computed_position = 100
-
-        current_state = None
-        if self.entity_description.current_state is not None:
-            current_state = self.device.status.get(
-                self.entity_description.current_state
-            )
-            if current_state is not None:
-                return (
-                    current_state in (True, "fully_close")
-                ) is not self.is_cover_status_inverted
-
-        position = self.real_current_cover_position
-        if position is not None:
-            return position == computed_position
-        return None
 
     async def async_open_cover(self, **kwargs: Any) -> None:
         """Open the cover."""
