@@ -27,7 +27,7 @@ from .const import (
     TUYA_DISCOVERY_NEW,
     XTDPCode,
     XTMultiManagerPostSetupCallbackPriority,
-    LOGGER,
+    LOGGER,  # noqa: F401
 )
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaCoverEntity,
@@ -406,7 +406,6 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
                         current_cover_position, reverse=True
                     )
                 )
-        LOGGER.warning("Current cover position: %s", current_cover_position)
         return current_cover_position
 
     async def async_open_cover(self, **kwargs: Any) -> None:
