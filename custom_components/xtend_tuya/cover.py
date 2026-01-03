@@ -27,6 +27,7 @@ from .const import (
     TUYA_DISCOVERY_NEW,
     XTDPCode,
     XTMultiManagerPostSetupCallbackPriority,
+    LOGGER,
 )
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaCoverEntity,
@@ -400,27 +401,13 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         current_cover_position = super().current_cover_position
         if current_cover_position is not None:
             if self.is_cover_status_inverted and self._current_position is not None:
-                return round(
+                current_cover_position = round(
                     self._current_position.get_remap_helper().remap_value_to(
                         current_cover_position, reverse=True
                     )
                 )
+        LOGGER.warning("Current cover position: %s", current_cover_position)
         return current_cover_position
-
-    @property
-    def real_current_cover_position(self) -> int | None:
-        """Return cover current position."""
-        if self._current_position is None:
-            return None
-
-        if (position := self.device.status.get(self._current_position.dpcode)) is None:
-            return None
-
-        return round(
-            self._current_position.get_remap_helper().remap_value_to(
-                position, reverse=True
-            )
-        )
 
     @property
     def is_closed(self) -> bool | None:
