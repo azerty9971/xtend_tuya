@@ -439,7 +439,7 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
                     current_state in (True, "fully_close")
                 ) is not self.is_cover_status_inverted
 
-        position = self.real_current_cover_position
+        position = self.current_cover_position
         if position is not None:
             return position == computed_position
         return None
