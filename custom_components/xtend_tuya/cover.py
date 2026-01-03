@@ -409,28 +409,6 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         LOGGER.warning("Current cover position: %s", current_cover_position)
         return current_cover_position
 
-    @property
-    def is_closed(self) -> bool | None:
-        """Return true if cover is closed."""
-        computed_position = 0
-        if self.is_cover_status_inverted:
-            computed_position = 100
-
-        current_state = None
-        if self.entity_description.current_state is not None:
-            current_state = self.device.status.get(
-                self.entity_description.current_state
-            )
-            if current_state is not None:
-                return (
-                    current_state in (True, "fully_close")
-                ) is not self.is_cover_status_inverted
-
-        position = self.current_cover_position
-        if position is not None:
-            return position == computed_position
-        return None
-
     async def async_open_cover(self, **kwargs: Any) -> None:
         """Open the cover."""
         if self.is_cover_control_inverted:
