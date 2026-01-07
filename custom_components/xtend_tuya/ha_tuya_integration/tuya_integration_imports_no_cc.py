@@ -30,6 +30,7 @@ from homeassistant.components.tuya.climate import (
     TUYA_HVAC_TO_HA as TuyaClimateHVACToHA,  # noqa: F401
     _RoundedIntegerWrapper as TuyaClimateRoundedIntegerWrapper,  # noqa: F401
     _get_temperature_wrapper as tuya_climate_get_temperature_wrapper,  # noqa: F401
+    _SwingModeWrapper as TuyaClimateSwingModeWrapper,  # noqa: F401
 )
 from homeassistant.components.tuya.cover import (
     COVERS as COVERS_TUYA,  # noqa: F401
@@ -37,7 +38,6 @@ from homeassistant.components.tuya.cover import (
     TuyaCoverEntityDescription as TuyaCoverEntityDescription,
     _DPCodePercentageMappingWrapper as TuyaCoverDPCodePercentageMappingWrapper,  # noqa: F401
     _IsClosedWrapper as TuyaCoverIsClosedWrapper,  # noqa: F401
-    _InstructionWrapper as TuyaCoverInstructionWrapper,  # noqa: F401
     _get_instruction_wrapper as tuya_cover_get_instruction_wrapper,  # noqa: F401
 )
 from homeassistant.components.event import (
@@ -147,16 +147,27 @@ try:
     from homeassistant.components.tuya.util import (
         _DPTYPE_MAPPING as TUYA_DPTYPE_MAPPING,  # noqa: F401 # type: ignore
         parse_dptype as tuya_util_parse_dptype,  # noqa: F401
+        RemapHelper as TuyaRemapHelper,  # noqa: F401
     )
 except Exception:
     from homeassistant.components.tuya.entity import (
         _DPTYPE_MAPPING as TUYA_DPTYPE_MAPPING,  # noqa: F401 # type: ignore
     )
 
+from homeassistant.components.tuya.type_information import (
+    TypeInformation as TuyaTypeInformation,  # noqa: F401
+    BooleanTypeInformation as TuyaBooleanTypeInformation,  # noqa: F401
+    EnumTypeInformation as TuyaEnumTypeInformation,  # noqa: F401
+    IntegerTypeInformation as TuyaIntegerTypeInformation,  # noqa: F401
+    BitmapTypeInformation as TuyaBitmapTypeInformation,  # noqa: F401
+    StringTypeInformation as TuyaStringTypeInformation,  # noqa: F401
+    JsonTypeInformation as TuyaJsonTypeInformation,  # noqa: F401
+    RawTypeInformation as TuyaRawTypeInformation,  # noqa: F401
+    _should_log_warning as tuya_type_information_should_log_warning,  # noqa: F401
+)
+
 try:
     from homeassistant.components.tuya.models import (
-        EnumTypeData as TuyaEnumTypeData,  # noqa: F401
-        IntegerTypeData as TuyaIntegerTypeData,  # noqa: F401
         DPCodeWrapper as TuyaDPCodeWrapper,  # noqa: F401
         DPCodeTypeInformationWrapper as TuyaDPCodeTypeInformationWrapper,  # noqa: F401
         DPCodeBooleanWrapper as TuyaDPCodeBooleanWrapper,  # noqa: F401
@@ -164,10 +175,9 @@ try:
         DPCodeIntegerWrapper as TuyaDPCodeIntegerWrapper,  # noqa: F401
         DPCodeBitmapBitWrapper as TuyaDPCodeBitmapBitWrapper,  # noqa: F401
         DPCodeStringWrapper as TuyaDPCodeStringWrapper,  # noqa: F401
-        DPCodeBase64Wrapper as TuyaDPCodeBase64Wrapper,  # noqa: F401
-        find_dpcode as tuya_find_dpcode,  # noqa: F401
-        TypeInformation as TuyaTypeInformation,  # noqa: F401
-        _TYPE_INFORMATION_MAPPINGS as TUYA_TYPE_INFORMATION_MAPPINGS,  # noqa: F401
+        DPCodeJsonWrapper as TuyaDPCodeJsonWrapper,  # noqa: F401
+        DPCodeRawWrapper as TuyaDPCodeRawWrapper,  # noqa: F401
+        DeviceWrapper as TuyaDeviceWrapper,  # noqa: F401
     )
 except Exception:
     from homeassistant.components.tuya.entity import (

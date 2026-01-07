@@ -77,12 +77,12 @@ class XTMergingManager:
         if msg_queue:
             if multi_manager is not None:
                 multi_manager.device_watcher.report_message(
-                    device1.id, f"Messages for merging of {higher_bak} and {lower_bak}:"
+                    device1.id, f"Messages for merging of {higher_bak.name}({higher_bak.source}) and {lower_bak.name}({lower_bak.source}):"
                 )
                 for msg in msg_queue:
                     multi_manager.device_watcher.report_message(device1.id, msg)
             else:
-                LOGGER.warning(f"Messages for merging of {higher_bak} and {lower_bak}:")
+                LOGGER.warning(f"Messages for merging of {higher_bak.name}({higher_bak.source}) and {lower_bak.name}({lower_bak.source}):")
                 for msg in msg_queue:
                     LOGGER.warning(msg)
 
@@ -116,7 +116,7 @@ class XTMergingManager:
                     if status in status_alias and status_code is not None:
                         # Replace status_code with status in the device
                         device.replace_status_code_with_another(
-                            str(status_code), status
+                            str(status_code), status, True
                         )
 
     @staticmethod

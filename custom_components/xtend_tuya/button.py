@@ -1,7 +1,7 @@
 """Support for XT buttons."""
 
 from __future__ import annotations
-from typing import cast
+from typing import cast, Any
 from dataclasses import dataclass, field
 from homeassistant.const import EntityCategory, Platform
 from homeassistant.core import HomeAssistant, callback
@@ -35,6 +35,8 @@ from .ha_tuya_integration.tuya_integration_imports import (
     TuyaButtonEntity,
     TuyaButtonEntityDescription,
     TuyaDPCodeBooleanWrapper,
+    TuyaDPCodeWrapper,
+    TuyaCustomerDevice,
 )
 from .entity import (
     XTEntity,
@@ -46,6 +48,71 @@ from .multi_manager.shared.data_entry.ir_device_data_entry import (
     XTDataEntryAddIRDeviceKey,
     XTDataEntryManager,
 )
+
+
+class XTIRActionDPCodeWrapper(TuyaDPCodeWrapper):
+    """XT IR Action DPCode Wrapper."""
+
+    def __init__(
+        self, description: XTButtonEntityDescription, multi_manager: MultiManager, device: XTDevice
+    ) -> None:
+        super().__init__(description.key)
+        self.multi_manager = multi_manager
+        self.description = description
+        self.device = device
+        self.button_press_handler: XTDataEntryManager | None = None
+        if (
+            self.description.is_ir_descriptor
+            and self.description.ir_remote_information is not None
+            and self.description.ir_hub_information is not None
+        ):
+            self.button_press_handler = XTDataEntryAddIRDeviceKey(
+                source=XTDiscoverySource.SOURCE_ADD_IR_DEVICE_KEY,
+                hass=multi_manager.hass,
+                multi_manager=multi_manager,
+                device=device,
+                hub=self.description.ir_hub_information,
+                remote=self.description.ir_remote_information,
+            )
+        elif (
+            self.description.is_ir_descriptor
+            and self.description.ir_hub_information is not None
+        ):
+            self.button_press_handler = XTDataEntryAddIRDevice(
+                source=XTDiscoverySource.SOURCE_ADD_IR_DEVICE,
+                hass=multi_manager.hass,
+                multi_manager=multi_manager,
+                device=device,
+                hub=self.description.ir_hub_information,
+            )
+
+    def _convert_value_to_raw_value(
+        self, device: TuyaCustomerDevice, value: bool
+    ) -> Any:
+        """Convert a Home Assistant value back to a raw device value."""
+        return True  # Always send True to trigger the action
+
+    def get_update_commands( # pyright: ignore[reportIncompatibleMethodOverride]
+        self,
+        device: XTDevice,
+        value: Any,
+    ) -> list[dict[str, Any]]:
+        if (
+            self.description.is_ir_descriptor
+            and self.description.ir_key_information is not None
+            and self.description.ir_remote_information is not None
+            and self.description.ir_hub_information is not None
+        ):
+            XTEventLoopProtector.execute_out_of_event_loop(
+                self.multi_manager.send_ir_command,
+                device,
+                self.description.ir_key_information,
+                self.description.ir_remote_information,
+                self.description.ir_hub_information
+            )
+        elif self.button_press_handler is not None:
+            self.button_press_handler.fire_event()
+        return []
 
 
 @dataclass(frozen=True)
@@ -197,10 +264,10 @@ async def async_setup_entry(
         for device_id in device_ids:
             if hub_device := hass_data.manager.device_map.get(device_id):
                 if hub_device.category in IR_HUB_CATEGORY_LIST:
-                    hub_information: (
-                        XTIRHubInformation | None
-                    ) = await XTEventLoopProtector.execute_out_of_event_loop_and_return(
-                        hass_data.manager.get_ir_hub_information, hub_device
+                    hub_information: XTIRHubInformation | None = (
+                        await XTEventLoopProtector.execute_out_of_event_loop_and_return(
+                            hass_data.manager.get_ir_hub_information, hub_device
+                        )
                     )
                     if hub_information is None:
                         continue
@@ -224,17 +291,17 @@ async def async_setup_entry(
                         entity_registry_enabled_default=True,
                         entity_registry_visible_default=True,
                     )
-                    if dpcode_wrapper := TuyaDPCodeBooleanWrapper.find_dpcode(
-                        hub_device, descriptor.key, prefer_function=True
-                    ):
-                        entities.append(
-                            XTButtonEntity.get_entity_instance(
-                                descriptor,
-                                hub_device,
-                                hass_data.manager,
-                                dpcode_wrapper,
-                            )
+                    dpcode_wrapper = XTIRActionDPCodeWrapper(
+                        descriptor, hass_data.manager, hub_device
+                    )
+                    entities.append(
+                        XTButtonEntity.get_entity_instance(
+                            descriptor,
+                            hub_device,
+                            hass_data.manager,
+                            dpcode_wrapper, # type: ignore
                         )
+                    )
 
                     for remote_information in hub_information.remote_ids:
                         if remote_device := hass_data.manager.device_map.get(
@@ -251,17 +318,17 @@ async def async_setup_entry(
                                 entity_registry_enabled_default=True,
                                 entity_registry_visible_default=True,
                             )
-                            if dpcode_wrapper := TuyaDPCodeBooleanWrapper.find_dpcode(
-                                remote_device, descriptor.key, prefer_function=True
-                            ):
-                                entities.append(
-                                    XTButtonEntity.get_entity_instance(
-                                        descriptor,
-                                        remote_device,
-                                        hass_data.manager,
-                                        dpcode_wrapper,
-                                    )
+                            dpcode_wrapper = XTIRActionDPCodeWrapper(
+                                descriptor, hass_data.manager, hub_device
+                            )
+                            entities.append(
+                                XTButtonEntity.get_entity_instance(
+                                    descriptor,
+                                    remote_device,
+                                    hass_data.manager,
+                                    dpcode_wrapper, # type: ignore
                                 )
+                            )
                             for remote_key in remote_information.keys:
                                 descriptor = XTButtonEntityDescription(
                                     key=f"xt_ir_key_{remote_key.key}",
@@ -276,22 +343,17 @@ async def async_setup_entry(
                                     entity_registry_enabled_default=True,
                                     entity_registry_visible_default=True,
                                 )
-                                if (
-                                    dpcode_wrapper
-                                    := TuyaDPCodeBooleanWrapper.find_dpcode(
+                                dpcode_wrapper = XTIRActionDPCodeWrapper(
+                                    descriptor, hass_data.manager, hub_device
+                                )
+                                entities.append(
+                                    XTButtonEntity.get_entity_instance(
+                                        descriptor,
                                         remote_device,
-                                        remote_key.key,
-                                        prefer_function=True,
+                                        hass_data.manager,
+                                        dpcode_wrapper, # type: ignore
                                     )
-                                ):
-                                    entities.append(
-                                        XTButtonEntity.get_entity_instance(
-                                            descriptor,
-                                            remote_device,
-                                            hass_data.manager,
-                                            dpcode_wrapper,
-                                        )
-                                    )
+                                )
         async_add_entities(entities)
 
     @callback
@@ -307,11 +369,8 @@ async def async_setup_entry(
                     hass_data.manager.set_general_property(
                         XTMultiManagerProperties.IR_DEVICE_ID, device.id
                     )
-                if (
-                    category_descriptions
-                    := XTEntityDescriptorManager.get_category_descriptors(
-                        supported_descriptors, device.category
-                    )
+                if category_descriptions := XTEntityDescriptorManager.get_category_descriptors(
+                    supported_descriptors, device.category
                 ):
                     externally_managed_dpcodes = (
                         XTEntityDescriptorManager.get_category_keys(
@@ -372,13 +431,10 @@ async def async_setup_entry(
                         ):
                             for reset_state in description.vf_reset_state:
                                 if reset_state in device.status:
-                                    if (
-                                        dpcode_wrapper
-                                        := TuyaDPCodeBooleanWrapper.find_dpcode(
-                                            device,
-                                            description.key,
-                                            prefer_function=True,
-                                        )
+                                    if dpcode_wrapper := TuyaDPCodeBooleanWrapper.find_dpcode(
+                                        device,
+                                        description.key,
+                                        prefer_function=True,
                                     ):
                                         entities.append(
                                             XTButtonEntity.get_entity_instance(
@@ -432,31 +488,6 @@ class XTButtonEntity(XTEntity, TuyaButtonEntity):
         self.device_manager = device_manager
         self.entity_description = description
         self._entity_description = description
-        self._button_press_handler: XTDataEntryManager | None = None
-        if (
-            self._entity_description.is_ir_descriptor
-            and self._entity_description.ir_remote_information is not None
-            and self._entity_description.ir_hub_information is not None
-        ):
-            self._button_press_handler = XTDataEntryAddIRDeviceKey(
-                source=XTDiscoverySource.SOURCE_ADD_IR_DEVICE_KEY,
-                hass=device_manager.hass,
-                multi_manager=device_manager,
-                device=device,
-                hub=self._entity_description.ir_hub_information,
-                remote=self._entity_description.ir_remote_information,
-            )
-        elif (
-            self._entity_description.is_ir_descriptor
-            and self._entity_description.ir_hub_information is not None
-        ):
-            self._button_press_handler = XTDataEntryAddIRDevice(
-                source=XTDiscoverySource.SOURCE_ADD_IR_DEVICE,
-                hass=device_manager.hass,
-                multi_manager=device_manager,
-                device=device,
-                hub=self._entity_description.ir_hub_information,
-            )
 
     @staticmethod
     def get_entity_instance(
@@ -477,22 +508,3 @@ class XTButtonEntity(XTEntity, TuyaButtonEntity):
             XTButtonEntityDescription(**description.__dict__),
             dpcode_wrapper,
         )
-
-    def press(self) -> None:
-        """Press the button."""
-        if (
-            self._entity_description.is_ir_descriptor
-            and self._entity_description.ir_key_information is not None
-            and self._entity_description.ir_remote_information is not None
-            and self._entity_description.ir_hub_information is not None
-        ):
-            self.device_manager.send_ir_command(
-                self.device,
-                self._entity_description.ir_key_information,
-                self._entity_description.ir_remote_information,
-                self._entity_description.ir_hub_information,
-            )
-        elif self._button_press_handler is not None:
-            self._button_press_handler.fire_event()
-        else:
-            super().press()
