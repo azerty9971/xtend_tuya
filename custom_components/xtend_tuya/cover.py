@@ -311,6 +311,7 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         tilt_position: TuyaCoverDPCodePercentageMappingWrapper | None,
     ) -> None:
         """Initialize the cover entity."""
+        device_manager.device_watcher.report_message(device.id, f"Initializing cover entity {device.name}: current_position: {current_position.dpcode if current_position else None}, set_position: {set_position.dpcode if set_position else None}", device)
         super(XTCoverEntity, self).__init__(device, device_manager, description)
         super(XTEntity, self).__init__(
             device,
