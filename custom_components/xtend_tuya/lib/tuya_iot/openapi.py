@@ -182,6 +182,8 @@ class TuyaOpenAPI:
     def test_validity(self) -> bool:
         response = self.get("/v2.0/cloud/space/child")
         if success := response.get("success", False):
+            if success is False:
+                logger.error(f"Test API validity failed: AuthType: {self.auth_type} <=> {response}")
             return success is True
         return False
 
