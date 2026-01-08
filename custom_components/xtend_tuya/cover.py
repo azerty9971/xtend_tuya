@@ -415,6 +415,7 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
             await self._async_send_commands(
                 self._set_position.get_update_commands(self.device, 100)
             )
+            return
         
         if (
             self._instruction_wrapper
@@ -437,6 +438,7 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
             await self._async_send_commands(
                 self._set_position.get_update_commands(self.device, 0)
             )
+            return
         
         if (
             self._instruction_wrapper
