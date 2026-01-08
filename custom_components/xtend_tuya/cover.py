@@ -112,7 +112,7 @@ COVERS: dict[str, tuple[XTCoverEntityDescription, ...]] = {
             key=XTDPCode.CONTROL,
             translation_key="curtain",
             current_state=XTDPCode.SITUATION_SET,
-            current_position=(XTDPCode.PERCENT_STATE, XTDPCode.PERCENT_CONTROL),
+            current_position=(XTDPCode.PERCENT_CONTROL, XTDPCode.PERCENT_STATE),
             set_position=XTDPCode.PERCENT_CONTROL,
             device_class=CoverDeviceClass.CURTAIN,
             control_back_mode=XTDPCode.CONTROL_BACK_MODE,
@@ -120,7 +120,7 @@ COVERS: dict[str, tuple[XTCoverEntityDescription, ...]] = {
         XTCoverEntityDescription(
             key=XTDPCode.CONTROL_2,
             translation_key="curtain_2",
-            current_position=(XTDPCode.PERCENT_STATE_2, XTDPCode.PERCENT_CONTROL_2),
+            current_position=(XTDPCode.PERCENT_CONTROL_2, XTDPCode.PERCENT_STATE_2),
             set_position=XTDPCode.PERCENT_CONTROL_2,
             device_class=CoverDeviceClass.CURTAIN,
             control_back_mode=XTDPCode.CONTROL_BACK_MODE,
@@ -128,7 +128,7 @@ COVERS: dict[str, tuple[XTCoverEntityDescription, ...]] = {
         XTCoverEntityDescription(
             key=XTDPCode.CONTROL_3,
             translation_key="curtain_3",
-            current_position=(XTDPCode.PERCENT_STATE_3, XTDPCode.PERCENT_CONTROL_3),
+            current_position=(XTDPCode.PERCENT_CONTROL_3, XTDPCode.PERCENT_STATE_3),
             set_position=XTDPCode.PERCENT_CONTROL_3,
             device_class=CoverDeviceClass.CURTAIN,
             control_back_mode=XTDPCode.CONTROL_BACK_MODE,
@@ -311,6 +311,7 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         tilt_position: TuyaCoverDPCodePercentageMappingWrapper | None,
     ) -> None:
         """Initialize the cover entity."""
+        device_manager.device_watcher.report_message(device.id, f"Initializing cover entity {device.name}: current_position: {current_position.dpcode if current_position else None}, set_position: {set_position.dpcode if set_position else None}", device)
         super(XTCoverEntity, self).__init__(device, device_manager, description)
         super(XTEntity, self).__init__(
             device,
@@ -408,18 +409,50 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
                 )
         return current_cover_position
 
+    async def _async_open_cover(self, **kwargs: Any) -> None:
+        """Open the cover."""
+        if self._set_position is not None:
+            await self._async_send_commands(
+                self._set_position.get_update_commands(self.device, 100)
+            )
+            return
+        
+        if (
+            self._instruction_wrapper
+            and (options := self._instruction_wrapper.options)
+            and "open" in options
+        ):
+            await self._async_send_wrapper_updates(self._instruction_wrapper, "open")
+            return
+
     async def async_open_cover(self, **kwargs: Any) -> None:
         """Open the cover."""
         if self.is_cover_control_inverted:
-            await super().async_close_cover(**kwargs)
+            await self._async_close_cover(**kwargs)
         else:
-            await super().async_open_cover(**kwargs)
+            await self._async_open_cover(**kwargs)
+    
+    async def _async_close_cover(self, **kwargs: Any) -> None:
+        """Close cover."""
+        if self._set_position is not None:
+            await self._async_send_commands(
+                self._set_position.get_update_commands(self.device, 0)
+            )
+            return
+        
+        if (
+            self._instruction_wrapper
+            and (options := self._instruction_wrapper.options)
+            and "close" in options
+        ):
+            await self._async_send_wrapper_updates(self._instruction_wrapper, "close")
+            return
 
     async def async_close_cover(self, **kwargs: Any) -> None:
         if self.is_cover_control_inverted:
-            await super().async_open_cover(**kwargs)
+            await self._async_open_cover(**kwargs)
         else:
-            await super().async_close_cover(**kwargs)
+            await self._async_close_cover(**kwargs)
 
     async def async_set_cover_position(self, **kwargs: Any) -> None:
         """Move the cover to a specific position."""
