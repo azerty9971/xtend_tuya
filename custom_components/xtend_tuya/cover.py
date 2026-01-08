@@ -112,7 +112,7 @@ COVERS: dict[str, tuple[XTCoverEntityDescription, ...]] = {
             key=XTDPCode.CONTROL,
             translation_key="curtain",
             current_state=XTDPCode.SITUATION_SET,
-            current_position=(XTDPCode.PERCENT_STATE, XTDPCode.PERCENT_CONTROL),
+            current_position=(XTDPCode.PERCENT_CONTROL, XTDPCode.PERCENT_STATE),
             set_position=XTDPCode.PERCENT_CONTROL,
             device_class=CoverDeviceClass.CURTAIN,
             control_back_mode=XTDPCode.CONTROL_BACK_MODE,
@@ -120,7 +120,7 @@ COVERS: dict[str, tuple[XTCoverEntityDescription, ...]] = {
         XTCoverEntityDescription(
             key=XTDPCode.CONTROL_2,
             translation_key="curtain_2",
-            current_position=(XTDPCode.PERCENT_STATE_2, XTDPCode.PERCENT_CONTROL_2),
+            current_position=(XTDPCode.PERCENT_CONTROL_2, XTDPCode.PERCENT_STATE_2),
             set_position=XTDPCode.PERCENT_CONTROL_2,
             device_class=CoverDeviceClass.CURTAIN,
             control_back_mode=XTDPCode.CONTROL_BACK_MODE,
@@ -128,7 +128,7 @@ COVERS: dict[str, tuple[XTCoverEntityDescription, ...]] = {
         XTCoverEntityDescription(
             key=XTDPCode.CONTROL_3,
             translation_key="curtain_3",
-            current_position=(XTDPCode.PERCENT_STATE_3, XTDPCode.PERCENT_CONTROL_3),
+            current_position=(XTDPCode.PERCENT_CONTROL_3, XTDPCode.PERCENT_STATE_3),
             set_position=XTDPCode.PERCENT_CONTROL_3,
             device_class=CoverDeviceClass.CURTAIN,
             control_back_mode=XTDPCode.CONTROL_BACK_MODE,
