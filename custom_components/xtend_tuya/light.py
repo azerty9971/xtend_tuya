@@ -2,9 +2,18 @@
 
 from __future__ import annotations
 from typing import cast
+import json
 from dataclasses import dataclass
 from homeassistant.const import EntityCategory, Platform
 from homeassistant.core import HomeAssistant, callback
+from homeassistant.components.light import (
+    ATTR_HS_COLOR,
+    ATTR_BRIGHTNESS,
+    ATTR_COLOR_TEMP_KELVIN,
+    ColorMode,
+)
+from homeassistant.util.color import color_temperature_kelvin_to_mired
+from .multi_manager.shared.threading import XTEventLoopProtector
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from .util import (
@@ -95,6 +104,15 @@ LIGHTS: dict[str, tuple[XTLightEntityDescription, ...]] = {
             key=XTDPCode.LIGHT,
             translation_key="light",
             entity_category=EntityCategory.CONFIG,
+        ),
+    ),
+    "dj": (
+        XTLightEntityDescription(
+            key="switch",
+            translation_key="light",
+            brightness=("brightness_control",),
+            color_temp=("color_temp_control",),
+            color_data=("control_data", "hs_color_set"),
         ),
     ),
 }
@@ -325,6 +343,56 @@ class XTLightEntity(XTEntity, TuyaLightEntity):
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description
+
+    async def async_turn_on(self, **kwargs):
+        if self.device.category == "dj":
+            cmds: list[dict] = []
+            cmds.append({"code": "switch", "value": True})
+
+            if ATTR_BRIGHTNESS in kwargs:
+                bri = max(1, min(254, int(kwargs[ATTR_BRIGHTNESS])))
+                cmds.append({"code": "brightness_control", "value": bri})
+
+            if ATTR_COLOR_TEMP_KELVIN in kwargs:
+                mired = int(
+                    round(color_temperature_kelvin_to_mired(kwargs[ATTR_COLOR_TEMP_KELVIN]))
+                )
+                ct = max(153, min(370, mired))
+                cmds.append({"code": "color_temp_control", "value": ct})
+                self._attr_color_mode = ColorMode.COLOR_TEMP
+                self._attr_color_temp_kelvin = kwargs[ATTR_COLOR_TEMP_KELVIN]
+
+            if ATTR_HS_COLOR in kwargs:
+                h, s_pct = kwargs[ATTR_HS_COLOR]
+                v = kwargs.get(ATTR_BRIGHTNESS, getattr(self, "brightness", 255) or 255)
+                h_i = int(round(h))
+                s_i = int(round(s_pct * 255 / 100))
+                v_i = int(round(max(0, min(255, v))))
+                bri_for_color = max(1, min(254, v_i))
+                cmds.append({"code": "brightness_control", "value": bri_for_color})
+                h_byte = int(round((h_i % 360) * 255 / 360))
+                hs_hex = f"{h_byte:02x}{s_i:02x}"
+                cmds.append({"code": "hs_color_set", "value": hs_hex})
+                cmds.append(
+                    {
+                        "code": "control_data",
+                        "value": json.dumps({"h": h_i, "s": s_i, "v": v_i}),
+                    }
+                )
+                self._attr_color_mode = ColorMode.HS
+                self._attr_hs_color = (float(h), float(s_pct))
+                self._attr_brightness = int(v)
+
+            if len(cmds) == 1:
+                return await super().async_turn_on(**kwargs)
+
+            await XTEventLoopProtector.execute_out_of_event_loop_and_return(
+                self.device_manager.send_commands, self.device.id, cmds
+            )
+            self.async_write_ha_state()
+            return
+
+        return await super().async_turn_on(**kwargs)
 
     @staticmethod
     def get_entity_instance(
