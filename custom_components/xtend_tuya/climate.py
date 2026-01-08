@@ -10,6 +10,7 @@ from homeassistant.components.climate.const import (
     SWING_ON,
     SWING_HORIZONTAL,
     SWING_VERTICAL,
+    ClimateEntityFeature,
 )
 from homeassistant.const import UnitOfTemperature, Platform
 from homeassistant.core import HomeAssistant, callback
@@ -447,6 +448,32 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description
+
+        # Re-determine HVAC modes
+        self._attr_hvac_modes: list[HVACMode] = []
+        self._hvac_to_tuya = {}
+        if hvac_mode_wrapper:
+            self._attr_hvac_modes = [HVACMode.OFF]
+            unknown_hvac_modes: list[str] = []
+            for tuya_mode in hvac_mode_wrapper.options:
+                if tuya_mode in XT_HVAC_TO_HA:
+                    ha_mode = XT_HVAC_TO_HA[tuya_mode]
+                    self._hvac_to_tuya[ha_mode] = tuya_mode
+                    self._attr_hvac_modes.append(ha_mode)
+                else:
+                    unknown_hvac_modes.append(tuya_mode)
+
+            self._attr_preset_modes = unknown_hvac_modes
+            if unknown_hvac_modes:  # Tuya modes are presets instead of hvac_modes
+                self._attr_hvac_modes.append(description.switch_only_hvac_mode)
+                self._attr_supported_features |= ClimateEntityFeature.PRESET_MODE
+            else:
+                self._attr_supported_features &= ~ClimateEntityFeature.PRESET_MODE
+        elif switch_wrapper:
+            self._attr_hvac_modes = [
+                HVACMode.OFF,
+                description.switch_only_hvac_mode,
+            ]
 
     @staticmethod
     def get_entity_instance(
