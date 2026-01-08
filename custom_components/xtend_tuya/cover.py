@@ -409,18 +409,48 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
                 )
         return current_cover_position
 
+    async def _async_open_cover(self, **kwargs: Any) -> None:
+        """Open the cover."""
+        if self._set_position is not None:
+            await self._async_send_commands(
+                self._set_position.get_update_commands(self.device, 100)
+            )
+        
+        if (
+            self._instruction_wrapper
+            and (options := self._instruction_wrapper.options)
+            and "open" in options
+        ):
+            await self._async_send_wrapper_updates(self._instruction_wrapper, "open")
+            return
+
     async def async_open_cover(self, **kwargs: Any) -> None:
         """Open the cover."""
         if self.is_cover_control_inverted:
-            await super().async_close_cover(**kwargs)
+            await self._async_close_cover(**kwargs)
         else:
-            await super().async_open_cover(**kwargs)
+            await self._async_open_cover(**kwargs)
+    
+    async def _async_close_cover(self, **kwargs: Any) -> None:
+        """Close cover."""
+        if self._set_position is not None:
+            await self._async_send_commands(
+                self._set_position.get_update_commands(self.device, 0)
+            )
+        
+        if (
+            self._instruction_wrapper
+            and (options := self._instruction_wrapper.options)
+            and "close" in options
+        ):
+            await self._async_send_wrapper_updates(self._instruction_wrapper, "close")
+            return
 
     async def async_close_cover(self, **kwargs: Any) -> None:
         if self.is_cover_control_inverted:
-            await super().async_open_cover(**kwargs)
+            await self._async_open_cover(**kwargs)
         else:
-            await super().async_close_cover(**kwargs)
+            await self._async_close_cover(**kwargs)
 
     async def async_set_cover_position(self, **kwargs: Any) -> None:
         """Move the cover to a specific position."""
