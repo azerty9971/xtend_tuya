@@ -648,9 +648,12 @@ class SmartHomeDeviceManage(DeviceManage):
     def send_commands(
         self, device_id: str, commands: list[dict[str, Any]]
     ) -> dict[str, Any]:
-        return self.api.post(
+        return_value = self.api.post(
             f"/v1.0/devices/{device_id}/commands", {"commands": commands}
         )
+        if return_value.get("success") is False:
+            raise Exception(f"send_commands error:({commands}): {return_value}")
+        return return_value
 
 
 class IndustrySolutionDeviceManage(DeviceManage):
