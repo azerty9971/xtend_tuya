@@ -386,8 +386,10 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
                 )
             return True
         except Exception as e:
-            LOGGER.warning(
-                f"[Sharing]Send command failed, device id: {device_id}, commands: {regular_commands}, exception: {e}"
+            self.multi_manager.device_watcher.report_message(
+                device_id,
+                f"[Sharing]Send command failed, device id: {device_id}, commands: {regular_commands}, exception: {e}",
+                device=device,
             )
         return False
 
