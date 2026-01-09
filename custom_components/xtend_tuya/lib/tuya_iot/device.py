@@ -170,7 +170,9 @@ class TuyaDeviceManager:
         protocol = msg.get("protocol", 0)
         data = msg.get("data", {})
         if protocol == PROTOCOL_DEVICE_REPORT:
-            self._on_device_report(data["devId"], data["status"])
+            logger.debug(f"mq on_message data -> {data}")
+            if status := data.get("status", None):
+                self._on_device_report(data["devId"], status)
         elif protocol == PROTOCOL_OTHER:
             self._on_device_other(data["devId"], data["bizCode"], data)
 
