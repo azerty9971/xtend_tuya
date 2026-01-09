@@ -72,14 +72,15 @@ class HomeAssistantXTData(NamedTuple):
 
 type XTConfigEntry = ConfigEntry[HomeAssistantXTData]
 
-
 @dataclass
-class XTDeviceStatusRange:
+class XTDeviceStatusFunctionShared:
     code: str = ""
     type: TuyaDPType | None = None
     values: str = "{}"
     dp_id: int = 0
 
+@dataclass
+class XTDeviceStatusRange(XTDeviceStatusFunctionShared):
     def __repr__(self) -> str:
         return f"StatusRange(code={self.code}, type={self.type}, values={self.values}, dp_id={self.dp_id})"
 
@@ -105,13 +106,9 @@ class XTDeviceStatusRange:
 
 
 @dataclass
-class XTDeviceFunction:
-    code: str = ""
-    type: TuyaDPType | None = None
+class XTDeviceFunction(XTDeviceStatusFunctionShared):
     desc: str = ""
     name: str = ""
-    values: str = "{}"
-    dp_id: int = 0
 
     def __repr__(self) -> str:
         return f"Function(code={self.code}, type={self.type}, desc={self.desc}, name={self.name}, values={self.values}, dp_id={self.dp_id})"
