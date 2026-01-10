@@ -336,9 +336,8 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         if not response.get("success") or not response2.get("success"):
             LOGGER.warning(f"Response1: {response}")
             LOGGER.warning(f"Response2: {response2}")
-            return
 
-        if response2.get("success"):
+        if response2.get("success", False):
             result = response2.get("result", {})
             data_model = json.loads(result.get("model", "{}"))
             device_properties.data_model = data_model
@@ -384,7 +383,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                             if code in device_properties.function:
                                 device_properties.function[code].dp_id = dp_id
 
-        if response.get("success"):
+        if response.get("success", False):
             result = response.get("result", {})
             for dp_property in result["properties"]:
                 if "dp_id" not in dp_property:
