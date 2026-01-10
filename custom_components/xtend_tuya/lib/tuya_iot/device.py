@@ -166,13 +166,10 @@ class TuyaDeviceManager:
         self.mq.remove_message_listener(self.on_message)
 
     def on_message(self, msg: dict):
-        logger.debug(f"MQTT receive-> {msg}")
         protocol = msg.get("protocol", 0)
         data = msg.get("data", {})
         if protocol == PROTOCOL_DEVICE_REPORT:
-            logger.debug(f"MQTT on_message data -> {data}")
             if status := data.get("status", None):
-                logger.debug(f"MQTT on_message status -> {status}")
                 self._on_device_report(data["devId"], status)
         elif protocol == PROTOCOL_OTHER:
             self._on_device_other(data["devId"], data["bizCode"], data)
@@ -185,7 +182,6 @@ class TuyaDeviceManager:
         device = self.device_map.get(device_id, None)
         if not device:
             return
-        logger.debug(f"MQTT _on_device_report-> {status}", stack_info=True)
         for item in status:
             if "code" in item and "value" in item:
                 code = item["code"]
