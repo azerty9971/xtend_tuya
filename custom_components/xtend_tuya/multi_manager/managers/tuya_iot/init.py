@@ -3,6 +3,7 @@ import requests
 import json
 from datetime import datetime
 from typing import Optional, Literal, Any
+from enum import StrEnum
 from webrtc_models import (
     RTCIceCandidateInit,
 )
@@ -466,62 +467,70 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
     def get_platform_descriptors_to_merge(self, platform: Platform) -> Any:
         pass
 
-    def send_commands(self, device_id: str, commands: list[dict[str, Any]]) -> bool:
-        open_api_regular_commands: list[dict[str, Any]] = []
-        property_commands: list[dict[str, Any]] = []
+    def send_command(self, device_id: str, command: dict[str, Any], reverse_filters: bool = False) -> bool:
+        class XTApiList(StrEnum):
+            OPEN_API_REGULAR = "open_api_regular"
+            PROPERTY_UPDATE = "property_update"
+        api_priority_list: list[XTApiList] = []
         device = self.multi_manager.device_map.get(device_id)
         dpId: int | None = None
         if device is None or self.iot_account is None:
             return False
-        return_result = True
-        for command in commands:
-            command_code = command["code"]
-            command_value = command["value"]
+        command_code = command.get("code")
+        command_value = command.get("value")
 
-            # Filter commands that don't require the use of OpenAPI
-            skip_command = False
-            prop_command = False
-            regular_command = False
-            if dpId := self.multi_manager._read_dpId_from_code(command_code, device):
-                if not device.local_strategy[dpId].get("use_open_api", False):
-                    skip_command = True
-                    return_result = False
-                    break
-                if device.local_strategy[dpId].get("property_update", False):
-                    prop_command = True
-                else:
-                    regular_command = True
-            else:
-                return_result = False
-                skip_command = True
-            if not skip_command:
-                if regular_command:
-                    command_dict = {"code": command_code, "value": command_value}
-                    open_api_regular_commands.append(command_dict)
-                elif prop_command:
-                    if dpId is not None:
-                        # command_value = prepare_value_for_property_update(device.local_strategy[dpId], command_value)
-                        property_dict = {str(command_code): command_value}
-                        property_commands.append(property_dict)
-        try:
-            if open_api_regular_commands:
-                LOGGER.debug(
-                    f"Sending Open API regular command : {open_api_regular_commands}"
-                )
-                self.iot_account.device_manager.send_commands(
-                    device_id, open_api_regular_commands
-                )
-            if property_commands:
-                LOGGER.debug(f"Sending property command : {property_commands}")
-                self.iot_account.device_manager.send_property_update(
-                    device_id, property_commands
-                )
-        except Exception as e:
-            LOGGER.warning(
-                f"[IOT]Send command failed, device id: {device_id}, commands: {commands}, exception: {e}"
-            )
+        if command_code is None or command_value is None:
             return False
-        return return_result
+
+        if dpId := self.multi_manager._read_dpId_from_code(command_code, device):
+            use_open_api: bool = device.local_strategy[dpId].get("use_open_api", False)
+            if use_open_api is False:
+                if reverse_filters is False:
+                    return False
+            else:
+                if reverse_filters is True:
+                    return False
+            property_update: bool = device.local_strategy[dpId].get("property_update", False)
+            if property_update:
+                api_priority_list.append(XTApiList.PROPERTY_UPDATE)
+                api_priority_list.append(XTApiList.OPEN_API_REGULAR)
+            else:
+                api_priority_list.append(XTApiList.OPEN_API_REGULAR)
+                api_priority_list.append(XTApiList.PROPERTY_UPDATE)
+        else:
+            return False
+
+        command_list: list = []
+        for api_type in api_priority_list:
+            try:
+                match api_type:
+                    case XTApiList.OPEN_API_REGULAR:
+                        command_list = []
+                        command_dict = {"code": command_code, "value": command_value}
+                        command_list.append(command_dict)
+                        LOGGER.debug(
+                            f"Sending Open API regular command : {command_list}"
+                        )
+                        self.iot_account.device_manager.send_commands(
+                            device_id, command_list
+                        )
+                    case XTApiList.PROPERTY_UPDATE:
+                        command_list = []
+                        property_dict = {str(command_code): command_value}
+                        command_list.append(property_dict)
+                        LOGGER.debug(f"Sending property command : {command_list}")
+                        self.iot_account.device_manager.send_property_update(
+                            device_id, command_list
+                        )
+                
+                # If the command fails, the caller returns an exception, so we assume it worked if we reach here
+                return True
+            except Exception as e:
+                self.multi_manager.device_watcher.report_message(
+                    device_id,
+                    f"[IOT]Send {api_type} command failed, device id: {device_id}, command: {command_list}, exception: {e}",
+                )
+        return False
 
     def convert_to_xt_device(
         self, device: Any, device_source_priority: XTDeviceSourcePriority | None = None

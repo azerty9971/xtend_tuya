@@ -166,11 +166,11 @@ class TuyaDeviceManager:
         self.mq.remove_message_listener(self.on_message)
 
     def on_message(self, msg: dict):
-        logger.debug(f"mq receive-> {msg}")
         protocol = msg.get("protocol", 0)
         data = msg.get("data", {})
         if protocol == PROTOCOL_DEVICE_REPORT:
-            self._on_device_report(data["devId"], data["status"])
+            if status := data.get("status", None):
+                self._on_device_report(data["devId"], status)
         elif protocol == PROTOCOL_OTHER:
             self._on_device_other(data["devId"], data["bizCode"], data)
 
@@ -182,7 +182,6 @@ class TuyaDeviceManager:
         device = self.device_map.get(device_id, None)
         if not device:
             return
-        logger.debug(f"mq _on_device_report-> {status}")
         for item in status:
             if "code" in item and "value" in item:
                 code = item["code"]
@@ -648,9 +647,12 @@ class SmartHomeDeviceManage(DeviceManage):
     def send_commands(
         self, device_id: str, commands: list[dict[str, Any]]
     ) -> dict[str, Any]:
-        return self.api.post(
+        return_value = self.api.post(
             f"/v1.0/devices/{device_id}/commands", {"commands": commands}
         )
+        if return_value.get("success") is False:
+            raise Exception(f"send_commands error:({commands}): {return_value}")
+        return return_value
 
 
 class IndustrySolutionDeviceManage(DeviceManage):

@@ -34,7 +34,7 @@ class XTDeviceManagerAPIInterface(ABC):
     ) -> dict[str, Any] | None:
         pass
 
-    def send_commands(self, device_id: str, commands: list[dict[str, Any]]) -> bool:
+    def send_command(self, device_id: str, command: dict[str, Any], reverse_filters: bool = False) -> bool:
         return False
 
     @abstractmethod

@@ -474,9 +474,15 @@ class MultiManager:  # noqa: F811
             )
 
         if regular_commands:
-            for account in self.accounts.values():
-                if account.send_commands(device_id, regular_commands):
-                    break
+            for regular_command in regular_commands:
+                last_command_result: bool = False
+                for account in self.accounts.values():
+                    if last_command_result := account.send_command(device_id, regular_command, reverse_filters=False):
+                        break
+                if last_command_result is False:
+                    for account in self.accounts.values():
+                        if last_command_result := account.send_command(device_id, regular_command, reverse_filters=True):
+                            break
 
     def get_device_stream_allocate(
         self, device_id: str, stream_type: Literal["flv", "hls", "rtmp", "rtsp"]
