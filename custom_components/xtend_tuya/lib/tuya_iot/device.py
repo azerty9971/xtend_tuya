@@ -185,7 +185,7 @@ class TuyaDeviceManager:
         device = self.device_map.get(device_id, None)
         if not device:
             return
-        logger.debug(f"MQTT _on_device_report-> {status}")
+        logger.debug(f"MQTT _on_device_report-> {status}", stack_info=True)
         for item in status:
             if "code" in item and "value" in item:
                 code = item["code"]
