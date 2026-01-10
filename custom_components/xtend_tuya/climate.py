@@ -464,7 +464,6 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
                     continue
                 if tuya_mode in XT_HVAC_TO_HA:
                     ha_mode = XT_HVAC_TO_HA[tuya_mode]
-                    self._tuya_to_hvac[tuya_mode] = ha_mode
                     if ha_mode not in self._hvac_to_tuya:
                         self._hvac_to_tuya[ha_mode] = tuya_mode
                         self._attr_hvac_modes.append(ha_mode)
@@ -472,6 +471,7 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
                         if self._hvac_to_tuya[ha_mode] not in hvac_preset_modes:
                             hvac_preset_modes.append(self._hvac_to_tuya[ha_mode])
                         hvac_preset_modes.append(tuya_mode)
+                    self._tuya_to_hvac[tuya_mode] = ha_mode
                 else:
                     self._tuya_to_hvac[tuya_mode] = None
                     hvac_preset_modes.append(tuya_mode)
