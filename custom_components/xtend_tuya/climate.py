@@ -478,7 +478,7 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
                 else:
                     #Unknown tuya_mode, allow presets
                     enable_presets = True
-                    self._tuya_to_hvac[tuya_mode] = None
+                    self._tuya_to_hvac[tuya_mode] = HVACMode.AUTO  # Default to AUTO
 
             if enable_presets:  # Tuya modes are presets instead of hvac_modes
                 self._attr_preset_modes = hvac_preset_modes
@@ -509,6 +509,18 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
         if (hvac_status := self._read_wrapper(self._hvac_mode_wrapper)) is None:
             return None
         return self._tuya_to_hvac.get(hvac_status)
+    
+    @property
+    def preset_mode(self) -> str | None:
+        """Return preset mode."""
+        if self._hvac_mode_wrapper is None:
+            return None
+
+        mode = self._read_wrapper(self._hvac_mode_wrapper)
+        if mode not in self._tuya_to_hvac:
+            return None
+
+        return mode
 
     @staticmethod
     def get_entity_instance(
