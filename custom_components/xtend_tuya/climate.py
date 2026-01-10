@@ -456,11 +456,15 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
         self._attr_preset_modes = []
         self._hvac_to_tuya = {}
         self._tuya_to_hvac: dict[str, HVACMode | None] = {}
+        enable_presets = False
         if hvac_mode_wrapper:
             self._attr_hvac_modes = [HVACMode.OFF]
             hvac_preset_modes: list[str] = []
             for tuya_mode in hvac_mode_wrapper.options:
+                hvac_preset_modes.append(tuya_mode)
                 if tuya_mode == HVACMode.OFF:
+                    self._tuya_to_hvac[tuya_mode] = HVACMode.OFF
+                    self._hvac_to_tuya[HVACMode.OFF] = tuya_mode
                     continue
                 if tuya_mode in XT_HVAC_TO_HA:
                     ha_mode = XT_HVAC_TO_HA[tuya_mode]
@@ -468,16 +472,16 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
                         self._hvac_to_tuya[ha_mode] = tuya_mode
                         self._attr_hvac_modes.append(ha_mode)
                     else:
-                        if self._hvac_to_tuya[ha_mode] not in hvac_preset_modes:
-                            hvac_preset_modes.append(self._hvac_to_tuya[ha_mode])
-                        hvac_preset_modes.append(tuya_mode)
+                        #More than one tuya_mode maps to the same ha_mode, allow presets for all tuya_modes
+                        enable_presets = True
                     self._tuya_to_hvac[tuya_mode] = ha_mode
                 else:
+                    #Unknown tuya_mode, allow presets
+                    enable_presets = True
                     self._tuya_to_hvac[tuya_mode] = None
-                    hvac_preset_modes.append(tuya_mode)
 
-            self._attr_preset_modes = hvac_preset_modes
-            if self._attr_preset_modes:  # Tuya modes are presets instead of hvac_modes
+            if enable_presets:  # Tuya modes are presets instead of hvac_modes
+                self._attr_preset_modes = hvac_preset_modes
                 self._attr_supported_features |= ClimateEntityFeature.PRESET_MODE
             else:
                 self._attr_supported_features &= ~ClimateEntityFeature.PRESET_MODE
