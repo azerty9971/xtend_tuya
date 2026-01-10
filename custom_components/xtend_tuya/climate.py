@@ -490,6 +490,25 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
                 HVACMode.OFF,
                 description.switch_only_hvac_mode,
             ]
+    
+    @property
+    def hvac_mode(self) -> HVACMode | None:
+        """Return hvac mode."""
+        # If the switch is off, hvac mode is off.
+        switch_status: bool | None
+        if (switch_status := self._read_wrapper(self._switch_wrapper)) is False:
+            return HVACMode.OFF
+
+        # If we don't have a mode wrapper, return switch only mode.
+        if self._hvac_mode_wrapper is None:
+            if switch_status is True:
+                return self.entity_description.switch_only_hvac_mode
+            return None
+
+        # If we do have a mode wrapper, check if the mode maps to an HVAC mode.
+        if (hvac_status := self._read_wrapper(self._hvac_mode_wrapper)) is None:
+            return None
+        return self._tuya_to_hvac.get(hvac_status)
 
     @staticmethod
     def get_entity_instance(
