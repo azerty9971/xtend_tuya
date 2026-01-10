@@ -172,6 +172,7 @@ class TuyaDeviceManager:
         if protocol == PROTOCOL_DEVICE_REPORT:
             logger.debug(f"MQTT on_message data -> {data}")
             if status := data.get("status", None):
+                logger.debug(f"MQTT on_message status -> {status}")
                 self._on_device_report(data["devId"], status)
         elif protocol == PROTOCOL_OTHER:
             self._on_device_other(data["devId"], data["bizCode"], data)
