@@ -122,6 +122,8 @@ from homeassistant.components.tuya.switch import (
 )
 from homeassistant.components.tuya.vacuum import (
     TuyaVacuumEntity as TuyaVacuumEntity,
+    _VacuumActionWrapper as TuyaVacuumActionWrapper,  # noqa: F401
+    _VacuumActivityWrapper as TuyaVacuumActivityWrapper,  # noqa: F401
 )
 import homeassistant.components.tuya as tuya_integration  # noqa: F401
 
