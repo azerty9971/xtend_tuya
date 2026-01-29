@@ -37,7 +37,8 @@ from homeassistant.components.tuya.cover import (
     TuyaCoverEntity as TuyaCoverEntity,
     TuyaCoverEntityDescription as TuyaCoverEntityDescription,
     _DPCodePercentageMappingWrapper as TuyaCoverDPCodePercentageMappingWrapper,  # noqa: F401
-    _IsClosedWrapper as TuyaCoverIsClosedWrapper,  # noqa: F401
+    _IsClosedEnumWrapper as TuyaCoverIsClosedEnumWrapper,  # noqa: F401
+    _IsClosedInvertedWrapper as TuyaCoverIsClosedInvertedWrapper,  # noqa: F401
     _get_instruction_wrapper as tuya_cover_get_instruction_wrapper,  # noqa: F401
 )
 from homeassistant.components.event import (
@@ -49,7 +50,6 @@ try:
         EVENTS as EVENTS_TUYA,  # noqa: F401 # type: ignore
         TuyaEventEntity as TuyaEventEntity,
         TuyaEventEntityDescription as TuyaEventEntityDescription,
-        _DPCodeEventWrapper as TuyaEventDPCodeEventWrapper,  # noqa: F401
     )
 except Exception:
     EVENTS_TUYA: dict[str, tuple[EventEntityDescription, ...]] = {}
