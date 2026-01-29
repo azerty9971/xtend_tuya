@@ -28,18 +28,19 @@ class MultiDeviceListener:
             signal_list = util.append_lists(
                 signal_list, account.on_update_device(device)
             )
-        self.trigger_device_discovery(device, signal_list, updated_status_properties)
+        self.trigger_device_discovery(device, signal_list, updated_status_properties, dp_timestamps)
 
     def trigger_device_discovery(
         self,
         device: sh.XTDevice,
         signal_list: list[str],
         updated_status_properties: list[str] | None = None,
+        dp_timestamps: dict | None = None,
     ):
         for signal in signal_list:
             try:
                 dispatcher_send(
-                    self.hass, f"{signal}_{device.id}", updated_status_properties
+                    self.hass, f"{signal}_{device.id}", updated_status_properties, dp_timestamps
                 )
             except Exception as e:
                 # Could happen upon restart of HA
