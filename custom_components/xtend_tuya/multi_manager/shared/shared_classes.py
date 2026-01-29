@@ -81,6 +81,9 @@ class XTDeviceStatusFunctionShared:
 
 @dataclass
 class XTDeviceStatusRange(XTDeviceStatusFunctionShared):
+
+    report_type: Optional[str] = None
+
     def __repr__(self) -> str:
         return f"StatusRange(code={self.code}, type={self.type}, values={self.values}, dp_id={self.dp_id})"
 
