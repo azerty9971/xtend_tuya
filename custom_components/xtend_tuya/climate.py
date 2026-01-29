@@ -44,6 +44,7 @@ from .ha_tuya_integration.tuya_integration_imports import (
     TuyaCustomerDevice,
     TuyaDeviceWrapper,
     TuyaClimatePresetWrapper,
+    TuyaClimateHvacModeWrapper,
 )
 from .entity import (
     XTEntity,
@@ -372,7 +373,7 @@ async def async_setup_entry(
                                 XT_CLIMATE_MODE_DPCODES,
                                 prefer_function=True,
                             ),
-                            hvac_mode_wrapper=TuyaDPCodeEnumWrapper.find_dpcode(
+                            hvac_mode_wrapper=TuyaClimateHvacModeWrapper.find_dpcode(
                                 device,
                                 XT_CLIMATE_MODE_DPCODES,  # type: ignore
                                 prefer_function=True,

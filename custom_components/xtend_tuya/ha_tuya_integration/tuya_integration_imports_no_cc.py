@@ -32,6 +32,7 @@ from homeassistant.components.tuya.climate import (
     _get_temperature_wrapper as tuya_climate_get_temperature_wrapper,  # noqa: F401
     _SwingModeWrapper as TuyaClimateSwingModeWrapper,  # noqa: F401
     _PresetWrapper as TuyaClimatePresetWrapper,  # noqa: F401
+    _HvacModeWrapper as TuyaClimateHvacModeWrapper,  # noqa: F401
 )
 from homeassistant.components.tuya.cover import (
     COVERS as COVERS_TUYA,  # noqa: F401
