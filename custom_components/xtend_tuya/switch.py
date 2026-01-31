@@ -1,7 +1,7 @@
 """Support for XT switches."""
 
 from __future__ import annotations
-from typing import Any, cast
+from typing import cast
 from dataclasses import dataclass
 from homeassistant.const import EntityCategory, Platform
 from homeassistant.core import HomeAssistant, callback
@@ -36,8 +36,6 @@ from .entity import (
 class XTSwitchEntityDescription(TuyaSwitchEntityDescription, frozen_or_thawed=True):
     override_tuya: bool = False
     dont_send_to_cloud: bool = False
-    on_value: Any = None
-    off_value: Any = None
 
     # duplicate the entity if handled by another integration
     ignore_other_dp_code_handler: bool = False
@@ -578,63 +576,6 @@ class XTSwitchEntity(XTEntity, TuyaSwitchEntity):
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description  # type: ignore
-
-    @property
-    def is_on(self) -> bool | None:
-        """Return true if switch is on."""
-        current_value = self._dpcode_wrapper.read_device_status(
-            self.device,
-        )
-        if (
-            self.entity_description.on_value is not None
-            and self.entity_description.off_value is not None
-        ):
-            if self.entity_description.on_value == current_value:
-                return True
-            if self.entity_description.off_value == current_value:
-                return False
-        elif self.entity_description.on_value is not None:
-            if self.entity_description.on_value == current_value:
-                return True
-            else:
-                return False
-        elif self.entity_description.off_value is not None:
-            if self.entity_description.off_value == current_value:
-                return False
-            else:
-                return True
-
-        return super().is_on
-
-    async def async_turn_on(self, **kwargs: Any) -> None:
-        """Turn the switch on."""
-        if self.entity_description.dont_send_to_cloud is True:
-            if self.entity_description.on_value is not None:
-                self.device.status[self._dpcode_wrapper.dpcode] = (
-                    self.entity_description.on_value
-                )
-            else:
-                self.device.status[self._dpcode_wrapper.dpcode] = True
-            self.device_manager.multi_device_listener.update_device(
-                self.device, [self._dpcode_wrapper.dpcode]
-            )
-        else:
-            await super().async_turn_on(**kwargs)
-
-    async def async_turn_off(self, **kwargs: Any) -> None:
-        """Turn the switch off."""
-        if self.entity_description.dont_send_to_cloud is True:
-            if self.entity_description.off_value is not None:
-                self.device.status[self._dpcode_wrapper.dpcode] = (
-                    self.entity_description.off_value
-                )
-            else:
-                self.device.status[self._dpcode_wrapper.dpcode] = False
-            self.device_manager.multi_device_listener.update_device(
-                self.device, [self._dpcode_wrapper.dpcode]
-            )
-        else:
-            await super().async_turn_off(**kwargs)
 
     @staticmethod
     def get_entity_instance(

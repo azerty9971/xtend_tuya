@@ -31,13 +31,16 @@ from homeassistant.components.tuya.climate import (
     _RoundedIntegerWrapper as TuyaClimateRoundedIntegerWrapper,  # noqa: F401
     _get_temperature_wrapper as tuya_climate_get_temperature_wrapper,  # noqa: F401
     _SwingModeWrapper as TuyaClimateSwingModeWrapper,  # noqa: F401
+    _PresetWrapper as TuyaClimatePresetWrapper,  # noqa: F401
+    _HvacModeWrapper as TuyaClimateHvacModeWrapper,  # noqa: F401
 )
 from homeassistant.components.tuya.cover import (
     COVERS as COVERS_TUYA,  # noqa: F401
     TuyaCoverEntity as TuyaCoverEntity,
     TuyaCoverEntityDescription as TuyaCoverEntityDescription,
     _DPCodePercentageMappingWrapper as TuyaCoverDPCodePercentageMappingWrapper,  # noqa: F401
-    _IsClosedWrapper as TuyaCoverIsClosedWrapper,  # noqa: F401
+    _IsClosedEnumWrapper as TuyaCoverIsClosedEnumWrapper,  # noqa: F401
+    _IsClosedInvertedWrapper as TuyaCoverIsClosedInvertedWrapper,  # noqa: F401
     _get_instruction_wrapper as tuya_cover_get_instruction_wrapper,  # noqa: F401
 )
 from homeassistant.components.event import (
@@ -49,7 +52,6 @@ try:
         EVENTS as EVENTS_TUYA,  # noqa: F401 # type: ignore
         TuyaEventEntity as TuyaEventEntity,
         TuyaEventEntityDescription as TuyaEventEntityDescription,
-        _DPCodeEventWrapper as TuyaEventDPCodeEventWrapper,  # noqa: F401
     )
 except Exception:
     EVENTS_TUYA: dict[str, tuple[EventEntityDescription, ...]] = {}
@@ -120,6 +122,8 @@ from homeassistant.components.tuya.switch import (
 )
 from homeassistant.components.tuya.vacuum import (
     TuyaVacuumEntity as TuyaVacuumEntity,
+    _VacuumActionWrapper as TuyaVacuumActionWrapper,  # noqa: F401
+    _VacuumActivityWrapper as TuyaVacuumActivityWrapper,  # noqa: F401
 )
 import homeassistant.components.tuya as tuya_integration  # noqa: F401
 
