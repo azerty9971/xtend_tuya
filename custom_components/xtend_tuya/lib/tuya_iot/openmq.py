@@ -112,7 +112,10 @@ class TuyaOpenMQ(threading.Thread):
             ),
         }
         response = self.api.post(path, body)
-        logger.warning(f"_get_mqtt_config response: {response}", stack_info=True)
+        if response.get("success", False):
+            logger.debug(f"_get_mqtt_config response: {response}")
+        else:
+            logger.error(f"_get_mqtt_config response: {response}", stack_info=True)
 
         if response.get("success", False) is False:
             if first_pass:
