@@ -255,7 +255,7 @@ class TuyaOpenMQ(threading.Thread):
         if rc == 0:
             for key, value in self.mq_config.source_topic.items():
                 mqttc.subscribe(value)
-            logger.debug(f"{self.topics} MQTT connected and subscribed to {self.topics} topics")
+            logger.debug(f"{self.topics} MQTT connected and subscribed to topics: {self.mq_config.source_topic}")
         else:
             logger.error(f"MQTT connect failed with rc={rc}")
 
