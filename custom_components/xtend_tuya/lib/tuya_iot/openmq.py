@@ -214,7 +214,8 @@ class TuyaOpenMQ(threading.Thread):
 
             # exit if the new mq_config is not valid
             if self.mq_config.is_valid() is False:
-                logger.error("error while get mqtt config", stack_info=True)
+                logger.error("Got an invalid mqtt config, please check your system logs", stack_info=True)
+                self.stop()
                 return
 
         # If we have a client, disconnect it first
@@ -251,7 +252,6 @@ class TuyaOpenMQ(threading.Thread):
         rc: mqtt_ReasonCode,
         properties: mqtt_Properties | None = None,
     ):
-        # logger.debug(f"connect flags->{flags}, rc->{rc}")
         if rc == 0:
             for key, value in self.mq_config.source_topic.items():
                 mqttc.subscribe(value)
