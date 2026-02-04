@@ -801,7 +801,6 @@ class CloudFixes:
                     if dp_id not in device.local_strategy:
                         continue
                     local_strategy = device.local_strategy[dp_id]
-                    valueDescr_range = []
                     config_item: dict[str, Any] | None = local_strategy.get("config_item", None)
                     if config_item is None:
                         continue
