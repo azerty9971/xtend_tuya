@@ -797,11 +797,30 @@ class CloudFixes:
                     "abilityId" in property
                 ):
                     dp_id = int(property["abilityId"])
-                    typeSpec = property.get("typeSpec", None)
-                    if typeSpec is not None:
-                        mm.LOGGER.warning(
-                            f"CloudFixes: Checking data_model property for dp_id {dp_id} with typeSpec {typeSpec}"
-                        )
+                    typeSpec = property.get("typeSpec", {})
+                    if dp_id not in device.local_strategy:
+                        continue
+                    local_strategy = device.local_strategy[dp_id]
+                    valueDescr_range = []
+                    config_item: dict[str, Any] | None = local_strategy.get("config_item", None)
+                    if config_item is None:
+                        continue
+                    if config_item.get("valueType", None) != "Enum":
+                        continue
+                    valueDesc = config_item.get("valueDesc")
+                    if valueDesc is None:
+                        continue
+                    value_dict: dict[str, Any] = json.loads(valueDesc)
+                    valueDescr_range: list = value_dict.get("range", [])
+                    for range_value in typeSpec.get("range", []):
+                        if range_value not in valueDescr_range:
+                            valueDescr_range.append(range_value)
+                            mm.LOGGER.warning(
+                                f"CloudFixes: Added missing range value '{range_value}' to local strategy dpId '{dp_id}' using data model."
+                            )
+                    value_dict["range"] = valueDescr_range
+                    config_item["valueDesc"] = json.dumps(value_dict)
+                    
 
     
     @staticmethod
@@ -818,11 +837,11 @@ class CloudFixes:
                     continue
                 if valueDesc := config_item.get("valueDesc", None):
                     value_dict = json.loads(valueDesc)
-                    if valueDescr_range := value_dict.get("range", {}):
+                    if valueDescr_range := value_dict.get("range", []):
                         if status_range := device.status_range.get(status_code, None):
                             if status_range_values := json.loads(status_range.values):
                                 status_range_range_dict: list = status_range_values.get(
-                                    "range", {}
+                                    "range", []
                                 )
                                 new_range_list: list = []
                                 for new_range_value in valueDescr_range:
@@ -835,7 +854,7 @@ class CloudFixes:
                         if function := device.function.get(status_code, None):
                             if function_values := json.loads(function.values):
                                 function_range_dict: list = function_values.get(
-                                    "range", {}
+                                    "range", []
                                 )
                                 new_range_list: list = []
                                 for new_range_value in valueDescr_range:
