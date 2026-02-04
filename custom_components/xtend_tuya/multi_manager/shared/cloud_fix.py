@@ -30,6 +30,7 @@ class CloudFixes:
         CloudFixes._fix_incorrect_percentage_scale(device)
         CloudFixes._align_valuedescr(device)
         CloudFixes._fix_missing_local_strategy_enum_mapping_map(device)
+        CloudFixes._fix_missing_range_values_using_data_model(device)
         CloudFixes._fix_missing_range_values_using_local_strategy(device)
         CloudFixes._fix_missing_aliases_using_status_format(device)
         CloudFixes._remove_status_that_are_local_strategy_aliases(device)
@@ -788,6 +789,21 @@ class CloudFixes:
                     if "true" in mappings and str(True) not in mappings:
                         mappings[str(True)] = mappings["true"]
 
+    @staticmethod
+    def _fix_missing_range_values_using_data_model(device: XTDevice):
+        for service in device.data_model.get("services", {}):
+            for property in service.get("properties", {}):
+                if (
+                    "abilityId" in property
+                ):
+                    dp_id = int(property["abilityId"])
+                    typeSpec = property.get("typeSpec", None)
+                    if typeSpec is not None:
+                        mm.LOGGER.warning(
+                            f"CloudFixes: Checking data_model property for dp_id {dp_id} with typeSpec {typeSpec}"
+                        )
+
+    
     @staticmethod
     def _fix_missing_range_values_using_local_strategy(device: XTDevice):
         for local_strategy in device.local_strategy.values():
