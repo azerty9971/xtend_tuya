@@ -1,6 +1,7 @@
 """Support for XT Climate."""
 
 from __future__ import annotations
+import collections
 from dataclasses import dataclass
 from enum import StrEnum
 from typing import cast, Self
@@ -45,6 +46,7 @@ from .ha_tuya_integration.tuya_integration_imports import (
     TuyaDeviceWrapper,
     TuyaClimatePresetWrapper,
     TuyaClimateHvacModeWrapper,
+    TuyaEnumTypeInformation,
 )
 from .entity import (
     XTEntity,
@@ -211,6 +213,38 @@ CLIMATE_DESCRIPTIONS: dict[str, XTClimateEntityDescription] = {
     ),
 }
 
+def _filter_hvac_mode_mappings(tuya_range: list[str]) -> dict[str, HVACMode | None]:
+    """Filter TUYA_HVAC_TO_HA modes that are not in the range.
+
+    If multiple Tuya modes map to the same HA mode, set the mapping to None to avoid
+    ambiguity when converting back from HA to Tuya modes.
+    """
+    modes_in_range = {
+        tuya_mode: XT_HVAC_TO_HA.get(tuya_mode) for tuya_mode in tuya_range
+    }
+    modes_occurrences = collections.Counter(modes_in_range.values())
+    for key, value in modes_in_range.items():
+        if value is not None and modes_occurrences[value] > 1:
+            modes_in_range[key] = None
+    return modes_in_range
+
+class XTClimatePresetWrapper(TuyaClimatePresetWrapper):
+    def __init__(self, dpcode: str, type_information: TuyaEnumTypeInformation) -> None:
+        """Init _PresetWrapper."""
+        super().__init__(dpcode, type_information)
+        mappings = _filter_hvac_mode_mappings(type_information.range)
+        self.options = [
+            tuya_mode for tuya_mode, ha_mode in mappings.items() if ha_mode is None
+        ]
+
+class XTClimateHvacModeWrapper(TuyaClimateHvacModeWrapper):
+    def __init__(self, dpcode: str, type_information: TuyaEnumTypeInformation) -> None:
+        """Init _HvacModeWrapper."""
+        super().__init__(dpcode, type_information)
+        self._mappings = _filter_hvac_mode_mappings(type_information.range)
+        self.options = [
+            ha_mode for ha_mode in self._mappings.values() if ha_mode is not None
+        ]
 
 class XTClimateSwingModeWrapper(TuyaClimateSwingModeWrapper):
     @classmethod
@@ -368,12 +402,12 @@ async def async_setup_entry(
                                 XT_CLIMATE_FAN_SPEED_DPCODES,  # type: ignore
                                 prefer_function=True,
                             ),
-                            preset_wrapper=TuyaClimatePresetWrapper.find_dpcode(
+                            preset_wrapper=XTClimatePresetWrapper.find_dpcode(
                                 device,
                                 XT_CLIMATE_MODE_DPCODES,
                                 prefer_function=True,
                             ),
-                            hvac_mode_wrapper=TuyaClimateHvacModeWrapper.find_dpcode(
+                            hvac_mode_wrapper=XTClimateHvacModeWrapper.find_dpcode(
                                 device,
                                 XT_CLIMATE_MODE_DPCODES,  # type: ignore
                                 prefer_function=True,
