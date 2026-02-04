@@ -814,9 +814,6 @@ class CloudFixes:
                     for range_value in typeSpec.get("range", []):
                         if range_value not in valueDescr_range:
                             valueDescr_range.append(range_value)
-                            mm.LOGGER.warning(
-                                f"CloudFixes: Added missing range value '{range_value}' to local strategy dpId '{dp_id}' using data model."
-                            )
                     value_dict["range"] = valueDescr_range
                     config_item["valueDesc"] = json.dumps(value_dict)
                     
