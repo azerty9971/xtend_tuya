@@ -237,6 +237,12 @@ class XTClimatePresetWrapper(TuyaClimatePresetWrapper):
         self.options = [
             tuya_mode for tuya_mode, ha_mode in mappings.items() if ha_mode is None
         ]
+    
+    def read_device_status(self, device: TuyaCustomerDevice) -> str | None:
+        """Read the device status."""
+        if (raw := super(TuyaClimatePresetWrapper, self).read_device_status(device)) in XT_HVAC_TO_HA:
+            return None
+        return raw
 
 class XTClimateHvacModeWrapper(TuyaClimateHvacModeWrapper):
     def __init__(self, dpcode: str, type_information: TuyaEnumTypeInformation) -> None:
@@ -246,6 +252,12 @@ class XTClimateHvacModeWrapper(TuyaClimateHvacModeWrapper):
         self.options = [
             ha_mode for ha_mode in self._mappings.values() if ha_mode is not None
         ]
+    
+    def read_device_status(self, device: TuyaCustomerDevice) -> HVACMode | None:
+        """Read the device status."""
+        if (raw := super(TuyaClimateHvacModeWrapper, self).read_device_status(device)) not in XT_HVAC_TO_HA:
+            return None
+        return XT_HVAC_TO_HA[raw]
 
 class XTClimateSwingModeWrapper(TuyaClimateSwingModeWrapper):
     @classmethod
