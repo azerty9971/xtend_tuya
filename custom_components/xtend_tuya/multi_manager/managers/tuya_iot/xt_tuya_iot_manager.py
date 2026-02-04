@@ -341,8 +341,8 @@ class XTIOTDeviceManager(TuyaDeviceManager):
             result = response2.get("result", {})
             data_model = json.loads(result.get("model", "{}"))
             device_properties.data_model = data_model
-            for service in data_model["services"]:
-                for property in service["properties"]:
+            for service in data_model.get("services", {}):
+                for property in service.get("properties", {}):
                     if (
                         "abilityId" in property
                         and "code" in property
