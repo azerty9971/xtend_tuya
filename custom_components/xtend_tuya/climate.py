@@ -30,7 +30,7 @@ from .const import (
     XTDPCode,
     XT_CELSIUS_ALIASES,
     XT_FAHRENHEIT_ALIASES,
-    LOGGER,
+    LOGGER,  # noqa: F401
 )
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaClimateEntity,
@@ -226,7 +226,6 @@ def _filter_hvac_mode_mappings(tuya_range: list[str]) -> dict[str, HVACMode | No
     for key, value in modes_in_range.items():
         if value is not None and modes_occurrences[value] > 1:
             modes_in_range[key] = None
-    LOGGER.warning(f"Filtered HVAC mode mappings: {modes_in_range}")
     return modes_in_range
 
 class XTClimatePresetWrapper(TuyaClimatePresetWrapper):
