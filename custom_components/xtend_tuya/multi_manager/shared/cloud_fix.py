@@ -30,6 +30,7 @@ class CloudFixes:
         CloudFixes._fix_incorrect_percentage_scale(device)
         CloudFixes._align_valuedescr(device)
         CloudFixes._fix_missing_local_strategy_enum_mapping_map(device)
+        CloudFixes._fix_missing_range_values_using_data_model(device)
         CloudFixes._fix_missing_range_values_using_local_strategy(device)
         CloudFixes._fix_missing_aliases_using_status_format(device)
         CloudFixes._remove_status_that_are_local_strategy_aliases(device)
@@ -789,6 +790,36 @@ class CloudFixes:
                         mappings[str(True)] = mappings["true"]
 
     @staticmethod
+    def _fix_missing_range_values_using_data_model(device: XTDevice):
+        for service in device.data_model.get("services", {}):
+            for property in service.get("properties", {}):
+                if (
+                    "abilityId" in property
+                ):
+                    dp_id = int(property["abilityId"])
+                    typeSpec = property.get("typeSpec", {})
+                    if dp_id not in device.local_strategy:
+                        continue
+                    local_strategy = device.local_strategy[dp_id]
+                    config_item: dict[str, Any] | None = local_strategy.get("config_item", None)
+                    if config_item is None:
+                        continue
+                    if config_item.get("valueType", None) != "Enum":
+                        continue
+                    valueDesc = config_item.get("valueDesc")
+                    if valueDesc is None:
+                        continue
+                    value_dict: dict[str, Any] = json.loads(valueDesc)
+                    valueDescr_range: list = value_dict.get("range", [])
+                    for range_value in typeSpec.get("range", []):
+                        if range_value not in valueDescr_range:
+                            valueDescr_range.append(range_value)
+                    value_dict["range"] = valueDescr_range
+                    config_item["valueDesc"] = json.dumps(value_dict)
+                    
+
+    
+    @staticmethod
     def _fix_missing_range_values_using_local_strategy(device: XTDevice):
         for local_strategy in device.local_strategy.values():
             status_code = local_strategy.get("status_code", None)
@@ -802,11 +833,11 @@ class CloudFixes:
                     continue
                 if valueDesc := config_item.get("valueDesc", None):
                     value_dict = json.loads(valueDesc)
-                    if valueDescr_range := value_dict.get("range", {}):
+                    if valueDescr_range := value_dict.get("range", []):
                         if status_range := device.status_range.get(status_code, None):
                             if status_range_values := json.loads(status_range.values):
                                 status_range_range_dict: list = status_range_values.get(
-                                    "range", {}
+                                    "range", []
                                 )
                                 new_range_list: list = []
                                 for new_range_value in valueDescr_range:
@@ -819,7 +850,7 @@ class CloudFixes:
                         if function := device.function.get(status_code, None):
                             if function_values := json.loads(function.values):
                                 function_range_dict: list = function_values.get(
-                                    "range", {}
+                                    "range", []
                                 )
                                 new_range_list: list = []
                                 for new_range_value in valueDescr_range:
