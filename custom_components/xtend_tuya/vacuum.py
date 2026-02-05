@@ -6,6 +6,9 @@ from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.components.vacuum.const import (
+    VacuumActivity,
+)
 
 from .multi_manager.multi_manager import (
     MultiManager,
@@ -19,8 +22,10 @@ from .entity import (
 )
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaVacuumEntity,
+    TuyaDeviceWrapper,
+    TuyaVacuumActionWrapper,
+    TuyaVacuumActivityWrapper,
     TuyaDPCodeEnumWrapper,
-    TuyaDPCodeBooleanWrapper,
 )
 
 CHARGE_DPCODE = (XTDPCode.SWITCH_CHARGE,)
@@ -70,26 +75,10 @@ async def async_setup_entry(
                         XTVacuumEntity(
                             device,
                             hass_data.manager,
-                            charge_wrapper=TuyaDPCodeBooleanWrapper.find_dpcode(
-                                device, CHARGE_DPCODE, prefer_function=True
-                            ),
+                            action_wrapper=TuyaVacuumActionWrapper.find_dpcode(device),
+                            activity_wrapper=TuyaVacuumActivityWrapper.find_dpcode(device),
                             fan_speed_wrapper=TuyaDPCodeEnumWrapper.find_dpcode(
-                                device, FAN_SPEED_DPCODE, prefer_function=True
-                            ),
-                            locate_wrapper=TuyaDPCodeBooleanWrapper.find_dpcode(
-                                device, LOCATE_DPCODE, prefer_function=True
-                            ),
-                            mode_wrapper=TuyaDPCodeEnumWrapper.find_dpcode(
-                                device, MODE_DPCODE, prefer_function=True
-                            ),
-                            pause_wrapper=TuyaDPCodeBooleanWrapper.find_dpcode(
-                                device, PAUSE_DPCODE
-                            ),
-                            status_wrapper=TuyaDPCodeEnumWrapper.find_dpcode(
-                                device, STATUS_DPCODE
-                            ),
-                            switch_wrapper=TuyaDPCodeBooleanWrapper.find_dpcode(
-                                device, SWITCH_DPCODE, prefer_function=True
+                                device, XTDPCode.SUCTION, prefer_function=True
                             ),
                         )
                     )
@@ -110,26 +99,18 @@ class XTVacuumEntity(XTEntity, TuyaVacuumEntity):
         device: XTDevice,
         device_manager: MultiManager,
         *,
-        charge_wrapper: TuyaDPCodeBooleanWrapper | None,
-        fan_speed_wrapper: TuyaDPCodeEnumWrapper | None,
-        locate_wrapper: TuyaDPCodeBooleanWrapper | None,
-        mode_wrapper: TuyaDPCodeEnumWrapper | None,
-        pause_wrapper: TuyaDPCodeBooleanWrapper | None,
-        status_wrapper: TuyaDPCodeEnumWrapper | None,
-        switch_wrapper: TuyaDPCodeBooleanWrapper | None,
+        action_wrapper: TuyaDeviceWrapper[str] | None,
+        activity_wrapper: TuyaDeviceWrapper[VacuumActivity] | None,
+        fan_speed_wrapper: TuyaDeviceWrapper[str] | None,
     ) -> None:
         """Init Tuya vacuum."""
         super(XTVacuumEntity, self).__init__(device, device_manager)
         super(XTEntity, self).__init__(
             device,
             device_manager,  # type: ignore
-            charge_wrapper=charge_wrapper,
+            action_wrapper=action_wrapper,
+            activity_wrapper=activity_wrapper,
             fan_speed_wrapper=fan_speed_wrapper,
-            locate_wrapper=locate_wrapper,
-            mode_wrapper=mode_wrapper,
-            pause_wrapper=pause_wrapper,
-            status_wrapper=status_wrapper,
-            switch_wrapper=switch_wrapper,
         )
         self.device = device
         self.device_manager = device_manager

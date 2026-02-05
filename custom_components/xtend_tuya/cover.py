@@ -35,7 +35,8 @@ from .ha_tuya_integration.tuya_integration_imports import (
     TuyaDPCode,
     TuyaDPType,
     TuyaCoverDPCodePercentageMappingWrapper,
-    TuyaCoverIsClosedWrapper,
+    TuyaCoverIsClosedEnumWrapper,
+    TuyaCoverIsClosedInvertedWrapper,
     tuya_cover_get_instruction_wrapper,
     TuyaDeviceWrapper,
     TuyaRemapHelper,
@@ -77,7 +78,7 @@ class XTCoverEntityDescription(TuyaCoverEntityDescription):
         hass: HomeAssistant,
         *,
         current_position: XTCoverDPCodePercentageMappingWrapper | None,
-        current_state_wrapper: TuyaCoverIsClosedWrapper | None,
+        current_state_wrapper: TuyaCoverIsClosedInvertedWrapper | TuyaCoverIsClosedEnumWrapper | None,
         instruction_wrapper: TuyaDeviceWrapper | None,
         set_position: XTCoverDPCodePercentageMappingWrapper | None,
         tilt_position: TuyaCoverDPCodePercentageMappingWrapper | None,
@@ -305,12 +306,13 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         hass: HomeAssistant,
         *,
         current_position: XTCoverDPCodePercentageMappingWrapper | None,
-        current_state_wrapper: TuyaCoverIsClosedWrapper | None,
+        current_state_wrapper: TuyaCoverIsClosedInvertedWrapper | TuyaCoverIsClosedEnumWrapper | None,
         instruction_wrapper: TuyaDeviceWrapper | None,
         set_position: XTCoverDPCodePercentageMappingWrapper | None,
         tilt_position: TuyaCoverDPCodePercentageMappingWrapper | None,
     ) -> None:
         """Initialize the cover entity."""
+        device_manager.device_watcher.report_message(device.id, f"Initializing cover entity {device.name}: current_position: {current_position.dpcode if current_position else None}, set_position: {set_position.dpcode if set_position else None}", device)
         super(XTCoverEntity, self).__init__(device, device_manager, description)
         super(XTEntity, self).__init__(
             device,
@@ -408,18 +410,50 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
                 )
         return current_cover_position
 
+    async def _async_open_cover(self, **kwargs: Any) -> None:
+        """Open the cover."""
+        if self._set_position is not None:
+            await self._async_send_commands(
+                self._set_position.get_update_commands(self.device, 100)
+            )
+            return
+        
+        if (
+            self._instruction_wrapper
+            and (options := self._instruction_wrapper.options)
+            and "open" in options
+        ):
+            await self._async_send_wrapper_updates(self._instruction_wrapper, "open")
+            return
+
     async def async_open_cover(self, **kwargs: Any) -> None:
         """Open the cover."""
         if self.is_cover_control_inverted:
-            await super().async_close_cover(**kwargs)
+            await self._async_close_cover(**kwargs)
         else:
-            await super().async_open_cover(**kwargs)
+            await self._async_open_cover(**kwargs)
+    
+    async def _async_close_cover(self, **kwargs: Any) -> None:
+        """Close cover."""
+        if self._set_position is not None:
+            await self._async_send_commands(
+                self._set_position.get_update_commands(self.device, 0)
+            )
+            return
+        
+        if (
+            self._instruction_wrapper
+            and (options := self._instruction_wrapper.options)
+            and "close" in options
+        ):
+            await self._async_send_wrapper_updates(self._instruction_wrapper, "close")
+            return
 
     async def async_close_cover(self, **kwargs: Any) -> None:
         if self.is_cover_control_inverted:
-            await super().async_open_cover(**kwargs)
+            await self._async_open_cover(**kwargs)
         else:
-            await super().async_close_cover(**kwargs)
+            await self._async_close_cover(**kwargs)
 
     async def async_set_cover_position(self, **kwargs: Any) -> None:
         """Move the cover to a specific position."""
@@ -437,7 +471,7 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         hass: HomeAssistant,
         *,
         current_position: XTCoverDPCodePercentageMappingWrapper | None,
-        current_state_wrapper: TuyaCoverIsClosedWrapper | None,
+        current_state_wrapper: TuyaCoverIsClosedInvertedWrapper | TuyaCoverIsClosedEnumWrapper | None,
         instruction_wrapper: TuyaDeviceWrapper | None,
         set_position: XTCoverDPCodePercentageMappingWrapper | None,
         tilt_position: TuyaCoverDPCodePercentageMappingWrapper | None,

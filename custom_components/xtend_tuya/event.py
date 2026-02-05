@@ -18,11 +18,12 @@ from .multi_manager.multi_manager import (
 from .const import (
     TUYA_DISCOVERY_NEW,
     LOGGER,
+    XTDPCode,
 )
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaEventEntity,
     TuyaEventEntityDescription,
-    TuyaEventDPCodeEventWrapper,
+    TuyaDeviceWrapper,
 )
 from .entity import (
     XTEntity,
@@ -45,7 +46,7 @@ class XTEventEntityDescription(TuyaEventEntityDescription):
         device: XTDevice,
         device_manager: MultiManager,
         description: XTEventEntityDescription,
-        dpcode_wrapper: TuyaEventDPCodeEventWrapper,
+        dpcode_wrapper: TuyaDeviceWrapper,
     ) -> XTEventEntity:
         return XTEventEntity(
             device=device,
@@ -59,7 +60,36 @@ class XTEventEntityDescription(TuyaEventEntityDescription):
 # default status set of each category (that don't have a set instruction)
 # end up being events.
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
-EVENTS: dict[str, tuple[XTEventEntityDescription, ...]] = {}
+EVENTS: dict[str, tuple[XTEventEntityDescription, ...]] = {
+    # Smart Lock - Track who unlocked the door
+    "jtmspro": (
+        XTEventEntityDescription(
+            key=XTDPCode.CARD_UNLOCK_USER,
+            translation_key="card_unlock_user",
+            device_class=None,
+        ),
+        XTEventEntityDescription(
+            key=XTDPCode.FACE_UNLOCK_USER,
+            translation_key="face_unlock_user",
+            device_class=None,
+        ),
+        XTEventEntityDescription(
+            key=XTDPCode.HAND_UNLOCK_USER,
+            translation_key="hand_unlock_user",
+            device_class=None,
+        ),
+        XTEventEntityDescription(
+            key=XTDPCode.FINGERPRINT_UNLOCK_USER,
+            translation_key="fingerprint_unlock_user",
+            device_class=None,
+        ),
+        XTEventEntityDescription(
+            key=XTDPCode.PASSWORD_UNLOCK_USER,
+            translation_key="password_unlock_user",
+            device_class=None,
+        ),
+    ),
+}
 
 
 async def async_setup_entry(
@@ -179,7 +209,7 @@ class XTEventEntity(XTEntity, TuyaEventEntity):
         device: XTDevice,
         device_manager: MultiManager,
         description: XTEventEntityDescription,
-        dpcode_wrapper: TuyaEventDPCodeEventWrapper,
+        dpcode_wrapper: TuyaDeviceWrapper[tuple[str, dict[str, Any] | None]],
     ) -> None:
         """Init Tuya event entity."""
         try:
@@ -201,7 +231,7 @@ class XTEventEntity(XTEntity, TuyaEventEntity):
         description: XTEventEntityDescription,
         device: XTDevice,
         device_manager: MultiManager,
-        dpcode_wrapper: TuyaEventDPCodeEventWrapper,
+        dpcode_wrapper: TuyaDeviceWrapper,
     ) -> XTEventEntity:
         if hasattr(description, "get_entity_instance") and callable(
             getattr(description, "get_entity_instance")

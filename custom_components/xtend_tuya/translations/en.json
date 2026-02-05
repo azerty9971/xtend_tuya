@@ -36,7 +36,7 @@
                 }
             },
             "configure": {
-                "description": "Add a Tuya OpenAPI credential to improve the compatibility with some Tuya devices. Please follow the guide at [this URL](https://github.com/azerty9971/xtend_tuya/blob/main/docs/cloud_credentials.md)",
+                "description": "Add a Tuya OpenAPI credential to improve the compatibility with some Tuya devices. Please follow the guide at the URL by clicking the button below.",
                 "data": {
                     "no_openapi": "Don't ask for OpenAPI credentials",
                     "country_code": "Country",
@@ -63,7 +63,7 @@
     "options": {
         "step": {
             "configure": {
-                "description": "Add a Tuya OpenAPI credential to improve the compatibility with some Tuya devices. Please follow the guide at [this URL](https://github.com/azerty9971/xtend_tuya/blob/main/docs/cloud_credentials.md)",
+                "description": "Add a Tuya OpenAPI credential to improve the compatibility with some Tuya devices. Please follow the guide at the URL by clicking the button below.",
                 "data": {
                     "no_openapi": "Don't ask for OpenAPI credentials",
                     "country_code": "Country",
@@ -3041,7 +3041,7 @@
             "fix_flow": {
                 "step": {
                     "confirm": {
-                        "description": "The integration \"{name}\" (`{config_entry_id}`) could not connect to the Tuya OpenAPI service (credentials expired)\n\nTo fix this error please follow the guide at [this URL](https://github.com/azerty9971/xtend_tuya/blob/main/docs/renew_cloud_credentials.md), then restart Home Assistant.",
+                        "description": "The integration \"{name}\" (`{config_entry_id}`) could not connect to the Tuya OpenAPI service (credentials expired)\n\nTo fix this error please follow the guide at the URL by clicking the button below, then restart Home Assistant.",
                         "title": "Tuya OpenAPI credentials expired"
                     }
                 }
@@ -3052,7 +3052,7 @@
             "fix_flow": {
                 "step": {
                     "confirm": {
-                        "description": "The integration \"{name}\" (`{config_entry_id}`) Does not have Tuya OpenAPI credentials\n\nWithout this, a lot of entities might be missing in your devices.\n\nTo fix this warning please follow the guide at [this URL](https://github.com/azerty9971/xtend_tuya/blob/main/docs/cloud_credentials.md), then restart Home Assistant.",
+                        "description": "The integration \"{name}\" (`{config_entry_id}`) Does not have Tuya OpenAPI credentials\n\nWithout this, a lot of entities might be missing in your devices.\n\nTo fix this warning please follow the guide at the URL by clicking the button below, then restart Home Assistant.",
                         "title": "Tuya OpenAPI account not configured"
                     }
                 }
@@ -3063,7 +3063,7 @@
             "fix_flow": {
                 "step": {
                     "confirm": {
-                        "description": "The integration \"{name}\" (`{config_entry_id}`) Does not have a Tuya OpenAPI account that is subscribed to the Smart Lock Open Service\n\nWithout this, locks will not function properly.\n\nTo fix this warning please follow the guide at [this URL](https://github.com/azerty9971/xtend_tuya/blob/main/docs/configure_locks.md), then restart Home Assistant.",
+                        "description": "The integration \"{name}\" (`{config_entry_id}`) Does not have a Tuya OpenAPI account that is subscribed to the Smart Lock Open Service\n\nWithout this, locks will not function properly.\n\nTo fix this warning please follow the guide at the URL by clicking the button below, then restart Home Assistant.",
                         "title": "Tuya OpenAPI account badly configured (lock)"
                     }
                 }
@@ -3074,7 +3074,7 @@
             "fix_flow": {
                 "step": {
                     "confirm": {
-                        "description": "The integration \"{name}\" (`{config_entry_id}`) Does not have a Tuya OpenAPI account that is subscribed to the IoT Video Live Stream service\n\nWithout this, cameras will not function properly.\n\nTo fix this warning please follow the guide at [this URL](https://github.com/azerty9971/xtend_tuya/blob/main/docs/configure_cameras.md), then restart Home Assistant.",
+                        "description": "The integration \"{name}\" (`{config_entry_id}`) Does not have a Tuya OpenAPI account that is subscribed to the IoT Video Live Stream service\n\nWithout this, cameras will not function properly.\n\nTo fix this warning please follow the guide at the URL by clicking the button below, then restart Home Assistant.",
                         "title": "Tuya OpenAPI account badly configured (camera)"
                     }
                 }
@@ -3085,7 +3085,7 @@
             "fix_flow": {
                 "step": {
                     "confirm": {
-                        "description": "The integration \"{name}\" (`{config_entry_id}`) Does not have a Tuya OpenAPI account that is subscribed to the IR Control Hub Open Service service\n\nWithout this, IR devices will not function properly.\n\nTo fix this warning please follow the guide at [this URL](https://github.com/azerty9971/xtend_tuya/blob/main/docs/configure_ir.md), then restart Home Assistant.",
+                        "description": "The integration \"{name}\" (`{config_entry_id}`) Does not have a Tuya OpenAPI account that is subscribed to the IR Control Hub Open Service service\n\nWithout this, IR devices will not function properly.\n\nTo fix this warning please follow the guide at the URL by clicking the button below, then restart Home Assistant.",
                         "title": "Tuya OpenAPI account badly configured (IR)"
                     }
                 }

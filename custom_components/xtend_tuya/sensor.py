@@ -1790,16 +1790,23 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
         if manual_call and self.cancel_reset_after_x_seconds is not None:
             self.cancel_reset_after_x_seconds()
         self.cancel_reset_after_x_seconds = None
-        value = self.device.status.get(self._dpcode_wrapper.dpcode)
+        dpcode = getattr(self._dpcode_wrapper, "dpcode", None)
+        if dpcode is None:
+            return
+        value = self.device.status.get(dpcode)
         default_value = get_default_value(self.get_dptype_from_dpcode_wrapper())
         if value is None or value == default_value:
             return
-        self.device.status[self._dpcode_wrapper.dpcode] = default_value
+        self.device.status[dpcode] = default_value
         self.schedule_update_ha_state()
 
     async def async_added_to_hass(self) -> None:
         """Call when entity about to be added to hass."""
         await super().async_added_to_hass()
+
+        dpcode = getattr(self._dpcode_wrapper, "dpcode", None)
+        if dpcode is None:
+            return
 
         async def reset_status_daily(now: datetime) -> None:
             should_reset = False
@@ -1814,17 +1821,17 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
 
             if should_reset:
                 if device := self.device_manager.device_map.get(self.device.id, None):
-                    if self._dpcode_wrapper.dpcode in device.status:
+                    if dpcode in device.status:
                         default_value = get_default_value(
                             self.get_dptype_from_dpcode_wrapper()
                         )
                         if now.hour != 0 or now.minute != 0:
                             LOGGER.error(
-                                f"Resetting {device.name}'s status {self._dpcode_wrapper.dpcode} to {default_value} at unexpected time",
+                                f"Resetting {device.name}'s status {dpcode} to {default_value} at unexpected time",
                                 stack_info=True,
                             )
                         else:
-                            device.status[self._dpcode_wrapper.dpcode] = default_value
+                            device.status[dpcode] = default_value
                             self.async_write_ha_state()
 
         if (
@@ -1853,13 +1860,13 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
                     self._restored_data.native_value = scaled_value_back
 
                 if device := self.device_manager.device_map.get(self.device.id, None):
-                    device.status[self._dpcode_wrapper.dpcode] = (
+                    device.status[dpcode] = (
                         self._restored_data.native_value
                     )
 
         if self.entity_description.refresh_device_after_load:
             self.device_manager.multi_device_listener.update_device(
-                self.device, [self._dpcode_wrapper.dpcode]
+                self.device, [dpcode]
             )
 
     @staticmethod
