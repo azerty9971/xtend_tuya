@@ -492,35 +492,32 @@ class MultiManager:  # noqa: F811
                         ):
                             break
                 
-                LOGGER.warning(f"Command {regular_command} on device {device_id} failed with all APIs, trying aliases if they exist")
                 # If it still didn't work, try sending the command aliases if they exist
                 if last_command_result is False:
-                    alias_command: dict[str, list[dict[str, Any]]] = {}
-                    for command in regular_commands:
-                        if code := command.get("code", None):
-                            for alias in device.get_status_code_aliases(code):
-                                if code not in alias:
-                                    alias_command[code] = []
-                                alias_command[code].append(
-                                    {
-                                        "code": alias,
-                                        "value": command["value"],
-                                    }
-                                )
-                    for account in self.accounts.values():
-                        for code in alias_command:
-                            last_command_result = False
-                            for command in alias_command[code]:
-                                if last_command_result := account.send_command(
-                                    device_id, command, reverse_filters=False
-                                ):
-                                    break
-                            if last_command_result is False:
-                                for command in alias_command[code]:
-                                    if last_command_result := account.send_command(
-                                        device_id, command, reverse_filters=True
-                                    ):
-                                        break
+                    LOGGER.warning(f"Command {regular_command} on device {device_id} failed with all APIs, trying aliases if they exist")
+                    alias_command: list[dict[str, Any]] = []
+                    if code := regular_command.get("code", None):
+                        for alias in device.get_status_code_aliases(code):
+                            alias_command.append(
+                                {
+                                    "code": alias,
+                                    "value": regular_command["value"],
+                                }
+                            )
+                    for command in alias_command:
+                        last_command_result = False
+                        for account in self.accounts.values():
+                            if last_command_result := account.send_command(
+                                device_id, command, reverse_filters=False
+                            ):
+                                break
+                        for account in self.accounts.values():
+                            if last_command_result := account.send_command(
+                                device_id, command, reverse_filters=True
+                            ):
+                                break
+                        if last_command_result is True:
+                            break
 
     def get_device_stream_allocate(
         self, device_id: str, stream_type: Literal["flv", "hls", "rtmp", "rtsp"]
