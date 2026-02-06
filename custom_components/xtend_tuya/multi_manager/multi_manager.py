@@ -494,7 +494,6 @@ class MultiManager:  # noqa: F811
                 
                 # If it still didn't work, try sending the command aliases if they exist
                 if last_command_result is False:
-                    LOGGER.warning(f"Command {regular_command} on device {device_id} failed with all APIs, trying aliases if they exist")
                     alias_command: list[dict[str, Any]] = []
                     if code := regular_command.get("code", None):
                         for alias in device.get_status_code_aliases(code):
