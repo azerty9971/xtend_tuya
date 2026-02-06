@@ -449,11 +449,11 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
             await self._async_send_wrapper_updates(self._instruction_wrapper, "close")
             return
 
-    #async def async_close_cover(self, **kwargs: Any) -> None:
-    #    if self.is_cover_control_inverted:
-    #        await self._async_open_cover(**kwargs)
-    #    else:
-    #        await self._async_close_cover(**kwargs)
+    async def async_close_cover(self, **kwargs: Any) -> None:
+        if self.is_cover_control_inverted:
+            await self._async_open_cover(**kwargs)
+        else:
+            await self._async_close_cover(**kwargs)
 
     async def async_set_cover_position(self, **kwargs: Any) -> None:
         """Move the cover to a specific position."""
