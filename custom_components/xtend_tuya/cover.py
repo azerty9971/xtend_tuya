@@ -60,7 +60,7 @@ class XTCoverEntityDescription(TuyaCoverEntityDescription):
     current_position: (  # type: ignore
         TuyaDPCode | tuple[TuyaDPCode, ...] | XTDPCode | tuple[XTDPCode, ...] | None
     ) = None
-    set_position: TuyaDPCode | XTDPCode | None = None  # type: ignore
+    set_position: TuyaDPCode | tuple[TuyaDPCode, ...] | XTDPCode | tuple[XTDPCode, ...] | None = None  # type: ignore
 
     # duplicate the entity if handled by another integration
     ignore_other_dp_code_handler: bool = False
@@ -114,7 +114,7 @@ COVERS: dict[str, tuple[XTCoverEntityDescription, ...]] = {
             translation_key="curtain",
             current_state=XTDPCode.SITUATION_SET,
             current_position=(XTDPCode.PERCENT_CONTROL, XTDPCode.PERCENT_STATE),
-            set_position=XTDPCode.PERCENT_CONTROL,
+            set_position=(XTDPCode.PERCENT_CONTROL, XTDPCode.PERCENT_STATE),
             device_class=CoverDeviceClass.CURTAIN,
             control_back_mode=XTDPCode.CONTROL_BACK_MODE,
         ),
@@ -122,7 +122,7 @@ COVERS: dict[str, tuple[XTCoverEntityDescription, ...]] = {
             key=XTDPCode.CONTROL_2,
             translation_key="curtain_2",
             current_position=(XTDPCode.PERCENT_CONTROL_2, XTDPCode.PERCENT_STATE_2),
-            set_position=XTDPCode.PERCENT_CONTROL_2,
+            set_position=(XTDPCode.PERCENT_CONTROL_2, XTDPCode.PERCENT_STATE_2),
             device_class=CoverDeviceClass.CURTAIN,
             control_back_mode=XTDPCode.CONTROL_BACK_MODE,
         ),
@@ -130,7 +130,7 @@ COVERS: dict[str, tuple[XTCoverEntityDescription, ...]] = {
             key=XTDPCode.CONTROL_3,
             translation_key="curtain_3",
             current_position=(XTDPCode.PERCENT_CONTROL_3, XTDPCode.PERCENT_STATE_3),
-            set_position=XTDPCode.PERCENT_CONTROL_3,
+            set_position=(XTDPCode.PERCENT_CONTROL_3, XTDPCode.PERCENT_STATE_3),
             device_class=CoverDeviceClass.CURTAIN,
             control_back_mode=XTDPCode.CONTROL_BACK_MODE,
         ),
