@@ -491,7 +491,8 @@ class MultiManager:  # noqa: F811
                             device_id, regular_command, reverse_filters=True
                         ):
                             break
-
+                
+                LOGGER.warning(f"Command {regular_command} on device {device_id} failed with all APIs, trying aliases if they exist")
                 # If it still didn't work, try sending the command aliases if they exist
                 if last_command_result is False:
                     alias_command: dict[str, list[dict[str, Any]]] = {}
