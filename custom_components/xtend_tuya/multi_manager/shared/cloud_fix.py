@@ -36,6 +36,7 @@ class CloudFixes:
         CloudFixes._remove_status_that_are_local_strategy_aliases(device)
         CloudFixes._fix_unaligned_function_or_status_range(device)
         CloudFixes._strip_valuedescr_of_non_label_fields_for_bitmaps(device)
+        CloudFixes._fix_isolated_status_range_and_function(device)
         if multi_manager is not None:
             multi_manager.device_watcher.report_message(
                 device.id,
@@ -134,6 +135,24 @@ class CloudFixes:
                         else:
                             values_dict = {}
                         config_item["valueDesc"] = json.dumps(values_dict)
+
+    @staticmethod
+    def _fix_isolated_status_range_and_function(device: XTDevice):
+        # Remove status_ranges and functions that are not linked to any local strategy item
+        status_range_pop: list[str] = []
+        for status in device.status_range:
+            dp_id: int = device.status_range[status].dp_id
+            if dp_id == 0 or dp_id not in device.local_strategy:
+                status_range_pop.append(status)
+        for status in status_range_pop:
+            device.status_range.pop(status)
+        function_pop: list[str] = []
+        for function in device.function:
+            dp_id: int = device.function[function].dp_id
+            if dp_id == 0 or dp_id not in device.local_strategy:
+                function_pop.append(function)
+        for function in function_pop:
+            device.function.pop(function)
 
     @staticmethod
     def _fix_unaligned_function_or_status_range(device: XTDevice):
