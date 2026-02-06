@@ -200,7 +200,7 @@ class MultiManager:  # noqa: F811
             CloudFixes.apply_fixes(device, self)
             CloudFixes.apply_fixes(device, self)
 
-            #Don't allow changes to DPCodes after the global initialization
+            # Don't allow changes to DPCodes after the global initialization
             device.force_compatibility = True
         self._enable_multi_map_device_alignment()
         self._process_pending_messages()
@@ -467,6 +467,8 @@ class MultiManager:  # noqa: F811
                         break
                 if not vf_found:
                     regular_commands.append(command)
+        else:
+            return
 
         if virtual_function_commands:
             self.virtual_function_handler.process_virtual_function(
@@ -477,12 +479,47 @@ class MultiManager:  # noqa: F811
             for regular_command in regular_commands:
                 last_command_result: bool = False
                 for account in self.accounts.values():
-                    if last_command_result := account.send_command(device_id, regular_command, reverse_filters=False):
+                    if last_command_result := account.send_command(
+                        device_id, regular_command, reverse_filters=False
+                    ):
                         break
+
+                # If the command failed, try using the other APIs
                 if last_command_result is False:
                     for account in self.accounts.values():
-                        if last_command_result := account.send_command(device_id, regular_command, reverse_filters=True):
+                        if last_command_result := account.send_command(
+                            device_id, regular_command, reverse_filters=True
+                        ):
                             break
+
+                # If it still didn't work, try sending the command aliases if they exist
+                if last_command_result is False:
+                    alias_command: dict[str, list[dict[str, Any]]] = {}
+                    for command in regular_commands:
+                        if code := command.get("code", None):
+                            for alias in device.get_status_code_aliases(code):
+                                if code not in alias:
+                                    alias_command[code] = []
+                                alias_command[code].append(
+                                    {
+                                        "code": alias,
+                                        "value": command["value"],
+                                    }
+                                )
+                    for account in self.accounts.values():
+                        for code in alias_command:
+                            last_command_result = False
+                            for command in alias_command[code]:
+                                if last_command_result := account.send_command(
+                                    device_id, command, reverse_filters=False
+                                ):
+                                    break
+                            if last_command_result is False:
+                                for command in alias_command[code]:
+                                    if last_command_result := account.send_command(
+                                        device_id, command, reverse_filters=True
+                                    ):
+                                        break
 
     def get_device_stream_allocate(
         self, device_id: str, stream_type: Literal["flv", "hls", "rtmp", "rtsp"]
@@ -513,7 +550,9 @@ class MultiManager:  # noqa: F811
             old_online_status = device.online
             for online_status in device.online_states:
                 device.online = device.online_states[online_status]
-                if device.online:  # Prefer to be more On than Off if multiple state are not in accordance
+                if (
+                    device.online
+                ):  # Prefer to be more On than Off if multiple state are not in accordance
                     break
             if device.online != old_online_status:
                 self.multi_device_listener.update_device(device, None)
