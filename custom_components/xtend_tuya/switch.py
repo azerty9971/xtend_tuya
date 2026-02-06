@@ -1,7 +1,7 @@
 """Support for XT switches."""
 
 from __future__ import annotations
-from typing import cast
+from typing import cast, Any
 from dataclasses import dataclass
 from homeassistant.const import EntityCategory, Platform
 from homeassistant.core import HomeAssistant, callback
@@ -576,6 +576,22 @@ class XTSwitchEntity(XTEntity, TuyaSwitchEntity):
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description  # type: ignore
+
+    async def async_turn_on(self, **kwargs: Any) -> None:
+        if self.entity_description.dont_send_to_cloud:
+            if self.entity_description.key in self.device.status:
+                self.device.status[self.entity_description.key] = True
+                self.device_manager.multi_device_listener.update_device(self.device, [self.entity_description.key])
+            return
+        await super().async_turn_on(**kwargs)
+    
+    async def async_turn_off(self, **kwargs: Any) -> None:
+        if self.entity_description.dont_send_to_cloud:
+            if self.entity_description.key in self.device.status:
+                self.device.status[self.entity_description.key] = False
+                self.device_manager.multi_device_listener.update_device(self.device, [self.entity_description.key])
+            return
+        await super().async_turn_off(**kwargs)
 
     @staticmethod
     def get_entity_instance(

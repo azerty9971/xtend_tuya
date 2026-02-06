@@ -342,6 +342,13 @@ class XTDevice(TuyaDevice):
                 for alias in local_strategy.get("status_code_alias", {}):
                     return_list[alias] = status_code
         return return_list
+    
+    def get_status_code_aliases(self, status_code: str) -> list[str]:
+        alias_list: list[str] = []
+        for local_strategy in self.local_strategy.values():
+            if local_strategy.get("status_code", None) == status_code:
+                alias_list.extend(local_strategy.get("status_code_alias", []))
+        return alias_list
 
     def replace_status_code_with_another(
         self, orig_status_code: str, new_status_code: str, skip_force_compatibility: bool = False

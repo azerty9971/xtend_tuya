@@ -1783,8 +1783,6 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
         self.device = device
         self.device_manager = device_manager
         self.entity_description = description  # type: ignore
-        if self.device.category == "dlq":
-            LOGGER.warning(f"Added DLQ device: {self.device.name}")
 
     def reset_value(self, _: datetime | None, manual_call: bool = False) -> None:
         if manual_call and self.cancel_reset_after_x_seconds is not None:
