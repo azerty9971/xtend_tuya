@@ -581,7 +581,7 @@ class XTSwitchEntity(XTEntity, TuyaSwitchEntity):
         if self.entity_description.dont_send_to_cloud:
             if self.entity_description.key in self.device.status:
                 self.device.status[self.entity_description.key] = True
-                self.async_write_ha_state()
+                self.device_manager.multi_device_listener.update_device(self.device, [self.entity_description.key])
             return
         await super().async_turn_on(**kwargs)
     
@@ -589,7 +589,7 @@ class XTSwitchEntity(XTEntity, TuyaSwitchEntity):
         if self.entity_description.dont_send_to_cloud:
             if self.entity_description.key in self.device.status:
                 self.device.status[self.entity_description.key] = False
-                self.async_write_ha_state()
+                self.device_manager.multi_device_listener.update_device(self.device, [self.entity_description.key])
             return
         await super().async_turn_off(**kwargs)
 
