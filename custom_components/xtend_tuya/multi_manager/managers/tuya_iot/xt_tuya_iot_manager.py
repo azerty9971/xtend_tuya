@@ -466,10 +466,12 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                     device_id,
                     f"Sending property update, payload: {json.dumps({'properties': property_str})}",
                 )
-                self.api.post(
+                result = self.api.post(
                     f"/v2.0/cloud/thing/{device_id}/shadow/properties/issue",
                     {"properties": property_str},
                 )
+                if result.get("success") is False:
+                    raise Exception(f"send_property_update error:({properties}): {result}")
 
     def send_lock_unlock_command(self, device: XTDevice, lock: bool) -> bool:
         self.multi_manager.device_watcher.report_message(
