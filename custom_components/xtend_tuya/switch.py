@@ -579,11 +579,15 @@ class XTSwitchEntity(XTEntity, TuyaSwitchEntity):
 
     async def async_turn_on(self, **kwargs: Any) -> None:
         if self.entity_description.dont_send_to_cloud:
+            if self.entity_description.key in self.device.status:
+                self.device.status[self.entity_description.key] = True
             return
         await super().async_turn_on(**kwargs)
     
     async def async_turn_off(self, **kwargs: Any) -> None:
         if self.entity_description.dont_send_to_cloud:
+            if self.entity_description.key in self.device.status:
+                self.device.status[self.entity_description.key] = False
             return
         await super().async_turn_off(**kwargs)
 
