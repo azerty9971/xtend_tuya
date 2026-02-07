@@ -60,8 +60,10 @@ XT_HVAC_TO_HA = {
     "dehumidify": HVACMode.DRY,
     "freeze": HVACMode.COOL,
     "heat": HVACMode.HEAT,
+    "High": HVACMode.HEAT_COOL,
     "home": HVACMode.HEAT_COOL,
     "hot": HVACMode.HEAT,
+    "Low": HVACMode.HEAT_COOL,
     "manual": HVACMode.HEAT_COOL,
     "smartcool": HVACMode.HEAT_COOL,
     "temporary": HVACMode.HEAT_COOL,
@@ -381,7 +383,6 @@ async def async_setup_entry(
             this_platform,
         ),
     )
-    LOGGER.warning(f"Supported climate descriptors: {supported_descriptors}")
 
     @callback
     def async_discover_device(device_map, restrict_dpcode: str | None = None) -> None:
