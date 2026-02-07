@@ -103,7 +103,7 @@ SELECTS: dict[str, tuple[XTSelectEntityDescription, ...]] = {
             entity_category=EntityCategory.CONFIG,
         ),
         XTSelectEntityDescription(
-            key=XTDPCode.MODE2,
+            key=XTDPCode.MODE_CAP,
             translation_key="dj_mode",
             entity_category=EntityCategory.CONFIG,
         ),
