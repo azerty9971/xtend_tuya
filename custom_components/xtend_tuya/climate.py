@@ -60,10 +60,8 @@ XT_HVAC_TO_HA = {
     "dehumidify": HVACMode.DRY,
     "freeze": HVACMode.COOL,
     "heat": HVACMode.HEAT,
-    "High": HVACMode.HEAT_COOL,
     "home": HVACMode.HEAT_COOL,
     "hot": HVACMode.HEAT,
-    "Low": HVACMode.HEAT_COOL,
     "manual": HVACMode.HEAT_COOL,
     "smartcool": HVACMode.HEAT_COOL,
     "temporary": HVACMode.HEAT_COOL,
@@ -78,7 +76,6 @@ MERGED_HVAC_TO_HA: dict[str, HVACMode] = append_dictionnaries(
 XT_CLIMATE_MODE_DPCODES: tuple[XTDPCode, ...] = (
     XTDPCode.MODE,
     XTDPCode.MODE1,
-    XTDPCode.MODE2,
 )
 XT_CLIMATE_CURRENT_NON_UNIT_TEMPERATURE_DPCODES: tuple[XTDPCode, ...] = (
     XTDPCode.GET_TEMP,

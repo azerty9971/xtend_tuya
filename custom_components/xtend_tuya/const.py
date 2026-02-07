@@ -794,7 +794,7 @@ class XTDPCode(StrEnum):
     MINITEMP_SET = "minitemp_set"
     MONITORING = "monitoring"
     MODE1 = "mode1"  # Working mode / Mode
-    MODE2 = "Mode"
+    MODE_CAP = "Mode"
     MOVEDISTANCE_MAX = "movedistance_max"
     MOVEDISTANCE_MIN = "movedistance_min"
     MOVESENSITIVITY = "movesensitivity"
