@@ -381,6 +381,7 @@ async def async_setup_entry(
             this_platform,
         ),
     )
+    LOGGER.warning(f"Supported climate descriptors: {supported_descriptors}")
 
     @callback
     def async_discover_device(device_map, restrict_dpcode: str | None = None) -> None:
