@@ -438,7 +438,7 @@ class MultiManager:  # noqa: F811
             return_list = append_lists(return_list, account.query_scenes())
         return return_list
 
-    def send_commands(self, device_id: str, commands: list[dict[str, Any]]):
+    def send_commands(self, device_id: str, commands: list[dict[str, Any]]) -> bool:
         virtual_function_commands: list[dict[str, Any]] = []
         regular_commands: list[dict[str, Any]] = []
         if device := self.device_map.get(device_id, None):
@@ -468,16 +468,17 @@ class MultiManager:  # noqa: F811
                 if not vf_found:
                     regular_commands.append(command)
         else:
-            return
+            return False
 
         if virtual_function_commands:
             self.virtual_function_handler.process_virtual_function(
                 device_id, virtual_function_commands
             )
+            return True
 
+        last_command_result: bool = False
         if regular_commands:
             for regular_command in regular_commands:
-                last_command_result: bool = False
                 for account in self.accounts.values():
                     if last_command_result := account.send_command(
                         device_id, regular_command, reverse_filters=False
@@ -517,6 +518,7 @@ class MultiManager:  # noqa: F811
                                 break
                         if last_command_result is True:
                             break
+        return last_command_result
 
     def get_device_stream_allocate(
         self, device_id: str, stream_type: Literal["flv", "hls", "rtmp", "rtsp"]
