@@ -729,3 +729,19 @@ class XTEntity(TuyaEntity):
         human_name = human_name.replace("_", " ")
         human_name = human_name.capitalize()
         return human_name
+    
+    @staticmethod
+    def get_device_classes_from_uom(device_class_dict: dict[Any, set[type[StrEnum] | str | None]]) -> dict[type[StrEnum] | str, str]:
+        return_dict: dict[type[StrEnum] | str, str] = {}
+        for device_class, uom_set in device_class_dict.items():
+            for uom in uom_set:
+                if uom is None:
+                    continue
+                return_dict[uom] = device_class.value
+        return return_dict
+
+    @staticmethod
+    def get_device_class_from_uom(dpcode_information: sc.XTDevice.XTDeviceDPCodeInformation | None, device_class_from_uom_dict: dict[type[StrEnum] | str, str]) -> Any | None:
+        if dpcode_information is not None and dpcode_information.unit in device_class_from_uom_dict:
+            return device_class_from_uom_dict[dpcode_information.unit]
+        return None

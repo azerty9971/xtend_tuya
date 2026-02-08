@@ -10,6 +10,9 @@ from homeassistant.components.sensor import (
     SensorExtraStoredData,
     RestoreSensor,
 )
+from homeassistant.components.sensor.const import (
+    DEVICE_CLASS_UNITS as SENSOR_DEVICE_CLASS_UNITS,
+)
 from homeassistant.const import (
     UnitOfEnergy,
     UnitOfTime,
@@ -1640,9 +1643,14 @@ async def async_setup_entry(
                 generic_dpcodes = XTEntity.get_generic_dpcodes_for_this_platform(
                     device, this_platform
                 )
+                if not generic_dpcodes:
+                    continue
+                dev_class_from_uom = XTEntity.get_device_classes_from_uom(SENSOR_DEVICE_CLASS_UNITS)
                 for dpcode in generic_dpcodes:
+                    dpcode_info = device.get_dpcode_information(dpcode=dpcode)
                     descriptor = XTSensorEntityDescription(
                         key=dpcode,
+                        device_class=XTEntity.get_device_class_from_uom(dpcode_info, dev_class_from_uom),
                         translation_key="xt_generic_sensor",
                         translation_placeholders={
                             "name": XTEntity.get_human_name(dpcode)
