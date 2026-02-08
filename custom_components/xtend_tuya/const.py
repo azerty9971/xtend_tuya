@@ -244,8 +244,8 @@ class WorkMode(StrEnum):
     WHITE = "white"
 
 UOM_MAPPING_DICT: dict[str, str | None] = {
-    "": None,
     "kwh": "kWh",
+    "kW·h": "kWh",
     "％": "%",
     "gal": "gal"
 }
