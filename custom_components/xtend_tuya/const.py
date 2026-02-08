@@ -243,7 +243,12 @@ class WorkMode(StrEnum):
     SCENE = "scene"
     WHITE = "white"
 
-UOM_MAPPING_DICT: dict[str, str] = {}
+UOM_MAPPING_DICT: dict[str, str | None] = {
+    "": None,
+    "kwh": "kWh",
+    "％": "%",
+    "gal": "gal"
+}
 
 class XTDPCode(StrEnum):
     """Data Point Codes used by XT.

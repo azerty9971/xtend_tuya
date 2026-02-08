@@ -561,21 +561,21 @@ class CloudFixes:
                 if sr_uom in UOM_MAPPING_DICT:
                     sr_uom = UOM_MAPPING_DICT[sr_uom]
                 sr_value["unit"] = sr_uom
-                if sr_uom not in all_uom:
+                if sr_uom is not None and sr_uom not in all_uom:
                     all_uom.append(sr_uom)
             if fn_value and "unit" in fn_value:
                 fn_uom = fn_value["unit"]
                 if fn_uom in UOM_MAPPING_DICT:
                     fn_uom = UOM_MAPPING_DICT[fn_uom]
                 fn_value["unit"] = fn_uom
-                if fn_uom not in all_uom:
+                if fn_uom is not None and fn_uom not in all_uom:
                     all_uom.append(fn_uom)
             if ls_value and "unit" in ls_value:
                 ls_uom = ls_value["unit"]
                 if ls_uom in UOM_MAPPING_DICT:
                     ls_uom = UOM_MAPPING_DICT[ls_uom]
                 ls_value["unit"] = ls_uom
-                if ls_uom not in all_uom:
+                if ls_uom is not None and ls_uom not in all_uom:
                     all_uom.append(ls_uom)
             if len(all_uom) > 1:
                 LOGGER.warning(f"Multiple different uom found for code {code} on device {device.name}: {all_uom}")
