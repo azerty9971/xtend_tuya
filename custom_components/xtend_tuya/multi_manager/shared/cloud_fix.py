@@ -572,6 +572,8 @@ class CloudFixes:
                     all_uom.append(fn_uom)
             if ls_value and "unit" in ls_value:
                 ls_uom = ls_value["unit"]
+                if code == "temp_adjust_step":
+                    LOGGER.warning(f"temp_adjust_step: |{ls_uom}|, found ({UOM_MAPPING_DICT.get(ls_uom, 'no mapping')})")
                 if ls_uom in UOM_MAPPING_DICT:
                     ls_uom = UOM_MAPPING_DICT[ls_uom]
                 ls_value["unit"] = ls_uom
