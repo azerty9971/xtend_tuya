@@ -737,7 +737,11 @@ class XTEntity(TuyaEntity):
             for uom in uom_set:
                 if uom is None:
                     continue
-                return_dict[uom] = device_class.value
+                if isinstance(uom, str):
+                    return_dict[uom] = device_class.value
+                elif issubclass(uom, StrEnum):
+                    for uom_value in uom:
+                        return_dict[uom_value] = device_class.value
         return return_dict
 
     @staticmethod
