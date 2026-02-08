@@ -11,6 +11,10 @@ from ...ha_tuya_integration.tuya_integration_imports import (
     TuyaDPType,
     tuya_util_parse_dptype,
 )
+from ...const import (
+    UOM_MAPPING_DICT,
+    LOGGER,
+)
 import custom_components.xtend_tuya.multi_manager.multi_manager as mm
 
 
@@ -37,6 +41,7 @@ class CloudFixes:
         CloudFixes._fix_unaligned_function_or_status_range(device)
         CloudFixes._strip_valuedescr_of_non_label_fields_for_bitmaps(device)
         CloudFixes._fix_isolated_status_range_and_function(device)
+        CloudFixes._align_uom(device)
         if multi_manager is not None:
             multi_manager.device_watcher.report_message(
                 device.id,
@@ -508,6 +513,80 @@ class CloudFixes:
             )
         else:
             return json.dumps({})
+
+    @staticmethod
+    def _align_uom(device: XTDevice):
+        all_codes: dict[str, int] = {}
+        for code in device.status_range:
+            if code not in all_codes:
+                all_codes[code] = 1
+            else:
+                all_codes[code] += 1
+        for code in device.function:
+            if code not in all_codes:
+                all_codes[code] = 1
+            else:
+                all_codes[code] += 1
+        for dp_item in device.local_strategy.values():
+            if code := dp_item.get("status_code"):
+                if code not in all_codes:
+                    all_codes[code] = 1
+                else:
+                    all_codes[code] += 1
+        for code in all_codes:
+            if all_codes[code] < 2:
+                continue
+            sr_value = None
+            sr_uom = None
+            fn_value = None
+            fn_uom = None
+            ls_value = None
+            ls_uom = None
+            dp_id = None
+            config_item = None
+            all_uom: list[str] = []
+            if code in device.status_range:
+                sr_value = json.loads(device.status_range[code].values)
+                dp_id = device.status_range[code].dp_id
+            if code in device.function:
+                fn_value = json.loads(device.function[code].values)
+                dp_id = device.function[code].dp_id
+            if dp_id is not None:
+                if dp_item := device.local_strategy.get(dp_id):
+                    if config_item := dp_item.get("config_item"):
+                        if value_descr := config_item.get("valueDesc"):
+                            ls_value = json.loads(value_descr)
+            if sr_value and "unit" in sr_value:
+                sr_uom = sr_value["unit"]
+                if sr_uom in UOM_MAPPING_DICT:
+                    sr_uom = UOM_MAPPING_DICT[sr_uom]
+                sr_value["unit"] = sr_uom
+                if sr_uom not in all_uom:
+                    all_uom.append(sr_uom)
+            if fn_value and "unit" in fn_value:
+                fn_uom = fn_value["unit"]
+                if fn_uom in UOM_MAPPING_DICT:
+                    fn_uom = UOM_MAPPING_DICT[fn_uom]
+                fn_value["unit"] = fn_uom
+                if fn_uom not in all_uom:
+                    all_uom.append(fn_uom)
+            if ls_value and "unit" in ls_value:
+                ls_uom = ls_value["unit"]
+                if ls_uom in UOM_MAPPING_DICT:
+                    ls_uom = UOM_MAPPING_DICT[ls_uom]
+                ls_value["unit"] = ls_uom
+                if ls_uom not in all_uom:
+                    all_uom.append(ls_uom)
+            if len(all_uom) > 1:
+                LOGGER.warning(f"Multiple different uom found for code {code} on device {device.name}: {all_uom}")
+            if sr_uom is not None:
+                device.status_range[code].values = json.dumps(sr_value)
+            if fn_uom is not None:
+                device.function[code].values = json.dumps(fn_value)
+            if ls_uom is not None and config_item is not None:
+                config_item["valueDesc"] = json.dumps(ls_value)
+            
+            
 
     @staticmethod
     def _align_valuedescr(device: XTDevice):
