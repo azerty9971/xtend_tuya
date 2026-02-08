@@ -579,11 +579,11 @@ class CloudFixes:
                     all_uom.append(ls_uom)
             if len(all_uom) > 1:
                 LOGGER.warning(f"Multiple different uom found for code {code} on device {device.name}: {all_uom}")
-            if sr_uom is not None:
+            if sr_value is not None:
                 device.status_range[code].values = json.dumps(sr_value)
-            if fn_uom is not None:
+            if fn_value is not None:
                 device.function[code].values = json.dumps(fn_value)
-            if ls_uom is not None and config_item is not None:
+            if ls_value is not None and config_item is not None:
                 config_item["valueDesc"] = json.dumps(ls_value)
             
             
