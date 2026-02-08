@@ -746,6 +746,10 @@ class XTEntity(TuyaEntity):
 
     @staticmethod
     def get_device_class_from_uom(dpcode_information: sc.XTDevice.XTDeviceDPCodeInformation | None, device_class_from_uom_dict: dict[type[StrEnum] | str, str]) -> Any | None:
-        if dpcode_information is not None and dpcode_information.unit in device_class_from_uom_dict:
+        if dpcode_information is None:
+            return None
+        if dpcode_information.unit in device_class_from_uom_dict:
             return device_class_from_uom_dict[dpcode_information.unit]
+        if dpcode_information.unit is not None:
+            LOGGER.warning(f"Unit {dpcode_information.unit} not found in device_class_from_uom_dict")
         return None
