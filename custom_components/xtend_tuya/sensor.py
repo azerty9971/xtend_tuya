@@ -1650,7 +1650,7 @@ async def async_setup_entry(
                     dpcode_info = device.get_dpcode_information(dpcode=dpcode)
                     descriptor = XTSensorEntityDescription(
                         key=dpcode,
-                        device_class=XTEntity.get_device_class_from_uom(dpcode_info, dev_class_from_uom),
+                        device_class=XTEntity.get_device_class_from_uom(dpcode_info, dev_class_from_uom, device),
                         translation_key="xt_generic_sensor",
                         translation_placeholders={
                             "name": XTEntity.get_human_name(dpcode)
