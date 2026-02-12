@@ -7,6 +7,7 @@ from enum import StrEnum
 from typing import cast, Self
 from homeassistant.components.climate.const import (
     HVACMode,
+    HVACAction,  # <--- AGGIUNTO
     SWING_OFF,
     SWING_ON,
     SWING_HORIZONTAL,
@@ -77,6 +78,16 @@ XT_CLIMATE_MODE_DPCODES: tuple[XTDPCode, ...] = (
     XTDPCode.MODE,
     XTDPCode.MODE1,
 )
+
+# --- NUOVO BLOCCO PER GESTIRE L'AZIONE (Heating/Idle) ---
+XT_CLIMATE_ACTION_DPCODES: tuple[XTDPCode, ...] = (
+    XTDPCode.WORK_STATE,   # DP 19 (Verifica che sia nel tuo const.py)
+    XTDPCode.WORK_MODE,
+    XTDPCode.WORK_STATUS,
+)
+# --------------------------------------------------------
+
+
 XT_CLIMATE_CURRENT_NON_UNIT_TEMPERATURE_DPCODES: tuple[XTDPCode, ...] = (
     XTDPCode.GET_TEMP,
 )
@@ -158,6 +169,10 @@ XT_CLIMATE_SWITCH_DPCODES: tuple[XTDPCode, ...] = (
     XTDPCode.POWER,
     XTDPCode.POWER2,
 )
+# AGGIUNTO: DP code per cold_hot_select (DP 109)
+XT_CLIMATE_COLD_HOT_SELECT_DPCODES: tuple[XTDPCode, ...] = (
+    XTDPCode.COLD_HOT_SELECT,
+)
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -185,6 +200,10 @@ class XTClimateEntityDescription(TuyaClimateEntityDescription):
         switch_wrapper: TuyaDPCodeBooleanWrapper | None,
         target_humidity_wrapper: TuyaClimateRoundedIntegerWrapper | None,
         temperature_unit: UnitOfTemperature,
+        # AGGIUNTO wrapper per l'azione
+        action_wrapper: TuyaDPCodeEnumWrapper | None = None,
+        # AGGIUNTO wrapper per cold_hot_select
+        cold_hot_select_wrapper: TuyaDPCodeEnumWrapper | None = None,
     ) -> XTClimateEntity:
         return XTClimateEntity(
             device=device,
@@ -200,6 +219,8 @@ class XTClimateEntityDescription(TuyaClimateEntityDescription):
             switch_wrapper=switch_wrapper,
             target_humidity_wrapper=target_humidity_wrapper,
             temperature_unit=temperature_unit,
+            action_wrapper=action_wrapper, # Passiamo il wrapper
+            cold_hot_select_wrapper=cold_hot_select_wrapper, # AGGIUNTO
         )
 
 
@@ -241,7 +262,7 @@ class XTClimatePresetWrapper(TuyaClimatePresetWrapper):
         self.options = [
             tuya_mode for tuya_mode, ha_mode in mappings.items() if ha_mode is None
         ]
-    
+
     def read_device_status(self, device: TuyaCustomerDevice) -> str | None:
         """Read the device status."""
         if (raw := super(TuyaClimatePresetWrapper, self).read_device_status(device)) in XT_HVAC_TO_HA:
@@ -256,7 +277,7 @@ class XTClimateHvacModeWrapper(TuyaClimateHvacModeWrapper):
         self.options = [
             ha_mode for ha_mode in self._mappings.values() if ha_mode is not None
         ]
-    
+
     def read_device_status(self, device: TuyaCustomerDevice) -> HVACMode | None:
         """Read the device status."""
         if (raw := super(TuyaClimateHvacModeWrapper, self).read_device_status(device)) not in XT_HVAC_TO_HA:
@@ -444,6 +465,16 @@ async def async_setup_entry(
                                 prefer_function=True,
                             ),
                             temperature_unit=temperature_wrappers[2],
+                            # AGGIUNTO: Trova il DP per l'azione (work_state)
+                            action_wrapper=TuyaDPCodeEnumWrapper.find_dpcode(
+                                device,
+                                XT_CLIMATE_ACTION_DPCODES, # type: ignore
+                            ),
+                            # AGGIUNTO: Trova il DP per cold_hot_select
+                            cold_hot_select_wrapper=TuyaDPCodeEnumWrapper.find_dpcode(
+                                device,
+                                XT_CLIMATE_COLD_HOT_SELECT_DPCODES,  # type: ignore
+                            ),
                         )
                     )
         async_add_entities(entities)
@@ -471,6 +502,8 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
         SWING_MODE_HORIZONTAL = "swing_mode_horizontal"  # Swing horizontaly
         SWING_MODE_VERTICAL = "swing_mode_vertical"  # Swing verticaly
         SWITCH_ON = "switch_on"  # Switch on device
+        ACTION = "work_state"
+        COLD_HOT_SELECT = "cold_hot_select"  # AGGIUNTO: Selezione HEAT/COOL
 
     def __init__(
         self,
@@ -488,12 +521,20 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
         switch_wrapper: TuyaDPCodeBooleanWrapper | None,
         target_humidity_wrapper: TuyaClimateRoundedIntegerWrapper | None,
         temperature_unit: UnitOfTemperature,
+        # AGGIUNTO
+        action_wrapper: TuyaDPCodeEnumWrapper | None = None,
+        # AGGIUNTO wrapper per cold_hot_select
+        cold_hot_select_wrapper: TuyaDPCodeEnumWrapper | None = None,
     ) -> None:
         """Determine which values to use."""
         device_manager.device_watcher.report_message(
             device.id,
             f"Creating XTClimateEntity for device {device.name} ({device.id}), wrappers: cur_temp({current_temperature_wrapper.dpcode if current_temperature_wrapper else 'None'}), set_temp({set_temperature_wrapper.dpcode if set_temperature_wrapper else 'None'}), hvac_mode({hvac_mode_wrapper.dpcode if hvac_mode_wrapper else 'None'}), fan_mode({fan_mode_wrapper.dpcode if fan_mode_wrapper else 'None'})",
         )
+        # Salva il wrapper dell'azione
+        self._action_wrapper = action_wrapper
+        # Salva il wrapper per cold_hot_select
+        self._cold_hot_select_wrapper = cold_hot_select_wrapper
         super(XTClimateEntity, self).__init__(device, device_manager, description)
         super(XTEntity, self).__init__(
             device,
@@ -514,6 +555,108 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
         self.device_manager = device_manager
         self.entity_description = description
 
+    # AGGIUNTO: Sovrascrivi hvac_action per leggere lo stato reale basato su cold_hot_select
+    @property
+    def hvac_action(self) -> HVACAction | None:
+        """Return the current running hvac operation if supported."""
+        # Innanzitutto, leggi il work_state se disponibile
+        if self._action_wrapper:
+            status = self.device.status.get(self._action_wrapper.dpcode)
+
+            if status is not None:
+                # Mappatura dei valori grezzi Tuya -> Home Assistant HVACAction
+                if status in ["heating", "warming", "opened", "heat"]:
+                    return HVACAction.HEATING
+                if status in ["cooling", "cool"]:
+                    return HVACAction.COOLING
+                if status in ["stop", "closed", "off", "idle", "standby", "ventilation"]:
+                    return HVACAction.IDLE
+                if status in ["drying", "wet"]:
+                    return HVACAction.DRY
+                if status in ["fan", "wind"]:
+                    return HVACAction.FAN
+
+        # Se non c'è work_state, usa cold_hot_select per determinare HEATING/COOLING
+        if self._cold_hot_select_wrapper:
+            cold_hot_value = self.device.status.get(self._cold_hot_select_wrapper.dpcode)
+
+            # Verifica se il device è acceso
+            switch_on = self.is_on
+
+            if switch_on and cold_hot_value:
+                if cold_hot_value == "hot":
+                    return HVACAction.HEATING
+                elif cold_hot_value == "cold":
+                    return HVACAction.COOLING
+            else:
+                return HVACAction.IDLE
+
+        # Fallback al comportamento standard
+        return super().hvac_action
+
+    # AGGIUNTO: Proprietà hvac_modes per includere HEAT e COOL quando device supporta HEAT_COOL
+    @property
+    def hvac_modes(self) -> list[HVACMode]:
+        """Return the list of available hvac modes, aggiungendo HEAT e COOL se HEAT_COOL è supportato."""
+        base_hvac_modes = list(super().hvac_modes)
+
+        # Se il device supporta HEAT_COOL e abbiamo il wrapper per cold_hot_select
+        if HVACMode.HEAT_COOL in base_hvac_modes and self._cold_hot_select_wrapper:
+            # Aggiungi HEAT e COOL alle modalità disponibili
+            if HVACMode.HEAT not in base_hvac_modes:
+                base_hvac_modes.insert(1, HVACMode.HEAT)  # Dopo OFF
+            if HVACMode.COOL not in base_hvac_modes:
+                base_hvac_modes.insert(2, HVACMode.COOL)  # Dopo HEAT
+
+        return base_hvac_modes
+
+    # AGGIUNTO: Proprietà hvac_mode con getter e setter per gestire cold_hot_select
+    @property
+    def hvac_mode(self) -> HVACMode | None:
+        """Return current HVAC mode basato su cold_hot_select quando in HEAT_COOL."""
+        base_hvac_mode = super().hvac_mode
+
+        # Se il device è in HEAT_COOL e abbiamo il wrapper per cold_hot_select
+        if base_hvac_mode == HVACMode.HEAT_COOL and self._cold_hot_select_wrapper:
+            cold_hot_value = self.device.status.get(self._cold_hot_select_wrapper.dpcode)
+
+            if cold_hot_value == "hot":
+                return HVACMode.HEAT
+            elif cold_hot_value == "cold":
+                return HVACMode.COOL
+
+        return base_hvac_mode
+
+    async def async_set_hvac_mode(self, hvac_mode: HVACMode) -> None:
+        """Set HVAC mode usando il DP Code cold_hot_select."""
+
+        # Mappiamo le modalità di Home Assistant ai valori Enum di Tuya
+        tuya_value = None
+        if hvac_mode == HVACMode.HEAT:
+            tuya_value = "hot"
+        elif hvac_mode == HVACMode.COOL:
+            tuya_value = "cold"
+        elif hvac_mode == HVACMode.OFF:
+            # Nota: se il tuo dispositivo ha un DP separato per ON/OFF (es. "switch")
+            # dovrai gestire anche quello qui.
+            pass
+
+        if tuya_value:
+            # Usiamo il metodo send_commands del MultiManager come definito nel tuo file
+            # Passiamo una lista contenente il dizionario con il codice e il valore
+            success = await self.hass.async_add_executor_job(
+                self.device_manager.send_commands,
+                self.device.id,
+                [{"code": "cold_hot_select", "value": tuya_value}]
+            )
+
+            if success:
+                # Forziamo l'aggiornamento locale dello stato per feedback immediato nell'UI
+                self._attr_hvac_mode = hvac_mode
+                self.async_write_ha_state()
+            else:
+                LOGGER.error(f"Fallito invio comando {tuya_value} a {self.device.id}")
+
     @staticmethod
     def get_entity_instance(
         description: XTClimateEntityDescription,
@@ -530,6 +673,10 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
         switch_wrapper: TuyaDPCodeBooleanWrapper | None,
         target_humidity_wrapper: TuyaClimateRoundedIntegerWrapper | None,
         temperature_unit: UnitOfTemperature,
+        # AGGIUNTO nei parametri
+        action_wrapper: TuyaDPCodeEnumWrapper | None = None,
+        # AGGIUNTO wrapper per cold_hot_select
+        cold_hot_select_wrapper: TuyaDPCodeEnumWrapper | None = None,
     ) -> XTClimateEntity:
         if hasattr(description, "get_entity_instance") and callable(
             getattr(description, "get_entity_instance")
@@ -548,6 +695,8 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
                 switch_wrapper=switch_wrapper,
                 target_humidity_wrapper=target_humidity_wrapper,
                 temperature_unit=temperature_unit,
+                action_wrapper=action_wrapper, # Passaggio parametro
+                cold_hot_select_wrapper=cold_hot_select_wrapper, # AGGIUNTO
             )
         return XTClimateEntity(
             device,
@@ -563,4 +712,6 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
             switch_wrapper=switch_wrapper,
             target_humidity_wrapper=target_humidity_wrapper,
             temperature_unit=temperature_unit,
+            action_wrapper=action_wrapper, # Passaggio parametro
+            cold_hot_select_wrapper=cold_hot_select_wrapper, # AGGIUNTO
         )

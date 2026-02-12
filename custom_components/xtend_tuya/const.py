@@ -716,6 +716,7 @@ class XTDPCode(StrEnum):
     COLOR = "Color"
     CONNECTION_STATE = "connection_state"
     CONTROL_SKIP = "control_skip"
+    COLD_HOT_SELECT = "cold_hot_select"  # DP 109
     CTIME = "Ctime"
     CTIME2 = "CTime2"
     CURRENT = "Current"
