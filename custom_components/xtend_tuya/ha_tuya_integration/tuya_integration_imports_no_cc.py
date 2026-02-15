@@ -31,9 +31,22 @@ from homeassistant.components.tuya.climate import (
     _RoundedIntegerWrapper as TuyaClimateRoundedIntegerWrapper,  # noqa: F401
     _get_temperature_wrapper as tuya_climate_get_temperature_wrapper,  # noqa: F401
     _SwingModeWrapper as TuyaClimateSwingModeWrapper,  # noqa: F401
-    _PresetWrapper as TuyaClimatePresetWrapper,  # noqa: F401
-    _HvacModeWrapper as TuyaClimateHvacModeWrapper,  # noqa: F401
 )
+try:
+    from homeassistant.components.tuya.climate import (
+        _PresetWrapper as TuyaClimatePresetWrapper,  # noqa: F401
+        _HvacModeWrapper as TuyaClimateHvacModeWrapper,  # noqa: F401
+    )
+except ImportError:
+    # HA 2026.1+ removed these wrappers - use DPCodeEnumWrapper as fallback
+    try:
+        from homeassistant.components.tuya.models import (
+            DPCodeEnumWrapper as TuyaClimatePresetWrapper,  # noqa: F401
+            DPCodeEnumWrapper as TuyaClimateHvacModeWrapper,  # noqa: F401
+        )
+    except ImportError:
+        TuyaClimatePresetWrapper = None  # type: ignore  # noqa: F401
+        TuyaClimateHvacModeWrapper = None  # type: ignore  # noqa: F401
 from homeassistant.components.tuya.cover import (
     COVERS as COVERS_TUYA,  # noqa: F401
     TuyaCoverEntity as TuyaCoverEntity,
@@ -113,9 +126,21 @@ from homeassistant.components.tuya.switch import (
 )
 from homeassistant.components.tuya.vacuum import (
     TuyaVacuumEntity as TuyaVacuumEntity,
-    _VacuumActionWrapper as TuyaVacuumActionWrapper,  # noqa: F401
-    _VacuumActivityWrapper as TuyaVacuumActivityWrapper,  # noqa: F401
 )
+try:
+    from homeassistant.components.tuya.vacuum import (
+        _VacuumActionWrapper as TuyaVacuumActionWrapper,  # noqa: F401
+        _VacuumActivityWrapper as TuyaVacuumActivityWrapper,  # noqa: F401
+    )
+except ImportError:
+    # HA 2026.1+ removed these wrappers
+    class _VacuumStub:
+        """Stub for removed vacuum wrappers."""
+        @classmethod
+        def find_dpcode(cls, *args, **kwargs):
+            return None
+    TuyaVacuumActionWrapper = _VacuumStub  # type: ignore  # noqa: F401
+    TuyaVacuumActivityWrapper = _VacuumStub  # type: ignore  # noqa: F401
 import homeassistant.components.tuya as tuya_integration  # noqa: F401
 
 # from homeassistant.components.tuya import (

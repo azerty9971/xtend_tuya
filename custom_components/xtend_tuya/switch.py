@@ -3,10 +3,12 @@
 from __future__ import annotations
 from typing import cast, Any
 from dataclasses import dataclass
+from homeassistant.components.switch import SwitchEntity, SwitchEntityDescription
 from homeassistant.const import EntityCategory, Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.restore_state import RestoreEntity
 from .util import (
     restrict_descriptor_category,
 )
@@ -20,6 +22,7 @@ from .const import (
     XTDPCode,
     CROSS_CATEGORY_DEVICE_DESCRIPTOR,
     XTMultiManagerPostSetupCallbackPriority,
+    LOGGER,
 )
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaSwitchEntity,
@@ -30,6 +33,7 @@ from .entity import (
     XTEntity,
     XTEntityDescriptorManager,
 )
+from .smart_cover_control import SmartCoverManager
 
 
 @dataclass(frozen=True)
@@ -52,6 +56,26 @@ class XTSwitchEntityDescription(TuyaSwitchEntityDescription, frozen_or_thawed=Tr
             device_manager=device_manager,
             description=XTSwitchEntityDescription(**description.__dict__),
             dpcode_wrapper=dpcode_wrapper,
+        )
+
+
+@dataclass
+class XTSmartCoverSwitchEntityDescription(SwitchEntityDescription):
+    """Describe a Smart Cover Switch entity."""
+
+    control_dp: str | None = None
+    force_update: bool = False
+    entity_registry_enabled_default: bool = True
+    entity_registry_visible_default: bool = True
+
+    def get_entity_instance(
+        self,
+        device: XTDevice,
+        device_manager: MultiManager,
+        description: XTSmartCoverSwitchEntityDescription,
+    ) -> XTSmartCoverSwitchEntity:
+        return XTSmartCoverSwitchEntity(
+            device=device, device_manager=device_manager, description=description
         )
 
 
@@ -409,6 +433,59 @@ SWITCHES: dict[str, tuple[XTSwitchEntityDescription, ...]] = {
             translation_key="pump_switch",
         ),
     ),
+    # Smart Cover positioning switches
+    "cl": (
+        XTSmartCoverSwitchEntityDescription(
+            key="smart_cover_positioning_enabled_1",
+            translation_key="smart_cover_positioning_enabled",
+            name="Enable Custom Calibration",
+            icon="mdi:cog",
+            entity_category=EntityCategory.CONFIG,
+            control_dp=XTDPCode.CONTROL,
+        ),
+        XTSmartCoverSwitchEntityDescription(
+            key="smart_cover_positioning_enabled_2",
+            translation_key="smart_cover_positioning_enabled_2",
+            name="Enable Custom Calibration 2",
+            icon="mdi:cog",
+            entity_category=EntityCategory.CONFIG,
+            control_dp=XTDPCode.CONTROL_2,
+        ),
+        XTSmartCoverSwitchEntityDescription(
+            key="smart_cover_positioning_enabled_3",
+            translation_key="smart_cover_positioning_enabled_3",
+            name="Enable Custom Calibration 3",
+            icon="mdi:cog",
+            entity_category=EntityCategory.CONFIG,
+            control_dp=XTDPCode.CONTROL_3,
+        ),
+    ),
+    "clkg": (
+        XTSmartCoverSwitchEntityDescription(
+            key="smart_cover_positioning_enabled_1",
+            translation_key="smart_cover_positioning_enabled",
+            name="Enable Custom Calibration",
+            icon="mdi:cog",
+            entity_category=EntityCategory.CONFIG,
+            control_dp=XTDPCode.CONTROL,
+        ),
+        XTSmartCoverSwitchEntityDescription(
+            key="smart_cover_positioning_enabled_2",
+            translation_key="smart_cover_positioning_enabled_2",
+            name="Enable Custom Calibration 2",
+            icon="mdi:cog",
+            entity_category=EntityCategory.CONFIG,
+            control_dp=XTDPCode.CONTROL_2,
+        ),
+        XTSmartCoverSwitchEntityDescription(
+            key="smart_cover_positioning_enabled_3",
+            translation_key="smart_cover_positioning_enabled_3",
+            name="Enable Custom Calibration 3",
+            icon="mdi:cog",
+            entity_category=EntityCategory.CONFIG,
+            control_dp=XTDPCode.CONTROL_3,
+        ),
+    ),
 }
 
 # Lock duplicates
@@ -425,6 +502,10 @@ async def async_setup_entry(
 
     if entry.runtime_data.multi_manager is None or hass_data.manager is None:
         return
+
+    # Initialize smart cover manager if not exists
+    if not hasattr(hass_data.manager, 'smart_cover_manager'):
+        hass_data.manager.smart_cover_manager = SmartCoverManager(hass)
 
     supported_descriptors, externally_managed_descriptors = cast(
         tuple[
@@ -470,13 +551,35 @@ async def async_setup_entry(
                         )
         async_add_entities(entities)
 
+    created_smart_cover_ids: set[str] = set()
+
     @callback
     def async_discover_device(device_map, restrict_dpcode: str | None = None) -> None:
         """Discover and add a discovered tuya sensor."""
         if hass_data.manager is None:
             return
-        entities: list[XTSwitchEntity] = []
+        entities: list[XTSwitchEntity | XTSmartCoverSwitchEntity] = []
         device_ids = [*device_map]
+        # Handle smart cover switch entities for cl/clkg devices
+        for device_id in device_ids:
+            if device := hass_data.manager.device_map.get(device_id):
+                if device.category in ["cl", "clkg"]:
+                    smart_cover_descs = SWITCHES.get(device.category)
+                    if smart_cover_descs:
+                        for desc in smart_cover_descs:
+                            if isinstance(desc, XTSmartCoverSwitchEntityDescription):
+                                if desc.control_dp and (
+                                    desc.control_dp in device.status_range
+                                    or desc.control_dp in device.function
+                                ):
+                                    entity_uid = f"{device.id}_{desc.control_dp}_{desc.key}"
+                                    if entity_uid not in created_smart_cover_ids:
+                                        created_smart_cover_ids.add(entity_uid)
+                                        entities.append(
+                                            XTSmartCoverSwitchEntity.get_entity_instance(
+                                                desc, device, hass_data.manager
+                                            )
+                                        )
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
                 if category_descriptions := XTEntityDescriptorManager.get_category_descriptors(
@@ -612,3 +715,128 @@ class XTSwitchEntity(XTEntity, TuyaSwitchEntity):
             XTSwitchEntityDescription(**description.__dict__),
             dpcode_wrapper,
         )
+
+
+class XTSmartCoverSwitchEntity(XTEntity, RestoreEntity, SwitchEntity):
+    """XT Smart Cover Switch Entity for enabling/disabling smart positioning."""
+
+    entity_description: XTSmartCoverSwitchEntityDescription
+
+    def __init__(
+        self,
+        device: XTDevice,
+        device_manager: MultiManager,
+        description: XTSmartCoverSwitchEntityDescription,
+    ) -> None:
+        """Initialize the switch entity."""
+        self.device = device
+        self.device_manager = device_manager
+        self.entity_description = description
+
+        base_name = "Enable Custom Calibration"
+        if description.control_dp == XTDPCode.CONTROL_2:
+            base_name = "Enable Custom Calibration 2"
+        elif description.control_dp == XTDPCode.CONTROL_3:
+            base_name = "Enable Custom Calibration 3"
+
+        self.entity_description.name = base_name
+        super().__init__(device, device_manager, description)
+        self._attr_is_on = False
+
+    @property
+    def unique_id(self) -> str:
+        """Return unique ID for the entity."""
+        return f"{self.device.id}_{self.entity_description.control_dp}_{self.entity_description.key}"
+
+    @property
+    def is_on(self) -> bool:
+        """Return if smart positioning is enabled."""
+        return self._attr_is_on
+
+    async def async_turn_on(self, **kwargs: Any) -> None:
+        """Enable smart positioning."""
+        self._attr_is_on = True
+
+        if hasattr(self.device_manager, 'smart_cover_manager'):
+            controller = self.device_manager.smart_cover_manager.get_controller(
+                self.device.id, self.entity_description.control_dp
+            )
+            if not controller:
+                cover_entity_id = f"cover.{self.device.name.lower().replace(' ', '_')}"
+                try:
+                    controller = await self.device_manager.smart_cover_manager.get_or_create_controller(
+                        self.device,
+                        self.device_manager,
+                        cover_entity_id,
+                        self.entity_description.control_dp,
+                    )
+                except Exception:
+                    controller = None
+            if controller:
+                controller.positioning_enabled = True
+                await controller._save_state()
+
+        self.async_write_ha_state()
+
+    async def async_turn_off(self, **kwargs: Any) -> None:
+        """Disable smart positioning."""
+        self._attr_is_on = False
+
+        if hasattr(self.device_manager, 'smart_cover_manager'):
+            controller = self.device_manager.smart_cover_manager.get_controller(
+                self.device.id, self.entity_description.control_dp
+            )
+            if controller:
+                controller.positioning_enabled = False
+                await controller._save_state()
+
+        self.async_write_ha_state()
+
+    async def async_added_to_hass(self) -> None:
+        """Entity added to hass."""
+        await super().async_added_to_hass()
+
+        last_state = await self.async_get_last_state()
+        if last_state is not None and last_state.state not in ("unknown", "unavailable"):
+            self._attr_is_on = last_state.state.lower() == "on"
+
+            if hasattr(self.device_manager, 'smart_cover_manager'):
+                controller = self.device_manager.smart_cover_manager.get_controller(
+                    self.device.id, self.entity_description.control_dp
+                )
+                if not controller:
+                    cover_entity_id = f"cover.{self.device.name.lower().replace(' ', '_')}"
+                    try:
+                        controller = await self.device_manager.smart_cover_manager.get_or_create_controller(
+                            self.device,
+                            self.device_manager,
+                            cover_entity_id,
+                            self.entity_description.control_dp,
+                        )
+                    except Exception:
+                        controller = None
+                if controller:
+                    controller.positioning_enabled = self._attr_is_on
+                    await controller._save_state()
+
+        self.async_write_ha_state()
+
+    @property
+    def available(self) -> bool:
+        """Return if entity is available."""
+        return (
+            self.entity_description.control_dp in self.device.status_range
+            or self.entity_description.control_dp in self.device.function
+        )
+
+    @staticmethod
+    def get_entity_instance(
+        description: XTSmartCoverSwitchEntityDescription,
+        device: XTDevice,
+        device_manager: MultiManager,
+    ) -> XTSmartCoverSwitchEntity:
+        if hasattr(description, "get_entity_instance") and callable(
+            getattr(description, "get_entity_instance")
+        ):
+            return description.get_entity_instance(device, device_manager, description)
+        return XTSmartCoverSwitchEntity(device, device_manager, description)

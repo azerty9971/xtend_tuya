@@ -1,14 +1,18 @@
 """Support for Tuya number."""
 
 from __future__ import annotations
+from dataclasses import dataclass
 from typing import cast
 from homeassistant.components.number import (
     NumberDeviceClass,
+    NumberEntity,
+    NumberEntityDescription,
 )
-from homeassistant.const import EntityCategory, Platform
+from homeassistant.const import EntityCategory, Platform, UnitOfTime
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.components.number.const import (
     NumberMode,
     DEVICE_CLASS_UNITS as NUMBER_DEVICE_CLASS_UNITS,
@@ -20,6 +24,7 @@ from .const import (
     TUYA_DISCOVERY_NEW,
     XTDPCode,
     XTMultiManagerPostSetupCallbackPriority,
+    LOGGER,
 )
 from .multi_manager.multi_manager import (
     XTConfigEntry,
@@ -35,6 +40,7 @@ from .entity import (
     XTEntity,
     XTEntityDescriptorManager,
 )
+from .smart_cover_control import SmartCoverManager
 
 
 class XTNumberEntityDescription(TuyaNumberEntityDescription):
@@ -58,6 +64,26 @@ class XTNumberEntityDescription(TuyaNumberEntityDescription):
             device_manager=device_manager,
             description=XTNumberEntityDescription(**description.__dict__),
             dpcode_wrapper=dpcode_wrapper,
+        )
+
+
+@dataclass
+class XTSmartCoverNumberEntityDescription(NumberEntityDescription):
+    """Describe a Smart Cover Number entity."""
+
+    control_dp: str | None = None
+    force_update: bool = False
+    entity_registry_enabled_default: bool = True
+    entity_registry_visible_default: bool = True
+
+    def get_entity_instance(
+        self,
+        device: XTDevice,
+        device_manager: MultiManager,
+        description: XTSmartCoverNumberEntityDescription,
+    ) -> XTSmartCoverNumberEntity:
+        return XTSmartCoverNumberEntity(
+            device=device, device_manager=device_manager, description=description
         )
 
 
@@ -619,6 +645,89 @@ NUMBERS: dict[str, tuple[XTNumberEntityDescription, ...]] = {
         *TEMPERATURE_SENSORS,
         *HUMIDITY_SENSORS,
     ),
+    # Smart Cover timing controls
+    "cl": (
+        XTSmartCoverNumberEntityDescription(
+            key="smart_cover_open_close_time_1",
+            translation_key="smart_cover_open_close_time",
+            name="Open-Close Time in Seconds",
+            icon="mdi:timer",
+            native_min_value=1.0,
+            native_max_value=300.0,
+            native_step=1.0,
+            native_unit_of_measurement=UnitOfTime.SECONDS,
+            device_class=NumberDeviceClass.DURATION,
+            entity_category=EntityCategory.CONFIG,
+            control_dp=XTDPCode.CONTROL,
+        ),
+        XTSmartCoverNumberEntityDescription(
+            key="smart_cover_open_close_time_2",
+            translation_key="smart_cover_open_close_time_2",
+            name="Open-Close Time 2 in Seconds",
+            icon="mdi:timer",
+            native_min_value=1.0,
+            native_max_value=300.0,
+            native_step=1.0,
+            native_unit_of_measurement=UnitOfTime.SECONDS,
+            device_class=NumberDeviceClass.DURATION,
+            entity_category=EntityCategory.CONFIG,
+            control_dp=XTDPCode.CONTROL_2,
+        ),
+        XTSmartCoverNumberEntityDescription(
+            key="smart_cover_open_close_time_3",
+            translation_key="smart_cover_open_close_time_3",
+            name="Open-Close Time 3 in Seconds",
+            icon="mdi:timer",
+            native_min_value=1.0,
+            native_max_value=300.0,
+            native_step=1.0,
+            native_unit_of_measurement=UnitOfTime.SECONDS,
+            device_class=NumberDeviceClass.DURATION,
+            entity_category=EntityCategory.CONFIG,
+            control_dp=XTDPCode.CONTROL_3,
+        ),
+    ),
+    "clkg": (
+        XTSmartCoverNumberEntityDescription(
+            key="smart_cover_open_close_time_1",
+            translation_key="smart_cover_open_close_time",
+            name="Open-Close Time in Seconds",
+            icon="mdi:timer",
+            native_min_value=1.0,
+            native_max_value=300.0,
+            native_step=1.0,
+            native_unit_of_measurement=UnitOfTime.SECONDS,
+            device_class=NumberDeviceClass.DURATION,
+            entity_category=EntityCategory.CONFIG,
+            control_dp=XTDPCode.CONTROL,
+        ),
+        XTSmartCoverNumberEntityDescription(
+            key="smart_cover_open_close_time_2",
+            translation_key="smart_cover_open_close_time_2",
+            name="Open-Close Time 2 in Seconds",
+            icon="mdi:timer",
+            native_min_value=1.0,
+            native_max_value=300.0,
+            native_step=1.0,
+            native_unit_of_measurement=UnitOfTime.SECONDS,
+            device_class=NumberDeviceClass.DURATION,
+            entity_category=EntityCategory.CONFIG,
+            control_dp=XTDPCode.CONTROL_2,
+        ),
+        XTSmartCoverNumberEntityDescription(
+            key="smart_cover_open_close_time_3",
+            translation_key="smart_cover_open_close_time_3",
+            name="Open-Close Time 3 in Seconds",
+            icon="mdi:timer",
+            native_min_value=1.0,
+            native_max_value=300.0,
+            native_step=1.0,
+            native_unit_of_measurement=UnitOfTime.SECONDS,
+            device_class=NumberDeviceClass.DURATION,
+            entity_category=EntityCategory.CONFIG,
+            control_dp=XTDPCode.CONTROL_3,
+        ),
+    ),
 }
 
 # Lock duplicates
@@ -635,6 +744,10 @@ async def async_setup_entry(
 
     if entry.runtime_data.multi_manager is None or hass_data.manager is None:
         return
+
+    # Initialize smart cover manager if not exists
+    if not hasattr(hass_data.manager, 'smart_cover_manager'):
+        hass_data.manager.smart_cover_manager = SmartCoverManager(hass)
 
     supported_descriptors, externally_managed_descriptors = cast(
         tuple[
@@ -685,13 +798,35 @@ async def async_setup_entry(
                         )
         async_add_entities(entities)
 
+    created_smart_cover_ids: set[str] = set()
+
     @callback
     def async_discover_device(device_map, restrict_dpcode: str | None = None) -> None:
         """Discover and add a discovered Tuya number."""
         if hass_data.manager is None:
             return
-        entities: list[XTNumberEntity] = []
+        entities: list[XTNumberEntity | XTSmartCoverNumberEntity] = []
         device_ids = [*device_map]
+        # Handle smart cover number entities for cl/clkg devices
+        for device_id in device_ids:
+            if device := hass_data.manager.device_map.get(device_id):
+                if device.category in ["cl", "clkg"]:
+                    smart_cover_descs = NUMBERS.get(device.category)
+                    if smart_cover_descs:
+                        for desc in smart_cover_descs:
+                            if isinstance(desc, XTSmartCoverNumberEntityDescription):
+                                if desc.control_dp and (
+                                    desc.control_dp in device.status_range
+                                    or desc.control_dp in device.function
+                                ):
+                                    entity_uid = f"{device.id}_{desc.control_dp}_{desc.key}"
+                                    if entity_uid not in created_smart_cover_ids:
+                                        created_smart_cover_ids.add(entity_uid)
+                                        entities.append(
+                                            XTSmartCoverNumberEntity.get_entity_instance(
+                                                desc, device, hass_data.manager
+                                            )
+                                        )
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
                 if category_descriptions := XTEntityDescriptorManager.get_category_descriptors(
@@ -812,3 +947,158 @@ class XTNumberEntity(XTEntity, TuyaNumberEntity):
             XTNumberEntityDescription(**description.__dict__),
             dpcode_wrapper,
         )
+
+
+class XTSmartCoverNumberEntity(XTEntity, RestoreEntity, NumberEntity):
+    """XT Smart Cover Number Entity for timing configuration."""
+
+    entity_description: XTSmartCoverNumberEntityDescription
+
+    def __init__(
+        self,
+        device: XTDevice,
+        device_manager: MultiManager,
+        description: XTSmartCoverNumberEntityDescription,
+    ) -> None:
+        """Initialize the number entity."""
+        self.device = device
+        self.device_manager = device_manager
+        self.entity_description = description
+
+        base_name = "Open-Close Time in Seconds"
+        if description.control_dp == XTDPCode.CONTROL_2:
+            base_name = "Open-Close Time 2 in Seconds"
+        elif description.control_dp == XTDPCode.CONTROL_3:
+            base_name = "Open-Close Time 3 in Seconds"
+
+        self.entity_description.name = base_name
+        super().__init__(device, device_manager, description)
+        self._attr_native_value = 60.0
+
+    @property
+    def unique_id(self) -> str:
+        """Return unique ID for the entity."""
+        return f"{self.device.id}_{self.entity_description.control_dp}_{self.entity_description.key}"
+
+    @property
+    def native_value(self) -> float:
+        """Return the current value."""
+        return self._attr_native_value
+
+    async def async_set_native_value(self, value: float) -> None:
+        """Set the timing value."""
+        self._attr_native_value = value
+
+        if hasattr(self.device_manager, 'smart_cover_manager'):
+            controller = self.device_manager.smart_cover_manager.get_controller(
+                self.device.id, self.entity_description.control_dp
+            )
+            if not controller:
+                cover_entity_id = f"cover.{self.device.name.lower().replace(' ', '_')}"
+                controller = self.device_manager.smart_cover_manager.register_cover(
+                    self.device,
+                    self.device_manager,
+                    cover_entity_id,
+                    self.entity_description.control_dp,
+                )
+            if controller:
+                controller.set_timing_config(value, value)
+
+        self.async_write_ha_state()
+
+    async def async_added_to_hass(self) -> None:
+        """Entity added to hass."""
+        await super().async_added_to_hass()
+
+        restored_from_controller = False
+
+        # FIRST: Try to read directly from storage file
+        try:
+            import json
+            import os
+            storage_key = f"xtend_tuya_smart_cover_{self.device.id}_{self.entity_description.control_dp}"
+            storage_path = self.hass.config.path(f".storage/{storage_key}")
+
+            def _read_storage():
+                if os.path.exists(storage_path):
+                    with open(storage_path, 'r') as f:
+                        return json.load(f)
+                return None
+
+            storage_data = await self.hass.async_add_executor_job(_read_storage)
+            if storage_data:
+                timing_config = storage_data.get("data", {}).get("timing_config", {})
+                storage_value = timing_config.get("full_open_time")
+
+                if storage_value and storage_value != 60.0 and storage_value >= 1.0:
+                    self._attr_native_value = storage_value
+                    restored_from_controller = True
+
+                    if hasattr(self.device_manager, 'smart_cover_manager'):
+                        controller = self.device_manager.smart_cover_manager.get_controller(
+                            self.device.id, self.entity_description.control_dp
+                        )
+                        if controller:
+                            controller.set_timing_config(storage_value, storage_value)
+        except Exception:
+            pass
+
+        # SECOND: Try to get value from controller
+        if not restored_from_controller and hasattr(self.device_manager, 'smart_cover_manager'):
+            controller = self.device_manager.smart_cover_manager.get_controller(
+                self.device.id, self.entity_description.control_dp
+            )
+            if controller and hasattr(controller, 'timing_config'):
+                controller_value = controller.timing_config.full_open_time
+                if controller_value != 60.0 and controller_value >= 1.0:
+                    self._attr_native_value = controller_value
+                    restored_from_controller = True
+
+        # THIRD: Fall back to HA state
+        if not restored_from_controller:
+            last_state = await self.async_get_last_state()
+            if last_state is not None and last_state.state not in ("unknown", "unavailable"):
+                try:
+                    restored_value = float(last_state.state)
+                    if (self.native_min_value is None or restored_value >= self.native_min_value) and \
+                       (self.native_max_value is None or restored_value <= self.native_max_value):
+                        self._attr_native_value = restored_value
+
+                        if hasattr(self.device_manager, 'smart_cover_manager'):
+                            controller = self.device_manager.smart_cover_manager.get_controller(
+                                self.device.id, self.entity_description.control_dp
+                            )
+                            if not controller:
+                                cover_entity_id = f"cover.{self.device.name.lower().replace(' ', '_')}"
+                                controller = self.device_manager.smart_cover_manager.register_cover(
+                                    self.device,
+                                    self.device_manager,
+                                    cover_entity_id,
+                                    self.entity_description.control_dp,
+                                )
+                            if controller:
+                                controller.set_timing_config(restored_value, restored_value)
+                except (ValueError, TypeError):
+                    self._attr_native_value = 60.0
+
+        self.async_write_ha_state()
+
+    @property
+    def available(self) -> bool:
+        """Return if entity is available."""
+        return (
+            self.entity_description.control_dp in self.device.status_range
+            or self.entity_description.control_dp in self.device.function
+        )
+
+    @staticmethod
+    def get_entity_instance(
+        description: XTSmartCoverNumberEntityDescription,
+        device: XTDevice,
+        device_manager: MultiManager,
+    ) -> XTSmartCoverNumberEntity:
+        if hasattr(description, "get_entity_instance") and callable(
+            getattr(description, "get_entity_instance")
+        ):
+            return description.get_entity_instance(device, device_manager, description)
+        return XTSmartCoverNumberEntity(device, device_manager, description)
