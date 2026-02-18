@@ -45,7 +45,7 @@ from .entity import (
     XTEntity,
     XTEntityDescriptorManager,
 )
-from .smart_cover_control import SmartCoverManager
+from .smart_cover_control import SmartCoverManager, CoverMovementState
 
 class XTCoverDPCodePercentageMappingWrapper(TuyaCoverDPCodePercentageMappingWrapper):
     """XT Cover DPCode percentage mapping wrapper."""
@@ -145,14 +145,16 @@ COVERS: dict[str, tuple[XTCoverEntityDescription, ...]] = {
         ),
         # switch_1 is an undocumented code that behaves identically to control
         # It is used by the Kogan Smart Blinds Driver
-        XTCoverEntityDescription(
-            key=XTDPCode.SWITCH_1,
-            translation_key="blind",
-            current_position=XTDPCode.PERCENT_CONTROL,
-            set_position=XTDPCode.PERCENT_CONTROL,
-            device_class=CoverDeviceClass.BLIND,
-            control_back_mode=XTDPCode.CONTROL_BACK_MODE,
-        ),
+        # Commented out to prevent extra blind entities on curtain devices
+        # that already have a CONTROL entity (most cl/clkg devices expose both)
+        # XTCoverEntityDescription(
+        #     key=XTDPCode.SWITCH_1,
+        #     translation_key="blind",
+        #     current_position=XTDPCode.PERCENT_CONTROL,
+        #     set_position=XTDPCode.PERCENT_CONTROL,
+        #     device_class=CoverDeviceClass.BLIND,
+        #     control_back_mode=XTDPCode.CONTROL_BACK_MODE,
+        # ),
     ),
 }
 
@@ -521,6 +523,20 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
             except Exception:
                 pass
         return super().is_closed
+
+    @property
+    def is_opening(self) -> bool:
+        """Return true if cover is opening."""
+        if self._smart_controller:
+            return self._smart_controller.state.movement_state == CoverMovementState.OPENING
+        return super().is_opening
+
+    @property
+    def is_closing(self) -> bool:
+        """Return true if cover is closing."""
+        if self._smart_controller:
+            return self._smart_controller.state.movement_state == CoverMovementState.CLOSING
+        return super().is_closing
 
     async def async_set_cover_position(self, **kwargs: Any) -> None:
         """Move the cover to a specific position."""

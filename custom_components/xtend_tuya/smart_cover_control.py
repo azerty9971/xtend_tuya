@@ -95,6 +95,7 @@ class SmartCoverController:
         # Precise timing for positioning
         self._movement_timer = None  # Single precise timer for movement
         self._movement_start_time = None  # When current movement started
+        self._watchdog_timer = None  # Safety timer to auto-stop stuck movements
 
         # Position tracking
         self._device_has_position_dp = False  # Whether device has a real position DP
@@ -482,6 +483,50 @@ class SmartCoverController:
             finally:
                 self._movement_timer = None
 
+    def _clear_watchdog_timer(self) -> None:
+        """Clear the watchdog safety timer."""
+        if self._watchdog_timer is not None:
+            try:
+                self._watchdog_timer.cancel()
+                LOGGER.debug(f"{self.device.name}: Cleared watchdog timer")
+            except Exception as e:
+                LOGGER.warning(f"{self.device.name}: Error clearing watchdog timer: {e}")
+            finally:
+                self._watchdog_timer = None
+
+    def _start_watchdog_timer(self, movement_state: CoverMovementState) -> None:
+        """Start a safety watchdog timer to auto-stop stuck movements.
+
+        This prevents covers from being stuck in 'opening...' or 'closing...' state
+        if the device never reports a stop status.
+        """
+        self._clear_watchdog_timer()
+
+        # Use the full travel time + 20% margin as the watchdog timeout
+        if movement_state == CoverMovementState.OPENING:
+            max_time = self.timing_config.full_open_time * 1.2
+        elif movement_state == CoverMovementState.CLOSING:
+            max_time = self.timing_config.full_close_time * 1.2
+        else:
+            return
+
+        def watchdog_triggered():
+            """Auto-stop movement if it exceeds maximum expected travel time."""
+            if self.state.movement_state != CoverMovementState.STOPPED:
+                LOGGER.warning(
+                    f"{self.device.name}: Watchdog triggered - movement stuck in "
+                    f"'{self.state.movement_state.value}' for >{max_time:.0f}s, forcing stop"
+                )
+                # Update position to the physical limit
+                if self.state.movement_state == CoverMovementState.OPENING:
+                    self.state.position = 100
+                elif self.state.movement_state == CoverMovementState.CLOSING:
+                    self.state.position = 0
+                self._stop_movement(time.time())
+
+        self._watchdog_timer = self.hass.loop.call_later(max_time, watchdog_triggered)
+        LOGGER.debug(f"{self.device.name}: Watchdog timer set for {max_time:.0f}s")
+
     def _start_movement(
         self,
         movement_state: CoverMovementState,
@@ -504,13 +549,14 @@ class SmartCoverController:
 
         LOGGER.debug(f"{self.device.name}: Started {movement_state.value} movement from {self.state.position}% at {start_time}")
 
-        # Don't schedule position updates for manual movements - only for smart positioning
-        # Manual movements will be tracked through periodic updates or manual stop commands
+        # Start watchdog timer to auto-stop if device never reports stop
+        self._start_watchdog_timer(movement_state)
 
     def _stop_movement(self, stop_time: float) -> None:
         """Stop the current movement."""
-        # Clear any running timer first
+        # Clear any running timers
         self._clear_movement_timer()
+        self._clear_watchdog_timer()
 
         # For smart positioning, trust the precise timer - don't recalculate position
         if self._smart_positioning_active:
@@ -869,6 +915,10 @@ class SmartCoverController:
         """Clean up resources and callbacks."""
         # Clear command tracking
         self._command_confirmations.clear()
+
+        # Clear timers
+        self._clear_movement_timer()
+        self._clear_watchdog_timer()
 
         # Unregister callbacks
         for unsubscribe in self._unsubscribe_callbacks:
