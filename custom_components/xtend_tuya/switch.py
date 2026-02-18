@@ -803,38 +803,38 @@ class XTSmartCoverSwitchEntity(XTEntity, RestoreEntity, SwitchEntity):
         """Entity added to hass."""
         await super().async_added_to_hass()
 
-        last_state = await self.async_get_last_state()
-        if last_state is not None and last_state.state not in ("unknown", "unavailable"):
-            self._attr_is_on = last_state.state.lower() == "on"
-
-            if hasattr(self.device_manager, 'smart_cover_manager'):
-                controller = self.device_manager.smart_cover_manager.get_controller(
-                    self.device.id, self.entity_description.control_dp
-                )
-                if not controller:
-                    cover_entity_id = f"cover.{self.device.name.lower().replace(' ', '_')}"
-                    try:
-                        controller = await self.device_manager.smart_cover_manager.get_or_create_controller(
-                            self.device,
-                            self.device_manager,
-                            cover_entity_id,
-                            self.entity_description.control_dp,
-                        )
-                    except Exception:
-                        controller = None
-                if controller:
-                    controller.positioning_enabled = self._attr_is_on
-                    await controller._save_state()
+        # Read positioning_enabled directly from storage file.
+        # This avoids timing issues - controllers may not exist yet because
+        # cover entities create them in post_setup_callbacks which run AFTER
+        # all platform entities' async_added_to_hass.
+        control_dp_str = str(self.entity_description.control_dp)
+        store_key = f"xtend_tuya_smart_cover_{self.device.id}_{control_dp_str}"
+        try:
+            from homeassistant.helpers.storage import Store
+            store = Store(self.hass, 1, store_key)
+            stored_data = await store.async_load()
+            if stored_data and isinstance(stored_data, dict):
+                self._attr_is_on = stored_data.get("positioning_enabled", False)
+            else:
+                # No storage data yet - fall back to HA restore state
+                last_state = await self.async_get_last_state()
+                if last_state is not None and last_state.state not in ("unknown", "unavailable"):
+                    self._attr_is_on = last_state.state.lower() == "on"
+        except Exception as e:
+            LOGGER.warning(f"{self.device.name}: Failed to load positioning state from storage: {e}")
+            last_state = await self.async_get_last_state()
+            if last_state is not None and last_state.state not in ("unknown", "unavailable"):
+                self._attr_is_on = last_state.state.lower() == "on"
 
         self.async_write_ha_state()
 
     @property
     def available(self) -> bool:
         """Return if entity is available."""
-        return (
-            self.entity_description.control_dp in self.device.status_range
-            or self.entity_description.control_dp in self.device.function
-        )
+        dp_str = self.entity_description.control_dp.value if hasattr(self.entity_description.control_dp, 'value') else str(self.entity_description.control_dp)
+        in_range = any((k.value if hasattr(k, 'value') else str(k)) == dp_str for k in self.device.status_range)
+        in_func = any((k.value if hasattr(k, 'value') else str(k)) == dp_str for k in self.device.function) if hasattr(self.device, 'function') else False
+        return in_range or in_func
 
     @staticmethod
     def get_entity_instance(

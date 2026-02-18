@@ -119,77 +119,25 @@ class SmartCoverController:
 
     async def async_setup(self) -> None:
         """Set up the smart cover controller."""
-        # Test storage accessibility first
-        await self._test_storage_access()
-
         LOGGER.info(f"Setting up smart cover controller for {self.device.id}_{self.control_dp}")
-        LOGGER.info(f"Store path: {self._store.path}")
 
-        # Check if storage file exists before loading
-        import os
-        storage_exists = os.path.exists(self._store.path)
-        LOGGER.info(f"Storage file exists: {storage_exists} at path: {self._store.path}")
-        if storage_exists:
-            file_size = os.path.getsize(self._store.path)
-            LOGGER.info(f"Storage file size: {file_size} bytes")
-
-    async def _test_storage_access(self) -> None:
-        """Test if storage directory is accessible and writable."""
-        try:
-            # Try to save and load a simple test
-            test_data = {"test": "storage_test", "timestamp": time.time()}
-            test_store = Store(self.hass, 1, f"test_storage_access_{self.device.id}")
-
-            LOGGER.info(f"Testing storage access with path: {test_store.path}")
-
-            # Save test data
-            await test_store.async_save(test_data)
-            LOGGER.info("Test storage save successful")
-
-            # Load test data
-            loaded_data = await test_store.async_load()
-            if loaded_data and loaded_data.get("test") == "storage_test":
-                LOGGER.info("Test storage load successful")
-
-                # Clean up test file
-                try:
-                    await test_store.async_remove()
-                    LOGGER.info("Test storage cleanup successful")
-                except Exception as cleanup_err:
-                    LOGGER.warning(f"Test storage cleanup failed: {cleanup_err}")
-            else:
-                LOGGER.error(f"Test storage load failed - got: {loaded_data}")
-        except Exception as e:
-            LOGGER.error(f"Storage access test failed: {e}")
-            import traceback
-            LOGGER.error(f"Storage test traceback: {traceback.format_exc()}")
-
-        # Monitor device status changes
+        # Set up status monitoring via HA dispatcher
         self._setup_status_monitoring()
 
-        # FIRST: Load stored state before position initialization
+        # Load stored state
+        stored_data = None
         try:
-            LOGGER.info(f"Attempting to load stored data from {self._store.path}")
             stored_data = await self._store.async_load()
-            LOGGER.info(f"Raw loaded data: {stored_data}")
 
             if stored_data:
-                LOGGER.info(f"Successfully loaded stored data for {self.device.id}_{self.control_dp}: {stored_data}")
-                # Decode the data manually
                 if "state" in stored_data:
                     state_data = stored_data["state"]
-                    stored_position = state_data.get("position", 0)
-                    LOGGER.info(f"Loaded stored position: {stored_position}% for {self.device.id}_{self.control_dp}")
-
                     self.state = CoverState(
-                        position=stored_position,
+                        position=state_data.get("position", 0),
                         target_position=state_data.get("target_position"),
                         movement_state=CoverMovementState(state_data.get("movement_state", "stopped")),
                         last_update_time=state_data.get("last_update_time", time.time()),
                     )
-                    LOGGER.info(f"Created CoverState with position: {self.state.position}%")
-                else:
-                    LOGGER.warning(f"No 'state' key found in stored data for {self.device.id}_{self.control_dp}")
 
                 if "timing_config" in stored_data:
                     timing_data = stored_data["timing_config"]
@@ -198,92 +146,69 @@ class SmartCoverController:
                         full_close_time=timing_data.get("full_close_time", 60.0),
                         position_tolerance=timing_data.get("position_tolerance", 1),
                     )
-                    LOGGER.info(f"Restored timing config for {self.device.id}_{self.control_dp}: {self.timing_config.full_open_time}s")
 
-                # Load positioning enabled state
                 self.positioning_enabled = stored_data.get("positioning_enabled", False)
-                LOGGER.info(f"Restored positioning_enabled for {self.device.id}_{self.control_dp}: {self.positioning_enabled}")
             else:
-                LOGGER.warning(f"No stored data found for {self.device.id}_{self.control_dp}, using defaults")
-                LOGGER.warning(f"async_load() returned: {stored_data} (type: {type(stored_data)})")
-                LOGGER.info(f"Default timing config: {self.timing_config.full_open_time}s")
-                LOGGER.info(f"Default positioning_enabled: {self.positioning_enabled}")
+                LOGGER.debug(f"No stored data for {self.device.id}_{self.control_dp}, using defaults")
         except Exception as e:
             LOGGER.error(f"Error loading stored data for {self.device.id}_{self.control_dp}: {e}")
-            LOGGER.error(f"Exception type: {type(e)}")
-            import traceback
-            LOGGER.error(f"Load state traceback: {traceback.format_exc()}")
-            LOGGER.info(f"Using default values due to load error")
-            stored_data = None  # Explicitly set to None on error
+            stored_data = None
 
-        # THEN: Initialize current position - priority order:
-        # 1. Stored state (from previous session - most reliable for smart positioning)
-        # 2. Device status (from Tuya device - fallback if no stored state)
-        # 3. Default to 0 (fallback)
-
+        # Initialize current position - priority order:
+        # 1. Stored state (from previous session)
+        # 2. Device status (from Tuya device)
+        # 3. Default to 0
         stored_position = self.state.position
         device_position = self._get_position_from_device_status()
         has_stored_state = stored_data is not None and "state" in stored_data
 
-        LOGGER.info(f"{self.device.name}: Initialization positions - stored: {stored_position}%, device: {device_position}%, has_stored_state: {has_stored_state}")
-
         if has_stored_state:
-            # We have stored state - this is our calculated position, trust it (even if 0%)
-            LOGGER.info(f"Initialized {self.device.name} position from stored state: {stored_position}%")
-
-            # Only consider device position if it differs significantly, and log the discrepancy
             if (device_position is not None and
-                abs(device_position - stored_position) > 5):  # 5% threshold for significant difference
-                LOGGER.warning(f"Device position ({device_position}%) differs significantly from stored smart position ({stored_position}%)")
-                LOGGER.warning(f"Using stored smart position {stored_position}% - device position may be inaccurate")
-                # Still use stored position, don't override with potentially inaccurate device position
-
+                abs(device_position - stored_position) > 5):
+                LOGGER.warning(
+                    f"{self.device.name}: Device position ({device_position}%) differs from "
+                    f"stored ({stored_position}%), using stored"
+                )
         elif device_position is not None:
-            # No stored state, but device has position - use it
             self.state.position = device_position
-            LOGGER.info(f"Initialized {self.device.name} position from device status: {device_position}%")
-            await self._save_state()  # Save the device position as our starting point
+            await self._save_state()
         else:
-            # No position data available - check if we had a saved position that wasn't restored properly
-            if stored_data is not None:
-                LOGGER.warning(f"No device position available but we have stored data: {stored_data}")
-                # Use whatever position was in stored data, even if it's 0
-                LOGGER.info(f"Using stored position {stored_position}% despite no device position data")
-            else:
-                # Truly no data - default to 0
+            if stored_data is None:
                 self.state.position = 0
-                LOGGER.info(f"No position data available for {self.device.name} - defaulting to 0%")
-
-        # Log final initialization with DP value
-        control_dp_value = self.control_dp.value if hasattr(self.control_dp, 'value') else str(self.control_dp)
-        LOGGER.info(
-            f"Smart cover controller initialized for {self.device.name} "
-            f"(DP: {control_dp_value}) at position {self.state.position}%"
-        )
 
         # Mark initial setup as complete
         self._initial_setup_complete = True
-
-        # Save the state now that setup is complete (includes any timing config updates from initialization)
         await self._save_state()
-        LOGGER.info(f"Initial state saved for {self.device.name} after setup completion")
+
+        control_dp_value = str(self.control_dp)
+        LOGGER.info(
+            f"Smart cover controller initialized for {self.device.name} "
+            f"(DP: {control_dp_value}) at position {self.state.position}%, "
+            f"positioning_enabled={self.positioning_enabled}"
+        )
 
     def _setup_status_monitoring(self) -> None:
-        """Set up monitoring of device status changes."""
-        # Register callback with multi manager to get notified of status changes
-        LOGGER.info(f"Registering status monitoring for {self.device.name} ({self.control_dp})")
-        self.device_manager.register_status_callback(
-            self.device.id,
-            self._on_device_status_change
-        )
+        """Set up monitoring of device status changes via HA dispatcher."""
+        from homeassistant.helpers.dispatcher import async_dispatcher_connect
+        from homeassistant.core import callback as ha_callback
 
-        # Store callback so we can unregister it later
-        self._unsubscribe_callbacks.append(
-            lambda: self.device_manager.unregister_status_callback(
-                self.device.id,
-                self._on_device_status_change
-            )
-        )
+        signal = f"tuya_entry_update_{self.device.id}"
+
+        @ha_callback
+        def _on_dispatcher_update(updated_status_properties=None, dp_timestamps=None):
+            """Convert dispatcher update to status change format."""
+            if not updated_status_properties:
+                return
+            status_updates = []
+            for dp_code in updated_status_properties:
+                value = self.device.status.get(dp_code)
+                if value is not None:
+                    status_updates.append({"code": dp_code, "value": value})
+            if status_updates:
+                self._on_device_status_change(self.device.id, status_updates)
+
+        unsub = async_dispatcher_connect(self.hass, signal, _on_dispatcher_update)
+        self._unsubscribe_callbacks.append(unsub)
 
     def _on_device_status_change(self, device_id: str, status_updates: list) -> None:
         """Handle device status changes from Tuya."""
