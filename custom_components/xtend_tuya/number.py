@@ -815,11 +815,18 @@ async def async_setup_entry(
                     if smart_cover_descs:
                         for desc in smart_cover_descs:
                             if isinstance(desc, XTSmartCoverNumberEntityDescription):
-                                if desc.control_dp and (
-                                    desc.control_dp in device.status_range
-                                    or desc.control_dp in device.function
-                                ):
-                                    entity_uid = f"{device.id}_{desc.control_dp}_{desc.key}"
+                                # Compare as string to handle enum vs string keys
+                                dp_str = desc.control_dp.value if hasattr(desc.control_dp, 'value') else str(desc.control_dp)
+                                dp_in_range = any(
+                                    (k.value if hasattr(k, 'value') else str(k)) == dp_str
+                                    for k in device.status_range
+                                )
+                                dp_in_func = any(
+                                    (k.value if hasattr(k, 'value') else str(k)) == dp_str
+                                    for k in device.function
+                                ) if hasattr(device, 'function') else False
+                                if desc.control_dp and (dp_in_range or dp_in_func):
+                                    entity_uid = f"{device.id}_{dp_str}_{desc.key}"
                                     if entity_uid not in created_smart_cover_ids:
                                         created_smart_cover_ids.add(entity_uid)
                                         entities.append(
