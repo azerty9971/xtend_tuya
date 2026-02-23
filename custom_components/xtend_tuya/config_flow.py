@@ -399,7 +399,7 @@ class TuyaOptionFlow(OptionsFlow):
             )
 
         return self.async_show_form(
-            step_id="device_configure",
+            step_id="climate_device_settings",
             data_schema=vol.Schema(
                 {
                     vol.Required(
