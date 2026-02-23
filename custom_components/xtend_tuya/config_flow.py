@@ -300,8 +300,7 @@ class TuyaOptionFlow(OptionsFlow):
             if function := getattr(
                 self, OPTION_STEP_DEFINITION[XTStepId(step_postfix)][0]
             ):
-                return functools.partial(
-                    function,
+                return function(
                     *OPTION_STEP_DEFINITION[XTStepId(step_postfix)][1],
                     **OPTION_STEP_DEFINITION[XTStepId(step_postfix)][2],
                 )
