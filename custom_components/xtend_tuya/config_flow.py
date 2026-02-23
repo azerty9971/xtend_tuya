@@ -293,15 +293,6 @@ class TuyaOptionFlow(OptionsFlow):
         else:
             self.options = {}
 
-    async def async_step_init(
-        self, user_input: dict[str, Any] | None = None
-    ) -> ConfigFlowResult:
-        """Manage the options."""
-        return self.async_show_menu(
-            step_id="init",
-            menu_options=[XTStepId.CONFIGURE_API, XTStepId.DEVICE_SETTINGS],
-        )
-
     def __getattr__(self, name: str):
         step_prefix: str = STEP_METHOD_PREFIX
         step_postfix = name[len(step_prefix) :]
