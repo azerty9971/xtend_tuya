@@ -300,10 +300,16 @@ class TuyaOptionFlow(OptionsFlow):
             if function := getattr(
                 self, OPTION_STEP_DEFINITION[XTStepId(step_postfix)][0]
             ):
-                return function(
-                    *OPTION_STEP_DEFINITION[XTStepId(step_postfix)][1],
-                    **OPTION_STEP_DEFINITION[XTStepId(step_postfix)][2],
-                )
+
+                async def wrapper(
+                    user_input: dict[str, Any] | None = None,
+                ) -> ConfigFlowResult:
+                    return function(
+                        *OPTION_STEP_DEFINITION[XTStepId(step_postfix)][1],
+                        **OPTION_STEP_DEFINITION[XTStepId(step_postfix)][2],
+                    )
+
+                return wrapper
 
         raise AttributeError
 
@@ -331,7 +337,7 @@ class TuyaOptionFlow(OptionsFlow):
         if user_input is not None:
             self.selected_device_id = user_input.get("device")
             if self.selected_device_id is not None:
-                return await self.async_step_device_configure()
+                return await self.async_step_climate_device_settings()
 
         # Get available climate devices
         self._device_options = {}
