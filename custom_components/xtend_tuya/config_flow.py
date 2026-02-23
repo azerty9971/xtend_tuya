@@ -7,6 +7,7 @@ from enum import StrEnum
 from tuya_sharing import LoginControl
 from .lib.tuya_iot import AuthType
 import voluptuous as vol
+import functools
 from homeassistant.core import callback, HomeAssistant
 from homeassistant.config_entries import (
     ConfigEntry,
@@ -57,6 +58,35 @@ from .multi_manager.managers.tuya_iot.xt_tuya_iot_openapi import XTIOTOpenAPI
 import custom_components.xtend_tuya.util as util
 import custom_components.xtend_tuya.multi_manager.multi_manager as mm
 import custom_components.xtend_tuya.multi_manager.shared.data_entry.shared_data_entry as data_entry
+
+STEP_METHOD_PREFIX = "async_step_"
+
+
+class XTStepId(StrEnum):
+    INIT = "init"
+    CONFIGURE_API = "configure_api"
+    DEVICE_SETTINGS = "device_settings"
+    CLIMATE_DEVICE_SETTINGS = "climate_device_settings"
+
+
+OPTION_STEP_DEFINITION: dict[XTStepId, tuple[str, list[Any], dict[str, Any]]] = {
+    XTStepId.INIT: (
+        "async_show_menu",
+        [],
+        {
+            "step_id": XTStepId.INIT,
+            "menu_options": [XTStepId.CONFIGURE_API, XTStepId.DEVICE_SETTINGS],
+        },
+    ),
+    XTStepId.DEVICE_SETTINGS: (
+        "async_show_menu",
+        [],
+        {
+            "step_id": XTStepId.DEVICE_SETTINGS,
+            "menu_options": [XTStepId.CLIMATE_DEVICE_SETTINGS],
+        },
+    ),
+}
 
 
 class XTConfigFlows:
@@ -256,8 +286,7 @@ class TuyaOptionFlow(OptionsFlow):
         """Initialize options flow."""
         self.handler = config_entry.entry_id
         self.xt_config_entry = config_entry
-        self.selected_device_id: str = ""
-        self.selected_device_name: str = ""
+        self.selected_device_id: str | None = None
         self._device_options: dict[str, str] = {}
         if config_entry.options is not None:
             self.options = config_entry.options
@@ -270,8 +299,23 @@ class TuyaOptionFlow(OptionsFlow):
         """Manage the options."""
         return self.async_show_menu(
             step_id="init",
-            menu_options=["configure_api", "device_settings"],
+            menu_options=[XTStepId.CONFIGURE_API, XTStepId.DEVICE_SETTINGS],
         )
+
+    def __getattr__(self, name: str):
+        step_prefix: str = STEP_METHOD_PREFIX
+        step_postfix = name[len(step_prefix) :]
+        if name.startswith(step_prefix) and step_postfix in OPTION_STEP_DEFINITION:
+            if function := getattr(
+                self, OPTION_STEP_DEFINITION[XTStepId(step_postfix)][0]
+            ):
+                return functools.partial(
+                    function,
+                    *OPTION_STEP_DEFINITION[XTStepId(step_postfix)][1],
+                    **OPTION_STEP_DEFINITION[XTStepId(step_postfix)][2],
+                )
+
+        raise AttributeError
 
     async def async_step_configure_api(
         self, user_input: dict[str, Any] | None = None
@@ -295,9 +339,9 @@ class TuyaOptionFlow(OptionsFlow):
     ) -> ConfigFlowResult:
         """Handle device settings step."""
         if user_input is not None:
-            self.selected_device_id = user_input["device"]
-            self.selected_device_name = self._device_options.get(user_input["device"], user_input["device"])
-            return await self.async_step_device_configure()
+            self.selected_device_id = user_input.get("device")
+            if self.selected_device_id is not None:
+                return await self.async_step_device_configure()
 
         # Get available climate devices
         self._device_options = {}
@@ -310,12 +354,15 @@ class TuyaOptionFlow(OptionsFlow):
                 device_id,
                 device,
             ) in self.xt_config_entry.runtime_data.multi_manager.device_map.items():
-                if device.category in ("cl", "wk", "wkf", "kt", "sfkzq") or "thermostat" in device.product_name.lower():
+                if (
+                    device.category in ("cl", "wk", "wkf", "kt", "sfkzq")
+                    or "thermostat" in device.product_name.lower()
+                ):
                     self._device_options[device_id] = f"{device.name} ({device.id})"
-        
+
         # Fallback if no devices found or runtime data not available
         if not self._device_options:
-             return self.async_abort(reason="no_devices_found")
+            return self.async_abort(reason="no_devices_found")
 
         return self.async_show_form(
             step_id="device_settings",
@@ -326,7 +373,7 @@ class TuyaOptionFlow(OptionsFlow):
             ),
         )
 
-    async def async_step_device_configure(
+    async def async_step_climate_device_settings(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
         """Handle device configuration."""
@@ -337,12 +384,18 @@ class TuyaOptionFlow(OptionsFlow):
                 new_options["device_settings"] = {}
             else:
                 new_options["device_settings"] = dict(new_options["device_settings"])
-            
+
             # Preserve other settings for this device
-            current_device_settings = dict(new_options["device_settings"].get(self.selected_device_id, {}))
-            current_device_settings["target_temperature_step"] = user_input["target_temperature_step"]
-            new_options["device_settings"][self.selected_device_id] = current_device_settings
-            
+            current_device_settings = dict(
+                new_options["device_settings"].get(self.selected_device_id, {})
+            )
+            current_device_settings["target_temperature_step"] = user_input[
+                "target_temperature_step"
+            ]
+            new_options["device_settings"][
+                self.selected_device_id
+            ] = current_device_settings
+
             return self.async_create_entry(title="", data=new_options)
 
         # Get current setting for this device
@@ -351,7 +404,9 @@ class TuyaOptionFlow(OptionsFlow):
             "device_settings" in self.options
             and self.selected_device_id in self.options["device_settings"]
         ):
-            current_step = self.options["device_settings"][self.selected_device_id].get("target_temperature_step", 0.5)
+            current_step = self.options["device_settings"][self.selected_device_id].get(
+                "target_temperature_step", 0.5
+            )
 
         return self.async_show_form(
             step_id="device_configure",
@@ -360,11 +415,17 @@ class TuyaOptionFlow(OptionsFlow):
                     vol.Required(
                         "target_temperature_step",
                         default=current_step,
-                    ): vol.In({0.1: "0.1 (raw value: 1)", 0.5: "0.5 (raw value: 5)", 1.0: "1.0 (raw value: 10)"}),
+                    ): vol.In(
+                        {
+                            0.1: "0.1 (raw value: 1)",
+                            0.5: "0.5 (raw value: 5)",
+                            1.0: "1.0 (raw value: 10)",
+                        }
+                    ),
                 }
             ),
-             description_placeholders={
-                "device_name": self.selected_device_name or self.selected_device_id,
+            description_placeholders={
+                "device_name": self.selected_device_id or "",
             },
         )
 
@@ -388,7 +449,7 @@ class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
         self.config_entry_title: str = ""
 
     def __getattr__(self, name: str):
-        step_prefix: str = "async_step_"
+        step_prefix: str = STEP_METHOD_PREFIX
         if (
             name.startswith(step_prefix)
             and name[len(step_prefix) :] in XTDiscoverySource
