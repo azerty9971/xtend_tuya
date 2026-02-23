@@ -330,7 +330,7 @@ class XTEntityDescriptorManager:
     ) -> EntityDescription:
         if real_type is None:
             return base
-        base_dict = base.__dict__
+        base_dict: dict[str, Any] = base.__dict__ # type: ignore
         if (
             other.translation_placeholders is not None
             and base.translation_placeholders is None
