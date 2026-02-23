@@ -665,3 +665,14 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
             target_humidity_wrapper=target_humidity_wrapper,
             temperature_unit=temperature_unit,
         )
+
+    @property
+    def target_temperature_step(self) -> float | None:
+        """Return the target temperature step to use."""
+        if (
+            self.device_manager.config_entry.options
+            and "device_settings" in self.device_manager.config_entry.options
+            and self.device.id in self.device_manager.config_entry.options["device_settings"]
+        ):
+             return self.device_manager.config_entry.options["device_settings"][self.device.id].get("target_temperature_step")
+        return super().target_temperature_step

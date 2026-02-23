@@ -62,6 +62,25 @@
     },
     "options": {
         "step": {
+            "init": {
+                "title": "Xtend Tuya Settings",
+                "menu_options": {
+                    "configure_api": "API Credentials",
+                    "device_settings": "Device Settings"
+                }
+            },
+            "configure_api": {
+                "description": "Add a Tuya OpenAPI credential to improve the compatibility with some Tuya devices. Please follow the guide at the URL by clicking the button below.",
+                "data": {
+                    "no_openapi": "Don't ask for OpenAPI credentials",
+                    "country_code": "Country",
+                    "access_id": "Tuya IoT Access ID",
+                    "access_secret": "Tuya IoT Access Secret",
+                    "username": "SmartLife/Tuya account",
+                    "password": "SmartLife/Tuya account password"
+                },
+                "title": "Add Tuya OpenAPI credentials"
+            },
             "configure": {
                 "description": "Add a Tuya OpenAPI credential to improve the compatibility with some Tuya devices. Please follow the guide at the URL by clicking the button below.",
                 "data": {
@@ -73,7 +92,24 @@
                     "password": "SmartLife/Tuya account password"
                 },
                 "title": "Add Tuya OpenAPI credentials"
+            },
+            "device_settings": {
+                "title": "Select Device",
+                "description": "Select a climate device to configure.",
+                "data": {
+                    "device": "Device"
+                }
+            },
+            "device_configure": {
+                "title": "Configure {device_name}",
+                "description": "Set the temperature step for this device. The raw Tuya value is 10x the step (e.g. raw value 5 = step 0.5, raw value 1 = step 0.1).",
+                "data": {
+                    "target_temperature_step": "Target temperature step"
+                }
             }
+        },
+        "abort": {
+            "no_devices_found": "No climate devices found. Make sure your devices are connected and the integration is loaded."
         }
     },
     "services": {
@@ -265,10 +301,6 @@
             "xt_generic_binary_sensor": {
                 "name": "{name}"
             },
-
-
-
-
             "carbon_dioxide": {
                 "name": "Carbon dioxide"
             },
@@ -352,10 +384,6 @@
             "xt_generic_button": {
                 "name": "{name}"
             },
-
-
-
-
             "reset_duster_cloth": {
                 "name": "Reset duster cloth"
             },
@@ -408,11 +436,6 @@
             "door_3": {
                 "name": "Door 3"
             },
-
-
-
-
-
             "blind": {
                 "name": "Blind"
             },
@@ -427,10 +450,6 @@
             }
         },
         "event": {
-
-
-
-
             "numbered_button": {
                 "name": "Button {button_number}",
                 "state_attributes": {
@@ -454,10 +473,6 @@
             "xt_generic_light": {
                 "name": "{name}"
             },
-            
-
-
-
             "backlight": {
                 "name": "Backlight"
             },
@@ -738,10 +753,6 @@
             "xt_generic_number": {
                 "name": "{name}"
             },
-
-
-
-
             "alarm_delay": {
                 "name": "Alarm delay"
             },
@@ -1164,10 +1175,6 @@
             "xt_generic_select": {
                 "name": "{name}"
             },
-
-
-
-
             "basic_anti_flicker": {
                 "name": "Anti-flicker",
                 "state": {
@@ -2263,10 +2270,6 @@
             "xt_generic_sensor": {
                 "name": "{name}"
             },
-
-
-
-
             "air_pressure": {
                 "name": "Air pressure"
             },
@@ -2815,10 +2818,6 @@
             "xt_generic_switch": {
                 "name": "{name}"
             },
-
-
-
-
             "anion": {
                 "name": "Anion"
             },
