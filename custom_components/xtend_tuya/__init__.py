@@ -1,22 +1,5 @@
 """Support for Tuya Smart devices."""
 
-import socket
-
-# save the original DNS lookup function
-_original_getaddrinfo = socket.getaddrinfo
-
-def _getaddrinfo_ipv4_only(host, port, family=0, type=0, proto=0, flags=0):
-    """
-    IPv6 sniper: If the request is going to a tuya server, 
-    force it to use IPv4 (AF_INET) to prevent IPv6 timeout
-    """
-    if host and ("tuya" in host or "tinytuya" in host):
-        return _original_getaddrinfo(host, port, socket.AF_INET, type, proto, flags)
-    return _original_getaddrinfo(host, port, family, type, proto, flags)
-
-# Replace the global function with the sniper
-socket.getaddrinfo = _getaddrinfo_ipv4_only
-
 from __future__ import annotations
 import logging
 import asyncio
@@ -54,6 +37,36 @@ from .entity import (
 from .multi_manager.shared.tuya_patches.tuya_patches import (
     XTTuyaPatcher,
 )
+import socket
+
+# save the original DNS lookup function
+_original_getaddrinfo = socket.getaddrinfo
+
+
+def _getaddrinfo_ipv4_only(host, port, family=0, type=0, proto=0, flags=0):
+    """
+    IPv6 sniper: If the request is going to a tuya server,
+    force it to use IPv4 (AF_INET) to prevent IPv6 timeout
+    """
+    tuya_hosts = [
+        "apigw.iotbing.com",
+        "openapi.tuyaus.com",
+        "openapi.tuyacn.com",
+        "openapi.tuyaeu.com",
+        "openapi.tuyain.com",
+        "openapi-sg.iotbing.com",
+        "openapi-ueaz.tuyaus.com",
+        "openapi-weaz.tuyaeu.com",
+    ]
+    if host and host in tuya_hosts:
+        LOGGER.warning(f"Tuya host {host} detected, using IPv4 to prevent potential timeout")
+        return _original_getaddrinfo(host, port, socket.AF_INET, type, proto, flags)
+    return _original_getaddrinfo(host, port, family, type, proto, flags)
+
+
+# Replace the global function with the sniper
+socket.getaddrinfo = _getaddrinfo_ipv4_only
+
 
 # Suppress logs from the library, it logs unneeded on error
 logging.getLogger("tuya_sharing").setLevel(logging.CRITICAL)
