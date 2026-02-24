@@ -63,18 +63,19 @@ STEP_METHOD_PREFIX = "async_step_"
 
 
 class XTStepId(StrEnum):
-    INIT = "init"
+    CONFIGURE = "configure"
     CONFIGURE_API = "configure_api"
     DEVICE_SETTINGS = "device_settings"
+    SELECT_CLIMATE_DEVICE = "select_climate_device"
     CLIMATE_DEVICE_SETTINGS = "climate_device_settings"
 
 
 OPTION_STEP_DEFINITION: dict[XTStepId, tuple[str, list[Any], dict[str, Any]]] = {
-    XTStepId.INIT: (
+    XTStepId.CONFIGURE: (
         "async_show_menu",
         [],
         {
-            "step_id": XTStepId.INIT,
+            "step_id": XTStepId.CONFIGURE,
             "menu_options": [XTStepId.CONFIGURE_API, XTStepId.DEVICE_SETTINGS],
         },
     ),
@@ -83,7 +84,16 @@ OPTION_STEP_DEFINITION: dict[XTStepId, tuple[str, list[Any], dict[str, Any]]] = 
         [],
         {
             "step_id": XTStepId.DEVICE_SETTINGS,
-            "menu_options": [XTStepId.CLIMATE_DEVICE_SETTINGS],
+            "menu_options": [XTStepId.SELECT_CLIMATE_DEVICE],
+        },
+    ),
+    XTStepId.SELECT_CLIMATE_DEVICE: (
+        "async_step_select_device",
+        [],
+        {
+            "user_input": None,
+            "has_preferences": {f"{mm.XTDevice.XTDevicePreference.IS_A_CLIMATE_DEVICE}": True},
+            "next_step_id": XTStepId.CLIMATE_DEVICE_SETTINGS,
         },
     ),
 }
@@ -287,7 +297,9 @@ class TuyaOptionFlow(OptionsFlow):
         self.handler = config_entry.entry_id
         self.xt_config_entry = config_entry
         self.selected_device_id: str | None = None
+        self.selected_device_next_step_id: str | None = None
         self._device_options: dict[str, str] = {}
+        self.multi_manager: mm.MultiManager | None = getattr(config_entry.runtime_data, "multi_manager") if config_entry.runtime_data else None
         if config_entry.options is not None:
             self.options = config_entry.options
         else:
@@ -330,38 +342,41 @@ class TuyaOptionFlow(OptionsFlow):
                     data["device_settings"] = self.options["device_settings"]
                 return self.async_create_entry(title="", data=data)
 
-    async def async_step_device_settings(
-        self, user_input: dict[str, Any] | None = None
+    async def async_step_select_device(
+        self,
+        user_input: dict[str, Any] | None = None,
+        has_preferences: dict[str, Any] | None = None,
+        next_step_id: str | None = None,
     ) -> ConfigFlowResult:
         """Handle device settings step."""
+        if next_step_id is not None:
+            self.selected_device_next_step_id = next_step_id
         if user_input is not None:
             self.selected_device_id = user_input.get("device")
             if self.selected_device_id is not None:
-                return await self.async_step_climate_device_settings()
+                if function := getattr(self, f"{STEP_METHOD_PREFIX}{self.selected_device_next_step_id}", None):
+                    return await function()
 
-        # Get available climate devices
+        # Get devices based on preferences
         self._device_options = {}
-        if (
-            hasattr(self.xt_config_entry, "runtime_data")
-            and self.xt_config_entry.runtime_data
-            and self.xt_config_entry.runtime_data.multi_manager
-        ):
+        if self.multi_manager is not None:
             for (
                 device_id,
                 device,
-            ) in self.xt_config_entry.runtime_data.multi_manager.device_map.items():
-                if (
-                    device.category in ("cl", "wk", "wkf", "kt", "sfkzq")
-                    or "thermostat" in device.product_name.lower()
-                ):
-                    self._device_options[device_id] = f"{device.name} ({device.id})"
+            ) in self.multi_manager.device_map.items():
+                if has_preferences is not None:
+                    for has_preference in has_preferences:
+                        preference_value = device.get_preference(has_preference, None)
+                        if preference_value is not None:
+                            if preference_value == has_preferences[has_preference]:
+                                self._device_options[device_id] = f"{device.name} ({device.id})"
 
         # Fallback if no devices found or runtime data not available
         if not self._device_options:
             return self.async_abort(reason="no_devices_found")
 
         return self.async_show_form(
-            step_id="device_settings",
+            step_id="select_device",
             data_schema=vol.Schema(
                 {
                     vol.Required("device"): vol.In(self._device_options),
@@ -424,11 +439,6 @@ class TuyaOptionFlow(OptionsFlow):
                 "device_name": self.selected_device_id or "",
             },
         )
-
-    async def async_step_configure(
-        self, user_input: dict[str, Any] | None = None
-    ) -> ConfigFlowResult:
-        return await self.async_step_init(user_input=user_input)
 
 
 class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
