@@ -439,6 +439,11 @@ class TuyaOptionFlow(OptionsFlow):
                 "device_name": self.selected_device_id or "",
             },
         )
+    
+    async def async_step_configure(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        return await self.async_step_init(user_input=user_input)
 
 
 class TuyaConfigFlow(ConfigFlow, domain=DOMAIN):
