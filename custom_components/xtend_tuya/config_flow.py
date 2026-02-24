@@ -63,7 +63,7 @@ STEP_METHOD_PREFIX = "async_step_"
 
 
 class XTStepId(StrEnum):
-    CONFIGURE = "configure"
+    INIT = "init"
     CONFIGURE_API = "configure_api"
     DEVICE_SETTINGS = "device_settings"
     SELECT_CLIMATE_DEVICE = "select_climate_device"
@@ -71,11 +71,11 @@ class XTStepId(StrEnum):
 
 
 OPTION_STEP_DEFINITION: dict[XTStepId, tuple[str, list[Any], dict[str, Any]]] = {
-    XTStepId.CONFIGURE: (
+    XTStepId.INIT: (
         "async_show_menu",
         [],
         {
-            "step_id": XTStepId.CONFIGURE,
+            "step_id": XTStepId.INIT,
             "menu_options": [XTStepId.CONFIGURE_API, XTStepId.DEVICE_SETTINGS],
         },
     ),
