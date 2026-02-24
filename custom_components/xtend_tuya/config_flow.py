@@ -7,8 +7,6 @@ from enum import StrEnum
 from tuya_sharing import LoginControl
 from .lib.tuya_iot import AuthType
 import voluptuous as vol
-import inspect
-import functools
 from homeassistant.core import callback, HomeAssistant
 from homeassistant.config_entries import (
     ConfigEntry,
