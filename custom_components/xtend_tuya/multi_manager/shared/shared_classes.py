@@ -17,7 +17,6 @@ import custom_components.xtend_tuya.util as util
 import custom_components.xtend_tuya.entity as entity
 from ...ha_tuya_integration.tuya_integration_imports import (
     TuyaDPType,
-    tuya_util_parse_dptype,
 )
 from ...const import (
     LOGGER,
@@ -94,7 +93,7 @@ class XTDeviceStatusRange(XTDeviceStatusFunctionShared):
         else:
             code = ""
         if hasattr(status_range, "type"):
-            type = tuya_util_parse_dptype(status_range.type)
+            type = TuyaDPType.try_parse(status_range.type)
         else:
             type = None
         if hasattr(status_range, "values"):
@@ -123,7 +122,7 @@ class XTDeviceFunction(XTDeviceStatusFunctionShared):
         else:
             code = ""
         if hasattr(function, "type"):
-            type = tuya_util_parse_dptype(function.type)
+            type = TuyaDPType.try_parse(function.type)
         else:
             type = None
         if hasattr(function, "values"):
@@ -189,7 +188,7 @@ class XTDevice(TuyaDevice):
 
     class XTDevicePreference(StrEnum):
         IS_A_COVER_DEVICE = "IS_A_COVER_DEVICE"
-        IS_A_CLIMATE_DEVICE = "IS_A_CLIMATE_DEVICE"
+        CLIMATE_DEVICE_ENTITY = "CLIMATE_DEVICE_ENTITY"
         LOCK_MANUAL_UNLOCK_COMMAND = "LOCK_MANUAL_UNLOCK_COMMAND"
         LOCK_GET_SUPPORTED_UNLOCK_TYPES = "LOCK_GET_SUPPORTED_UNLOCK_TYPES"
         LOCK_GET_DOOR_LOCK_PASSWORD_TICKET = "LOCK_GET_DOOR_LOCK_PASSWORD_TICKET"
@@ -442,7 +441,7 @@ class XTDevice(TuyaDevice):
                 if config_item := local_strategy.get("config_item"):
                     if dp_info.dptype is None:
                         if ls_dptype := config_item.get("valueType"):
-                            dp_info.dptype = tuya_util_parse_dptype(ls_dptype)
+                            dp_info.dptype = TuyaDPType.try_parse(ls_dptype)
                     if ls_value_descr := config_item.get("valueDesc"):
                         try:
                             value_descr_dict = cast(

@@ -57,6 +57,8 @@ from .multi_manager.managers.tuya_iot.xt_tuya_iot_openapi import XTIOTOpenAPI
 import custom_components.xtend_tuya.util as util
 import custom_components.xtend_tuya.multi_manager.multi_manager as mm
 import custom_components.xtend_tuya.multi_manager.shared.data_entry.shared_data_entry as data_entry
+import custom_components.xtend_tuya.entity as entity
+import custom_components.xtend_tuya.climate as climate
 
 STEP_METHOD_PREFIX = "async_step_"
 
@@ -94,7 +96,7 @@ OPTION_STEP_DEFINITION: dict[XTStepId, tuple[str, list[Any], dict[str, Any], boo
         {
             "user_input": None,
             "has_preferences": {
-                f"{mm.XTDevice.XTDevicePreference.IS_A_CLIMATE_DEVICE}": True
+                f"{mm.XTDevice.XTDevicePreference.CLIMATE_DEVICE_ENTITY}": None
             },
             "next_step_id": XTStepId.CLIMATE_DEVICE_SETTINGS,
         },
@@ -386,7 +388,10 @@ class TuyaOptionFlow(OptionsFlow):
                     for has_preference in has_preferences:
                         preference_value = device.get_preference(has_preference, None)
                         if preference_value is not None:
-                            if preference_value == has_preferences[has_preference]:
+                            if (
+                                has_preferences[has_preference] is None
+                                or preference_value == has_preferences[has_preference]
+                            ):
                                 self._device_options[device_id] = (
                                     f"{device.name} ({device.id})"
                                 )
@@ -409,27 +414,26 @@ class TuyaOptionFlow(OptionsFlow):
     ) -> ConfigFlowResult:
         """Handle device configuration."""
         if user_input is not None:
-            # Update options, preserving all existing settings
+            # Update the configurable properties
             new_options = dict(self.options)
-            if "device_settings" not in new_options:
-                new_options["device_settings"] = {}
-            else:
-                new_options["device_settings"] = dict(new_options["device_settings"])
-
-            # Preserve other settings for this device
-            current_device_settings = dict(
-                new_options["device_settings"].get(self.selected_device_id, {})
-            )
-            current_device_settings["target_temperature_step"] = user_input[
-                "target_temperature_step"
-            ]
-            new_options["device_settings"][
-                self.selected_device_id
-            ] = current_device_settings
-
             return self.async_create_entry(title="", data=new_options)
 
-        # Get current setting for this device
+        if self.selected_device_id is None:
+            return self.async_abort(reason="device_not_selected")
+        # Get the configurable properties for the selected device
+        device: mm.XTDevice | None = self.multi_manager.device_map.get(self.selected_device_id) if self.multi_manager else None
+        if device is None:
+            return self.async_abort(reason="device_not_found")
+
+        climate_entity: climate.XTClimateEntity | None = device.get_preference(
+            mm.XTDevice.XTDevicePreference.CLIMATE_DEVICE_ENTITY)
+        if climate_entity is None:
+            return self.async_abort(reason="climate_entity_not_found")
+        
+        configurable_properties: climate.XTClimateConfigurableProperties | None = climate_entity.get_configurable_properties()
+        if configurable_properties is None:
+            return self.async_abort(reason="no_configurable_properties")
+        
         current_step = 0.5
         if (
             "device_settings" in self.options

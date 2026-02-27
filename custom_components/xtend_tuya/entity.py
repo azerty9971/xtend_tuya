@@ -765,6 +765,9 @@ class XTEntity(TuyaEntity):
                                 return_dict[uom_value].add(device_class.value)  # type: ignore
         return return_dict
 
+    def get_configurable_properties(self) -> Any | None:
+        return None
+
     @staticmethod
     def get_device_class_from_uom(
         dpcode_information: sc.XTDevice.XTDeviceDPCodeInformation | None,

@@ -136,7 +136,6 @@ from tuya_sharing.manager import (
 )
 from homeassistant.components.tuya.const import (
     DPCode as TuyaDPCode,  # noqa: F401
-    DPType as TuyaDPType,  # noqa: F401
     DOMAIN as TuyaDOMAIN,  # noqa: F401
     DEVICE_CLASS_UNITS as TuyaDEVICE_CLASS_UNITS,  # noqa: F401
     CELSIUS_ALIASES as TuyaCELSIUS_ALIASES,  # noqa: F401
@@ -147,18 +146,16 @@ from homeassistant.components.tuya.entity import (
     TuyaEntity as TuyaEntity,
 )
 
-try:
-    from homeassistant.components.tuya.util import (
-        _DPTYPE_MAPPING as TUYA_DPTYPE_MAPPING,  # noqa: F401 # type: ignore
-        parse_dptype as tuya_util_parse_dptype,  # noqa: F401
-        RemapHelper as TuyaRemapHelper,  # noqa: F401
-    )
-except Exception:
-    from homeassistant.components.tuya.entity import (
-        _DPTYPE_MAPPING as TUYA_DPTYPE_MAPPING,  # noqa: F401 # type: ignore
-    )
+from tuya_device_handlers.const import (
+    DPType as TuyaDPType,   # noqa: F401
+    _DPTYPE_MAPPING as TUYA_DPTYPE_MAPPING,  # noqa: F401 # type: ignore
+)
 
-from homeassistant.components.tuya.type_information import (
+from tuya_device_handlers.utils import (
+    RemapHelper as TuyaRemapHelper,  # noqa: F401
+)
+
+from tuya_device_handlers.type_information import (
     TypeInformation as TuyaTypeInformation,  # noqa: F401
     BooleanTypeInformation as TuyaBooleanTypeInformation,  # noqa: F401
     EnumTypeInformation as TuyaEnumTypeInformation,  # noqa: F401
@@ -167,27 +164,27 @@ from homeassistant.components.tuya.type_information import (
     StringTypeInformation as TuyaStringTypeInformation,  # noqa: F401
     JsonTypeInformation as TuyaJsonTypeInformation,  # noqa: F401
     RawTypeInformation as TuyaRawTypeInformation,  # noqa: F401
-    _should_log_warning as tuya_type_information_should_log_warning,  # noqa: F401
 )
 
-try:
-    from homeassistant.components.tuya.models import (
-        DPCodeWrapper as TuyaDPCodeWrapper,  # noqa: F401
-        DPCodeTypeInformationWrapper as TuyaDPCodeTypeInformationWrapper,  # noqa: F401
-        DPCodeBooleanWrapper as TuyaDPCodeBooleanWrapper,  # noqa: F401
-        DPCodeEnumWrapper as TuyaDPCodeEnumWrapper,  # noqa: F401
-        DPCodeIntegerWrapper as TuyaDPCodeIntegerWrapper,  # noqa: F401
-        DPCodeBitmapBitWrapper as TuyaDPCodeBitmapBitWrapper,  # noqa: F401
-        DPCodeStringWrapper as TuyaDPCodeStringWrapper,  # noqa: F401
-        DPCodeJsonWrapper as TuyaDPCodeJsonWrapper,  # noqa: F401
-        DPCodeRawWrapper as TuyaDPCodeRawWrapper,  # noqa: F401
-        DeviceWrapper as TuyaDeviceWrapper,  # noqa: F401
-    )
-except Exception:
-    from homeassistant.components.tuya.entity import (
-        EnumTypeData as TuyaEnumTypeData,  # noqa: F401 # type: ignore
-        IntegerTypeData as TuyaIntegerTypeData,  # noqa: F401 # type: ignore
-    )
+from tuya_device_handlers.device_wrapper.common import (
+    _should_log_warning as tuya_type_information_should_log_warning,  # noqa: F401
+    DPCodeWrapper as TuyaDPCodeWrapper,  # noqa: F401
+    DPCodeTypeInformationWrapper as TuyaDPCodeTypeInformationWrapper,  # noqa: F401
+    DPCodeBooleanWrapper as TuyaDPCodeBooleanWrapper,  # noqa: F401
+    DPCodeEnumWrapper as TuyaDPCodeEnumWrapper,  # noqa: F401
+    DPCodeIntegerWrapper as TuyaDPCodeIntegerWrapper,  # noqa: F401
+    DPCodeStringWrapper as TuyaDPCodeStringWrapper,  # noqa: F401
+    DPCodeJsonWrapper as TuyaDPCodeJsonWrapper,  # noqa: F401
+    DPCodeRawWrapper as TuyaDPCodeRawWrapper,  # noqa: F401
+)
+
+from tuya_device_handlers.device_wrapper.base import (
+    DeviceWrapper as TuyaDeviceWrapper,  # noqa: F401
+)
+
+from tuya_device_handlers.device_wrapper.binary_sensor import (
+    DPCodeBitmapBitWrapper as TuyaDPCodeBitmapBitWrapper,  # noqa: F401
+)
 
 from tuya_sharing.scenes import (
     SharingScene as TuyaScene,  # noqa: F401

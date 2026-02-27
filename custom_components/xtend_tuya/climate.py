@@ -4,7 +4,7 @@ from __future__ import annotations
 import collections
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import cast, Self
+from typing import Any, cast, Self
 from homeassistant.components.climate.const import (
     HVACMode,
     HVACAction,
@@ -166,6 +166,20 @@ XT_CLIMATE_SWITCH_DPCODES: tuple[XTDPCode, ...] = (
 )
 
 XT_CLIMATE_HVAC_ACTION_DPCODES: tuple[XTDPCode, ...] = (XTDPCode.WORK_STATE,)
+
+
+@dataclass(frozen=True, kw_only=True)
+class XTClimateConfigurableProperties:
+    current_humidity_wrapper: TuyaClimateRoundedIntegerWrapper | None
+    current_temperature_wrapper: TuyaDPCodeIntegerWrapper | None
+    fan_mode_wrapper: TuyaDPCodeEnumWrapper | None
+    preset_wrapper: TuyaDeviceWrapper[str] | None
+    hvac_mode_wrapper: TuyaDPCodeEnumWrapper | None
+    hvac_action_wrapper: TuyaDPCodeEnumWrapper | None
+    set_temperature_wrapper: TuyaDPCodeIntegerWrapper | None
+    swing_wrapper: TuyaClimateSwingModeWrapper | None
+    switch_wrapper: TuyaDPCodeBooleanWrapper | None
+    target_humidity_wrapper: TuyaClimateRoundedIntegerWrapper | None
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -573,8 +587,8 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
         self.entity_description = description
         self._hvac_action_wrapper = hvac_action_wrapper
         self.device.set_preference(
-            f"{XTDevice.XTDevicePreference.IS_A_CLIMATE_DEVICE}",
-            True,
+            f"{XTDevice.XTDevicePreference.CLIMATE_DEVICE_ENTITY}",
+            self,
         )
 
         # Re-Determine HVAC modes
@@ -609,6 +623,20 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
                         self._attr_hvac_modes.append(
                             self._hvac_mode_wrapper.replace_heat_cool_with
                         )
+
+    def get_configurable_properties(self) -> Any | None:
+        return XTClimateConfigurableProperties(
+            current_humidity_wrapper=self._current_humidity_wrapper, # type: ignore
+            current_temperature_wrapper=self._current_temperature, # type: ignore
+            fan_mode_wrapper=self._fan_mode_wrapper, # type: ignore
+            preset_wrapper=self._preset_wrapper,
+            hvac_mode_wrapper=self._hvac_mode_wrapper, # type: ignore
+            hvac_action_wrapper=self._hvac_action_wrapper,
+            set_temperature_wrapper=self._set_temperature, # type: ignore
+            swing_wrapper=self._swing_wrapper, # type: ignore
+            switch_wrapper=self._switch_wrapper, # type: ignore
+            target_humidity_wrapper=self._target_humidity_wrapper, # type: ignore
+        )
 
     @property
     def hvac_action(self) -> HVACAction | None:  # type: ignore
@@ -678,16 +706,16 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
             temperature_unit=temperature_unit,
         )
 
-    @property
-    def target_temperature_step(self) -> float | None:
-        """Return the target temperature step to use."""
-        if (
-            self.device_manager.config_entry.options
-            and "device_settings" in self.device_manager.config_entry.options
-            and self.device.id
-            in self.device_manager.config_entry.options["device_settings"]
-        ):
-            return self.device_manager.config_entry.options["device_settings"][
-                self.device.id
-            ].get("target_temperature_step")
-        return super().target_temperature_step
+    # @property
+    # def target_temperature_step(self) -> float | None:
+    #     """Return the target temperature step to use."""
+    #     if (
+    #         self.device_manager.config_entry.options
+    #         and "device_settings" in self.device_manager.config_entry.options
+    #         and self.device.id
+    #         in self.device_manager.config_entry.options["device_settings"]
+    #     ):
+    #         return self.device_manager.config_entry.options["device_settings"][
+    #             self.device.id
+    #         ].get("target_temperature_step")
+    #     return super().target_temperature_step

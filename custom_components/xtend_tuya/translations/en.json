@@ -123,7 +123,11 @@
             }
         },
         "abort": {
-            "no_devices_found": "No climate devices found. Make sure your devices are connected and the integration is loaded."
+            "no_devices_found": "No devices found for this configuration category.",
+            "device_not_selected": "No device selected. Please select a device to configure.",
+            "device_not_found": "Selected device not found. Please select a valid device to configure.",
+            "climate_entity_not_found": "No climate entity found for the selected device. Please select a device with a climate entity to configure.",
+            "no_configurable_properties": "The selected device does not have configurable properties."
         }
     },
     "services": {

@@ -52,7 +52,7 @@ from .xt_tuya_iot_device import (
     XTSmartHomeDeviceManage,
 )
 from ....ha_tuya_integration.tuya_integration_imports import (
-    tuya_util_parse_dptype,
+    TuyaDPType,
 )
 from .xt_tuya_iot_mq import (
     XTIOTOpenMQ,
@@ -353,7 +353,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                         dp_id = int(property["abilityId"])
                         code = property["code"]
                         typeSpec = property["typeSpec"]
-                        real_type = tuya_util_parse_dptype(typeSpec["type"])
+                        real_type = TuyaDPType.try_parse(typeSpec["type"])
                         access_mode = property["accessMode"]
                         typeSpec.pop("type")
                         typeSpec_json = json.dumps(typeSpec)
@@ -401,7 +401,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                             property_update = False
                         else:
                             property_update = True
-                        real_type = tuya_util_parse_dptype(dp_type)
+                        real_type = TuyaDPType.try_parse(dp_type)
                         device_properties.local_strategy[dp_id] = {
                             "value_convert": "default",
                             "status_code": code,
