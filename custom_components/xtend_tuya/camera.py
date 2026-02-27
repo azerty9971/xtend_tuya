@@ -353,7 +353,7 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         try:
             return await super().stream_source()
         except Exception as e:
-            LOGGER.error(
+            LOGGER.debug(
                 f"Error getting stream source for device {self.device.id}: {e}",
                 stack_info=True,
             )
