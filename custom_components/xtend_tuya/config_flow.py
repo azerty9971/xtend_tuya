@@ -57,7 +57,6 @@ from .multi_manager.managers.tuya_iot.xt_tuya_iot_openapi import XTIOTOpenAPI
 import custom_components.xtend_tuya.util as util
 import custom_components.xtend_tuya.multi_manager.multi_manager as mm
 import custom_components.xtend_tuya.multi_manager.shared.data_entry.shared_data_entry as data_entry
-import custom_components.xtend_tuya.entity as entity
 import custom_components.xtend_tuya.climate as climate
 
 STEP_METHOD_PREFIX = "async_step_"
@@ -296,6 +295,13 @@ class XTConfigFlows:
             ),
         )
 
+class XTConfigFlowConfigurationManager:
+    @staticmethod
+    def get_configuration():
+        pass
+
+    def save_configuration(self, config: dict[str, Any]):
+        pass
 
 class TuyaOptionFlow(OptionsFlow):
     def __init__(self, config_entry: ConfigEntry) -> None:
@@ -356,7 +362,7 @@ class TuyaOptionFlow(OptionsFlow):
                 # Preserve device_settings when updating API config
                 if "device_settings" in self.options:
                     data["device_settings"] = self.options["device_settings"]
-                return self.async_create_entry(title="", data=data)
+                return self.async_create_entry(data=data)
 
     async def async_step_select_device(
         self,
@@ -434,6 +440,7 @@ class TuyaOptionFlow(OptionsFlow):
         if configurable_properties is None:
             return self.async_abort(reason="no_configurable_properties")
         
+
         current_step = 0.5
         if (
             "device_settings" in self.options
