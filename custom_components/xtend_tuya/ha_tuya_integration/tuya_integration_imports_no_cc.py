@@ -43,21 +43,12 @@ from homeassistant.components.tuya.cover import (
     _IsClosedInvertedWrapper as TuyaCoverIsClosedInvertedWrapper,  # noqa: F401
     _get_instruction_wrapper as tuya_cover_get_instruction_wrapper,  # noqa: F401
 )
-from homeassistant.components.event import (
-    EventEntityDescription,
-)
 
-try:
-    from homeassistant.components.tuya.event import (
-        EVENTS as EVENTS_TUYA,  # noqa: F401 # type: ignore
-        TuyaEventEntity as TuyaEventEntity,
-        TuyaEventEntityDescription as TuyaEventEntityDescription,
-    )
-except Exception:
-    EVENTS_TUYA: dict[str, tuple[EventEntityDescription, ...]] = {}
-    from homeassistant.components.event import (
-        EventEntity as TuyaEventEntity,  # noqa: F401
-    )
+from homeassistant.components.tuya.event import (
+    EVENTS as EVENTS_TUYA,  # noqa: F401 # type: ignore
+    TuyaEventEntity as TuyaEventEntity,
+    TuyaEventEntityDescription as TuyaEventEntityDescription,
+)
 from homeassistant.components.tuya.fan import (
     TUYA_SUPPORT_TYPE as FANS_TUYA,  # noqa: F401
     TuyaFanEntity as TuyaFanEntity,
