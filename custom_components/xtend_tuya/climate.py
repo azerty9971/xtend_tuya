@@ -4,7 +4,7 @@ from __future__ import annotations
 import collections
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import cast, Self
+from typing import Any, cast, Self
 from homeassistant.components.climate.const import (
     HVACMode,
     HVACAction,
@@ -165,9 +165,21 @@ XT_CLIMATE_SWITCH_DPCODES: tuple[XTDPCode, ...] = (
     XTDPCode.POWER2,
 )
 
-XT_CLIMATE_HVAC_ACTION_DPCODES: tuple[XTDPCode, ...] = (
-    XTDPCode.WORK_STATE,
-)
+XT_CLIMATE_HVAC_ACTION_DPCODES: tuple[XTDPCode, ...] = (XTDPCode.WORK_STATE,)
+
+
+@dataclass(frozen=True, kw_only=True)
+class XTClimateConfigurableProperties:
+    current_humidity_wrapper: TuyaClimateRoundedIntegerWrapper | None
+    current_temperature_wrapper: TuyaDPCodeIntegerWrapper | None
+    fan_mode_wrapper: TuyaDPCodeEnumWrapper | None
+    preset_wrapper: TuyaDeviceWrapper[str] | None
+    hvac_mode_wrapper: TuyaDPCodeEnumWrapper | None
+    hvac_action_wrapper: TuyaDPCodeEnumWrapper | None
+    set_temperature_wrapper: TuyaDPCodeIntegerWrapper | None
+    swing_wrapper: TuyaClimateSwingModeWrapper | None
+    switch_wrapper: TuyaDPCodeBooleanWrapper | None
+    target_humidity_wrapper: TuyaClimateRoundedIntegerWrapper | None
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -230,6 +242,7 @@ CLIMATE_DESCRIPTIONS: dict[str, XTClimateEntityDescription] = {
     ),
 }
 
+
 def _filter_hvac_mode_mappings(tuya_range: list[str]) -> dict[str, HVACMode | None]:
     """Filter TUYA_HVAC_TO_HA modes that are not in the range.
 
@@ -245,6 +258,7 @@ def _filter_hvac_mode_mappings(tuya_range: list[str]) -> dict[str, HVACMode | No
             modes_in_range[key] = None
     return modes_in_range
 
+
 class XTClimatePresetWrapper(TuyaClimatePresetWrapper):
     def __init__(self, dpcode: str, type_information: TuyaEnumTypeInformation) -> None:
         """Init _PresetWrapper."""
@@ -256,9 +270,12 @@ class XTClimatePresetWrapper(TuyaClimatePresetWrapper):
 
     def read_device_status(self, device: TuyaCustomerDevice) -> str | None:
         """Read the device status."""
-        if (raw := super(TuyaDPCodeEnumWrapper, self).read_device_status(device)) in self.options:
+        if (
+            raw := super(TuyaDPCodeEnumWrapper, self).read_device_status(device)
+        ) in self.options:
             return raw
         return None
+
 
 class XTClimateHvacModeWrapper(TuyaClimateHvacModeWrapper):
     def __init__(self, dpcode: str, type_information: TuyaEnumTypeInformation) -> None:
@@ -268,12 +285,43 @@ class XTClimateHvacModeWrapper(TuyaClimateHvacModeWrapper):
         self.options = [
             ha_mode for ha_mode in self._mappings.values() if ha_mode is not None
         ]
-    
+        self.replace_heat_cool_with: HVACMode | None = None
+
     def read_device_status(self, device: TuyaCustomerDevice) -> HVACMode | None:
         """Read the device status."""
-        if (raw := super(TuyaDPCodeEnumWrapper, self).read_device_status(device)) not in XT_HVAC_TO_HA:
+        if (
+            raw := super(TuyaDPCodeEnumWrapper, self).read_device_status(device)
+        ) not in XT_HVAC_TO_HA:
             return None
-        return XT_HVAC_TO_HA[raw]
+        base_value = XT_HVAC_TO_HA[raw]
+        if base_value == HVACMode.HEAT_COOL and self.replace_heat_cool_with is not None:
+            return self.replace_heat_cool_with
+        return base_value
+
+    def remap_heat_cool_based_on_action_wrapper(
+        self, action_wrapper: TuyaDPCodeEnumWrapper | None
+    ):
+        if action_wrapper is None:
+            return
+        has_heating = False
+        has_cooling = False
+        for option in action_wrapper.options:
+            if option in XT_HVAC_ACTION_TO_HA:
+                match XT_HVAC_ACTION_TO_HA[option]:
+                    case HVACAction.HEATING:
+                        has_heating = True
+                    case HVACAction.COOLING:
+                        has_cooling = True
+
+        if has_heating and has_cooling:
+            # Device has both cooling and heating, don't change anything
+            return
+        if has_heating:
+            self.replace_heat_cool_with = HVACMode.HEAT
+
+        if has_cooling:
+            self.replace_heat_cool_with = HVACMode.COOL
+
 
 class XTClimateSwingModeWrapper(TuyaClimateSwingModeWrapper):
     @classmethod
@@ -416,6 +464,20 @@ async def async_setup_entry(
                     temperature_wrappers = _get_temperature_wrappers(
                         device, hass.config.units.temperature_unit
                     )
+                    hvac_action_wrapper = TuyaDPCodeEnumWrapper.find_dpcode(
+                        device,
+                        XT_CLIMATE_HVAC_ACTION_DPCODES,  # type: ignore
+                        prefer_function=True,
+                    )
+                    hvac_mode_wrapper = XTClimateHvacModeWrapper.find_dpcode(
+                        device,
+                        XT_CLIMATE_MODE_DPCODES,  # type: ignore
+                        prefer_function=True,
+                    )
+                    if hvac_mode_wrapper is not None:
+                        hvac_mode_wrapper.remap_heat_cool_based_on_action_wrapper(
+                            hvac_action_wrapper
+                        )
                     entities.append(
                         XTClimateEntity.get_entity_instance(
                             device_descriptor,
@@ -436,16 +498,8 @@ async def async_setup_entry(
                                 XT_CLIMATE_MODE_DPCODES,
                                 prefer_function=True,
                             ),
-                            hvac_mode_wrapper=XTClimateHvacModeWrapper.find_dpcode(
-                                device,
-                                XT_CLIMATE_MODE_DPCODES,  # type: ignore
-                                prefer_function=True,
-                            ),
-                            hvac_action_wrapper=TuyaDPCodeEnumWrapper.find_dpcode(
-                                device,
-                                XT_CLIMATE_HVAC_ACTION_DPCODES,  # type: ignore
-                                prefer_function=True,
-                            ),
+                            hvac_mode_wrapper=hvac_mode_wrapper,
+                            hvac_action_wrapper=hvac_action_wrapper,
                             set_temperature_wrapper=temperature_wrappers[1],
                             swing_wrapper=XTClimateSwingModeWrapper.find_dpcode(
                                 device,
@@ -532,15 +586,66 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
         self.device_manager = device_manager
         self.entity_description = description
         self._hvac_action_wrapper = hvac_action_wrapper
+        self.device.set_preference(
+            f"{XTDevice.XTDevicePreference.CLIMATE_DEVICE_ENTITY}",
+            self,
+        )
+
+        # Re-Determine HVAC modes
+        self._attr_hvac_modes = []
+        if hvac_mode_wrapper:
+            self._attr_hvac_modes = [HVACMode.OFF]
+            for mode in hvac_mode_wrapper.options:
+                if mode != HVACMode.OFF:
+                    # OFF is always added first
+                    self._attr_hvac_modes.append(HVACMode(mode))
+
+        elif switch_wrapper:
+            self._attr_hvac_modes = [
+                HVACMode.OFF,
+                description.switch_only_hvac_mode,
+            ]
+
+        # Determine preset modes (ignore if empty options)
+        if preset_wrapper and preset_wrapper.options:
+            for option in preset_wrapper.options:
+                if hvac_mode := XT_HVAC_TO_HA.get(option):
+                    if hvac_mode not in self._attr_hvac_modes:
+                        self._attr_hvac_modes.append(hvac_mode)
+            if isinstance(self._hvac_mode_wrapper, XTClimateHvacModeWrapper):
+                if self._hvac_mode_wrapper.replace_heat_cool_with is not None:
+                    if HVACMode.HEAT_COOL in self._attr_hvac_modes:
+                        self._attr_hvac_modes.remove(HVACMode.HEAT_COOL)
+                    if (
+                        self._hvac_mode_wrapper.replace_heat_cool_with
+                        not in self._attr_hvac_modes
+                    ):
+                        self._attr_hvac_modes.append(
+                            self._hvac_mode_wrapper.replace_heat_cool_with
+                        )
+
+    def get_configurable_properties(self) -> Any | None:
+        return XTClimateConfigurableProperties(
+            current_humidity_wrapper=self._current_humidity_wrapper, # type: ignore
+            current_temperature_wrapper=self._current_temperature, # type: ignore
+            fan_mode_wrapper=self._fan_mode_wrapper, # type: ignore
+            preset_wrapper=self._preset_wrapper,
+            hvac_mode_wrapper=self._hvac_mode_wrapper, # type: ignore
+            hvac_action_wrapper=self._hvac_action_wrapper,
+            set_temperature_wrapper=self._set_temperature, # type: ignore
+            swing_wrapper=self._swing_wrapper, # type: ignore
+            switch_wrapper=self._switch_wrapper, # type: ignore
+            target_humidity_wrapper=self._target_humidity_wrapper, # type: ignore
+        )
 
     @property
-    def hvac_action(self) -> HVACAction | None: # type: ignore
+    def hvac_action(self) -> HVACAction | None:  # type: ignore
         """Return the current running hvac operation if supported."""
         raw_value = self._read_wrapper(self._hvac_action_wrapper)
         if raw_value in XT_HVAC_ACTION_TO_HA:
             return XT_HVAC_ACTION_TO_HA[raw_value]
         return self._attr_hvac_action
-    
+
     @property
     def preset_mode(self) -> str | None:
         """Return preset mode."""
@@ -600,3 +705,17 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
             target_humidity_wrapper=target_humidity_wrapper,
             temperature_unit=temperature_unit,
         )
+
+    # @property
+    # def target_temperature_step(self) -> float | None:
+    #     """Return the target temperature step to use."""
+    #     if (
+    #         self.device_manager.config_entry.options
+    #         and "device_settings" in self.device_manager.config_entry.options
+    #         and self.device.id
+    #         in self.device_manager.config_entry.options["device_settings"]
+    #     ):
+    #         return self.device_manager.config_entry.options["device_settings"][
+    #             self.device.id
+    #         ].get("target_temperature_step")
+    #     return super().target_temperature_step

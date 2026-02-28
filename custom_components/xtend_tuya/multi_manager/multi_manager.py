@@ -2,7 +2,7 @@ from __future__ import annotations
 import copy
 import importlib
 import os
-import asyncio
+import inspect
 from typing import Any, Literal, Optional, Callable
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
@@ -673,7 +673,7 @@ class MultiManager:  # noqa: F811
             for callback, *args in self.post_setup_callbacks[priority]:
                 if args is None:
                     args = tuple()
-                if asyncio.iscoroutinefunction(callback):
+                if inspect.iscoroutinefunction(callback):
                     await callback(*args)
                 else:
                     callback(*args)

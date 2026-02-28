@@ -62,7 +62,16 @@
     },
     "options": {
         "step": {
-            "configure": {
+            "init": {
+                "title": "Xtend Tuya Settings",
+                "description": "Select the settings you want to configure.",
+                "menu_options": {
+                    "configure_api": "API Credentials",
+                    "device_settings": "Device Settings"
+                }
+            },
+            "configure_api": {
+                "title": "Add Tuya OpenAPI credentials",
                 "description": "Add a Tuya OpenAPI credential to improve the compatibility with some Tuya devices. Please follow the guide at the URL by clicking the button below.",
                 "data": {
                     "no_openapi": "Don't ask for OpenAPI credentials",
@@ -71,9 +80,54 @@
                     "access_secret": "Tuya IoT Access Secret",
                     "username": "SmartLife/Tuya account",
                     "password": "SmartLife/Tuya account password"
-                },
-                "title": "Add Tuya OpenAPI credentials"
+                }
+            },
+            "device_settings": {
+                "title": "Configuration category",
+                "menu_options": {
+                    "select_climate_device": "Climate options"
+                }
+            },
+            "select_device": {
+                "title": "Select device",
+                "description": "Select a device to configure.",
+                "data": {
+                    "device": "Device"
+                }
+            },
+            "configure": {
+                "title": "Add Tuya OpenAPI credentials",
+                "description": "Add a Tuya OpenAPI credential to improve the compatibility with some Tuya devices. Please follow the guide at the URL by clicking the button below.",
+                "data": {
+                    "no_openapi": "Don't ask for OpenAPI credentials",
+                    "country_code": "Country",
+                    "access_id": "Tuya IoT Access ID",
+                    "access_secret": "Tuya IoT Access Secret",
+                    "username": "SmartLife/Tuya account",
+                    "password": "SmartLife/Tuya account password"
+                }
+            },
+            "select_climate_device": {
+                "title": "Select Device",
+                "description": "Select a climate device to configure.",
+                "data": {
+                    "device": "Device"
+                }
+            },
+            "climate_device_settings": {
+                "title": "Configure {device_name}",
+                "description": "Set the temperature step for this device. The raw Tuya value is 10x the step (e.g. raw value 5 = step 0.5, raw value 1 = step 0.1).",
+                "data": {
+                    "target_temperature_step": "Target temperature step"
+                }
             }
+        },
+        "abort": {
+            "no_devices_found": "No devices found for this configuration category.",
+            "device_not_selected": "No device selected. Please select a device to configure.",
+            "device_not_found": "Selected device not found. Please select a valid device to configure.",
+            "climate_entity_not_found": "No climate entity found for the selected device. Please select a device with a climate entity to configure.",
+            "no_configurable_properties": "The selected device does not have configurable properties."
         }
     },
     "services": {
@@ -265,10 +319,6 @@
             "xt_generic_binary_sensor": {
                 "name": "{name}"
             },
-
-
-
-
             "carbon_dioxide": {
                 "name": "Carbon dioxide"
             },
@@ -352,10 +402,6 @@
             "xt_generic_button": {
                 "name": "{name}"
             },
-
-
-
-
             "reset_duster_cloth": {
                 "name": "Reset duster cloth"
             },
@@ -408,11 +454,6 @@
             "door_3": {
                 "name": "Door 3"
             },
-
-
-
-
-
             "blind": {
                 "name": "Blind"
             },
@@ -427,10 +468,6 @@
             }
         },
         "event": {
-
-
-
-
             "numbered_button": {
                 "name": "Button {button_number}",
                 "state_attributes": {
@@ -454,10 +491,6 @@
             "xt_generic_light": {
                 "name": "{name}"
             },
-            
-
-
-
             "backlight": {
                 "name": "Backlight"
             },
@@ -738,10 +771,6 @@
             "xt_generic_number": {
                 "name": "{name}"
             },
-
-
-
-
             "alarm_delay": {
                 "name": "Alarm delay"
             },
@@ -1164,10 +1193,6 @@
             "xt_generic_select": {
                 "name": "{name}"
             },
-
-
-
-
             "basic_anti_flicker": {
                 "name": "Anti-flicker",
                 "state": {
@@ -2263,10 +2288,6 @@
             "xt_generic_sensor": {
                 "name": "{name}"
             },
-
-
-
-
             "air_pressure": {
                 "name": "Air pressure"
             },
@@ -2815,10 +2836,6 @@
             "xt_generic_switch": {
                 "name": "{name}"
             },
-
-
-
-
             "anion": {
                 "name": "Anion"
             },
