@@ -330,7 +330,7 @@ class XTEntityDescriptorManager:
     ) -> EntityDescription:
         if real_type is None:
             return base
-        base_dict = base.__dict__
+        base_dict: dict[str, Any] = base.__dict__ # type: ignore
         if (
             other.translation_placeholders is not None
             and base.translation_placeholders is None
@@ -764,6 +764,9 @@ class XTEntity(TuyaEntity):
                             elif isinstance(return_dict[uom_value], set):
                                 return_dict[uom_value].add(device_class.value)  # type: ignore
         return return_dict
+
+    def get_configurable_properties(self) -> Any | None:
+        return None
 
     @staticmethod
     def get_device_class_from_uom(

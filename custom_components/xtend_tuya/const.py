@@ -1040,6 +1040,7 @@ UOM_MAPPING_DICT: dict[str, str | None] = {
     "格": None,
     "电机电流>1k，瞬间<1k，除臭2K>60": None,
     "线程号": None,
+    "次": None,
 }
 
 DPCODE_PREFERED_DEVICE_CLASS: dict[str, str | None] = {

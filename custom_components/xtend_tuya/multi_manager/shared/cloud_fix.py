@@ -9,7 +9,6 @@ from .shared_classes import (
 )
 from ...ha_tuya_integration.tuya_integration_imports import (
     TuyaDPType,
-    tuya_util_parse_dptype,
 )
 from ...const import (
     UOM_MAPPING_DICT,
@@ -143,19 +142,25 @@ class CloudFixes:
 
     @staticmethod
     def _fix_isolated_status_range_and_function(device: XTDevice):
-        # Remove status_ranges and functions that are not linked to any local strategy item
+        # Remove status_ranges and functions that are not linked to any local strategy item or status
         status_range_pop: list[str] = []
         for status in device.status_range:
             dp_id: int = device.status_range[status].dp_id
-            if dp_id == 0 or dp_id not in device.local_strategy:
-                status_range_pop.append(status)
+            if dp_id != 0 and dp_id in device.local_strategy:
+                continue
+            if status in device.status:
+                continue
+            status_range_pop.append(status)
         for status in status_range_pop:
             device.status_range.pop(status)
         function_pop: list[str] = []
         for function in device.function:
             dp_id: int = device.function[function].dp_id
-            if dp_id == 0 or dp_id not in device.local_strategy:
-                function_pop.append(function)
+            if dp_id != 0 and dp_id in device.local_strategy:
+                continue
+            if function in device.status:
+                continue
+            function_pop.append(function)
         for function in function_pop:
             device.function.pop(function)
 
@@ -276,7 +281,7 @@ class CloudFixes:
                         device.status_range[key]
                     )
                 )
-            device.status_range[key].type = tuya_util_parse_dptype(
+            device.status_range[key].type = TuyaDPType.try_parse(
                 str(device.status_range[key].type)
             )
         for key in device.function:
@@ -284,13 +289,13 @@ class CloudFixes:
                 device.function[key] = XTDeviceFunction.from_compatible_function(
                     device.function[key]
                 )
-            device.function[key].type = tuya_util_parse_dptype(
+            device.function[key].type = TuyaDPType.try_parse(
                 str(device.function[key].type)
             )
         for dpId in device.local_strategy:
             if config_item := device.local_strategy[dpId].get("config_item"):
                 if "valueType" in config_item and "valueDesc" in config_item:
-                    config_item["valueType"] = tuya_util_parse_dptype(
+                    config_item["valueType"] = TuyaDPType.try_parse(
                         config_item["valueType"]
                     )
                     if code := device.local_strategy[dpId].get("status_code"):
@@ -833,13 +838,13 @@ class CloudFixes:
                 return 1
             if (
                 value1[key] == TuyaDPType.RAW
-                and tuya_util_parse_dptype(value2[key]) is not None
+                and TuyaDPType.try_parse(value2[key]) is not None
                 and isinstance(value1[key], TuyaDPType)
             ):
                 return 2
             if (
                 value2[key] == TuyaDPType.RAW
-                and tuya_util_parse_dptype(value1[key]) is not None
+                and TuyaDPType.try_parse(value1[key]) is not None
                 and isinstance(value2[key], TuyaDPType)
             ):
                 return 1
