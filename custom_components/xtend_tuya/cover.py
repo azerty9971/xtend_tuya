@@ -45,6 +45,7 @@ from .entity import (
     XTEntity,
     XTEntityDescriptorManager,
 )
+from .smart_cover_control import SmartCoverManager, CoverMovementState
 
 class XTCoverDPCodePercentageMappingWrapper(TuyaCoverDPCodePercentageMappingWrapper):
     """XT Cover DPCode percentage mapping wrapper."""
@@ -144,14 +145,16 @@ COVERS: dict[str, tuple[XTCoverEntityDescription, ...]] = {
         ),
         # switch_1 is an undocumented code that behaves identically to control
         # It is used by the Kogan Smart Blinds Driver
-        XTCoverEntityDescription(
-            key=XTDPCode.SWITCH_1,
-            translation_key="blind",
-            current_position=XTDPCode.PERCENT_CONTROL,
-            set_position=XTDPCode.PERCENT_CONTROL,
-            device_class=CoverDeviceClass.BLIND,
-            control_back_mode=XTDPCode.CONTROL_BACK_MODE,
-        ),
+        # Commented out to prevent extra blind entities on curtain devices
+        # that already have a CONTROL entity (most cl/clkg devices expose both)
+        # XTCoverEntityDescription(
+        #     key=XTDPCode.SWITCH_1,
+        #     translation_key="blind",
+        #     current_position=XTDPCode.PERCENT_CONTROL,
+        #     set_position=XTDPCode.PERCENT_CONTROL,
+        #     device_class=CoverDeviceClass.BLIND,
+        #     control_back_mode=XTDPCode.CONTROL_BACK_MODE,
+        # ),
     ),
 }
 
@@ -167,6 +170,10 @@ async def async_setup_entry(
 
     if entry.runtime_data.multi_manager is None or hass_data.manager is None:
         return
+
+    # Initialize smart cover manager if not exists
+    if not hasattr(hass_data.manager, 'smart_cover_manager'):
+        hass_data.manager.smart_cover_manager = SmartCoverManager(hass)
 
     supported_descriptors, externally_managed_descriptors = cast(
         tuple[
@@ -328,9 +335,14 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         self.local_hass = hass
         self._current_position = current_position or set_position
         self._set_position = set_position
+        self._smart_controller = None
         device_manager.add_post_setup_callback(
             XTMultiManagerPostSetupCallbackPriority.PRIORITY1,
             self.add_cover_open_close_option,
+        )
+        device_manager.add_post_setup_callback(
+            XTMultiManagerPostSetupCallbackPriority.PRIORITY1,
+            self._setup_smart_controller,
         )
 
     @property
@@ -398,8 +410,54 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
                     XTDPCode.XT_COVER_INVERT_STATUS,
                 )
 
+    def _setup_smart_controller(self) -> None:
+        """Set up smart cover controller if supported."""
+        try:
+            cover_dps = [XTDPCode.CONTROL, XTDPCode.CONTROL_2, XTDPCode.CONTROL_3]
+            device_control_dp = None
+
+            if hasattr(self.entity_description, 'key'):
+                entity_key = self.entity_description.key
+                entity_key_str = entity_key.value if hasattr(entity_key, 'value') else str(entity_key)
+
+                for dp in cover_dps:
+                    dp_str = dp.value if hasattr(dp, 'value') else str(dp)
+                    dp_in_device = dp in self.device.status_range
+                    keys_equal = (dp == entity_key) or (dp_str == entity_key_str)
+
+                    if dp_in_device and keys_equal:
+                        device_control_dp = dp
+                        break
+
+                if not device_control_dp and entity_key_str in ['control', 'control_2', 'control_3']:
+                    device_control_dp = entity_key
+
+            if device_control_dp and hasattr(self.device_manager, 'smart_cover_manager'):
+                cover_entity_id = f"cover.{self.device.name.lower().replace(' ', '_')}"
+                self._smart_controller = self.device_manager.smart_cover_manager.register_cover(
+                    self.device,
+                    self.device_manager,
+                    cover_entity_id,
+                    device_control_dp,
+                )
+                if self._smart_controller:
+                    LOGGER.info(
+                        f"Smart cover controller registered for {self.device.name} "
+                        f"with DP {device_control_dp}"
+                    )
+        except Exception as e:
+            LOGGER.warning(f"Failed to setup smart controller for {self.device.name}: {e}")
+
     @property
     def current_cover_position(self) -> int | None:
+        # If smart controller is available, use it for position
+        if self._smart_controller:
+            try:
+                smart_position = self._smart_controller.get_current_position()
+                return smart_position
+            except Exception:
+                pass
+
         current_cover_position = super().current_cover_position
         if current_cover_position is not None:
             if self.is_cover_status_inverted and self._current_position is not None:
@@ -455,9 +513,45 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         else:
             await self._async_close_cover(**kwargs)
 
+    @property
+    def is_closed(self) -> bool | None:
+        """Return true if cover is closed."""
+        if self._smart_controller:
+            try:
+                smart_position = self._smart_controller.get_current_position()
+                return smart_position <= 5
+            except Exception:
+                pass
+        return super().is_closed
+
+    @property
+    def is_opening(self) -> bool:
+        """Return true if cover is opening."""
+        if self._smart_controller:
+            return self._smart_controller.state.movement_state == CoverMovementState.OPENING
+        return super().is_opening
+
+    @property
+    def is_closing(self) -> bool:
+        """Return true if cover is closing."""
+        if self._smart_controller:
+            return self._smart_controller.state.movement_state == CoverMovementState.CLOSING
+        return super().is_closing
+
     async def async_set_cover_position(self, **kwargs: Any) -> None:
         """Move the cover to a specific position."""
-        computed_position = kwargs[ATTR_POSITION]
+        target_position = kwargs[ATTR_POSITION]
+
+        # Check if smart positioning is enabled
+        if (self._smart_controller and
+            hasattr(self._smart_controller, 'positioning_enabled') and
+            self._smart_controller.positioning_enabled):
+            await self._smart_controller.async_set_cover_position(target_position)
+            self.async_write_ha_state()
+            return
+
+        # Use normal Tuya positioning
+        computed_position = target_position
         if self.is_cover_control_inverted:
             computed_position = 100 - computed_position
             kwargs[ATTR_POSITION] = computed_position
