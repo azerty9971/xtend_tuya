@@ -102,7 +102,7 @@ class XTSharingMQ(SharingMQ):
     def _on_message(self, mqttc: mqtt.Client, user_data: Any, msg: mqtt.MQTTMessage):
         msg_dict = json.loads(msg.payload.decode("utf8"))
 
-        LOGGER.debug(f"[SHARING MQTT]on_message: {msg_dict}")
+        #LOGGER.debug(f"[SHARING MQTT]on_message: {msg_dict}")
 
         for listener in self.message_listeners:
             listener(msg_dict)

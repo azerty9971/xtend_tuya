@@ -167,6 +167,7 @@ def _async_device_as_dict(hass: HomeAssistant, device: XTDevice) -> dict[str, An
             "property_update": property_update,
             "access_mode": access_mode,
             "dpId": status_range.dp_id,
+            "report_type": status_range.report_type,
         }
 
     # Gather information how this Tuya device is represented in Home Assistant
