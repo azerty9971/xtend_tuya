@@ -1888,6 +1888,11 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
                     scaled_value_back = type_information.scale_value_back(
                         self._restored_data.native_value  # type: ignore
                     )
+                    self.device_manager.device_watcher.report_message(
+                        self.device.id,
+                        f"Scaled back value is {scaled_value_back}",
+                        self.device
+                    )
                     self._restored_data.native_value = scaled_value_back
 
                 if device := self.device_manager.device_map.get(self.device.id, None):
