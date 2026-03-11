@@ -37,7 +37,7 @@ class DeviceWatcher:
         dev_id: str,
         message: str,
         device: XTDevice | None = None,
-        print_stack: bool = False,
+        print_stack: bool = True,
     ):
         if self.is_watched(dev_id):
             if dev_id in self.multi_manager.device_map:
