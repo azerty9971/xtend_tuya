@@ -84,7 +84,7 @@ class XTDeviceStatusRange(XTDeviceStatusFunctionShared):
     report_type: Optional[str] = None
 
     def __repr__(self) -> str:
-        return f"StatusRange(code={self.code}, type={self.type}, values={self.values}, dp_id={self.dp_id})"
+        return f"StatusRange(code={self.code}, type={self.type}, values={self.values}, dp_id={self.dp_id}), report_type={self.report_type})"
 
     @staticmethod
     def from_compatible_status_range(status_range: Any):
