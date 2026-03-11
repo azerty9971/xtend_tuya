@@ -265,6 +265,7 @@ class XTVirtualStateHandler:
             if (
                 virtual_state.virtual_state_value
                 == VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD
+                and 1 == 2
             ):
                 if virtual_state.key not in device.status:
                     continue
