@@ -1720,14 +1720,14 @@ async def async_setup_entry(
                                 category_descriptions, [restrict_dpcode]
                             ),
                         )
-                    for description in category_descriptions:
-                        if (
-                            hasattr(description, "virtual_state")
-                            and description.virtual_state
-                            and description.virtual_state & VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD
-                            and description.key in device.status_range
-                        ):
-                            device.status_range[description.key].report_type = "sum"
+                    # for description in category_descriptions:
+                    #     if (
+                    #         hasattr(description, "virtual_state")
+                    #         and description.virtual_state
+                    #         and description.virtual_state & VirtualStates.STATE_SUMMED_IN_REPORTING_PAYLOAD
+                    #         and description.key in device.status_range
+                    #     ):
+                    #         device.status_range[description.key].report_type = "sum"
                     entities.extend(
                         XTSensorEntity.get_entity_instance(
                             description, device, hass_data.manager, dpcode_wrapper
