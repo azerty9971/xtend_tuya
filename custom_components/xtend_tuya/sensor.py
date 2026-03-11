@@ -1871,7 +1871,7 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
                 )
             )
 
-        if self.entity_description.restoredata and 1 == 2:
+        if self.entity_description.restoredata:
             self._restored_data = await self.async_get_last_sensor_data()
             if (
                 self._restored_data is not None
