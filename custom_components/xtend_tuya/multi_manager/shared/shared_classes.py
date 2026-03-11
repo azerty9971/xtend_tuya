@@ -104,7 +104,11 @@ class XTDeviceStatusRange(XTDeviceStatusFunctionShared):
             dp_id = status_range.dp_id
         else:
             dp_id = 0
-        return XTDeviceStatusRange(code=code, type=type, values=values, dp_id=dp_id)
+        if hasattr(status_range, "report_type"):
+            report_type = status_range.report_type
+        else:
+            report_type = None
+        return XTDeviceStatusRange(code=code, type=type, values=values, dp_id=dp_id, report_type=report_type)
 
 
 @dataclass
