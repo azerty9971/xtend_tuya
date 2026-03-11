@@ -1,12 +1,10 @@
 from __future__ import annotations
 
-from typing import Any
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaDPCodeIntegerWrapper,
     TuyaCustomerDevice,
     tuya_type_information_should_log_warning,
 )
-from .type_information import XTIntegerNoMinMaxCheckTypeInformation
 from .const import (
     LOGGER,
 )
