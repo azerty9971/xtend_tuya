@@ -207,7 +207,7 @@ class XTVirtualStateHandler:
     ) -> list:
         status = copy.deepcopy(status_in)
         virtual_states = self.get_category_virtual_states(device.category)
-        debug: bool = False
+        debug: bool = True
         for virtual_state in virtual_states:
             if (
                 virtual_state.virtual_state_value
