@@ -1887,6 +1887,11 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
             ):
                 # Scale integer/float value
                 type_information = self.get_type_information()
+                self.device_manager.device_watcher.report_message(
+                    self.device.id,
+                    f"Restoring {self.entity_description.key} of {self.device.name} with value {self._restored_data.native_value} and type information {type_information}",
+                    self.device
+                )
                 if isinstance(type_information, TuyaIntegerTypeInformation):
                     scaled_value_back = type_information.scale_value_back(
                         self._restored_data.native_value  # type: ignore
