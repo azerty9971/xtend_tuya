@@ -26,7 +26,7 @@ from ...const import (
 
 class DeviceWatcher:
     def __init__(self, multi_manager: mm.MultiManager) -> None:
-        self.watched_dev_id: list[str] = ["bf74848d47bcd0d090ak3g"]
+        self.watched_dev_id: list[str] = [""]
         self.multi_manager = multi_manager
 
     def is_watched(self, dev_id: str) -> bool:
