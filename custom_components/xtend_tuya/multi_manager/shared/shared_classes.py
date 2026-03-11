@@ -37,7 +37,7 @@ class DeviceWatcher:
         dev_id: str,
         message: str,
         device: XTDevice | None = None,
-        print_stack: bool = False,
+        print_stack: bool = True,
     ):
         if self.is_watched(dev_id):
             if dev_id in self.multi_manager.device_map:
@@ -84,7 +84,7 @@ class XTDeviceStatusRange(XTDeviceStatusFunctionShared):
     report_type: Optional[str] = None
 
     def __repr__(self) -> str:
-        return f"StatusRange(code={self.code}, type={self.type}, values={self.values}, dp_id={self.dp_id})"
+        return f"StatusRange(code={self.code}, type={self.type}, values={self.values}, dp_id={self.dp_id}), report_type={self.report_type})"
 
     @staticmethod
     def from_compatible_status_range(status_range: Any):
@@ -104,7 +104,11 @@ class XTDeviceStatusRange(XTDeviceStatusFunctionShared):
             dp_id = status_range.dp_id
         else:
             dp_id = 0
-        return XTDeviceStatusRange(code=code, type=type, values=values, dp_id=dp_id)
+        if hasattr(status_range, "report_type"):
+            report_type = status_range.report_type
+        else:
+            report_type = None
+        return XTDeviceStatusRange(code=code, type=type, values=values, dp_id=dp_id, report_type=report_type)
 
 
 @dataclass

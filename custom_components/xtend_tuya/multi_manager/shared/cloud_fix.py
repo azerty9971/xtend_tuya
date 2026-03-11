@@ -21,11 +21,12 @@ class CloudFixes:
     @staticmethod
     def apply_fixes(device: XTDevice, multi_manager: mm.MultiManager | None = None):
         if multi_manager is not None:
-            multi_manager.device_watcher.report_message(
-                device.id,
-                f"CloudFixes for source {device.source} BEFORE: {device}",
-                device=device,
-            )
+            # multi_manager.device_watcher.report_message(
+            #     device.id,
+            #     f"CloudFixes for source {device.source} BEFORE: {device}",
+            #     device=device,
+            # )
+            pass
         CloudFixes._unify_data_types(device)
         CloudFixes._unify_added_attributes(device)
         CloudFixes._map_dpid_to_codes(device)
@@ -42,11 +43,12 @@ class CloudFixes:
         CloudFixes._fix_isolated_status_range_and_function(device)
         CloudFixes._align_uom(device)
         if multi_manager is not None:
-            multi_manager.device_watcher.report_message(
-                device.id,
-                f"CloudFixes for source {device.source} AFTER: {device}",
-                device=device,
-            )
+            # multi_manager.device_watcher.report_message(
+            #     device.id,
+            #     f"CloudFixes for source {device.source} AFTER: {device}",
+            #     device=device,
+            # )
+            pass
 
     @staticmethod
     def fix_incorrect_percent_scale_forced(
