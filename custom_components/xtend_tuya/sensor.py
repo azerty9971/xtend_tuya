@@ -1881,7 +1881,7 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
                 type_information = self.get_type_information()
                 self.device_manager.device_watcher.report_message(
                     self.device.id,
-                    f"Restoring {self.entity_description.key} of {self.device.name} with value {self._restored_data.native_value} and type information {type_information}",
+                    f"Restoring {self.entity_description.key} of {self.device.name} with value {self._restored_data.native_value} and type information {type_information}, isinstance: {isinstance(type_information, TuyaIntegerTypeInformation)}",
                     self.device
                 )
                 if isinstance(type_information, TuyaIntegerTypeInformation):
