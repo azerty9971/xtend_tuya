@@ -249,7 +249,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         entity_registry_enabled_default=True,
         restoredata=True,
         ignore_other_dp_code_handler=True,
-        wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
+        # wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
     ),
     XTSensorEntityDescription(
         key=XTDPCode.ADD_ELE2,
@@ -260,7 +260,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         entity_registry_enabled_default=False,
         restoredata=True,
         ignore_other_dp_code_handler=True,
-        wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
+        # wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
     ),
     XTSensorEntityDescription(
         key=XTDPCode.ADD_ELE_TODAY,
@@ -272,7 +272,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         entity_registry_enabled_default=True,
         restoredata=True,
         reset_daily=True,
-        wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
+        # wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
     ),
     XTSensorEntityDescription(
         key=XTDPCode.ADD_ELE_THIS_MONTH,
@@ -284,7 +284,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         entity_registry_enabled_default=True,
         restoredata=True,
         reset_monthly=True,
-        wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
+        # wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
     ),
     XTSensorEntityDescription(
         key=XTDPCode.ADD_ELE_THIS_YEAR,
@@ -296,7 +296,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         entity_registry_enabled_default=True,
         restoredata=True,
         reset_yearly=True,
-        wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
+        # wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
     ),
     XTSensorEntityDescription(
         key=XTDPCode.ADD_ELE2_TODAY,
@@ -308,7 +308,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         entity_registry_enabled_default=False,
         restoredata=True,
         reset_daily=True,
-        wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
+        # wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
     ),
     XTSensorEntityDescription(
         key=XTDPCode.ADD_ELE2_THIS_MONTH,
@@ -320,7 +320,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         entity_registry_enabled_default=False,
         restoredata=True,
         reset_monthly=True,
-        wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
+        # wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
     ),
     XTSensorEntityDescription(
         key=XTDPCode.ADD_ELE2_THIS_YEAR,
@@ -332,7 +332,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         entity_registry_enabled_default=False,
         restoredata=True,
         reset_yearly=True,
-        wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
+        # wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
     ),
     XTSensorEntityDescription(
         key=XTDPCode.BALANCE_ENERGY,
@@ -378,7 +378,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         state_class=SensorStateClass.TOTAL_INCREASING,
         native_unit_of_measurement=UnitOfEnergy.WATT_HOUR,
         restoredata=True,
-        wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
+        # wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
     ),
     XTSensorEntityDescription(
         key=XTDPCode.ELECTRIC_TODAY,
@@ -389,7 +389,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         native_unit_of_measurement=UnitOfEnergy.WATT_HOUR,
         restoredata=True,
         reset_daily=True,
-        wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
+        # wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
     ),
     XTSensorEntityDescription(
         key=XTDPCode.ELECTRIC_THIS_MONTH,
@@ -400,7 +400,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         native_unit_of_measurement=UnitOfEnergy.WATT_HOUR,
         restoredata=True,
         reset_monthly=True,
-        wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
+        # wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
     ),
     XTSensorEntityDescription(
         key=XTDPCode.ELECTRIC_THIS_YEAR,
@@ -412,7 +412,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         entity_registry_enabled_default=True,
         restoredata=True,
         reset_yearly=True,
-        wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
+        # wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
     ),
     XTSensorEntityDescription(
         key=XTDPCode.ENERGYCONSUMED,
@@ -475,7 +475,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         entity_registry_enabled_default=True,
         restoredata=True,
         ignore_other_dp_code_handler=True,
-        wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
+        # wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
     ),
     XTSensorEntityDescription(
         key=XTDPCode.REVERSE_ENERGY_A,
