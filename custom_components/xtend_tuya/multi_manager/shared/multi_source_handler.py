@@ -103,6 +103,7 @@ class MultiSourceHandler:
                 dev_id, item, False, True
             )
             if not result_ok or code is None:
+                i += 1
                 continue
 
             for virtual_state in virtual_states:
