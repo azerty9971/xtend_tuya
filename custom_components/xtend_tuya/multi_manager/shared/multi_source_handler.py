@@ -134,6 +134,7 @@ class MultiSourceHandler:
                         break
 
                     if update_time_valid is None:
+                        #only check update time once per dpcode, otherwise it would always fail
                         update_time_valid = self._is_code_update_time_valid(
                             dev_id,
                             code,
