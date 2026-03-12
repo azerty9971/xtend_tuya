@@ -124,15 +124,11 @@ class MultiSourceHandler:
                         self._is_allowed_source_for_code(dev_id, code, original_source)
                         is False
                     ):
-                        if code == "add_ele":
-                            LOGGER.warning(
-                                f"[{original_source}]Code {code} for device {dev_id} is not from allowed source, filtering out",
-                                stack_info=True,
-                            )
                         status_list.pop(i)
                         i -= 1
                         break
 
+                    # Only check update time if the source is allowed
                     if update_time_valid is None:
                         #only check update time once per dpcode, otherwise it would always fail
                         update_time_valid = self._is_code_update_time_valid(
@@ -142,11 +138,6 @@ class MultiSourceHandler:
                             original_source,
                         )
                     if update_time_valid is False:
-                        if code == "add_ele":
-                            LOGGER.warning(
-                                f"[{original_source}]Code {code} for device {dev_id} has invalid update time, filtering out",
-                                stack_info=True,
-                            )
                         status_list.pop(i)
                         i -= 1
                         break
@@ -166,11 +157,6 @@ class MultiSourceHandler:
     def _is_code_update_time_valid(
         self, dev_id: str, code: str, update_time: int, source: str
     ) -> bool:
-        last_update_time = self.device_map[dev_id][code].last_update_time
-        return_value = self.device_map[dev_id][code].update_last_update_time(
+        return self.device_map[dev_id][code].update_last_update_time(
             update_time
         )
-        LOGGER.warning(
-            f"[{source}]Code {code} for device {dev_id} update time valid: {return_value}, update_time: {update_time}, last_update_time: {last_update_time}"
-        )
-        return return_value
