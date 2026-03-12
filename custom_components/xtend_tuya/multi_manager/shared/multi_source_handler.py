@@ -125,7 +125,7 @@ class MultiSourceHandler:
                         )
                     ) or (
                         not self._is_code_update_time_valid(
-                            dev_id, code, item.get("t", 0)
+                            dev_id, code, item.get("t", 0), original_source
                         )
                     ):
                         status_list.pop(i)
@@ -145,9 +145,9 @@ class MultiSourceHandler:
         return self.device_map[dev_id][code].get_allowed_source() == source
 
     def _is_code_update_time_valid(
-        self, dev_id: str, code: str, update_time: int
+        self, dev_id: str, code: str, update_time: int, source: str
     ) -> bool:
         last_update_time = self.device_map[dev_id][code].last_update_time
         return_value = self.device_map[dev_id][code].update_last_update_time(update_time)
-        LOGGER.warning(f"Code {code} for device {dev_id} update time valid: {return_value}, update_time: {update_time}, last_update_time: {last_update_time}")
+        LOGGER.warning(f"[{source}]Code {code} for device {dev_id} update time valid: {return_value}, update_time: {update_time}, last_update_time: {last_update_time}")
         return return_value
