@@ -147,6 +147,7 @@ class MultiSourceHandler:
     def _is_code_update_time_valid(
         self, dev_id: str, code: str, update_time: int
     ) -> bool:
+        last_update_time = self.device_map[dev_id][code].last_update_time
         return_value = self.device_map[dev_id][code].update_last_update_time(update_time)
-        LOGGER.warning(f"Code {code} for device {dev_id} update time valid: {return_value}, update_time: {update_time}, last_update_time: {self.device_map[dev_id][code].last_update_time}")
+        LOGGER.warning(f"Code {code} for device {dev_id} update time valid: {return_value}, update_time: {update_time}, last_update_time: {last_update_time}")
         return return_value
