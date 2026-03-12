@@ -52,7 +52,7 @@ class MultiSourceCodeCounter:
             return self.last_allowed_source
 
     def update_last_update_time(self, update_time: int) -> bool:
-        if update_time < self.last_update_time:
+        if update_time <= self.last_update_time:
             return False
         self.last_update_time = update_time
         return True
