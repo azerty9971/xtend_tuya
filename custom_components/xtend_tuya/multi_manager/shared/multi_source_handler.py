@@ -116,13 +116,13 @@ class MultiSourceHandler:
                 i += 1
                 continue
 
+            update_time_valid: bool | None = None
             for virtual_state in virtual_states:
                 if code == virtual_state.key:
                     self._prepare_structure_for_code(dev_id, code)
                     if (
-                        self._is_allowed_source_for_code(
-                            dev_id, code, original_source
-                        ) is False
+                        self._is_allowed_source_for_code(dev_id, code, original_source)
+                        is False
                     ):
                         if code == "add_ele":
                             LOGGER.warning(
@@ -132,12 +132,15 @@ class MultiSourceHandler:
                         status_list.pop(i)
                         i -= 1
                         break
-                    
-                    if (
-                        self._is_code_update_time_valid(
-                            dev_id, code, item.get("t", 0), original_source
-                        ) is False
-                    ):
+
+                    if update_time_valid is None:
+                        update_time_valid = self._is_code_update_time_valid(
+                            dev_id,
+                            code,
+                            item.get("t", 0),
+                            original_source,
+                        )
+                    if update_time_valid is False:
                         if code == "add_ele":
                             LOGGER.warning(
                                 f"[{original_source}]Code {code} for device {dev_id} has invalid update time, filtering out",
@@ -163,6 +166,10 @@ class MultiSourceHandler:
         self, dev_id: str, code: str, update_time: int, source: str
     ) -> bool:
         last_update_time = self.device_map[dev_id][code].last_update_time
-        return_value = self.device_map[dev_id][code].update_last_update_time(update_time)
-        LOGGER.warning(f"[{source}]Code {code} for device {dev_id} update time valid: {return_value}, update_time: {update_time}, last_update_time: {last_update_time}")
+        return_value = self.device_map[dev_id][code].update_last_update_time(
+            update_time
+        )
+        LOGGER.warning(
+            f"[{source}]Code {code} for device {dev_id} update time valid: {return_value}, update_time: {update_time}, last_update_time: {last_update_time}"
+        )
         return return_value
