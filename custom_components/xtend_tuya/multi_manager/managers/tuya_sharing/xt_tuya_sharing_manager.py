@@ -196,7 +196,8 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
                 if code == "add_ele":
                     report_value = True
                     LOGGER.warning(
-                        f"[{MESSAGE_SOURCE_TUYA_SHARING}]Device {device_id} reported add_ele: {status_new}, before filtering"
+                        f"[{MESSAGE_SOURCE_TUYA_SHARING}]Device {device_id} reported add_ele: {status_new}, before filtering",
+                        stack_info=True,
                     )
         status_new = self.multi_manager.multi_source_handler.filter_status_list(
             device_id, MESSAGE_SOURCE_TUYA_SHARING, status_new
