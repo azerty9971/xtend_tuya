@@ -119,10 +119,14 @@ class MultiSourceHandler:
             for virtual_state in virtual_states:
                 if code == virtual_state.key:
                     self._prepare_structure_for_code(dev_id, code)
-                    if not self._is_allowed_source_for_code(
-                        dev_id, code, original_source
-                    ) or not self._is_code_update_time_valid(
-                        dev_id, code, item.get("t", 0)
+                    if (
+                        not self._is_allowed_source_for_code(
+                            dev_id, code, original_source
+                        )
+                    ) or (
+                        not self._is_code_update_time_valid(
+                            dev_id, code, item.get("t", 0)
+                        )
                     ):
                         status_list.pop(i)
                         i -= 1
