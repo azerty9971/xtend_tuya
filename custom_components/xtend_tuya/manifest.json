@@ -46,5 +46,5 @@
   "issue_tracker": "https://github.com/azerty9971/xtend_tuya/issues",
   "loggers": ["tuya_iot", "tuya_sharing"],
   "requirements": ["tuya-iot-py-sdk==0.6.6", "yappi==1.7.3"],
-  "version": "4.3.5"
+  "version": "4.3.6"
 }

@@ -20,6 +20,7 @@ from ..const import (
     XTIRRemoteInformation,
     XTIRRemoteKeysInformation,
     XTLockingMechanism,
+    MESSAGE_SOURCE_TUYA_SHARING,
 )
 from .shared.shared_classes import (
     DeviceWatcher,
@@ -357,10 +358,12 @@ class MultiManager:  # noqa: F811
         return code, dpId, value, True
 
     def convert_device_report_status_list(
-        self, device_id: str, status_in: list
+        self, device_id: str, status_in: list, source: str
     ) -> list[dict[str, Any]]:
         status = copy.deepcopy(status_in)
         for item in status:
+            if "t" in item and source in [MESSAGE_SOURCE_TUYA_SHARING]:
+                item["t"] = int(item["t"] / 1000)  # Convert from ms to s
             code, dpId, value, result_ok = self._read_code_dpid_value_from_state(
                 device_id, item
             )
