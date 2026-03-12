@@ -2,6 +2,9 @@ from __future__ import annotations
 import copy
 from typing import Any
 import custom_components.xtend_tuya.multi_manager.multi_manager as mm
+from ...const import (
+    LOGGER,
+)
 
 
 class SourceCodeCounter:
@@ -112,6 +115,9 @@ class MultiSourceHandler:
                     if not self._is_allowed_source_for_code(
                         dev_id, code, original_source
                     ):
+                        LOGGER.warning(
+                            f"[{original_source}]Filtering out code {code} from device {dev_id} report, as the allowed source is {self.device_map[dev_id][code].get_allowed_source()}"
+                        )
                         status_list.pop(i)
                         i -= 1
                         break
