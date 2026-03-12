@@ -1,8 +1,8 @@
 """Support for XT buttons."""
 
 from __future__ import annotations
-from typing import cast, Any
-from dataclasses import dataclass, field
+from typing import cast, Any, Self
+from dataclasses import dataclass
 from homeassistant.const import EntityCategory, Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
@@ -37,6 +37,7 @@ from .ha_tuya_integration.tuya_integration_imports import (
     TuyaDPCodeBooleanWrapper,
     TuyaDPCodeWrapper,
     TuyaCustomerDevice,
+    TuyaBooleanTypeInformation,
 )
 from .entity import (
     XTEntity,
@@ -49,6 +50,58 @@ from .multi_manager.shared.data_entry.ir_device_data_entry import (
     XTDataEntryManager,
 )
 
+class XTVirtualButtonTypeInformation(TuyaBooleanTypeInformation):
+    """XT Virtual Button Type Information."""
+
+    @classmethod
+    def find_dpcode(
+        cls,
+        device: TuyaCustomerDevice,
+        dpcodes: str | tuple[str, ...] | None,
+        *,
+        prefer_function: bool = False,
+    ) -> Self | None:
+        """Find type information for a matching DP code available for this device."""
+        dpcode = ""
+        if isinstance(dpcodes, str):
+            dpcode = dpcodes
+        return cls._from_json(
+                            dpcode=dpcode,
+                            type_data="",
+                            report_type="",
+                        )
+
+class XTVirtualButtonDPCodeWrapper(TuyaDPCodeBooleanWrapper):
+
+    _DPTYPE = XTVirtualButtonTypeInformation
+
+    def _convert_value_to_raw_value(
+        self, device: TuyaCustomerDevice, value: Any
+    ) -> Any:
+        """Convert display value back to a raw device value.
+
+        Base implementation does no validation, subclasses may override to provide
+        specific validation.
+        """
+        return True  # Always send True to trigger the action
+
+    @classmethod
+    def find_dpcode(
+        cls,
+        device: TuyaCustomerDevice,
+        dpcodes: str | tuple[str, ...] | None,
+        *,
+        prefer_function: bool = False,
+    ) -> Self | None:
+        """Find and return a DPCodeTypeInformationWrapper for the given DP codes."""
+        if type_information := cls._DPTYPE.find_dpcode(
+            device, dpcodes, prefer_function=prefer_function
+        ):
+            return cls(
+                dpcode=type_information.dpcode,
+                type_information=type_information,
+            )
+        return None
 
 class XTIRActionDPCodeWrapper(TuyaDPCodeWrapper):
     """XT IR Action DPCode Wrapper."""
@@ -118,7 +171,7 @@ class XTIRActionDPCodeWrapper(TuyaDPCodeWrapper):
 @dataclass(frozen=True)
 class XTButtonEntityDescription(TuyaButtonEntityDescription):
     virtual_function: VirtualFunctions | None = None
-    vf_reset_state: list[XTDPCode] | None = field(default_factory=list)
+    vf_reset_state: list[XTDPCode] | None = None
     is_ir_descriptor: bool = False
     ir_hub_information: XTIRHubInformation | None = None
     ir_remote_information: XTIRRemoteInformation | None = None
@@ -431,7 +484,7 @@ async def async_setup_entry(
                         ):
                             for reset_state in description.vf_reset_state:
                                 if reset_state in device.status:
-                                    if dpcode_wrapper := TuyaDPCodeBooleanWrapper.find_dpcode(
+                                    if dpcode_wrapper := XTVirtualButtonDPCodeWrapper.find_dpcode(
                                         device,
                                         description.key,
                                         prefer_function=True,
