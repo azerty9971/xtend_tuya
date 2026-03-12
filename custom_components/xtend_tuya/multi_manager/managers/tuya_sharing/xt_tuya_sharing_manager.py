@@ -90,7 +90,7 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
         device = [
             device
             for device in self.device_map.values()
-            #if hasattr(device, "id") and getattr(device, "set_up", False)
+            # if hasattr(device, "id") and getattr(device, "set_up", False)
         ]
 
         if self.customer_api is not None:
@@ -188,7 +188,9 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
         if not device:
             return
         status_new = self.multi_manager.convert_device_report_status_list(
-            device_id, status
+            device_id,
+            status,
+            MESSAGE_SOURCE_TUYA_SHARING,
         )
         # report_value = False
         for status_item in status_new:
@@ -221,6 +223,11 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
             return
         super().send_commands(device_id, commands)
 
-    def send_lock_unlock_command(self, device: XTDevice, lock: bool, force_unlock_mechanism: XTLockingMechanism = XTLockingMechanism.AUTO) -> bool:
+    def send_lock_unlock_command(
+        self,
+        device: XTDevice,
+        lock: bool,
+        force_unlock_mechanism: XTLockingMechanism = XTLockingMechanism.AUTO,
+    ) -> bool:
         # I didn't find a way to implement this using the Sharing SDK...
         return False
