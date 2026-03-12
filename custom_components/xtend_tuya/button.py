@@ -50,6 +50,7 @@ from .multi_manager.shared.data_entry.ir_device_data_entry import (
     XTDataEntryManager,
 )
 
+
 class XTVirtualButtonTypeInformation(TuyaBooleanTypeInformation):
     """XT Virtual Button Type Information."""
 
@@ -66,10 +67,11 @@ class XTVirtualButtonTypeInformation(TuyaBooleanTypeInformation):
         if isinstance(dpcodes, str):
             dpcode = dpcodes
         return cls._from_json(
-                            dpcode=dpcode,
-                            type_data="",
-                            report_type="",
-                        )
+            dpcode=dpcode,
+            type_data="",
+            report_type="",
+        )
+
 
 class XTVirtualButtonDPCodeWrapper(TuyaDPCodeBooleanWrapper):
 
@@ -103,11 +105,15 @@ class XTVirtualButtonDPCodeWrapper(TuyaDPCodeBooleanWrapper):
             )
         return None
 
+
 class XTIRActionDPCodeWrapper(TuyaDPCodeWrapper):
     """XT IR Action DPCode Wrapper."""
 
     def __init__(
-        self, description: XTButtonEntityDescription, multi_manager: MultiManager, device: XTDevice
+        self,
+        description: XTButtonEntityDescription,
+        multi_manager: MultiManager,
+        device: XTDevice,
     ) -> None:
         super().__init__(description.key)
         self.multi_manager = multi_manager
@@ -145,7 +151,7 @@ class XTIRActionDPCodeWrapper(TuyaDPCodeWrapper):
         """Convert a Home Assistant value back to a raw device value."""
         return True  # Always send True to trigger the action
 
-    def get_update_commands( # pyright: ignore[reportIncompatibleMethodOverride]
+    def get_update_commands(  # pyright: ignore[reportIncompatibleMethodOverride]
         self,
         device: XTDevice,
         value: Any,
@@ -161,7 +167,7 @@ class XTIRActionDPCodeWrapper(TuyaDPCodeWrapper):
                 device,
                 self.description.ir_key_information,
                 self.description.ir_remote_information,
-                self.description.ir_hub_information
+                self.description.ir_hub_information,
             )
         elif self.button_press_handler is not None:
             self.button_press_handler.fire_event()
@@ -203,7 +209,16 @@ CONSUMPTION_BUTTONS: tuple[XTButtonEntityDescription, ...] = (
     XTButtonEntityDescription(
         key=XTDPCode.RESET_ADD_ELE,
         virtual_function=VirtualFunctions.FUNCTION_RESET_STATE,
-        vf_reset_state=[XTDPCode.ADD_ELE],
+        vf_reset_state=[
+            XTDPCode.ADD_ELE,
+            XTDPCode.ADD_ELE_TODAY,
+            XTDPCode.ADD_ELE_THIS_MONTH,
+            XTDPCode.ADD_ELE_THIS_YEAR,
+            XTDPCode.ADD_ELE2,
+            XTDPCode.ADD_ELE2_TODAY,
+            XTDPCode.ADD_ELE2_THIS_MONTH,
+            XTDPCode.ADD_ELE2_THIS_YEAR,
+        ],
         translation_key="reset_add_ele",
         entity_category=EntityCategory.CONFIG,
     ),
@@ -352,7 +367,7 @@ async def async_setup_entry(
                             descriptor,
                             hub_device,
                             hass_data.manager,
-                            dpcode_wrapper, # type: ignore
+                            dpcode_wrapper,  # type: ignore
                         )
                     )
 
@@ -379,7 +394,7 @@ async def async_setup_entry(
                                     descriptor,
                                     remote_device,
                                     hass_data.manager,
-                                    dpcode_wrapper, # type: ignore
+                                    dpcode_wrapper,  # type: ignore
                                 )
                             )
                             for remote_key in remote_information.keys:
@@ -404,7 +419,7 @@ async def async_setup_entry(
                                         descriptor,
                                         remote_device,
                                         hass_data.manager,
-                                        dpcode_wrapper, # type: ignore
+                                        dpcode_wrapper,  # type: ignore
                                     )
                                 )
         async_add_entities(entities)
