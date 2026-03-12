@@ -192,22 +192,22 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
             status,
             MESSAGE_SOURCE_TUYA_SHARING,
         )
-        # report_value = False
+        report_value = False
         for status_item in status_new:
             if code := status_item.get("code", None):
                 if code == "add_ele":
-                    # report_value = True
-                    LOGGER.warning(
-                        f"[{MESSAGE_SOURCE_TUYA_SHARING}]Device {device_id} reported add_ele: {status_new}, before filtering",
-                        stack_info=True,
-                    )
+                    report_value = True
+                    # LOGGER.warning(
+                    #     f"[{MESSAGE_SOURCE_TUYA_SHARING}]Device {device_id} reported add_ele: {status_new}, before filtering",
+                    #     stack_info=True,
+                    # )
         status_new = self.multi_manager.multi_source_handler.filter_status_list(
             device_id, MESSAGE_SOURCE_TUYA_SHARING, status_new
         )
-        # if report_value:
-        #     LOGGER.warning(
-        #         f"[{MESSAGE_SOURCE_TUYA_SHARING}]Device {device_id} reported add_ele: {status_new}, after filtering"
-        #     )
+        if report_value:
+            LOGGER.warning(
+                f"[{MESSAGE_SOURCE_TUYA_SHARING}]Device {device_id} reported add_ele: {status_new}, after filtering"
+            )
         status_new = self.multi_manager.virtual_state_handler.apply_virtual_states_to_status_list(
             device, status_new, MESSAGE_SOURCE_TUYA_SHARING
         )

@@ -17,6 +17,7 @@ class MultiSourceCodeCounter:
     def __init__(self) -> None:
         self.source_counter_list: list[SourceCodeCounter] = []
         self.last_allowed_source = None
+        self.last_update_time = 0
 
     def register_source_message(self, source: str):
         source_counter_found = False
@@ -49,6 +50,12 @@ class MultiSourceCodeCounter:
             return highest_source
         else:
             return self.last_allowed_source
+
+    def update_last_update_time(self, update_time: int) -> bool:
+        if update_time < self.last_update_time:
+            return False
+        self.last_update_time = update_time
+        return True
 
 
 class MultiSourceHandler:
@@ -114,6 +121,8 @@ class MultiSourceHandler:
                     self._prepare_structure_for_code(dev_id, code)
                     if not self._is_allowed_source_for_code(
                         dev_id, code, original_source
+                    ) or not self._is_code_update_time_valid(
+                        dev_id, code, item.get("t", 0)
                     ):
                         status_list.pop(i)
                         i -= 1
@@ -130,3 +139,8 @@ class MultiSourceHandler:
 
     def _is_allowed_source_for_code(self, dev_id: str, code: str, source: str) -> bool:
         return self.device_map[dev_id][code].get_allowed_source() == source
+
+    def _is_code_update_time_valid(
+        self, dev_id: str, code: str, update_time: int
+    ) -> bool:
+        return self.device_map[dev_id][code].update_last_update_time(update_time)
