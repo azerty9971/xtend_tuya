@@ -303,21 +303,9 @@ class XTIOTDeviceManager(TuyaDeviceManager):
             status,
             MESSAGE_SOURCE_TUYA_IOT,
         )
-        # report_value = False
-        for status_item in status_new:
-            if code := status_item.get("code", None):
-                if code == "add_ele":
-                    # report_value = True
-                    LOGGER.warning(
-                        f"[{MESSAGE_SOURCE_TUYA_IOT}]Device {device_id} reported add_ele: {status_new}, before filtering"
-                    )
         status_new = self.multi_manager.multi_source_handler.filter_status_list(
             device_id, MESSAGE_SOURCE_TUYA_IOT, status_new
         )
-        # if report_value:
-        #     LOGGER.warning(
-        #         f"[{MESSAGE_SOURCE_TUYA_IOT}]Device {device_id} reported add_ele: {status_new}, after filtering"
-        #     )
         status_new = self.multi_manager.virtual_state_handler.apply_virtual_states_to_status_list(
             device, status_new, MESSAGE_SOURCE_TUYA_IOT
         )
