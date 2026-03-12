@@ -120,14 +120,29 @@ class MultiSourceHandler:
                 if code == virtual_state.key:
                     self._prepare_structure_for_code(dev_id, code)
                     if (
-                        not self._is_allowed_source_for_code(
+                        self._is_allowed_source_for_code(
                             dev_id, code, original_source
-                        )
-                    ) or (
-                        not self._is_code_update_time_valid(
-                            dev_id, code, item.get("t", 0), original_source
-                        )
+                        ) is False
                     ):
+                        if code == "add_ele":
+                            LOGGER.warning(
+                                f"[{original_source}]Code {code} for device {dev_id} is not from allowed source, filtering out",
+                                stack_info=True,
+                            )
+                        status_list.pop(i)
+                        i -= 1
+                        break
+                    
+                    if (
+                        self._is_code_update_time_valid(
+                            dev_id, code, item.get("t", 0), original_source
+                        ) is False
+                    ):
+                        if code == "add_ele":
+                            LOGGER.warning(
+                                f"[{original_source}]Code {code} for device {dev_id} has invalid update time, filtering out",
+                                stack_info=True,
+                            )
                         status_list.pop(i)
                         i -= 1
                         break
