@@ -26,6 +26,7 @@ from ....const import (
 #     Properties as mqtt_Properties,
 # )
 from urllib.parse import urlsplit
+import uuid
 
 
 class XTSharingMQ(SharingMQ):
@@ -56,6 +57,8 @@ class XTSharingMQ(SharingMQ):
         )
         self.manager = manager
         self.shutting_down = False
+        self.uuid = str(uuid.uuid4())
+        LOGGER.warning(f"Initialized SharingMQ with uuid: {self.uuid}", stack_info=True)
 
     def subscribe_device(self, dev_id: str, device: CustomerDevice):
         if device is None:
@@ -102,7 +105,7 @@ class XTSharingMQ(SharingMQ):
     def _on_message(self, mqttc: mqtt.Client, user_data: Any, msg: mqtt.MQTTMessage):
         msg_dict = json.loads(msg.payload.decode("utf8"))
 
-        #LOGGER.debug(f"[SHARING MQTT]on_message: {msg_dict}")
+        LOGGER.warning(f"[SHARING MQTT]({self.uuid})on_message: {msg_dict}")
 
         for listener in self.message_listeners:
             listener(msg_dict)
