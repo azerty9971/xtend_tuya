@@ -78,8 +78,10 @@ class XTVirtualFunctionHandler:
                 virtual_function.virtual_function_value
                 == VirtualFunctions.FUNCTION_RESET_STATE
             ):
+                needs_update = False
                 for state_to_reset in virtual_function.vf_reset_state:
                     if state_to_reset in device.status:
                         device.status[state_to_reset] = 0
-                        self.multi_manager.multi_device_listener.update_device(device)
-                        break
+                        needs_update = True
+                if needs_update:
+                    self.multi_manager.multi_device_listener.update_device(device)
