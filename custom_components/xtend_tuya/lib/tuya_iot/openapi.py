@@ -154,9 +154,6 @@ class TuyaOpenAPI:
         return sign, t
 
     def __refresh_access_token_if_need(self, path: str):
-        if self.is_connect() is False:
-            return
-
         if self.token_info.is_valid() is True:
             return
 
