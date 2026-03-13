@@ -223,6 +223,13 @@ CONSUMPTION_BUTTONS: tuple[XTButtonEntityDescription, ...] = (
             XTDPCode.ELECTRIC_THIS_MONTH,
             XTDPCode.ELECTRIC_THIS_YEAR,
             XTDPCode.POWER_CONSUMPTION,
+            XTDPCode.REVERSE_ENERGY_A,
+            XTDPCode.REVERSE_ENERGY_B,
+            XTDPCode.REVERSE_ENERGY_C,
+            XTDPCode.REVERSE_ENERGY_T,
+            XTDPCode.REVERSE_ENERGY_TOTAL,
+            XTDPCode.TOTALENERGYCONSUMED,
+            XTDPCode.TOTAL_FORWARD_ENERGY,
         ],
         translation_key="reset_add_ele",
         entity_category=EntityCategory.CONFIG,
@@ -517,7 +524,7 @@ async def async_setup_entry(
                                                 dpcode_wrapper,
                                             )
                                         )
-                                break
+                                    break
 
         async_add_entities(entities)
         if restrict_dpcode is None:
