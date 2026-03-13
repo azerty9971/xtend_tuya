@@ -517,7 +517,7 @@ async def async_setup_entry(
                                                 dpcode_wrapper,
                                             )
                                         )
-                                break
+                                    break
 
         async_add_entities(entities)
         if restrict_dpcode is None:
