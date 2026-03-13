@@ -556,9 +556,9 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
             params = json.loads(payload)
         match method:
             case "GET":
-                return self.iot_account.device_manager.api.get(url, params)
+                return self.iot_account.device_manager.non_user_api.get(url, params)
             case "POST":
-                return self.iot_account.device_manager.api.post(url, params)
+                return self.iot_account.device_manager.non_user_api.post(url, params)
         return None
 
     def get_webrtc_sdp_answer(
