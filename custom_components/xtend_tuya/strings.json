@@ -472,7 +472,7 @@
         },
         "event": {
             "alarm_lock": {
-                "name": "Movement detected",
+                "name": "Lock alarm",
                 "state_attributes": {
                     "event_type": {
                         "state": {
