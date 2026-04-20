@@ -288,23 +288,31 @@ class XTLockEntity(XTEntity, LockEntity):  # type: ignore
 
     @property
     def is_locking(self) -> bool | None:  # type: ignore
-        if self.temporary_unlock:
-            return False
-        """Return true if the lock is locking."""
-        is_locked = self.is_locked
-        if self._attr_is_locking and is_locked:
-            self._attr_is_locking = False
-        return self._attr_is_locking
+        # if self.temporary_unlock:
+        #     return False
+        # """Return true if the lock is locking."""
+        # is_locked = self.is_locked
+        # if self._attr_is_locking and is_locked:
+        #     self._attr_is_locking = False
+        # return self._attr_is_locking
+        
+        #This tends to cause issues if the device doesn't properly report ending of lock/unlock
+        #disable it as it's only a visual indicator...
+        return False
 
     @property
     def is_unlocking(self) -> bool | None:  # type: ignore
-        if self.temporary_unlock:
-            return False
-        """Return true if the lock is unlocking."""
-        is_locked = self.is_locked
-        if self._attr_is_unlocking and not is_locked:
-            self._attr_is_unlocking = False
-        return self._attr_is_unlocking
+        # if self.temporary_unlock:
+        #     return False
+        # """Return true if the lock is unlocking."""
+        # is_locked = self.is_locked
+        # if self._attr_is_unlocking and not is_locked:
+        #     self._attr_is_unlocking = False
+        # return self._attr_is_unlocking
+        
+        #This tends to cause issues if the device doesn't properly report ending of lock/unlock
+        #disable it as it's only a visual indicator...
+        return False
 
     def _get_state_value(self, codes: list[XTDPCode]) -> Any | None:
         self.update_changed_value_list()
