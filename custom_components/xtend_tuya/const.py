@@ -4,6 +4,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from enum import StrEnum, IntFlag, IntEnum, Flag, auto
 from typing import Any
+from types import NoneType
 import logging
 from homeassistant.const import (
     Platform,
@@ -14,6 +15,9 @@ from .ha_tuya_integration.tuya_integration_imports import (
     TuyaFAHRENHEIT_ALIASES,
     TuyaDeviceCategory as XTDeviceCategory,  # noqa: F401
 )
+
+type XTJsonSerializable = float | int | str | NoneType
+type XTAcceptableStoragePropertyValue = dict[str, XTJsonSerializable] | list[XTJsonSerializable] | XTJsonSerializable
 
 XT_CELSIUS_ALIASES = TuyaCELSIUS_ALIASES.union(set())
 XT_FAHRENHEIT_ALIASES = TuyaFAHRENHEIT_ALIASES.union(set())

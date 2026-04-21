@@ -450,6 +450,7 @@ class XTEntity(TuyaEntity):
     ) -> None:
         self.device = device
         self.device_manager = device_manager
+        self.description = kwargs.get("description", None)
         try:
             super(XTEntity, self).__init__(device, device_manager, *args, **kwargs)
         except Exception as e:
@@ -769,12 +770,44 @@ class XTEntity(TuyaEntity):
                                 return_dict[uom_value].add(device_class.value)  # type: ignore
         return return_dict
 
+    def get_configurable_properties_type(self) -> type[Any] | None:
+        return None
+    
+    def get_configurable_properties_key(self) -> str | None:
+        return None
+    
+    def get_configurable_properties_dpcode(self) -> str:
+        return self.description.key if self.description is not None else ""
+
     def get_configurable_properties(self) -> Any | None:
-        return None
+        property_type = self.get_configurable_properties_type()
+        property_key = self.get_configurable_properties_key()
+        if property_type is None or property_key is None:
+            return None
+        stored_configuration = self.device_manager.get_device_stored_property(
+            device_id=self.device.id,
+            dpcode=self.get_configurable_properties_dpcode(),
+            prop_name=property_key,
+        )
+        if stored_configuration is not None and isinstance(stored_configuration, dict):
+            return property_type(**stored_configuration)
+        return property_type()
 
-    def load_configurable_properties(self) -> bool | None:
-        return None
-
+    def set_configurable_properties(self, configurable_properties: Any):
+        property_type = self.get_configurable_properties_type()
+        property_key = self.get_configurable_properties_key()
+        if property_type is None or property_key is None:
+            return None
+        
+        if isinstance(property_type, configurable_properties):
+            self.device_manager.set_device_stored_property(
+                device_id=self.device.id,
+                dpcode=self.get_configurable_properties_dpcode(),
+                prop_name=property_key,
+                prop_value=configurable_properties.__dict__
+            )
+        else:
+            LOGGER.warning(f"set_configurable_properties tried to save incompatible type: {type(configurable_properties)}")
     @staticmethod
     def get_device_class_from_uom(
         dpcode_information: sc.XTDevice.XTDeviceDPCodeInformation | None,

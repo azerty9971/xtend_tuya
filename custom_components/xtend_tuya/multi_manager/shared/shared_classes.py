@@ -362,7 +362,7 @@ class XTDevice(TuyaDevice):
         source: str = "Compatible device",
         device_source_priority: int | None = None,
         keep_synced_with_original: bool = False,
-    ):
+    ) -> XTDevice:
         # If the device is already an XT device return it right away
         if isinstance(device, XTDevice):
             return device

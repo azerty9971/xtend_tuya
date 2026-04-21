@@ -300,6 +300,7 @@ class XTConfigFlows:
             ),
         )
 
+
 class XTConfigFlowConfigurationManager:
     @staticmethod
     def get_configuration():
@@ -307,6 +308,7 @@ class XTConfigFlowConfigurationManager:
 
     def save_configuration(self, config: dict[str, Any]):
         pass
+
 
 class TuyaOptionFlow(OptionsFlow):
     def __init__(self, config_entry: ConfigEntry) -> None:
@@ -426,48 +428,79 @@ class TuyaOptionFlow(OptionsFlow):
         """Handle device configuration."""
         if user_input is not None:
             # Update the configurable properties
-            new_options = dict(self.options)
-            return self.async_create_entry(title="", data=new_options)
+            LOGGER.warning(f"User input is: {user_input}")
+            return self.async_create_entry(title="", data=self.options)
 
         if self.selected_device_id is None:
             return self.async_abort(reason="device_not_selected")
         # Get the configurable properties for the selected device
-        device: mm.XTDevice | None = self.multi_manager.device_map.get(self.selected_device_id) if self.multi_manager else None
+        device: mm.XTDevice | None = (
+            self.multi_manager.device_map.get(self.selected_device_id)
+            if self.multi_manager
+            else None
+        )
         if device is None:
             return self.async_abort(reason="device_not_found")
 
         climate_entity: climate.XTClimateEntity | None = device.get_preference(
-            mm.XTDevice.XTDevicePreference.CLIMATE_DEVICE_ENTITY)
+            mm.XTDevice.XTDevicePreference.CLIMATE_DEVICE_ENTITY
+        )
         if climate_entity is None:
             return self.async_abort(reason="climate_entity_not_found")
-        
-        configurable_properties: climate.XTClimateDefinition | None = climate_entity.get_configurable_properties()
+
+        configurable_properties: climate.XTClimateConfigurableProperties | None = (
+            climate_entity.get_configurable_properties()
+        )
         if configurable_properties is None:
             return self.async_abort(reason="no_configurable_properties")
-        
-
-        current_step = 0.5
-        if (
-            "device_settings" in self.options
-            and self.selected_device_id in self.options["device_settings"]
-        ):
-            current_step = self.options["device_settings"][self.selected_device_id].get(
-                "target_temperature_step", 0.5
-            )
 
         return self.async_show_form(
             step_id="climate_device_settings",
             data_schema=vol.Schema(
                 {
-                    vol.Required(
-                        "target_temperature_step",
-                        default=current_step,
-                    ): vol.In(
-                        {
-                            0.1: "0.1 (raw value: 1)",
-                            0.5: "0.5 (raw value: 5)",
-                            1.0: "1.0 (raw value: 10)",
-                        }
+                    vol.Optional(
+                        "current_temperature_value_multiplicator",
+                        default=(
+                            configurable_properties.current_temperature_value_multiplicator
+                            if configurable_properties.current_temperature_value_multiplicator
+                            is not None
+                            else vol.UNDEFINED
+                        ),
+                    ): vol.All(
+                        vol.Coerce(float),
+                    ),
+                    vol.Optional(
+                        "target_temperature_value_multiplicator",
+                        default=(
+                            configurable_properties.target_temperature_value_multiplicator
+                            if configurable_properties.target_temperature_value_multiplicator
+                            is not None
+                            else vol.UNDEFINED
+                        ),
+                    ): vol.All(
+                        vol.Coerce(float),
+                    ),
+                    vol.Optional(
+                        "current_humidity_value_multiplicator",
+                        default=(
+                            configurable_properties.current_humidity_value_multiplicator
+                            if configurable_properties.current_humidity_value_multiplicator
+                            is not None
+                            else vol.UNDEFINED
+                        ),
+                    ): vol.All(
+                        vol.Coerce(float),
+                    ),
+                    vol.Optional(
+                        "target_humidity_value_multiplicator",
+                        default=(
+                            configurable_properties.target_humidity_value_multiplicator
+                            if configurable_properties.target_humidity_value_multiplicator
+                            is not None
+                            else vol.UNDEFINED
+                        ),
+                    ): vol.All(
+                        vol.Coerce(float),
                     ),
                 }
             ),

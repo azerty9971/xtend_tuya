@@ -197,6 +197,14 @@ class XTClimateDefinition(TuyaClimateDefinition):
     hvac_action_wrapper: TuyaDPCodeEnumWrapper | None
 
 
+@dataclass
+class XTClimateConfigurableProperties:
+    current_temperature_value_multiplicator: float | None = None
+    current_humidity_value_multiplicator: float | None = None
+    target_temperature_value_multiplicator: float | None = None
+    target_humidity_value_multiplicator: float | None = None
+
+
 @dataclass(frozen=True, kw_only=True)
 class XTClimateEntityDescription(TuyaClimateEntityDescription):
     """Describe an Tuya climate entity."""
@@ -567,15 +575,15 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
     ) -> None:
         """Determine which values to use."""
         super(XTClimateEntity, self).__init__(
-            device,
-            device_manager,  # type: ignore
-            description,
+            device=device,
+            device_manager=device_manager,  # type: ignore
+            description=description,
             definition=definition,
         )
         super(XTEntity, self).__init__(
-            device,
-            device_manager,  # type: ignore
-            description,
+            device=device,
+            device_manager=device_manager,  # type: ignore
+            description=description,
             definition=definition,
         )
         self.device = device
@@ -586,6 +594,9 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
         self.device.set_preference(
             f"{XTDevice.XTDevicePreference.CLIMATE_DEVICE_ENTITY}",
             self,
+        )
+        self.configurable_properties = cast(
+            XTClimateConfigurableProperties, self.get_configurable_properties()
         )
 
         # Re-Determine HVAC modes
@@ -627,8 +638,73 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
                         if ha_mode_replace_heat_cool_with not in self._attr_hvac_modes:
                             self._attr_hvac_modes.append(ha_mode_replace_heat_cool_with)
 
-    def get_configurable_properties(self) -> Any | None:
-        return self._definition
+    def get_configurable_properties_type(self) -> type[Any] | None:
+        return XTClimateConfigurableProperties
+
+    def get_configurable_properties_key(self) -> str | None:
+        return "climate_configurable_properties"
+
+    @property
+    def current_temperature(self) -> float | None:
+        """Return the current temperature."""
+        current_temperature = super().current_temperature
+        if (
+            current_temperature is not None
+            and self.configurable_properties is not None
+            and self.configurable_properties.current_temperature_value_multiplicator
+            is not None
+        ):
+            current_temperature *= (
+                self.configurable_properties.current_temperature_value_multiplicator
+            )
+        return current_temperature
+
+    @property
+    def current_humidity(self) -> int | None:
+        """Return the current humidity."""
+        current_humidity = super().current_humidity
+        if (
+            current_humidity is not None
+            and self.configurable_properties is not None
+            and self.configurable_properties.current_humidity_value_multiplicator
+            is not None
+        ):
+            current_humidity = int(
+                current_humidity
+                * self.configurable_properties.current_humidity_value_multiplicator
+            )
+        return current_humidity
+
+    @property
+    def target_temperature(self) -> float | None:
+        """Return the temperature currently set to be reached."""
+        target_temperature = super().target_temperature
+        if (
+            target_temperature is not None
+            and self.configurable_properties is not None
+            and self.configurable_properties.target_temperature_value_multiplicator
+            is not None
+        ):
+            target_temperature *= (
+                self.configurable_properties.target_temperature_value_multiplicator
+            )
+        return target_temperature
+
+    @property
+    def target_humidity(self) -> int | None:
+        """Return the humidity currently set to be reached."""
+        target_humidity = super().target_humidity
+        if (
+            target_humidity is not None
+            and self.configurable_properties is not None
+            and self.configurable_properties.target_humidity_value_multiplicator
+            is not None
+        ):
+            target_humidity = int(
+                target_humidity
+                * self.configurable_properties.target_humidity_value_multiplicator
+            )
+        return target_humidity
 
     @property
     def hvac_action(self) -> HVACAction | None:  # type: ignore
