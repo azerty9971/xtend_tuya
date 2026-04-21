@@ -13,6 +13,7 @@ from homeassistant.components.event import (
 )
 from tuya_device_handlers.definition.event import (
     TuyaEventDefinition,
+    get_default_definition,
 )
 from tuya_device_handlers.device_wrapper.common import (
     DPCodeIntegerWrapper,
@@ -129,6 +130,8 @@ def xt_get_default_definition(
                 return TuyaEventDefinition(
                     event_wrapper=wrapper,
                 )
+    else:
+        return get_default_definition(device=device, dpcode=dpcode, wrapper_class=wrapper_classes)
     return None
 
 @dataclass(frozen=True)
