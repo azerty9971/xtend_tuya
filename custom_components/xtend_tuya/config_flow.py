@@ -450,15 +450,23 @@ class TuyaOptionFlow(OptionsFlow):
             new_config.current_temperature_value_multiplicator = user_input.get(
                 "current_temperature_value_multiplicator", None
             )
+            if new_config.current_temperature_value_multiplicator == 0:
+                new_config.current_temperature_value_multiplicator = None
             new_config.current_humidity_value_multiplicator = user_input.get(
                 "current_humidity_value_multiplicator", None
             )
+            if new_config.current_humidity_value_multiplicator == 0:
+                new_config.current_humidity_value_multiplicator = None
             new_config.target_temperature_value_multiplicator = user_input.get(
                 "target_temperature_value_multiplicator", None
             )
+            if new_config.target_temperature_value_multiplicator == 0:
+                new_config.target_temperature_value_multiplicator = None
             new_config.target_humidity_value_multiplicator = user_input.get(
                 "target_humidity_value_multiplicator", None
             )
+            if new_config.target_humidity_value_multiplicator == 0:
+                new_config.target_humidity_value_multiplicator = None
             climate_entity.set_configurable_properties(new_config)
             await self.multi_manager.storage_manager.save_store()
             self.multi_manager.multi_device_listener.update_device(device=device)

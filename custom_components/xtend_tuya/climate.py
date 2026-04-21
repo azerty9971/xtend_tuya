@@ -35,7 +35,7 @@ from homeassistant.components.climate.const import (
     SWING_HORIZONTAL,
     SWING_VERTICAL,
 )
-from homeassistant.const import Platform
+from homeassistant.const import Platform, ATTR_TEMPERATURE
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -710,6 +710,18 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
                 * self.configurable_properties.target_humidity_value_multiplicator
             )
         return target_humidity
+
+    async def async_set_humidity(self, humidity: int) -> None:
+        """Set new target humidity."""
+        if self.configurable_properties is not None and self.configurable_properties.target_humidity_value_multiplicator is not None:
+            humidity = int(humidity / self.configurable_properties.target_humidity_value_multiplicator)
+        await super().async_set_humidity(humidity=humidity)
+
+    async def async_set_temperature(self, **kwargs: Any) -> None:
+        """Set new target temperature."""
+        if ATTR_TEMPERATURE in kwargs and self.configurable_properties is not None and self.configurable_properties.target_temperature_value_multiplicator is not None:
+            kwargs[ATTR_TEMPERATURE] = kwargs[ATTR_TEMPERATURE] / self.configurable_properties.target_temperature_value_multiplicator
+        await super().async_set_temperature(**kwargs)
 
     @property
     def hvac_action(self) -> HVACAction | None:  # type: ignore
