@@ -643,6 +643,11 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
 
     def get_configurable_properties_key(self) -> str | None:
         return "climate_configurable_properties"
+    
+    def refresh_configurable_properties(self):
+        self.configurable_properties = cast(
+            XTClimateConfigurableProperties, self.get_configurable_properties()
+        )
 
     @property
     def current_temperature(self) -> float | None:

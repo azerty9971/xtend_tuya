@@ -806,8 +806,13 @@ class XTEntity(TuyaEntity):
                 prop_name=property_key,
                 prop_value=configurable_properties.__dict__
             )
+            self.refresh_configurable_properties()
         else:
             LOGGER.warning(f"set_configurable_properties tried to save incompatible type: {type(configurable_properties)}")
+    
+    def refresh_configurable_properties(self):
+        return None
+
     @staticmethod
     def get_device_class_from_uom(
         dpcode_information: sc.XTDevice.XTDeviceDPCodeInformation | None,
