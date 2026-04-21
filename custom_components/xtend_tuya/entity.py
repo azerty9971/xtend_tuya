@@ -799,7 +799,7 @@ class XTEntity(TuyaEntity):
         if property_type is None or property_key is None:
             return None
         
-        if isinstance(property_type, configurable_properties):
+        if isinstance(configurable_properties, property_type):
             self.device_manager.set_device_stored_property(
                 device_id=self.device.id,
                 dpcode=self.get_configurable_properties_dpcode(),
