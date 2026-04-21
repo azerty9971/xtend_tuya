@@ -426,18 +426,14 @@ class TuyaOptionFlow(OptionsFlow):
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
         """Handle device configuration."""
-        if user_input is not None:
-            # Update the configurable properties
-            LOGGER.warning(f"User input is: {user_input}")
-            return self.async_create_entry(title="", data=self.options)
-
         if self.selected_device_id is None:
             return self.async_abort(reason="device_not_selected")
+
+        if self.multi_manager is None:
+            return self.async_abort(reason="no_multi_manager")
         # Get the configurable properties for the selected device
-        device: mm.XTDevice | None = (
-            self.multi_manager.device_map.get(self.selected_device_id)
-            if self.multi_manager
-            else None
+        device: mm.XTDevice | None = self.multi_manager.device_map.get(
+            self.selected_device_id
         )
         if device is None:
             return self.async_abort(reason="device_not_found")
@@ -447,6 +443,26 @@ class TuyaOptionFlow(OptionsFlow):
         )
         if climate_entity is None:
             return self.async_abort(reason="climate_entity_not_found")
+
+        if user_input is not None:
+            # Update the configurable properties
+            new_config = climate.XTClimateConfigurableProperties()
+            new_config.current_temperature_value_multiplicator = user_input.get(
+                "current_temperature_value_multiplicator", None
+            )
+            new_config.current_humidity_value_multiplicator = user_input.get(
+                "current_humidity_value_multiplicator", None
+            )
+            new_config.target_temperature_value_multiplicator = user_input.get(
+                "target_temperature_value_multiplicator", None
+            )
+            new_config.target_humidity_value_multiplicator = user_input.get(
+                "target_humidity_value_multiplicator", None
+            )
+            climate_entity.set_configurable_properties(new_config)
+            await self.multi_manager.storage_manager.save_store()
+            self.multi_manager.multi_device_listener.update_device(device=device)
+            return self.async_create_entry(title="", data=self.options)
 
         configurable_properties: climate.XTClimateConfigurableProperties | None = (
             climate_entity.get_configurable_properties()
@@ -505,7 +521,7 @@ class TuyaOptionFlow(OptionsFlow):
                 }
             ),
             description_placeholders={
-                "device_name": self.selected_device_id or "",
+                "device_name": device.name or "",
             },
         )
 
