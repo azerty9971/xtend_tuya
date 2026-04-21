@@ -1721,6 +1721,9 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
         *ELECTRICITY_SENSORS,
         *TIMER_SENSORS,
     ),
+    "rs": (
+        *TEMPERATURE_SENSORS,
+    ),
     # QT-08W Solar Intelligent Water Valve
     "sfkzq": (
         XTSensorEntityDescription(
