@@ -24,6 +24,7 @@ from ..const import (
     XTDeviceWatcherCategory,
     XT_DEVICE_EVENT_NOTIFY_DPCODE,
     XTEntityAccessMode,
+    XTAcceptableStoragePropertyValue,
 )
 from .shared.shared_classes import (
     DeviceWatcher,
@@ -73,6 +74,9 @@ from .shared.interface.device_manager import (
 from ..entity_parser.entity_parser import (
     XTCustomEntityParser,
 )
+from .shared.storage.storage_manager import (
+    XTStorageManager,
+)
 import custom_components.xtend_tuya.multi_manager.shared.data_entry.shared_data_entry as shared_data_entry
 
 
@@ -88,6 +92,7 @@ class MultiManager:  # noqa: F811
         self.hass = hass
         self.multi_source_handler = MultiSourceHandler(self)
         self.device_watcher = DeviceWatcher(self)
+        self.storage_manager = XTStorageManager(hass, config_entry, self)
         self.accounts: dict[str, XTDeviceManagerInterface] = {}
         self.master_device_map: XTDeviceMap = XTDeviceMap({})
         self.is_ready_for_messages = False
@@ -125,6 +130,16 @@ class MultiManager:  # noqa: F811
         return None
 
     async def setup_entry(self) -> None:
+        # Load data from storage
+        if await self.storage_manager.load_store() is False:
+            LOGGER.debug(
+                f"Could not load from storage for {self.config_entry.entry_id=}, creating fresh storage space"
+            )
+            # Overwrite with an empty store
+            if await self.storage_manager.save_store() is False:
+                LOGGER.warning(
+                    f"Failed to create a fresh storage space for {self.config_entry.entry_id=}"
+                )
         # Load all the plugins
         subdirs = AllowedPlugins.get_plugins_to_load()
         concurrency_manager = XTConcurrencyManager()
@@ -215,9 +230,11 @@ class MultiManager:  # noqa: F811
             # Don't allow changes to DPCodes after the global initialization
             device.force_compatibility = True
 
-            #Apply conversion strategy after initial import
+            # Apply conversion strategy after initial import
             for dpcode in device.status:
-                device.status[dpcode] = device.apply_dpcode_strategy(dpcode, device.status[dpcode], self)
+                device.status[dpcode] = device.apply_dpcode_strategy(
+                    dpcode, device.status[dpcode], self
+                )
         self._enable_multi_map_device_alignment()
         self._process_pending_messages()
         for device in self.device_map.values():
@@ -737,6 +754,32 @@ class MultiManager:  # noqa: F811
             if account.delete_ir_key(device, key, remote, hub):
                 return True
         return False
+
+    def get_device_stored_property(
+        self,
+        device_id: str,
+        dpcode: str,
+        prop_name: str,
+    ) -> XTAcceptableStoragePropertyValue | None:
+        return self.storage_manager.get_device_configurable_property(
+            device_id=device_id,
+            dpcode=dpcode,
+            prop_name=prop_name,
+        )
+
+    def set_device_stored_property(
+        self,
+        device_id: str,
+        dpcode: str,
+        prop_name: str,
+        prop_value: XTAcceptableStoragePropertyValue,
+    ):
+        self.storage_manager.set_device_configurable_property(
+            device_id=device_id,
+            dpcode=dpcode,
+            prop_name=prop_name,
+            prop_value=prop_value,
+        )
 
     def set_general_property(
         self, property_id: XTMultiManagerProperties, property_value: Any
