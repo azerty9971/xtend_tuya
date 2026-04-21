@@ -710,6 +710,38 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
                 * self.configurable_properties.target_humidity_value_multiplicator
             )
         return target_humidity
+    
+    @property
+    def min_temp(self) -> float: # type: ignore
+        """Return the minimum temperature."""
+        min_temp = super().min_temp
+        if self.configurable_properties is not None and self.configurable_properties.target_temperature_value_multiplicator is not None:
+            min_temp = min_temp * self.configurable_properties.target_temperature_value_multiplicator
+        return min_temp
+
+    @property
+    def max_temp(self) -> float: # type: ignore
+        """Return the maximum temperature."""
+        max_temp = super().max_temp
+        if self.configurable_properties is not None and self.configurable_properties.target_temperature_value_multiplicator is not None:
+            max_temp = max_temp * self.configurable_properties.target_temperature_value_multiplicator
+        return max_temp
+
+    @property
+    def min_humidity(self) -> float: # type: ignore
+        """Return the minimum humidity."""
+        min_humidity = super().min_humidity
+        if self.configurable_properties is not None and self.configurable_properties.target_humidity_value_multiplicator is not None:
+            min_humidity = min_humidity * self.configurable_properties.target_humidity_value_multiplicator
+        return min_humidity
+
+    @property
+    def max_humidity(self) -> float: # type: ignore
+        """Return the maximum humidity."""
+        max_humidity = super().max_humidity
+        if self.configurable_properties is not None and self.configurable_properties.target_humidity_value_multiplicator is not None:
+            max_humidity = max_humidity * self.configurable_properties.target_humidity_value_multiplicator
+        return max_humidity
 
     async def async_set_humidity(self, humidity: int) -> None:
         """Set new target humidity."""
