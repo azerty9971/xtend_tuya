@@ -1110,6 +1110,7 @@ UOM_MAPPING_DICT: dict[str, str | None] = {
     "小时": "h",
     "Hour": "h",
     "秒": "s",
+    "S": "s",
     "day": "d",
     "": None,
     "ADC": None,
@@ -1117,6 +1118,7 @@ UOM_MAPPING_DICT: dict[str, str | None] = {
     "电机电流>1k，瞬间<1k，除臭2K>60": None,
     "线程号": None,
     "次": None,
+    "times": None,
 }
 
 DPCODE_PREFERED_DEVICE_CLASS: dict[str, str | None] = {
