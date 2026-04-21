@@ -131,22 +131,12 @@ class MultiManager:  # noqa: F811
 
     async def setup_entry(self) -> None:
         # Load data from storage
-        if (
-            await XTEventLoopProtector.execute_out_of_event_loop_and_return(
-                self.storage_manager.load_store
-            )
-            is False
-        ):
+        if await self.storage_manager.load_store() is False:
             LOGGER.warning(
                 f"Could not load from storage for {self.config_entry.entry_id=}, creating fresh storage space"
             )
             # Overwrite with an empty store
-            if (
-                await XTEventLoopProtector.execute_out_of_event_loop_and_return(
-                    self.storage_manager.save_store
-                )
-                is False
-            ):
+            if await self.storage_manager.save_store() is False:
                 LOGGER.warning(
                     f"Failed to create a fresh storage space for {self.config_entry.entry_id=}"
                 )
