@@ -1110,6 +1110,7 @@ UOM_MAPPING_DICT: dict[str, str | None] = {
     "KM": "km",
     "v": "V",
     "％": "%",
+    "μg/m3": "μg/m³",
     "℃": "°C",
     "C": "°C",
     "℉": "°F",
@@ -1132,6 +1133,7 @@ UOM_MAPPING_DICT: dict[str, str | None] = {
 DPCODE_PREFERED_DEVICE_CLASS: dict[str, str | None] = {
     "battery": "battery",
     "battery_percentage": "battery",
+    "maxco2_set": "carbon_dioxide",
     "motionless_far_detection": "distance",
     "breathe_detection": "distance",
     "micro_min_detection": "distance",
@@ -1184,6 +1186,7 @@ DPCODE_PREFERED_DEVICE_CLASS: dict[str, str | None] = {
     "qidongwencha": "temperature_delta",
     "temp_calibration": "temperature_delta",
     "water_total_h": "water",
+    "alarm_bright": None,
     "fan_speed": None,
     "heating_ratio": None,
     "percent_control": None,
