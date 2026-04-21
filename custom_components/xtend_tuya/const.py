@@ -1120,7 +1120,12 @@ UOM_MAPPING_DICT: dict[str, str | None] = {
 }
 
 DPCODE_PREFERED_DEVICE_CLASS: dict[str, str | None] = {
+    "battery": "battery",
     "battery_percentage": "battery",
+    "motionless_far_detection": "distance",
+    "breathe_detection": "distance",
+    "micro_min_detection": "distance",
+    "bre_min_detection": "distance",
     "active_energy_total": "energy",
     "add_ele1": "energy",
     "charge_energy": "energy",
