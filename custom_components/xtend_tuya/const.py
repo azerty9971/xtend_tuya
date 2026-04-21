@@ -1102,6 +1102,7 @@ UOM_MAPPING_DICT: dict[str, str | None] = {
     "kW·h": "kWh",
     "kW.h": "kWh",
     "kVar": "kvar",
+    "KM": "km",
     "v": "V",
     "％": "%",
     "℃": "°C",
