@@ -13,12 +13,16 @@ from homeassistant.components.event import (
 )
 from tuya_device_handlers.definition.event import (
     TuyaEventDefinition,
-    get_default_definition,
 )
 from tuya_device_handlers.device_wrapper.common import (
     DPCodeIntegerWrapper,
     DPCodeBooleanWrapper,
     DPCodeJsonWrapper,
+    DPCodeStringWrapper,
+    DPCodeTypeInformationWrapper,
+)
+from tuya_device_handlers.device_wrapper.event import (
+    SimpleEventEnumWrapper,
 )
 from .util import (
     restrict_descriptor_category,
@@ -50,7 +54,6 @@ from .entity import (
 
 class XTJSONEventWrapper(DPCodeJsonWrapper[tuple[str, dict[str, Any]]]):
     def __init__(self, dpcode: str, type_information: Any) -> None:
-        """Init IntegerEventWrapper."""
         super().__init__(dpcode, type_information)
         self.options = [f"{self.dpcode}"]
 
@@ -78,7 +81,6 @@ class XTJSONEventWrapper(DPCodeJsonWrapper[tuple[str, dict[str, Any]]]):
 
 class XTIntegerEventWrapper(DPCodeIntegerWrapper[tuple[str, dict[str, Any]]]):
     def __init__(self, dpcode: str, type_information: Any) -> None:
-        """Init IntegerEventWrapper."""
         super().__init__(dpcode, type_information)
         self.options = [f"{self.dpcode}"]
 
@@ -92,7 +94,6 @@ class XTIntegerEventWrapper(DPCodeIntegerWrapper[tuple[str, dict[str, Any]]]):
 
 class XTBooleanEventWrapper(DPCodeBooleanWrapper[tuple[str, dict[str, Any]]]):
     def __init__(self, dpcode: str, type_information: Any) -> None:
-        """Init IntegerEventWrapper."""
         super().__init__(dpcode, type_information)
         self.options = [f"{self.dpcode}"]
 
@@ -104,8 +105,36 @@ class XTBooleanEventWrapper(DPCodeBooleanWrapper[tuple[str, dict[str, Any]]]):
             return None
         return (f"{self.dpcode}", {"value": status, "changed_time": datetime.now()})
 
+class XTStringEventWrapper(DPCodeStringWrapper[tuple[str, dict[str, Any]]]):
+    def __init__(self, dpcode: str, type_information: Any) -> None:
+        super().__init__(dpcode, type_information)
+        self.options = [f"{self.dpcode}"]
+
+    def read_device_status(
+        self, device: TuyaCustomerDevice
+    ) -> tuple[str, dict[str, Any]] | None:
+        """Return the event with message attribute."""
+        if (status := self._read_dpcode_value(device)) is None:
+            return None
+        return (f"{self.dpcode}", {"value": status, "changed_time": datetime.now()})
+
+def xt_get_default_definition(
+    device: XTDevice,
+    dpcode: str,
+    wrapper_classes: type[DPCodeTypeInformationWrapper] | tuple[type[DPCodeTypeInformationWrapper], ...],  # type: ignore[type-arg]
+) -> TuyaEventDefinition | None:
+    if isinstance(wrapper_classes, tuple):
+        for wrapper_class in wrapper_classes:    
+            if wrapper := wrapper_class.find_dpcode(device, dpcode):
+                return TuyaEventDefinition(
+                    event_wrapper=wrapper,
+                )
+    return None
+
 @dataclass(frozen=True)
 class XTEventEntityDescription(TuyaEventEntityDescription):
+    wrapper_class: type[DPCodeTypeInformationWrapper] | tuple[type[DPCodeTypeInformationWrapper], ...] = SimpleEventEnumWrapper # type: ignore
+
     override_tuya: bool = False
     dont_send_to_cloud: bool = False
     on_value: Any = None
@@ -140,6 +169,18 @@ EVENTS: dict[str, tuple[XTEventEntityDescription, ...]] = {
             key=XTDPCode.ALARM_LOCK,
             translation_key="alarm_lock",
             device_class=None,
+        ),
+        XTEventEntityDescription(
+            key=XTDPCode.ALARM_MESSAGE,
+            device_class=EventDeviceClass.DOORBELL,
+            translation_key="doorbell_message",
+            wrapper_class=XTStringEventWrapper,
+        ),
+        XTEventEntityDescription(
+            key=XTDPCode.DOORBELL_PIC,
+            device_class=EventDeviceClass.DOORBELL,
+            translation_key="doorbell_picture",
+            wrapper_class=XTStringEventWrapper,
         ),
         XTEventEntityDescription(
             key=XTDPCode.CARD_UNLOCK_USER,
@@ -346,7 +387,7 @@ async def async_setup_entry(
                                 externally_managed_dpcodes,
                             )
                             and (
-                                definition := get_default_definition(
+                                definition := xt_get_default_definition(
                                     device, description.key, description.wrapper_class
                                 )
                             )
@@ -369,7 +410,7 @@ async def async_setup_entry(
                                 externally_managed_dpcodes,
                             )
                             and (
-                                definition := get_default_definition(
+                                definition := xt_get_default_definition(
                                     device, description.key, description.wrapper_class
                                 )
                             )
