@@ -132,7 +132,7 @@ class MultiManager:  # noqa: F811
     async def setup_entry(self) -> None:
         # Load data from storage
         if await self.storage_manager.load_store() is False:
-            LOGGER.warning(
+            LOGGER.debug(
                 f"Could not load from storage for {self.config_entry.entry_id=}, creating fresh storage space"
             )
             # Overwrite with an empty store
