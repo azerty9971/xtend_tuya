@@ -810,6 +810,7 @@ class XTDPCode(StrEnum):
     DEVICE_MODE = "device_mode"
     DIRECTION_A = "direction_a"
     DIRECTION_B = "direction_b"
+    DOORBELL = "doorbell"
     DOORBELL_VOLUME = "doorbell_volume"
     ECO = "eco"
     ELECTRIC = "electric"
@@ -1025,6 +1026,7 @@ class XTDPCode(StrEnum):
     UNLOCK_METHOD_MODIFY = "unlock_method_modify"
     UNLOCK_PASSWORD = "unlock_password"
     UNLOCK_PHONE_REMOTE = "unlock_phone_remote"
+    UNLOCK_TEMPORARY = "unlock_temporary"
     UNLOCK_VOICE_REMOTE = "unlock_voice_remote"
     CARD_UNLOCK_USER = "card_unlock_user"
     FACE_UNLOCK_USER = "face_unlock_user"
@@ -1151,6 +1153,7 @@ DPCODE_PREFERED_DEVICE_CLASS: dict[str, str | None] = {
     "ALARM_LOW_TEMP": "temperature",
     "AUTO_HIGH_TEMP": "temperature",
     "AUTO_LOW_TEMP": "temperature",
+    "c_temperature": "temperature",
     "current_temp": "temperature",
     "frost_protect_temp": "temperature",
     "holiday_temp_set": "temperature",
@@ -1159,6 +1162,7 @@ DPCODE_PREFERED_DEVICE_CLASS: dict[str, str | None] = {
     "maxtemp_set": "temperature",
     "minitemp_set": "temperature",
     "set_temp": "temperature",
+    "temperature_c": "temperature",
     "temp_current": "temperature",
     "temp_current_f": "temperature",
     "temp_now_huas": "temperature",
@@ -1174,6 +1178,7 @@ DPCODE_PREFERED_DEVICE_CLASS: dict[str, str | None] = {
     "qidongwencha": "temperature_delta",
     "temp_calibration": "temperature_delta",
     "water_total_h": "water",
+    "fan_speed": None,
     "heating_ratio": None,
     "percent_control": None,
     "percent_state": None,

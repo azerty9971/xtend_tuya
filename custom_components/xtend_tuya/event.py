@@ -17,6 +17,7 @@ from tuya_device_handlers.definition.event import (
 )
 from tuya_device_handlers.device_wrapper.common import (
     DPCodeIntegerWrapper,
+    DPCodeBooleanWrapper,
     DPCodeJsonWrapper,
 )
 from .util import (
@@ -47,12 +48,7 @@ from .entity import (
 )
 
 
-class JSONEventWrapper(DPCodeJsonWrapper[tuple[str, dict[str, Any]]]):
-    """Wrapper for a string message received in a base64/UTF-8 RAW DPCode.
-
-    Raises 'triggered' event, with the message in the event attributes.
-    """
-
+class XTJSONEventWrapper(DPCodeJsonWrapper[tuple[str, dict[str, Any]]]):
     def __init__(self, dpcode: str, type_information: Any) -> None:
         """Init IntegerEventWrapper."""
         super().__init__(dpcode, type_information)
@@ -80,12 +76,7 @@ class JSONEventWrapper(DPCodeJsonWrapper[tuple[str, dict[str, Any]]]):
         )
 
 
-class IntegerEventWrapper(DPCodeIntegerWrapper[tuple[str, dict[str, Any]]]):
-    """Wrapper for a string message received in a base64/UTF-8 RAW DPCode.
-
-    Raises 'triggered' event, with the message in the event attributes.
-    """
-
+class XTIntegerEventWrapper(DPCodeIntegerWrapper[tuple[str, dict[str, Any]]]):
     def __init__(self, dpcode: str, type_information: Any) -> None:
         """Init IntegerEventWrapper."""
         super().__init__(dpcode, type_information)
@@ -99,6 +90,19 @@ class IntegerEventWrapper(DPCodeIntegerWrapper[tuple[str, dict[str, Any]]]):
             return None
         return (f"{self.dpcode}", {"value": status, "changed_time": datetime.now()})
 
+class XTBooleanEventWrapper(DPCodeBooleanWrapper[tuple[str, dict[str, Any]]]):
+    def __init__(self, dpcode: str, type_information: Any) -> None:
+        """Init IntegerEventWrapper."""
+        super().__init__(dpcode, type_information)
+        self.options = [f"{self.dpcode}"]
+
+    def read_device_status(
+        self, device: TuyaCustomerDevice
+    ) -> tuple[str, dict[str, Any]] | None:
+        """Return the event with message attribute."""
+        if (status := self._read_dpcode_value(device)) is None:
+            return None
+        return (f"{self.dpcode}", {"value": status, "changed_time": datetime.now()})
 
 @dataclass(frozen=True)
 class XTEventEntityDescription(TuyaEventEntityDescription):
@@ -142,28 +146,34 @@ EVENTS: dict[str, tuple[XTEventEntityDescription, ...]] = {
             translation_key="unlock_user",
             translation_placeholders={"user_type": "Card"},
             device_class=None,
-            wrapper_class=IntegerEventWrapper,
+            wrapper_class=XTIntegerEventWrapper,
+        ),
+        XTEventEntityDescription(
+            key=XTDPCode.DOORBELL,
+            translation_key="doorbell",
+            device_class=None,
+            wrapper_class=XTBooleanEventWrapper,
         ),
         XTEventEntityDescription(
             key=XTDPCode.FACE_UNLOCK_USER,
             translation_key="unlock_user",
             translation_placeholders={"user_type": "Face"},
             device_class=None,
-            wrapper_class=IntegerEventWrapper,
+            wrapper_class=XTIntegerEventWrapper,
         ),
         XTEventEntityDescription(
             key=XTDPCode.FINGERPRINT_UNLOCK_USER,
             translation_key="unlock_user",
             translation_placeholders={"user_type": "Fingerprint"},
             device_class=None,
-            wrapper_class=IntegerEventWrapper,
+            wrapper_class=XTIntegerEventWrapper,
         ),
         XTEventEntityDescription(
             key=XTDPCode.HAND_UNLOCK_USER,
             translation_key="unlock_user",
             translation_placeholders={"user_type": "Hand"},
             device_class=None,
-            wrapper_class=IntegerEventWrapper,
+            wrapper_class=XTIntegerEventWrapper,
         ),
         XTEventEntityDescription(
             key=XTDPCode.IPC_MOVEMENT_DETECT,
@@ -175,90 +185,97 @@ EVENTS: dict[str, tuple[XTEventEntityDescription, ...]] = {
             translation_key="unlock_user",
             translation_placeholders={"user_type": "Password"},
             device_class=None,
-            wrapper_class=IntegerEventWrapper,
+            wrapper_class=XTIntegerEventWrapper,
         ),
         XTEventEntityDescription(
             key=XTDPCode.UNLOCK_BLE,
             translation_key="unlock_user",
             translation_placeholders={"user_type": "Bluetooth"},
             device_class=None,
-            wrapper_class=IntegerEventWrapper,
+            wrapper_class=XTIntegerEventWrapper,
         ),
         XTEventEntityDescription(
             key=XTDPCode.UNLOCK_CARD,
             translation_key="unlock_user",
             translation_placeholders={"user_type": "Card"},
             device_class=None,
-            wrapper_class=IntegerEventWrapper,
+            wrapper_class=XTIntegerEventWrapper,
         ),
         XTEventEntityDescription(
             key=XTDPCode.UNLOCK_DYNAMIC,
             translation_key="unlock_user",
             translation_placeholders={"user_type": "Dynamic"},
             device_class=None,
-            wrapper_class=IntegerEventWrapper,
+            wrapper_class=XTIntegerEventWrapper,
         ),
         XTEventEntityDescription(
             key=XTDPCode.UNLOCK_FACE,
             translation_key="unlock_user",
             translation_placeholders={"user_type": "Face"},
             device_class=None,
-            wrapper_class=IntegerEventWrapper,
+            wrapper_class=XTIntegerEventWrapper,
         ),
         XTEventEntityDescription(
             key=XTDPCode.UNLOCK_FINGERPRINT,
             translation_key="unlock_user",
             translation_placeholders={"user_type": "Fingerprint"},
             device_class=None,
-            wrapper_class=IntegerEventWrapper,
+            wrapper_class=XTIntegerEventWrapper,
         ),
         XTEventEntityDescription(
             key=XTDPCode.UNLOCK_FINGER_VEIN,
             translation_key="unlock_user",
             translation_placeholders={"user_type": "Finger vein"},
             device_class=None,
-            wrapper_class=IntegerEventWrapper,
+            wrapper_class=XTIntegerEventWrapper,
         ),
         XTEventEntityDescription(
             key=XTDPCode.UNLOCK_HAND,
             translation_key="unlock_user",
             translation_placeholders={"user_type": "Hand"},
             device_class=None,
-            wrapper_class=IntegerEventWrapper,
+            wrapper_class=XTIntegerEventWrapper,
         ),
         XTEventEntityDescription(
             key=XTDPCode.UNLOCK_KEY,
             translation_key="unlock_user",
             translation_placeholders={"user_type": "Key"},
             device_class=None,
-            wrapper_class=IntegerEventWrapper,
+            wrapper_class=XTIntegerEventWrapper,
         ),
         XTEventEntityDescription(
             key=XTDPCode.UNLOCK_PASSWORD,
             translation_key="unlock_user",
             translation_placeholders={"user_type": "Password"},
             device_class=None,
-            wrapper_class=IntegerEventWrapper,
+            wrapper_class=XTIntegerEventWrapper,
         ),
         XTEventEntityDescription(
             key=XTDPCode.UNLOCK_PHONE_REMOTE,
             translation_key="unlock_user",
             translation_placeholders={"user_type": "Phone"},
             device_class=None,
-            wrapper_class=IntegerEventWrapper,
+            wrapper_class=XTIntegerEventWrapper,
+        ),
+        XTEventEntityDescription(
+            key=XTDPCode.UNLOCK_TEMPORARY,
+            translation_key="unlock_user",
+            translation_placeholders={"user_type": "Temporary"},
+            device_class=None,
+            wrapper_class=XTIntegerEventWrapper,
         ),
         XTEventEntityDescription(
             key=XTDPCode.UNLOCK_VOICE_REMOTE,
             translation_key="unlock_user",
             translation_placeholders={"user_type": "Voice"},
             device_class=None,
-            wrapper_class=IntegerEventWrapper,
+            wrapper_class=XTIntegerEventWrapper,
         ),
         XTEventEntityDescription(
             key=XT_DEVICE_EVENT_NOTIFY_DPCODE,
             translation_key="xt_device_event_notify",
             device_class=None,
-            wrapper_class=JSONEventWrapper,
+            wrapper_class=XTJSONEventWrapper,
             entity_registry_visible_default=False,
         ),
     ),
