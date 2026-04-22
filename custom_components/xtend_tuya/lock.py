@@ -1,6 +1,5 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
-import json
 from typing import Any, cast
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.components.lock import (
@@ -9,20 +8,13 @@ from homeassistant.components.lock import (
 )
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.const import Platform
-from homeassistant.helpers.dispatcher import async_dispatcher_connect, dispatcher_send
+from homeassistant.helpers.dispatcher import async_dispatcher_connect
 
-from custom_components.xtend_tuya.multi_manager.shared.shared_classes import (
-    XTDeviceStatusRange,
-)
 from .const import (
     TUYA_DISCOVERY_NEW,
     XTDPCode,
     XTLockingMechanism,
-    XTMultiManagerPostSetupCallbackPriority,
     XTMultiManagerProperties,
-)
-from .ha_tuya_integration.tuya_integration_imports import (
-    TuyaDPType,
 )
 from .multi_manager.multi_manager import (
     XTConfigEntry,
