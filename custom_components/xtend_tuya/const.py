@@ -16,7 +16,7 @@ from .ha_tuya_integration.tuya_integration_imports import (
     TuyaDeviceCategory as XTDeviceCategory,  # noqa: F401
 )
 
-type XTJsonSerializable = float | int | str | NoneType
+type XTJsonSerializable = float | int | str | bool | NoneType
 type XTAcceptableStoragePropertyValue = dict[str, XTJsonSerializable] | list[XTJsonSerializable] | XTJsonSerializable
 
 XT_CELSIUS_ALIASES = TuyaCELSIUS_ALIASES.union(set())
@@ -180,6 +180,20 @@ class XTLockingMechanism(StrEnum):
     DOOR_OPEN = "door_open"
     DOOR_OPERATE = "door_operate"
     DPCODE_COMMAND = "dpcode_command"
+
+    def get_human_name(self, value: str) -> str:
+        match value:
+            case XTLockingMechanism.AUTO:
+                return "Auto"
+            case XTLockingMechanism.DOOR_OPEN:
+                return "door_open API"
+            case XTLockingMechanism.DOOR_OPERATE:
+                return "door_operate API"
+            case XTLockingMechanism.DPCODE_COMMAND:
+                return "DPCode command"
+            case _:
+                return "Unknown"
+
 
 
 class XTMultiManagerPostSetupCallbackPriority(IntEnum):
@@ -1086,7 +1100,6 @@ class XTDPCode(StrEnum):
     XT_FORWARD_ENERGY_TOTAL_THIS_YEAR = "xt_forward_energy_total_this_year"
     XT_FORWARD_ENERGY_TOTAL_TODAY = "xt_forward_energy_total_today"
     XT_IMPORT_ELECTRICAL_HISTORY = "xt_import_electrical_history"
-    XT_LOCK_UNLOCK_MECHANISM = "xt_lock_unlock_mechanism"
     XT_RESET_ADD_ELE = "xt_reset_add_ele"
     XT_TOTAL_FORWARD_ENERGY = "xt_total_forward_energy"
     XT_TOTAL_FORWARD_ENERGY_THIS_MONTH = "xt_total_forward_energy_this_month"
@@ -1139,6 +1152,7 @@ DPCODE_PREFERED_DEVICE_CLASS: dict[str, str | None] = {
     "micro_min_detection": "distance",
     "bre_min_detection": "distance",
     "active_energy_total": "energy",
+    "add_ele": "energy",
     "add_ele1": "energy",
     "charge_energy": "energy",
     "cur_neutral": "energy",

@@ -80,12 +80,6 @@ TEMPERATURE_SELECTS: tuple[XTSelectEntityDescription, ...] = (
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
 SELECTS: dict[str, tuple[XTSelectEntityDescription, ...]] = {
     CROSS_CATEGORY_DEVICE_DESCRIPTOR: (
-        XTSelectEntityDescription(
-            key=XTDPCode.XT_LOCK_UNLOCK_MECHANISM,
-            translation_key="xt_lock_unlock_mechanism",
-            entity_category=EntityCategory.CONFIG,
-            dont_send_to_cloud=True,
-        ),
     ),
     "cz": (
         XTSelectEntityDescription(

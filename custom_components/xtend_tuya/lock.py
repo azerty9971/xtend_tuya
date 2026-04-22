@@ -1,6 +1,5 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
-import json
 from typing import Any, cast
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.components.lock import (
@@ -9,20 +8,13 @@ from homeassistant.components.lock import (
 )
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.const import Platform
-from homeassistant.helpers.dispatcher import async_dispatcher_connect, dispatcher_send
+from homeassistant.helpers.dispatcher import async_dispatcher_connect
 
-from custom_components.xtend_tuya.multi_manager.shared.shared_classes import (
-    XTDeviceStatusRange,
-)
 from .const import (
     TUYA_DISCOVERY_NEW,
     XTDPCode,
     XTLockingMechanism,
-    XTMultiManagerPostSetupCallbackPriority,
     XTMultiManagerProperties,
-)
-from .ha_tuya_integration.tuya_integration_imports import (
-    TuyaDPType,
 )
 from .multi_manager.multi_manager import (
     XTConfigEntry,
@@ -34,6 +26,10 @@ from .entity import (
     XTEntityDescriptorManager,
 )
 
+@dataclass
+class XTLockConfigurableProperties:
+    force_temporary_unlock: bool = False
+    lock_unlock_mecanism: XTLockingMechanism = XTLockingMechanism.AUTO
 
 @dataclass(frozen=True)
 class XTLockEntityDescription(LockEntityDescription):
@@ -175,6 +171,13 @@ class XTLockEntity(XTEntity, LockEntity):  # type: ignore
         self.temporary_unlock = description.temporary_unlock
         self.status_initial_value: dict[str, Any] = {}
         self.status_value_has_changed: dict[str, bool] = {}
+        self.device.set_preference(
+            f"{XTDevice.XTDevicePreference.LOCK_DEVICE_ENTITY}",
+            self,
+        )
+        self.configurable_properties = cast(
+            XTLockConfigurableProperties, self.get_configurable_properties()
+        )
         if self._get_state_value(self.entity_description.unlock_status_list) is None:
             # If we can't find the status of the lock then assume a temporary lock
             self.temporary_unlock = True
@@ -196,9 +199,16 @@ class XTLockEntity(XTEntity, LockEntity):  # type: ignore
                 if dpcode in device.status:
                     self.status_initial_value[dpcode] = device.status[dpcode]
                     self.status_value_has_changed[dpcode] = False
-        device_manager.add_post_setup_callback(
-            XTMultiManagerPostSetupCallbackPriority.PRIORITY1,
-            self.add_lock_mecanism_option,
+
+    def get_configurable_properties_type(self) -> type[Any] | None:
+        return XTLockConfigurableProperties
+
+    def get_configurable_properties_key(self) -> str | None:
+        return "lock_configurable_properties"
+    
+    def refresh_configurable_properties(self):
+        self.configurable_properties = cast(
+            XTLockConfigurableProperties, self.get_configurable_properties()
         )
 
     @staticmethod
@@ -262,7 +272,7 @@ class XTLockEntity(XTEntity, LockEntity):  # type: ignore
     @property
     def is_locked(self) -> bool | None:  # type: ignore
         """Return true if the lock is locked."""
-        if self.temporary_unlock:
+        if self.temporary_unlock or self.configurable_properties.force_temporary_unlock:
             return True
 
         is_unlocked_mixed = self._get_state_value(
@@ -332,9 +342,7 @@ class XTLockEntity(XTEntity, LockEntity):  # type: ignore
         if self.device_manager.send_lock_unlock_command(
             self.device,
             True,
-            self.device.status.get(
-                XTDPCode.XT_LOCK_UNLOCK_MECHANISM, XTLockingMechanism.AUTO
-            ),
+            self.configurable_properties.lock_unlock_mecanism,
         ):
             if not self.temporary_unlock:
                 self._attr_is_locking = True
@@ -344,9 +352,7 @@ class XTLockEntity(XTEntity, LockEntity):  # type: ignore
         if self.device_manager.send_lock_unlock_command(
             self.device,
             False,
-            self.device.status.get(
-                XTDPCode.XT_LOCK_UNLOCK_MECHANISM, XTLockingMechanism.AUTO
-            ),
+            self.configurable_properties.lock_unlock_mecanism,
         ):
             if not self.temporary_unlock:
                 self._attr_is_unlocking = True
@@ -354,29 +360,6 @@ class XTLockEntity(XTEntity, LockEntity):  # type: ignore
     def open(self, **kwargs: Any) -> None:
         """Open the door latch."""
         raise NotImplementedError
-
-    def add_lock_mecanism_option(self) -> None:
-        if XTDPCode.XT_LOCK_UNLOCK_MECHANISM not in self.device.status:
-            self.device.status[XTDPCode.XT_LOCK_UNLOCK_MECHANISM] = (
-                XTLockingMechanism.AUTO
-            )
-            values_dict = {"range": []}
-            for mechanism in XTLockingMechanism:
-                values_dict["range"].append(mechanism.value)
-            self.device.status_range[XTDPCode.XT_LOCK_UNLOCK_MECHANISM] = (
-                XTDeviceStatusRange(
-                    code=XTDPCode.XT_LOCK_UNLOCK_MECHANISM,
-                    type=TuyaDPType.ENUM,
-                    values=json.dumps(values_dict),
-                    dp_id=0,
-                )
-            )
-            dispatcher_send(
-                self.local_hass,
-                TUYA_DISCOVERY_NEW,
-                [self.device.id],
-                XTDPCode.XT_LOCK_UNLOCK_MECHANISM,
-            )
 
     @staticmethod
     def get_entity_instance(

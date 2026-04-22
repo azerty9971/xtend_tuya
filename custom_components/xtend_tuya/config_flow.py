@@ -48,6 +48,7 @@ from .const import (
     TUYA_SMART_APP,
     TUYA_RESPONSE_PLATFORM_URL,
     XTDiscoverySource,
+    XTLockingMechanism,
     LOGGER,
 )
 from .multi_manager.shared.threading import (
@@ -62,6 +63,7 @@ import custom_components.xtend_tuya.util as util
 import custom_components.xtend_tuya.multi_manager.multi_manager as mm
 import custom_components.xtend_tuya.multi_manager.shared.data_entry.shared_data_entry as data_entry
 import custom_components.xtend_tuya.climate as climate
+import custom_components.xtend_tuya.lock as lock
 
 STEP_METHOD_PREFIX = "async_step_"
 
@@ -72,6 +74,8 @@ class XTStepId(StrEnum):
     DEVICE_SETTINGS = "device_settings"
     SELECT_CLIMATE_DEVICE = "select_climate_device"
     CLIMATE_DEVICE_SETTINGS = "climate_device_settings"
+    SELECT_LOCK_DEVICE = "select_lock_device"
+    LOCK_DEVICE_SETTINGS = "lock_device_settings"
 
 
 OPTION_STEP_DEFINITION: dict[XTStepId, tuple[str, list[Any], dict[str, Any], bool]] = {
@@ -89,7 +93,10 @@ OPTION_STEP_DEFINITION: dict[XTStepId, tuple[str, list[Any], dict[str, Any], boo
         [],
         {
             "step_id": XTStepId.DEVICE_SETTINGS,
-            "menu_options": [XTStepId.SELECT_CLIMATE_DEVICE],
+            "menu_options": [
+                XTStepId.SELECT_CLIMATE_DEVICE,
+                XTStepId.SELECT_LOCK_DEVICE,
+            ],
         },
         False,
     ),
@@ -102,6 +109,18 @@ OPTION_STEP_DEFINITION: dict[XTStepId, tuple[str, list[Any], dict[str, Any], boo
                 f"{mm.XTDevice.XTDevicePreference.CLIMATE_DEVICE_ENTITY}": None
             },
             "next_step_id": XTStepId.CLIMATE_DEVICE_SETTINGS,
+        },
+        True,
+    ),
+    XTStepId.SELECT_LOCK_DEVICE: (
+        "async_step_select_device",
+        [],
+        {
+            "user_input": None,
+            "has_preferences": {
+                f"{mm.XTDevice.XTDevicePreference.LOCK_DEVICE_ENTITY}": None
+            },
+            "next_step_id": XTStepId.LOCK_DEVICE_SETTINGS,
         },
         True,
     ),
@@ -525,6 +544,78 @@ class TuyaOptionFlow(OptionsFlow):
                         ),
                     ): vol.All(
                         vol.Coerce(float),
+                    ),
+                }
+            ),
+            description_placeholders={
+                "device_name": device.name or "",
+            },
+        )
+
+    async def async_step_lock_device_settings(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Handle device configuration."""
+        if self.selected_device_id is None:
+            return self.async_abort(reason="device_not_selected")
+
+        if self.multi_manager is None:
+            return self.async_abort(reason="no_multi_manager")
+        # Get the configurable properties for the selected device
+        device: mm.XTDevice | None = self.multi_manager.device_map.get(
+            self.selected_device_id
+        )
+        if device is None:
+            return self.async_abort(reason="device_not_found")
+
+        lock_entity: lock.XTLockEntity | None = device.get_preference(
+            mm.XTDevice.XTDevicePreference.LOCK_DEVICE_ENTITY
+        )
+        if lock_entity is None:
+            return self.async_abort(reason="lock_entity_not_found")
+
+        if user_input is not None:
+            # Update the configurable properties
+            new_config = lock.XTLockConfigurableProperties()
+            new_config.force_temporary_unlock = user_input.get(
+                "force_temporary_unlock", False
+            )
+            new_config.lock_unlock_mecanism = user_input.get("lock_unlock_mecanism", XTLockingMechanism.AUTO)
+            lock_entity.set_configurable_properties(new_config)
+            await self.multi_manager.storage_manager.save_store()
+            self.multi_manager.multi_device_listener.update_device(device=device)
+            return self.async_create_entry(title="", data=self.options)
+
+        configurable_properties: lock.XTLockConfigurableProperties | None = (
+            lock_entity.get_configurable_properties()
+        )
+        if configurable_properties is None:
+            return self.async_abort(reason="no_configurable_properties")
+
+        return self.async_show_form(
+            step_id="lock_device_settings",
+            data_schema=vol.Schema(
+                {
+                    vol.Optional(
+                        "force_temporary_unlock",
+                        default=bool(
+                            configurable_properties.force_temporary_unlock
+                            if configurable_properties.force_temporary_unlock
+                            is not None
+                            else False
+                        ),
+                    ): bool,
+                    vol.Required(
+                        "lock_unlock_mecanism",
+                        default=configurable_properties.lock_unlock_mecanism
+                            if configurable_properties.lock_unlock_mecanism
+                            is not None
+                            else XTLockingMechanism.AUTO,
+                    ): vol.In(
+                        {
+                            lock_mecanism.value: lock_mecanism.get_human_name(lock_mecanism.value)
+                            for lock_mecanism in XTLockingMechanism
+                        }
                     ),
                 }
             ),
