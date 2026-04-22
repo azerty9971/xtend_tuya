@@ -123,13 +123,22 @@
                     "target_temperature_value_multiplicator": "Target temperature multiplier",
                     "target_humidity_value_multiplicator": "Target humidity multiplier"
                 }
+            },
+            "lock_device_settings": {
+                "title": "Configure {device_name}",
+                "description": "Set the properties of the device",
+                "data": {
+                    "force_temporary_unlock": "Lock is only opening temporarely",
+                    "lock_unlock_mecanism": "Force unlock mecanism"
+                }
             }
         },
         "abort": {
+            "climate_entity_not_found": "No climate entity found for the selected device. Please select a device with a climate entity to configure.",
+            "lock_entity_not_found": "No lock entity found for the selected device. Please select a device with a lock entity to configure.",
             "no_devices_found": "No devices found for this configuration category.",
             "device_not_selected": "No device selected. Please select a device to configure.",
             "device_not_found": "Selected device not found. Please select a valid device to configure.",
-            "climate_entity_not_found": "No climate entity found for the selected device. Please select a device with a climate entity to configure.",
             "no_configurable_properties": "The selected device does not have configurable properties.",
             "no_multi_manager": "No Multi Manager stored, please contact the developer."
         }
