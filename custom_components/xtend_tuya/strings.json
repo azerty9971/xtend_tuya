@@ -85,7 +85,8 @@
             "device_settings": {
                 "title": "Configuration category",
                 "menu_options": {
-                    "select_climate_device": "Climate options"
+                    "select_climate_device": "Climate options",
+                    "select_lock_device": "Lock options"
                 }
             },
             "select_device": {
@@ -110,6 +111,13 @@
             "select_climate_device": {
                 "title": "Select Device",
                 "description": "Select a climate device to configure.",
+                "data": {
+                    "device": "Device"
+                }
+            },
+            "select_lock_device": {
+                "title": "Select Device",
+                "description": "Select a lock device to configure.",
                 "data": {
                     "device": "Device"
                 }

@@ -85,7 +85,8 @@
             "device_settings": {
                 "title": "Configuration category",
                 "menu_options": {
-                    "select_climate_device": "Climate options"
+                    "select_climate_device": "Climate options",
+                    "select_lock_device": "Lock options"
                 }
             },
             "select_device": {
