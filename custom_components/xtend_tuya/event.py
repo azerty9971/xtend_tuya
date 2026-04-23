@@ -117,6 +117,7 @@ class XTStringEventWrapper(DPCodeStringWrapper[tuple[str, dict[str, Any]]]):
         """Return the event with message attribute."""
         if (status := self._read_dpcode_value(device)) is None:
             return None
+        LOGGER.warning(f"{self.dpcode}: {status}")
         return (f"{self.dpcode}", {"value": status, "changed_time": datetime.now()})
 
 def xt_get_default_definition(
