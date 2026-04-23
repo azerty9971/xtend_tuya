@@ -237,6 +237,15 @@ class XTEntityDescriptorManager:
                     cross_both = add_cross
                 for key in base_descriptors:
                     merged_descriptors = base_descriptors[key]
+                    if cross_both is not None:
+                        merged_descriptors = (
+                            XTEntityDescriptorManager.merge_descriptors(
+                                merged_descriptors,
+                                cross_both,
+                                key_fields,
+                                entity_type,
+                            )
+                        )
                     if key in descriptors_to_add:
                         merged_descriptors = (
                             XTEntityDescriptorManager.merge_descriptors(
@@ -244,12 +253,6 @@ class XTEntityDescriptorManager:
                                 descriptors_to_add[key],
                                 key_fields,
                                 entity_type,
-                            )
-                        )
-                    if cross_both is not None:
-                        merged_descriptors = (
-                            XTEntityDescriptorManager.merge_descriptors(
-                                merged_descriptors, cross_both, key_fields, entity_type
                             )
                         )
                     return_dict[key] = merged_descriptors
@@ -459,14 +462,18 @@ class XTEntity(TuyaEntity):
             LOGGER.warning(f"Error calling super constructor: {e}", stack_info=True)
             pass
 
-    def get_type_information(self, wrapper: TuyaDeviceWrapper) -> TuyaTypeInformation | None:
+    def get_type_information(
+        self, wrapper: TuyaDeviceWrapper
+    ) -> TuyaTypeInformation | None:
         if hasattr(wrapper, "type_information"):
             type_information = getattr(wrapper, "type_information")
             if type_information is not None:
                 return type_information
         return None
 
-    def get_dptype_from_dpcode_wrapper(self, wrapper: TuyaDeviceWrapper) -> TuyaDPType | None:
+    def get_dptype_from_dpcode_wrapper(
+        self, wrapper: TuyaDeviceWrapper
+    ) -> TuyaDPType | None:
         # Probably not working. Just kept for backward compatibility
         if type_information := self.get_type_information(wrapper=wrapper):
             if hasattr(type_information, "_DPTYPE"):
@@ -772,10 +779,10 @@ class XTEntity(TuyaEntity):
 
     def get_configurable_properties_type(self) -> type[Any] | None:
         return None
-    
+
     def get_configurable_properties_key(self) -> str | None:
         return None
-    
+
     def get_configurable_properties_dpcode(self) -> str:
         return self.description.key if self.description is not None else ""
 
@@ -798,18 +805,20 @@ class XTEntity(TuyaEntity):
         property_key = self.get_configurable_properties_key()
         if property_type is None or property_key is None:
             return None
-        
+
         if isinstance(configurable_properties, property_type):
             self.device_manager.set_device_stored_property(
                 device_id=self.device.id,
                 dpcode=self.get_configurable_properties_dpcode(),
                 prop_name=property_key,
-                prop_value=configurable_properties.__dict__
+                prop_value=configurable_properties.__dict__,
             )
             self.refresh_configurable_properties()
         else:
-            LOGGER.warning(f"set_configurable_properties tried to save incompatible type: {type(configurable_properties)}")
-    
+            LOGGER.warning(
+                f"set_configurable_properties tried to save incompatible type: {type(configurable_properties)}"
+            )
+
     def refresh_configurable_properties(self):
         return None
 
