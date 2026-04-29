@@ -41,7 +41,7 @@ from homeassistant.components.tuya.event import (
     TuyaEventEntityDescription as TuyaEventEntityDescription,
 )
 from homeassistant.components.tuya.fan import (
-    TUYA_SUPPORT_TYPE as FANS_TUYA,  # noqa: F401
+    FANS as FANS_TUYA,  # noqa: F401
     TuyaFanEntity as TuyaFanEntity,
 )
 from homeassistant.components.tuya.humidifier import (
@@ -91,6 +91,7 @@ from homeassistant.components.tuya.vacuum import (
     TuyaVacuumEntity as TuyaVacuumEntity,
 )
 import homeassistant.components.tuya as tuya_integration  # noqa: F401
+import homeassistant.components.tuya.coordinator as tuya_coordinator  # noqa: F401
 
 # from homeassistant.components.tuya import (
 #    ManagerCompat as TuyaManager,
