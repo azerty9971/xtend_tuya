@@ -10,6 +10,9 @@ from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.components.fan import (
+    FanEntityDescription,
+)
 from .multi_manager.multi_manager import (
     XTConfigEntry,
     MultiManager,
@@ -24,8 +27,8 @@ from .entity import (
     XTEntityDescriptorManager,
 )
 
-XT_SUPPORT_TYPE = {
-    XTDeviceCategory.XFJ,
+FANS: dict[str, FanEntityDescription] = {
+    XTDeviceCategory.XFJ: FanEntityDescription(key=""),
 }
 
 
@@ -40,9 +43,9 @@ async def async_setup_entry(
         return
 
     supported_descriptors, externally_managed_descriptors = cast(
-        tuple[set[str], set[str]],
+        tuple[dict[str, FanEntityDescription], dict[str, FanEntityDescription]],
         XTEntityDescriptorManager.get_platform_descriptors(
-            XT_SUPPORT_TYPE, entry.runtime_data.multi_manager, None, this_platform
+            FANS, entry.runtime_data.multi_manager, None, this_platform
         ),
     )
 
@@ -59,13 +62,14 @@ async def async_setup_entry(
             if device := hass_data.manager.device_map.get(device_id):
                 if (
                     device
-                    and device.category in supported_descriptors
+                    and (description := supported_descriptors.get(device.category))
                     and (definition := get_default_definition(device=device))
                 ):
                     entities.append(
                         XTFanEntity(
                             device=device,
                             device_manager=hass_data.manager,
+                            description=description,
                             definition=definition,
                         )
                     )
@@ -85,17 +89,20 @@ class XTFanEntity(XTEntity, TuyaFanEntity):
         self,
         device: XTDevice,
         device_manager: MultiManager,
+        description: FanEntityDescription,
         definition: TuyaFanDefinition,
     ) -> None:
         """Init XT Fan Device."""
         super(XTFanEntity, self).__init__(
             device=device,
             device_manager=device_manager,  # type: ignore
+            description=description,
             definition=definition,
         )
         super(XTEntity, self).__init__(
             device=device,
             device_manager=device_manager,  # type: ignore
+            description=description,
             definition=definition,
         )
         self.device = device
