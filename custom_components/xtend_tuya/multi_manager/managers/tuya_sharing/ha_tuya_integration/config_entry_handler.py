@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import Any
 from homeassistant.core import HomeAssistant
 from .....ha_tuya_integration.tuya_integration_imports import (
-    tuya_integration,
+    tuya_coordinator,
     TuyaCustomerDevice,
 )
 from ....multi_manager import (
@@ -44,7 +44,7 @@ class XTHATuyaIntegrationConfigEntryManager:
         before_call: bool,
         base_object: Any,
         hass: HomeAssistant,
-        entry: tuya_integration.TuyaConfigEntry,
+        entry: tuya_coordinator.TuyaConfigEntry,
     ):
         if not before_call and self.config_entry.title == entry.title:
             hass.config_entries.async_schedule_reload(self.config_entry.entry_id)
@@ -54,7 +54,7 @@ class XTHATuyaIntegrationConfigEntryManager:
         before_call: bool,
         base_object: Any,
         hass: HomeAssistant,
-        entry: tuya_integration.TuyaConfigEntry,
+        entry: tuya_coordinator.TuyaConfigEntry,
     ):
         if before_call:
             # If before the call, we need to add the regular device listener back
@@ -74,7 +74,7 @@ class XTHATuyaIntegrationConfigEntryManager:
         before_call: bool,
         base_object: Any,
         hass: HomeAssistant,
-        entry: tuya_integration.TuyaConfigEntry,
+        entry: tuya_coordinator.TuyaConfigEntry,
     ):
         if not before_call and self.config_entry.title == entry.title:
             self.manager.set_overriden_device_manager(None)

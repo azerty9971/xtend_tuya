@@ -262,8 +262,8 @@ class XTEntityDescriptorManager:
                         if cross_both is not None:
                             merged_descriptors = (
                                 XTEntityDescriptorManager.merge_descriptors(
-                                    merged_descriptors,
                                     cross_both,
+                                    merged_descriptors,
                                     key_fields,
                                     entity_type,
                                 )

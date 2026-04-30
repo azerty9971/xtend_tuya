@@ -11,6 +11,9 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.components.event import (
     EventDeviceClass,
 )
+from homeassistant.components.event.const import (
+    DoorbellEventType,
+)
 from tuya_device_handlers.definition.event import (
     TuyaEventDefinition,
     get_default_definition,
@@ -106,6 +109,11 @@ class XTBooleanEventWrapper(DPCodeBooleanWrapper[tuple[str, dict[str, Any]]]):
             return None
         return (f"{self.dpcode}", {"value": status, "changed_time": datetime.now()})
 
+class XTDoorbellBooleanEventWrapper(XTBooleanEventWrapper):
+    def __init__(self, dpcode: str, type_information: Any) -> None:
+        super().__init__(dpcode, type_information)
+        self.options = [f"{self.dpcode}", DoorbellEventType.RING]
+
 class XTStringEventWrapper(DPCodeStringWrapper[tuple[str, dict[str, Any]]]):
     def __init__(self, dpcode: str, type_information: Any) -> None:
         super().__init__(dpcode, type_information)
@@ -117,7 +125,13 @@ class XTStringEventWrapper(DPCodeStringWrapper[tuple[str, dict[str, Any]]]):
         """Return the event with message attribute."""
         if (status := self._read_dpcode_value(device)) is None:
             return None
+        LOGGER.warning(f"{self.dpcode}: {status}")
         return (f"{self.dpcode}", {"value": status, "changed_time": datetime.now()})
+
+class XTDoorbellStringEventWrapper(XTStringEventWrapper):
+    def __init__(self, dpcode: str, type_information: Any) -> None:
+        super().__init__(dpcode, type_information)
+        self.options = [f"{self.dpcode}", DoorbellEventType.RING]
 
 def xt_get_default_definition(
     device: XTDevice,
@@ -177,13 +191,13 @@ EVENTS: dict[str, tuple[XTEventEntityDescription, ...]] = {
             key=XTDPCode.ALARM_MESSAGE,
             device_class=EventDeviceClass.DOORBELL,
             translation_key="doorbell_message",
-            wrapper_class=XTStringEventWrapper,
+            wrapper_class=XTDoorbellStringEventWrapper,
         ),
         XTEventEntityDescription(
             key=XTDPCode.DOORBELL_PIC,
             device_class=EventDeviceClass.DOORBELL,
             translation_key="doorbell_picture",
-            wrapper_class=XTStringEventWrapper,
+            wrapper_class=XTDoorbellStringEventWrapper,
         ),
         XTEventEntityDescription(
             key=XTDPCode.CARD_UNLOCK_USER,
@@ -195,8 +209,8 @@ EVENTS: dict[str, tuple[XTEventEntityDescription, ...]] = {
         XTEventEntityDescription(
             key=XTDPCode.DOORBELL,
             translation_key="doorbell",
-            device_class=None,
-            wrapper_class=XTBooleanEventWrapper,
+            device_class=EventDeviceClass.DOORBELL,
+            wrapper_class=XTDoorbellBooleanEventWrapper,
         ),
         XTEventEntityDescription(
             key=XTDPCode.FACE_UNLOCK_USER,
