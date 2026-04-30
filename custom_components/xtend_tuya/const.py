@@ -4,6 +4,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from enum import StrEnum, IntFlag, IntEnum, Flag, auto
 from typing import Any
+from types import NoneType
 import logging
 from homeassistant.const import (
     Platform,
@@ -14,6 +15,9 @@ from .ha_tuya_integration.tuya_integration_imports import (
     TuyaFAHRENHEIT_ALIASES,
     TuyaDeviceCategory as XTDeviceCategory,  # noqa: F401
 )
+
+type XTJsonSerializable = float | int | str | bool | NoneType
+type XTAcceptableStoragePropertyValue = dict[str, XTJsonSerializable] | list[XTJsonSerializable] | XTJsonSerializable
 
 XT_CELSIUS_ALIASES = TuyaCELSIUS_ALIASES.union(set())
 XT_FAHRENHEIT_ALIASES = TuyaFAHRENHEIT_ALIASES.union(set())
@@ -177,6 +181,20 @@ class XTLockingMechanism(StrEnum):
     DOOR_OPERATE = "door_operate"
     DPCODE_COMMAND = "dpcode_command"
 
+    def get_human_name(self, value: str) -> str:
+        match value:
+            case XTLockingMechanism.AUTO:
+                return "Auto"
+            case XTLockingMechanism.DOOR_OPEN:
+                return "door_open API"
+            case XTLockingMechanism.DOOR_OPERATE:
+                return "door_operate API"
+            case XTLockingMechanism.DPCODE_COMMAND:
+                return "DPCode command"
+            case _:
+                return "Unknown"
+
+
 
 class XTMultiManagerPostSetupCallbackPriority(IntEnum):
     PRIORITY1 = 1
@@ -318,6 +336,7 @@ class XTDPCode(StrEnum):
     ALARM_DELAY_TIME = "alarm_delay_time"
     ALARM_MESSAGE = "alarm_message"
     ALARM_MSG = "alarm_msg"
+    ALARM_STATE = "alarm_state"
     ALARM_SWITCH = "alarm_switch"  # Alarm switch
     ALARM_TIME = "alarm_time"  # Alarm time
     ALARM_VOLUME = "alarm_volume"  # Alarm volume
@@ -327,6 +346,7 @@ class XTDPCode(StrEnum):
     ARM_DOWN_PERCENT = "arm_down_percent"
     ARM_UP_PERCENT = "arm_up_percent"
     ATMOSPHERIC_PRESSTURE = "atmospheric_pressture"  # Typo is in Tuya API
+    AUTO_CLEAN = "auto_clean"
     BACKUP_RESERVE = "backup_reserve"
     BASIC_ANTI_FLICKER = "basic_anti_flicker"
     BASIC_DEVICE_VOLUME = "basic_device_volume"
@@ -414,19 +434,23 @@ class XTDPCode(StrEnum):
     DECIBEL_SWITCH = "decibel_switch"
     DEHUMIDITY_SET_ENUM = "dehumidify_set_enum"
     DEHUMIDITY_SET_VALUE = "dehumidify_set_value"
+    DELAY_CLEAN_TIME = "delay_clean_time"
     DELAY_SET = "delay_set"
     DEW_POINT_TEMP = "dew_point_temp"
     DISINFECTION = "disinfection"
     DO_NOT_DISTURB = "do_not_disturb"
+    DOORBELL_PIC = "doorbell_pic"
     DOORCONTACT_STATE = "doorcontact_state"  # Status of door window sensor
     DOORCONTACT_STATE_2 = "doorcontact_state_2"
     DOORCONTACT_STATE_3 = "doorcontact_state_3"
     DUSTER_CLOTH = "duster_cloth"
+    EC_CURRENT = "ec_current"
     ECO2 = "eco2"
     EDGE_BRUSH = "edge_brush"
     ELECTRICITY_LEFT = "electricity_left"
     EXCRETION_TIME_DAY = "excretion_time_day"
     EXCRETION_TIMES_DAY = "excretion_times_day"
+    FACTORY_RESET = "factory_reset"
     FAN_BEEP = "fan_beep"  # Sound
     FAN_COOL = "fan_cool"  # Cool wind
     FAN_DIRECTION = "fan_direction"  # Fan direction
@@ -483,6 +507,7 @@ class XTDPCode(StrEnum):
     LIQUID_STATE = "liquid_state"
     LOCK = "lock"  # Lock / Child lock
     MACH_OPERATE = "mach_operate"
+    MANUAL_CLEAN = "manual_clean"
     MANUAL_FEED = "manual_feed"
     MASTER_MODE = "master_mode"  # alarm mode
     MASTER_STATE = "master_state"  # alarm state
@@ -499,6 +524,7 @@ class XTDPCode(StrEnum):
     MUFFLING = "muffling"  # Muffling
     NEAR_DETECTION = "near_detection"
     OPPOSITE = "opposite"
+    ORP_CURRENT = "orp_current"
     OUTPUT_POWER_LIMIT = "output_power_limit"
     OXYGEN = "oxygen"  # Oxygen bar
     PAUSE = "pause"
@@ -511,6 +537,7 @@ class XTDPCode(StrEnum):
     PHASE_A = "phase_a"
     PHASE_B = "phase_b"
     PHASE_C = "phase_c"
+    PH_CURRENT = "ph_current"
     PIR = "pir"  # Motion sensor
     PM1 = "pm1"
     PM10 = "pm10"
@@ -712,7 +739,6 @@ class XTDPCode(StrEnum):
     ADD_ELE2_THIS_YEAR = "add_ele2_this_year"
     ADD_ELE2_TODAY = "add_ele2_today"
     ALARM_LOCK = "alarm_lock"
-    AUTO_CLEAN = "auto_clean"
     AUTO_DEORDRIZER = "auto_deordrizer"
     AUTO_LOCK_TIME = "auto_lock_time"
     AUTO_PUMP = "auto_pump"
@@ -787,7 +813,6 @@ class XTDPCode(StrEnum):
     C_CURRENT = "C_Current"
     C_VOLTAGE = "C_Voltage"
     DEEP_CLEAN = "deep_clean"
-    DELAY_CLEAN_TIME = "delay_clean_time"
     DELAY_TASK = "delay_task"
     DEODORIZATION = "deodorization"
     DEODORIZATION_NUM = "deodorization_num"
@@ -806,6 +831,7 @@ class XTDPCode(StrEnum):
     DEVICE_MODE = "device_mode"
     DIRECTION_A = "direction_a"
     DIRECTION_B = "direction_b"
+    DOORBELL = "doorbell"
     DOORBELL_VOLUME = "doorbell_volume"
     ECO = "eco"
     ELECTRIC = "electric"
@@ -818,7 +844,6 @@ class XTDPCode(StrEnum):
     ENERGYCONSUMEDA = "EnergyConsumedA"
     ENERGYCONSUMEDB = "EnergyConsumedB"
     ENERGYCONSUMEDC = "EnergyConsumedC"
-    FACTORY_RESET = "factory_reset"
     FAULT2 = "Fault"
     FLOW_VELOCITY = "flow_velocity"
     FORWARD_ENERGY_TOTAL_TODAY = "forward_energy_total_today"
@@ -853,7 +878,6 @@ class XTDPCode(StrEnum):
     LOCK_RECORD = "lock_record"
     MAGNETNUM = "magnetNum"
     MALFUNCTION = "malfunction"
-    MANUAL_CLEAN = "manual_clean"
     MANUAL_LOCK = "manual_lock"
     MAXHUM_SET = "maxhum_set"
     MAXTEMP_SET = "maxtemp_set"
@@ -1021,6 +1045,7 @@ class XTDPCode(StrEnum):
     UNLOCK_METHOD_MODIFY = "unlock_method_modify"
     UNLOCK_PASSWORD = "unlock_password"
     UNLOCK_PHONE_REMOTE = "unlock_phone_remote"
+    UNLOCK_TEMPORARY = "unlock_temporary"
     UNLOCK_VOICE_REMOTE = "unlock_voice_remote"
     CARD_UNLOCK_USER = "card_unlock_user"
     FACE_UNLOCK_USER = "face_unlock_user"
@@ -1075,7 +1100,6 @@ class XTDPCode(StrEnum):
     XT_FORWARD_ENERGY_TOTAL_THIS_YEAR = "xt_forward_energy_total_this_year"
     XT_FORWARD_ENERGY_TOTAL_TODAY = "xt_forward_energy_total_today"
     XT_IMPORT_ELECTRICAL_HISTORY = "xt_import_electrical_history"
-    XT_LOCK_UNLOCK_MECHANISM = "xt_lock_unlock_mechanism"
     XT_RESET_ADD_ELE = "xt_reset_add_ele"
     XT_TOTAL_FORWARD_ENERGY = "xt_total_forward_energy"
     XT_TOTAL_FORWARD_ENERGY_THIS_MONTH = "xt_total_forward_energy_this_month"
@@ -1096,8 +1120,10 @@ UOM_MAPPING_DICT: dict[str, str | None] = {
     "kW·h": "kWh",
     "kW.h": "kWh",
     "kVar": "kvar",
+    "KM": "km",
     "v": "V",
     "％": "%",
+    "μg/m3": "μg/m³",
     "℃": "°C",
     "C": "°C",
     "℉": "°F",
@@ -1106,6 +1132,7 @@ UOM_MAPPING_DICT: dict[str, str | None] = {
     "小时": "h",
     "Hour": "h",
     "秒": "s",
+    "S": "s",
     "day": "d",
     "": None,
     "ADC": None,
@@ -1113,11 +1140,19 @@ UOM_MAPPING_DICT: dict[str, str | None] = {
     "电机电流>1k，瞬间<1k，除臭2K>60": None,
     "线程号": None,
     "次": None,
+    "times": None,
 }
 
 DPCODE_PREFERED_DEVICE_CLASS: dict[str, str | None] = {
+    "battery": "battery",
     "battery_percentage": "battery",
+    "maxco2_set": "carbon_dioxide",
+    "motionless_far_detection": "distance",
+    "breathe_detection": "distance",
+    "micro_min_detection": "distance",
+    "bre_min_detection": "distance",
     "active_energy_total": "energy",
+    "add_ele": "energy",
     "add_ele1": "energy",
     "charge_energy": "energy",
     "cur_neutral": "energy",
@@ -1140,6 +1175,7 @@ DPCODE_PREFERED_DEVICE_CLASS: dict[str, str | None] = {
     "ALARM_LOW_TEMP": "temperature",
     "AUTO_HIGH_TEMP": "temperature",
     "AUTO_LOW_TEMP": "temperature",
+    "c_temperature": "temperature",
     "current_temp": "temperature",
     "frost_protect_temp": "temperature",
     "holiday_temp_set": "temperature",
@@ -1148,6 +1184,7 @@ DPCODE_PREFERED_DEVICE_CLASS: dict[str, str | None] = {
     "maxtemp_set": "temperature",
     "minitemp_set": "temperature",
     "set_temp": "temperature",
+    "temperature_c": "temperature",
     "temp_current": "temperature",
     "temp_current_f": "temperature",
     "temp_now_huas": "temperature",
@@ -1163,6 +1200,8 @@ DPCODE_PREFERED_DEVICE_CLASS: dict[str, str | None] = {
     "qidongwencha": "temperature_delta",
     "temp_calibration": "temperature_delta",
     "water_total_h": "water",
+    "alarm_bright": None,
+    "fan_speed": None,
     "heating_ratio": None,
     "percent_control": None,
     "percent_state": None,

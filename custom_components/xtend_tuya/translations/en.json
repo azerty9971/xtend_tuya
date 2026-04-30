@@ -85,7 +85,8 @@
             "device_settings": {
                 "title": "Configuration category",
                 "menu_options": {
-                    "select_climate_device": "Climate options"
+                    "select_climate_device": "Climate options",
+                    "select_lock_device": "Lock options"
                 }
             },
             "select_device": {
@@ -114,20 +115,40 @@
                     "device": "Device"
                 }
             },
+            "select_lock_device": {
+                "title": "Select Device",
+                "description": "Select a lock device to configure.",
+                "data": {
+                    "device": "Device"
+                }
+            },
             "climate_device_settings": {
                 "title": "Configure {device_name}",
-                "description": "Set the temperature step for this device. The raw Tuya value is 10x the step (e.g. raw value 5 = step 0.5, raw value 1 = step 0.1).",
+                "description": "Set the properties of the device",
                 "data": {
-                    "target_temperature_step": "Target temperature step"
+                    "current_temperature_value_multiplicator": "Current temperature multiplier",
+                    "current_humidity_value_multiplicator": "Current humidity multiplier",
+                    "target_temperature_value_multiplicator": "Target temperature multiplier",
+                    "target_humidity_value_multiplicator": "Target humidity multiplier"
+                }
+            },
+            "lock_device_settings": {
+                "title": "Configure {device_name}",
+                "description": "Set the properties of the device",
+                "data": {
+                    "force_temporary_unlock": "Lock is only opening temporarely",
+                    "lock_unlock_mecanism": "Force unlock mecanism"
                 }
             }
         },
         "abort": {
+            "climate_entity_not_found": "No climate entity found for the selected device. Please select a device with a climate entity to configure.",
+            "lock_entity_not_found": "No lock entity found for the selected device. Please select a device with a lock entity to configure.",
             "no_devices_found": "No devices found for this configuration category.",
             "device_not_selected": "No device selected. Please select a device to configure.",
             "device_not_found": "Selected device not found. Please select a valid device to configure.",
-            "climate_entity_not_found": "No climate entity found for the selected device. Please select a device with a climate entity to configure.",
-            "no_configurable_properties": "The selected device does not have configurable properties."
+            "no_configurable_properties": "The selected device does not have configurable properties.",
+            "no_multi_manager": "No Multi Manager stored, please contact the developer."
         }
     },
     "services": {
@@ -472,7 +493,7 @@
         },
         "event": {
             "alarm_lock": {
-                "name": "Movement detected",
+                "name": "Lock alarm",
                 "state_attributes": {
                     "event_type": {
                         "state": {

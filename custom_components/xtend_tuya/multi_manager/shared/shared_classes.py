@@ -243,6 +243,7 @@ class XTDevice(TuyaDevice):
     class XTDevicePreference(StrEnum):
         IS_A_COVER_DEVICE = "IS_A_COVER_DEVICE"
         CLIMATE_DEVICE_ENTITY = "CLIMATE_DEVICE_ENTITY"
+        LOCK_DEVICE_ENTITY = "LOCK_DEVICE_ENTITY"
         LOCK_MANUAL_UNLOCK_COMMAND = "LOCK_MANUAL_UNLOCK_COMMAND"
         LOCK_GET_SUPPORTED_UNLOCK_TYPES = "LOCK_GET_SUPPORTED_UNLOCK_TYPES"
         LOCK_GET_DOOR_LOCK_PASSWORD_TICKET = "LOCK_GET_DOOR_LOCK_PASSWORD_TICKET"
@@ -362,7 +363,7 @@ class XTDevice(TuyaDevice):
         source: str = "Compatible device",
         device_source_priority: int | None = None,
         keep_synced_with_original: bool = False,
-    ):
+    ) -> XTDevice:
         # If the device is already an XT device return it right away
         if isinstance(device, XTDevice):
             return device
