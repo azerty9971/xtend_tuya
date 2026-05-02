@@ -18,6 +18,7 @@ from homeassistant.components.tuya.button import (
     BUTTONS as BUTTONS_TUYA,  # noqa: F401
     TuyaButtonEntity as TuyaButtonEntity,
 )
+import homeassistant.components.tuya.coordinator as tuya_coordinator
 from homeassistant.components.tuya.camera import (
     CAMERAS as CAMERAS_TUYA,  # noqa: F401
     TuyaCameraEntity as TuyaCameraEntity,
