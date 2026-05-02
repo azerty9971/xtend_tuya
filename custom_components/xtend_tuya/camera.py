@@ -217,6 +217,7 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
             XTDPCode.MOVEMENT_DETECT_PIC,
             XTDPCode.VIDEO_REQUEST_REALTIME,
         ]
+        multi_manager.device_watcher.report_message(device.id, f"Statuses of device {device.name}: {device.status=}", XTDeviceWatcherCategory.PLATFORM_CAMERA, device)
         for test_status in camera_status:
             if test_status in device.status:
                 return True
