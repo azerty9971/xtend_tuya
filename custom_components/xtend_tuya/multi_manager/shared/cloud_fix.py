@@ -70,8 +70,8 @@ class CloudFixes:
             if dpcode_info := device.get_dpcode_information(dpcode=dpcode):
                 match dpcode_info.dptype:
                     case TuyaDPType.RAW:
-                        if dpcode_info.value_convert == "default":
-                            continue
+                        # if dpcode_info.value_convert == "default":
+                        #     continue
                         converted_value = device.apply_dpcode_strategy(
                             dpcode=dpcode,
                             value=device.status[dpcode],
