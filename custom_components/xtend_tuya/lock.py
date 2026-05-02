@@ -68,6 +68,7 @@ LOCK_LOCKED_UNLOCKED_STATUS_DPCODES: list[XTDPCode] = [
     XTDPCode.OPEN_CLOSE,
     # This one is a string value, keep it at the end of the enum
     XTDPCode.CLOSED_OPENED,
+    XTDPCode.CLOSED_OPENED_KIT,
 ]
 
 # Statuses that can be sent to lock/unlock the lock
@@ -283,9 +284,9 @@ class XTLockEntity(XTEntity, LockEntity):  # type: ignore
             is_unlocked = is_unlocked_mixed
         elif isinstance(is_unlocked_mixed, str):
             is_unlocked_mixed_lower = is_unlocked_mixed.lower()
-            if is_unlocked_mixed_lower in ["open", "opened"]:
+            if is_unlocked_mixed_lower in ["open", "opened", "AQAB"]:
                 is_unlocked = True
-            if is_unlocked_mixed_lower in ["close", "closed"]:
+            if is_unlocked_mixed_lower in ["close", "closed", "AQAC"]:
                 is_unlocked = False
         if is_unlocked is not None:
             if not is_unlocked:
