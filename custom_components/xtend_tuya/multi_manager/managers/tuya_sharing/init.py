@@ -5,13 +5,13 @@ from datetime import datetime
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady
-from ....lib.tuya_sharing.home import (
+from tuya_sharing.home import (
     HomeRepository,
 )
-from ....lib.tuya_sharing.scenes import (
+from tuya_sharing.scenes import (
     SceneRepository,
 )
-from ....lib.tuya_sharing.user import (
+from tuya_sharing.user import (
     UserRepository,
 )
 from .xt_tuya_sharing_manager import (

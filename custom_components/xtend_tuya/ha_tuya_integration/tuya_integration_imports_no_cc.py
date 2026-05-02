@@ -1,3 +1,4 @@
+from ..lib.tuya_sharing import strategy_repo  # noqa: F401
 from homeassistant.components.alarm_control_panel import (
     AlarmControlPanelEntityDescription as TuyaAlarmControlPanelEntityDescription,  # noqa: F401
 )
@@ -18,6 +19,7 @@ from homeassistant.components.tuya.button import (
     BUTTONS as BUTTONS_TUYA,  # noqa: F401
     TuyaButtonEntity as TuyaButtonEntity,
 )
+import homeassistant.components.tuya.coordinator as tuya_coordinator
 from homeassistant.components.tuya.camera import (
     CAMERAS as CAMERAS_TUYA,  # noqa: F401
     TuyaCameraEntity as TuyaCameraEntity,
@@ -96,7 +98,7 @@ import homeassistant.components.tuya.coordinator as tuya_coordinator  # noqa: F4
 # from homeassistant.components.tuya import (
 #    ManagerCompat as TuyaManager,
 # )
-from ..lib.tuya_sharing.manager import (
+from tuya_sharing.manager import (
     Manager as TuyaManager,  # noqa: F401
     CustomerDevice as TuyaCustomerDevice,  # noqa: F401
 )
@@ -152,7 +154,7 @@ from tuya_device_handlers.device_wrapper.binary_sensor import (
     DPCodeBitmapBitWrapper as TuyaDPCodeBitmapBitWrapper,  # noqa: F401
 )
 
-from ..lib.tuya_sharing.scenes import (
+from tuya_sharing.scenes import (
     SharingScene as TuyaScene,  # noqa: F401
 )
 from homeassistant.components.tuya.scene import (

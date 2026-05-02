@@ -333,6 +333,8 @@ class XTEntityDescriptorManager:
                         entity_type,
                     )
                 )
+            case XTEntityDescriptorManager.XTEntityDescriptorType.ENTITY:
+                return base_descriptors
 
     @staticmethod
     def merge_descriptor(
@@ -455,7 +457,12 @@ class XTEntity(TuyaEntity):
         self.device_manager = device_manager
         self.description = kwargs.get("description", None)
         try:
-            super(XTEntity, self).__init__(device, device_manager, *args, **kwargs)
+            super(XTEntity, self).__init__(
+                device,
+                device_manager,
+                *args,
+                **kwargs,
+            )
         except Exception as e:
             # In case we have an error, do nothing
             LOGGER.exception(e)

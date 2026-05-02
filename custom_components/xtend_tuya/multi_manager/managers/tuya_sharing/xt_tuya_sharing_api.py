@@ -6,8 +6,8 @@ import time
 
 # from datetime import datetime
 import json
-from ....lib.tuya_sharing import SharingTokenListener
-from ....lib.tuya_sharing.customerapi import (
+from tuya_sharing import SharingTokenListener
+from tuya_sharing.customerapi import (
     CustomerApi,
     CustomerTokenInfo,
     _secret_generating,

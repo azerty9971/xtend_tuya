@@ -44,7 +44,6 @@ import socket
 # save the original DNS lookup function
 _original_getaddrinfo = socket.getaddrinfo
 
-
 def _getaddrinfo_ipv4_only(host, port, family=0, type=0, proto=0, flags=0):
     """
     IPv6 sniper: If the request is going to a tuya server,
@@ -112,7 +111,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
 
     # Get all devices from Tuya
     last_time = datetime.now()
-    await multi_manager.update_device_cache()
+    await multi_manager.mm_update_device_cache()
     multi_manager.device_watcher.report_message(
         XTDeviceWatcherSpecialDevice.NOT_LINKED_TO_A_DEVICE,
         f"Xtended Tuya {entry.title} {datetime.now() - last_time} for update_device_cache",

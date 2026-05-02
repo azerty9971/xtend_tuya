@@ -102,7 +102,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         self.home_manager = home_manager
 
     def forward_message_to_multi_manager(self, msg: dict):
-        self.multi_manager.on_message(MESSAGE_SOURCE_TUYA_IOT, msg)
+        self.multi_manager.on_message(msg, MESSAGE_SOURCE_TUYA_IOT)
 
     def refresh_mq(self):
         self.mq.stop()
@@ -310,7 +310,6 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                 data_value["event_time"] = event_time
             if data_value and event_time is not None:
                 self.multi_manager.on_message(
-                    source=MESSAGE_SOURCE_TUYA_IOT,
                     msg={
                         "protocol": PROTOCOL_DEVICE_REPORT,
                         "data": {
@@ -325,6 +324,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                         },
                         "t": event_time,
                     },
+                    source=MESSAGE_SOURCE_TUYA_IOT,
                 )
         else:
             super()._on_device_other(device_id, biz_code, data)
@@ -633,7 +633,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                 else:
                     # Otherwise, we want to send the lock/unlock command as a boolean
                     commands.append({"code": dpcode, "value": not lock})
-            return self.multi_manager.send_commands(
+            return self.multi_manager.xt_send_commands(
                 device_id=device.id, commands=commands
             )
         return False
