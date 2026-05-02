@@ -44,9 +44,6 @@ import socket
 # save the original DNS lookup function
 _original_getaddrinfo = socket.getaddrinfo
 
-import os
-LOGGER.warning(f"Current path is {__file__}")
-
 def _getaddrinfo_ipv4_only(host, port, family=0, type=0, proto=0, flags=0):
     """
     IPv6 sniper: If the request is going to a tuya server,

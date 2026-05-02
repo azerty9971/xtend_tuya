@@ -3,3 +3,4 @@
 *.logs
 __pycache__
 .ruff_cache
+.vscode/launch.json
