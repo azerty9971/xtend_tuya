@@ -90,6 +90,8 @@ async def async_setup_entry(
         ),
     )
 
+    LOGGER.warning(f"All camera supported descriptors: {supported_descriptors}")
+
     @callback
     async def add_camera_devices(device_map) -> None:
         if hass_data.manager is None:
