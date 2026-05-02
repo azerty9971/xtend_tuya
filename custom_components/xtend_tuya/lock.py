@@ -284,9 +284,9 @@ class XTLockEntity(XTEntity, LockEntity):  # type: ignore
             is_unlocked = is_unlocked_mixed
         elif isinstance(is_unlocked_mixed, str):
             is_unlocked_mixed_lower = is_unlocked_mixed.lower()
-            if is_unlocked_mixed_lower in ["open", "opened", "AQAB"]:
+            if is_unlocked_mixed_lower in ["open", "opened", "aqab"]:
                 is_unlocked = True
-            if is_unlocked_mixed_lower in ["close", "closed", "AQAC"]:
+            if is_unlocked_mixed_lower in ["close", "closed", "aqac"]:
                 is_unlocked = False
         if is_unlocked is not None:
             if not is_unlocked:
