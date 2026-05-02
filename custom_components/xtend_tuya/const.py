@@ -1163,6 +1163,7 @@ DPCODE_PREFERED_DEVICE_CLASS: dict[str, str | None] = {
     "ALARM_LOW_HUMID": "humidity",
     "AUTO_HIGH_HUMID": "humidity",
     "AUTO_LOW_HUMID": "humidity",
+    "hum_calibration": "humidity",
     "hum_sensitivity": "humidity",
     "humidity_now": "humidity",
     "humidity_set": "humidity",
