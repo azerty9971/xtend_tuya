@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import Any
-from ....lib.tuya_sharing.customerapi import (
+from tuya_sharing.customerapi import (
     SharingTokenListener,
 )
 from ....const import (

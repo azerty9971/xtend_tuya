@@ -97,7 +97,7 @@ import homeassistant.components.tuya.coordinator as tuya_coordinator  # noqa: F4
 # from homeassistant.components.tuya import (
 #    ManagerCompat as TuyaManager,
 # )
-from ..lib.tuya_sharing.manager import (
+from tuya_sharing.manager import (
     Manager as TuyaManager,  # noqa: F401
     CustomerDevice as TuyaCustomerDevice,  # noqa: F401
 )
@@ -153,7 +153,7 @@ from tuya_device_handlers.device_wrapper.binary_sensor import (
     DPCodeBitmapBitWrapper as TuyaDPCodeBitmapBitWrapper,  # noqa: F401
 )
 
-from ..lib.tuya_sharing.scenes import (
+from tuya_sharing.scenes import (
     SharingScene as TuyaScene,  # noqa: F401
 )
 from homeassistant.components.tuya.scene import (

@@ -19,7 +19,7 @@ from .const import (
     DOMAIN,
     DOMAIN_ORIG,
 )
-from .lib.tuya_sharing.manager import (
+from tuya_sharing.manager import (
     Manager,
     SharingDeviceListener,
 )
@@ -75,7 +75,7 @@ class ConfigEntryRuntimeData(NamedTuple):
 
 
 def get_config_entry_runtime_data(
-    hass: HomeAssistant, entry: tuya_coordinator.TuyaConfigEntry, domain: str
+    hass: HomeAssistant, entry: tuya_coordinator.TuyaConfigEntry | shared.XTConfigEntry, domain: str
 ) -> ConfigEntryRuntimeData | None:
     if not entry:
         return None

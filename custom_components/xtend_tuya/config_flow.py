@@ -4,7 +4,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Any, cast
 from enum import StrEnum
-from .lib.tuya_sharing import LoginControl
+from tuya_sharing import LoginControl
 from .lib.tuya_iot import AuthType
 import voluptuous as vol
 from homeassistant.core import callback, HomeAssistant

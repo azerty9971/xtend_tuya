@@ -1,6 +1,6 @@
 import json
 from base64 import b64decode
-from .. import strategy
+from tuya_sharing import strategy
 
 
 @strategy.register("sp_v2_encryption")

@@ -36,6 +36,7 @@ from .shared.shared_classes import (
 )
 from ..ha_tuya_integration.tuya_integration_imports import (
     TuyaDPType,
+    TuyaManager,
 )
 from .shared.threading import (
     XTConcurrencyManager,
@@ -80,7 +81,7 @@ from .shared.storage.storage_manager import (
 import custom_components.xtend_tuya.multi_manager.shared.data_entry.shared_data_entry as shared_data_entry
 
 
-class MultiManager:  # noqa: F811
+class MultiManager(TuyaManager):
     def __init__(self, hass: HomeAssistant, config_entry: XTConfigEntry) -> None:
         self.config_entry = config_entry
         self.virtual_state_handler = XTVirtualStateHandler(self)
@@ -112,7 +113,7 @@ class MultiManager:  # noqa: F811
         self._user_input_flows: dict[str, shared_data_entry.XTFlowDataBase] = {}
 
     @property
-    def device_map(self):
+    def device_map(self):  # type: ignore
         return self.master_device_map
 
     @property
@@ -197,7 +198,7 @@ class MultiManager:  # noqa: F811
                 return_list.append(new_descriptors)
         return return_list
 
-    async def update_device_cache(self):
+    async def mm_update_device_cache(self) -> None:
         self.is_ready_for_messages = False
         XTDeviceMap.clear_master_device_map()
         concurrency_manager = XTConcurrencyManager()
@@ -276,7 +277,10 @@ class MultiManager:  # noqa: F811
     def _process_pending_messages(self):
         self.is_ready_for_messages = True
         for messages in self.pending_messages:
-            self.on_message(messages[0], messages[1])
+            self.on_message(
+                messages[1],
+                messages[0],
+            )
         self.pending_messages.clear()
 
     def update_master_device_map(self):
@@ -441,7 +445,10 @@ class MultiManager:  # noqa: F811
                 pass
         return status
 
-    def on_message(self, source: str, msg: dict):
+    def on_message(self, msg: dict, source: str | None = None):
+        if source is None:
+            LOGGER.warning("Called on_message with Source = None", stack_info=True)
+            return None
         if not self.is_ready_for_messages:
             self.pending_messages.append((source, msg))
             return
@@ -516,7 +523,7 @@ class MultiManager:  # noqa: F811
             return_list = append_lists(return_list, account.query_scenes())
         return return_list
 
-    def send_commands(self, device_id: str, commands: list[dict[str, Any]]) -> bool:
+    def xt_send_commands(self, device_id: str, commands: list[dict[str, Any]]) -> bool:
         virtual_function_commands: list[dict[str, Any]] = []
         regular_commands: list[dict[str, Any]] = []
         if device := self.device_map.get(device_id, None):
