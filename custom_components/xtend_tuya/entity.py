@@ -333,6 +333,8 @@ class XTEntityDescriptorManager:
                         entity_type,
                     )
                 )
+            case XTEntityDescriptorManager.XTEntityDescriptorType.ENTITY:
+                return base_descriptors
 
     @staticmethod
     def merge_descriptor(
