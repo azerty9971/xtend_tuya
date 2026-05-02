@@ -125,7 +125,6 @@ class XTStringEventWrapper(DPCodeStringWrapper[tuple[str, dict[str, Any]]]):
         """Return the event with message attribute."""
         if (status := self._read_dpcode_value(device)) is None:
             return None
-        LOGGER.warning(f"{device.name} {self.dpcode}: {status}")
         return (f"{self.dpcode}", {"value": status, "changed_time": datetime.now()})
 
 class XTDoorbellStringEventWrapper(XTStringEventWrapper):
