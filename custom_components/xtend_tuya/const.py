@@ -1149,6 +1149,7 @@ UOM_MAPPING_DICT: dict[str, str | None] = {
     "线程号": None,
     "次": None,
     "times": None,
+    "0.1s": None,
 }
 
 DPCODE_PREFERED_DEVICE_CLASS: dict[str, str | None] = {
@@ -1157,6 +1158,7 @@ DPCODE_PREFERED_DEVICE_CLASS: dict[str, str | None] = {
     "maxco2_set": "carbon_dioxide",
     "motionless_far_detection": "distance",
     "breathe_detection": "distance",
+    "dis_current": "distance",
     "micro_min_detection": "distance",
     "bre_min_detection": "distance",
     "active_energy_total": "energy",

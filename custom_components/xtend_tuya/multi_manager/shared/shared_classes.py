@@ -35,7 +35,7 @@ class DeviceWatcher:
         self.watched_dev_id: dict[
             str, XTDeviceWatcherCategory | tuple[str, XTDeviceWatcherCategory]
         ] = {
-            "eb9cf41ff3e4610e86c16v": XTDeviceWatcherCategory.MQTT | XTDeviceWatcherCategory.PLATFORM_EVENT,
+            "eb669c64d4253468bdiisw": XTDeviceWatcherCategory.MQTT | XTDeviceWatcherCategory.PLATFORM_EVENT,
             "bf62aed104ff5fa4b2xekz": XTDeviceWatcherCategory.PLATFORM_CAMERA,
             # "eba792ceaf7c7de77bg0zd": XTDeviceWatcherCategory.MQTT
             # | XTDeviceWatcherCategory.PLATFORM_EVENT,
