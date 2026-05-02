@@ -215,6 +215,7 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
             XTDPCode.IPC_WORK_MODE,
             XTDPCode.PHOTO_AGAIN,
             XTDPCode.MOVEMENT_DETECT_PIC,
+            XTDPCode.VIDEO_REQUEST_REALTIME,
         ]
         for test_status in camera_status:
             if test_status in device.status:

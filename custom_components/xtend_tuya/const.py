@@ -1072,6 +1072,7 @@ class XTDPCode(StrEnum):
     UV_END_TIME = "uv_end_time"
     UV_LIGHT = "uv_light"
     VBAT_STATE = "vbat_state"
+    VIDEO_REQUEST_REALTIME = "video_request_realtime"
     VOL_YD = "vol_yd"
     VOLTAGEA = "VoltageA"
     VOLTAGEB = "VoltageB"
