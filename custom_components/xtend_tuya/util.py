@@ -96,7 +96,7 @@ def get_config_entry_runtime_data(
     else:
         runtime_data = entry.runtime_data
         device_manager = entry.runtime_data.manager
-        device_listener = entry.runtime_data.listener
+        device_listener = device_manager.listener
     if device_manager is not None and device_listener is not None:
         return ConfigEntryRuntimeData(
             device_manager=device_manager,
