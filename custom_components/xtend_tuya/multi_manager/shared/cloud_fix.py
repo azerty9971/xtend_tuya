@@ -64,8 +64,8 @@ class CloudFixes:
         device: XTDevice, multi_manager: mm.MultiManager | None = None
     ):
         for dpcode in device.status:
-            if device.status[dpcode] is None:
-                continue
+            # if device.status[dpcode] is None:
+            #     continue
             new_dptype: TuyaDPType | None = None
             if dpcode_info := device.get_dpcode_information(dpcode=dpcode):
                 match dpcode_info.dptype:
