@@ -381,7 +381,16 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
 
     @property
     def is_closed(self) -> bool | None:
-        return super().is_closed
+        """Return true if cover is closed."""
+        # If it's available, prefer the position over the current state
+        if (position := self.current_cover_position) is not None:
+            return position == 0
+
+        current_state = self._read_wrapper(self._current_state_wrapper)
+        if self.is_cover_status_inverted:
+            return not current_state
+        else:
+            return current_state
 
     async def _async_open_cover(self, **kwargs: Any) -> None:
         """Open the cover."""
