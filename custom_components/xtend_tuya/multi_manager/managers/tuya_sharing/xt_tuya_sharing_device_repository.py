@@ -94,7 +94,7 @@ class XTSharingDeviceRepository(DeviceRepository):
     def query_devices_by_home(self, home_id: str) -> list[CustomerDevice]:
         try:
             response = self.api.get("/v1.0/m/life/ha/home/devices", {"homeId": home_id})
-        except Exception as e:
+        except Exception:
             # LOGGER.warning(f"query_devices_by_home exception, removing home {home_id}: {e}")
             self.manager.delete_home(home_id)
             return []
