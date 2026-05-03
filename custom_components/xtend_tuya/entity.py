@@ -871,6 +871,5 @@ class XTEntity(TuyaEntity):
                 return DPCODE_PREFERED_DEVICE_CLASS[dpcode_information.dpcode]
         LOGGER.warning(
             f"Multiple possible device class {proposed_device_class} for unit {dpcode_information.unit} on device {device.name} ({dpcode_information.dpcode}), unable to determine the most probable one, returning None. Please report to developer.",
-            stack_info=True,
         )
         return None
