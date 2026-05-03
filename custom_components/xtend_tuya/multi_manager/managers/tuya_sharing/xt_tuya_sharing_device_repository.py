@@ -92,7 +92,11 @@ class XTSharingDeviceRepository(DeviceRepository):
             )
 
     def query_devices_by_home(self, home_id: str) -> list[CustomerDevice]:
-        response = self.api.get("/v1.0/m/life/ha/home/devices", {"homeId": home_id})
+        try:
+            response = self.api.get("/v1.0/m/life/ha/home/devices", {"homeId": home_id})
+        except Exception as e:
+            LOGGER.warning(f"query_devices_by_home exception: {e}")
+            return []
         return self._query_devices(response)
 
     def _query_devices(self, response) -> list[CustomerDevice]:
