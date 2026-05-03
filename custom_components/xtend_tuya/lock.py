@@ -394,6 +394,7 @@ class XTLockEntity(XTEntity, LockEntity):  # type: ignore
     def unmark_temporary_unlocked(self, _):
         LOGGER.warning(f"Lock is not locked anymore {self.device.name}")
         self.__temporary_unlock_event = None
+        self.async_write_ha_state()
 
     def unlock(self, **kwargs: Any) -> None:
         """Unlock the lock."""
