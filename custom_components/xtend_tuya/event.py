@@ -24,6 +24,7 @@ from tuya_device_handlers.device_wrapper.common import (
     DPCodeJsonWrapper,
     DPCodeStringWrapper,
     DPCodeTypeInformationWrapper,
+    DPCodeRawWrapper,
 )
 from tuya_device_handlers.device_wrapper.event import (
     SimpleEventEnumWrapper,
@@ -113,6 +114,19 @@ class XTDoorbellBooleanEventWrapper(XTBooleanEventWrapper):
     def __init__(self, dpcode: str, type_information: Any) -> None:
         super().__init__(dpcode, type_information)
         self.options = [f"{self.dpcode}", DoorbellEventType.RING]
+
+class XTRawEventWrapper(DPCodeRawWrapper[tuple[str, dict[str, Any]]]):
+    def __init__(self, dpcode: str, type_information: Any) -> None:
+        super().__init__(dpcode, type_information)
+        self.options = [f"{self.dpcode}"]
+
+    def read_device_status(
+        self, device: TuyaCustomerDevice
+    ) -> tuple[str, dict[str, Any]] | None:
+        """Return the event with message attribute."""
+        if (status := self._read_dpcode_value(device)) is None:
+            return None
+        return (f"{self.dpcode}", {"value": status, "changed_time": datetime.now()})
 
 class XTStringEventWrapper(DPCodeStringWrapper[tuple[str, dict[str, Any]]]):
     def __init__(self, dpcode: str, type_information: Any) -> None:
@@ -259,6 +273,13 @@ EVENTS: dict[str, tuple[XTEventEntityDescription, ...]] = {
             wrapper_class=XTIntegerEventWrapper,
         ),
         XTEventEntityDescription(
+            key=XTDPCode.UNLOCK_CARD_KIT,
+            translation_key="unlock_user",
+            translation_placeholders={"user_type": "Card"},
+            device_class=None,
+            wrapper_class=XTStringEventWrapper,
+        ),
+        XTEventEntityDescription(
             key=XTDPCode.UNLOCK_DYNAMIC,
             translation_key="unlock_user",
             translation_placeholders={"user_type": "Dynamic"},
@@ -278,6 +299,13 @@ EVENTS: dict[str, tuple[XTEventEntityDescription, ...]] = {
             translation_placeholders={"user_type": "Fingerprint"},
             device_class=None,
             wrapper_class=XTIntegerEventWrapper,
+        ),
+        XTEventEntityDescription(
+            key=XTDPCode.UNLOCK_FINGERPRINT_KIT,
+            translation_key="unlock_user",
+            translation_placeholders={"user_type": "Fingerprint"},
+            device_class=None,
+            wrapper_class=XTStringEventWrapper,
         ),
         XTEventEntityDescription(
             key=XTDPCode.UNLOCK_FINGER_VEIN,
@@ -301,11 +329,25 @@ EVENTS: dict[str, tuple[XTEventEntityDescription, ...]] = {
             wrapper_class=XTIntegerEventWrapper,
         ),
         XTEventEntityDescription(
+            key=XTDPCode.UNLOCK_OFFLINE_PD,
+            translation_key="unlock_user",
+            translation_placeholders={"user_type": "Offline password"},
+            device_class=None,
+            wrapper_class=XTStringEventWrapper,
+        ),
+        XTEventEntityDescription(
             key=XTDPCode.UNLOCK_PASSWORD,
             translation_key="unlock_user",
             translation_placeholders={"user_type": "Password"},
             device_class=None,
             wrapper_class=XTIntegerEventWrapper,
+        ),
+        XTEventEntityDescription(
+            key=XTDPCode.UNLOCK_PASSWORD_KIT,
+            translation_key="unlock_user",
+            translation_placeholders={"user_type": "Password"},
+            device_class=None,
+            wrapper_class=XTStringEventWrapper,
         ),
         XTEventEntityDescription(
             key=XTDPCode.UNLOCK_PHONE_REMOTE,
@@ -315,11 +357,32 @@ EVENTS: dict[str, tuple[XTEventEntityDescription, ...]] = {
             wrapper_class=XTIntegerEventWrapper,
         ),
         XTEventEntityDescription(
+            key=XTDPCode.UNLOCK_PHONE_REMOTE_KIT,
+            translation_key="unlock_user",
+            translation_placeholders={"user_type": "Phone"},
+            device_class=None,
+            wrapper_class=XTStringEventWrapper,
+        ),
+        XTEventEntityDescription(
+            key=XTDPCode.UNLOCK_TELECONTROL_KIT,
+            translation_key="unlock_user",
+            translation_placeholders={"user_type": "Remote control"},
+            device_class=None,
+            wrapper_class=XTStringEventWrapper,
+        ),
+        XTEventEntityDescription(
             key=XTDPCode.UNLOCK_TEMPORARY,
             translation_key="unlock_user",
             translation_placeholders={"user_type": "Temporary"},
             device_class=None,
             wrapper_class=XTIntegerEventWrapper,
+        ),
+        XTEventEntityDescription(
+            key=XTDPCode.UNLOCK_TEMPORARY_KIT,
+            translation_key="unlock_user",
+            translation_placeholders={"user_type": "Temporary"},
+            device_class=None,
+            wrapper_class=XTStringEventWrapper,
         ),
         XTEventEntityDescription(
             key=XTDPCode.UNLOCK_VOICE_REMOTE,

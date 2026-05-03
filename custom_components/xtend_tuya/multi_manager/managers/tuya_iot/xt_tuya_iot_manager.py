@@ -427,8 +427,8 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         response = self.api.get(f"/v2.0/cloud/thing/{device.id}/shadow/properties")
         response2 = self.api.get(f"/v2.0/cloud/thing/{device.id}/model")
         if not response.get("success") or not response2.get("success"):
-            LOGGER.warning(f"Response1: {response}")
-            LOGGER.warning(f"Response2: {response2}")
+            LOGGER.warning(f"Response1: {response}: {device.id=}")
+            LOGGER.warning(f"Response2: {response2}: {device.id=}")
 
         if response2.get("success", False):
             result = response2.get("result", {})

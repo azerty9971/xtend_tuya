@@ -18,7 +18,7 @@ from homeassistant.components.cover import (
 )
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers.dispatcher import async_dispatcher_connect, dispatcher_send
+from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from .util import (
     restrict_descriptor_category,
@@ -28,20 +28,14 @@ from .multi_manager.multi_manager import (
     MultiManager,
     XTDevice,
 )
-from .multi_manager.shared.shared_classes import (
-    XTDeviceStatusRange,
-)
 from .const import (
     TUYA_DISCOVERY_NEW,
-    XTDPCode,
-    XTMultiManagerPostSetupCallbackPriority,
-    LOGGER,  # noqa: F401
+    XTDPCode,  # noqa: F401
 )
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaCoverEntity,
     TuyaCoverEntityDescription,
     TuyaDPCode,
-    TuyaDPType,
     TuyaRemapHelper,
 )
 from .entity import (
@@ -49,6 +43,10 @@ from .entity import (
     XTEntityDescriptorManager,
 )
 
+@dataclass
+class XTCoverConfigurableProperties:
+    invert_status: bool = False
+    invert_control: bool = False
 
 @dataclass(frozen=True)
 class XTCoverEntityDescription(TuyaCoverEntityDescription):
@@ -341,81 +339,38 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
                 None,
             ),
         )
-        device_manager.add_post_setup_callback(
-            XTMultiManagerPostSetupCallbackPriority.PRIORITY1,
-            self.add_cover_open_close_option,
+        self.device.set_preference(
+            f"{XTDevice.XTDevicePreference.COVER_DEVICE_ENTITY}",
+            self,
+        )
+        self.configurable_properties = cast(
+            XTCoverConfigurableProperties, self.get_configurable_properties()
+        )
+    
+    def get_configurable_properties_type(self) -> type[Any] | None:
+        return XTCoverConfigurableProperties
+
+    def get_configurable_properties_key(self) -> str | None:
+        return "cover_configurable_properties"
+    
+    def refresh_configurable_properties(self):
+        self.configurable_properties = cast(
+            XTCoverConfigurableProperties, self.get_configurable_properties()
         )
 
     @property
-    def is_cover_control_inverted(self) -> bool | None:
-        if is_reversed := self.device.status.get(XTDPCode.XT_COVER_INVERT_CONTROL):
-            if is_reversed is False:
-                return False
-            elif is_reversed is True:
-                return True
-        return None
+    def is_cover_control_inverted(self) -> bool:
+        return self.configurable_properties.invert_control
 
     @property
-    def is_cover_status_inverted(self) -> bool | None:
-        if is_reversed := self.device.status.get(XTDPCode.XT_COVER_INVERT_STATUS):
-            if is_reversed is False:
-                return False
-            elif is_reversed is True:
-                return True
-        return None
-
-    def add_cover_open_close_option(self) -> None:
-        if (
-            self.device.get_preference(
-                f"{XTDevice.XTDevicePreference.IS_A_COVER_DEVICE}"
-            )
-            is None
-        ):
-            self.device.set_preference(
-                f"{XTDevice.XTDevicePreference.IS_A_COVER_DEVICE}", True
-            )
-            send_update = False
-            if XTDPCode.XT_COVER_INVERT_CONTROL not in self.device.status:
-                self.device.status[XTDPCode.XT_COVER_INVERT_CONTROL] = False
-                self.device.status_range[XTDPCode.XT_COVER_INVERT_CONTROL] = (
-                    XTDeviceStatusRange(
-                        code=XTDPCode.XT_COVER_INVERT_CONTROL,
-                        type=TuyaDPType.BOOLEAN,
-                        values="{}",
-                        dp_id=0,
-                    )
-                )
-                send_update = True
-            if XTDPCode.XT_COVER_INVERT_STATUS not in self.device.status:
-                self.device.status[XTDPCode.XT_COVER_INVERT_STATUS] = False
-                self.device.status_range[XTDPCode.XT_COVER_INVERT_STATUS] = (
-                    XTDeviceStatusRange(
-                        code=XTDPCode.XT_COVER_INVERT_STATUS,
-                        type=TuyaDPType.BOOLEAN,
-                        values="{}",
-                        dp_id=0,
-                    )
-                )
-                send_update = True
-            if send_update:
-                dispatcher_send(
-                    self.local_hass,
-                    TUYA_DISCOVERY_NEW,
-                    [self.device.id],
-                    XTDPCode.XT_COVER_INVERT_CONTROL,
-                )
-                dispatcher_send(
-                    self.local_hass,
-                    TUYA_DISCOVERY_NEW,
-                    [self.device.id],
-                    XTDPCode.XT_COVER_INVERT_STATUS,
-                )
+    def is_cover_status_inverted(self) -> bool:
+        return self.configurable_properties.invert_status
 
     @property
     def current_cover_position(self) -> int | None:
         current_cover_position = super().current_cover_position
         if current_cover_position is not None:
-            if self.is_cover_status_inverted and self._current_position is not None:
+            if self.is_cover_status_inverted:
                 if self._remap_helper is not None:
                     current_cover_position = round(
                         self._remap_helper.remap_value_to(
@@ -426,7 +381,16 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
 
     @property
     def is_closed(self) -> bool | None:
-        return super().is_closed
+        """Return true if cover is closed."""
+        # If it's available, prefer the position over the current state
+        if (position := self.current_cover_position) is not None:
+            return position == 0
+
+        current_state = self._read_wrapper(self._current_state_wrapper)
+        if self.is_cover_status_inverted:
+            return not current_state
+        else:
+            return current_state
 
     async def _async_open_cover(self, **kwargs: Any) -> None:
         """Open the cover."""

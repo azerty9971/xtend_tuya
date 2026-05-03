@@ -165,6 +165,14 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
                 new_device = device.get_copy()
                 self.device_repository.update_device_strategy_info(new_device)
                 self.device_map[device.id] = new_device
+    
+    def delete_home(self, home_id: str):
+        index = 0
+        for home in self.user_homes:
+            if home.id == home_id:
+                del self.user_homes[index]
+                return None
+            index += 1
 
     def on_message(self, msg: dict[str, Any]):
         try:
