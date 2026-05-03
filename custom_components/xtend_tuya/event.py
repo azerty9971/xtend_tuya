@@ -589,6 +589,14 @@ class XTEventEntity(XTEntity, TuyaEventEntity):
                             self.device.id
                         ],
                     )
+            elif isinstance(self.entity_description.trigger_global_event, str):
+                dispatcher_send(
+                        self.hass,
+                        f"{XT_GLOBAL_EVENT_PREFIX}{self.entity_description.trigger_global_event}",
+                        [
+                            self.device.id
+                        ],
+                    )
         return await super()._process_device_update(
             updated_status_properties=updated_status_properties,
             dp_timestamps=dp_timestamps,
