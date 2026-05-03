@@ -86,7 +86,10 @@ async def async_setup_entry(
     supported_descriptors, externally_managed_descriptors = cast(
         tuple[dict[str, CameraEntityDescription], dict[str, CameraEntityDescription]],
         XTEntityDescriptorManager.get_platform_descriptors(
-            CAMERAS, entry.runtime_data.multi_manager, CameraEntityDescription, this_platform
+            CAMERAS,
+            entry.runtime_data.multi_manager,
+            CameraEntityDescription,
+            this_platform,
         ),
     )
 
@@ -217,7 +220,12 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
             XTDPCode.MOVEMENT_DETECT_PIC,
             XTDPCode.VIDEO_REQUEST_REALTIME,
         ]
-        multi_manager.device_watcher.report_message(device.id, f"Statuses of device {device.name}: {device.status=}", XTDeviceWatcherCategory.PLATFORM_CAMERA, device)
+        multi_manager.device_watcher.report_message(
+            device.id,
+            f"Statuses of device {device.name}: {device.status=}",
+            XTDeviceWatcherCategory.PLATFORM_CAMERA,
+            device,
+        )
         for test_status in camera_status:
             if test_status in device.status:
                 return True
@@ -367,7 +375,14 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
     async def stream_source(self) -> str | None:
         """Return the source of the stream."""
         try:
-            return await super().stream_source()
+            stream_source = await super().stream_source()
+            self.device_manager.device_watcher.report_message(
+                self.device.id,
+                f"Source stream is {stream_source}",
+                XTDeviceWatcherCategory.PLATFORM_CAMERA,
+                self.device,
+            )
+            return stream_source
         except Exception as e:
             self.device_manager.device_watcher.report_message(
                 self.device.id,
