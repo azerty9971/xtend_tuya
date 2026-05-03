@@ -389,9 +389,10 @@ class XTLockEntity(XTEntity, LockEntity):  # type: ignore
     def mark_temporary_unlocked(self, unlocked_time: float):
         if self.__temporary_unlock_event is not None:
             self.__temporary_unlock_event()
-        self.__temporary_unlock_event = async_call_later(self.hass, unlocked_time, self.unmark_temporary_unlock)
+        self.__temporary_unlock_event = async_call_later(self.hass, unlocked_time, self.unmark_temporary_unlocked)
 
-    def unmark_temporary_unlock(self, _):
+    def unmark_temporary_unlocked(self, _):
+        LOGGER.warning(f"Lock is not locked anymore {self.device.name}")
         self.__temporary_unlock_event = None
 
     def unlock(self, **kwargs: Any) -> None:
