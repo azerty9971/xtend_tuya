@@ -12,9 +12,11 @@ from tuya_device_handlers.device_wrapper.cover import (
     CoverInstructionBooleanWrapper,
 )
 from tuya_device_handlers.helpers.homeassistant import TuyaCoverAction
+from tuya_device_handlers.utils import RemapHelper
 from homeassistant.components.cover import (
     CoverDeviceClass,
     ATTR_POSITION,
+    CoverEntityFeature,
 )
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant, callback
@@ -47,6 +49,8 @@ from .entity import (
 class XTCoverConfigurableProperties:
     invert_status: bool = False
     invert_control: bool = False
+    virtual_position: int | None = None
+    open_time: float | None = None
 
 @dataclass(frozen=True)
 class XTCoverEntityDescription(TuyaCoverEntityDescription):
@@ -102,8 +106,10 @@ COVERS: dict[str, tuple[XTCoverEntityDescription, ...]] = {
             key=XTDPCode.CONTROL,
             translation_key="curtain",
             current_state=XTDPCode.SITUATION_SET,
-            current_position=(XTDPCode.PERCENT_CONTROL, XTDPCode.PERCENT_STATE),
-            set_position=(XTDPCode.PERCENT_CONTROL, XTDPCode.PERCENT_STATE),
+            # DEBUG TEST REMOVE BEFORE RELEASE
+            # current_position=(XTDPCode.PERCENT_CONTROL, XTDPCode.PERCENT_STATE),
+            # set_position=(XTDPCode.PERCENT_CONTROL, XTDPCode.PERCENT_STATE),
+            # END DEBUG TEST
             device_class=CoverDeviceClass.CURTAIN,
             control_back_mode=XTDPCode.CONTROL_BACK_MODE,
         ),
@@ -339,13 +345,16 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
                 None,
             ),
         )
+        if self._remap_helper is None:
+            self._remap_helper = RemapHelper(source_min=0, source_max=100, target_min=0, target_max=100)
         self.device.set_preference(
             f"{XTDevice.XTDevicePreference.COVER_DEVICE_ENTITY}",
             self,
         )
-        self.configurable_properties = cast(
-            XTCoverConfigurableProperties, self.get_configurable_properties()
-        )
+        # self.configurable_properties = cast(
+        #     XTCoverConfigurableProperties, self.get_configurable_properties()
+        # )
+        self.refresh_configurable_properties()
     
     def get_configurable_properties_type(self) -> type[Any] | None:
         return XTCoverConfigurableProperties
@@ -357,6 +366,15 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         self.configurable_properties = cast(
             XTCoverConfigurableProperties, self.get_configurable_properties()
         )
+        if self.configurable_properties.open_time is None:
+            if self._set_position is None:
+                if self._attr_supported_features is not None:
+                    self._attr_supported_features &= ~CoverEntityFeature.SET_POSITION
+        else:
+            if self._attr_supported_features is not None:
+                self._attr_supported_features |= CoverEntityFeature.SET_POSITION
+            else:
+                self._attr_supported_features = CoverEntityFeature.SET_POSITION
 
     @property
     def is_cover_control_inverted(self) -> bool:
@@ -367,8 +385,14 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         return self.configurable_properties.invert_status
 
     @property
+    def cover_virtual_position(self) -> int | None:
+        return self.configurable_properties.virtual_position
+
+    @property
     def current_cover_position(self) -> int | None:
         current_cover_position = super().current_cover_position
+        if current_cover_position is None:
+            current_cover_position = self.cover_virtual_position
         if current_cover_position is not None:
             if self.is_cover_status_inverted:
                 if self._remap_helper is not None:
