@@ -16,6 +16,8 @@ from .const import (
     XTDPCode,
     XTLockingMechanism,
     XTMultiManagerProperties,
+    XTGlobalEvents,
+    XT_GLOBAL_EVENT_PREFIX,
 )
 from .multi_manager.multi_manager import (
     XTConfigEntry,
@@ -138,11 +140,25 @@ async def async_setup_entry(
                         )
                     )
         async_add_entities(entities)
+    
+    @callback
+    def async_lock_unlocked(dev_id: str) -> None:
+        if hass_data.manager is None:
+            return None
+        if device := hass_data.manager.device_map.get(dev_id):
+            if entity := cast(XTLockEntity, device.get_preference(XTDevice.XTDevicePreference.LOCK_DEVICE_ENTITY, None)):
+                if open_time := entity.temporary_unlock_time:
+                    entity.mark_temporary_unlocked(open_time)
+
 
     async_discover_device([*hass_data.manager.device_map])
 
     entry.async_on_unload(
         async_dispatcher_connect(hass, TUYA_DISCOVERY_NEW, async_discover_device)
+    )
+
+    entry.async_on_unload(
+        async_dispatcher_connect(hass, f"{XT_GLOBAL_EVENT_PREFIX}{XTGlobalEvents.LOCK_UNLOCKED}", async_lock_unlocked)
     )
 
 

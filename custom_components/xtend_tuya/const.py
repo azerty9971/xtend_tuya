@@ -49,6 +49,7 @@ TUYA_SCHEMA = "haauthorize"
 TUYA_DISCOVERY_NEW_ORIG = "tuya_discovery_new"
 TUYA_HA_SIGNAL_UPDATE_ENTITY = "tuya_entry_update"
 TUYA_DISCOVERY_NEW = "xt_tuya_discovery_new"
+XT_GLOBAL_EVENT_PREFIX = "xt_tuya_global_event_"
 
 TUYA_RESPONSE_CODE = "code"
 TUYA_RESPONSE_MSG = "msg"
@@ -141,6 +142,8 @@ class AllowedPlugins:
     def get_plugins_to_load() -> list[str]:
         return [MESSAGE_SOURCE_TUYA_SHARING, MESSAGE_SOURCE_TUYA_IOT]
 
+class XTGlobalEvents(StrEnum):
+    LOCK_UNLOCKED = "LOCK_UNLOCKED"
 
 class VirtualStates(IntFlag):
     """Virtual states"""
