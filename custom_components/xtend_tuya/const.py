@@ -1100,8 +1100,6 @@ class XTDPCode(StrEnum):
     XT_ADD_ELE2_THIS_MONTH = "xt_add_ele2_this_month"
     XT_ADD_ELE2_THIS_YEAR = "xt_add_ele2_this_year"
     XT_ADD_ELE2_TODAY = "xt_add_ele2_today"
-    XT_COVER_INVERT_CONTROL = "xt_cover_invert_control"
-    XT_COVER_INVERT_STATUS = "xt_cover_invert_status"
     XT_DEVICE_EVENT_NOTIFY = "xt_device_event_notify"
     XT_FORWARD_ENERGY_TOTAL = "xt_forward_energy_total"
     XT_FORWARD_ENERGY_TOTAL_THIS_MONTH = "xt_forward_energy_total_this_month"

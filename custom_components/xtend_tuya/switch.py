@@ -64,20 +64,6 @@ class XTSwitchEntityDescription(TuyaSwitchEntityDescription, frozen_or_thawed=Tr
 SWITCHES: dict[str, tuple[XTSwitchEntityDescription, ...]] = {
     CROSS_CATEGORY_DEVICE_DESCRIPTOR: (
         XTSwitchEntityDescription(
-            key=XTDPCode.XT_COVER_INVERT_CONTROL,
-            translation_key="xt_cover_invert_control",
-            entity_category=EntityCategory.CONFIG,
-            dont_send_to_cloud=True,
-            entity_registry_visible_default=False,
-        ),
-        XTSwitchEntityDescription(
-            key=XTDPCode.XT_COVER_INVERT_STATUS,
-            translation_key="xt_cover_invert_status",
-            entity_category=EntityCategory.CONFIG,
-            dont_send_to_cloud=True,
-            entity_registry_visible_default=False,
-        ),
-        XTSwitchEntityDescription(
             key=XTDPCode.SWITCH,
             translation_key="switch",
             entity_category=EntityCategory.CONFIG,
