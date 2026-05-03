@@ -107,8 +107,8 @@ COVERS: dict[str, tuple[XTCoverEntityDescription, ...]] = {
             translation_key="curtain",
             current_state=XTDPCode.SITUATION_SET,
             # DEBUG TEST REMOVE BEFORE RELEASE
-            # current_position=(XTDPCode.PERCENT_CONTROL, XTDPCode.PERCENT_STATE),
-            # set_position=(XTDPCode.PERCENT_CONTROL, XTDPCode.PERCENT_STATE),
+            current_position=(XTDPCode.PERCENT_CONTROL, XTDPCode.PERCENT_STATE),
+            set_position=(XTDPCode.PERCENT_CONTROL, XTDPCode.PERCENT_STATE),
             # END DEBUG TEST
             device_class=CoverDeviceClass.CURTAIN,
             control_back_mode=XTDPCode.CONTROL_BACK_MODE,
