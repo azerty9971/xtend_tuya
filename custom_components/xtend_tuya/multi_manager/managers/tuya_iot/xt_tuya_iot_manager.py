@@ -633,7 +633,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                 else:
                     # Otherwise, we want to send the lock/unlock command as a boolean
                     commands.append({"code": dpcode, "value": not lock})
-            return self.multi_manager.xt_send_commands(
+            return self.multi_manager.send_commands(
                 device_id=device.id, commands=commands
             )
         return False

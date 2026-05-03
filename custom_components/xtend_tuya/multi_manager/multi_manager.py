@@ -523,7 +523,7 @@ class MultiManager(TuyaManager):
             return_list = append_lists(return_list, account.query_scenes())
         return return_list
 
-    def xt_send_commands(self, device_id: str, commands: list[dict[str, Any]]) -> bool:
+    def send_commands(self, device_id: str, commands: list[dict[str, Any]]) -> bool: # type: ignore
         virtual_function_commands: list[dict[str, Any]] = []
         regular_commands: list[dict[str, Any]] = []
         if device := self.device_map.get(device_id, None):
