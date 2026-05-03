@@ -1222,6 +1222,7 @@ DPCODE_PREFERED_DEVICE_CLASS: dict[str, str | None] = {
     "alarm_bright": None,
     "fan_speed": None,
     "heating_ratio": None,
+    "ipc_siren_volume": None,
     "percent_control": None,
     "percent_state": None,
     "position_best": None,
