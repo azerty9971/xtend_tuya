@@ -146,13 +146,10 @@ async def async_setup_entry(
     def async_lock_unlocked(dev_id: str) -> None:
         if hass_data.manager is None:
             return None
-        LOGGER.warning(f"async_lock_unlocked: {dev_id=}")
         if device := hass_data.manager.device_map.get(dev_id):
-            LOGGER.warning(f"async_lock_unlocked found device {device.name}")
             if entity := cast(XTLockEntity, device.get_preference(XTDevice.XTDevicePreference.LOCK_DEVICE_ENTITY, None)):
-                LOGGER.warning(f"async_lock_unlocked lock entity found for {dev_id}")
                 if open_time := entity.temporary_unlock_time:
-                    LOGGER.warning(f"Calling mark_temporary_unlocked for device {dev_id}")
+                    LOGGER.warning(f"Calling mark_temporary_unlocked for device {dev_id} for {open_time}")
                     entity.mark_temporary_unlocked(open_time)
 
 

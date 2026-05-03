@@ -579,6 +579,12 @@ class XTEventEntity(XTEntity, TuyaEventEntity):
         updated_status_properties: list[str],
         dp_timestamps: dict[str, int] | None,
     ) -> bool:
+        event_sent = await super()._process_device_update(
+            updated_status_properties=updated_status_properties,
+            dp_timestamps=dp_timestamps,
+        )
+        if event_sent is False:
+            return event_sent
         if self.entity_description.trigger_global_event is not None:
             if isinstance(self.entity_description.trigger_global_event, tuple):
                 for event in self.entity_description.trigger_global_event:
@@ -593,10 +599,7 @@ class XTEventEntity(XTEntity, TuyaEventEntity):
                         f"{XT_GLOBAL_EVENT_PREFIX}{self.entity_description.trigger_global_event}",
                         self.device.id,
                     )
-        return await super()._process_device_update(
-            updated_status_properties=updated_status_properties,
-            dp_timestamps=dp_timestamps,
-        )
+        return event_sent
 
     @property
     def state_attributes(self) -> dict[str, Any]:  # type: ignore
