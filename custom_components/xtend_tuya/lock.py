@@ -18,7 +18,6 @@ from .const import (
     XTMultiManagerProperties,
     XTGlobalEvents,
     XT_GLOBAL_EVENT_PREFIX,
-    LOGGER,
 )
 from .multi_manager.multi_manager import (
     XTConfigEntry,
@@ -149,7 +148,6 @@ async def async_setup_entry(
         if device := hass_data.manager.device_map.get(dev_id):
             if entity := cast(XTLockEntity, device.get_preference(XTDevice.XTDevicePreference.LOCK_DEVICE_ENTITY, None)):
                 if open_time := entity.temporary_unlock_time:
-                    LOGGER.warning(f"Calling mark_temporary_unlocked for device {dev_id} for {open_time}")
                     entity.mark_temporary_unlocked(open_time)
 
 
@@ -392,7 +390,6 @@ class XTLockEntity(XTEntity, LockEntity):  # type: ignore
         self.__temporary_unlock_event = async_call_later(self.hass, unlocked_time, self.unmark_temporary_unlocked)
 
     def unmark_temporary_unlocked(self, _):
-        LOGGER.warning(f"Lock is not locked anymore {self.device.name}")
         self.__temporary_unlock_event = None
         self.schedule_update_ha_state()
 
