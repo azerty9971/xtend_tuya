@@ -671,6 +671,9 @@ class TuyaOptionFlow(OptionsFlow):
             new_config.invert_status = user_input.get(
                 "invert_status", False
             )
+            new_config.open_time = user_input.get("open_time", None)
+            if new_config.open_time is not None and new_config.open_time <= 0.1:
+                new_config.open_time = None
             cover_entity.set_configurable_properties(new_config)
             await self.multi_manager.storage_manager.save_store()
             self.multi_manager.multi_device_listener.update_device(device=device)
@@ -698,6 +701,17 @@ class TuyaOptionFlow(OptionsFlow):
                             configurable_properties.invert_status
                         ),
                     ): bool,
+                    vol.Optional(
+                        "open_time",
+                        default=(
+                            configurable_properties.open_time
+                            if configurable_properties.open_time
+                            is not None
+                            else vol.UNDEFINED
+                        ),
+                    ): vol.All(
+                        vol.Coerce(float),
+                    ),
                 }
             ),
             description_placeholders={

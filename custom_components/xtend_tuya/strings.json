@@ -145,7 +145,8 @@
                 "description": "Set the properties of the device",
                 "data": {
                     "invert_control": "Invert the control of the device",
-                    "invert_status": "Invert the reported status of the device"
+                    "invert_status": "Invert the reported status of the device",
+                    "open_time": "Time from opened to closed (seconds)"
                 }
             },
             "lock_device_settings": {
