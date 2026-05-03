@@ -593,9 +593,11 @@ class TuyaOptionFlow(OptionsFlow):
         if user_input is not None:
             # Update the configurable properties
             new_config = lock.XTLockConfigurableProperties()
-            new_config.force_temporary_unlock = user_input.get(
-                "force_temporary_unlock", False
+            new_config.temporary_unlock_time = user_input.get(
+                "temporary_unlock_time", None
             )
+            if new_config.temporary_unlock_time is not None and new_config.temporary_unlock_time < 0.1:
+                new_config.temporary_unlock_time = None
             new_config.lock_unlock_mecanism = user_input.get("lock_unlock_mecanism", XTLockingMechanism.AUTO)
             lock_entity.set_configurable_properties(new_config)
             await self.multi_manager.storage_manager.save_store()
@@ -613,14 +615,16 @@ class TuyaOptionFlow(OptionsFlow):
             data_schema=vol.Schema(
                 {
                     vol.Optional(
-                        "force_temporary_unlock",
-                        default=bool(
-                            configurable_properties.force_temporary_unlock
-                            if configurable_properties.force_temporary_unlock
+                        "temporary_unlock_time",
+                        default=(
+                            configurable_properties.temporary_unlock_time
+                            if configurable_properties.temporary_unlock_time
                             is not None
-                            else False
+                            else vol.UNDEFINED
                         ),
-                    ): bool,
+                    ): vol.All(
+                        vol.Coerce(float),
+                    ),
                     vol.Required(
                         "lock_unlock_mecanism",
                         default=configurable_properties.lock_unlock_mecanism

@@ -803,9 +803,13 @@ class XTEntity(TuyaEntity):
             dpcode=self.get_configurable_properties_dpcode(),
             prop_name=property_key,
         )
+        new_config = property_type()
         if stored_configuration is not None and isinstance(stored_configuration, dict):
-            return property_type(**stored_configuration)
-        return property_type()
+            for key in stored_configuration:
+                if hasattr(new_config, key):
+                    setattr(new_config, key, stored_configuration[key])
+            return new_config
+        return new_config
 
     def set_configurable_properties(self, configurable_properties: Any):
         property_type = self.get_configurable_properties_type()
