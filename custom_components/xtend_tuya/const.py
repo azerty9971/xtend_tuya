@@ -49,6 +49,7 @@ TUYA_SCHEMA = "haauthorize"
 TUYA_DISCOVERY_NEW_ORIG = "tuya_discovery_new"
 TUYA_HA_SIGNAL_UPDATE_ENTITY = "tuya_entry_update"
 TUYA_DISCOVERY_NEW = "xt_tuya_discovery_new"
+XT_GLOBAL_EVENT_PREFIX = "xt_tuya_global_event_"
 
 TUYA_RESPONSE_CODE = "code"
 TUYA_RESPONSE_MSG = "msg"
@@ -141,6 +142,8 @@ class AllowedPlugins:
     def get_plugins_to_load() -> list[str]:
         return [MESSAGE_SOURCE_TUYA_SHARING, MESSAGE_SOURCE_TUYA_IOT]
 
+class XTGlobalEvents(StrEnum):
+    LOCK_UNLOCKED = "LOCK_UNLOCKED"
 
 class VirtualStates(IntFlag):
     """Virtual states"""
@@ -1174,6 +1177,12 @@ DPCODE_PREFERED_DEVICE_CLASS: dict[str, str | None] = {
     "add_ele1": "energy",
     "charge_energy": "energy",
     "cur_neutral": "energy",
+    "energy_forword_a": "energy",
+    "energy_forword_b": "energy",
+    "energy_reverse_a": "energy",
+    "energy_reserse_a": "energy",
+    "energy_reverse_b": "energy",
+    "energy_reserse_b": "energy",
     "today_acc_energy1": "energy",
     "today_energy_add1": "energy",
     "total_energy1": "energy",
@@ -1222,6 +1231,7 @@ DPCODE_PREFERED_DEVICE_CLASS: dict[str, str | None] = {
     "alarm_bright": None,
     "fan_speed": None,
     "heating_ratio": None,
+    "ipc_siren_volume": None,
     "percent_control": None,
     "percent_state": None,
     "position_best": None,

@@ -145,14 +145,15 @@
                 "description": "Set the properties of the device",
                 "data": {
                     "invert_control": "Invert the control of the device",
-                    "invert_status": "Invert the reported status of the device"
+                    "invert_status": "Invert the reported status of the device",
+                    "open_time": "Time from opened to closed (seconds)"
                 }
             },
             "lock_device_settings": {
                 "title": "Configure {device_name}",
                 "description": "Set the properties of the device",
                 "data": {
-                    "force_temporary_unlock": "Lock is only opening temporarely",
+                    "temporary_unlock_time": "Seconds the lock stays opened",
                     "lock_unlock_mecanism": "Force unlock mecanism"
                 }
             }
