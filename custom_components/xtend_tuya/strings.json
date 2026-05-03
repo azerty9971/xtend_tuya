@@ -86,6 +86,7 @@
                 "title": "Configuration category",
                 "menu_options": {
                     "select_climate_device": "Climate options",
+                    "select_cover_device": "Cover options",
                     "select_lock_device": "Lock options"
                 }
             },
