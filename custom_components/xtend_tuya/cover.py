@@ -334,7 +334,7 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
             from_state: int,
             to_state: int,
             update_interval: float,
-            on_complete_callback = None
+            on_complete_callback=None,
         ) -> None:
             self.cover_entity = cover_entity
             self.total_open_time = open_time
@@ -374,7 +374,7 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
             self._is_stopping = True
             if self._timer_cancel is not None:
                 self._timer_cancel()
-            
+
             self.update_virtual_position_tick(datetime.now())
 
             # Persist the virtual cover position
@@ -382,12 +382,16 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
                 self.cover_entity.set_configurable_properties(
                     self.cover_entity.configurable_properties
                 )
-                XTEventLoopProtector.execute_out_of_event_loop(self.cover_entity.device_manager.storage_manager.save_store)
+                XTEventLoopProtector.execute_out_of_event_loop(
+                    self.cover_entity.device_manager.storage_manager.save_store
+                )
 
             if self.cover_entity.virtual_operation_handler == self:
                 self.cover_entity.virtual_operation_handler = None
             if self.on_complete_callback is not None:
-                XTEventLoopProtector.execute_out_of_event_loop(self.on_complete_callback)
+                XTEventLoopProtector.execute_out_of_event_loop(
+                    self.on_complete_callback
+                )
 
         def update_virtual_position_tick(self, _):
             if self.operation_end_time is None:
@@ -639,7 +643,10 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         if self.is_virtual_position_used():
             if self.configurable_properties.open_time is not None:
                 on_complete_callback = None
-                if self._set_position is None and self.current_cover_position is not None:
+                if (
+                    self._set_position is None
+                    or self.configurable_properties.no_precise_position
+                ) and self.current_cover_position is not None:
                     on_complete_callback = self.async_stop_cover
                     if self.current_cover_position < computed_position:
                         await self.async_open_cover()
