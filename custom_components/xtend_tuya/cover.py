@@ -562,7 +562,7 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         if self.virtual_operation_handler is not None:
             self.virtual_operation_handler.stop()
 
-    async def _async_open_cover(self, **kwargs: Any) -> None:
+    async def _async_open_cover(self, skip_virtual_position: bool = False, **kwargs: Any) -> None:
         """Open the cover."""
         if self._set_position is not None:
             await self._async_send_commands(
@@ -576,7 +576,7 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
             await self._async_send_wrapper_updates(
                 self._instruction_wrapper, TuyaCoverAction.OPEN
             )
-        if self.is_virtual_position_used():
+        if self.is_virtual_position_used() and skip_virtual_position is False:
             if self.configurable_properties.open_time is not None:
                 self.virtual_operation_handler = (
                     XTCoverEntity.XTCoverVirtualPositionHandler(
@@ -589,15 +589,15 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
                 )
                 self.virtual_operation_handler.start()
 
-    async def async_open_cover(self, **kwargs: Any) -> None:
+    async def async_open_cover(self, skip_virtual_position: bool = False, **kwargs: Any) -> None:
         LOGGER.warning("async_open_cover")
         """Open the cover."""
         if self.is_cover_control_inverted:
-            await self._async_close_cover(**kwargs)
+            await self._async_close_cover(skip_virtual_position=skip_virtual_position, **kwargs)
         else:
-            await self._async_open_cover(**kwargs)
+            await self._async_open_cover(skip_virtual_position=skip_virtual_position, **kwargs)
 
-    async def _async_close_cover(self, **kwargs: Any) -> None:
+    async def _async_close_cover(self, skip_virtual_position: bool = False, **kwargs: Any) -> None:
         """Close cover."""
         if self._set_position is not None:
             await self._async_send_commands(
@@ -611,7 +611,7 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
             await self._async_send_wrapper_updates(
                 self._instruction_wrapper, TuyaCoverAction.CLOSE
             )
-        if self.is_virtual_position_used():
+        if self.is_virtual_position_used() and skip_virtual_position is False:
             if self.configurable_properties.open_time is not None:
                 self.virtual_operation_handler = (
                     XTCoverEntity.XTCoverVirtualPositionHandler(
@@ -624,12 +624,12 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
                 )
                 self.virtual_operation_handler.start()
 
-    async def async_close_cover(self, **kwargs: Any) -> None:
+    async def async_close_cover(self, skip_virtual_position: bool = False, **kwargs: Any) -> None:
         LOGGER.warning("async_close_cover")
         if self.is_cover_control_inverted:
-            await self._async_open_cover(**kwargs)
+            await self._async_open_cover(skip_virtual_position=skip_virtual_position, **kwargs)
         else:
-            await self._async_close_cover(**kwargs)
+            await self._async_close_cover(skip_virtual_position=skip_virtual_position, **kwargs)
 
     async def async_set_cover_position(self, **kwargs: Any) -> None:
         LOGGER.warning("async_set_cover_position")
@@ -649,9 +649,9 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
                 ) and self.current_cover_position is not None:
                     on_complete_callback = self.async_stop_cover
                     if self.current_cover_position < computed_position:
-                        await self.async_open_cover()
+                        await self.async_open_cover(skip_virtual_position=True)
                     else:
-                        await self.async_close_cover()
+                        await self.async_close_cover(skip_virtual_position=True)
                 self.virtual_operation_handler = (
                     XTCoverEntity.XTCoverVirtualPositionHandler(
                         self,
