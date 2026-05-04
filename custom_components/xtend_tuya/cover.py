@@ -391,6 +391,7 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
             self.cover_entity.configurable_properties.virtual_position = int(
                 self.from_state + (self.to_state - self.from_state) * (seconds_elapsed / seconds_total_operation)
             )
+            self.cover_entity.schedule_update_ha_state()
 
             # re schedule the next update
             if (
