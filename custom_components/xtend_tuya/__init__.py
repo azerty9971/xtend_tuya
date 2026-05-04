@@ -382,6 +382,9 @@ async def async_remove_entry(hass: HomeAssistant, entry: XTConfigEntry) -> None:
 
     This will revoke the credentials from Tuya.
     """
+
+    LOGGER.debug(f"Removing XT {entry.title}")
+
     runtime_data = get_config_entry_runtime_data(hass, entry, DOMAIN)
     if runtime_data:
         await XTEventLoopProtector.execute_out_of_event_loop_and_return(
