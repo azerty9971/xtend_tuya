@@ -678,6 +678,9 @@ class TuyaOptionFlow(OptionsFlow):
             new_config.force_virtual_position = user_input.get(
                 "force_virtual_position", False
             )
+            new_config.no_precise_position = user_input.get(
+                "no_precise_position", False
+            )
             new_config.open_time = user_input.get("open_time", None)
             if new_config.open_time is not None and new_config.open_time <= 0.1:
                 new_config.open_time = None
@@ -736,6 +739,12 @@ class TuyaOptionFlow(OptionsFlow):
                     ): vol.All(
                         vol.Coerce(float),
                     ),
+                    vol.Optional(
+                        "no_precise_position",
+                        default=bool(
+                            configurable_properties.no_precise_position
+                        ),
+                    ): bool,
                 }
             ),
             description_placeholders={

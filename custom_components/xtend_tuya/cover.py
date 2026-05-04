@@ -36,6 +36,7 @@ from .multi_manager.multi_manager import (
 from .const import (
     TUYA_DISCOVERY_NEW,
     XTDPCode,  # noqa: F401
+    LOGGER,  # noqa: F401
 )
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaCoverEntity,
@@ -55,6 +56,7 @@ class XTCoverConfigurableProperties:
     invert_control: bool = False
     virtual_position: int = 100
     force_virtual_position: bool = False
+    no_precise_position: bool = False
     open_time: float | None = None
     update_interval: float = 1.0
 
@@ -332,6 +334,7 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
             from_state: int,
             to_state: int,
             update_interval: float,
+            on_complete_callback = None
         ) -> None:
             self.cover_entity = cover_entity
             self.total_open_time = open_time
@@ -344,6 +347,7 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
             )
             self._timer_cancel = None
             self._is_stopping = False
+            self.on_complete_callback = on_complete_callback
 
         def _compute_open_close_finish_time(
             self, from_percent: int, to_percent: int
@@ -382,6 +386,8 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
 
             if self.cover_entity.virtual_operation_handler == self:
                 self.cover_entity.virtual_operation_handler = None
+            if self.on_complete_callback is not None:
+                XTEventLoopProtector.execute_out_of_event_loop(self.on_complete_callback)
 
         def update_virtual_position_tick(self, _):
             if self.operation_end_time is None:
@@ -540,6 +546,7 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
             return current_state
 
     async def async_stop_cover(self, **kwargs: Any) -> None:
+        LOGGER.warning("async_stop_cover")
         """Stop the cover."""
         if (
             self._instruction_wrapper
@@ -579,6 +586,7 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
                 self.virtual_operation_handler.start()
 
     async def async_open_cover(self, **kwargs: Any) -> None:
+        LOGGER.warning("async_open_cover")
         """Open the cover."""
         if self.is_cover_control_inverted:
             await self._async_close_cover(**kwargs)
@@ -613,12 +621,14 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
                 self.virtual_operation_handler.start()
 
     async def async_close_cover(self, **kwargs: Any) -> None:
+        LOGGER.warning("async_close_cover")
         if self.is_cover_control_inverted:
             await self._async_open_cover(**kwargs)
         else:
             await self._async_close_cover(**kwargs)
 
     async def async_set_cover_position(self, **kwargs: Any) -> None:
+        LOGGER.warning("async_set_cover_position")
         """Move the cover to a specific position."""
         computed_position = kwargs[ATTR_POSITION]
         if self.is_cover_control_inverted and self._remap_helper is not None:
@@ -628,6 +638,13 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
             kwargs[ATTR_POSITION] = computed_position
         if self.is_virtual_position_used():
             if self.configurable_properties.open_time is not None:
+                on_complete_callback = None
+                if self._set_position is None and self.current_cover_position is not None:
+                    on_complete_callback = self.async_stop_cover
+                    if self.current_cover_position < computed_position:
+                        await self.async_open_cover()
+                    else:
+                        await self.async_close_cover()
                 self.virtual_operation_handler = (
                     XTCoverEntity.XTCoverVirtualPositionHandler(
                         self,
@@ -635,6 +652,7 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
                         self.cover_virtual_position,
                         computed_position,
                         self.configurable_properties.update_interval,
+                        on_complete_callback,
                     )
                 )
                 self.virtual_operation_handler.start()

@@ -148,7 +148,8 @@
                     "invert_status": "Invert the reported status of the device",
                     "open_time": "Time from opened to closed (seconds)",
                     "update_interval": "Status refresh interval",
-                    "force_virtual_position": "Force use of virtual position"
+                    "force_virtual_position": "Force use of virtual position",
+                    "no_precise_position": "Device doesn't support precise positioning"
                 }
             },
             "lock_device_settings": {
