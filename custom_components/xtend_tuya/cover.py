@@ -386,6 +386,8 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
             now = datetime.now()
             time_elapsed = now - self.operation_start_time
             total_operation_time = self.operation_end_time - self.operation_start_time
+            if time_elapsed > total_operation_time:
+                time_elapsed = total_operation_time
             seconds_elapsed = time_elapsed.total_seconds()
             seconds_total_operation = total_operation_time.total_seconds()
             self.cover_entity.configurable_properties.virtual_position = int(
