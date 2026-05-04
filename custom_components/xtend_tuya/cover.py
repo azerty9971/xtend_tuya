@@ -566,6 +566,7 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
                         self.configurable_properties.update_interval,
                     )
                 )
+                self.virtual_operation_handler.start()
 
     async def async_open_cover(self, **kwargs: Any) -> None:
         """Open the cover."""
@@ -599,6 +600,7 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
                         self.configurable_properties.update_interval,
                     )
                 )
+                self.virtual_operation_handler.start()
 
     async def async_close_cover(self, **kwargs: Any) -> None:
         if self.is_cover_control_inverted:
@@ -625,6 +627,7 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
                         self.configurable_properties.update_interval,
                     )
                 )
+                self.virtual_operation_handler.start()
 
         await super().async_set_cover_position(**kwargs)
 
