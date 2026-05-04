@@ -101,7 +101,7 @@ class XTThread(threading.Thread):
         self.callable = callable
         self.immediate_start = immediate_start
         self.exception: Exception | None = None
-        super().__init__(target=self.call_thread, args=args, kwargs=kwargs)
+        super().__init__(target=self.call_thread, daemon=True, args=args, kwargs=kwargs)
 
     def call_thread(self, *args, **kwargs):
         try:
