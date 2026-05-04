@@ -344,6 +344,7 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
                 self.from_state, self.to_state
             )
             self._timer_cancel = None
+            self._is_stopping = False
 
         def _compute_open_close_finish_time(
             self, from_percent: int, to_percent: int
@@ -367,8 +368,11 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
             self.update_virtual_position_tick(datetime.now())
 
         def stop(self):
+            self._is_stopping = True
             if self._timer_cancel is not None:
                 self._timer_cancel()
+            
+            self.update_virtual_position_tick(datetime.now())
 
             # Persist the virtual cover position
             if self.cover_entity.configurable_properties is not None:
@@ -391,13 +395,16 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
             seconds_elapsed = time_elapsed.total_seconds()
             seconds_total_operation = total_operation_time.total_seconds()
             self.cover_entity.configurable_properties.virtual_position = int(
-                self.from_state + (self.to_state - self.from_state) * (seconds_elapsed / seconds_total_operation)
+                self.from_state
+                + (self.to_state - self.from_state)
+                * (seconds_elapsed / seconds_total_operation)
             )
             self.cover_entity.schedule_update_ha_state()
 
             # re schedule the next update
             if (
-                self.operation_end_time is not None
+                self._is_stopping is False
+                and self.operation_end_time is not None
                 and datetime.now() < self.operation_end_time
             ):
                 self._timer_cancel = async_call_later(
@@ -407,7 +414,8 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
                 )
             else:
                 self._timer_cancel = None
-                self.stop()
+                if self._is_stopping is False:
+                    self.stop()
 
     entity_description: XTCoverEntityDescription  # type: ignore
 
