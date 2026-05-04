@@ -550,7 +550,6 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
             return current_state
 
     async def async_stop_cover(self, **kwargs: Any) -> None:
-        LOGGER.warning("async_stop_cover")
         """Stop the cover."""
         if (
             self._instruction_wrapper
@@ -590,7 +589,6 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
                 self.virtual_operation_handler.start()
 
     async def async_open_cover(self, skip_virtual_position: bool = False, **kwargs: Any) -> None:
-        LOGGER.warning("async_open_cover")
         """Open the cover."""
         if self.is_cover_control_inverted:
             await self._async_close_cover(skip_virtual_position=skip_virtual_position, **kwargs)
@@ -625,14 +623,12 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
                 self.virtual_operation_handler.start()
 
     async def async_close_cover(self, skip_virtual_position: bool = False, **kwargs: Any) -> None:
-        LOGGER.warning("async_close_cover")
         if self.is_cover_control_inverted:
             await self._async_open_cover(skip_virtual_position=skip_virtual_position, **kwargs)
         else:
             await self._async_close_cover(skip_virtual_position=skip_virtual_position, **kwargs)
 
     async def async_set_cover_position(self, **kwargs: Any) -> None:
-        LOGGER.warning("async_set_cover_position")
         """Move the cover to a specific position."""
         computed_position = kwargs[ATTR_POSITION]
         if self.is_cover_control_inverted and self._remap_helper is not None:
