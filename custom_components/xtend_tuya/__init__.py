@@ -72,44 +72,6 @@ def _getaddrinfo_ipv4_only(host, port, family=0, type=0, proto=0, flags=0):
     #     LOGGER.warning(f"_getaddrinfo_ipv4_only: {host=} {port=} {family=} {type=} {proto=} {flags=}")
     return _original_getaddrinfo(host, port, family, type, proto, flags)
 
-
-
-
-
-
-# DEBUG, REMOVE BEFORE RELEASE
-import threading
-
-_original_thread_init = threading.Thread.__init__
-
-def patched_init(self, *args, **kwargs):
-    daemon = kwargs.get("daemon")
-    if daemon is None:
-        daemon = threading.current_thread().daemon
-    if daemon is True:
-        LOGGER.warning("Thread created! Name=%s Daemon=%s", kwargs.get("name"), daemon, stack_info=False)
-    else:
-        LOGGER.warning("Thread created! Name=%s Daemon=%s", kwargs.get("name"), daemon, stack_info=True)
-    for t in threading.enumerate():
-        if t.daemon is not True:
-            LOGGER.warning(
-                "Thread still running: name=%s daemon=%s target=%s",
-                t.name,
-                t.daemon,
-                getattr(t, "_target", None),
-            )
-    _original_thread_init(self, *args, **kwargs)
-
-threading.Thread.__init__ = patched_init
-#END DEBUG
-
-
-
-
-
-
-
-
 # Replace the global function with the sniper
 socket.getaddrinfo = _getaddrinfo_ipv4_only
 
