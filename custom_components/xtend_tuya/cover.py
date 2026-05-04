@@ -31,6 +31,7 @@ from .multi_manager.multi_manager import (
     XTConfigEntry,
     MultiManager,
     XTDevice,
+    XTEventLoopProtector,
 )
 from .const import (
     TUYA_DISCOVERY_NEW,
@@ -377,6 +378,7 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
                 self.cover_entity.set_configurable_properties(
                     self.cover_entity.configurable_properties
                 )
+                XTEventLoopProtector.execute_out_of_event_loop(self.cover_entity.device_manager.storage_manager.save_store)
 
             if self.cover_entity.virtual_operation_handler == self:
                 self.cover_entity.virtual_operation_handler = None
