@@ -72,7 +72,6 @@ def _getaddrinfo_ipv4_only(host, port, family=0, type=0, proto=0, flags=0):
     #     LOGGER.warning(f"_getaddrinfo_ipv4_only: {host=} {port=} {family=} {type=} {proto=} {flags=}")
     return _original_getaddrinfo(host, port, family, type, proto, flags)
 
-
 # Replace the global function with the sniper
 socket.getaddrinfo = _getaddrinfo_ipv4_only
 
@@ -381,6 +380,7 @@ async def async_remove_entry(hass: HomeAssistant, entry: XTConfigEntry) -> None:
 
     This will revoke the credentials from Tuya.
     """
+
     runtime_data = get_config_entry_runtime_data(hass, entry, DOMAIN)
     if runtime_data:
         await XTEventLoopProtector.execute_out_of_event_loop_and_return(

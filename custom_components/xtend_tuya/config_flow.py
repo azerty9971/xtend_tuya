@@ -666,6 +666,10 @@ class TuyaOptionFlow(OptionsFlow):
         if cover_entity is None:
             return self.async_abort(reason="cover_entity_not_found")
 
+        configurable_properties: cover.XTCoverConfigurableProperties | None = (
+            cover_entity.get_configurable_properties()
+        )
+
         if user_input is not None:
             # Update the configurable properties
             new_config = cover.XTCoverConfigurableProperties()
@@ -675,17 +679,26 @@ class TuyaOptionFlow(OptionsFlow):
             new_config.invert_status = user_input.get(
                 "invert_status", False
             )
+            new_config.force_virtual_position = user_input.get(
+                "force_virtual_position", False
+            )
+            new_config.no_precise_position = user_input.get(
+                "no_precise_position", False
+            )
             new_config.open_time = user_input.get("open_time", None)
             if new_config.open_time is not None and new_config.open_time <= 0.1:
                 new_config.open_time = None
+            new_interval = user_input.get("update_interval")
+            if new_interval is not None:
+                new_config.update_interval = new_interval
+            if configurable_properties is not None:
+                new_config.virtual_position = configurable_properties.virtual_position
+            
             cover_entity.set_configurable_properties(new_config)
             await self.multi_manager.storage_manager.save_store()
             self.multi_manager.multi_device_listener.update_device(device=device)
             return self.async_create_entry(title="", data=self.options)
 
-        configurable_properties: cover.XTCoverConfigurableProperties | None = (
-            cover_entity.get_configurable_properties()
-        )
         if configurable_properties is None:
             return self.async_abort(reason="no_configurable_properties")
 
@@ -706,6 +719,12 @@ class TuyaOptionFlow(OptionsFlow):
                         ),
                     ): bool,
                     vol.Optional(
+                        "force_virtual_position",
+                        default=bool(
+                            configurable_properties.force_virtual_position
+                        ),
+                    ): bool,
+                    vol.Optional(
                         "open_time",
                         default=(
                             configurable_properties.open_time
@@ -716,6 +735,20 @@ class TuyaOptionFlow(OptionsFlow):
                     ): vol.All(
                         vol.Coerce(float),
                     ),
+                    vol.Optional(
+                        "update_interval",
+                        default=(
+                            configurable_properties.update_interval
+                        ),
+                    ): vol.All(
+                        vol.Coerce(float),
+                    ),
+                    vol.Optional(
+                        "no_precise_position",
+                        default=bool(
+                            configurable_properties.no_precise_position
+                        ),
+                    ): bool,
                 }
             ),
             description_placeholders={
