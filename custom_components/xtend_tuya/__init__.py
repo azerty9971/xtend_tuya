@@ -363,7 +363,6 @@ def is_config_entry_master(
 
 async def async_unload_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
     """Unloading the Tuya platforms."""
-    LOGGER.warning(f"Unloading XT {entry.title}")
     if unload_ok := await hass.config_entries.async_unload_platforms(entry, PLATFORMS):
         tuya = entry.runtime_data
         if tuya.manager is not None:
@@ -381,8 +380,6 @@ async def async_remove_entry(hass: HomeAssistant, entry: XTConfigEntry) -> None:
 
     This will revoke the credentials from Tuya.
     """
-
-    LOGGER.warning(f"Removing XT {entry.title}")
 
     runtime_data = get_config_entry_runtime_data(hass, entry, DOMAIN)
     if runtime_data:
