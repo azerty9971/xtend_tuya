@@ -84,13 +84,13 @@ _original_thread_init = threading.Thread.__init__
 
 def patched_init(self, *args, **kwargs):
     LOGGER.warning("Thread created! Name=%s", kwargs.get("name"), stack_info=True)
-    for t in threading.enumerate():
-        LOGGER.warning(
-            "Thread still running: name=%s daemon=%s target=%s",
-            t.name,
-            t.daemon,
-            getattr(t, "_target", None),
-        )
+    # for t in threading.enumerate():
+    #     LOGGER.warning(
+    #         "Thread still running: name=%s daemon=%s target=%s",
+    #         t.name,
+    #         t.daemon,
+    #         getattr(t, "_target", None),
+    #     )
     _original_thread_init(self, *args, **kwargs)
 
 threading.Thread.__init__ = patched_init
