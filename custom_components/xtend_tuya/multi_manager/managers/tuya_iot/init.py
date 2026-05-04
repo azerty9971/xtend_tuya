@@ -316,6 +316,7 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
             return None
         if self.iot_account.device_manager.mq:
             self.iot_account.device_manager.mq.stop()
+            self.iot_account.device_manager.ipc_manager.mq.stop()
 
     def on_post_setup(self):
         if self.iot_account is None:
