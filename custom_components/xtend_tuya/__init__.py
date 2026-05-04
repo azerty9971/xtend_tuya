@@ -73,6 +73,29 @@ def _getaddrinfo_ipv4_only(host, port, family=0, type=0, proto=0, flags=0):
     return _original_getaddrinfo(host, port, family, type, proto, flags)
 
 
+
+
+
+
+# DEBUG, REMOVE BEFORE RELEASE
+import threading
+
+_original_thread_init = threading.Thread.__init__
+
+def patched_init(self, *args, **kwargs):
+    LOGGER.warning("Thread created! Name=%s", kwargs.get("name"), stack_info=True)
+    _original_thread_init(self, *args, **kwargs)
+
+threading.Thread.__init__ = patched_init
+#END DEBUG
+
+
+
+
+
+
+
+
 # Replace the global function with the sniper
 socket.getaddrinfo = _getaddrinfo_ipv4_only
 
