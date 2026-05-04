@@ -675,9 +675,15 @@ class TuyaOptionFlow(OptionsFlow):
             new_config.invert_status = user_input.get(
                 "invert_status", False
             )
+            new_config.force_virtual_position = user_input.get(
+                "force_virtual_position", False
+            )
             new_config.open_time = user_input.get("open_time", None)
             if new_config.open_time is not None and new_config.open_time <= 0.1:
                 new_config.open_time = None
+            new_interval = user_input.get("update_interval")
+            if new_interval is not None:
+                new_config.update_interval = new_interval
             cover_entity.set_configurable_properties(new_config)
             await self.multi_manager.storage_manager.save_store()
             self.multi_manager.multi_device_listener.update_device(device=device)
@@ -706,12 +712,26 @@ class TuyaOptionFlow(OptionsFlow):
                         ),
                     ): bool,
                     vol.Optional(
+                        "force_virtual_position",
+                        default=bool(
+                            configurable_properties.force_virtual_position
+                        ),
+                    ): bool,
+                    vol.Optional(
                         "open_time",
                         default=(
                             configurable_properties.open_time
                             if configurable_properties.open_time
                             is not None
                             else vol.UNDEFINED
+                        ),
+                    ): vol.All(
+                        vol.Coerce(float),
+                    ),
+                    vol.Optional(
+                        "update_interval",
+                        default=(
+                            configurable_properties.update_interval
                         ),
                     ): vol.All(
                         vol.Coerce(float),

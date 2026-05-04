@@ -3,6 +3,7 @@
 from __future__ import annotations
 from typing import cast
 from dataclasses import dataclass
+from datetime import datetime, timedelta
 from typing import Any
 from tuya_device_handlers.definition.cover import (
     TuyaCoverDefinition,
@@ -21,6 +22,7 @@ from homeassistant.components.cover import (
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
+from homeassistant.helpers.event import async_call_later
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from .util import (
     restrict_descriptor_category,
@@ -45,12 +47,16 @@ from .entity import (
     XTEntityDescriptorManager,
 )
 
+
 @dataclass
 class XTCoverConfigurableProperties:
     invert_status: bool = False
     invert_control: bool = False
-    virtual_position: int | None = None
+    virtual_position: int = 100
+    force_virtual_position: bool = False
     open_time: float | None = None
+    update_interval: float = 1.0
+
 
 @dataclass(frozen=True)
 class XTCoverEntityDescription(TuyaCoverEntityDescription):
@@ -107,8 +113,8 @@ COVERS: dict[str, tuple[XTCoverEntityDescription, ...]] = {
             translation_key="curtain",
             current_state=XTDPCode.SITUATION_SET,
             # DEBUG TEST REMOVE BEFORE RELEASE
-            current_position=(XTDPCode.PERCENT_CONTROL, XTDPCode.PERCENT_STATE),
-            set_position=(XTDPCode.PERCENT_CONTROL, XTDPCode.PERCENT_STATE),
+            # current_position=(XTDPCode.PERCENT_CONTROL, XTDPCode.PERCENT_STATE),
+            # set_position=(XTDPCode.PERCENT_CONTROL, XTDPCode.PERCENT_STATE),
             # END DEBUG TEST
             device_class=CoverDeviceClass.CURTAIN,
             control_back_mode=XTDPCode.CONTROL_BACK_MODE,
@@ -311,6 +317,95 @@ async def async_setup_entry(
 class XTCoverEntity(XTEntity, TuyaCoverEntity):
     """XT Cover Device."""
 
+    class XTCoverVirtualPositionHandler:
+        # cover_entity: XTCoverEntity
+        # total_open_time: float
+        # operation_start_time: datetime
+        # operation_end_time: datetime | None
+        # update_interval: float
+        # from_state: int
+        # to_state: int
+
+        def __init__(
+            self,
+            cover_entity: XTCoverEntity,
+            open_time: float,
+            from_state: int,
+            to_state: int,
+            update_interval: float,
+        ) -> None:
+            self.cover_entity = cover_entity
+            self.total_open_time = open_time
+            self.from_state = from_state
+            self.to_state = to_state
+            self.update_interval = update_interval
+            self.operation_start_time = datetime.now()
+            self.operation_end_time = self._compute_open_close_finish_time(
+                self.from_state, self.to_state
+            )
+            self._timer_cancel = None
+
+        def _compute_open_close_finish_time(
+            self, from_percent: int, to_percent: int
+        ) -> datetime | None:
+            move_percent: int = abs(from_percent - to_percent)
+            if move_percent == 0:
+                return None
+
+            open_seconds: float = self.total_open_time * move_percent / 100
+            return datetime.now() + timedelta(seconds=open_seconds)
+
+        def _compute_next_check_time(self) -> datetime | None:
+            if self.update_interval == 0.0:
+                return None
+            return datetime.now() + timedelta(seconds=self.update_interval)
+
+        def start(self):
+            if self._timer_cancel is not None:
+                self._timer_cancel()
+                self._timer_cancel = None
+            self.update_virtual_position_tick(datetime.now())
+
+        def stop(self):
+            if self._timer_cancel is not None:
+                self._timer_cancel()
+
+            # Persist the virtual cover position
+            if self.cover_entity.configurable_properties is not None:
+                self.cover_entity.set_configurable_properties(
+                    self.cover_entity.configurable_properties
+                )
+
+            if self.cover_entity.virtual_operation_handler == self:
+                self.cover_entity.virtual_operation_handler = None
+
+        def update_virtual_position_tick(self, _):
+            if self.operation_end_time is None:
+                return None
+
+            now = datetime.now()
+            time_elapsed = now - self.operation_start_time
+            total_operation_time = self.operation_end_time - self.operation_start_time
+            seconds_elapsed = time_elapsed.total_seconds()
+            seconds_total_operation = total_operation_time.total_seconds()
+            self.cover_entity.configurable_properties.virtual_position = int(
+                self.from_state + (self.to_state - self.from_state) * (seconds_elapsed / seconds_total_operation)
+            )
+
+            # re schedule the next update
+            if (
+                self.operation_end_time is not None
+                and datetime.now() < self.operation_end_time
+            ):
+                self._timer_cancel = async_call_later(
+                    self.cover_entity.hass,
+                    self.update_interval,
+                    self.update_virtual_position_tick,
+                )
+            else:
+                self._timer_cancel = None
+                self.stop()
+
     entity_description: XTCoverEntityDescription  # type: ignore
 
     def __init__(
@@ -336,7 +431,7 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         )
         self.device = device
         self.local_hass = hass
-        self._current_position = definition.current_position_wrapper
+        # self._current_position = definition.current_position_wrapper
         self._remap_helper = cast(
             TuyaRemapHelper | None,
             getattr(
@@ -346,7 +441,9 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
             ),
         )
         if self._remap_helper is None:
-            self._remap_helper = RemapHelper(source_min=0, source_max=100, target_min=0, target_max=100)
+            self._remap_helper = RemapHelper(
+                source_min=0, source_max=100, target_min=0, target_max=100
+            )
         self.device.set_preference(
             f"{XTDevice.XTDevicePreference.COVER_DEVICE_ENTITY}",
             self,
@@ -355,13 +452,16 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         #     XTCoverConfigurableProperties, self.get_configurable_properties()
         # )
         self.refresh_configurable_properties()
-    
+        self.virtual_operation_handler: (
+            XTCoverEntity.XTCoverVirtualPositionHandler | None
+        ) = None
+
     def get_configurable_properties_type(self) -> type[Any] | None:
         return XTCoverConfigurableProperties
 
     def get_configurable_properties_key(self) -> str | None:
         return "cover_configurable_properties"
-    
+
     def refresh_configurable_properties(self):
         self.configurable_properties = cast(
             XTCoverConfigurableProperties, self.get_configurable_properties()
@@ -384,15 +484,25 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
     def is_cover_status_inverted(self) -> bool:
         return self.configurable_properties.invert_status
 
+    def is_virtual_position_used(self) -> bool:
+        if self.configurable_properties is None:
+            return False
+        if self.configurable_properties.open_time is None:
+            return False
+        if (
+            self._current_position is not None
+            and self.configurable_properties.force_virtual_position is False
+        ):
+            return False
+        return True
+
     @property
-    def cover_virtual_position(self) -> int | None:
+    def cover_virtual_position(self) -> int:
         return self.configurable_properties.virtual_position
 
     @property
     def current_cover_position(self) -> int | None:
         current_cover_position = super().current_cover_position
-        if current_cover_position is None:
-            current_cover_position = self.cover_virtual_position
         if current_cover_position is not None:
             if self.is_cover_status_inverted:
                 if self._remap_helper is not None:
@@ -401,6 +511,8 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
                             current_cover_position, reverse=True
                         )
                     )
+        if self.is_virtual_position_used():
+            current_cover_position = self.cover_virtual_position
         return current_cover_position
 
     @property
@@ -416,15 +528,25 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         else:
             return current_state
 
+    async def async_stop_cover(self, **kwargs: Any) -> None:
+        """Stop the cover."""
+        if (
+            self._instruction_wrapper
+            and TuyaCoverAction.STOP in self._instruction_wrapper.options
+        ):
+            await self._async_send_wrapper_updates(
+                self._instruction_wrapper, TuyaCoverAction.STOP
+            )
+        if self.virtual_operation_handler is not None:
+            self.virtual_operation_handler.stop()
+
     async def _async_open_cover(self, **kwargs: Any) -> None:
         """Open the cover."""
         if self._set_position is not None:
             await self._async_send_commands(
                 self._set_position.get_update_commands(self.device, 100)
             )
-            return
-
-        if (
+        elif (
             self._instruction_wrapper
             and (options := self._instruction_wrapper.options)
             and TuyaCoverAction.OPEN in options
@@ -432,7 +554,17 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
             await self._async_send_wrapper_updates(
                 self._instruction_wrapper, TuyaCoverAction.OPEN
             )
-            return
+        if self.is_virtual_position_used():
+            if self.configurable_properties.open_time is not None:
+                self.virtual_operation_handler = (
+                    XTCoverEntity.XTCoverVirtualPositionHandler(
+                        self,
+                        self.configurable_properties.open_time,
+                        self.cover_virtual_position,
+                        100,
+                        self.configurable_properties.update_interval,
+                    )
+                )
 
     async def async_open_cover(self, **kwargs: Any) -> None:
         """Open the cover."""
@@ -447,9 +579,7 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
             await self._async_send_commands(
                 self._set_position.get_update_commands(self.device, 0)
             )
-            return
-
-        if (
+        elif (
             self._instruction_wrapper
             and (options := self._instruction_wrapper.options)
             and TuyaCoverAction.CLOSE in options
@@ -457,7 +587,17 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
             await self._async_send_wrapper_updates(
                 self._instruction_wrapper, TuyaCoverAction.CLOSE
             )
-            return
+        if self.is_virtual_position_used():
+            if self.configurable_properties.open_time is not None:
+                self.virtual_operation_handler = (
+                    XTCoverEntity.XTCoverVirtualPositionHandler(
+                        self,
+                        self.configurable_properties.open_time,
+                        self.cover_virtual_position,
+                        0,
+                        self.configurable_properties.update_interval,
+                    )
+                )
 
     async def async_close_cover(self, **kwargs: Any) -> None:
         if self.is_cover_control_inverted:
@@ -473,6 +613,18 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
                 self._remap_helper.remap_value_to(computed_position, reverse=True)
             )
             kwargs[ATTR_POSITION] = computed_position
+        if self.is_virtual_position_used():
+            if self.configurable_properties.open_time is not None:
+                self.virtual_operation_handler = (
+                    XTCoverEntity.XTCoverVirtualPositionHandler(
+                        self,
+                        self.configurable_properties.open_time,
+                        self.cover_virtual_position,
+                        computed_position,
+                        self.configurable_properties.update_interval,
+                    )
+                )
+
         await super().async_set_cover_position(**kwargs)
 
     @staticmethod
