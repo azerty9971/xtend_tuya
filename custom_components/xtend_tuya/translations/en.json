@@ -86,6 +86,7 @@
                 "title": "Configuration category",
                 "menu_options": {
                     "select_climate_device": "Climate options",
+                    "select_cover_device": "Cover options",
                     "select_lock_device": "Lock options"
                 }
             },
@@ -115,6 +116,13 @@
                     "device": "Device"
                 }
             },
+            "select_cover_device": {
+                "title": "Select Device",
+                "description": "Select a cover device to configure.",
+                "data": {
+                    "device": "Device"
+                }
+            },
             "select_lock_device": {
                 "title": "Select Device",
                 "description": "Select a lock device to configure.",
@@ -132,11 +140,23 @@
                     "target_humidity_value_multiplicator": "Target humidity multiplier"
                 }
             },
+            "cover_device_settings": {
+                "title": "Configure {device_name}",
+                "description": "Set the properties of the device",
+                "data": {
+                    "invert_control": "Invert the control of the device",
+                    "invert_status": "Invert the reported status of the device",
+                    "open_time": "Time from opened to closed (seconds)",
+                    "update_interval": "Status refresh interval",
+                    "force_virtual_position": "Force use of virtual position",
+                    "no_precise_position": "Device doesn't support precise positioning"
+                }
+            },
             "lock_device_settings": {
                 "title": "Configure {device_name}",
                 "description": "Set the properties of the device",
                 "data": {
-                    "force_temporary_unlock": "Lock is only opening temporarely",
+                    "temporary_unlock_time": "Seconds the lock stays opened",
                     "lock_unlock_mecanism": "Force unlock mecanism"
                 }
             }

@@ -1,3 +1,4 @@
+from ..lib.tuya_sharing import strategy_repo  # noqa: F401
 from homeassistant.components.alarm_control_panel import (
     AlarmControlPanelEntityDescription as TuyaAlarmControlPanelEntityDescription,  # noqa: F401
 )
@@ -41,7 +42,7 @@ from homeassistant.components.tuya.event import (
     TuyaEventEntityDescription as TuyaEventEntityDescription,
 )
 from homeassistant.components.tuya.fan import (
-    TUYA_SUPPORT_TYPE as FANS_TUYA,  # noqa: F401
+    FANS as FANS_TUYA,  # noqa: F401
     TuyaFanEntity as TuyaFanEntity,
 )
 from homeassistant.components.tuya.humidifier import (
@@ -91,11 +92,12 @@ from homeassistant.components.tuya.vacuum import (
     TuyaVacuumEntity as TuyaVacuumEntity,
 )
 import homeassistant.components.tuya as tuya_integration  # noqa: F401
+import homeassistant.components.tuya.coordinator as tuya_coordinator  # noqa: F401
 
 # from homeassistant.components.tuya import (
 #    ManagerCompat as TuyaManager,
 # )
-from ..lib.tuya_sharing.manager import (
+from tuya_sharing.manager import (
     Manager as TuyaManager,  # noqa: F401
     CustomerDevice as TuyaCustomerDevice,  # noqa: F401
 )
@@ -151,7 +153,7 @@ from tuya_device_handlers.device_wrapper.binary_sensor import (
     DPCodeBitmapBitWrapper as TuyaDPCodeBitmapBitWrapper,  # noqa: F401
 )
 
-from ..lib.tuya_sharing.scenes import (
+from tuya_sharing.scenes import (
     SharingScene as TuyaScene,  # noqa: F401
 )
 from homeassistant.components.tuya.scene import (

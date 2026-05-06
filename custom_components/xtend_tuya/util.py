@@ -19,12 +19,13 @@ from .const import (
     DOMAIN,
     DOMAIN_ORIG,
 )
-from .lib.tuya_sharing.manager import (
+from tuya_sharing.manager import (
     Manager,
     SharingDeviceListener,
 )
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaDPType,
+    tuya_coordinator,
 )
 import custom_components.xtend_tuya.multi_manager.multi_manager as mm
 import custom_components.xtend_tuya.multi_manager.shared.shared_classes as shared
@@ -74,34 +75,17 @@ class ConfigEntryRuntimeData(NamedTuple):
 
 
 def get_config_entry_runtime_data(
-    hass: HomeAssistant, entry: ConfigEntry, domain: str
+    hass: HomeAssistant, entry: tuya_coordinator.TuyaConfigEntry | shared.XTConfigEntry, domain: str
 ) -> ConfigEntryRuntimeData | None:
     if not entry:
         return None
-    runtime_data = None
-    device_manager = None
-    device_listener = None
-    if not hasattr(entry, "runtime_data") or entry.runtime_data is None:
-        # Try to fetch the manager using the old way
-        if domain in hass.data and entry.entry_id in hass.data[domain]:
-            runtime_data = hass.data[domain][entry.entry_id]
-            if hasattr(runtime_data, "device_manager"):
-                device_manager = runtime_data.device_manager
-            if hasattr(runtime_data, "manager"):
-                device_manager = runtime_data.manager
-            if hasattr(runtime_data, "device_listener"):
-                device_listener = runtime_data.device_listener
-            if hasattr(runtime_data, "listener"):
-                device_listener = runtime_data.listener
-    else:
-        runtime_data = entry.runtime_data
-        device_manager = entry.runtime_data.manager
-        device_listener = entry.runtime_data.listener
-    if device_manager is not None and device_listener is not None:
+    runtime_data = entry.runtime_data
+    device_manager = runtime_data.manager
+    if device_manager is not None:
         return ConfigEntryRuntimeData(
-            device_manager=device_manager,
+            device_manager=device_manager, # type: ignore
             generic_runtime_data=runtime_data,
-            device_listener=device_listener,
+            device_listener=runtime_data, # type: ignore
         )
     else:
         return None

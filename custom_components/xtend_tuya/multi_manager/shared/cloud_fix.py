@@ -64,19 +64,20 @@ class CloudFixes:
         device: XTDevice, multi_manager: mm.MultiManager | None = None
     ):
         for dpcode in device.status:
-            if device.status[dpcode] is None:
-                continue
+            # if device.status[dpcode] is None:
+            #     continue
             new_dptype: TuyaDPType | None = None
             if dpcode_info := device.get_dpcode_information(dpcode=dpcode):
                 match dpcode_info.dptype:
                     case TuyaDPType.RAW:
                         if dpcode_info.value_convert == "default":
-                            continue
-                        converted_value = device.apply_dpcode_strategy(
-                            dpcode=dpcode,
-                            value=device.status[dpcode],
-                            multi_manager=multi_manager,
-                        )
+                            converted_value = device.status[dpcode] if device.status[dpcode] is not None else str("")
+                        else:
+                            converted_value = device.apply_dpcode_strategy(
+                                dpcode=dpcode,
+                                value=device.status[dpcode],
+                                multi_manager=multi_manager,
+                            )
                         if isinstance(converted_value, str):
                             new_dptype = TuyaDPType.STRING
                         try:

@@ -49,6 +49,7 @@ TUYA_SCHEMA = "haauthorize"
 TUYA_DISCOVERY_NEW_ORIG = "tuya_discovery_new"
 TUYA_HA_SIGNAL_UPDATE_ENTITY = "tuya_entry_update"
 TUYA_DISCOVERY_NEW = "xt_tuya_discovery_new"
+XT_GLOBAL_EVENT_PREFIX = "xt_tuya_global_event_"
 
 TUYA_RESPONSE_CODE = "code"
 TUYA_RESPONSE_MSG = "msg"
@@ -141,6 +142,8 @@ class AllowedPlugins:
     def get_plugins_to_load() -> list[str]:
         return [MESSAGE_SOURCE_TUYA_SHARING, MESSAGE_SOURCE_TUYA_IOT]
 
+class XTGlobalEvents(StrEnum):
+    LOCK_UNLOCKED = "LOCK_UNLOCKED"
 
 class VirtualStates(IntFlag):
     """Virtual states"""
@@ -1034,18 +1037,25 @@ class XTDPCode(StrEnum):
     UNIT2 = "Unit"
     UNLOCK_BLE = "unlock_ble"
     UNLOCK_CARD = "unlock_card"
+    UNLOCK_CARD_KIT = "unlock_card_kit"
     UNLOCK_DYNAMIC = "unlock_dynamic"
     UNLOCK_KEY = "unlock_key"
     UNLOCK_FACE = "unlock_face"
     UNLOCK_FINGERPRINT = "unlock_fingerprint"
+    UNLOCK_FINGERPRINT_KIT = "unlock_fingerprint_kit"
     UNLOCK_FINGER_VEIN = "unlock_finger_vein"
     UNLOCK_HAND = "unlock_hand"
     UNLOCK_METHOD_CREATE = "unlock_method_create"
     UNLOCK_METHOD_DELETE = "unlock_method_delete"
     UNLOCK_METHOD_MODIFY = "unlock_method_modify"
+    UNLOCK_OFFLINE_PD = "unlock_offline_pd"
     UNLOCK_PASSWORD = "unlock_password"
+    UNLOCK_PASSWORD_KIT = "unlock_password_kit"
     UNLOCK_PHONE_REMOTE = "unlock_phone_remote"
+    UNLOCK_PHONE_REMOTE_KIT = "unlock_phone_remote_kit"
+    UNLOCK_TELECONTROL_KIT = "unlock_telecontrol_kit"
     UNLOCK_TEMPORARY = "unlock_temporary"
+    UNLOCK_TEMPORARY_KIT = "unlock_temporary_kit"
     UNLOCK_VOICE_REMOTE = "unlock_voice_remote"
     CARD_UNLOCK_USER = "card_unlock_user"
     FACE_UNLOCK_USER = "face_unlock_user"
@@ -1065,6 +1075,7 @@ class XTDPCode(StrEnum):
     UV_END_TIME = "uv_end_time"
     UV_LIGHT = "uv_light"
     VBAT_STATE = "vbat_state"
+    VIDEO_REQUEST_REALTIME = "video_request_realtime"
     VOL_YD = "vol_yd"
     VOLTAGEA = "VoltageA"
     VOLTAGEB = "VoltageB"
@@ -1092,8 +1103,6 @@ class XTDPCode(StrEnum):
     XT_ADD_ELE2_THIS_MONTH = "xt_add_ele2_this_month"
     XT_ADD_ELE2_THIS_YEAR = "xt_add_ele2_this_year"
     XT_ADD_ELE2_TODAY = "xt_add_ele2_today"
-    XT_COVER_INVERT_CONTROL = "xt_cover_invert_control"
-    XT_COVER_INVERT_STATUS = "xt_cover_invert_status"
     XT_DEVICE_EVENT_NOTIFY = "xt_device_event_notify"
     XT_FORWARD_ENERGY_TOTAL = "xt_forward_energy_total"
     XT_FORWARD_ENERGY_TOTAL_THIS_MONTH = "xt_forward_energy_total_this_month"
@@ -1119,7 +1128,9 @@ UOM_MAPPING_DICT: dict[str, str | None] = {
     "kwh": "kWh",
     "kW·h": "kWh",
     "kW.h": "kWh",
+    "KWH": "kWh",
     "kVar": "kvar",
+    "M": "m",
     "KM": "km",
     "v": "V",
     "％": "%",
@@ -1134,13 +1145,17 @@ UOM_MAPPING_DICT: dict[str, str | None] = {
     "秒": "s",
     "S": "s",
     "day": "d",
+    "lux": "lx",
     "": None,
     "ADC": None,
     "格": None,
     "电机电流>1k，瞬间<1k，除臭2K>60": None,
     "线程号": None,
+    "欧姆": None,
     "次": None,
     "times": None,
+    "0.1s": None,
+    "x": None,
 }
 
 DPCODE_PREFERED_DEVICE_CLASS: dict[str, str | None] = {
@@ -1149,13 +1164,25 @@ DPCODE_PREFERED_DEVICE_CLASS: dict[str, str | None] = {
     "maxco2_set": "carbon_dioxide",
     "motionless_far_detection": "distance",
     "breathe_detection": "distance",
+    "dis_current": "distance",
     "micro_min_detection": "distance",
+    "bre_max_detection": "distance",
     "bre_min_detection": "distance",
+    "breathdistance_max": "distance",
+    "breathdistance_min": "distance",
+    "movedistance_max": "distance",
+    "movedistance_min": "distance",
     "active_energy_total": "energy",
     "add_ele": "energy",
     "add_ele1": "energy",
     "charge_energy": "energy",
     "cur_neutral": "energy",
+    "energy_forword_a": "energy",
+    "energy_forword_b": "energy",
+    "energy_reverse_a": "energy",
+    "energy_reserse_a": "energy",
+    "energy_reverse_b": "energy",
+    "energy_reserse_b": "energy",
     "today_acc_energy1": "energy",
     "today_energy_add1": "energy",
     "total_energy1": "energy",
@@ -1204,6 +1231,7 @@ DPCODE_PREFERED_DEVICE_CLASS: dict[str, str | None] = {
     "alarm_bright": None,
     "fan_speed": None,
     "heating_ratio": None,
+    "ipc_siren_volume": None,
     "percent_control": None,
     "percent_state": None,
     "position_best": None,

@@ -1337,21 +1337,6 @@ LOCK_SENSORS: tuple[XTSensorEntityDescription, ...] = (
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
 SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
     CROSS_CATEGORY_DEVICE_DESCRIPTOR: (
-        XTSensorEntityDescription(
-            key=XTDPCode.XT_COVER_INVERT_CONTROL,
-            translation_key="xt_cover_invert_control",
-            entity_registry_visible_default=False,
-            restoredata=True,
-            wrapper_class=(TuyaDPCodeBooleanWrapper,),
-        ),
-        XTSensorEntityDescription(
-            key=XTDPCode.XT_COVER_INVERT_STATUS,
-            translation_key="xt_cover_invert_status",
-            entity_registry_visible_default=False,
-            restoredata=True,
-            refresh_device_after_load=True,
-            wrapper_class=(TuyaDPCodeBooleanWrapper,),
-        ),
         *CONSUMPTION_SENSORS,
         *BATTERY_SENSORS,
     ),

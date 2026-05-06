@@ -4,7 +4,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Any, cast
 from enum import StrEnum
-from .lib.tuya_sharing import LoginControl
+from tuya_sharing import LoginControl
 from .lib.tuya_iot import AuthType
 import voluptuous as vol
 from homeassistant.core import callback, HomeAssistant
@@ -64,6 +64,7 @@ import custom_components.xtend_tuya.multi_manager.multi_manager as mm
 import custom_components.xtend_tuya.multi_manager.shared.data_entry.shared_data_entry as data_entry
 import custom_components.xtend_tuya.climate as climate
 import custom_components.xtend_tuya.lock as lock
+import custom_components.xtend_tuya.cover as cover
 
 STEP_METHOD_PREFIX = "async_step_"
 
@@ -76,6 +77,8 @@ class XTStepId(StrEnum):
     CLIMATE_DEVICE_SETTINGS = "climate_device_settings"
     SELECT_LOCK_DEVICE = "select_lock_device"
     LOCK_DEVICE_SETTINGS = "lock_device_settings"
+    SELECT_COVER_DEVICE = "select_cover_device"
+    COVER_DEVICE_SETTINGS = "cover_device_settings"
 
 
 OPTION_STEP_DEFINITION: dict[XTStepId, tuple[str, list[Any], dict[str, Any], bool]] = {
@@ -95,6 +98,7 @@ OPTION_STEP_DEFINITION: dict[XTStepId, tuple[str, list[Any], dict[str, Any], boo
             "step_id": XTStepId.DEVICE_SETTINGS,
             "menu_options": [
                 XTStepId.SELECT_CLIMATE_DEVICE,
+                XTStepId.SELECT_COVER_DEVICE,
                 XTStepId.SELECT_LOCK_DEVICE,
             ],
         },
@@ -121,6 +125,18 @@ OPTION_STEP_DEFINITION: dict[XTStepId, tuple[str, list[Any], dict[str, Any], boo
                 f"{mm.XTDevice.XTDevicePreference.LOCK_DEVICE_ENTITY}": None
             },
             "next_step_id": XTStepId.LOCK_DEVICE_SETTINGS,
+        },
+        True,
+    ),
+    XTStepId.SELECT_COVER_DEVICE: (
+        "async_step_select_device",
+        [],
+        {
+            "user_input": None,
+            "has_preferences": {
+                f"{mm.XTDevice.XTDevicePreference.COVER_DEVICE_ENTITY}": None
+            },
+            "next_step_id": XTStepId.COVER_DEVICE_SETTINGS,
         },
         True,
     ),
@@ -577,9 +593,11 @@ class TuyaOptionFlow(OptionsFlow):
         if user_input is not None:
             # Update the configurable properties
             new_config = lock.XTLockConfigurableProperties()
-            new_config.force_temporary_unlock = user_input.get(
-                "force_temporary_unlock", False
+            new_config.temporary_unlock_time = user_input.get(
+                "temporary_unlock_time", None
             )
+            if new_config.temporary_unlock_time is not None and new_config.temporary_unlock_time < 0.1:
+                new_config.temporary_unlock_time = None
             new_config.lock_unlock_mecanism = user_input.get("lock_unlock_mecanism", XTLockingMechanism.AUTO)
             lock_entity.set_configurable_properties(new_config)
             await self.multi_manager.storage_manager.save_store()
@@ -597,14 +615,16 @@ class TuyaOptionFlow(OptionsFlow):
             data_schema=vol.Schema(
                 {
                     vol.Optional(
-                        "force_temporary_unlock",
-                        default=bool(
-                            configurable_properties.force_temporary_unlock
-                            if configurable_properties.force_temporary_unlock
+                        "temporary_unlock_time",
+                        default=(
+                            configurable_properties.temporary_unlock_time
+                            if configurable_properties.temporary_unlock_time
                             is not None
-                            else False
+                            else vol.UNDEFINED
                         ),
-                    ): bool,
+                    ): vol.All(
+                        vol.Coerce(float),
+                    ),
                     vol.Required(
                         "lock_unlock_mecanism",
                         default=configurable_properties.lock_unlock_mecanism
@@ -617,6 +637,118 @@ class TuyaOptionFlow(OptionsFlow):
                             for lock_mecanism in XTLockingMechanism
                         }
                     ),
+                }
+            ),
+            description_placeholders={
+                "device_name": device.name or "",
+            },
+        )
+    
+    async def async_step_cover_device_settings(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Handle device configuration."""
+        if self.selected_device_id is None:
+            return self.async_abort(reason="device_not_selected")
+
+        if self.multi_manager is None:
+            return self.async_abort(reason="no_multi_manager")
+        # Get the configurable properties for the selected device
+        device: mm.XTDevice | None = self.multi_manager.device_map.get(
+            self.selected_device_id
+        )
+        if device is None:
+            return self.async_abort(reason="device_not_found")
+
+        cover_entity: cover.XTCoverEntity | None = device.get_preference(
+            mm.XTDevice.XTDevicePreference.COVER_DEVICE_ENTITY
+        )
+        if cover_entity is None:
+            return self.async_abort(reason="cover_entity_not_found")
+
+        configurable_properties: cover.XTCoverConfigurableProperties | None = (
+            cover_entity.get_configurable_properties()
+        )
+
+        if user_input is not None:
+            # Update the configurable properties
+            new_config = cover.XTCoverConfigurableProperties()
+            new_config.invert_control = user_input.get(
+                "invert_control", False
+            )
+            new_config.invert_status = user_input.get(
+                "invert_status", False
+            )
+            new_config.force_virtual_position = user_input.get(
+                "force_virtual_position", False
+            )
+            new_config.no_precise_position = user_input.get(
+                "no_precise_position", False
+            )
+            new_config.open_time = user_input.get("open_time", None)
+            if new_config.open_time is not None and new_config.open_time <= 0.1:
+                new_config.open_time = None
+            new_interval = user_input.get("update_interval")
+            if new_interval is not None:
+                new_config.update_interval = new_interval
+            if configurable_properties is not None:
+                new_config.virtual_position = configurable_properties.virtual_position
+            
+            cover_entity.set_configurable_properties(new_config)
+            await self.multi_manager.storage_manager.save_store()
+            self.multi_manager.multi_device_listener.update_device(device=device)
+            return self.async_create_entry(title="", data=self.options)
+
+        if configurable_properties is None:
+            return self.async_abort(reason="no_configurable_properties")
+
+        return self.async_show_form(
+            step_id="cover_device_settings",
+            data_schema=vol.Schema(
+                {
+                    vol.Optional(
+                        "invert_control",
+                        default=bool(
+                            configurable_properties.invert_control
+                        ),
+                    ): bool,
+                    vol.Optional(
+                        "invert_status",
+                        default=bool(
+                            configurable_properties.invert_status
+                        ),
+                    ): bool,
+                    vol.Optional(
+                        "force_virtual_position",
+                        default=bool(
+                            configurable_properties.force_virtual_position
+                        ),
+                    ): bool,
+                    vol.Optional(
+                        "open_time",
+                        default=(
+                            configurable_properties.open_time
+                            if configurable_properties.open_time
+                            is not None
+                            else vol.UNDEFINED
+                        ),
+                    ): vol.All(
+                        vol.Coerce(float),
+                    ),
+                    vol.Optional(
+                        "update_interval",
+                        default=(
+                            configurable_properties.update_interval
+                        ),
+                    ): vol.All(
+                        vol.Coerce(float),
+                    ),
+                    vol.Optional(
+                        "no_precise_position",
+                        default=bool(
+                            configurable_properties.no_precise_position
+                        ),
+                    ): bool,
                 }
             ),
             description_placeholders={

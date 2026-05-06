@@ -102,7 +102,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         self.home_manager = home_manager
 
     def forward_message_to_multi_manager(self, msg: dict):
-        self.multi_manager.on_message(MESSAGE_SOURCE_TUYA_IOT, msg)
+        self.multi_manager.on_message(msg, MESSAGE_SOURCE_TUYA_IOT)
 
     def refresh_mq(self):
         self.mq.stop()
@@ -310,7 +310,6 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                 data_value["event_time"] = event_time
             if data_value and event_time is not None:
                 self.multi_manager.on_message(
-                    source=MESSAGE_SOURCE_TUYA_IOT,
                     msg={
                         "protocol": PROTOCOL_DEVICE_REPORT,
                         "data": {
@@ -325,6 +324,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                         },
                         "t": event_time,
                     },
+                    source=MESSAGE_SOURCE_TUYA_IOT,
                 )
         else:
             super()._on_device_other(device_id, biz_code, data)
@@ -427,8 +427,8 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         response = self.api.get(f"/v2.0/cloud/thing/{device.id}/shadow/properties")
         response2 = self.api.get(f"/v2.0/cloud/thing/{device.id}/model")
         if not response.get("success") or not response2.get("success"):
-            LOGGER.warning(f"Response1: {response}")
-            LOGGER.warning(f"Response2: {response2}")
+            LOGGER.warning(f"Response1: {response}: {device.id=}")
+            LOGGER.warning(f"Response2: {response2}: {device.id=}")
 
         if response2.get("success", False):
             result = response2.get("result", {})

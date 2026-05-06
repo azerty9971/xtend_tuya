@@ -262,8 +262,8 @@ class XTEntityDescriptorManager:
                         if cross_both is not None:
                             merged_descriptors = (
                                 XTEntityDescriptorManager.merge_descriptors(
-                                    merged_descriptors,
                                     cross_both,
+                                    merged_descriptors,
                                     key_fields,
                                     entity_type,
                                 )
@@ -333,6 +333,8 @@ class XTEntityDescriptorManager:
                         entity_type,
                     )
                 )
+            case XTEntityDescriptorManager.XTEntityDescriptorType.ENTITY:
+                return base_descriptors
 
     @staticmethod
     def merge_descriptor(
@@ -455,7 +457,12 @@ class XTEntity(TuyaEntity):
         self.device_manager = device_manager
         self.description = kwargs.get("description", None)
         try:
-            super(XTEntity, self).__init__(device, device_manager, *args, **kwargs)
+            super(XTEntity, self).__init__(
+                device,
+                device_manager,
+                *args,
+                **kwargs,
+            )
         except Exception as e:
             # In case we have an error, do nothing
             LOGGER.exception(e)
@@ -796,9 +803,13 @@ class XTEntity(TuyaEntity):
             dpcode=self.get_configurable_properties_dpcode(),
             prop_name=property_key,
         )
+        new_config = property_type()
         if stored_configuration is not None and isinstance(stored_configuration, dict):
-            return property_type(**stored_configuration)
-        return property_type()
+            for key in stored_configuration:
+                if hasattr(new_config, key):
+                    setattr(new_config, key, stored_configuration[key])
+            return new_config
+        return new_config
 
     def set_configurable_properties(self, configurable_properties: Any):
         property_type = self.get_configurable_properties_type()
@@ -859,7 +870,6 @@ class XTEntity(TuyaEntity):
             ):
                 return DPCODE_PREFERED_DEVICE_CLASS[dpcode_information.dpcode]
         LOGGER.warning(
-            f"Multiple possible device class {proposed_device_class} for unit {dpcode_information.unit} on device {device.name} ({dpcode_information.dpcode}), unable to determine the most probable one, returning None. Plese report to developer.",
-            stack_info=True,
+            f"Multiple possible device class {proposed_device_class} for unit {dpcode_information.unit} on device {device.name} ({dpcode_information.dpcode}), unable to determine the most probable one, returning None. Please report to developer.",
         )
         return None
