@@ -152,6 +152,11 @@ class TuyaOpenAPI:
         self.__country_code = ""
         self.__schema = ""
 
+    def report_message(self, method: str, message: str, stack_info: bool = False):
+        method_call = getattr(logger, method, None)
+        if method_call is not None and callable(method_call):
+            method_call(msg=message, stack_info=stack_info)
+
     # https://developer.tuya.com/docs/iot/open-api/api-reference/singnature?id=Ka43a5mtx1gsc
     def _calculate_sign(
         self,
@@ -348,7 +353,7 @@ class TuyaOpenAPI:
         elif self.token_info.is_reconnecting() is True and no_loop is False:
             wait_time = 0.2
             loop_pass = 0
-            #logger.debug("Already connecting to tuya cloud, wait for it to finish.")
+            # logger.debug("Already connecting to tuya cloud, wait for it to finish.")
             while self.token_info.is_reconnecting() is True:
                 time.sleep(wait_time)
                 loop_pass += 1
@@ -404,19 +409,23 @@ class TuyaOpenAPI:
         time_taken = time.time() - start_time
 
         if response.ok is False or result.get("success", True) is False:
-            # logger.debug(
-            #     f"[IOT API][{time_taken}]Request: {method} {path} PARAMS: {json.dumps(params, ensure_ascii=False, indent=2) if params is not None else ''} BODY: {json.dumps(body, ensure_ascii=False, indent=2) if body is not None else ''}, first_pass={first_pass}, access_token={access_token}"
-            # )
-            # logger.debug(
-            #     f"[IOT API][{time_taken}]Response: {json.dumps(result, ensure_ascii=False, indent=2)}",
-            #     stack_info=True,
-            # )
+            self.report_message(
+                "debug",
+                f"[IOT API][{time_taken}]Request: {method} {path} PARAMS: {json.dumps(params, ensure_ascii=False, indent=2) if params is not None else ''} BODY: {json.dumps(body, ensure_ascii=False, indent=2) if body is not None else ''}, first_pass={first_pass}, access_token={access_token}"
+            )
+            self.report_message(
+                "debug",
+                f"[IOT API][{time_taken}]Response: {json.dumps(result, ensure_ascii=False, indent=2)}",
+                stack_info=True,
+            )
             pass
         if first_pass is False:
-            logger.warning(
-                f"[IOT API][{time_taken}]SECOND PASS Request: {method} {path} PARAMS: {json.dumps(params, ensure_ascii=False, indent=2) if params is not None else ''} BODY: {json.dumps(body, ensure_ascii=False, indent=2) if body is not None else ''}, first_pass={first_pass}, access_token={access_token}"
+            self.report_message(
+                "warning",
+                f"[IOT API][{time_taken}]SECOND PASS Request: {method} {path} PARAMS: {json.dumps(params, ensure_ascii=False, indent=2) if params is not None else ''} BODY: {json.dumps(body, ensure_ascii=False, indent=2) if body is not None else ''}, first_pass={first_pass}, access_token={access_token}",
             )
-            logger.warning(
+            self.report_message(
+                "warning",
                 f"[IOT API][{time_taken}]SECOND PASS Response: {json.dumps(result, ensure_ascii=False, indent=2)}",
                 stack_info=True,
             )
