@@ -10,14 +10,16 @@ from ....lib.tuya_iot import (
     TuyaOpenAPI,
 )
 
+from ....const import (
+    XTDeviceWatcherSpecialDevice,
+    XTDeviceWatcherCategory,
+)
+
 if TYPE_CHECKING:
     from ...multi_manager import (
         MultiManager,
     )
-    from ....const import (
-        XTDeviceWatcherSpecialDevice,
-        XTDeviceWatcherCategory,
-    )
+
 
 class XTIOTOpenAPI(TuyaOpenAPI):
 
@@ -45,6 +47,10 @@ class XTIOTOpenAPI(TuyaOpenAPI):
 
     def report_message(self, method: str, message: str, stack_info: bool = False):
         if self.multi_manager:
-            self.multi_manager.device_watcher.report_message(XTDeviceWatcherSpecialDevice.NOT_LINKED_TO_A_DEVICE, message, XTDeviceWatcherCategory.IOT_API)
+            self.multi_manager.device_watcher.report_message(
+                XTDeviceWatcherSpecialDevice.NOT_LINKED_TO_A_DEVICE,
+                message,
+                XTDeviceWatcherCategory.IOT_API,
+            )
         else:
             return super().report_message(method, message, stack_info)
