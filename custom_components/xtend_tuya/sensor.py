@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 import asyncio
+import base64
 from typing import cast, Callable, TYPE_CHECKING
 from dataclasses import dataclass, field
 from datetime import datetime, UTC
@@ -119,7 +120,7 @@ class XTElectricityCurrentStringWrapper(TuyaDPCodeStringWrapper[float]):
     def read_device_status(self, device: TuyaCustomerDevice) -> float | None:
         """Read the device value for the dpcode."""
         if (raw_value := self._read_dpcode_value(device)) is None or (
-            value := ElectricityData.from_bytes(raw_value)
+            value := ElectricityData.from_bytes(base64.b64decode(raw_value))
         ) is None:
             return None
         return value.current
@@ -134,7 +135,7 @@ class XTElectricityPowerStringWrapper(TuyaDPCodeStringWrapper[float]):
     def read_device_status(self, device: TuyaCustomerDevice) -> float | None:
         """Read the device value for the dpcode."""
         if (raw_value := self._read_dpcode_value(device)) is None or (
-            value := ElectricityData.from_bytes(raw_value)
+            value := ElectricityData.from_bytes(base64.b64decode(raw_value))
         ) is None:
             return None
         return value.power
@@ -148,7 +149,7 @@ class XTElectricityVoltageStringWrapper(TuyaDPCodeStringWrapper[float]):
     def read_device_status(self, device: TuyaCustomerDevice) -> float | None:
         """Read the device value for the dpcode."""
         if (raw_value := self._read_dpcode_value(device)) is None or (
-            value := ElectricityData.from_bytes(raw_value)
+            value := ElectricityData.from_bytes(base64.b64decode(raw_value))
         ) is None:
             return None
         return value.voltage
