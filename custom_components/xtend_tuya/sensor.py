@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 import asyncio
+import base64
 from typing import cast, Callable, TYPE_CHECKING
 from dataclasses import dataclass, field
 from datetime import datetime, UTC
@@ -76,6 +77,7 @@ from .ha_tuya_integration.tuya_integration_imports import (
     TuyaDPCodeIntegerWrapper,
     TuyaDPCodeEnumWrapper,
     TuyaDPCodeStringWrapper,
+    TuyaCustomerDevice,
 )
 from tuya_device_handlers.definition.sensor import (
     TuyaSensorDefinition,
@@ -87,6 +89,17 @@ from .multi_manager.shared.threading import (
 from .models import (
     XTDPCodeIntegerNoMinMaxCheckWrapper,
 )
+from tuya_device_handlers.device_wrapper.sensor import (
+    ElectricityCurrentJsonWrapper,
+    ElectricityCurrentRawWrapper,
+    ElectricityPowerJsonWrapper,
+    ElectricityPowerRawWrapper,
+    ElectricityVoltageJsonWrapper,
+    ElectricityVoltageRawWrapper,
+)
+from tuya_device_handlers.raw_data_model import (
+    ElectricityData,
+)
 
 if TYPE_CHECKING:
     from .multi_manager.multi_manager import (
@@ -96,6 +109,67 @@ if TYPE_CHECKING:
     )
 
 COMPOUND_KEY: list[str | tuple[str, ...]] = ["key", "dpcode"]
+
+
+class XTElectricityCurrentStringWrapper(TuyaDPCodeStringWrapper[float]):
+    """Custom DPCode Wrapper for extracting electricity current from base64."""
+
+    native_unit = "mA"
+    suggested_unit = "A"
+
+    def read_device_status(self, device: TuyaCustomerDevice) -> float | None:
+        """Read the device value for the dpcode."""
+        if (raw_value := self._read_dpcode_value(device)) is None or (
+            value := ElectricityData.from_bytes(base64.b64decode(raw_value))
+        ) is None:
+            return None
+        return value.current
+
+
+class XTElectricityPowerStringWrapper(TuyaDPCodeStringWrapper[float]):
+    """Custom DPCode Wrapper for extracting electricity power from base64."""
+
+    native_unit = "W"
+    suggested_unit = "kW"
+
+    def read_device_status(self, device: TuyaCustomerDevice) -> float | None:
+        """Read the device value for the dpcode."""
+        if (raw_value := self._read_dpcode_value(device)) is None or (
+            value := ElectricityData.from_bytes(base64.b64decode(raw_value))
+        ) is None:
+            return None
+        return value.power
+
+
+class XTElectricityVoltageStringWrapper(TuyaDPCodeStringWrapper[float]):
+    """Custom DPCode Wrapper for extracting electricity voltage from base64."""
+
+    native_unit = "V"
+
+    def read_device_status(self, device: TuyaCustomerDevice) -> float | None:
+        """Read the device value for the dpcode."""
+        if (raw_value := self._read_dpcode_value(device)) is None or (
+            value := ElectricityData.from_bytes(base64.b64decode(raw_value))
+        ) is None:
+            return None
+        return value.voltage
+
+
+CURRENT_WRAPPER = (
+    ElectricityCurrentRawWrapper,
+    ElectricityCurrentJsonWrapper,
+    XTElectricityCurrentStringWrapper,
+)
+POWER_WRAPPER = (
+    ElectricityPowerRawWrapper,
+    ElectricityPowerJsonWrapper,
+    XTElectricityPowerStringWrapper,
+)
+VOLTAGE_WRAPPER = (
+    ElectricityVoltageRawWrapper,
+    ElectricityVoltageJsonWrapper,
+    XTElectricityVoltageStringWrapper,
+)
 
 
 def xt_get_generic_dpcode_wrapper(
@@ -1176,6 +1250,78 @@ ELECTRICITY_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         translation_key="phaseflag",
     ),
     XTSensorEntityDescription(
+        key=f"{XTDPCode.PHASE_A}electriccurrent",
+        dpcode=XTDPCode.PHASE_A,
+        translation_key="phase_a_current",
+        device_class=SensorDeviceClass.CURRENT,
+        state_class=SensorStateClass.MEASUREMENT,
+        wrapper_class=CURRENT_WRAPPER,
+    ),
+    XTSensorEntityDescription(
+        key=f"{XTDPCode.PHASE_A}power",
+        dpcode=XTDPCode.PHASE_A,
+        translation_key="phase_a_power",
+        device_class=SensorDeviceClass.POWER,
+        state_class=SensorStateClass.MEASUREMENT,
+        wrapper_class=POWER_WRAPPER,
+    ),
+    XTSensorEntityDescription(
+        key=f"{XTDPCode.PHASE_A}voltage",
+        dpcode=XTDPCode.PHASE_A,
+        translation_key="phase_a_voltage",
+        device_class=SensorDeviceClass.VOLTAGE,
+        state_class=SensorStateClass.MEASUREMENT,
+        wrapper_class=VOLTAGE_WRAPPER,
+    ),
+    XTSensorEntityDescription(
+        key=f"{XTDPCode.PHASE_B}electriccurrent",
+        dpcode=XTDPCode.PHASE_B,
+        translation_key="phase_b_current",
+        device_class=SensorDeviceClass.CURRENT,
+        state_class=SensorStateClass.MEASUREMENT,
+        wrapper_class=CURRENT_WRAPPER,
+    ),
+    XTSensorEntityDescription(
+        key=f"{XTDPCode.PHASE_B}power",
+        dpcode=XTDPCode.PHASE_B,
+        translation_key="phase_b_power",
+        device_class=SensorDeviceClass.POWER,
+        state_class=SensorStateClass.MEASUREMENT,
+        wrapper_class=POWER_WRAPPER,
+    ),
+    XTSensorEntityDescription(
+        key=f"{XTDPCode.PHASE_B}voltage",
+        dpcode=XTDPCode.PHASE_B,
+        translation_key="phase_b_voltage",
+        device_class=SensorDeviceClass.VOLTAGE,
+        state_class=SensorStateClass.MEASUREMENT,
+        wrapper_class=VOLTAGE_WRAPPER,
+    ),
+    XTSensorEntityDescription(
+        key=f"{XTDPCode.PHASE_C}electriccurrent",
+        dpcode=XTDPCode.PHASE_C,
+        translation_key="phase_c_current",
+        device_class=SensorDeviceClass.CURRENT,
+        state_class=SensorStateClass.MEASUREMENT,
+        wrapper_class=CURRENT_WRAPPER,
+    ),
+    XTSensorEntityDescription(
+        key=f"{XTDPCode.PHASE_C}power",
+        dpcode=XTDPCode.PHASE_C,
+        translation_key="phase_c_power",
+        device_class=SensorDeviceClass.POWER,
+        state_class=SensorStateClass.MEASUREMENT,
+        wrapper_class=POWER_WRAPPER,
+    ),
+    XTSensorEntityDescription(
+        key=f"{XTDPCode.PHASE_C}voltage",
+        dpcode=XTDPCode.PHASE_C,
+        translation_key="phase_c_voltage",
+        device_class=SensorDeviceClass.VOLTAGE,
+        state_class=SensorStateClass.MEASUREMENT,
+        wrapper_class=VOLTAGE_WRAPPER,
+    ),
+    XTSensorEntityDescription(
         key=XTDPCode.POWERFACTORA,
         translation_key="powerfactora",
     ),
@@ -1443,9 +1589,7 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
         *TEMPERATURE_SENSORS,
         *ELECTRICITY_SENSORS,
     ),
-    "ms": (
-        *LOCK_SENSORS,
-    ),
+    "ms": (*LOCK_SENSORS,),
     # Automatic cat litter box
     # Note: Undocumented
     "msp": (
@@ -1643,9 +1787,7 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
         ),
         *TEMPERATURE_SENSORS,
     ),
-    "ms_category": (
-        *LOCK_SENSORS,
-    ),
+    "ms_category": (*LOCK_SENSORS,),
     "mzj": (
         XTSensorEntityDescription(
             key=XTDPCode.REMAININGTIME,
@@ -1694,9 +1836,7 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
         *ELECTRICITY_SENSORS,
         *TIMER_SENSORS,
     ),
-    "rs": (
-        *TEMPERATURE_SENSORS,
-    ),
+    "rs": (*TEMPERATURE_SENSORS,),
     # QT-08W Solar Intelligent Water Valve
     "sfkzq": (
         XTSensorEntityDescription(
@@ -1811,9 +1951,7 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
             entity_registry_enabled_default=False,
         ),
     ),
-    "wk": (
-        *TEMPERATURE_SENSORS,
-    ),
+    "wk": (*TEMPERATURE_SENSORS,),
     "wnykq": (
         XTSensorEntityDescription(
             key=XTDPCode.IR_CONTROL,
@@ -1947,7 +2085,12 @@ async def async_setup_entry(
                 generic_dpcodes = XTEntity.get_generic_dpcodes_for_this_platform(
                     device, this_platform
                 )
-                hass_data.manager.device_watcher.report_message(device_id, f"Generic dpcodes for sensor: {generic_dpcodes=}", XTDeviceWatcherCategory.PLATFORM_SENSOR, device)
+                hass_data.manager.device_watcher.report_message(
+                    device_id,
+                    f"Generic dpcodes for sensor: {generic_dpcodes=}",
+                    XTDeviceWatcherCategory.PLATFORM_SENSOR,
+                    device,
+                )
                 if not generic_dpcodes:
                     continue
                 dev_class_from_uom = XTEntity.get_device_classes_from_uom(
@@ -1973,7 +2116,12 @@ async def async_setup_entry(
                         },
                         entity_registry_enabled_default=False,
                         entity_registry_visible_default=False,
-                        wrapper_class=(TuyaDPCodeStringWrapper, TuyaDPCodeIntegerWrapper, TuyaDPCodeEnumWrapper, TuyaDPCodeBooleanWrapper)
+                        wrapper_class=(
+                            TuyaDPCodeStringWrapper,
+                            TuyaDPCodeIntegerWrapper,
+                            TuyaDPCodeEnumWrapper,
+                            TuyaDPCodeBooleanWrapper,
+                        ),
                     )
                     if definition := xt_get_default_definition(
                         device,
@@ -2172,7 +2320,9 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
         if dpcode is None:
             return
         value = self.device.status.get(dpcode)
-        default_value = get_default_value(self.get_dptype_from_dpcode_wrapper(wrapper=self._dpcode_wrapper))
+        default_value = get_default_value(
+            self.get_dptype_from_dpcode_wrapper(wrapper=self._dpcode_wrapper)
+        )
         if value is None or value == default_value:
             return
         self.device.status[dpcode] = default_value
@@ -2368,7 +2518,9 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
                 if device := self.device_manager.device_map.get(self.device.id, None):
                     if dpcode in device.status:
                         default_value = get_default_value(
-                            self.get_dptype_from_dpcode_wrapper(wrapper=self._dpcode_wrapper)
+                            self.get_dptype_from_dpcode_wrapper(
+                                wrapper=self._dpcode_wrapper
+                            )
                         )
                         if now.hour != 0 or now.minute != 0:
                             LOGGER.error(
@@ -2409,7 +2561,13 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
         if dpcode is None:
             return
         scaled_value_back = self.scale_value_back(value)
-        self.device_manager.device_watcher.report_message(self.device.id, f"Restoring value of {self.device.name}, original: {value}, converted back: {scaled_value_back}", XTDeviceWatcherCategory.PLATFORM_SENSOR, self.device, False)
+        self.device_manager.device_watcher.report_message(
+            self.device.id,
+            f"Restoring value of {self.device.name}, original: {value}, converted back: {scaled_value_back}",
+            XTDeviceWatcherCategory.PLATFORM_SENSOR,
+            self.device,
+            False,
+        )
         self.device.status[dpcode] = scaled_value_back
         self.async_write_ha_state()
 
