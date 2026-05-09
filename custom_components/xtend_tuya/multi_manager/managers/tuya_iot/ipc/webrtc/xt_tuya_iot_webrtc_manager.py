@@ -191,7 +191,7 @@ class XTIOTWebRTCManager:
         self.ipc_manager.multi_manager.device_watcher.report_message(
             device_id,
             f"webrtc_config {webrtc_config}",
-            XTDeviceWatcherCategory.IOT_API,
+            XTDeviceWatcherCategory.IOT_API | XTDeviceWatcherCategory.PLATFORM_CAMERA,
             None,
             print_stack=True,
         )

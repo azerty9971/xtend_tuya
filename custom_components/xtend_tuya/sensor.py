@@ -1358,30 +1358,9 @@ LOCK_SENSORS: tuple[XTSensorEntityDescription, ...] = (
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
 SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
     CROSS_CATEGORY_DEVICE_DESCRIPTOR: (
-        XTSensorEntityDescription(
-            key=XTDPCode.XT_COVER_INVERT_CONTROL,
-            translation_key="xt_cover_invert_control",
-            entity_registry_visible_default=False,
-            restoredata=True,
-            wrapper_class=(TuyaDPCodeBooleanWrapper,),
-        ),
-        XTSensorEntityDescription(
-            key=XTDPCode.XT_COVER_INVERT_STATUS,
-            translation_key="xt_cover_invert_status",
-            entity_registry_visible_default=False,
-            restoredata=True,
-            refresh_device_after_load=True,
-            wrapper_class=(TuyaDPCodeBooleanWrapper,),
-        ),
-        XTSensorEntityDescription(
-            key=XTDPCode.XT_LOCK_UNLOCK_MECHANISM,
-            translation_key="xt_lock_unlock_mechanism",
-            entity_registry_visible_default=False,
-            restoredata=True,
-            refresh_device_after_load=True,
-        ),
+        *CONSUMPTION_SENSORS,
+        *BATTERY_SENSORS,
     ),
-    "cl": (*BATTERY_SENSORS,),
     "dbl": (
         XTSensorEntityDescription(
             key=XTDPCode.COUNTDOWN_LEFT,
@@ -1445,7 +1424,6 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
     "jtmspro": (
         *LOCK_SENSORS,
         *ELECTRICITY_SENSORS,
-        *BATTERY_SENSORS,
     ),
     # Switch
     # https://developer.tuya.com/en/docs/iot/s?id=K9gf7o5prgf7s
@@ -1468,7 +1446,6 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
         ),
         *TEMPERATURE_SENSORS,
         *HUMIDITY_SENSORS,
-        *CONSUMPTION_SENSORS,
         *ELECTRICITY_SENSORS,
     ),
     "MPPT": (
@@ -1486,10 +1463,8 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
         ),
         *TEMPERATURE_SENSORS,
         *ELECTRICITY_SENSORS,
-        *CONSUMPTION_SENSORS,
     ),
     "ms": (
-        *BATTERY_SENSORS,
         *LOCK_SENSORS,
     ),
     # Automatic cat litter box
@@ -1691,7 +1666,6 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
     ),
     "ms_category": (
         *LOCK_SENSORS,
-        *BATTERY_SENSORS,
     ),
     "mzj": (
         XTSensorEntityDescription(
@@ -1737,10 +1711,12 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
             translation_key="qccdz_work_state",
             entity_registry_enabled_default=True,
         ),
-        *CONSUMPTION_SENSORS,
         *TEMPERATURE_SENSORS,
         *ELECTRICITY_SENSORS,
         *TIMER_SENSORS,
+    ),
+    "rs": (
+        *TEMPERATURE_SENSORS,
     ),
     # QT-08W Solar Intelligent Water Valve
     "sfkzq": (
@@ -1867,7 +1843,6 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
         *BATTERY_SENSORS,
     ),  
     "wk": (
-        *BATTERY_SENSORS,
         *TEMPERATURE_SENSORS,
     ),
     "wnykq": (
@@ -1882,7 +1857,6 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
     "wsdcg": (
         *TEMPERATURE_SENSORS,
         *HUMIDITY_SENSORS,
-        *BATTERY_SENSORS,
     ),
     "xfj": (
         XTSensorEntityDescription(
@@ -1947,13 +1921,11 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
     ),
     # ZNRB devices don't send correct cloud data, for these devices use https://github.com/make-all/tuya-local instead
     # "znrb": (
-    #    *CONSUMPTION_SENSORS,
     #    *TEMPERATURE_SENSORS,
     # ),
     "zwjcy": (
         *TEMPERATURE_SENSORS,
         *HUMIDITY_SENSORS,
-        *BATTERY_SENSORS,
     ),
 }
 

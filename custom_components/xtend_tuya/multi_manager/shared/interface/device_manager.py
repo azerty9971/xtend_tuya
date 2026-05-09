@@ -183,7 +183,7 @@ class XTDeviceManagerDeviceManagementInterface(ABC):
 
     @abstractmethod
     async def update_device_cache(self):
-        pass
+        ...
 
     @abstractmethod
     def get_available_device_maps(self) -> list[XTDeviceMap]:

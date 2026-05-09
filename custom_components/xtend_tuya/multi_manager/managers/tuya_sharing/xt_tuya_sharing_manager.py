@@ -5,7 +5,7 @@ This file contains all the code that inherit from Tuya integration
 from __future__ import annotations
 from typing import Any, cast
 import json
-from ....lib.tuya_sharing.manager import (
+from tuya_sharing.manager import (
     Manager,
     SceneRepository,
     UserRepository,
@@ -18,7 +18,7 @@ from ....lib.tuya_sharing.manager import (
     BIZCODE_BIND_USER,
     BIZCODE_DELETE,
 )
-from ....lib.tuya_sharing.home import (
+from tuya_sharing.home import (
     SmartLifeHome,
     HomeRepository,
 )
@@ -76,7 +76,7 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
         return False
 
     def forward_message_to_multi_manager(self, msg: dict):
-        self.multi_manager.on_message(MESSAGE_SOURCE_TUYA_SHARING, msg)
+        self.multi_manager.on_message(msg, MESSAGE_SOURCE_TUYA_SHARING)
 
     def on_external_refresh_mq(self):
         if self.__other_device_manager is not None:
@@ -165,6 +165,14 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
                 new_device = device.get_copy()
                 self.device_repository.update_device_strategy_info(new_device)
                 self.device_map[device.id] = new_device
+    
+    def delete_home(self, home_id: str):
+        index = 0
+        for home in self.user_homes:
+            if home.id == home_id:
+                del self.user_homes[index]
+                return None
+            index += 1
 
     def on_message(self, msg: dict[str, Any]):
         try:
@@ -225,7 +233,6 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
                 data_value["event_time"] = event_time
             if data_value and event_time is not None:
                 self.multi_manager.on_message(
-                    source=MESSAGE_SOURCE_TUYA_SHARING,
                     msg={
                         "protocol": PROTOCOL_DEVICE_REPORT,
                         "data": {
@@ -240,6 +247,7 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
                         },
                         "t": event_time,
                     },
+                    source=MESSAGE_SOURCE_TUYA_SHARING,
                 )
         else:
             super()._on_device_other(device_id, biz_code, data)

@@ -97,11 +97,12 @@ class XTEventLoopProtector:
 
 
 class XTThread(threading.Thread):
+
     def __init__(self, callable, immediate_start: bool = False, *args, **kwargs):
         self.callable = callable
         self.immediate_start = immediate_start
         self.exception: Exception | None = None
-        super().__init__(target=self.call_thread, args=args, kwargs=kwargs)
+        super().__init__(target=self.call_thread, daemon=True, args=args, kwargs=kwargs)
 
     def call_thread(self, *args, **kwargs):
         try:

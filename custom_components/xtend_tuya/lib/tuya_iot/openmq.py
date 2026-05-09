@@ -192,7 +192,7 @@ class TuyaOpenMQ(threading.Thread):
                 #time.sleep(self.mq_config.expire_time - 60)
 
                 # run_mqtt will not do anything if already connected
-                time.sleep(30)
+                time.sleep(1)
             except Exception as e:
                 retry_amount += 1
                 if retry_amount > 10:

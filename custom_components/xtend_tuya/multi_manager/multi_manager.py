@@ -24,6 +24,7 @@ from ..const import (
     XTDeviceWatcherCategory,
     XT_DEVICE_EVENT_NOTIFY_DPCODE,
     XTEntityAccessMode,
+    XTAcceptableStoragePropertyValue,
 )
 from .shared.shared_classes import (
     DeviceWatcher,
@@ -35,6 +36,7 @@ from .shared.shared_classes import (
 )
 from ..ha_tuya_integration.tuya_integration_imports import (
     TuyaDPType,
+    TuyaManager,
 )
 from .shared.threading import (
     XTConcurrencyManager,
@@ -73,10 +75,13 @@ from .shared.interface.device_manager import (
 from ..entity_parser.entity_parser import (
     XTCustomEntityParser,
 )
+from .shared.storage.storage_manager import (
+    XTStorageManager,
+)
 import custom_components.xtend_tuya.multi_manager.shared.data_entry.shared_data_entry as shared_data_entry
 
 
-class MultiManager:  # noqa: F811
+class MultiManager(TuyaManager):
     def __init__(self, hass: HomeAssistant, config_entry: XTConfigEntry) -> None:
         self.config_entry = config_entry
         self.virtual_state_handler = XTVirtualStateHandler(self)
@@ -88,6 +93,7 @@ class MultiManager:  # noqa: F811
         self.hass = hass
         self.multi_source_handler = MultiSourceHandler(self)
         self.device_watcher = DeviceWatcher(self)
+        self.storage_manager = XTStorageManager(hass, config_entry, self)
         self.accounts: dict[str, XTDeviceManagerInterface] = {}
         self.master_device_map: XTDeviceMap = XTDeviceMap({})
         self.is_ready_for_messages = False
@@ -107,7 +113,7 @@ class MultiManager:  # noqa: F811
         self._user_input_flows: dict[str, shared_data_entry.XTFlowDataBase] = {}
 
     @property
-    def device_map(self):
+    def device_map(self):  # type: ignore
         return self.master_device_map
 
     @property
@@ -125,6 +131,16 @@ class MultiManager:  # noqa: F811
         return None
 
     async def setup_entry(self) -> None:
+        # Load data from storage
+        if await self.storage_manager.load_store() is False:
+            LOGGER.debug(
+                f"Could not load from storage for {self.config_entry.entry_id=}, creating fresh storage space"
+            )
+            # Overwrite with an empty store
+            if await self.storage_manager.save_store() is False:
+                LOGGER.warning(
+                    f"Failed to create a fresh storage space for {self.config_entry.entry_id=}"
+                )
         # Load all the plugins
         subdirs = AllowedPlugins.get_plugins_to_load()
         concurrency_manager = XTConcurrencyManager()
@@ -182,7 +198,7 @@ class MultiManager:  # noqa: F811
                 return_list.append(new_descriptors)
         return return_list
 
-    async def update_device_cache(self):
+    async def mm_update_device_cache(self) -> None:
         self.is_ready_for_messages = False
         XTDeviceMap.clear_master_device_map()
         concurrency_manager = XTConcurrencyManager()
@@ -215,9 +231,11 @@ class MultiManager:  # noqa: F811
             # Don't allow changes to DPCodes after the global initialization
             device.force_compatibility = True
 
-            #Apply conversion strategy after initial import
+            # Apply conversion strategy after initial import
             for dpcode in device.status:
-                device.status[dpcode] = device.apply_dpcode_strategy(dpcode, device.status[dpcode], self)
+                device.status[dpcode] = device.apply_dpcode_strategy(
+                    dpcode, device.status[dpcode], self
+                )
         self._enable_multi_map_device_alignment()
         self._process_pending_messages()
         for device in self.device_map.values():
@@ -259,7 +277,10 @@ class MultiManager:  # noqa: F811
     def _process_pending_messages(self):
         self.is_ready_for_messages = True
         for messages in self.pending_messages:
-            self.on_message(messages[0], messages[1])
+            self.on_message(
+                messages[1],
+                messages[0],
+            )
         self.pending_messages.clear()
 
     def update_master_device_map(self):
@@ -424,7 +445,10 @@ class MultiManager:  # noqa: F811
                 pass
         return status
 
-    def on_message(self, source: str, msg: dict):
+    def on_message(self, msg: dict, source: str | None = None):
+        if source is None:
+            LOGGER.warning("Called on_message with Source = None", stack_info=True)
+            return None
         if not self.is_ready_for_messages:
             self.pending_messages.append((source, msg))
             return
@@ -499,7 +523,7 @@ class MultiManager:  # noqa: F811
             return_list = append_lists(return_list, account.query_scenes())
         return return_list
 
-    def send_commands(self, device_id: str, commands: list[dict[str, Any]]) -> bool:
+    def send_commands(self, device_id: str, commands: list[dict[str, Any]]) -> bool: # type: ignore
         virtual_function_commands: list[dict[str, Any]] = []
         regular_commands: list[dict[str, Any]] = []
         if device := self.device_map.get(device_id, None):
@@ -737,6 +761,32 @@ class MultiManager:  # noqa: F811
             if account.delete_ir_key(device, key, remote, hub):
                 return True
         return False
+
+    def get_device_stored_property(
+        self,
+        device_id: str,
+        dpcode: str,
+        prop_name: str,
+    ) -> XTAcceptableStoragePropertyValue | None:
+        return self.storage_manager.get_device_configurable_property(
+            device_id=device_id,
+            dpcode=dpcode,
+            prop_name=prop_name,
+        )
+
+    def set_device_stored_property(
+        self,
+        device_id: str,
+        dpcode: str,
+        prop_name: str,
+        prop_value: XTAcceptableStoragePropertyValue,
+    ):
+        self.storage_manager.set_device_configurable_property(
+            device_id=device_id,
+            dpcode=dpcode,
+            prop_name=prop_name,
+            prop_value=prop_value,
+        )
 
     def set_general_property(
         self, property_id: XTMultiManagerProperties, property_value: Any
