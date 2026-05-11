@@ -1114,6 +1114,39 @@ class XTDPCode(StrEnum):
     XT_TOTAL_FORWARD_ENERGY_THIS_MONTH = "xt_total_forward_energy_this_month"
     XT_TOTAL_FORWARD_ENERGY_THIS_YEAR = "xt_total_forward_energy_this_year"
     XT_TOTAL_FORWARD_ENERGY_TODAY = "xt_total_forward_energy_today"
+    # Cat litter box (msp)
+    CAT_STATUS          = "status"              # alias for STATUS DP
+    INDUCTION_CLEAN_2   = "induction_clean"
+    DEVELOPER_MODE      = "developer_mode"
+    SLEEP_NEW           = "sleep_new"           # sleep mode switch (dp120)
+    IN_CLEAN            = "in_clean"            # auto-clean completed flag (dp121)
+    DP_TIME_CLEAR_FLAG  = "dp_time_clear_flag"  # scheduled clean flag (dp106)
+    UNIT_SWITCH         = "unit_switch"         # weight unit kg/lb (dp108)
+    TIME_CLEAR          = "time_clear"          # scheduled clean time (dp129)
+    BAG_CHANGE_COUNTING = "bag_change_counting" # bag usage count (dp139)
+    PONUD               = "ponud"               # cat weight in lb (dp134)
+    # ZG-205Z presence sensor (hps)
+    SENSITIVITY_CZ      = "sensitivity_cz"
+    SENSITIVITY_WD      = "sensitivity_wd"
+    WD_DETECTION        = "wd_detection"
+    MOV_MIN_DETECTION   = "mov_min_detection"
+    MICRO_MIN_DETECTION = "micro_min_detection"
+    BRE_MIN_DETECTION   = "bre_min_detection"
+    DISTANCE            = "distance"
+    DETECTION_NEAR      = "detection_near"
+    STUDY_TIMER         = "study_timer"
+    FALSE_ALARM         = "false_alarm"
+    LED_ONOFF           = "led_onoff"
+    START_STUDY         = "start_study"
+    RESET_SETTING       = "reset_setting"
+    SMALL_MOV_START     = "small_mov_start"
+    BREATHE_START       = "breathe_start"
+    FALSE_BREATH        = "false_breath"
+    BARREL_INFRARED     = "barrel_infrared"
+    SECURITY_STATUS     = "security_status"
+    GRAVITY_INDUCTION   = "gravity_induction"
+    ENTER_INFRARED      = "enter_infrared"
+    MOV_STATUS          = "mov_status"
     # END OF DPCODES FROM XT
 
     @staticmethod

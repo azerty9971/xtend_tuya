@@ -86,6 +86,7 @@ from .multi_manager.shared.threading import (
 )
 from .models import (
     XTDPCodeIntegerNoMinMaxCheckWrapper,
+    XTDPCodeBitmapLabelsWrapper,
 )
 
 if TYPE_CHECKING:
@@ -1369,6 +1370,23 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
             state_class=SensorStateClass.MEASUREMENT,
             entity_registry_enabled_default=True,
         ),
+        # ZG-205Z specific DPs
+        XTSensorEntityDescription(
+            key=XTDPCode.MOV_STATUS,
+            translation_key="mov_status",
+        ),
+        XTSensorEntityDescription(
+            key=XTDPCode.DISTANCE,
+            translation_key="distance",
+            device_class=SensorDeviceClass.DISTANCE,
+            state_class=SensorStateClass.MEASUREMENT,
+        ),
+        XTSensorEntityDescription(
+            key=XTDPCode.DETECTION_NEAR,
+            translation_key="detection_near",
+            device_class=SensorDeviceClass.DISTANCE,
+            state_class=SensorStateClass.MEASUREMENT,
+        ),
     ),
     # Formaldehyde Detector
     # Note: Not documented
@@ -1461,12 +1479,7 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
             state_class=SensorStateClass.MEASUREMENT,
             entity_registry_enabled_default=True,
         ),
-        XTSensorEntityDescription(
-            key=XTDPCode.CAPACITY_CALIBRATION,
-            translation_key="capacity_calibration",
-            state_class=SensorStateClass.MEASUREMENT,
-            entity_registry_enabled_default=True,
-        ),
+        # capacity_calibration is configurable — defined as number in number.py
         XTSensorEntityDescription(
             key=XTDPCode.CAT_WEIGHT,
             translation_key="cat_weight",
@@ -1499,12 +1512,7 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
             state_class=SensorStateClass.MEASUREMENT,
             entity_registry_enabled_default=True,
         ),
-        XTSensorEntityDescription(
-            key=XTDPCode.DETECTION_SENSITIVITY,
-            translation_key="detection_sensitivity",
-            state_class=SensorStateClass.MEASUREMENT,
-            entity_registry_enabled_default=True,
-        ),
+        # detection_sensitivity is configurable — defined as number in number.py
         XTSensorEntityDescription(
             key=XTDPCode.EXCRETION_TIME_DAY,
             translation_key="excretion_time_day",
@@ -1531,20 +1539,7 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
             state_class=SensorStateClass.MEASUREMENT,
             entity_registry_enabled_default=True,
         ),
-        XTSensorEntityDescription(
-            key=XTDPCode.INDUCTION_DELAY,
-            translation_key="induction_delay",
-            device_class=SensorDeviceClass.DURATION,
-            state_class=SensorStateClass.MEASUREMENT,
-            entity_registry_enabled_default=True,
-        ),
-        XTSensorEntityDescription(
-            key=XTDPCode.INDUCTION_INTERVAL,
-            translation_key="induction_interval",
-            device_class=SensorDeviceClass.DURATION,
-            state_class=SensorStateClass.MEASUREMENT,
-            entity_registry_enabled_default=True,
-        ),
+        # induction_delay and induction_interval are configurable — defined as numbers in number.py
         XTSensorEntityDescription(
             key=XTDPCode.MONITORING,
             translation_key="monitoring",
@@ -1593,12 +1588,7 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
             state_class=SensorStateClass.MEASUREMENT,
             entity_registry_enabled_default=False,
         ),
-        XTSensorEntityDescription(
-            key=XTDPCode.SAND_SURFACE_CALIBRATION,
-            translation_key="sand_surface_calibration",
-            state_class=SensorStateClass.MEASUREMENT,
-            entity_registry_enabled_default=True,
-        ),
+        # sand_surface_calibration is configurable — defined as number in number.py
         XTSensorEntityDescription(
             key=XTDPCode.SMART_CLEAN,
             translation_key="smart_clean",
@@ -1608,6 +1598,7 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
         XTSensorEntityDescription(
             key=XTDPCode.STATUS,
             translation_key="cat_litter_box_status",
+            # No state_class: values are string enums (standby, clean, empty, …), not numeric
             entity_category=EntityCategory.DIAGNOSTIC,
             entity_registry_enabled_default=True,
         ),
@@ -1640,6 +1631,28 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
             translation_key="work_stat",
             state_class=SensorStateClass.MEASUREMENT,
             entity_registry_enabled_default=False,
+        ),
+        # Bag change usage counter — Ti+ / DOEL ti+TpCTbt-01
+        XTSensorEntityDescription(
+            key=XTDPCode.BAG_CHANGE_COUNTING,
+            translation_key="bag_change_counting",
+            state_class=SensorStateClass.TOTAL_INCREASING,
+            entity_registry_enabled_default=True,
+        ),
+        # Cat weight in lb (read-only mirror of cat_weight in pounds) — Ti+ / DOEL ti+TpCTbt-01
+        XTSensorEntityDescription(
+            key=XTDPCode.PONUD,
+            translation_key="ponud",
+            device_class=SensorDeviceClass.WEIGHT,
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_registry_enabled_default=False,
+        ),
+        # DOEL ti+TpCTbt-01: fault bitmask as a human-readable string
+        XTSensorEntityDescription(
+            key=XTDPCode.FAULT,
+            translation_key="fault",
+            wrapper_class=(XTDPCodeBitmapLabelsWrapper,),
+            entity_category=EntityCategory.DIAGNOSTIC,
         ),
         *TEMPERATURE_SENSORS,
     ),
@@ -2096,6 +2109,21 @@ async def async_setup_entry(
     )
 
 
+# Some Bluetooth devices without a hub always report as offline in the Tuya cloud
+# because connectivity is maintained locally via the app rather than through a hub.
+# Listing them here forces HA to treat them as always available, so their last
+# known state remains visible and updates are reflected when the app syncs data.
+FORCE_ALWAYS_ONLINE_BY_DEVICE_ID: set[str] = {
+    "bfa469yud5ajx1w8",  # SGS01
+}
+FORCE_ALWAYS_ONLINE_BY_PID: set[str] = {
+    "gvygg3m8",          # SGS01 product ID
+}
+FORCE_ALWAYS_ONLINE_BY_CATEGORY: set[str] = {
+    "zwjcy",             # SGS01 category
+}
+
+
 class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
     """XT Sensor Entity."""
 
@@ -2163,6 +2191,17 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
                     function_code=description.dpcode or description.key,
                     scale_threshold=description.recalculate_scale_for_percentage_threshold,
                 )
+
+    @property
+    def available(self) -> bool:  # type: ignore[override]
+        """Return True for devices that must be treated as always-online."""
+        if (
+            self.device.id in FORCE_ALWAYS_ONLINE_BY_DEVICE_ID
+            or self.device.product_id in FORCE_ALWAYS_ONLINE_BY_PID
+            or self.device.category in FORCE_ALWAYS_ONLINE_BY_CATEGORY
+        ):
+            return True
+        return self.device.online
 
     def reset_value(self, _: datetime | None, manual_call: bool = False) -> None:
         if manual_call and self.cancel_reset_after_x_seconds is not None:

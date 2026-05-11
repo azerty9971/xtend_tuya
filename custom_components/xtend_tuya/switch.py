@@ -162,6 +162,17 @@ SWITCHES: dict[str, tuple[XTSwitchEntityDescription, ...]] = {
             translation_key="indicator_light",
             entity_category=EntityCategory.CONFIG,
         ),
+        # ZG-205Z uses "led_onoff" instead of "indicator_led"
+        XTSwitchEntityDescription(
+            key=XTDPCode.LED_ONOFF,
+            translation_key="indicator_light",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        XTSwitchEntityDescription(
+            key=XTDPCode.FALSE_BREATH,
+            translation_key="false_breath",
+            entity_category=EntityCategory.CONFIG,
+        ),
     ),
     "jtmspro": (
         XTSwitchEntityDescription(
@@ -236,11 +247,7 @@ SWITCHES: dict[str, tuple[XTSwitchEntityDescription, ...]] = {
             translation_key="clean_time_switch",
             entity_category=EntityCategory.CONFIG,
         ),
-        XTSwitchEntityDescription(
-            key=XTDPCode.CLEANING,
-            translation_key="one_click_cleanup",
-            entity_category=EntityCategory.CONFIG,
-        ),
+        # CLEANING is a momentary action — handled as a button, not a switch
         XTSwitchEntityDescription(
             key=XTDPCode.DEEP_CLEAN,
             translation_key="deep_clean",
@@ -341,6 +348,29 @@ SWITCHES: dict[str, tuple[XTSwitchEntityDescription, ...]] = {
         XTSwitchEntityDescription(
             key=XTDPCode.UV,
             translation_key="uv",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        # DOEL ti+TpCTbt-01 specific DPs
+        XTSwitchEntityDescription(
+            key=XTDPCode.SWITCH,
+            translation_key="switch",
+        ),
+        # INDUCTION_CLEAN_2 is a one-shot action — handled as a button, not a switch
+        # Ti+ / DOEL ti+TpCTbt-01 specific DPs
+        XTSwitchEntityDescription(
+            key=XTDPCode.SLEEP_NEW,
+            translation_key="sleep_new",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        XTSwitchEntityDescription(
+            key=XTDPCode.TIME,
+            translation_key="time",
+            entity_category=EntityCategory.CONFIG,
+            entity_registry_enabled_default=False,
+        ),
+        XTSwitchEntityDescription(
+            key=XTDPCode.DEVELOPER_MODE,
+            translation_key="developer_mode",
             entity_category=EntityCategory.CONFIG,
         ),
     ),
