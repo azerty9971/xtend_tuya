@@ -23,6 +23,7 @@ from .const import (
     XTIRRemoteInformation,
     XTIRRemoteKeysInformation,
     LOGGER,
+    IR_HUB_CATEGORY_LIST,
 )
 from .util import (
     restrict_descriptor_category,
@@ -64,10 +65,6 @@ class XTRemoteEntityDescription(RemoteEntityDescription):
 
 
 REMOTES: dict[str, tuple[XTRemoteEntityDescription, ...]] = {}
-IR_HUB_CATEGORY_LIST: list[str] = [
-    "wnykq",
-]
-
 
 async def async_setup_entry(
     hass: HomeAssistant, entry: XTConfigEntry, async_add_entities: AddEntitiesCallback
