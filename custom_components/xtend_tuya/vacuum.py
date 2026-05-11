@@ -11,6 +11,10 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
+from homeassistant.components.vacuum import (
+    StateVacuumEntityDescription,
+)
+
 from .multi_manager.multi_manager import (
     MultiManager,
     XTConfigEntry,
@@ -33,7 +37,24 @@ PAUSE_DPCODE = (XTDPCode.PAUSE,)
 STATUS_DPCODE = (XTDPCode.STATUS,)
 SWITCH_DPCODE = (XTDPCode.POWER_GO,)
 
-VACUUMS: list[str] = []
+
+class XTVacuumEntityDescription(StateVacuumEntityDescription, frozen_or_thawed=True):
+    def get_entity_instance(
+        self,
+        device: XTDevice,
+        device_manager: MultiManager,
+        description: XTVacuumEntityDescription,
+        definition: TuyaVacuumDefinition,
+    ) -> XTVacuumEntity:
+        return XTVacuumEntity(
+            device=device,
+            device_manager=device_manager,
+            description=XTVacuumEntityDescription(**description.__dict__),
+            definition=definition,
+        )
+
+
+VACUUMS: dict[str, XTVacuumEntityDescription] = {}
 
 
 async def async_setup_entry(
@@ -48,11 +69,14 @@ async def async_setup_entry(
 
     supported_descriptors, externally_managed_descriptors = cast(
         tuple[
-            list[str],
-            list[str],
+            dict[str, XTVacuumEntityDescription],
+            dict[str, XTVacuumEntityDescription],
         ],
         XTEntityDescriptorManager.get_platform_descriptors(
-            VACUUMS, entry.runtime_data.multi_manager, None, this_platform
+            VACUUMS,
+            entry.runtime_data.multi_manager,
+            XTVacuumEntityDescription,
+            this_platform,
         ),
     )
 
@@ -69,9 +93,10 @@ async def async_setup_entry(
             if device := hass_data.manager.device_map.get(device_id):
                 if device.category in supported_descriptors:
                     entities.append(
-                        XTVacuumEntity(
+                        XTVacuumEntity.get_entity_instance(
                             device=device,
                             device_manager=hass_data.manager,
+                            description=supported_descriptors[device.category],
                             definition=get_default_definition(device),
                         )
                     )
@@ -91,18 +116,44 @@ class XTVacuumEntity(XTEntity, TuyaVacuumEntity):
         self,
         device: XTDevice,
         device_manager: MultiManager,
+        description: XTVacuumEntityDescription,
         definition: TuyaVacuumDefinition,
     ) -> None:
         """Init Tuya vacuum."""
         super(XTVacuumEntity, self).__init__(
             device=device,
             device_manager=device_manager,  # type: ignore
+            description=description,
             definition=definition,
         )
         super(XTEntity, self).__init__(
             device=device,
             device_manager=device_manager,  # type: ignore
+            description=description,
             definition=definition,
         )
         self.device = device
         self.device_manager = device_manager
+
+    @staticmethod
+    def get_entity_instance(
+        device: XTDevice,
+        device_manager: MultiManager,
+        description: XTVacuumEntityDescription,
+        definition: TuyaVacuumDefinition,
+    ) -> XTVacuumEntity:
+        if hasattr(description, "get_entity_instance") and callable(
+            getattr(description, "get_entity_instance")
+        ):
+            return description.get_entity_instance(
+                device=device,
+                device_manager=device_manager,
+                description=description,
+                definition=definition,
+            )
+        return XTVacuumEntity(
+            device=device,
+            device_manager=device_manager,
+            description=XTVacuumEntityDescription(**description.__dict__),
+            definition=definition,
+        )

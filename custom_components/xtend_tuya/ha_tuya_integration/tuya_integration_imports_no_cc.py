@@ -90,6 +90,7 @@ from homeassistant.components.tuya.switch import (
 )
 from homeassistant.components.tuya.vacuum import (
     TuyaVacuumEntity as TuyaVacuumEntity,
+    VACUUMS as VACUUMS_TUYA,  # noqa: F401
 )
 import homeassistant.components.tuya as tuya_integration  # noqa: F401
 import homeassistant.components.tuya.coordinator as tuya_coordinator  # noqa: F401

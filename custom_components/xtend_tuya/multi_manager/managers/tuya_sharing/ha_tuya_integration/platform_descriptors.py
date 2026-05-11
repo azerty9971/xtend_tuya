@@ -17,6 +17,7 @@ from .....ha_tuya_integration.tuya_integration_imports import (
     SENSORS_TUYA,
     SIRENS_TUYA,
     SWITCHES_TUYA,
+    VACUUMS_TUYA,
 )
 
 
@@ -55,4 +56,4 @@ def get_tuya_platform_descriptors(platform: Platform) -> Any:
         case Platform.SWITCH:
             return SWITCHES_TUYA
         case Platform.VACUUM:
-            return ["sd"]
+            return VACUUMS_TUYA
