@@ -379,6 +379,52 @@ NUMBERS: dict[str, tuple[XTNumberEntityDescription, ...]] = {
             translation_key="sm_sensitivity",
             entity_category=EntityCategory.CONFIG,
         ),
+        # ZG-205Z presence sensor specific DPs
+        XTNumberEntityDescription(
+            key=XTDPCode.SENSITIVITY_CZ,
+            translation_key="sensitivity_cz",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        XTNumberEntityDescription(
+            key=XTDPCode.SENSITIVITY_WD,
+            translation_key="sensitivity_wd",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        XTNumberEntityDescription(
+            key=XTDPCode.FALSE_ALARM,
+            translation_key="false_alarm",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        XTNumberEntityDescription(
+            key=XTDPCode.STUDY_TIMER,
+            translation_key="study_timer",
+            device_class=NumberDeviceClass.DURATION,
+            entity_category=EntityCategory.CONFIG,
+        ),
+        XTNumberEntityDescription(
+            key=XTDPCode.WD_DETECTION,
+            translation_key="wd_detection",
+            device_class=NumberDeviceClass.DISTANCE,
+            entity_category=EntityCategory.CONFIG,
+        ),
+        XTNumberEntityDescription(
+            key=XTDPCode.MOV_MIN_DETECTION,
+            translation_key="mov_min_detection",
+            device_class=NumberDeviceClass.DISTANCE,
+            entity_category=EntityCategory.CONFIG,
+        ),
+        XTNumberEntityDescription(
+            key=XTDPCode.MICRO_MIN_DETECTION,
+            translation_key="micro_min_detection",
+            device_class=NumberDeviceClass.DISTANCE,
+            entity_category=EntityCategory.CONFIG,
+        ),
+        XTNumberEntityDescription(
+            key=XTDPCode.BRE_MIN_DETECTION,
+            translation_key="bre_min_detection",
+            device_class=NumberDeviceClass.DISTANCE,
+            entity_category=EntityCategory.CONFIG,
+        ),
     ),
     "jtmspro": (
         XTNumberEntityDescription(
@@ -498,6 +544,29 @@ NUMBERS: dict[str, tuple[XTNumberEntityDescription, ...]] = {
         XTNumberEntityDescription(
             key=XTDPCode.UV_START_TIME,
             translation_key="uv_start_time",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        # Ti+ / DOEL ti+TpCTbt-01 specific DPs
+        XTNumberEntityDescription(
+            key=XTDPCode.CAPACITY_CALIBRATION,
+            translation_key="capacity_calibration",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        XTNumberEntityDescription(
+            key=XTDPCode.DETECTION_SENSITIVITY,
+            translation_key="detection_sensitivity",
+            device_class=NumberDeviceClass.WEIGHT,
+            entity_category=EntityCategory.CONFIG,
+        ),
+        XTNumberEntityDescription(
+            key=XTDPCode.SAND_SURFACE_CALIBRATION,
+            translation_key="sand_surface_calibration",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        XTNumberEntityDescription(
+            key=XTDPCode.TIME_CLEAR,
+            translation_key="time_clear",
+            device_class=NumberDeviceClass.DURATION,
             entity_category=EntityCategory.CONFIG,
         ),
     ),

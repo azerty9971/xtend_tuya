@@ -174,6 +174,20 @@ BINARY_SENSORS: dict[str, tuple[XTBinarySensorEntityDescription, ...]] = {
             translation_key="store_full_notify",
             entity_registry_enabled_default=True,
         ),
+        # Ti+ / DOEL ti+TpCTbt-01: fires true when auto-clean cycle completes
+        XTBinarySensorEntityDescription(
+            key=XTDPCode.IN_CLEAN,
+            translation_key="in_clean",
+            entity_category=EntityCategory.DIAGNOSTIC,
+            entity_registry_enabled_default=False,
+        ),
+        # Ti+ / DOEL ti+TpCTbt-01: scheduled clean triggered flag
+        XTBinarySensorEntityDescription(
+            key=XTDPCode.DP_TIME_CLEAR_FLAG,
+            translation_key="dp_time_clear_flag",
+            entity_category=EntityCategory.DIAGNOSTIC,
+            entity_registry_enabled_default=False,
+        ),
     ),
     # QT-08W Solar Intelligent Water Valve
     # "sfkzq": (
