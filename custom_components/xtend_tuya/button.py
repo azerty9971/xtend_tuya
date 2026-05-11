@@ -36,6 +36,7 @@ from .const import (
     XTMultiManagerProperties,
     XTDiscoverySource,
     LOGGER,  # noqa: F401
+    IR_HUB_CATEGORY_LIST,
 )
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaButtonEntity,
@@ -237,11 +238,6 @@ class XTButtonEntityDescription(TuyaButtonEntityDescription):
             description=XTButtonEntityDescription(**description.__dict__),
             definition=definition,
         )
-
-
-IR_HUB_CATEGORY_LIST: list[str] = [
-    "wnykq",
-]
 
 CONSUMPTION_BUTTONS: tuple[XTButtonEntityDescription, ...] = (
     XTButtonEntityDescription(

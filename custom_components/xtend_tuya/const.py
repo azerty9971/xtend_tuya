@@ -96,6 +96,10 @@ class TuyaCloudOpenAPIEndpoint(StrEnum):
             case _:
                 return "America"
 
+IR_HUB_CATEGORY_LIST: list[str] = [
+    "wnykq",
+    "qt",
+]
 
 FULLY_OVERRIDEN_PLATFORMS = [
     Platform.CAMERA,
