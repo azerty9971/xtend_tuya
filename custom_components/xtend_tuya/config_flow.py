@@ -599,6 +599,7 @@ class TuyaOptionFlow(OptionsFlow):
             if new_config.temporary_unlock_time is not None and new_config.temporary_unlock_time < 0.1:
                 new_config.temporary_unlock_time = None
             new_config.lock_unlock_mecanism = user_input.get("lock_unlock_mecanism", XTLockingMechanism.AUTO)
+            new_config.lock_status_dpcode = user_input.get("lock_status_dpcode", None)
             lock_entity.set_configurable_properties(new_config)
             await self.multi_manager.storage_manager.save_store()
             self.multi_manager.multi_device_listener.update_device(device=device)
@@ -635,6 +636,18 @@ class TuyaOptionFlow(OptionsFlow):
                         {
                             lock_mecanism.value: lock_mecanism.get_human_name(lock_mecanism.value)
                             for lock_mecanism in XTLockingMechanism
+                        }
+                    ),
+                    vol.Optional(
+                        "lock_status_dpcode",
+                        default=configurable_properties.lock_status_dpcode
+                            if configurable_properties.lock_status_dpcode
+                            is not None
+                            else "",
+                    ): vol.In(
+                        {
+                            dpcode: dpcode
+                            for dpcode in lock_entity.entity_description.unlock_status_list
                         }
                     ),
                 }

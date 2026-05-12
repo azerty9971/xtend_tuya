@@ -157,7 +157,8 @@
                 "description": "Set the properties of the device",
                 "data": {
                     "temporary_unlock_time": "Seconds the lock stays opened",
-                    "lock_unlock_mecanism": "Force unlock mecanism"
+                    "lock_unlock_mecanism": "Force unlock mecanism",
+                    "lock_status_dpcode": "DPCode that represents the lock open/closed status"
                 }
             }
         },

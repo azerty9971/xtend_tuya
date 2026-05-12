@@ -32,6 +32,7 @@ from .entity import (
 @dataclass
 class XTLockConfigurableProperties:
     lock_unlock_mecanism: XTLockingMechanism = XTLockingMechanism.AUTO
+    lock_status_dpcode: str | None = None
     temporary_unlock_time: float | None = None
 
 @dataclass(frozen=True)
@@ -360,6 +361,9 @@ class XTLockEntity(XTEntity, LockEntity):  # type: ignore
         return False
 
     def _get_state_value(self, codes: list[XTDPCode]) -> Any | None:
+        forced_dpcode = self.configurable_properties.lock_status_dpcode
+        if forced_dpcode is not None and forced_dpcode in self.device.status:
+            return self.device.status[forced_dpcode]
         self.update_changed_value_list()
         for code in codes:
             if (
