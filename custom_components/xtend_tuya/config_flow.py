@@ -605,6 +605,8 @@ class TuyaOptionFlow(OptionsFlow):
                 "lock_unlock_mecanism", XTLockingMechanism.AUTO
             )
             new_config.lock_status_dpcode = user_input.get("lock_status_dpcode", None)
+            if new_config.lock_status_dpcode == "None":
+                new_config.lock_status_dpcode = None
             lock_entity.set_configurable_properties(new_config)
             await self.multi_manager.storage_manager.save_store()
             self.multi_manager.multi_device_listener.update_device(device=device)
@@ -620,7 +622,7 @@ class TuyaOptionFlow(OptionsFlow):
             str(dpcode): dpcode
             for dpcode in lock_entity.entity_description.unlock_status_list
         }
-        lock_status_dpcode_dict["None"] = None
+        lock_status_dpcode_dict["None"] = "None"
 
         return self.async_show_form(
             step_id="lock_device_settings",
