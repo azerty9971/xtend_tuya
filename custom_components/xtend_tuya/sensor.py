@@ -88,7 +88,6 @@ from .multi_manager.shared.threading import (
 )
 from .models import (
     XTDPCodeIntegerNoMinMaxCheckWrapper,
-    XTDPCodeBitmapLabelsWrapper,
 )
 from tuya_device_handlers.device_wrapper.sensor import (
     ElectricityCurrentJsonWrapper,
@@ -1790,13 +1789,6 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
             device_class=SensorDeviceClass.WEIGHT,
             state_class=SensorStateClass.MEASUREMENT,
             entity_registry_enabled_default=False,
-        ),
-        # DOEL ti+TpCTbt-01: fault bitmask as a human-readable string
-        XTSensorEntityDescription(
-            key=XTDPCode.FAULT,
-            translation_key="fault",
-            wrapper_class=(XTDPCodeBitmapLabelsWrapper,),
-            entity_category=EntityCategory.DIAGNOSTIC,
         ),
         *TEMPERATURE_SENSORS,
     ),
