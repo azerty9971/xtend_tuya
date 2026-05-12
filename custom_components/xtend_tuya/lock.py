@@ -18,6 +18,7 @@ from .const import (
     XTMultiManagerProperties,
     XTGlobalEvents,
     XT_GLOBAL_EVENT_PREFIX,
+    XTDeviceWatcherCategory,
 )
 from .multi_manager.multi_manager import (
     XTConfigEntry,
@@ -214,6 +215,7 @@ class XTLockEntity(XTEntity, LockEntity):  # type: ignore
                     f"{XTDevice.XTDevicePreference.LOCK_MANUAL_UNLOCK_COMMAND}",
                     manual_unlock_commands,
                 )
+        self.device_manager.device_watcher.report_message(self.device.id, f"Unlock status list: {description.unlock_status_list}", XTDeviceWatcherCategory.PLATFORM_LOCK, self.device)
         if len(description.unlock_status_list) > 1:
             for dpcode in description.unlock_status_list:
                 if dpcode in device.status:
@@ -314,6 +316,7 @@ class XTLockEntity(XTEntity, LockEntity):  # type: ignore
         is_unlocked_mixed = self._get_state_value(
             self.entity_description.unlock_status_list
         )
+        self.device_manager.device_watcher.report_message(self.device.id, f"is_unlocked_mixed: {is_unlocked_mixed}", XTDeviceWatcherCategory.PLATFORM_LOCK, self.device)
         is_unlocked: bool | None = None
         if isinstance(is_unlocked_mixed, bool):
             is_unlocked = is_unlocked_mixed
@@ -365,6 +368,7 @@ class XTLockEntity(XTEntity, LockEntity):  # type: ignore
         if forced_dpcode is not None and forced_dpcode in self.device.status:
             return self.device.status[forced_dpcode]
         self.update_changed_value_list()
+        self.device_manager.device_watcher.report_message(self.device.id, f"status_value_has_changed: {self.status_value_has_changed}", XTDeviceWatcherCategory.PLATFORM_LOCK, self.device)
         for code in codes:
             if (
                 code in self.status_value_has_changed
