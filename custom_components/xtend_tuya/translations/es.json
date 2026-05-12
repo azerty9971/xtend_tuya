@@ -74,14 +74,26 @@
             },
             "wet": {
                 "name": "H\u00famedo"
+            },
+            "in_clean": {
+                "name": "Limpieza autom\u00e1tica completada"
+            },
+            "dp_time_clear_flag": {
+                "name": "Limpieza programada activada"
             }
         },
         "button": {
+            "deep_clean": {
+                "name": "Limpieza a fondo"
+            },
             "factory_reset": {
                 "name": "Restablecimiento de f\u00e1brica"
             },
             "manual_clean": {
                 "name": "Limpieza manual"
+            },
+            "one_click_cleanup": {
+                "name": "Limpieza r\u00e1pida"
             },
             "reset_duster_cloth": {
                 "name": "Restablecer pa\u00f1o de limpieza"
@@ -178,8 +190,14 @@
             "cook_time": {
                 "name": "Tiempo de cocci\u00f3n"
             },
+            "capacity_calibration": {
+                "name": "Calibraci\u00f3n de capacidad"
+            },
             "delay_clean_time": {
                 "name": "Retrasar el tiempo de limpieza"
+            },
+            "detection_sensitivity": {
+                "name": "Sensibilidad de detecci\u00f3n"
             },
             "down_delay": {
                 "name": "Espera de bajada"
@@ -264,6 +282,36 @@
             },
             "water_level": {
                 "name": "Nivel del agua"
+            },
+            "sensitivity_cz": {
+                "name": "Sensibilidad CZ"
+            },
+            "sensitivity_wd": {
+                "name": "Sensibilidad WD"
+            },
+            "false_alarm": {
+                "name": "Umbral de falsas alarmas"
+            },
+            "study_timer": {
+                "name": "Temporizador de estudio"
+            },
+            "wd_detection": {
+                "name": "Distancia de detección WD"
+            },
+            "mov_min_detection": {
+                "name": "Distancia mínima de detección de movimiento"
+            },
+            "micro_min_detection": {
+                "name": "Distancia mínima de microdetección (ZG-205Z)"
+            },
+            "bre_min_detection": {
+                "name": "Distancia m\u00ednima de detecci\u00f3n de respiraci\u00f3n"
+            },
+            "sand_surface_calibration": {
+                "name": "Calibraci\u00f3n de superficie de arena"
+            },
+            "time_clear": {
+                "name": "Hora de limpieza programada"
             }
         },
         "select": {
@@ -579,6 +627,13 @@
                     "96h": "96h",
                     "cancel": "Cancelar"
                 }
+            },
+            "unit_switch": {
+                "name": "Unidad de peso",
+                "state": {
+                    "kg": "Kilogramos",
+                    "lb": "Libras"
+                }
             }
         },
         "sensor": {
@@ -626,13 +681,21 @@
             "cat_litter_box_status": {
                 "name": "Estado",
                 "state": {
-                    "clean": "Limpiando",
-                    "empty": "Vaciado",
-                    "level": "Nivelaci\u00f3n",
-                    "sleep": "Ahorro de energ\u00eda",
+                    "cleaning": "Limpiando",
+                    "clock": "Temporizador",
+                    "deodorization": "Desodorizando",
+                    "empty": "Vaciando",
+                    "level": "Nivelando",
+                    "off": "Apagado",
+                    "sleep": "Reposo",
                     "standby": "En espera",
-                    "uv": "Desinfecci\u00f3n"
+                    "standly": "En espera",
+                    "uv": "UV",
+                    "waiting_cluster": "Esperando"
                 }
+            },
+            "bag_change_counting": {
+                "name": "Contador de cambios de bolsa"
             },
             "cat_weight": {
                 "name": "Peso del gato"
@@ -655,6 +718,12 @@
             "depth": {
                 "name": "Profundidad"
             },
+            "detection_near": {
+                "name": "Detecci\u00f3n cercana"
+            },
+            "distance": {
+                "name": "Distancia al objetivo"
+            },
             "dew_point_temperature": {
                 "name": "Punto de roc\u00edo"
             },
@@ -666,6 +735,9 @@
             },
             "excretion_times_day": {
                 "name": "Tiempos de excreci\u00f3n (d\u00eda)"
+            },
+            "fault": {
+                "name": "Error"
             },
             "feels_like_temperature": {
                 "name": "Se siente como"
@@ -747,6 +819,9 @@
             "methane": {
                 "name": "Metano"
             },
+            "mov_status": {
+                "name": "Estado de movimiento"
+            },
             "odor_elimination_status": {
                 "name": "Estado",
                 "state": {
@@ -758,6 +833,9 @@
             },
             "phase_a_current": {
                 "name": "Corriente de la fase A"
+            },
+            "ponud": {
+                "name": "Peso del gato (lb)"
             },
             "phase_a_power": {
                 "name": "Potencia de la fase A"
@@ -933,6 +1011,9 @@
             "cry_detection": {
                 "name": "Detecci\u00f3n de llanto"
             },
+            "developer_mode": {
+                "name": "Modo desarrollador"
+            },
             "disinfection": {
                 "name": "Desinfecci\u00f3n"
             },
@@ -941,6 +1022,9 @@
             },
             "energy_saving": {
                 "name": "Ahorro de energ\u00eda"
+            },
+            "false_breath": {
+                "name": "Filtro de falsa respiraci\u00f3n"
             },
             "filter_cartridge_reset": {
                 "name": "Reinicio del cartucho de filtro"
@@ -1031,6 +1115,9 @@
             },
             "sleep": {
                 "name": "Dormir"
+            },
+            "sleep_new": {
+                "name": "Modo silencioso"
             },
             "sleep_aid": {
                 "name": "Ayuda para dormir"

@@ -268,40 +268,43 @@ BUTTONS: dict[str, tuple[XTButtonEntityDescription, ...]] = {
     ),
     "kg": (*CONSUMPTION_BUTTONS,),
     "msp": (
-        XTButtonEntityDescription(
-            key=XTDPCode.BAG_CHANGE_MODE,
-            translation_key="change_litter_bag",
-            entity_category=EntityCategory.CONFIG,
-        ),
-        # Poopy Nano 2 uses the DPCode "clean" for starting a manual clean.
-        # We reuse the same translation key.
+        # Poopy Nano 2 / DOEL ti+TpCTbt-01: "clean" triggers a manual clean cycle
         XTButtonEntityDescription(
             key=XTDPCode.CLEAN,
             translation_key="manual_clean",
-            entity_category=EntityCategory.CONFIG,
+        ),
+        # One-click cleanup action (momentary trigger)
+        XTButtonEntityDescription(
+            key=XTDPCode.CLEANING,
+            translation_key="one_click_cleanup",
         ),
         XTButtonEntityDescription(
             key=XTDPCode.EMPTY,
             translation_key="empty_litter",
-            entity_category=EntityCategory.CONFIG,
         ),
+        XTButtonEntityDescription(
+            key=XTDPCode.LEVEL_CAT_LITTER,
+            translation_key="level_cat_litter",
+        ),
+        # ZEDAR K1200 / DOEL: "manual_clean" triggers a manual clean cycle
+        XTButtonEntityDescription(
+            key=XTDPCode.MANUAL_CLEAN,
+            translation_key="manual_clean",
+        ),
+        XTButtonEntityDescription(
+            key=XTDPCode.INDUCTION_CLEAN_2,
+            translation_key="induction_clean",
+        ),
+        XTButtonEntityDescription(
+            key=XTDPCode.BAG_CHANGE_MODE,
+            translation_key="change_litter_bag",
+        ),
+        # ── Diagnostic ─────────────────────────────────────────────────────────────
         XTButtonEntityDescription(
             key=XTDPCode.FACTORY_RESET,
             translation_key="factory_reset",
             entity_category=EntityCategory.DIAGNOSTIC,
             entity_registry_enabled_default=False,
-        ),
-        XTButtonEntityDescription(
-            key=XTDPCode.LEVEL_CAT_LITTER,
-            translation_key="level_cat_litter",
-            entity_category=EntityCategory.CONFIG,
-        ),
-        # ZEDAR K1200 uses the DPCode "manual_clean" for starting a manual clean.
-        # We reuse the same translation key.
-        XTButtonEntityDescription(
-            key=XTDPCode.MANUAL_CLEAN,
-            translation_key="manual_clean",
-            entity_category=EntityCategory.CONFIG,
         ),
     ),
     "qccdz": (

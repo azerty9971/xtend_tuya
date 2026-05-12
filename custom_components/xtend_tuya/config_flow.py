@@ -596,9 +596,17 @@ class TuyaOptionFlow(OptionsFlow):
             new_config.temporary_unlock_time = user_input.get(
                 "temporary_unlock_time", None
             )
-            if new_config.temporary_unlock_time is not None and new_config.temporary_unlock_time < 0.1:
+            if (
+                new_config.temporary_unlock_time is not None
+                and new_config.temporary_unlock_time < 0.1
+            ):
                 new_config.temporary_unlock_time = None
-            new_config.lock_unlock_mecanism = user_input.get("lock_unlock_mecanism", XTLockingMechanism.AUTO)
+            new_config.lock_unlock_mecanism = user_input.get(
+                "lock_unlock_mecanism", XTLockingMechanism.AUTO
+            )
+            new_config.lock_status_dpcode = user_input.get("lock_status_dpcode", None)
+            if new_config.lock_status_dpcode == "None":
+                new_config.lock_status_dpcode = None
             lock_entity.set_configurable_properties(new_config)
             await self.multi_manager.storage_manager.save_store()
             self.multi_manager.multi_device_listener.update_device(device=device)
@@ -610,6 +618,12 @@ class TuyaOptionFlow(OptionsFlow):
         if configurable_properties is None:
             return self.async_abort(reason="no_configurable_properties")
 
+        lock_status_dpcode_dict: dict[str, Any] = {
+            str(dpcode): dpcode
+            for dpcode in lock_entity.entity_description.unlock_status_list
+        }
+        lock_status_dpcode_dict["None"] = "None"
+
         return self.async_show_form(
             step_id="lock_device_settings",
             data_schema=vol.Schema(
@@ -618,8 +632,7 @@ class TuyaOptionFlow(OptionsFlow):
                         "temporary_unlock_time",
                         default=(
                             configurable_properties.temporary_unlock_time
-                            if configurable_properties.temporary_unlock_time
-                            is not None
+                            if configurable_properties.temporary_unlock_time is not None
                             else vol.UNDEFINED
                         ),
                     ): vol.All(
@@ -627,15 +640,28 @@ class TuyaOptionFlow(OptionsFlow):
                     ),
                     vol.Required(
                         "lock_unlock_mecanism",
-                        default=configurable_properties.lock_unlock_mecanism
-                            if configurable_properties.lock_unlock_mecanism
-                            is not None
-                            else XTLockingMechanism.AUTO,
+                        default=(
+                            configurable_properties.lock_unlock_mecanism
+                            if configurable_properties.lock_unlock_mecanism is not None
+                            else XTLockingMechanism.AUTO
+                        ),
                     ): vol.In(
                         {
-                            lock_mecanism.value: lock_mecanism.get_human_name(lock_mecanism.value)
+                            lock_mecanism.value: lock_mecanism.get_human_name(
+                                lock_mecanism.value
+                            )
                             for lock_mecanism in XTLockingMechanism
                         }
+                    ),
+                    vol.Optional(
+                        "lock_status_dpcode",
+                        default=(
+                            configurable_properties.lock_status_dpcode
+                            if configurable_properties.lock_status_dpcode is not None
+                            else ""
+                        ),
+                    ): vol.In(
+                        lock_status_dpcode_dict
                     ),
                 }
             ),
@@ -643,7 +669,7 @@ class TuyaOptionFlow(OptionsFlow):
                 "device_name": device.name or "",
             },
         )
-    
+
     async def async_step_cover_device_settings(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
@@ -673,12 +699,8 @@ class TuyaOptionFlow(OptionsFlow):
         if user_input is not None:
             # Update the configurable properties
             new_config = cover.XTCoverConfigurableProperties()
-            new_config.invert_control = user_input.get(
-                "invert_control", False
-            )
-            new_config.invert_status = user_input.get(
-                "invert_status", False
-            )
+            new_config.invert_control = user_input.get("invert_control", False)
+            new_config.invert_status = user_input.get("invert_status", False)
             new_config.force_virtual_position = user_input.get(
                 "force_virtual_position", False
             )
@@ -693,7 +715,7 @@ class TuyaOptionFlow(OptionsFlow):
                 new_config.update_interval = new_interval
             if configurable_properties is not None:
                 new_config.virtual_position = configurable_properties.virtual_position
-            
+
             cover_entity.set_configurable_properties(new_config)
             await self.multi_manager.storage_manager.save_store()
             self.multi_manager.multi_device_listener.update_device(device=device)
@@ -708,28 +730,21 @@ class TuyaOptionFlow(OptionsFlow):
                 {
                     vol.Optional(
                         "invert_control",
-                        default=bool(
-                            configurable_properties.invert_control
-                        ),
+                        default=bool(configurable_properties.invert_control),
                     ): bool,
                     vol.Optional(
                         "invert_status",
-                        default=bool(
-                            configurable_properties.invert_status
-                        ),
+                        default=bool(configurable_properties.invert_status),
                     ): bool,
                     vol.Optional(
                         "force_virtual_position",
-                        default=bool(
-                            configurable_properties.force_virtual_position
-                        ),
+                        default=bool(configurable_properties.force_virtual_position),
                     ): bool,
                     vol.Optional(
                         "open_time",
                         default=(
                             configurable_properties.open_time
-                            if configurable_properties.open_time
-                            is not None
+                            if configurable_properties.open_time is not None
                             else vol.UNDEFINED
                         ),
                     ): vol.All(
@@ -737,17 +752,13 @@ class TuyaOptionFlow(OptionsFlow):
                     ),
                     vol.Optional(
                         "update_interval",
-                        default=(
-                            configurable_properties.update_interval
-                        ),
+                        default=(configurable_properties.update_interval),
                     ): vol.All(
                         vol.Coerce(float),
                     ),
                     vol.Optional(
                         "no_precise_position",
-                        default=bool(
-                            configurable_properties.no_precise_position
-                        ),
+                        default=bool(configurable_properties.no_precise_position),
                     ): bool,
                 }
             ),

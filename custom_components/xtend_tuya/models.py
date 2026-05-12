@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaDPCodeIntegerWrapper,
     TuyaCustomerDevice,
@@ -40,5 +41,4 @@ class XTDPCodeIntegerNoMinMaxCheckWrapper(TuyaDPCodeIntegerWrapper):
         self, device: TuyaCustomerDevice, value: float
     ) -> int:
         """Convert a Home Assistant value back to a raw device value."""
-        new_value = self.type_information.scale_value_back(value)
-        return new_value
+        return round(value * (10 ** self.type_information.scale))

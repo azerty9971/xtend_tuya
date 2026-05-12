@@ -17,7 +17,9 @@ from .ha_tuya_integration.tuya_integration_imports import (
 )
 
 type XTJsonSerializable = float | int | str | bool | NoneType
-type XTAcceptableStoragePropertyValue = dict[str, XTJsonSerializable] | list[XTJsonSerializable] | XTJsonSerializable
+type XTAcceptableStoragePropertyValue = dict[str, XTJsonSerializable] | list[
+    XTJsonSerializable
+] | XTJsonSerializable
 
 XT_CELSIUS_ALIASES = TuyaCELSIUS_ALIASES.union(set())
 XT_FAHRENHEIT_ALIASES = TuyaFAHRENHEIT_ALIASES.union(set())
@@ -68,6 +70,7 @@ CROSS_CATEGORY_DEVICE_DESCRIPTOR: str = "cross_category_device_descriptor"
 
 XT_RETRY_FAILED_CALLS_NUMBER: int = 5
 
+
 class TuyaCloudOpenAPIEndpoint(StrEnum):
     """Tuya Cloud Open API Endpoint."""
 
@@ -95,6 +98,7 @@ class TuyaCloudOpenAPIEndpoint(StrEnum):
                 return "Singapore"
             case _:
                 return "America"
+
 
 IR_HUB_CATEGORY_LIST: list[str] = [
     "wnykq",
@@ -141,30 +145,35 @@ TUYA_TEST_API_BAD_RETURN_CODES = [
     28841106,
 ]
 
+
 class AllowedPlugins:
     @staticmethod
     def get_plugins_to_load() -> list[str]:
         return [MESSAGE_SOURCE_TUYA_SHARING, MESSAGE_SOURCE_TUYA_IOT]
 
+
 class XTGlobalEvents(StrEnum):
     LOCK_UNLOCKED = "LOCK_UNLOCKED"
+
 
 class VirtualStates(IntFlag):
     """Virtual states"""
 
     # Copy the state so that it can be used with other virtual states
-    STATE_COPY_TO_MULTIPLE_STATE_NAME   = 0x0001
+    STATE_COPY_TO_MULTIPLE_STATE_NAME = 0x0001
     # Spoof the state value to make it a total instead of an incremental value
-    STATE_SUMMED_IN_REPORTING_PAYLOAD   = 0x0002
+    STATE_SUMMED_IN_REPORTING_PAYLOAD = 0x0002
     # Force the status update to come from the most talkative source and deduplicate same message from multiple sources
-    STATE_DEDUPLICATE_IN_REPORTING      = 0x0004
+    STATE_DEDUPLICATE_IN_REPORTING = 0x0004
 
 
 class VirtualFunctions(IntFlag):
     """Virtual functions"""
 
     FUNCTION_RESET_STATE = 0x0001  # Reset the specified states
-    FUNCTION_IMPORT_ELECTRICAL_HISTORY = 0x0002  # Import the electrical history of the entity
+    FUNCTION_IMPORT_ELECTRICAL_HISTORY = (
+        0x0002  # Import the electrical history of the entity
+    )
 
 
 class XTDeviceEntityFunctions(StrEnum):
@@ -202,7 +211,6 @@ class XTLockingMechanism(StrEnum):
                 return "Unknown"
 
 
-
 class XTMultiManagerPostSetupCallbackPriority(IntEnum):
     PRIORITY1 = 1
     PRIORITY2 = 2
@@ -222,29 +230,31 @@ class XTDiscoverySource(StrEnum):
     SOURCE_ADD_IR_DEVICE_KEY = "ir_add_key"
     SOURCE_ADD_IR_DEVICE = "ir_add_device"
 
+
 class XTDeviceWatcherSpecialDevice(StrEnum):
     NOT_LINKED_TO_A_DEVICE = "not_linked_to_a_device"
 
+
 class XTDeviceWatcherCategory(Flag):
-    MQTT                    = auto()
-    SHARING_API             = auto()
-    IOT_API                 = auto()
-    PLATFORM_BUTTON         = auto()
-    PLATFORM_CAMERA         = auto()
-    PLATFORM_CLIMATE        = auto()
-    PLATFORM_COVER          = auto()
-    PLATFORM_EVENT          = auto()
-    PLATFORM_LIGHT          = auto()
-    PLATFORM_LOCK           = auto()
-    PLATFORM_NUMBER         = auto()
-    PLATFORM_SENSOR         = auto()
-    CLOUD_FIX               = auto()
-    SHARING_API_INTERNAL    = auto()
-    VIRTUAL_STATE           = auto()
-    VIRTUAL_FUNCTION        = auto()
-    XT_PERFORMANCE          = auto()
-    DEBUG                   = auto()
-    STATUS_CHANGES          = auto()
+    MQTT = auto()
+    SHARING_API = auto()
+    IOT_API = auto()
+    PLATFORM_BUTTON = auto()
+    PLATFORM_CAMERA = auto()
+    PLATFORM_CLIMATE = auto()
+    PLATFORM_COVER = auto()
+    PLATFORM_EVENT = auto()
+    PLATFORM_LIGHT = auto()
+    PLATFORM_LOCK = auto()
+    PLATFORM_NUMBER = auto()
+    PLATFORM_SENSOR = auto()
+    CLOUD_FIX = auto()
+    SHARING_API_INTERNAL = auto()
+    VIRTUAL_STATE = auto()
+    VIRTUAL_FUNCTION = auto()
+    XT_PERFORMANCE = auto()
+    DEBUG = auto()
+    STATUS_CHANGES = auto()
 
     @classmethod
     def all_enum_values(cls) -> list[XTDeviceWatcherCategory]:
@@ -254,7 +264,9 @@ class XTDeviceWatcherCategory(Flag):
         return retval
 
     @classmethod
-    def get_unique_flags(cls, multi_flags: XTDeviceWatcherCategory) -> list[XTDeviceWatcherCategory]:
+    def get_unique_flags(
+        cls, multi_flags: XTDeviceWatcherCategory
+    ) -> list[XTDeviceWatcherCategory]:
         retval = []
         all_flags = cls.all_enum_values()
         for flag in all_flags:
@@ -738,39 +750,49 @@ class XTDPCode(StrEnum):
     ACTIVEPOWERB = "ActivePowerB"
     ACTIVEPOWERC = "ActivePowerC"
     ACV = "ACV"
-    ADD_ELE_THIS_MONTH = "add_ele_this_month"
-    ADD_ELE_THIS_YEAR = "add_ele_this_year"
-    ADD_ELE_TODAY = "add_ele_today"
     ADD_ELE2 = "add_ele2"
     ADD_ELE2_THIS_MONTH = "add_ele2_this_month"
     ADD_ELE2_THIS_YEAR = "add_ele2_this_year"
     ADD_ELE2_TODAY = "add_ele2_today"
+    ADD_ELE_THIS_MONTH = "add_ele_this_month"
+    ADD_ELE_THIS_YEAR = "add_ele_this_year"
+    ADD_ELE_TODAY = "add_ele_today"
     ALARM_LOCK = "alarm_lock"
+    AUTOMATIC_LOCK = "automatic_lock"
     AUTO_DEORDRIZER = "auto_deordrizer"
     AUTO_LOCK_TIME = "auto_lock_time"
     AUTO_PUMP = "auto_pump"
-    AUTOMATIC_LOCK = "automatic_lock"
     A_CURRENT = "A_Current"
     A_VOLTAGE = "A_Voltage"
     BACKLIGHT_SWITCH = "backlight_switch"
+    BAG_CHANGE_COUNTING = "bag_change_counting"  # bag usage count (dp139)
     BAG_CHANGE_MODE = "bag_change_mode"
     BALANCE_ENERGY = "balance_energy"
+    BARREL_INFRARED = "barrel_infrared"
     BEEP = "beep"
     BEEP_VOLUME = "beep_volume"
     BLUETOOTH_UNLOCK = "bluetooth_unlock"
     BREATHDISTANCE_MAX = "breathdistance_max"
     BREATHDISTANCE_MIN = "breathdistance_min"
+    BREATHE_START = "breathe_start"
     BREATHSENSITIVITY = "breathsensitivity"
+    BRE_MIN_DETECTION = "bre_min_detection"
     B_CURRENT = "B_Current"
     B_DETECTION_DISTANCE_MAX = "b_detection_distance_max"
     B_DETECTION_DISTANCE_MIN = "b_detection_distance_min"
-    B_VOLTAGE = "B_Voltage"
     B_SENSITIVITY = "b_sensitivity"
-    C_F_ = "C_F_"  # Temperature unit switching
+    B_VOLTAGE = "B_Voltage"
     CALIBRATION = "calibration"
     CAPACITY_CALIBRATION = "capacity_calibration"
     CAPACITY_UNIT = "capacity_unit"
+    CARD_UNLOCK_USER = "card_unlock_user"
+    CAT_STATUS = "status"  # alias for STATUS DP
     CDS = "cds"
+    CHARGE_CUR_SET = "charge_cur_set"
+    CHARGE_ENERGY = "charge_energy"
+    CHARGE_ENERGY_ONCE = "charge_energy_once"
+    CHARGINGOPERATION = "ChargingOperation"
+    CHOOSE_CAT_LITTER = "choose_cat_litter"
     # Channel data points for multi-sensor devices
     CH_0 = "ch_0"  # Channel 0 sensor data
     CH_1 = "ch_1"  # Channel 1 sensor data
@@ -782,32 +804,24 @@ class XTDPCode(StrEnum):
     CH_7 = "ch_7"  # Channel 7 sensor data
     CH_8 = "ch_8"  # Channel 8 sensor data
     CH_9 = "ch_9"  # Channel 9 sensor data
-    CH_PARA = "ch_para"  # Channel parameters
     CH_CFG = "ch_cfg"  # Channel configuration
-    CHARGE_CUR_SET = "charge_cur_set"
-    CHARGE_ENERGY = "charge_energy"
-    CHARGE_ENERGY_ONCE = "charge_energy_once"
-    CHARGINGOPERATION = "ChargingOperation"
-    CHOOSE_CAT_LITTER = "choose_cat_litter"
+    CH_PARA = "ch_para"  # Channel parameters
+    CLCT_TIME = "clct_time"
     CLEAN = "clean"
+    CLEANING = "cleaning"
+    CLEANING_NUM = "cleaning_num"
     CLEAN_NOTICE = "Clean_notice"
     CLEAN_TASTE = "Clean_taste"
     CLEAN_TASTE_SWITCH = "Clean_tasteSwitch"
     CLEAN_TIME_SWITCH = "clean_time_switch"
-    CLEANING = "cleaning"
-    CLEANING_NUM = "cleaning_num"
     CLEAR_ENERGY = "clear_energy"
     CLOSED_OPENED = "closed_opened"
     CLOSE_TIME = "close_time"
-    CLCT_TIME = "clct_time"
     COLOR = "Color"
     CONNECTION_STATE = "connection_state"
     CONTROL_SKIP = "control_skip"
     CTIME = "Ctime"
     CTIME2 = "CTime2"
-    CUR_CURRENT2 = "cur_current2"
-    CUR_POWER2 = "cur_power2"
-    CUR_VOLTAGE2 = "cur_voltage2"
     CURRENT = "Current"
     CURRENTA = "CurrentA"
     CURRENTB = "CurrentB"
@@ -816,18 +830,24 @@ class XTDPCode(StrEnum):
     CURRENT_B = "current_b"
     CURRENT_YD = "current_yd"
     CUR_CAP = "cur_cap"
+    CUR_CURRENT2 = "cur_current2"
+    CUR_POWER2 = "cur_power2"
+    CUR_VOLTAGE2 = "cur_voltage2"
     CYC_NUM = "cyc_num"
     C_CURRENT = "C_Current"
+    C_F_ = "C_F_"  # Temperature unit switching
     C_VOLTAGE = "C_Voltage"
     DEEP_CLEAN = "deep_clean"
     DELAY_TASK = "delay_task"
     DEODORIZATION = "deodorization"
     DEODORIZATION_NUM = "deodorization_num"
-    DEO_START_TIME = "deo_start_time"
     DEO_END_TIME = "deo_end_time"
-    DETECTION_DISTANCE_MIN = "detection_distance_min"
+    DEO_START_TIME = "deo_start_time"
     DETECTION_DISTANCE_MAX = "detection_distance_max"
+    DETECTION_DISTANCE_MIN = "detection_distance_min"
+    DETECTION_NEAR = "detection_near"
     DETECTION_SENSITIVITY = "detection_sensitivity"
+    DEVELOPER_MODE = "developer_mode"
     DEVICEID = "DeviceID"
     DEVICEKW = "DeviceKw"
     DEVICEKWH = "DeviceKwh"
@@ -838,8 +858,10 @@ class XTDPCode(StrEnum):
     DEVICE_MODE = "device_mode"
     DIRECTION_A = "direction_a"
     DIRECTION_B = "direction_b"
+    DISTANCE = "distance"
     DOORBELL = "doorbell"
     DOORBELL_VOLUME = "doorbell_volume"
+    DP_TIME_CLEAR_FLAG = "dp_time_clear_flag"  # scheduled clean flag (dp106)
     ECO = "eco"
     ELECTRIC = "electric"
     ELECTRIC_THIS_MONTH = "electric_this_month"
@@ -851,14 +873,21 @@ class XTDPCode(StrEnum):
     ENERGYCONSUMEDA = "EnergyConsumedA"
     ENERGYCONSUMEDB = "EnergyConsumedB"
     ENERGYCONSUMEDC = "EnergyConsumedC"
+    ENTER_INFRARED = "enter_infrared"
+    FACE_UNLOCK_USER = "face_unlock_user"
+    FALSE_ALARM = "false_alarm"
+    FALSE_BREATH = "false_breath"
     FAULT2 = "Fault"
+    FINGERPRINT_UNLOCK_USER = "fingerprint_unlock_user"
     FLOW_VELOCITY = "flow_velocity"
-    FORWARD_ENERGY_TOTAL_TODAY = "forward_energy_total_today"
     FORWARD_ENERGY_TOTAL_THIS_MONTH = "forward_energy_total_this_month"
     FORWARD_ENERGY_TOTAL_THIS_YEAR = "forward_energy_total_this_year"
+    FORWARD_ENERGY_TOTAL_TODAY = "forward_energy_total_today"
     FREQUENCY = "Frequency"
     GET_HUM = "get_hum"
     GET_TEMP = "get_temp"
+    GRAVITY_INDUCTION = "gravity_induction"
+    HAND_UNLOCK_USER = "hand_unlock_user"
     HEART_RATE = "heart_rate"
     HISTORY = "History"
     HOLD_SENSITIVITY = "hold_sensitivity"
@@ -871,16 +900,19 @@ class XTDPCode(StrEnum):
     INDICATOR_LED = "indicator_led"
     INDICATOR_LIGHT = "indicator_light"
     INDUCTION_CLEAN = "Induction_Clean"
+    INDUCTION_CLEAN_2 = "induction_clean"
     INDUCTION_DELAY = "induction_delay"
     INDUCTION_INTERVAL = "induction_interval"
     INFRARED_SENSOR_SWITCH = "infrared_sensor_switch"
+    IN_CLEAN = "in_clean"  # auto-clean completed flag (dp121)
     IPC_MOVEMENT_DETECT = "ipc_movement_detect"
     IR_CONTROL = "ir_control"
     KEY_REC = "key_rec"
     KEY_TONE = "key_tone"
     KILL = "kill"
-    LEVEL_CAT_LITTER = "level_cat_litter"
     LDR = "ldr"
+    LED_ONOFF = "led_onoff"
+    LEVEL_CAT_LITTER = "level_cat_litter"
     LOCK_MOTOR_STATE = "lock_motor_state"
     LOCK_RECORD = "lock_record"
     MAGNETNUM = "magnetNum"
@@ -889,14 +921,17 @@ class XTDPCode(StrEnum):
     MAXHUM_SET = "maxhum_set"
     MAXTEMP_SET = "maxtemp_set"
     METER_TYPE = "meter_type"
+    MICRO_MIN_DETECTION = "micro_min_detection"
     MINIHUM_SET = "minihum_set"
     MINITEMP_SET = "minitemp_set"
-    MONITORING = "monitoring"
     MODE1 = "mode1"  # Working mode / Mode
     MODE_CAP = "Mode"
+    MONITORING = "monitoring"
     MOVEDISTANCE_MAX = "movedistance_max"
     MOVEDISTANCE_MIN = "movedistance_min"
     MOVESENSITIVITY = "movesensitivity"
+    MOV_MIN_DETECTION = "mov_min_detection"
+    MOV_STATUS = "mov_status"
     M_ADC_NUM = "M_ADC_NUM"
     M_DETECTION_DISTANCE_MAX = "m_detection_distance_max"
     M_DETECTION_DISTANCE_MIN = "m_detection_distance_min"
@@ -915,6 +950,7 @@ class XTDPCode(StrEnum):
     OFF_BED_TIME = "off_bed_time"
     ONLINE_STATE = "online_state"
     OPEN_CLOSE = "open_close"
+    PASSWORD_UNLOCK_USER = "password_unlock_user"
     PEDAL_ANGLE = "pedal_angle"
     PHASEFLAG = "PhaseFlag"
     PHOTO_AGAIN = "photo_again"
@@ -923,37 +959,38 @@ class XTDPCode(StrEnum):
     PIR_RADAR = "PIR_RADAR"
     PIR_SENSITIVITY = "pir_sensitivity"
     PIR_STATE = "pir_state"
+    PONUD = "ponud"  # cat weight in lb (dp134)
     POWER2 = "Power"
-    POWER_A = "power_a"
-    POWER_B = "power_b"
     POWERFACTORA = "PowerFactorA"
     POWERFACTORB = "PowerFactorB"
     POWERFACTORC = "PowerFactorC"
     POWERON = "poweron"
     POWERONOFF = "PowerOnOff"
+    POWER_A = "power_a"
+    POWER_B = "power_b"
     POWER_CONSUMPTION = "power_consumption"
     POWER_CONSUMPTION2 = "power_consumption2"
-    POWER_CONSUMPTION2_TODAY = "power_consumption2_today"
     POWER_CONSUMPTION2_THIS_MONTH = "power_consumption2_this_month"
     POWER_CONSUMPTION2_THIS_YEAR = "power_consumption2_this_year"
-    POWER_CONSUMPTION_TODAY = "power_consumption_today"
+    POWER_CONSUMPTION2_TODAY = "power_consumption2_today"
     POWER_CONSUMPTION_THIS_MONTH = "power_consumption_this_month"
     POWER_CONSUMPTION_THIS_YEAR = "power_consumption_this_year"
+    POWER_CONSUMPTION_TODAY = "power_consumption_today"
     POWER_FACTOR = "power_factor"
     POWER_FACTOR_B = "power_factor_b"
     POWER_SET = "power_set"
+    PRESENCE_DELAY = "presence_delay"
+    PRODUCT_SPECIFICATIONS = "product_specifications"
+    PUMP_MODE = "pump_mode"
     PV1_CURR = "pv1_curr"
     PV1_VOLT = "pv1_volt"
     PV2_CURR = "pv2_curr"
     PV2_VOLT = "pv2_volt"
-    PVV = "PVV"
     PVI = "PVI"
-    PRESENCE_DELAY = "presence_delay"
-    PRODUCT_SPECIFICATIONS = "product_specifications"
-    PUMP_MODE = "pump_mode"
-    QUIET_TIMING_ON = "quiet_timing_on"
+    PVV = "PVV"
     QUIET_TIME_END = "quiet_time_end"
     QUIET_TIME_START = "quiet_time_start"
+    QUIET_TIMING_ON = "quiet_timing_on"
     REACTIVEPOWER = "ReactivePower"
     REACTIVEPOWERA = "ReactivePowerA"
     REACTIVEPOWERB = "ReactivePowerB"
@@ -965,6 +1002,7 @@ class XTDPCode(StrEnum):
     REMAININGTIME = "RemainingTime"
     REMOTE_NO_DP_KEY = "remote_no_dp_key"
     REPORT_SENSITIVITY = "report_sensitivity"
+    RESET_SETTING = "reset_setting"
     RESIDUAL_ELECTRICITY = "residual_electricity"
     RESPIRATORY_RATE = "respiratory_rate"
     RESTORE_FACTORY_SETTINGS = "restore_factory_settings"
@@ -976,18 +1014,24 @@ class XTDPCode(StrEnum):
     RTC_TIME = "rtc_time"
     RUN_TASK_STA = "run_task_sta"
     SAND_SURFACE_CALIBRATION = "sand_surface_calibration"
-    SETDELAYTIME = "SetDelayTime"
-    SETDEFINETIME = "SetDefineTime"
-    SETTIME = "SetTime"
+    SECURITY_STATUS = "security_status"
+    # ZG-205Z presence sensor (hps)
+    SENSITIVITY_CZ = "sensitivity_cz"
+    SENSITIVITY_WD = "sensitivity_wd"
     SET16A = "Set16A"
     SET32A = "Set32A"
     SET40A = "Set40A"
     SET50A = "Set50A"
+    SETDEFINETIME = "SetDefineTime"
+    SETDELAYTIME = "SetDelayTime"
+    SETTIME = "SetTime"
     SIGLE_PHASE_POWER = "sigle_phase_power"
     SLEEPING = "sleeping"
     SLEEP_END_TIME = "sleep_end_time"
+    SLEEP_NEW = "sleep_new"  # sleep mode switch (dp120)
     SLEEP_STAGE = "sleep_stage"
     SLEEP_START_TIME = "sleep_start_time"
+    SMALL_MOV_START = "small_mov_start"
     SMART_CLEAN = "smart_clean"
     SM_DETECTION_DISTANCE_MAX = "sm_detection_distance_max"
     SM_DETECTION_DISTANCE_MIN = "sm_detection_distance_min"
@@ -998,8 +1042,10 @@ class XTDPCode(StrEnum):
     SPECIAL_FUNCTION = "special_function"
     STANDBY_BRIGHT = "standby_bright"
     STANDBY_TIME = "standby_time"
+    START_STUDY = "start_study"
     START_TIME = "start_time"
     STORE_FULL_NOTIFY = "store_full_notify"
+    STUDY_TIMER = "study_timer"
     SWITCH_CAP = "Switch"
     SWITCH_ENABLED = "switch_enabled"
     SWITCH_ON = "switch_on"
@@ -1021,16 +1067,17 @@ class XTDPCode(StrEnum):
     TEMP_CURRENT_CAP = "Temp_current"
     TEMP_CURRENT_F_CAP = "Temp_current_f"
     TEMP_SENSITIVITY = "temp_sensitivity"
-    TEMP_SET_CAP = "Temp_set"
     TEMP_SET_1 = "temp_set_1"  # Set the warm temperature in °C
+    TEMP_SET_CAP = "Temp_set"
     TEMP_SET_F_CAP = "Temp_set_f"
     TEMP_TOP = "temp_top"
     TEMP_UNIT = "temp_unit"
     THIN_FECES = "thin_feces"
     TIME = "time"
-    TOILET_NOTICE = "toilet_notice"
-    TIME_GET_IN_BED = "time_get_in_bed"
     TIMER_ON = "timer_on"
+    TIME_CLEAR = "time_clear"  # scheduled clean time (dp129)
+    TIME_GET_IN_BED = "time_get_in_bed"
+    TOILET_NOTICE = "toilet_notice"
     TOTALENERGYCONSUMED = "TotalEnergyConsumed"
     TOTAL_FORWARD_ENERGY_THIS_MONTH = "total_forward_energy_this_month"
     TOTAL_FORWARD_ENERGY_THIS_YEAR = "total_forward_energy_this_year"
@@ -1039,16 +1086,18 @@ class XTDPCode(StrEnum):
     TRIGGER_SENSITIVITY = "trigger_sensitivity"
     UNIT = "unit"
     UNIT2 = "Unit"
+    # Cat litter box (msp)
+    UNIT_SWITCH = "unit_switch"  # weight unit kg/lb (dp108)
     UNLOCK_BLE = "unlock_ble"
     UNLOCK_CARD = "unlock_card"
     UNLOCK_CARD_KIT = "unlock_card_kit"
     UNLOCK_DYNAMIC = "unlock_dynamic"
-    UNLOCK_KEY = "unlock_key"
     UNLOCK_FACE = "unlock_face"
     UNLOCK_FINGERPRINT = "unlock_fingerprint"
     UNLOCK_FINGERPRINT_KIT = "unlock_fingerprint_kit"
     UNLOCK_FINGER_VEIN = "unlock_finger_vein"
     UNLOCK_HAND = "unlock_hand"
+    UNLOCK_KEY = "unlock_key"
     UNLOCK_METHOD_CREATE = "unlock_method_create"
     UNLOCK_METHOD_DELETE = "unlock_method_delete"
     UNLOCK_METHOD_MODIFY = "unlock_method_modify"
@@ -1061,11 +1110,6 @@ class XTDPCode(StrEnum):
     UNLOCK_TEMPORARY = "unlock_temporary"
     UNLOCK_TEMPORARY_KIT = "unlock_temporary_kit"
     UNLOCK_VOICE_REMOTE = "unlock_voice_remote"
-    CARD_UNLOCK_USER = "card_unlock_user"
-    FACE_UNLOCK_USER = "face_unlock_user"
-    HAND_UNLOCK_USER = "hand_unlock_user"
-    FINGERPRINT_UNLOCK_USER = "fingerprint_unlock_user"
-    PASSWORD_UNLOCK_USER = "password_unlock_user"
     USAGE_TIMES = "usage_times"
     USE_TIME_1 = "use_time_1"
     USE_TIME_2 = "use_time_2"
@@ -1075,22 +1119,23 @@ class XTDPCode(StrEnum):
     USE_TIME_6 = "use_time_6"
     USE_TIME_7 = "use_time_7"
     USE_TIME_8 = "use_time_8"
-    UV_START_TIME = "uv_start_time"
     UV_END_TIME = "uv_end_time"
     UV_LIGHT = "uv_light"
+    UV_START_TIME = "uv_start_time"
     VBAT_STATE = "vbat_state"
     VIDEO_REQUEST_REALTIME = "video_request_realtime"
-    VOL_YD = "vol_yd"
     VOLTAGEA = "VoltageA"
     VOLTAGEB = "VoltageB"
     VOLTAGEC = "VoltageC"
     VOLTAGE_A = "voltage_a"
     VOLTAGE_CURRENT = "voltage_current"
+    VOL_YD = "vol_yd"
     WAKEUP = "wakeup"
     WATER_CONTROL = "water_control"
     WATER_ONCE = "water_once"
     WATER_TOTAL = "water_total"
     WATER_USE_DATA = "water_use_data"
+    WD_DETECTION = "wd_detection"
     WEATHER_SWITCH = "weather_switch"
     WINDSHAKE = "windshake"
     WINDSHAKE1 = "windshake1"
@@ -1100,13 +1145,13 @@ class XTDPCode(StrEnum):
     WORK_STATE = "work_state"
     WORK_STATUS = "WorkStatus"
     XT_ADD_ELE = "xt_add_ele"
-    XT_ADD_ELE_THIS_MONTH = "xt_add_ele_this_month"
-    XT_ADD_ELE_THIS_YEAR = "xt_add_ele_this_year"
-    XT_ADD_ELE_TODAY = "xt_add_ele_today"
     XT_ADD_ELE2 = "xt_add_ele2"
     XT_ADD_ELE2_THIS_MONTH = "xt_add_ele2_this_month"
     XT_ADD_ELE2_THIS_YEAR = "xt_add_ele2_this_year"
     XT_ADD_ELE2_TODAY = "xt_add_ele2_today"
+    XT_ADD_ELE_THIS_MONTH = "xt_add_ele_this_month"
+    XT_ADD_ELE_THIS_YEAR = "xt_add_ele_this_year"
+    XT_ADD_ELE_TODAY = "xt_add_ele_today"
     XT_DEVICE_EVENT_NOTIFY = "xt_device_event_notify"
     XT_FORWARD_ENERGY_TOTAL = "xt_forward_energy_total"
     XT_FORWARD_ENERGY_TOTAL_THIS_MONTH = "xt_forward_energy_total_this_month"
@@ -1130,6 +1175,7 @@ class XTDPCode(StrEnum):
 
 UOM_MAPPING_DICT: dict[str, str | None] = {
     "kwh": "kWh",
+    "kw.h": "kWh",
     "kW·h": "kWh",
     "kW.h": "kWh",
     "KWH": "kWh",
@@ -1166,6 +1212,12 @@ DPCODE_PREFERED_DEVICE_CLASS: dict[str, str | None] = {
     "battery": "battery",
     "batttery": "battery",
     "battery_percentage": "battery",
+    "battery_power": "battery",
+    "battery_state": "battery",
+    "battery_value": "battery",
+    "residual_electricity": "battery",
+    "va_battery": "battery",
+    "wireless_electricity": "battery",
     "maxco2_set": "carbon_dioxide",
     "motionless_far_detection": "distance",
     "breathe_detection": "distance",
@@ -1181,13 +1233,17 @@ DPCODE_PREFERED_DEVICE_CLASS: dict[str, str | None] = {
     "add_ele": "energy",
     "add_ele1": "energy",
     "charge_energy": "energy",
+    "credit": "energy",
     "cur_neutral": "energy",
+    "ele": "energy",
+    "energy_charge": "energy",
     "energy_forword_a": "energy",
     "energy_forword_b": "energy",
     "energy_reverse_a": "energy",
     "energy_reserse_a": "energy",
     "energy_reverse_b": "energy",
     "energy_reserse_b": "energy",
+    "power_factor": "energy",
     "today_acc_energy1": "energy",
     "today_energy_add1": "energy",
     "total_energy1": "energy",
@@ -1247,10 +1303,12 @@ DPCODE_PREFERED_DEVICE_CLASS: dict[str, str | None] = {
 XT_DEVICE_EVENT_NOTIFY_DPCODE = XTDPCode.XT_DEVICE_EVENT_NOTIFY
 BIZCODE_EVENT_NOTIFY = "event_notify"
 
+
 class XTEntityAccessMode(StrEnum):
     READ_ONLY = "ro"
     READ_WRITE = "rw"
     WRITE_ONLY = "wr"
+
 
 @dataclass
 class Country:
