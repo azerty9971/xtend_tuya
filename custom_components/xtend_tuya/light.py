@@ -1,11 +1,24 @@
 """Support for the XT lights."""
 
 from __future__ import annotations
-from typing import cast
+from typing import cast, Any
 from dataclasses import dataclass
+import json
 from tuya_device_handlers.definition.light import (
     TuyaLightDefinition,
-    get_default_definition,
+    FallbackColorDataMode,
+    LightDefinition,
+)
+from tuya_device_handlers.device_wrapper.light import (
+    BrightnessWrapper,
+    ColorTempWrapper,
+    ColorDataWrapper,
+    DEFAULT_H_TYPE_V2,
+    DEFAULT_S_TYPE_V2,
+    DEFAULT_V_TYPE_V2,
+)
+from tuya_device_handlers.utils import (
+    RemapHelper,
 )
 from homeassistant.const import EntityCategory, Platform
 from homeassistant.core import HomeAssistant, callback
@@ -28,6 +41,9 @@ from .ha_tuya_integration.tuya_integration_imports import (
     TuyaLightEntity,
     TuyaLightEntityDescription,
     TuyaDPCode,
+    TuyaDPCodeBooleanWrapper,
+    TuyaDPCodeEnumWrapper,
+    TuyaDPCodeIntegerWrapper,
 )
 from .entity import (
     XTEntity,
@@ -87,6 +103,125 @@ LIGHTS: dict[str, tuple[XTLightEntityDescription, ...]] = {
     ),
 }
 
+def xt_get_default_definition(
+    device: XTDevice,
+    *,
+    switch_dpcode: str,
+    brightness_dpcode: str | tuple[str, ...] | None = None,
+    brightness_max_dpcode: str | None = None,
+    brightness_min_dpcode: str | None = None,
+    color_data_dpcode: str | tuple[str, ...] | None = None,
+    color_mode_dpcode: str | None = None,
+    color_temp_dpcode: str | tuple[str, ...] | None = None,
+    fallback_color_data_mode: FallbackColorDataMode = FallbackColorDataMode.V1,
+) -> LightDefinition | None:
+    if not (
+        switch_wrapper := TuyaDPCodeBooleanWrapper.find_dpcode(
+            device, switch_dpcode, prefer_function=True
+        )
+    ):
+        return None
+    brightness_wrapper = _get_brightness_wrapper(
+        device,
+        brightness_dpcode=brightness_dpcode,
+        brightness_max_dpcode=brightness_max_dpcode,
+        brightness_min_dpcode=brightness_min_dpcode,
+    )
+    return LightDefinition(
+        brightness_wrapper=brightness_wrapper,
+        color_data_wrapper=_get_color_data_wrapper(
+            device,
+            brightness_wrapper,
+            color_data_dpcode=color_data_dpcode,
+            fallback_color_data_mode=fallback_color_data_mode,
+        ),
+        color_mode_wrapper=TuyaDPCodeEnumWrapper.find_dpcode(
+            device, color_mode_dpcode, prefer_function=True
+        ),
+        color_temp_wrapper=ColorTempWrapper.find_dpcode(
+            device, color_temp_dpcode, prefer_function=True
+        ),
+        switch_wrapper=switch_wrapper,
+    )
+
+
+def _get_brightness_wrapper(
+    device: XTDevice,
+    *,
+    brightness_dpcode: str | tuple[str, ...] | None,
+    brightness_max_dpcode: str | None,
+    brightness_min_dpcode: str | None,
+) -> BrightnessWrapper | None:
+    if (
+        brightness_wrapper := BrightnessWrapper.find_dpcode(
+            device, brightness_dpcode, prefer_function=True
+        )
+    ) is None:
+        return None
+    if brightness_max := TuyaDPCodeIntegerWrapper.find_dpcode(
+        device, brightness_max_dpcode, prefer_function=True
+    ):
+        brightness_wrapper.brightness_max = brightness_max
+        brightness_wrapper.brightness_max_remap = (
+            RemapHelper.from_type_information(
+                brightness_max.type_information, 0, 255
+            )
+        )
+    if brightness_min := TuyaDPCodeIntegerWrapper.find_dpcode(
+        device, brightness_min_dpcode, prefer_function=True
+    ):
+        brightness_wrapper.brightness_min = brightness_min
+        brightness_wrapper.brightness_min_remap = (
+            RemapHelper.from_type_information(
+                brightness_min.type_information, 0, 255
+            )
+        )
+    return brightness_wrapper
+
+
+def _get_color_data_wrapper(
+    device: XTDevice,
+    brightness_wrapper: BrightnessWrapper | None,
+    *,
+    color_data_dpcode: str | tuple[str, ...] | None,
+    fallback_color_data_mode: FallbackColorDataMode,
+) -> ColorDataWrapper | None:
+    if (
+        color_data_wrapper := ColorDataWrapper.find_dpcode(
+            device, color_data_dpcode, prefer_function=True
+        )
+    ) is None:
+        return None
+
+    # Fetch color data type information
+    if function_data := json.loads(
+        color_data_wrapper.type_information.type_data
+    ):
+        if "h" not in function_data:
+            function_data["h"] = {"min": 0, "max": 360}
+        if "s" not in function_data:
+            function_data["s"] = {"min": 0, "max": 255}
+        if "v" not in function_data:
+            function_data["v"] = {"min": 0, "max": 255}
+        color_data_wrapper.h_type = RemapHelper.from_function_data(
+            cast(dict[str, Any], function_data["h"]), 0, 360
+        )
+        color_data_wrapper.s_type = RemapHelper.from_function_data(
+            cast(dict[str, Any], function_data["s"]), 0, 100
+        )
+        color_data_wrapper.v_type = RemapHelper.from_function_data(
+            cast(dict[str, Any], function_data["v"]), 0, 255
+        )
+    elif (
+        fallback_color_data_mode == FallbackColorDataMode.V2
+        or color_data_wrapper.dpcode == "colour_data_v2"
+        or (brightness_wrapper and brightness_wrapper.max_value > 255)
+    ):
+        color_data_wrapper.h_type = DEFAULT_H_TYPE_V2
+        color_data_wrapper.s_type = DEFAULT_S_TYPE_V2
+        color_data_wrapper.v_type = DEFAULT_V_TYPE_V2
+
+    return color_data_wrapper
 
 async def async_setup_entry(
     hass: HomeAssistant, entry: XTConfigEntry, async_add_entities: AddEntitiesCallback
@@ -132,7 +267,7 @@ async def async_setup_entry(
                         entity_registry_enabled_default=False,
                         entity_registry_visible_default=False,
                     )
-                    if definition := get_default_definition(
+                    if definition := xt_get_default_definition(
                         device=device,
                         switch_dpcode=description.key,
                         brightness_dpcode=description.brightness,
@@ -194,7 +329,7 @@ async def async_setup_entry(
                                 externally_managed_dpcodes,
                             )
                             and (
-                                definition := get_default_definition(
+                                definition := xt_get_default_definition(
                                     device=device,
                                     switch_dpcode=description.key,
                                     brightness_dpcode=description.brightness,
@@ -225,7 +360,7 @@ async def async_setup_entry(
                                 externally_managed_dpcodes,
                             )
                             and (
-                                definition := get_default_definition(
+                                definition := xt_get_default_definition(
                                     device=device,
                                     switch_dpcode=description.key,
                                     brightness_dpcode=description.brightness,
