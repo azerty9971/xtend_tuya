@@ -1916,7 +1916,9 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
 SENSORS["cz"] = SENSORS["kg"]
 SENSORS["wkcz"] = SENSORS["kg"]
 SENSORS["dlq"] = SENSORS["kg"]
-SENSORS["tdq"] = SENSORS["kg"]
+# tdq category is used by some multi-plug socket devices, but also by temperature/humidity sensors (e.g., Tuya T&H Sensor)
+# Include temperature, humidity, and battery sensors alongside the standard socket sensors
+SENSORS["tdq"] = (*SENSORS["kg"], *TEMPERATURE_SENSORS, *HUMIDITY_SENSORS, *BATTERY_SENSORS)
 SENSORS["pc"] = SENSORS["kg"]
 SENSORS["aqcz"] = SENSORS["kg"]
 SENSORS["zndb"] = SENSORS["kg"]
