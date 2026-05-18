@@ -224,6 +224,7 @@ class TuyaOpenMQ(threading.Thread):
         # If we have a client, disconnect it first
         if self.client:
             self.client.disconnect()
+            self.client.loop_stop()
             self.client = None
 
         # get a new client
@@ -332,6 +333,7 @@ class TuyaOpenMQ(threading.Thread):
         self.message_listeners = set()
         if self.client is not None:
             self.client.disconnect()
+            self.client.loop_stop()
         self.client = None
         self._stop_event.set()
 
