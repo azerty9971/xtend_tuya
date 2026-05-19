@@ -482,6 +482,9 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
 
     def get_configurable_properties_key(self) -> str | None:
         return "cover_configurable_properties"
+    
+    def get_configurable_properties_dpcode(self) -> str:
+        return "this_cover"
 
     def refresh_configurable_properties(self):
         self.configurable_properties = cast(
