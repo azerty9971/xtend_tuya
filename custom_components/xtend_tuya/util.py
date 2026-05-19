@@ -77,9 +77,8 @@ class ConfigEntryRuntimeData(NamedTuple):
 def get_config_entry_runtime_data(
     hass: HomeAssistant, entry: tuya_coordinator.TuyaConfigEntry | shared.XTConfigEntry, domain: str
 ) -> ConfigEntryRuntimeData | None:
-    if not entry:
+    if not entry or not hasattr(entry, "runtime_data"):
         return None
-    LOGGER.warning(f"{entry=}")
     runtime_data = entry.runtime_data
     device_manager = runtime_data.manager
     if device_manager is not None:
