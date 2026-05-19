@@ -79,6 +79,7 @@ def get_config_entry_runtime_data(
 ) -> ConfigEntryRuntimeData | None:
     if not entry:
         return None
+    LOGGER.warning(f"{entry=}")
     runtime_data = entry.runtime_data
     device_manager = runtime_data.manager
     if device_manager is not None:

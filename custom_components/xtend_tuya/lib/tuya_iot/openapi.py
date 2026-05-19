@@ -404,7 +404,11 @@ class TuyaOpenAPI:
             headers=headers,
         )
 
-        result: dict[str, Any] = response.json()
+        try:
+            result: dict[str, Any] = response.json()
+        except Exception as e:
+            logger.error(f"Could not convert payload back to json: {response=} <=> {e}")
+            return {}
 
         time_taken = time.time() - start_time
 
