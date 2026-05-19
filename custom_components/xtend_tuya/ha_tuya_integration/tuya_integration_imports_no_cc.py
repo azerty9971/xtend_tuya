@@ -1,3 +1,4 @@
+import tuya_sharing.strategy_repo  # noqa: F401
 from ..lib.tuya_sharing import strategy_repo  # noqa: F401
 from homeassistant.components.alarm_control_panel import (
     AlarmControlPanelEntityDescription as TuyaAlarmControlPanelEntityDescription,  # noqa: F401
