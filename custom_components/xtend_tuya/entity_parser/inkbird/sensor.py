@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 import struct
+import base64
 from dataclasses import dataclass
 from typing import Any
 from enum import (
@@ -30,12 +31,14 @@ from ...multi_manager.multi_manager import (
 from ...ha_tuya_integration.tuya_integration_imports import (
     TuyaCustomerDevice,
     TuyaDPCodeRawWrapper,
+    TuyaDPCodeStringWrapper,
     TuyaRawTypeInformation,
+    TuyaStringTypeInformation,
 )
 from .const import INKBIRD_CHANNELS
 
 
-class DPCodeInkbirdWrapper(TuyaDPCodeRawWrapper):
+class DPCodeInkbirdRawWrapper(TuyaDPCodeRawWrapper):
     """DPCode wrapper for Inkbird base64-encoded data."""
 
     def __init__(self, dpcode: str, type_information: TuyaRawTypeInformation) -> None:
@@ -54,23 +57,57 @@ class DPCodeInkbirdWrapper(TuyaDPCodeRawWrapper):
             self.humidity = _humidity / 10.0
 
 
-class DPCodeInkbirdTemperatureWrapper(DPCodeInkbirdWrapper):
+class DPCodeInkbirdStringWrapper(TuyaDPCodeStringWrapper):
+    """DPCode wrapper for Inkbird base64-encoded data."""
+
+    def __init__(
+        self, dpcode: str, type_information: TuyaStringTypeInformation
+    ) -> None:
+        super().__init__(dpcode, type_information)
+        self.temperature_unit: UnitOfTemperature = UnitOfTemperature.CELSIUS
+        self.temperature: float | None = None
+        self.humidity: float | None = None
+        self.battery: int | None = None
+
+    def update_data(self, device: TuyaCustomerDevice) -> None:
+        if decoded_data := super().read_device_status(device):
+            _temperature, _humidity, _, self.battery = struct.Struct("<hHIb").unpack(
+                base64.b64decode(decoded_data[1:11])
+            )
+            self.temperature = _temperature / 10.0
+            self.humidity = _humidity / 10.0
+
+
+class DPCodeInkbirdTemperatureRawWrapper(DPCodeInkbirdRawWrapper):
     def read_device_status(self, device: TuyaCustomerDevice) -> Any | None:
         self.update_data(device)
         return self.temperature
 
 
-class DPCodeInkbirdHumidityWrapper(DPCodeInkbirdWrapper):
+class DPCodeInkbirdTemperatureStringWrapper(DPCodeInkbirdStringWrapper):
+    def read_device_status(self, device: TuyaCustomerDevice) -> Any | None:
+        self.update_data(device)
+        return self.temperature
+
+class DPCodeInkbirdHumidityRawWrapper(DPCodeInkbirdRawWrapper):
     def read_device_status(self, device: TuyaCustomerDevice) -> Any | None:
         self.update_data(device)
         return self.humidity
 
+class DPCodeInkbirdHumidityStringWrapper(DPCodeInkbirdStringWrapper):
+    def read_device_status(self, device: TuyaCustomerDevice) -> Any | None:
+        self.update_data(device)
+        return self.humidity
 
-class DPCodeInkbirdBatteryWrapper(DPCodeInkbirdWrapper):
+class DPCodeInkbirdBatteryRawWrapper(DPCodeInkbirdRawWrapper):
     def read_device_status(self, device: TuyaCustomerDevice) -> Any | None:
         self.update_data(device)
         return self.battery
 
+class DPCodeInkbirdBatteryStringWrapper(DPCodeInkbirdStringWrapper):
+    def read_device_status(self, device: TuyaCustomerDevice) -> Any | None:
+        self.update_data(device)
+        return self.battery
 
 class InkbirdSensor:
     INKBIRD_SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {}
@@ -102,7 +139,7 @@ class InkbirdSensor:
                         state_class=SensorStateClass.MEASUREMENT,
                         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
                         entity_registry_enabled_default=enabled_by_default,
-                        wrapper_class=(DPCodeInkbirdTemperatureWrapper,),
+                        wrapper_class=(DPCodeInkbirdTemperatureRawWrapper, DPCodeInkbirdTemperatureStringWrapper),
                     )
                 )
             if humidity:
@@ -116,7 +153,7 @@ class InkbirdSensor:
                         state_class=SensorStateClass.MEASUREMENT,
                         native_unit_of_measurement=PERCENTAGE,
                         entity_registry_enabled_default=enabled_by_default,
-                        wrapper_class=(DPCodeInkbirdHumidityWrapper,),
+                        wrapper_class=(DPCodeInkbirdHumidityRawWrapper,DPCodeInkbirdHumidityStringWrapper),
                     )
                 )
             if battery:
@@ -131,7 +168,7 @@ class InkbirdSensor:
                         native_unit_of_measurement=PERCENTAGE,
                         entity_category=EntityCategory.DIAGNOSTIC,
                         entity_registry_enabled_default=enabled_by_default,
-                        wrapper_class=(DPCodeInkbirdBatteryWrapper,),
+                        wrapper_class=(DPCodeInkbirdBatteryRawWrapper,DPCodeInkbirdBatteryStringWrapper),
                     )
                 )
         INKBIRD_CHANNEL_SENSORS: tuple[InkbirdSensorEntityDescription, ...] = tuple(
