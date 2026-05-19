@@ -70,12 +70,13 @@ class DPCodeInkbirdStringWrapper(TuyaDPCodeStringWrapper):
         self.battery: int | None = None
 
     def update_data(self, device: TuyaCustomerDevice) -> None:
-        if decoded_data := super().read_device_status(device):
-            _temperature, _humidity, _, self.battery = struct.Struct("<hHIb").unpack(
-                base64.b64decode(decoded_data[1:11])
-            )
-            self.temperature = _temperature / 10.0
-            self.humidity = _humidity / 10.0
+        if string_data := super().read_device_status(device):
+            if decoded_data := base64.b64decode(string_data):
+                _temperature, _humidity, _, self.battery = struct.Struct("<hHIb").unpack(
+                    decoded_data[1:11]
+                )
+                self.temperature = _temperature / 10.0
+                self.humidity = _humidity / 10.0
 
 
 class DPCodeInkbirdTemperatureRawWrapper(DPCodeInkbirdRawWrapper):
