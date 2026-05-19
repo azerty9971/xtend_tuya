@@ -408,7 +408,7 @@ class TuyaOpenAPI:
             result: dict[str, Any] = response.json()
         except Exception as e:
             logger.error(f"Could not convert payload back to json: {response=} <=> {e}")
-            return {}
+            raise Exception(e)
 
         time_taken = time.time() - start_time
 
