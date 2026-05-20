@@ -686,15 +686,21 @@ class TuyaOptionFlow(OptionsFlow):
         if device is None:
             return self.async_abort(reason="device_not_found")
 
-        cover_entity: cover.XTCoverEntity | None = device.get_preference(
+        cover_entities: dict[str, cover.XTCoverEntity] | None = device.get_preference(
             mm.XTDevice.XTDevicePreference.COVER_DEVICE_ENTITY
         )
-        if cover_entity is None:
+        if not cover_entities:
             return self.async_abort(reason="cover_entity_not_found")
 
-        configurable_properties: cover.XTCoverConfigurableProperties | None = (
-            cover_entity.get_configurable_properties()
-        )
+        configurable_properties: cover.XTCoverConfigurableProperties | None = None
+        cover_entity: cover.XTCoverEntity | None = None
+        for key in cover_entities:
+            if cover_entities[key] is not None:
+                cover_entity = cover_entities[key]
+                configurable_properties = cover_entity.get_configurable_properties()
+                break
+        if cover_entity is None or configurable_properties is None:
+            return self.async_abort(reason="cover_entity_not_found")
 
         if user_input is not None:
             # Update the configurable properties
@@ -715,8 +721,8 @@ class TuyaOptionFlow(OptionsFlow):
                 new_config.update_interval = new_interval
             if configurable_properties is not None:
                 new_config.virtual_position = configurable_properties.virtual_position
-
-            cover_entity.set_configurable_properties(new_config)
+            for dpcode in cover_entities:
+                cover_entities[dpcode].set_configurable_properties(new_config)
             await self.multi_manager.storage_manager.save_store()
             self.multi_manager.multi_device_listener.update_device(device=device)
             return self.async_create_entry(title="", data=self.options)
