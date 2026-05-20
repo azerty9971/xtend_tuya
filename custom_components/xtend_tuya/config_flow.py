@@ -134,7 +134,7 @@ OPTION_STEP_DEFINITION: dict[XTStepId, tuple[str, list[Any], dict[str, Any], boo
         {
             "user_input": None,
             "has_preferences": {
-                f"{mm.XTDevice.XTDevicePreference.COVER_DEVICE_ENTITY}": None
+                f"{mm.XTDevice.XTDevicePreference.COVER_DEVICE_ENTITIES}": None
             },
             "next_step_id": XTStepId.COVER_DEVICE_SETTINGS,
         },
@@ -687,7 +687,7 @@ class TuyaOptionFlow(OptionsFlow):
             return self.async_abort(reason="device_not_found")
 
         cover_entities: dict[str, cover.XTCoverEntity] | None = device.get_preference(
-            mm.XTDevice.XTDevicePreference.COVER_DEVICE_ENTITY
+            mm.XTDevice.XTDevicePreference.COVER_DEVICE_ENTITIES
         )
         if not cover_entities:
             return self.async_abort(reason="cover_entity_not_found")
