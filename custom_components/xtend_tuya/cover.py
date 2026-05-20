@@ -465,9 +465,11 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
             self._remap_helper = RemapHelper(
                 source_min=0, source_max=100, target_min=0, target_max=100
             )
+        device_cover_entities: dict[str, XTCoverEntity] = cast(dict[str, XTCoverEntity], self.device.get_preference(f"{XTDevice.XTDevicePreference.COVER_DEVICE_ENTITY}", {}))
+        device_cover_entities[self.get_configurable_properties_dpcode()] = self
         self.device.set_preference(
             f"{XTDevice.XTDevicePreference.COVER_DEVICE_ENTITY}",
-            self,
+            device_cover_entities,
         )
         # self.configurable_properties = cast(
         #     XTCoverConfigurableProperties, self.get_configurable_properties()
@@ -482,9 +484,6 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
 
     def get_configurable_properties_key(self) -> str | None:
         return "cover_configurable_properties"
-    
-    def get_configurable_properties_dpcode(self) -> str:
-        return "this_cover"
 
     def refresh_configurable_properties(self):
         self.configurable_properties = cast(
