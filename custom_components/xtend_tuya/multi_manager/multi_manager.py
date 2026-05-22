@@ -199,45 +199,55 @@ class MultiManager(TuyaManager):
         return return_list
 
     async def mm_update_device_cache(self) -> None:
+        # Ensure pending MQTT messages always get drained, even if a manager's
+        # cache update fails — otherwise on_message queues messages forever and
+        # entities stay `unavailable` despite live MQTT traffic.
         self.is_ready_for_messages = False
-        XTDeviceMap.clear_master_device_map()
-        concurrency_manager = XTConcurrencyManager()
+        try:
+            XTDeviceMap.clear_master_device_map()
+            concurrency_manager = XTConcurrencyManager()
 
-        async def update_manager_device_cache(
-            manager: XTDeviceManagerInterface,
-        ) -> None:
-            await manager.update_device_cache()
+            async def update_manager_device_cache(
+                manager: XTDeviceManagerInterface,
+            ) -> None:
+                await manager.update_device_cache()
 
-        for manager in self.accounts.values():
-            concurrency_manager.add_coroutine(
-                update_manager_device_cache(manager=manager)
-            )
-
-        await concurrency_manager.gather()
-
-        # Register all devices in the master device map
-        self.update_master_device_map()
-
-        # Now let's aggregate all of these devices into a single
-        # "All functionnality" device
-        self._merge_devices_from_multiple_sources()
-        for device in self.device_map.values():
-            # Applied twice because some parts at the end of apply_fix would change values of previous calls
-            CloudFixes.apply_fixes(device, self)
-            CloudFixes.apply_fixes(device, self)
-            CloudFixes.apply_post_init_fixes(device, self)
-            self._add_dpcodes_supported_by_all_devices(device)
-
-            # Don't allow changes to DPCodes after the global initialization
-            device.force_compatibility = True
-
-            # Apply conversion strategy after initial import
-            for dpcode in device.status:
-                device.status[dpcode] = device.apply_dpcode_strategy(
-                    dpcode, device.status[dpcode], self
+            for manager in self.accounts.values():
+                concurrency_manager.add_coroutine(
+                    update_manager_device_cache(manager=manager)
                 )
-        self._enable_multi_map_device_alignment()
-        self._process_pending_messages()
+
+            await concurrency_manager.gather()
+
+            # Register all devices in the master device map
+            self.update_master_device_map()
+
+            # Now let's aggregate all of these devices into a single
+            # "All functionnality" device
+            self._merge_devices_from_multiple_sources()
+            for device in self.device_map.values():
+                # Applied twice because some parts at the end of apply_fix would change values of previous calls
+                CloudFixes.apply_fixes(device, self)
+                CloudFixes.apply_fixes(device, self)
+                CloudFixes.apply_post_init_fixes(device, self)
+                self._add_dpcodes_supported_by_all_devices(device)
+
+                # Don't allow changes to DPCodes after the global initialization
+                device.force_compatibility = True
+
+                # Apply conversion strategy after initial import
+                for dpcode in device.status:
+                    device.status[dpcode] = device.apply_dpcode_strategy(
+                        dpcode, device.status[dpcode], self
+                    )
+            self._enable_multi_map_device_alignment()
+        except Exception:
+            LOGGER.exception(
+                "mm_update_device_cache failed; flushing pending message queue "
+                "and continuing so MQTT traffic isn't lost"
+            )
+        finally:
+            self._process_pending_messages()
         for device in self.device_map.values():
             if self.device_watcher.is_watched(
                 device.id, [XTDeviceWatcherCategory.STATUS_CHANGES]
