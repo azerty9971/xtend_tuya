@@ -3,7 +3,7 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import dispatcher_send
 from homeassistant.helpers import device_registry as dr
 from ...const import (
-    LOGGER,  # noqa: F401
+    LOGGER,
     DOMAIN,
     DOMAIN_ORIG,
 )
@@ -37,10 +37,16 @@ class MultiDeviceListener:
         updated_status_properties: list[str] | None = None,
         dp_timestamps: dict | None = None,
     ):
+        errors: list[Exception] = []
         for signal in signal_list:
-            dispatcher_send(
-                self.hass, f"{signal}_{device.id}", updated_status_properties, dp_timestamps
-            )
+            try:
+                dispatcher_send(
+                    self.hass, f"{signal}_{device.id}", updated_status_properties, dp_timestamps
+                )
+            except Exception as e:
+                errors.append(e)
+        for e in errors:
+            LOGGER.exception(e)
 
     def add_device(self, device: sh.XTDevice):
         self.add_device_by_id(device.id)
@@ -52,8 +58,14 @@ class MultiDeviceListener:
             signal_list = util.append_lists(
                 signal_list, account.get_add_device_signal_list(device_id)
             )
+        errors: list[Exception] = []
         for signal in signal_list:
-            dispatcher_send(self.hass, signal, [device_id])
+            try:
+                dispatcher_send(self.hass, signal, [device_id])
+            except Exception as e:
+                errors.append(e)
+        for e in errors:
+            LOGGER.exception(e)
 
     def remove_device(self, device_id: str):
         device_registry = dr.async_get(self.hass)

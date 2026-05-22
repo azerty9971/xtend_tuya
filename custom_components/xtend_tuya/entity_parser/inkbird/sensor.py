@@ -34,6 +34,7 @@ from ...ha_tuya_integration.tuya_integration_imports import (
     TuyaRawTypeInformation,
     TuyaStringTypeInformation,
 )
+from ...const import LOGGER
 from .const import INKBIRD_CHANNELS
 
 
@@ -79,12 +80,14 @@ class DPCodeInkbirdWrapper(TuyaDPCodeRawWrapper):
             return
         try:
             decoded_data = base64.b64decode(raw)
-        except Exception:
+        except Exception as e:
+            LOGGER.warning("Inkbird %s %s: failed to base64-decode %r: %s", device.id, self.dpcode, raw, e)
             return
         if len(decoded_data) < 10:
+            LOGGER.warning("Inkbird %s %s: decoded data too short (%d bytes, need >= 10)", device.id, self.dpcode, len(decoded_data))
             return
         _temperature, _humidity, _, self.battery = struct.Struct("<hHIb").unpack(
-            decoded_data[1:11]
+            decoded_data[1:10]
         )
         self.temperature = _temperature / 10.0
         self.humidity = _humidity / 10.0
