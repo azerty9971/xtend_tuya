@@ -3,7 +3,7 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import dispatcher_send
 from homeassistant.helpers import device_registry as dr
 from ...const import (
-    LOGGER,  # noqa: F401
+    LOGGER,
     DOMAIN,
     DOMAIN_ORIG,
 )
@@ -59,8 +59,15 @@ class MultiDeviceListener:
             signal_list = util.append_lists(
                 signal_list, account.get_add_device_signal_list(device_id)
             )
+        errors: list[Exception] = []
         for signal in signal_list:
-            dispatcher_send(self.hass, signal, [device_id])
+            try:
+                dispatcher_send(self.hass, signal, [device_id])
+            except Exception as e:
+                LOGGER.exception(e)
+                errors.append(e)
+        if errors:
+            raise ExceptionGroup("add_device_by_id signal dispatch failed", errors)
 
     def remove_device(self, device_id: str):
         device_registry = dr.async_get(self.hass)
