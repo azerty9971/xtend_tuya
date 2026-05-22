@@ -38,16 +38,9 @@ class MultiDeviceListener:
         dp_timestamps: dict | None = None,
     ):
         for signal in signal_list:
-            try:
-                dispatcher_send(
-                    self.hass, f"{signal}_{device.id}", updated_status_properties, dp_timestamps
-                )
-            except Exception as e:  # noqa: F841
-                # Could happen upon restart of HA
-                # LOGGER.debug(
-                #     f"Could not send {signal}_{device.id} (updated_status_properties = {updated_status_properties}) to dispatch: {e}"
-                # )
-                pass
+            dispatcher_send(
+                self.hass, f"{signal}_{device.id}", updated_status_properties, dp_timestamps
+            )
 
     def add_device(self, device: sh.XTDevice):
         self.add_device_by_id(device.id)
