@@ -1,6 +1,7 @@
 """Inkbird data parser for base64-encoded sensor data."""
 
 from __future__ import annotations
+import base64
 import struct
 from dataclasses import dataclass
 from typing import Any
@@ -31,6 +32,7 @@ from ...ha_tuya_integration.tuya_integration_imports import (
     TuyaCustomerDevice,
     TuyaDPCodeRawWrapper,
     TuyaRawTypeInformation,
+    TuyaStringTypeInformation,
 )
 from .const import INKBIRD_CHANNELS
 
@@ -45,13 +47,47 @@ class DPCodeInkbirdWrapper(TuyaDPCodeRawWrapper):
         self.humidity: float | None = None
         self.battery: int | None = None
 
+    @classmethod
+    def find_dpcode(
+        cls,
+        device: TuyaCustomerDevice,
+        dpcodes: str | tuple[str, ...] | None,
+        *,
+        prefer_function: bool = False,
+    ) -> "DPCodeInkbirdWrapper | None":
+        # Standard path: dpcode is RAW-typed in the Tuya schema
+        if result := super().find_dpcode(device, dpcodes, prefer_function=prefer_function):
+            return result
+        # Fallback: Inkbird ch_X dpcodes may be STRING-typed but hold base64 binary blobs.
+        # TuyaDPCodeRawWrapper.find_dpcode only matches RAW-typed dpcodes, so we fall back
+        # to detecting STRING-typed dpcodes whose values we know how to decode.
+        if dpcodes is None:
+            return None
+        codes: tuple[str, ...] = (dpcodes,) if isinstance(dpcodes, str) else dpcodes
+        for dpcode in codes:
+            if type_info := TuyaStringTypeInformation.find_dpcode(
+                device, dpcode, prefer_function=prefer_function
+            ):
+                return cls(dpcode, type_info)  # type: ignore[arg-type]
+        return None
+
     def update_data(self, device: TuyaCustomerDevice) -> None:
-        if decoded_data := super().read_device_status(device):
-            _temperature, _humidity, _, self.battery = struct.Struct("<hHIb").unpack(
-                decoded_data[1:11]
-            )
-            self.temperature = _temperature / 10.0
-            self.humidity = _humidity / 10.0
+        # Directly base64-decode from device.status, bypassing the parent's
+        # read_device_status which requires a RAW-typed status range entry.
+        raw = device.status.get(self.dpcode)
+        if raw is None:
+            return
+        try:
+            decoded_data = base64.b64decode(raw)
+        except Exception:
+            return
+        if len(decoded_data) < 10:
+            return
+        _temperature, _humidity, _, self.battery = struct.Struct("<hHIb").unpack(
+            decoded_data[1:11]
+        )
+        self.temperature = _temperature / 10.0
+        self.humidity = _humidity / 10.0
 
 
 class DPCodeInkbirdTemperatureWrapper(DPCodeInkbirdWrapper):
