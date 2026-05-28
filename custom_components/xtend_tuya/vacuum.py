@@ -3,7 +3,7 @@
 from __future__ import annotations
 from typing import cast
 from tuya_device_handlers.definition.vacuum import (
-    TuyaVacuumDefinition,
+    VacuumDefinition,
     get_default_definition,
 )
 from homeassistant.const import Platform
@@ -44,7 +44,7 @@ class XTVacuumEntityDescription(StateVacuumEntityDescription, frozen_or_thawed=T
         device: XTDevice,
         device_manager: MultiManager,
         description: XTVacuumEntityDescription,
-        definition: TuyaVacuumDefinition,
+        definition: VacuumDefinition,
     ) -> XTVacuumEntity:
         return XTVacuumEntity(
             device=device,
@@ -117,7 +117,7 @@ class XTVacuumEntity(XTEntity, TuyaVacuumEntity):
         device: XTDevice,
         device_manager: MultiManager,
         description: XTVacuumEntityDescription,
-        definition: TuyaVacuumDefinition,
+        definition: VacuumDefinition,
     ) -> None:
         """Init Tuya vacuum."""
         super(XTVacuumEntity, self).__init__(
@@ -140,7 +140,7 @@ class XTVacuumEntity(XTEntity, TuyaVacuumEntity):
         device: XTDevice,
         device_manager: MultiManager,
         description: XTVacuumEntityDescription,
-        definition: TuyaVacuumDefinition,
+        definition: VacuumDefinition,
     ) -> XTVacuumEntity:
         if hasattr(description, "get_entity_instance") and callable(
             getattr(description, "get_entity_instance")

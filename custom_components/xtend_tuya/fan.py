@@ -3,7 +3,7 @@
 from __future__ import annotations
 from typing import cast
 from tuya_device_handlers.definition.fan import (
-    TuyaFanDefinition,
+    FanDefinition,
     get_default_definition,
 )
 from homeassistant.const import Platform
@@ -90,7 +90,7 @@ class XTFanEntity(XTEntity, TuyaFanEntity):
         device: XTDevice,
         device_manager: MultiManager,
         description: FanEntityDescription,
-        definition: TuyaFanDefinition,
+        definition: FanDefinition,
     ) -> None:
         """Init XT Fan Device."""
         super(XTFanEntity, self).__init__(

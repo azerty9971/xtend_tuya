@@ -4,7 +4,7 @@ from __future__ import annotations
 from typing import cast
 from dataclasses import dataclass
 from tuya_device_handlers.definition.alarm_control_panel import (
-    TuyaAlarmControlPanelDefinition,
+    AlarmControlPanelDefinition,
     get_default_definition,
 )
 from homeassistant.const import (
@@ -39,7 +39,7 @@ class XTAlarmEntityDescription(TuyaAlarmControlPanelEntityDescription):
         device: XTDevice,
         device_manager: MultiManager,
         description: XTAlarmEntityDescription,
-        definition: TuyaAlarmControlPanelDefinition,
+        definition: AlarmControlPanelDefinition,
     ) -> XTAlarmEntity:
         return XTAlarmEntity(
             device=device,
@@ -143,7 +143,7 @@ class XTAlarmEntity(XTEntity, TuyaAlarmEntity):
         device: XTDevice,
         device_manager: MultiManager,
         description: XTAlarmEntityDescription,
-        definition: TuyaAlarmControlPanelDefinition,
+        definition: AlarmControlPanelDefinition,
     ) -> None:
         super(XTAlarmEntity, self).__init__(
             device=device,
@@ -163,7 +163,7 @@ class XTAlarmEntity(XTEntity, TuyaAlarmEntity):
         device: XTDevice,
         device_manager: MultiManager,
         description: XTAlarmEntityDescription,
-        definition: TuyaAlarmControlPanelDefinition,
+        definition: AlarmControlPanelDefinition,
     ) -> XTAlarmEntity:
         if hasattr(description, "get_entity_instance") and callable(
             getattr(description, "get_entity_instance")

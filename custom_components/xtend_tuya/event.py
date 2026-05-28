@@ -15,7 +15,7 @@ from homeassistant.components.event.const import (
     DoorbellEventType,
 )
 from tuya_device_handlers.definition.event import (
-    TuyaEventDefinition,
+    EventDefinition,
     get_default_definition,
 )
 from tuya_device_handlers.device_wrapper.common import (
@@ -158,11 +158,11 @@ def xt_get_default_definition(
     device: XTDevice,
     dpcode: str,
     wrapper_classes: type[DPCodeTypeInformationWrapper] | tuple[type[DPCodeTypeInformationWrapper], ...],  # type: ignore[type-arg]
-) -> TuyaEventDefinition | None:
+) -> EventDefinition | None:
     if isinstance(wrapper_classes, tuple):
         for wrapper_class in wrapper_classes:
             if wrapper := wrapper_class.find_dpcode(device, dpcode):
-                return TuyaEventDefinition(
+                return EventDefinition(
                     event_wrapper=wrapper,
                 )
     else:
@@ -191,7 +191,7 @@ class XTEventEntityDescription(TuyaEventEntityDescription):
         device: XTDevice,
         device_manager: MultiManager,
         description: XTEventEntityDescription,
-        definition: TuyaEventDefinition,
+        definition: EventDefinition,
     ) -> XTEventEntity:
         return XTEventEntity(
             device=device,
@@ -552,7 +552,7 @@ class XTEventEntity(XTEntity, TuyaEventEntity):
         device: XTDevice,
         device_manager: MultiManager,
         description: XTEventEntityDescription,
-        definition: TuyaEventDefinition,
+        definition: EventDefinition,
     ) -> None:
         """Init Tuya event entity."""
         try:
@@ -614,7 +614,7 @@ class XTEventEntity(XTEntity, TuyaEventEntity):
         device: XTDevice,
         device_manager: MultiManager,
         description: XTEventEntityDescription,
-        definition: TuyaEventDefinition,
+        definition: EventDefinition,
     ) -> XTEventEntity:
         if hasattr(description, "get_entity_instance") and callable(
             getattr(description, "get_entity_instance")

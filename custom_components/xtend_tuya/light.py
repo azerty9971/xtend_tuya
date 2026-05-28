@@ -5,7 +5,6 @@ from typing import cast, Any
 from dataclasses import dataclass
 import json
 from tuya_device_handlers.definition.light import (
-    TuyaLightDefinition,
     FallbackColorDataMode,
     LightDefinition,
 )
@@ -76,7 +75,7 @@ class XTLightEntityDescription(TuyaLightEntityDescription):
         device: XTDevice,
         device_manager: MultiManager,
         description: XTLightEntityDescription,
-        definition: TuyaLightDefinition,
+        definition: LightDefinition,
     ) -> XTLightEntity:
         return XTLightEntity(
             device=device,
@@ -399,7 +398,7 @@ class XTLightEntity(XTEntity, TuyaLightEntity):
         device: XTDevice,
         device_manager: MultiManager,
         description: XTLightEntityDescription,
-        definition: TuyaLightDefinition,
+        definition: LightDefinition,
     ) -> None:
         super(XTLightEntity, self).__init__(
             device=device,
@@ -422,7 +421,7 @@ class XTLightEntity(XTEntity, TuyaLightEntity):
         device: XTDevice,
         device_manager: MultiManager,
         description: XTLightEntityDescription,
-        definition: TuyaLightDefinition,
+        definition: LightDefinition,
     ) -> XTLightEntity:
         if hasattr(description, "get_entity_instance") and callable(
             getattr(description, "get_entity_instance")

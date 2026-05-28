@@ -9,7 +9,7 @@ from enum import (
     StrEnum,
 )
 from tuya_device_handlers.definition.sensor import (
-    TuyaSensorDefinition,
+    SensorDefinition,
 )
 from homeassistant.components.sensor import (
     SensorDeviceClass,
@@ -198,7 +198,7 @@ class InkbirdSensorEntityDescription(XTSensorEntityDescription):
         device: XTDevice,
         device_manager: MultiManager,
         description: XTSensorEntityDescription,
-        definition: TuyaSensorDefinition,
+        definition: SensorDefinition,
         supported_descriptors: dict[str, tuple[XTSensorEntityDescription, ...]],
     ) -> XTSensorEntity:
         return XTSensorEntity(

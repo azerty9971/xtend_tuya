@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Any
 from tuya_device_handlers.definition.cover import (
-    TuyaCoverDefinition,
+    CoverDefinition,
 )
 from tuya_device_handlers.device_wrapper.common import DPCodeTypeInformationWrapper
 from tuya_device_handlers.device_wrapper.cover import (
@@ -87,7 +87,7 @@ class XTCoverEntityDescription(TuyaCoverEntityDescription):
         device_manager: MultiManager,
         description: XTCoverEntityDescription,
         hass: HomeAssistant,
-        definition: TuyaCoverDefinition,
+        definition: CoverDefinition,
     ) -> XTCoverEntity:
         return XTCoverEntity(
             device=device,
@@ -170,14 +170,14 @@ def get_default_definition(
     current_state_wrapper: type[DPCodeTypeInformationWrapper],  # type: ignore[type-arg]
     instruction_wrapper: type[DPCodeTypeInformationWrapper],  # type: ignore[type-arg]
     position_wrapper: type[DPCodeTypeInformationWrapper],  # type: ignore[type-arg]
-) -> TuyaCoverDefinition | None:
+) -> CoverDefinition | None:
     if not (
         instruction_dpcode in device.function
         or instruction_dpcode in device.status_range
     ):
         return None
 
-    return TuyaCoverDefinition(
+    return CoverDefinition(
         current_position_wrapper=position_wrapper.find_dpcode(
             device, current_position_dpcode
         ),
@@ -435,7 +435,7 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         device_manager: MultiManager,
         description: XTCoverEntityDescription,
         hass: HomeAssistant,
-        definition: TuyaCoverDefinition,
+        definition: CoverDefinition,
     ) -> None:
         """Initialize the cover entity."""
         super(XTCoverEntity, self).__init__(
@@ -670,7 +670,7 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         device_manager: MultiManager,
         description: XTCoverEntityDescription,
         hass: HomeAssistant,
-        definition: TuyaCoverDefinition,
+        definition: CoverDefinition,
     ) -> XTCoverEntity:
         if hasattr(description, "get_entity_instance") and callable(
             getattr(description, "get_entity_instance")

@@ -13,7 +13,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.util.json import json_loads
 
 from tuya_device_handlers.definition.binary_sensor import (
-    TuyaBinarySensorDefinition,
+    BinarySensorDefinition,
     get_default_definition,
 )
 
@@ -65,7 +65,7 @@ class XTBinarySensorEntityDescription(TuyaBinarySensorEntityDescription):
         device: XTDevice,
         device_manager: MultiManager,
         description: XTBinarySensorEntityDescription,
-        definition: TuyaBinarySensorDefinition,
+        definition: BinarySensorDefinition,
     ) -> XTBinarySensorEntity:
         return XTBinarySensorEntity(
             device=device,
@@ -278,7 +278,7 @@ BINARY_SENSORS["jtmsbh"] = BINARY_SENSORS["jtmspro"]
 def xt_get_default_definition(
     device: XTDevice,
     description: XTBinarySensorEntityDescription,
-) -> TuyaBinarySensorDefinition | None:
+) -> BinarySensorDefinition | None:
     return get_default_definition(
         device=device,
         dpcode=description.dpcode or description.key,
@@ -497,7 +497,7 @@ class XTBinarySensorEntity(XTEntity, TuyaBinarySensorEntity):
         device: XTDevice,
         device_manager: MultiManager,
         description: XTBinarySensorEntityDescription,
-        definition: TuyaBinarySensorDefinition,
+        definition: BinarySensorDefinition,
     ) -> None:
         """Init Tuya binary sensor."""
         super(XTBinarySensorEntity, self).__init__(
@@ -535,7 +535,7 @@ class XTBinarySensorEntity(XTEntity, TuyaBinarySensorEntity):
         description: XTBinarySensorEntityDescription,
         device: XTDevice,
         device_manager: MultiManager,
-        definition: TuyaBinarySensorDefinition,
+        definition: BinarySensorDefinition,
     ) -> XTBinarySensorEntity:
         if hasattr(description, "get_entity_instance") and callable(
             getattr(description, "get_entity_instance")

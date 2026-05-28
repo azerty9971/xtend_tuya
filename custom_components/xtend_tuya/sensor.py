@@ -80,14 +80,11 @@ from .ha_tuya_integration.tuya_integration_imports import (
     TuyaCustomerDevice,
 )
 from tuya_device_handlers.definition.sensor import (
-    TuyaSensorDefinition,
+    SensorDefinition,
     get_default_definition,
 )
 from .multi_manager.shared.threading import (
     XTEventLoopProtector,
-)
-from .models import (
-    XTDPCodeIntegerNoMinMaxCheckWrapper,
 )
 from tuya_device_handlers.device_wrapper.sensor import (
     ElectricityCurrentJsonWrapper,
@@ -201,7 +198,7 @@ def xt_get_default_definition(
     device: XTDevice,
     description: TuyaSensorEntityDescription,
     device_manager: MultiManager,
-) -> TuyaSensorDefinition | None:
+) -> SensorDefinition | None:
     dpcode = description.dpcode or description.key
     if isinstance(description, XTSensorEntityDescription):
         if description.recalculate_scale_for_percentage:
@@ -247,7 +244,7 @@ class XTSensorEntityDescription(TuyaSensorEntityDescription, frozen=True):
         device: XTDevice,
         device_manager: MultiManager,
         description: XTSensorEntityDescription,
-        definition: TuyaSensorDefinition,
+        definition: SensorDefinition,
         supported_descriptors: dict[str, tuple[XTSensorEntityDescription, ...]],
     ) -> XTSensorEntity:
         return XTSensorEntity(
@@ -352,7 +349,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         entity_registry_enabled_default=True,
         restoredata=True,
         ignore_other_dp_code_handler=True,
-        wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
+        wrapper_class=(TuyaDPCodeIntegerWrapper,),
     ),
     XTSensorEntityDescription(
         key=XTDPCode.ADD_ELE_TODAY,
@@ -365,7 +362,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         entity_registry_enabled_default=True,
         restoredata=True,
         reset_daily=True,
-        wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
+        wrapper_class=(TuyaDPCodeIntegerWrapper,),
     ),
     XTSensorEntityDescription(
         key=XTDPCode.ADD_ELE_THIS_MONTH,
@@ -378,7 +375,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         entity_registry_enabled_default=True,
         restoredata=True,
         reset_monthly=True,
-        wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
+        wrapper_class=(TuyaDPCodeIntegerWrapper,),
     ),
     XTSensorEntityDescription(
         key=XTDPCode.ADD_ELE_THIS_YEAR,
@@ -391,7 +388,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         entity_registry_enabled_default=True,
         restoredata=True,
         reset_yearly=True,
-        wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
+        wrapper_class=(TuyaDPCodeIntegerWrapper,),
     ),
     XTSensorEntityDescription(
         # The ADD_ELE2 dpcode takes the opposite direction than ADD_ELE, if ADD_ELE is supposed
@@ -413,7 +410,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         entity_registry_enabled_default=False,
         restoredata=True,
         ignore_other_dp_code_handler=True,
-        wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
+        wrapper_class=(TuyaDPCodeIntegerWrapper,),
     ),
     XTSensorEntityDescription(
         key=XTDPCode.XT_ADD_ELE_TODAY,
@@ -426,7 +423,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         entity_registry_enabled_default=False,
         restoredata=True,
         reset_daily=True,
-        wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
+        wrapper_class=(TuyaDPCodeIntegerWrapper,),
     ),
     XTSensorEntityDescription(
         key=XTDPCode.XT_ADD_ELE_THIS_MONTH,
@@ -439,7 +436,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         entity_registry_enabled_default=False,
         restoredata=True,
         reset_monthly=True,
-        wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
+        wrapper_class=(TuyaDPCodeIntegerWrapper,),
     ),
     XTSensorEntityDescription(
         key=XTDPCode.XT_ADD_ELE_THIS_YEAR,
@@ -452,7 +449,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         entity_registry_enabled_default=False,
         restoredata=True,
         reset_yearly=True,
-        wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
+        wrapper_class=(TuyaDPCodeIntegerWrapper,),
     ),
     XTSensorEntityDescription(
         key=XTDPCode.ADD_ELE2,
@@ -473,7 +470,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         entity_registry_enabled_default=True,
         restoredata=True,
         ignore_other_dp_code_handler=True,
-        wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
+        wrapper_class=(TuyaDPCodeIntegerWrapper,),
     ),
     XTSensorEntityDescription(
         key=XTDPCode.ADD_ELE2_TODAY,
@@ -486,7 +483,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         entity_registry_enabled_default=True,
         restoredata=True,
         reset_daily=True,
-        wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
+        wrapper_class=(TuyaDPCodeIntegerWrapper,),
     ),
     XTSensorEntityDescription(
         key=XTDPCode.ADD_ELE2_THIS_MONTH,
@@ -499,7 +496,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         entity_registry_enabled_default=True,
         restoredata=True,
         reset_monthly=True,
-        wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
+        wrapper_class=(TuyaDPCodeIntegerWrapper,),
     ),
     XTSensorEntityDescription(
         key=XTDPCode.ADD_ELE2_THIS_YEAR,
@@ -512,7 +509,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         entity_registry_enabled_default=True,
         restoredata=True,
         reset_yearly=True,
-        wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
+        wrapper_class=(TuyaDPCodeIntegerWrapper,),
     ),
     XTSensorEntityDescription(
         # The ADD_ELE2 dpcode takes the opposite direction than ADD_ELE, if ADD_ELE is supposed
@@ -534,7 +531,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         entity_registry_enabled_default=False,
         restoredata=True,
         ignore_other_dp_code_handler=True,
-        wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
+        wrapper_class=(TuyaDPCodeIntegerWrapper,),
     ),
     XTSensorEntityDescription(
         key=XTDPCode.XT_ADD_ELE2_TODAY,
@@ -547,7 +544,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         entity_registry_enabled_default=False,
         restoredata=True,
         reset_daily=True,
-        wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
+        wrapper_class=(TuyaDPCodeIntegerWrapper,),
     ),
     XTSensorEntityDescription(
         key=XTDPCode.XT_ADD_ELE2_THIS_MONTH,
@@ -560,7 +557,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         entity_registry_enabled_default=False,
         restoredata=True,
         reset_monthly=True,
-        wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
+        wrapper_class=(TuyaDPCodeIntegerWrapper,),
     ),
     XTSensorEntityDescription(
         key=XTDPCode.XT_ADD_ELE2_THIS_YEAR,
@@ -573,7 +570,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         entity_registry_enabled_default=False,
         restoredata=True,
         reset_yearly=True,
-        wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
+        wrapper_class=(TuyaDPCodeIntegerWrapper,),
     ),
     XTSensorEntityDescription(
         key=XTDPCode.BALANCE_ENERGY,
@@ -619,7 +616,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         state_class=SensorStateClass.TOTAL_INCREASING,
         native_unit_of_measurement=UnitOfEnergy.WATT_HOUR,
         restoredata=True,
-        wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
+        wrapper_class=(TuyaDPCodeIntegerWrapper,),
     ),
     XTSensorEntityDescription(
         key=XTDPCode.ELECTRIC_TODAY,
@@ -630,7 +627,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         native_unit_of_measurement=UnitOfEnergy.WATT_HOUR,
         restoredata=True,
         reset_daily=True,
-        wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
+        wrapper_class=(TuyaDPCodeIntegerWrapper,),
     ),
     XTSensorEntityDescription(
         key=XTDPCode.ELECTRIC_THIS_MONTH,
@@ -641,7 +638,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         native_unit_of_measurement=UnitOfEnergy.WATT_HOUR,
         restoredata=True,
         reset_monthly=True,
-        wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
+        wrapper_class=(TuyaDPCodeIntegerWrapper,),
     ),
     XTSensorEntityDescription(
         key=XTDPCode.ELECTRIC_THIS_YEAR,
@@ -653,7 +650,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         entity_registry_enabled_default=True,
         restoredata=True,
         reset_yearly=True,
-        wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
+        wrapper_class=(TuyaDPCodeIntegerWrapper,),
     ),
     XTSensorEntityDescription(
         key=XTDPCode.ENERGYCONSUMED,
@@ -695,7 +692,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         state_class=SensorStateClass.TOTAL_INCREASING,
         restoredata=True,
         ignore_other_dp_code_handler=True,
-        wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
+        wrapper_class=(TuyaDPCodeIntegerWrapper,),
     ),
     XTSensorEntityDescription(
         key=XTDPCode.FORWARD_ENERGY_TOTAL_TODAY,
@@ -707,7 +704,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         entity_registry_enabled_default=True,
         restoredata=True,
         reset_daily=True,
-        wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
+        wrapper_class=(TuyaDPCodeIntegerWrapper,),
     ),
     XTSensorEntityDescription(
         key=XTDPCode.FORWARD_ENERGY_TOTAL_THIS_MONTH,
@@ -719,7 +716,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         entity_registry_enabled_default=True,
         restoredata=True,
         reset_monthly=True,
-        wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
+        wrapper_class=(TuyaDPCodeIntegerWrapper,),
     ),
     XTSensorEntityDescription(
         key=XTDPCode.FORWARD_ENERGY_TOTAL_THIS_YEAR,
@@ -731,7 +728,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         entity_registry_enabled_default=True,
         restoredata=True,
         reset_yearly=True,
-        wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
+        wrapper_class=(TuyaDPCodeIntegerWrapper,),
     ),
     XTSensorEntityDescription(
         # The ADD_ELE2 dpcode takes the opposite direction than ADD_ELE, if ADD_ELE is supposed
@@ -752,7 +749,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         entity_registry_enabled_default=False,
         restoredata=True,
         ignore_other_dp_code_handler=True,
-        wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
+        wrapper_class=(TuyaDPCodeIntegerWrapper,),
     ),
     XTSensorEntityDescription(
         key=XTDPCode.XT_FORWARD_ENERGY_TOTAL_TODAY,
@@ -764,7 +761,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         entity_registry_enabled_default=False,
         restoredata=True,
         reset_daily=True,
-        wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
+        wrapper_class=(TuyaDPCodeIntegerWrapper,),
     ),
     XTSensorEntityDescription(
         key=XTDPCode.XT_FORWARD_ENERGY_TOTAL_THIS_MONTH,
@@ -776,7 +773,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         entity_registry_enabled_default=False,
         restoredata=True,
         reset_monthly=True,
-        wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
+        wrapper_class=(TuyaDPCodeIntegerWrapper,),
     ),
     XTSensorEntityDescription(
         key=XTDPCode.XT_FORWARD_ENERGY_TOTAL_THIS_YEAR,
@@ -788,7 +785,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         entity_registry_enabled_default=False,
         restoredata=True,
         reset_yearly=True,
-        wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
+        wrapper_class=(TuyaDPCodeIntegerWrapper,),
     ),
     XTSensorEntityDescription(
         key=XTDPCode.POWER_CONSUMPTION,
@@ -808,7 +805,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         entity_registry_enabled_default=True,
         restoredata=True,
         ignore_other_dp_code_handler=True,
-        wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
+        wrapper_class=(TuyaDPCodeIntegerWrapper,),
     ),
     XTSensorEntityDescription(
         key=XTDPCode.REVERSE_ENERGY_A,
@@ -887,7 +884,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         entity_registry_enabled_default=True,
         restoredata=True,
         reset_daily=True,
-        wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
+        wrapper_class=(TuyaDPCodeIntegerWrapper,),
     ),
     XTSensorEntityDescription(
         key=XTDPCode.TOTAL_FORWARD_ENERGY_THIS_MONTH,
@@ -899,7 +896,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         entity_registry_enabled_default=True,
         restoredata=True,
         reset_monthly=True,
-        wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
+        wrapper_class=(TuyaDPCodeIntegerWrapper,),
     ),
     XTSensorEntityDescription(
         key=XTDPCode.TOTAL_FORWARD_ENERGY_THIS_YEAR,
@@ -911,7 +908,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         entity_registry_enabled_default=True,
         restoredata=True,
         reset_yearly=True,
-        wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
+        wrapper_class=(TuyaDPCodeIntegerWrapper,),
     ),
     XTSensorEntityDescription(
         # The ADD_ELE2 dpcode takes the opposite direction than ADD_ELE, if ADD_ELE is supposed
@@ -932,7 +929,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         entity_registry_enabled_default=False,
         restoredata=True,
         ignore_other_dp_code_handler=True,
-        wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
+        wrapper_class=(TuyaDPCodeIntegerWrapper,),
     ),
     XTSensorEntityDescription(
         key=XTDPCode.XT_TOTAL_FORWARD_ENERGY_TODAY,
@@ -944,7 +941,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         entity_registry_enabled_default=False,
         restoredata=True,
         reset_daily=True,
-        wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
+        wrapper_class=(TuyaDPCodeIntegerWrapper,),
     ),
     XTSensorEntityDescription(
         key=XTDPCode.XT_TOTAL_FORWARD_ENERGY_THIS_MONTH,
@@ -956,7 +953,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         entity_registry_enabled_default=False,
         restoredata=True,
         reset_monthly=True,
-        wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
+        wrapper_class=(TuyaDPCodeIntegerWrapper,),
     ),
     XTSensorEntityDescription(
         key=XTDPCode.XT_TOTAL_FORWARD_ENERGY_THIS_YEAR,
@@ -968,7 +965,7 @@ CONSUMPTION_SENSORS: tuple[XTSensorEntityDescription, ...] = (
         entity_registry_enabled_default=False,
         restoredata=True,
         reset_yearly=True,
-        wrapper_class=(XTDPCodeIntegerNoMinMaxCheckWrapper,),
+        wrapper_class=(TuyaDPCodeIntegerWrapper,),
     ),
 )
 
@@ -2282,7 +2279,7 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
         device: XTDevice,
         device_manager: MultiManager,
         description: XTSensorEntityDescription,
-        definition: TuyaSensorDefinition,
+        definition: SensorDefinition,
         supported_descriptors: dict[str, tuple[XTSensorEntityDescription, ...]],
     ) -> None:
         """Init XT sensor."""
@@ -2614,7 +2611,7 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
         description: XTSensorEntityDescription,
         device: XTDevice,
         device_manager: MultiManager,
-        definition: TuyaSensorDefinition,
+        definition: SensorDefinition,
         supported_descriptors: dict[str, tuple[XTSensorEntityDescription, ...]],
     ) -> XTSensorEntity:
         if hasattr(description, "get_entity_instance") and callable(

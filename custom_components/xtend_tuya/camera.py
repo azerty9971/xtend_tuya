@@ -10,7 +10,7 @@ from webrtc_models import (
     RTCIceServer,
 )
 from tuya_device_handlers.definition.camera import (
-    TuyaCameraDefinition,
+    CameraDefinition,
     get_default_definition,
 )
 from homeassistant.const import Platform
@@ -67,7 +67,7 @@ CAMERAS: dict[str, CameraEntityDescription] = {
 }
 
 
-def xt_get_default_definition(device: XTDevice) -> TuyaCameraDefinition:
+def xt_get_default_definition(device: XTDevice) -> CameraDefinition:
     return get_default_definition(
         device=device,
     )
@@ -166,7 +166,7 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         device: XTDevice,
         device_manager: MultiManager,
         description: CameraEntityDescription,
-        definition: TuyaCameraDefinition,
+        definition: CameraDefinition,
         hass: HomeAssistant,
         webrtc_config: WebRTCClientConfiguration | None = None,
         stream_quality: WebRTCStreamQuality = WebRTCStreamQuality.HIGH_QUALITY,
