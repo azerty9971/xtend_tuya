@@ -3,7 +3,7 @@
 from __future__ import annotations
 from typing import cast
 from tuya_device_handlers.definition.number import (
-    TuyaNumberDefinition,
+    NumberDefinition,
     get_default_definition,
 )
 from homeassistant.components.number import (
@@ -54,7 +54,7 @@ class XTNumberEntityDescription(TuyaNumberEntityDescription):
         device: XTDevice,
         device_manager: MultiManager,
         description: XTNumberEntityDescription,
-        definition: TuyaNumberDefinition,
+        definition: NumberDefinition,
     ) -> XTNumberEntity:
         return XTNumberEntity(
             device=device,
@@ -859,7 +859,7 @@ class XTNumberEntity(XTEntity, TuyaNumberEntity):
         device: XTDevice,
         device_manager: MultiManager,
         description: XTNumberEntityDescription,
-        definition: TuyaNumberDefinition,
+        definition: NumberDefinition,
     ) -> None:
         """Init XT number."""
         super(XTNumberEntity, self).__init__(
@@ -886,7 +886,7 @@ class XTNumberEntity(XTEntity, TuyaNumberEntity):
         device: XTDevice,
         device_manager: MultiManager,
         description: XTNumberEntityDescription,
-        definition: TuyaNumberDefinition,
+        definition: NumberDefinition,
     ) -> XTNumberEntity:
         if hasattr(description, "get_entity_instance") and callable(
             getattr(description, "get_entity_instance")

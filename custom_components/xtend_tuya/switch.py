@@ -4,7 +4,7 @@ from __future__ import annotations
 from typing import cast, Any
 from dataclasses import dataclass
 from tuya_device_handlers.definition.switch import (
-    TuyaSwitchDefinition,
+    SwitchDefinition,
     get_default_definition,
 )
 from homeassistant.const import EntityCategory, Platform
@@ -48,7 +48,7 @@ class XTSwitchEntityDescription(TuyaSwitchEntityDescription, frozen_or_thawed=Tr
         device: XTDevice,
         device_manager: MultiManager,
         description: XTSwitchEntityDescription,
-        definition: TuyaSwitchDefinition,
+        definition: SwitchDefinition,
     ) -> XTSwitchEntity:
         return XTSwitchEntity(
             device=device,
@@ -587,7 +587,7 @@ class XTSwitchEntity(XTEntity, TuyaSwitchEntity):
         device: XTDevice,
         device_manager: MultiManager,
         description: XTSwitchEntityDescription,
-        definition: TuyaSwitchDefinition,
+        definition: SwitchDefinition,
     ) -> None:
         """Init TuyaHaSwitch."""
         super(XTSwitchEntity, self).__init__(
@@ -631,7 +631,7 @@ class XTSwitchEntity(XTEntity, TuyaSwitchEntity):
         device: XTDevice,
         device_manager: MultiManager,
         description: XTSwitchEntityDescription,
-        definition: TuyaSwitchDefinition,
+        definition: SwitchDefinition,
     ) -> XTSwitchEntity:
         if hasattr(description, "get_entity_instance") and callable(
             getattr(description, "get_entity_instance")

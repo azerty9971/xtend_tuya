@@ -4,10 +4,9 @@ from __future__ import annotations
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaDPCodeIntegerWrapper,
     TuyaCustomerDevice,
-    tuya_type_information_should_log_warning,
 )
 from .const import (
-    LOGGER,
+    LOGGER,  # noqa: F401
 )
 
 
@@ -20,20 +19,6 @@ class XTDPCodeIntegerNoMinMaxCheckWrapper(TuyaDPCodeIntegerWrapper):
             return None
         # Validate input against defined range
         if not isinstance(raw_value, int):
-            if tuya_type_information_should_log_warning(
-                device.id, f"integer_out_range|{self.dpcode}|{raw_value}"
-            ):
-                LOGGER.warning(
-                    "Found invalid integer value `%s` for datapoint `%s` in product "
-                    "id `%s`, expected integer value between %s and %s; please report "
-                    "this defect to Tuya support",
-                    raw_value,
-                    self.dpcode,
-                    device.product_id,
-                    self.type_information.min,
-                    self.type_information.max,
-                )
-
             return None
         return self.type_information.scale_value(raw_value)
 

@@ -80,7 +80,7 @@ from .ha_tuya_integration.tuya_integration_imports import (
     TuyaCustomerDevice,
 )
 from tuya_device_handlers.definition.sensor import (
-    TuyaSensorDefinition,
+    SensorDefinition,
     get_default_definition,
 )
 from .multi_manager.shared.threading import (
@@ -201,7 +201,7 @@ def xt_get_default_definition(
     device: XTDevice,
     description: TuyaSensorEntityDescription,
     device_manager: MultiManager,
-) -> TuyaSensorDefinition | None:
+) -> SensorDefinition | None:
     dpcode = description.dpcode or description.key
     if isinstance(description, XTSensorEntityDescription):
         if description.recalculate_scale_for_percentage:
@@ -247,7 +247,7 @@ class XTSensorEntityDescription(TuyaSensorEntityDescription, frozen=True):
         device: XTDevice,
         device_manager: MultiManager,
         description: XTSensorEntityDescription,
-        definition: TuyaSensorDefinition,
+        definition: SensorDefinition,
         supported_descriptors: dict[str, tuple[XTSensorEntityDescription, ...]],
     ) -> XTSensorEntity:
         return XTSensorEntity(
@@ -2282,7 +2282,7 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
         device: XTDevice,
         device_manager: MultiManager,
         description: XTSensorEntityDescription,
-        definition: TuyaSensorDefinition,
+        definition: SensorDefinition,
         supported_descriptors: dict[str, tuple[XTSensorEntityDescription, ...]],
     ) -> None:
         """Init XT sensor."""
@@ -2614,7 +2614,7 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
         description: XTSensorEntityDescription,
         device: XTDevice,
         device_manager: MultiManager,
-        definition: TuyaSensorDefinition,
+        definition: SensorDefinition,
         supported_descriptors: dict[str, tuple[XTSensorEntityDescription, ...]],
     ) -> XTSensorEntity:
         if hasattr(description, "get_entity_instance") and callable(

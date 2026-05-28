@@ -4,7 +4,7 @@ from __future__ import annotations
 from typing import cast
 from dataclasses import dataclass
 from tuya_device_handlers.definition.select import (
-    TuyaSelectDefinition,
+    SelectDefinition,
     get_default_definition,
 )
 from homeassistant.const import EntityCategory, Platform
@@ -52,7 +52,7 @@ class XTSelectEntityDescription(TuyaSelectEntityDescription):
         device: XTDevice,
         device_manager: MultiManager,
         description: XTSelectEntityDescription,
-        definition: TuyaSelectDefinition,
+        definition: SelectDefinition,
     ) -> XTSelectEntity:
         return XTSelectEntity(
             device=device,
@@ -412,7 +412,7 @@ class XTSelectEntity(XTEntity, TuyaSelectEntity):
         device: XTDevice,
         device_manager: MultiManager,
         description: XTSelectEntityDescription,
-        definition: TuyaSelectDefinition,
+        definition: SelectDefinition,
     ) -> None:
         """Init XT select."""
         super(XTSelectEntity, self).__init__(
@@ -442,7 +442,7 @@ class XTSelectEntity(XTEntity, TuyaSelectEntity):
         description: XTSelectEntityDescription,
         device: XTDevice,
         device_manager: MultiManager,
-        definition: TuyaSelectDefinition,
+        definition: SelectDefinition,
     ) -> XTSelectEntity:
         if hasattr(description, "get_entity_instance") and callable(
             getattr(description, "get_entity_instance")

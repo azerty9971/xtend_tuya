@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from enum import StrEnum
 from typing import Any, cast, Self
 from tuya_device_handlers.definition.climate import (
-    TuyaClimateDefinition,
+    ClimateDefinition,
     _get_temperature_wrapper,
 )
 from tuya_device_handlers.device_wrapper.common import (
@@ -75,8 +75,11 @@ XT_HVAC_TUYA_TO_TUYALIB = {
     "cold": TuyaClimateHVACMode.COOL,
     "cool": TuyaClimateHVACMode.COOL,
     "dehumidify": TuyaClimateHVACMode.DRY,
+    "Eco": TuyaClimateHVACMode.HEAT_COOL,
+    "Fan": TuyaClimateHVACMode.FAN_ONLY,
     "freeze": TuyaClimateHVACMode.COOL,
     "heat": TuyaClimateHVACMode.HEAT,
+    "Heat": TuyaClimateHVACMode.HEAT,
     "home": TuyaClimateHVACMode.HEAT_COOL,
     "hot": TuyaClimateHVACMode.HEAT,
     "manual": TuyaClimateHVACMode.HEAT_COOL,
@@ -192,7 +195,7 @@ XT_CLIMATE_HVAC_ACTION_DPCODES: tuple[XTDPCode, ...] = (XTDPCode.WORK_STATE,)
 
 
 @dataclass
-class XTClimateDefinition(TuyaClimateDefinition):
+class XTClimateDefinition(ClimateDefinition):
     hvac_mode_wrapper: XTClimateHvacModeWrapper | None  # type: ignore
     hvac_action_wrapper: TuyaDPCodeEnumWrapper | None
 

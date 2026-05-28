@@ -797,8 +797,7 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
     ) -> None:
         if self.iot_account is None:
             return None
-        XTEventLoopProtector.execute_out_of_event_loop(
-            self.iot_account.device_manager.ipc_manager.webrtc_manager.async_handle_async_webrtc_offer,
+        await self.iot_account.device_manager.ipc_manager.webrtc_manager.async_handle_async_webrtc_offer(
             offer_sdp,
             session_id,
             send_message,

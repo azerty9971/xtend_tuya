@@ -4,7 +4,7 @@ from __future__ import annotations
 from typing import cast
 from dataclasses import dataclass
 from tuya_device_handlers.definition.siren import (
-    TuyaSirenDefinition,
+    SirenDefinition,
     get_default_definition,
 )
 from homeassistant.const import Platform
@@ -42,7 +42,7 @@ class XTSirenEntityDescription(TuyaSirenEntityDescription, frozen_or_thawed=True
         device: XTDevice,
         device_manager: MultiManager,
         description: XTSirenEntityDescription,
-        definition: TuyaSirenDefinition,
+        definition: SirenDefinition,
     ) -> XTSirenEntity:
         return XTSirenEntity(
             device=device,
@@ -162,7 +162,7 @@ class XTSirenEntity(XTEntity, TuyaSirenEntity):
         device: XTDevice,
         device_manager: MultiManager,
         description: XTSirenEntityDescription,
-        definition: TuyaSirenDefinition,
+        definition: SirenDefinition,
     ) -> None:
         """Init XT Siren."""
         super(XTSirenEntity, self).__init__(
@@ -186,7 +186,7 @@ class XTSirenEntity(XTEntity, TuyaSirenEntity):
         description: XTSirenEntityDescription,
         device: XTDevice,
         device_manager: MultiManager,
-        definition: TuyaSirenDefinition,
+        definition: SirenDefinition,
     ) -> XTSirenEntity:
         if hasattr(description, "get_entity_instance") and callable(
             getattr(description, "get_entity_instance")
