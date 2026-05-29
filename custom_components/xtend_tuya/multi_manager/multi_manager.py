@@ -241,10 +241,11 @@ class MultiManager(TuyaManager):
                         dpcode, device.status[dpcode], self
                     )
             self._enable_multi_map_device_alignment()
-        except Exception:
+        except Exception as e:
             LOGGER.exception(
                 "mm_update_device_cache failed; flushing pending message queue "
                 "and continuing so MQTT traffic isn't lost"
+                f"{e}"
             )
         finally:
             self._process_pending_messages()
