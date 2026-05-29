@@ -353,9 +353,10 @@ class TuyaOptionFlow(OptionsFlow):
         self.selected_device_id: str | None = None
         self.selected_device_next_step_id: str | None = None
         self._device_options: dict[str, str] = {}
+        _runtime_data = getattr(config_entry, "runtime_data", None)
         self.multi_manager: mm.MultiManager | None = (
-            getattr(config_entry.runtime_data, "multi_manager")
-            if config_entry.runtime_data
+            getattr(_runtime_data, "multi_manager", None)
+            if _runtime_data is not None
             else None
         )
         if config_entry.options is not None:
