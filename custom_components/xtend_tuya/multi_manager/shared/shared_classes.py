@@ -349,6 +349,21 @@ class XTDevice(TuyaDevice):
                 setattr(self.original_device, attr, value)
             XTDeviceMap.set_device_key_value_multimap(self.id, attr, value)
 
+    # Per-product corrections for status values that the Tuya cloud reports with
+    # swapped/incorrect semantics. Keyed by product_id -> dpcode -> {raw: corrected}.
+    # Applied on the report (read) path only, so writable dpcodes are unaffected.
+    DPCODE_VALUE_OVERRIDES: dict[str, dict[str, dict[Any, Any]]] = {
+        # Smart Towel Rack (category "mjj"): the work_state enum is inverted at
+        # the source, reporting "heating" while idle and "standby" while actually
+        # heating. See https://github.com/azerty9971/xtend_tuya/issues
+        "yghsoyzoicezv8sy": {
+            "work_state": {
+                "heating": "standby",
+                "standby": "heating",
+            },
+        },
+    }
+
     def apply_dpcode_strategy(
         self, dpcode: str, value: Any, multi_manager: mm.MultiManager | None = None
     ) -> Any:
@@ -370,7 +385,14 @@ class XTDevice(TuyaDevice):
                     )
                 ):
                     LOGGER.exception(e)
-        return local_value
+        return self._apply_dpcode_value_override(dpcode, local_value)
+
+    def _apply_dpcode_value_override(self, dpcode: str, value: Any) -> Any:
+        """Remap reported values for products that report them incorrectly."""
+        if product_overrides := XTDevice.DPCODE_VALUE_OVERRIDES.get(self.product_id):
+            if value_map := product_overrides.get(dpcode):
+                return value_map.get(value, value)
+        return value
 
     @staticmethod
     def from_compatible_device(
