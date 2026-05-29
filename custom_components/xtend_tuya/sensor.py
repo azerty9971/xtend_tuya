@@ -1483,8 +1483,10 @@ LOCK_SENSORS: tuple[XTSensorEntityDescription, ...] = (
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
 SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
     CROSS_CATEGORY_DEVICE_DESCRIPTOR: (
-        *CONSUMPTION_SENSORS,
         *BATTERY_SENSORS,
+        *CONSUMPTION_SENSORS,
+        *TEMPERATURE_SENSORS,
+        *HUMIDITY_SENSORS,
     ),
     "dbl": (
         XTSensorEntityDescription(
