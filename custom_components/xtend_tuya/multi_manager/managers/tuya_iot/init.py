@@ -115,8 +115,6 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
             or CONF_ENDPOINT_OT not in config_entry.options
             or CONF_ACCESS_ID not in config_entry.options
             or CONF_ACCESS_SECRET not in config_entry.options
-            or CONF_USERNAME not in config_entry.options
-            or CONF_PASSWORD not in config_entry.options
             or CONF_COUNTRY_CODE not in config_entry.options
             or CONF_APP_TYPE not in config_entry.options
         ):
@@ -163,12 +161,33 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
                     non_user_api.connect
                 )
             )
-            if auth_type == AuthType.CUSTOM:
+            # No-user-api mode: if no username is configured, skip user login and use
+            # the non-user (project-level) API token for all API calls. This allows
+            # xtend_tuya to work with Tuya IoT Platform project credentials only,
+            # without requiring a Tuya app account username/password.
+            _username = config_entry.options.get(CONF_USERNAME, "")
+            if not _username:
+                connect_user_api = {"success": True}
+                user_api_valid = True
+                api = non_user_api
+                # The project-level token UID is a service account UID (bay...) which
+                # lacks permission to list user devices. Override with the stored user UID
+                # from config_entry.data so that device listing via /v1.0/users/{uid}/devices works.
+                stored_uid = (config_entry.data or {}).get("token_info", {}).get("uid", "")
+                if stored_uid:
+                    api.token_info.uid = stored_uid
+                    LOGGER.info(f"No-user API mode: using stored user UID {stored_uid} for device listing")
+            elif auth_type == AuthType.CUSTOM:
                 connect_user_api = (
                     await XTEventLoopProtector.execute_out_of_event_loop_and_return(
                         api.connect,
                         config_entry.options[CONF_USERNAME],
                         config_entry.options[CONF_PASSWORD],
+                    )
+                )
+                user_api_valid = (
+                    await XTEventLoopProtector.execute_out_of_event_loop_and_return(
+                        api.test_validity
                     )
                 )
             else:
@@ -181,11 +200,11 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
                         config_entry.options[CONF_APP_TYPE],
                     )
                 )
-            user_api_valid = (
-                await XTEventLoopProtector.execute_out_of_event_loop_and_return(
-                    api.test_validity
+                user_api_valid = (
+                    await XTEventLoopProtector.execute_out_of_event_loop_and_return(
+                        api.test_validity
+                    )
                 )
-            )
         except requests.exceptions.RequestException as e:
             LOGGER.error(f"Tuya IOT request didn't work: {e}")
             await self.raise_issue(
