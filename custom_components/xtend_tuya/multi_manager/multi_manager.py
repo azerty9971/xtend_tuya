@@ -199,9 +199,6 @@ class MultiManager(TuyaManager):
         return return_list
 
     async def mm_update_device_cache(self) -> None:
-        # Ensure pending MQTT messages always get drained, even if a manager's
-        # cache update fails — otherwise on_message queues messages forever and
-        # entities stay `unavailable` despite live MQTT traffic.
         self.is_ready_for_messages = False
         XTDeviceMap.clear_master_device_map()
         concurrency_manager = XTConcurrencyManager()
