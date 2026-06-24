@@ -53,6 +53,8 @@ class DeviceWatcher:
             # XTDeviceWatcherSpecialDevice.NOT_LINKED_TO_A_DEVICE: XTDeviceWatcherCategory.IOT_API,
             # "vdevo172985271302839": XTDeviceWatcherCategory.PLATFORM_LOCK,
             # "ebf857472d1a0bd943jqag": XTDeviceWatcherCategory.MQTT | XTDeviceWatcherCategory.IOT_API | XTDeviceWatcherCategory.SHARING_API | XTDeviceWatcherCategory.STATUS_CHANGES
+            "bf970988b7a2d61f1fvhts": XTDeviceWatcherCategory.PLATFORM_LOCK | XTDeviceWatcherCategory.MQTT | XTDeviceWatcherCategory.IOT_API | XTDeviceWatcherCategory.SHARING_API | XTDeviceWatcherCategory.STATUS_CHANGES
+
         }
         self.multi_manager = multi_manager
 
