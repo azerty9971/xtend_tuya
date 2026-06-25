@@ -1636,6 +1636,7 @@
                     "auto": "Automatic",
                     "door_open": "Door open",
                     "door_operate": "Door operate",
+                    "ticket_flow": "Ticket flow",
                     "dpcode_command": "DPcode command"
                 }
             }
@@ -2791,6 +2792,7 @@
                     "auto": "Automatic",
                     "door_open": "Door open",
                     "door_operate": "Door operate",
+                    "ticket_flow": "Ticket flow",
                     "dpcode_command": "DPcode command"
                 }
             }
