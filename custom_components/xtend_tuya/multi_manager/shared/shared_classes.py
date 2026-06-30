@@ -55,6 +55,7 @@ class DeviceWatcher:
             # "ebf857472d1a0bd943jqag": XTDeviceWatcherCategory.MQTT | XTDeviceWatcherCategory.IOT_API | XTDeviceWatcherCategory.SHARING_API | XTDeviceWatcherCategory.STATUS_CHANGES
             "bf970988b7a2d61f1fvhts": XTDeviceWatcherCategory.PLATFORM_LOCK | XTDeviceWatcherCategory.MQTT | XTDeviceWatcherCategory.IOT_API | XTDeviceWatcherCategory.SHARING_API | XTDeviceWatcherCategory.STATUS_CHANGES,
             "bf37b3189473fa91029zbc": XTDeviceWatcherCategory.PLATFORM_LOCK | XTDeviceWatcherCategory.MQTT | XTDeviceWatcherCategory.IOT_API | XTDeviceWatcherCategory.SHARING_API | XTDeviceWatcherCategory.STATUS_CHANGES,
+            "bfb3bfdad8686c72dcx8h0": XTDeviceWatcherCategory.PLATFORM_LOCK | XTDeviceWatcherCategory.MQTT | XTDeviceWatcherCategory.IOT_API | XTDeviceWatcherCategory.SHARING_API | XTDeviceWatcherCategory.STATUS_CHANGES,
         }
         self.multi_manager = multi_manager
 
