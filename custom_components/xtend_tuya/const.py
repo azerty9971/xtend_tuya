@@ -1002,6 +1002,7 @@ class XTDPCode(StrEnum):
     RELEASES = "releases"
     REMAININGTIME = "RemainingTime"
     REMOTE_NO_DP_KEY = "remote_no_dp_key"
+    REPLY_UNLOCK_REQUEST = "reply_unlock_request"
     REPORT_SENSITIVITY = "report_sensitivity"
     RESET_SETTING = "reset_setting"
     RESIDUAL_ELECTRICITY = "residual_electricity"
