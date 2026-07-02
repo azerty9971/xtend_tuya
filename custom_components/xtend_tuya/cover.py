@@ -158,6 +158,7 @@ COVERS: dict[str, tuple[XTCoverEntityDescription, ...]] = {
 }
 
 COVERS["clkg"] = COVERS["cl"]
+COVERS["qt"]   = COVERS["cl"]
 
 
 def get_default_definition(
