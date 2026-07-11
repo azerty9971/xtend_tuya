@@ -77,7 +77,7 @@ class TuyaTokenInfo:
             )
 
     def __repr__(self) -> str:
-        return f"TuyaTokenInfo(valid: {self.is_valid()}, expire_time: {self.expire_time}, access_token: {self.access_token}, refresh_token: {self.refresh_token}, uid: {self.uid})"
+        return f"TuyaTokenInfo(valid: {self.is_valid()}, expire_time: {self.expire_time})"
 
     def is_valid(self) -> bool:
         if self.success is False:
@@ -212,9 +212,9 @@ class TuyaOpenAPI:
 
     def __refresh_access_token_if_need(self, path: str, first_pass: bool):
         # logger.debug(f"Check if need to refresh access token. {self.token_info}")
-        if first_pass is False:
-            # logger.debug("Not the first pass, do not refresh access token again.")
-            return
+        # if first_pass is False:
+        #     # logger.debug("Not the first pass, do not refresh access token again.")
+        #     return
         if self.token_info.is_valid() is True:
             # logger.debug("Access token is valid, no need to refresh.")
             return
@@ -276,8 +276,8 @@ class TuyaOpenAPI:
                     "grant_type": 1,
                 },
             )
-        if not response["success"]:
-            return response
+        if response.get("success", False) is False:
+            raise Exception(f"[IOT API] connect_non_user_specific error: {response=}")
 
         # Cache token info.
         self.token_info.update_token(response)
@@ -328,8 +328,8 @@ class TuyaOpenAPI:
                 },
             )
 
-        if not response.get("success", False):
-            return response
+        if response.get("success", False) is False:
+            raise Exception(f"[IOT API] connect_user_specific error: {response=}")
 
         # Cache token info.
         self.token_info.update_token(response)
@@ -341,6 +341,11 @@ class TuyaOpenAPI:
         return self.token_info.is_valid()
 
     def reconnect(self, no_loop: bool = False) -> bool:
+        self.report_message(
+            method="warning",
+            message=f"reconnect called: {self.token_info=}",
+            stack_info=True,
+        )
         if (
             self.__username != ""
             and self.__password != ""
@@ -436,11 +441,11 @@ class TuyaOpenAPI:
         else:
             self.report_message(
                 "debug",
-                f"[IOT API][{time_taken}]Request: {method} {path} PARAMS: {json.dumps(params, ensure_ascii=False, indent=2) if params is not None else ''} BODY: {json.dumps(body, ensure_ascii=False, indent=2) if body is not None else ''}"
+                f"[IOT API][{time_taken}]Request: {method} {path} PARAMS: {json.dumps(params, ensure_ascii=False, indent=2) if params is not None else ''} BODY: {json.dumps(body, ensure_ascii=False, indent=2) if body is not None else ''}",
             )
             self.report_message(
                 "debug",
-                f"[IOT API][{time_taken}]Response: {json.dumps(result, ensure_ascii=False, indent=2)}"
+                f"[IOT API][{time_taken}]Response: {json.dumps(result, ensure_ascii=False, indent=2)}",
             )
             pass
 
