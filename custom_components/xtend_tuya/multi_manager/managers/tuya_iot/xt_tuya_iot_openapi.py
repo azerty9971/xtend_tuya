@@ -48,9 +48,11 @@ class XTIOTOpenAPI(TuyaOpenAPI):
     def report_message(self, method: str, message: str, stack_info: bool = False):
         if self.multi_manager:
             self.multi_manager.device_watcher.report_message(
-                XTDeviceWatcherSpecialDevice.NOT_LINKED_TO_A_DEVICE,
-                message,
-                XTDeviceWatcherCategory.IOT_API,
+                dev_id=XTDeviceWatcherSpecialDevice.NOT_LINKED_TO_A_DEVICE,
+                message=message,
+                category=XTDeviceWatcherCategory.IOT_API,
+                print_stack=stack_info,
+                method=method,
             )
         else:
             return super().report_message(method, message, stack_info)
