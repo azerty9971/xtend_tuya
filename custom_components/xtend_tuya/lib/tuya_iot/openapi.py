@@ -156,6 +156,8 @@ class TuyaOpenAPI:
         method_call = getattr(logger, method, None)
         if method_call is not None and callable(method_call):
             method_call(msg=message, stack_info=stack_info)
+        else:
+            logger.warning(f"Could not find method {method} in LOGGER, {message=} {stack_info=}")
 
     # https://developer.tuya.com/docs/iot/open-api/api-reference/singnature?id=Ka43a5mtx1gsc
     def _calculate_sign(
