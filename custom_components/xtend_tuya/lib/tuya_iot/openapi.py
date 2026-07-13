@@ -156,6 +156,8 @@ class TuyaOpenAPI:
         method_call = getattr(logger, method, None)
         if method_call is not None and callable(method_call):
             method_call(msg=message, stack_info=stack_info)
+        else:
+            logger.warning(f"Could not find method {method} in LOGGER, {message=} {stack_info=}")
 
     # https://developer.tuya.com/docs/iot/open-api/api-reference/singnature?id=Ka43a5mtx1gsc
     def _calculate_sign(
@@ -215,16 +217,20 @@ class TuyaOpenAPI:
         # if first_pass is False:
         #     # logger.debug("Not the first pass, do not refresh access token again.")
         #     return
+        self.report_message("warning", f"__refresh_access_token_if_need start of flow {self.token_info=}")
         if self.token_info.is_valid() is True:
+            self.report_message("warning", f"__refresh_access_token_if_need is valid {self.token_info=}")
             # logger.debug("Access token is valid, no need to refresh.")
             return
 
         if path.startswith(self.__refresh_path) or path.startswith(self.__login_path):
+            self.report_message("warning", f"__refresh_access_token_if_need already requesting refresh token {self.token_info=}")
             # logger.debug("Already requesting refresh token, no need to refresh again.")
             return
 
         if self.reconnect(no_loop=False):
             # logger.warning(f"Successfully reconnected: {self.token_info}")
+            self.report_message("warning", f"__refresh_access_token_if_need successfully reconnected {self.token_info=}")
             pass
 
     def set_dev_channel(self, dev_channel: str):
@@ -453,12 +459,14 @@ class TuyaOpenAPI:
             TUYA_ERROR_CODE_TOKEN_INVALID,
             TUYA_ERROR_SIGN_INVALID,
         ]:
+            self.report_message("warning", f"__request got invalid token or sign invalid {self.token_info=}, ")
             self.token_info.mark_invalid()
             if (
                 first_pass is True
                 and path.startswith(self.__login_path) is False
                 and path.startswith(self.__refresh_path) is False
             ):
+                self.report_message("warning", f"__request replaying request after token refresh {self.token_info=}")
                 return self.__request(method, path, params, body, False)
 
         return result
