@@ -46,6 +46,7 @@ class TuyaTokenInfo:
         self.update_token(token_response=token_response)
 
     def update_token(self, token_response: dict[str, Any] = {}):
+        logger.warning(f"Got token {token_response=}")
         result = cast(dict[str, Any], token_response.get("result", {}))
 
         self.expire_time = (
