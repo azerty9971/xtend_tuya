@@ -16,6 +16,7 @@ from .version import VERSION
 
 TUYA_ERROR_CODE_TOKEN_INVALID = 1010
 TUYA_ERROR_SIGN_INVALID = 1004
+TUYA_ERROR_SIGN_INVALID2 = -9999999
 
 TO_C_CUSTOM_REFRESH_TOKEN_API = "/v1.0/iot-03/users/token/"
 TO_C_SMART_HOME_REFRESH_TOKEN_API = "/v1.0/token/"
@@ -459,6 +460,7 @@ class TuyaOpenAPI:
         if result.get("code", -1) in [
             TUYA_ERROR_CODE_TOKEN_INVALID,
             TUYA_ERROR_SIGN_INVALID,
+            TUYA_ERROR_SIGN_INVALID2,
         ]:
             self.report_message("warning", f"__request got invalid token or sign invalid {self.token_info=}, ")
             self.token_info.mark_invalid()
