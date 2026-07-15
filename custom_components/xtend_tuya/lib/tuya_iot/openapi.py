@@ -351,15 +351,10 @@ class TuyaOpenAPI:
     def reconnect(self, no_loop: bool = False) -> bool:
         self.report_message(
             method="warning",
-            message=f"reconnect called: {self.token_info=}",
+            message=f"reconnect called: {self.token_info=} hasUser: {self.__username != ""} hasPassword: {self.__password != ""} hasCountry: {self.__country_code != ""} is_reconnecting: {self.token_info.is_reconnecting()}",
             stack_info=True,
         )
-        if (
-            self.__username != ""
-            and self.__password != ""
-            and self.__country_code != ""
-            and self.token_info.is_reconnecting() is False
-        ):
+        if self.token_info.is_reconnecting() is False:
             self.connect(
                 self.__username, self.__password, self.__country_code, self.__schema
             )
@@ -375,6 +370,10 @@ class TuyaOpenAPI:
             # logger.debug(
             #     f"Waited {wait_time * loop_pass} seconds for reconnection."
             # )
+        self.report_message(
+            method="warning",
+            message="reconnect has ended"
+        )
         return self.is_token_valid()
 
     def __request(
