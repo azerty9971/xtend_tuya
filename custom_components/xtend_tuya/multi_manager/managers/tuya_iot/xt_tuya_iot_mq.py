@@ -59,7 +59,7 @@ class XTIOTOpenMQ(TuyaOpenMQ):
         rc: mqtt_ReasonCode,
         properties: mqtt_Properties | None = None,
     ):
-        if rc == 0 and 1 == 2:
+        if rc == 0:
             for key, value in self.mq_config.source_topic.items():
                 error, mid = mqttc.subscribe(value)
                 if self.manager is not None and error:
@@ -68,7 +68,7 @@ class XTIOTOpenMQ(TuyaOpenMQ):
                         f"[IOT] Subscribed to topic: {value=} => {error=} {mid=}",
                         XTDeviceWatcherCategory.MQTT,
                     )
-        elif rc == 135 or 1 == 1:  # Not authorized
+        elif rc == 135:  # Not authorized
             LOGGER.error(
                 f"[{self.class_id} MQTT] connect failed with rc={rc}, killing this MQTT queue"
             )
