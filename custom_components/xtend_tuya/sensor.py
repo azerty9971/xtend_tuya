@@ -3,7 +3,7 @@
 from __future__ import annotations
 import asyncio
 import base64
-from typing import cast, Callable, TYPE_CHECKING
+from typing import cast, Callable, TYPE_CHECKING, Any
 from dataclasses import dataclass, field
 from datetime import datetime, UTC
 from homeassistant.helpers import entity_registry as er
@@ -110,6 +110,20 @@ if TYPE_CHECKING:
 
 COMPOUND_KEY: list[str | tuple[str, ...]] = ["key", "dpcode"]
 
+class XTB64ToDateTimeStringWrapper(TuyaDPCodeStringWrapper[datetime]):
+    def read_device_status(self, device: TuyaCustomerDevice) -> datetime | None:
+        """Read device status and convert to a Home Assistant value."""
+        return b64todatetime(self._read_dpcode_value(device))
+
+    def _convert_value_to_raw_value(
+        self, device: TuyaCustomerDevice, value: Any
+    ) -> Any:
+        """Convert display value back to a raw device value.
+
+        Base implementation does no validation, subclasses may
+        override to provide specific validation.
+        """
+        raise NotImplementedError
 
 class XTElectricityCurrentStringWrapper(TuyaDPCodeStringWrapper[float]):
     """Custom DPCode Wrapper for extracting electricity current from base64."""
@@ -1884,14 +1898,14 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
             translation_key="start_time",
             device_class=SensorDeviceClass.TIMESTAMP,
             native_unit_of_measurement="",
-            native_value=b64todatetime,
+            wrapper_class=(XTB64ToDateTimeStringWrapper,)
         ),
         XTSensorEntityDescription(
             key=XTDPCode.CLOSE_TIME,
             translation_key="end_time",
             device_class=SensorDeviceClass.TIMESTAMP,
             native_unit_of_measurement="",
-            native_value=b64todatetime,
+            wrapper_class=(XTB64ToDateTimeStringWrapper,)
         ),
         XTSensorEntityDescription(
             key=XTDPCode.RUN_TASK_STA,
