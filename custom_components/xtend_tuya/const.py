@@ -1203,6 +1203,7 @@ UOM_MAPPING_DICT: dict[str, str | None] = {
     "": None,
     "ADC": None,
     "PF": None,
+    "mAh": None, #This one is not yet supported in HA...
     "格": None,
     "电机电流>1k，瞬间<1k，除臭2K>60": None,
     "线程号": None,
