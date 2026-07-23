@@ -1002,6 +1002,7 @@ class XTDPCode(StrEnum):
     RELEASES = "releases"
     REMAININGTIME = "RemainingTime"
     REMOTE_NO_DP_KEY = "remote_no_dp_key"
+    REPLY_UNLOCK_REQUEST = "reply_unlock_request"
     REPORT_SENSITIVITY = "report_sensitivity"
     RESET_SETTING = "reset_setting"
     RESIDUAL_ELECTRICITY = "residual_electricity"
@@ -1180,6 +1181,7 @@ UOM_MAPPING_DICT: dict[str, str | None] = {
     "kW·h": "kWh",
     "kW.h": "kWh",
     "KWH": "kWh",
+    "mA·h": "mAh",
     "kVar": "kvar",
     "M": "m",
     "KM": "km",
@@ -1200,6 +1202,8 @@ UOM_MAPPING_DICT: dict[str, str | None] = {
     "lux": "lx",
     "": None,
     "ADC": None,
+    "PF": None,
+    "mAh": None, #This one is not yet supported in HA...
     "格": None,
     "电机电流>1k，瞬间<1k，除臭2K>60": None,
     "线程号": None,
@@ -1248,6 +1252,7 @@ DPCODE_PREFERED_DEVICE_CLASS: dict[str, str | None] = {
     "energy_reserse_a": "energy",
     "energy_reverse_b": "energy",
     "energy_reserse_b": "energy",
+    "leakage_ele": "energy",
     "power_factor": "energy",
     "today_acc_energy1": "energy",
     "today_energy_add1": "energy",
@@ -1268,11 +1273,15 @@ DPCODE_PREFERED_DEVICE_CLASS: dict[str, str | None] = {
     "pm1": "pm1",
     "pm03": "pm25",
     "pm25_alarm_value": "pm25",
+    "speed": "speed",
+    "speed_limit": "speed",
     "ALARM_HIGH_TEMP": "temperature",
     "ALARM_LOW_TEMP": "temperature",
     "AUTO_HIGH_TEMP": "temperature",
     "AUTO_LOW_TEMP": "temperature",
+    "battery_temp_current": "temperature",
     "c_temperature": "temperature",
+    "cpu_temp": "temperature",
     "current_temp": "temperature",
     "frost_protect_temp": "temperature",
     "holiday_temp_set": "temperature",

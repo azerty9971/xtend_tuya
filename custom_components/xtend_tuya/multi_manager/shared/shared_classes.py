@@ -53,6 +53,9 @@ class DeviceWatcher:
             # XTDeviceWatcherSpecialDevice.NOT_LINKED_TO_A_DEVICE: XTDeviceWatcherCategory.IOT_API,
             # "vdevo172985271302839": XTDeviceWatcherCategory.PLATFORM_LOCK,
             # "ebf857472d1a0bd943jqag": XTDeviceWatcherCategory.MQTT | XTDeviceWatcherCategory.IOT_API | XTDeviceWatcherCategory.SHARING_API | XTDeviceWatcherCategory.STATUS_CHANGES
+            # "bf970988b7a2d61f1fvhts": XTDeviceWatcherCategory.PLATFORM_LOCK | XTDeviceWatcherCategory.MQTT | XTDeviceWatcherCategory.IOT_API | XTDeviceWatcherCategory.SHARING_API | XTDeviceWatcherCategory.STATUS_CHANGES,
+            # "bf37b3189473fa91029zbc": XTDeviceWatcherCategory.PLATFORM_LOCK | XTDeviceWatcherCategory.MQTT | XTDeviceWatcherCategory.IOT_API | XTDeviceWatcherCategory.SHARING_API | XTDeviceWatcherCategory.STATUS_CHANGES,
+            # "bfb3bfdad8686c72dcx8h0": XTDeviceWatcherCategory.PLATFORM_LOCK | XTDeviceWatcherCategory.MQTT | XTDeviceWatcherCategory.IOT_API | XTDeviceWatcherCategory.SHARING_API | XTDeviceWatcherCategory.STATUS_CHANGES,
         }
         self.multi_manager = multi_manager
 
@@ -89,7 +92,11 @@ class DeviceWatcher:
         device: XTDevice | None = None,
         print_stack: bool = False,
         category_parameter: str | None = None,
+        method: str = "warning"
     ):
+        method_call = getattr(LOGGER, method, None)
+        if method_call is None or callable(method_call) is False:
+            method_call = LOGGER.warning
         if self.is_watched(
             dev_id,
             XTDeviceWatcherCategory.get_unique_flags(category),
@@ -97,17 +104,17 @@ class DeviceWatcher:
         ):
             if dev_id in self.multi_manager.device_map:
                 managed_device = self.multi_manager.device_map[dev_id]
-                LOGGER.warning(
+                method_call(
                     f"DeviceWatcher for {managed_device.name} ({dev_id}): {message}",
                     stack_info=print_stack,
                 )
             elif device:
-                LOGGER.warning(
+                method_call(
                     f"DeviceWatcher for {device.name} ({dev_id}): {message}",
                     stack_info=print_stack,
                 )
             else:
-                LOGGER.warning(f"{message}", stack_info=print_stack)
+                method_call(f"{message}", stack_info=print_stack)
 
 
 class HomeAssistantXTData(NamedTuple):

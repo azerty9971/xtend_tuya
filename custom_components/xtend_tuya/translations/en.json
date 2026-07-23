@@ -3284,6 +3284,10 @@
         "tuya_iot_sensor_energy_stat_not_subscribed": {
             "title": "Tuya OpenAPI account badly configured (Energy stat)",
             "description": "The integration \"{name}\" (`{config_entry_id}`) Does not have a Tuya OpenAPI account that is subscribed to the Beta API service\n\nWithout this, fetching energy sensor consumption history will not function properly.\n\nTo fix this warning please follow the guide at the URL by clicking the button below, then restart Home Assistant."
+        },
+        "tuya_iot_mqtt_failed_login": {
+            "title": "Tuya OpenAPI MQTT Not authorized",
+            "description": "The integration \"{name}\" (`{config_entry_id}`) could not connect to the Tuya OpenAPI MQTT queue, something is wrong in your configuration\n\nTo fix this error please follow the guide at the URL by clicking the button below, then restart Home Assistant."
         }
     }
 }
