@@ -250,7 +250,7 @@ class XTDeviceManagerMultiManagerManagementInterface(ABC):
     ) -> None:
         return None
 
-    async def raise_issue(
+    def raise_issue(
         self,
         hass: HomeAssistant,
         config_entry: XTConfigEntry,

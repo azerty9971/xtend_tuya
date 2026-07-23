@@ -125,7 +125,7 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
                 and config_entry.options[CONF_NO_OPENAPI] is True
             ):
                 return None
-            await self.raise_issue(
+            self.raise_issue(
                 hass=hass,
                 config_entry=config_entry,
                 is_fixable=False,
@@ -190,7 +190,7 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
             )
         except requests.exceptions.RequestException as e:
             LOGGER.error(f"Tuya IOT request didn't work: {e}")
-            await self.raise_issue(
+            self.raise_issue(
                 hass=hass,
                 config_entry=config_entry,
                 is_fixable=False,
@@ -216,7 +216,7 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
                 )
             if user_api_valid is False:
                 LOGGER.error(f"Error validating the USER api: {user_api_valid}")
-            await self.raise_issue(
+            self.raise_issue(
                 hass=hass,
                 config_entry=config_entry,
                 is_fixable=False,
@@ -348,7 +348,7 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
                     )
                 )
                 if not test_api:
-                    await self.raise_issue(
+                    self.raise_issue(
                         hass=hass,
                         config_entry=config_entry,
                         is_fixable=False,
@@ -373,7 +373,7 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
                     )
                 )
                 if not test_api:
-                    await self.raise_issue(
+                    self.raise_issue(
                         hass=hass,
                         config_entry=config_entry,
                         is_fixable=False,
@@ -398,7 +398,7 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
                     )
                 )
                 if not test_api:
-                    await self.raise_issue(
+                    self.raise_issue(
                         hass=hass,
                         config_entry=config_entry,
                         is_fixable=False,
@@ -423,7 +423,7 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
                         device,
                     )
                     if not test_api:
-                        await self.raise_issue(
+                        self.raise_issue(
                             hass=hass,
                             config_entry=config_entry,
                             is_fixable=False,
