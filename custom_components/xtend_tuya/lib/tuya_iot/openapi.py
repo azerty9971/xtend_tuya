@@ -47,7 +47,6 @@ class TuyaTokenInfo:
         self.update_token(token_response=token_response)
 
     def update_token(self, token_response: dict[str, Any] = {}):
-        logger.warning(f"Got token {token_response=}")
         result = cast(dict[str, Any], token_response.get("result", {}))
 
         self.expire_time = (
@@ -219,20 +218,19 @@ class TuyaOpenAPI:
         # if first_pass is False:
         #     # logger.debug("Not the first pass, do not refresh access token again.")
         #     return
-        self.report_message("warning", f"__refresh_access_token_if_need start of flow {self.token_info=}")
+        self.report_message("debug", f"__refresh_access_token_if_need start of flow {self.token_info=}")
         if self.token_info.is_valid() is True:
-            self.report_message("warning", f"__refresh_access_token_if_need is valid {self.token_info=}")
+            self.report_message("debug", f"__refresh_access_token_if_need is valid {self.token_info=}")
             # logger.debug("Access token is valid, no need to refresh.")
             return
 
         if path.startswith(self.__refresh_path) or path.startswith(self.__login_path):
-            self.report_message("warning", f"__refresh_access_token_if_need already requesting refresh token {self.token_info=}")
+            self.report_message("debug", f"__refresh_access_token_if_need already requesting refresh token {self.token_info=}")
             # logger.debug("Already requesting refresh token, no need to refresh again.")
             return
 
         if self.reconnect(no_loop=False):
-            # logger.warning(f"Successfully reconnected: {self.token_info}")
-            self.report_message("warning", f"__refresh_access_token_if_need successfully reconnected {self.token_info=}")
+            self.report_message("debug", f"__refresh_access_token_if_need successfully reconnected {self.token_info=}")
             pass
 
     def set_dev_channel(self, dev_channel: str):
@@ -350,7 +348,7 @@ class TuyaOpenAPI:
 
     def reconnect(self, no_loop: bool = False) -> bool:
         self.report_message(
-            method="warning",
+            method="debug",
             message=f"reconnect called: {self.token_info=} hasUser: {self.__username != ""} hasPassword: {self.__password != ""} hasCountry: {self.__country_code != ""} is_reconnecting: {self.token_info.is_reconnecting()}",
             stack_info=True,
         )
@@ -361,17 +359,17 @@ class TuyaOpenAPI:
         elif self.token_info.is_reconnecting() is True and no_loop is False:
             wait_time = 0.2
             loop_pass = 0
-            # logger.debug("Already connecting to tuya cloud, wait for it to finish.")
+            logger.debug("Already connecting to tuya cloud, wait for it to finish.")
             while self.token_info.is_reconnecting() is True:
                 time.sleep(wait_time)
                 loop_pass += 1
             if self.token_info.is_valid() is False:
                 return self.reconnect(no_loop=True)
-            # logger.debug(
-            #     f"Waited {wait_time * loop_pass} seconds for reconnection."
-            # )
+            logger.debug(
+                f"Waited {wait_time * loop_pass} seconds for reconnection."
+            )
         self.report_message(
-            method="warning",
+            method="debug",
             message="reconnect has ended"
         )
         return self.is_token_valid()
@@ -437,11 +435,11 @@ class TuyaOpenAPI:
         #     pass
         if first_pass is False:
             self.report_message(
-                "warning",
+                "debug",
                 f"[IOT API][{time_taken}]SECOND PASS Request: {method} {path} PARAMS: {json.dumps(params, ensure_ascii=False, indent=2) if params is not None else ''} BODY: {json.dumps(body, ensure_ascii=False, indent=2) if body is not None else ''}, first_pass={first_pass}, access_token={access_token}",
             )
             self.report_message(
-                "warning",
+                "debug",
                 f"[IOT API][{time_taken}]SECOND PASS Response: {json.dumps(result, ensure_ascii=False, indent=2)}",
                 stack_info=True,
             )
@@ -461,14 +459,14 @@ class TuyaOpenAPI:
             TUYA_ERROR_SIGN_INVALID,
             TUYA_ERROR_SIGN_INVALID2,
         ]:
-            self.report_message("warning", f"__request got invalid token or sign invalid {self.token_info=}, ")
+            self.report_message("debug", f"__request got invalid token or sign invalid {self.token_info=}, ")
             self.token_info.mark_invalid()
             if (
                 first_pass is True
                 and path.startswith(self.__login_path) is False
                 and path.startswith(self.__refresh_path) is False
             ):
-                self.report_message("warning", f"__request replaying request after token refresh {self.token_info=}")
+                self.report_message("debug", f"__request replaying request after token refresh {self.token_info=}")
                 return self.__request(method, path, params, body, False)
 
         return result
