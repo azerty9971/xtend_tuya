@@ -10,6 +10,9 @@ from webrtc_models import (
 )
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.issue_registry import (
+    IssueSeverity,
+)
 from ....lib.tuya_iot import (
     AuthType,
     TuyaTokenInfo,
@@ -22,7 +25,6 @@ from .xt_tuya_iot_manager import (
 )
 from ...shared.interface.device_manager import (
     XTDeviceManagerInterface,
-    IssueSeverity,
     WebRTCSendMessage,
 )
 from ...shared.shared_classes import (
@@ -125,9 +127,7 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
                 and config_entry.options[CONF_NO_OPENAPI] is True
             ):
                 return None
-            self.raise_issue(
-                hass=hass,
-                config_entry=config_entry,
+            self.multi_manager.raise_issue(
                 is_fixable=False,
                 severity=IssueSeverity.WARNING,
                 translation_key="tuya_iot_not_configured",
@@ -190,9 +190,7 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
             )
         except requests.exceptions.RequestException as e:
             LOGGER.error(f"Tuya IOT request didn't work: {e}")
-            self.raise_issue(
-                hass=hass,
-                config_entry=config_entry,
+            self.multi_manager.raise_issue(
                 is_fixable=False,
                 severity=IssueSeverity.ERROR,
                 translation_key="tuya_iot_failed_request",
@@ -216,9 +214,7 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
                 )
             if user_api_valid is False:
                 LOGGER.error(f"Error validating the USER api: {user_api_valid}")
-            self.raise_issue(
-                hass=hass,
-                config_entry=config_entry,
+            self.multi_manager.raise_issue(
                 is_fixable=False,
                 severity=IssueSeverity.ERROR,
                 translation_key="tuya_iot_failed_login",
@@ -348,9 +344,7 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
                     )
                 )
                 if not test_api:
-                    self.raise_issue(
-                        hass=hass,
-                        config_entry=config_entry,
+                    self.multi_manager.raise_issue(
                         is_fixable=False,
                         severity=IssueSeverity.WARNING,
                         translation_key="tuya_iot_lock_not_subscribed",
@@ -373,9 +367,7 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
                     )
                 )
                 if not test_api:
-                    self.raise_issue(
-                        hass=hass,
-                        config_entry=config_entry,
+                    self.multi_manager.raise_issue(
                         is_fixable=False,
                         severity=IssueSeverity.WARNING,
                         translation_key="tuya_iot_camera_not_subscribed",
@@ -398,9 +390,7 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
                     )
                 )
                 if not test_api:
-                    self.raise_issue(
-                        hass=hass,
-                        config_entry=config_entry,
+                    self.multi_manager.raise_issue(
                         is_fixable=False,
                         severity=IssueSeverity.WARNING,
                         translation_key="tuya_iot_ir_not_subscribed",
@@ -423,9 +413,7 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
                         device,
                     )
                     if not test_api:
-                        self.raise_issue(
-                            hass=hass,
-                            config_entry=config_entry,
+                        self.multi_manager.raise_issue(
                             is_fixable=False,
                             severity=IssueSeverity.WARNING,
                             translation_key="tuya_iot_sensor_energy_stat_not_subscribed",
