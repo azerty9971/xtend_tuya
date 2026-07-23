@@ -419,7 +419,7 @@ async def async_setup_entry(
                     supported_descriptors, device.category
                 ):
                     if device.category == "sfkzq":
-                        LOGGER.warning(f"dicover_device: {supported_descriptors=}")
+                        LOGGER.warning(f"dicover_device: {supported_descriptors=} {externally_managed_descriptors=}")
                     externally_managed_dpcodes = (
                         XTEntityDescriptorManager.get_category_keys(
                             externally_managed_descriptors.get(device.category)
