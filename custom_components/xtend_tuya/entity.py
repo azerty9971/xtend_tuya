@@ -58,6 +58,8 @@ class XTEntityDescriptorManager:
                 include_descriptors = XTEntityDescriptorManager.merge_descriptors(
                     include_descriptors, descriptors_to_add, key_fields, descriptor_type
                 )
+            if platform == Platform.SELECT:
+                LOGGER.warning(f"get_platform_descriptors: {include_descriptors=}")
             for (
                 descriptors_to_exclude
             ) in multi_manager.get_platform_descriptors_to_exclude(platform):
@@ -271,7 +273,7 @@ class XTEntityDescriptorManager:
                         return_dict[key] = merged_descriptors
                 return return_dict
             case XTEntityDescriptorManager.XTEntityDescriptorType.LIST:
-                return_list: list = base_descriptors
+                return_list: list = []
                 var_type = XTEntityDescriptorManager.XTEntityDescriptorType.UNKNOWN
                 added_compound_keys: list[str] = []
                 if descriptors_to_add:
