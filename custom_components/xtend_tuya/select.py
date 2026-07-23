@@ -1,7 +1,7 @@
 """Support for Tuya select."""
 
 from __future__ import annotations
-from typing import cast, Self
+from typing import cast, Self, Any
 from dataclasses import dataclass
 from tuya_device_handlers.definition.select import (
     SelectDefinition,
@@ -24,6 +24,7 @@ from .const import (
     TUYA_DISCOVERY_NEW,
     XTDPCode,
     XTMultiManagerPostSetupCallbackPriority,
+    LOGGER,
 )
 from .entity import (
     XTEntity,
@@ -38,6 +39,23 @@ from .ha_tuya_integration.tuya_integration_imports import (
 )
 
 class XTEnumWithFixedValuesTypeInformation(TuyaEnumTypeInformation):
+
+    @classmethod
+    def _from_json(
+        cls,
+        dpcode: str,
+        type_data: str,
+        *,
+        report_type: str | None,
+    ) -> Self | None:
+        """Load JSON string and return an EnumTypeInformation object."""
+        return cls(
+            dpcode=dpcode,
+            type_data=type_data,
+            report_type=report_type,
+            range=[],
+        )
+
     @classmethod
     def find_dpcode(
         cls,
@@ -47,6 +65,7 @@ class XTEnumWithFixedValuesTypeInformation(TuyaEnumTypeInformation):
         prefer_function: bool = False,
     ) -> Self | None:
         """Find type information for a matching DP code."""
+        LOGGER.warning(f"Calling custom find_dpcode: {dpcodes=}")
         if dpcodes is None:
             return None
 
