@@ -8,7 +8,7 @@ from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.issue_registry import (
     IssueSeverity,
-    async_create_issue,
+    create_issue,
 )
 from ..lib.tuya_iot.device import (
     PROTOCOL_DEVICE_REPORT,
@@ -844,11 +844,12 @@ class MultiManager(TuyaManager):
         learn_more_url: str | None = None,
     ):
         try:
-            async_create_issue(
+            
+            create_issue(
                 hass=self.hass,
                 domain=DOMAIN,
-                issue_domain=DOMAIN,
                 issue_id=f"{self.config_entry.entry_id}_{translation_key}",
+                issue_domain=DOMAIN,
                 is_fixable=is_fixable,
                 severity=severity,
                 translation_key=translation_key,
