@@ -65,5 +65,11 @@ class XTIOTOpenMQ(TuyaOpenMQ):
                         f"[IOT] Subscribed to topic: {value=} => {error=} {mid=}",
                         XTDeviceWatcherCategory.MQTT,
                     )
+        elif rc == 135: #Not authorized
+            LOGGER.error(f"[{self.class_id} MQTT] connect failed with rc={rc}, killing this MQTT queue")
+            self.stop()
+            if self.manager and self.manager.multi_manager:
+                #self.manager.multi_manager.
+                pass
         else:
             LOGGER.error(f"[{self.class_id} MQTT] connect failed with rc={rc}")
