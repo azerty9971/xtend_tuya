@@ -1273,6 +1273,7 @@ DPCODE_PREFERED_DEVICE_CLASS: dict[str, str | None] = {
     "pm03": "pm25",
     "pm25_alarm_value": "pm25",
     "speed": "speed",
+    "speed_limit": "speed",
     "ALARM_HIGH_TEMP": "temperature",
     "ALARM_LOW_TEMP": "temperature",
     "AUTO_HIGH_TEMP": "temperature",
