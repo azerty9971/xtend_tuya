@@ -271,7 +271,7 @@ class XTEntityDescriptorManager:
                         return_dict[key] = merged_descriptors
                 return return_dict
             case XTEntityDescriptorManager.XTEntityDescriptorType.LIST:
-                return_list: list = []
+                return_list: list = base_descriptors
                 var_type = XTEntityDescriptorManager.XTEntityDescriptorType.UNKNOWN
                 added_compound_keys: list[str] = []
                 if descriptors_to_add:
