@@ -256,6 +256,9 @@ class XTSensorEntityDescription(TuyaSensorEntityDescription, frozen=True):
     # duplicate the entity if handled by another integration
     ignore_other_dp_code_handler: bool = False
 
+    #Skip tuya UoM validation
+    skip_uom_validation: bool = False
+
     def get_entity_instance(
         self,
         device: XTDevice,
@@ -1898,14 +1901,16 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
             translation_key="start_time",
             device_class=SensorDeviceClass.TIMESTAMP,
             native_unit_of_measurement="",
-            wrapper_class=(XTB64ToDateTimeStringWrapper,)
+            wrapper_class=(XTB64ToDateTimeStringWrapper,),
+            skip_uom_validation=True
         ),
         XTSensorEntityDescription(
             key=XTDPCode.CLOSE_TIME,
             translation_key="end_time",
             device_class=SensorDeviceClass.TIMESTAMP,
             native_unit_of_measurement="",
-            wrapper_class=(XTB64ToDateTimeStringWrapper,)
+            wrapper_class=(XTB64ToDateTimeStringWrapper,),
+            skip_uom_validation=True
         ),
         XTSensorEntityDescription(
             key=XTDPCode.RUN_TASK_STA,
@@ -2347,6 +2352,11 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
                     function_code=description.dpcode or description.key,
                     scale_threshold=description.recalculate_scale_for_percentage_threshold,
                 )
+
+    def _validate_device_class_unit(self, *args, **kwargs) -> None:
+        if self.entity_description.skip_uom_validation:
+            return
+        super()._validate_device_class_unit(*args, **kwargs)
 
     @property
     def available(self) -> bool:  # type: ignore[override]
