@@ -23,10 +23,6 @@ from ....const import (
     XTIRRemoteKeysInformation,
     XTLockingMechanism,
 )
-from homeassistant.helpers.issue_registry import (
-    IssueSeverity,
-    async_create_issue,
-)
 
 
 class XTDeviceManagerAPIInterface(ABC):
@@ -249,32 +245,6 @@ class XTDeviceManagerMultiManagerManagementInterface(ABC):
         multi_manager: mm.MultiManager,
     ) -> None:
         return None
-
-    async def raise_issue(
-        self,
-        hass: HomeAssistant,
-        config_entry: XTConfigEntry,
-        is_fixable: bool,
-        severity: IssueSeverity,
-        translation_key: str,
-        translation_placeholders: dict[str, Any],
-        learn_more_url: str | None = None,
-    ):
-        try:
-            async_create_issue(
-                hass=hass,
-                domain=DOMAIN,
-                issue_domain=DOMAIN,
-                issue_id=f"{config_entry.entry_id}_{translation_key}",
-                is_fixable=is_fixable,
-                severity=severity,
-                translation_key=translation_key,
-                translation_placeholders=translation_placeholders,
-                learn_more_url=learn_more_url,
-            )
-        except Exception as e:
-            # Prevent failure for any reason on this method
-            LOGGER.error(f"Exception raised during raise_issue: {e}")
 
 
 class XTDeviceManagerInterface(

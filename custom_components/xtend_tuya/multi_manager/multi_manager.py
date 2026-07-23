@@ -6,12 +6,17 @@ import inspect
 from typing import Any, Literal, Optional, Callable
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.issue_registry import (
+    IssueSeverity,
+    create_issue,
+)
 from ..lib.tuya_iot.device import (
     PROTOCOL_DEVICE_REPORT,
     PROTOCOL_OTHER,
 )
 from ..const import (
     LOGGER,
+    DOMAIN,
     AllowedPlugins,
     XTDeviceEntityFunctions,
     XTMultiManagerProperties,
@@ -829,3 +834,28 @@ class MultiManager(TuyaManager):
         self, flow_id: str
     ) -> shared_data_entry.XTFlowDataBase | None:
         return self._user_input_flows.get(flow_id)
+    
+    def raise_issue(
+        self,
+        is_fixable: bool,
+        severity: IssueSeverity,
+        translation_key: str,
+        translation_placeholders: dict[str, Any],
+        learn_more_url: str | None = None,
+    ):
+        try:
+            
+            create_issue(
+                hass=self.hass,
+                domain=DOMAIN,
+                issue_id=f"{self.config_entry.entry_id}_{translation_key}",
+                issue_domain=DOMAIN,
+                is_fixable=is_fixable,
+                severity=severity,
+                translation_key=translation_key,
+                translation_placeholders=translation_placeholders,
+                learn_more_url=learn_more_url,
+            )
+        except Exception as e:
+            # Prevent failure for any reason on this method
+            LOGGER.error(f"Exception raised during raise_issue: {e}")
