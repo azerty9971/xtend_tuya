@@ -528,7 +528,7 @@ class MultiManager(TuyaManager):
             return_list = append_lists(return_list, account.query_scenes())
         return return_list
 
-    def send_commands(self, device_id: str, commands: list[dict[str, Any]]) -> bool: # type: ignore
+    def send_commands(self, device_id: str, commands: list[dict[str, Any]]) -> bool:  # type: ignore
         virtual_function_commands: list[dict[str, Any]] = []
         regular_commands: list[dict[str, Any]] = []
         if device := self.device_map.get(device_id, None):
@@ -834,7 +834,7 @@ class MultiManager(TuyaManager):
         self, flow_id: str
     ) -> shared_data_entry.XTFlowDataBase | None:
         return self._user_input_flows.get(flow_id)
-    
+
     def raise_issue(
         self,
         is_fixable: bool,
@@ -844,8 +844,8 @@ class MultiManager(TuyaManager):
         learn_more_url: str | None = None,
     ):
         try:
-            
-            create_issue(
+            XTEventLoopProtector.execute_out_of_event_loop(
+                create_issue,
                 hass=self.hass,
                 domain=DOMAIN,
                 issue_id=f"{self.config_entry.entry_id}_{translation_key}",
