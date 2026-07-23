@@ -58,13 +58,9 @@ class XTEventLoopProtector:
             if is_coroutine:
                 XTEventLoopProtector.hass.async_create_task(callback(*args, **kwargs))
             else:
-                if len(kwargs) > 0:
-                    LOGGER.error(
-                        "calling execute_out_of_event_loop with kwargs not supported",
-                        stack_info=True,
-                    )
-                else:
-                    XTEventLoopProtector.hass.async_add_executor_job(callback, *args)
+                XTEventLoopProtector.hass.async_add_executor_job(
+                    partial(callback, *args, **kwargs)
+                )
 
     @staticmethod
     @callback
