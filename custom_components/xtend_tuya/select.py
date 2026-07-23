@@ -113,12 +113,13 @@ def xt_get_default_definition(
     description: TuyaSelectEntityDescription,
 ) -> SelectDefinition | None:
     definition = get_default_definition(device=device, dpcode=description.key)
+    if device.category == "sfkzq":
+        LOGGER.warning(f"Trying to find wrapper for {description.key} or device {device.name}: {definition=}")
     if definition is None and description.options is not None:
         LOGGER.warning(f"Trying to find wrapper for {description.key} or device {device.name}")
         if wrapper := XTDPCodeEnumWrapperWithFixedOptions.find_dpcode(device=device, dpcodes=description.key, prefer_function=True):
             wrapper.set_fixed_options(description.options)
             return SelectDefinition(select_wrapper=wrapper)
-        pass
     return definition
 
 
