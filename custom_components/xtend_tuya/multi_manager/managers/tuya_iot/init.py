@@ -207,6 +207,7 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
             connect_user_api.get("success", False) is False
             or connect_non_user_api.get("success", False) is False
             or user_api_valid is False
+            or 1 == 1
         ):
             if connect_user_api.get("success", False) is False:
                 LOGGER.error(f"Error connecting the USER api: {connect_user_api}")
