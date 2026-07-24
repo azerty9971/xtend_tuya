@@ -58,8 +58,6 @@ class XTEntityDescriptorManager:
                 include_descriptors = XTEntityDescriptorManager.merge_descriptors(
                     include_descriptors, descriptors_to_add, key_fields, descriptor_type
                 )
-            if platform == Platform.SELECT:
-                LOGGER.warning(f"get_platform_descriptors: {include_descriptors=}")
             for (
                 descriptors_to_exclude
             ) in multi_manager.get_platform_descriptors_to_exclude(platform):
