@@ -106,7 +106,7 @@ class XTDPCodeEnumWrapperWithFixedOptions[T = str](TuyaDPCodeTypeInformationWrap
 
     def set_fixed_options(self, options: list[str]):
         self.options = options
-        self._DPTYPE.range = options
+        self.type_information.range = options
 
 def xt_get_default_definition(
     device: TuyaCustomerDevice,
