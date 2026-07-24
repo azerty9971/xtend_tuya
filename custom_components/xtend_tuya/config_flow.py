@@ -210,15 +210,20 @@ class XTConfigFlows:
             )
             api.set_dev_channel("hass")
 
-            response = api.connect(
-                username=data[CONF_USERNAME_OT],
-                password=data[CONF_PASSWORD_OT],
-                country_code=data[CONF_COUNTRY_CODE],
-                schema=data[CONF_APP_TYPE],
-            )
+            try:
+                response = api.connect(
+                    username=data[CONF_USERNAME_OT],
+                    password=data[CONF_PASSWORD_OT],
+                    country_code=data[CONF_COUNTRY_CODE],
+                    schema=data[CONF_APP_TYPE],
+                )
 
-            if response.get(TUYA_RESPONSE_SUCCESS, False):
-                break
+                if response.get(TUYA_RESPONSE_SUCCESS, False):
+                    break
+            except Exception:
+                #We will get an exception if the credentials is incorrect
+                #This is expected and nothing needs to be done about it
+                pass
 
         return response, data
 
