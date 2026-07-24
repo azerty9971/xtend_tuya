@@ -284,6 +284,9 @@ def delete_all_device_entities(
 
 # Decodes a b64-encoded timestamp
 def b64todatetime(value):
+    if value is None:
+        return None
+    
     try:
         decoded_value = b64decode(value)
         if len(decoded_value) < 6:
