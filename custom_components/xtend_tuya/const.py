@@ -1210,6 +1210,7 @@ UOM_MAPPING_DICT: dict[str, str | None] = {
     "线程号": None,
     "欧姆": None,
     "次": None,
+    "无": None,
     "times": None,
     "0.1s": None,
     "x": None,
