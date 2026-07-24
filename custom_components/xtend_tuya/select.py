@@ -1,7 +1,7 @@
 """Support for Tuya select."""
 
 from __future__ import annotations
-from typing import cast, Self, Any
+from typing import cast, Self
 from dataclasses import dataclass
 from tuya_device_handlers.definition.select import (
     SelectDefinition,
@@ -106,6 +106,7 @@ class XTDPCodeEnumWrapperWithFixedOptions[T = str](TuyaDPCodeTypeInformationWrap
 
     def set_fixed_options(self, options: list[str]):
         self.options = options
+        self._DPTYPE.range = options
 
 def xt_get_default_definition(
     device: TuyaCustomerDevice,
