@@ -599,8 +599,6 @@ class XTEntity(TuyaEntity):
             externally_managed_dpcodes,
             key_fields,
         )
-        if platform == Platform.SELECT and device.category == "sfkzq":
-            LOGGER.warning(f"supports_description for {device.name}: {result=}, {dpcode=}")
         if result is True:
             # Register the code as being handled by the device
             XTEntity.register_handled_dpcode(device, platform, dpcode)
