@@ -16,6 +16,7 @@ from .version import VERSION
 
 TUYA_ERROR_CODE_TOKEN_INVALID = 1010
 TUYA_ERROR_SIGN_INVALID = 1004
+TUYA_ERROR_SIGN_INVALID2 = -9999999
 
 TO_C_CUSTOM_REFRESH_TOKEN_API = "/v1.0/iot-03/users/token/"
 TO_C_SMART_HOME_REFRESH_TOKEN_API = "/v1.0/token/"
@@ -77,7 +78,7 @@ class TuyaTokenInfo:
             )
 
     def __repr__(self) -> str:
-        return f"TuyaTokenInfo(valid: {self.is_valid()}, expire_time: {self.expire_time}, access_token: {self.access_token}, refresh_token: {self.refresh_token}, uid: {self.uid})"
+        return f"TuyaTokenInfo(valid: {self.is_valid()}, expire_time: {self.expire_time})"
 
     def is_valid(self) -> bool:
         if self.success is False:
@@ -156,6 +157,8 @@ class TuyaOpenAPI:
         method_call = getattr(logger, method, None)
         if method_call is not None and callable(method_call):
             method_call(msg=message, stack_info=stack_info)
+        else:
+            logger.warning(f"Could not find method {method} in LOGGER, {message=} {stack_info=}")
 
     # https://developer.tuya.com/docs/iot/open-api/api-reference/singnature?id=Ka43a5mtx1gsc
     def _calculate_sign(
@@ -212,19 +215,22 @@ class TuyaOpenAPI:
 
     def __refresh_access_token_if_need(self, path: str, first_pass: bool):
         # logger.debug(f"Check if need to refresh access token. {self.token_info}")
-        if first_pass is False:
-            # logger.debug("Not the first pass, do not refresh access token again.")
-            return
+        # if first_pass is False:
+        #     # logger.debug("Not the first pass, do not refresh access token again.")
+        #     return
+        self.report_message("debug", f"__refresh_access_token_if_need start of flow {self.token_info=}")
         if self.token_info.is_valid() is True:
+            self.report_message("debug", f"__refresh_access_token_if_need is valid {self.token_info=}")
             # logger.debug("Access token is valid, no need to refresh.")
             return
 
         if path.startswith(self.__refresh_path) or path.startswith(self.__login_path):
+            self.report_message("debug", f"__refresh_access_token_if_need already requesting refresh token {self.token_info=}")
             # logger.debug("Already requesting refresh token, no need to refresh again.")
             return
 
         if self.reconnect(no_loop=False):
-            # logger.warning(f"Successfully reconnected: {self.token_info}")
+            self.report_message("debug", f"__refresh_access_token_if_need successfully reconnected {self.token_info=}")
             pass
 
     def set_dev_channel(self, dev_channel: str):
@@ -276,8 +282,8 @@ class TuyaOpenAPI:
                     "grant_type": 1,
                 },
             )
-        if not response["success"]:
-            return response
+        if response.get("success", False) is False:
+            raise Exception(f"[IOT API] connect_non_user_specific error: {response=}")
 
         # Cache token info.
         self.token_info.update_token(response)
@@ -328,8 +334,8 @@ class TuyaOpenAPI:
                 },
             )
 
-        if not response.get("success", False):
-            return response
+        if response.get("success", False) is False:
+            raise Exception(f"[IOT API] connect_user_specific error: {response=}")
 
         # Cache token info.
         self.token_info.update_token(response)
@@ -341,27 +347,31 @@ class TuyaOpenAPI:
         return self.token_info.is_valid()
 
     def reconnect(self, no_loop: bool = False) -> bool:
-        if (
-            self.__username != ""
-            and self.__password != ""
-            and self.__country_code != ""
-            and self.token_info.is_reconnecting() is False
-        ):
+        self.report_message(
+            method="debug",
+            message=f"reconnect called: {self.token_info=} hasUser: {self.__username != ""} hasPassword: {self.__password != ""} hasCountry: {self.__country_code != ""} is_reconnecting: {self.token_info.is_reconnecting()}",
+            stack_info=True,
+        )
+        if self.token_info.is_reconnecting() is False:
             self.connect(
                 self.__username, self.__password, self.__country_code, self.__schema
             )
         elif self.token_info.is_reconnecting() is True and no_loop is False:
             wait_time = 0.2
             loop_pass = 0
-            # logger.debug("Already connecting to tuya cloud, wait for it to finish.")
+            logger.debug("Already connecting to tuya cloud, wait for it to finish.")
             while self.token_info.is_reconnecting() is True:
                 time.sleep(wait_time)
                 loop_pass += 1
             if self.token_info.is_valid() is False:
                 return self.reconnect(no_loop=True)
-            # logger.debug(
-            #     f"Waited {wait_time * loop_pass} seconds for reconnection."
-            # )
+            logger.debug(
+                f"Waited {wait_time * loop_pass} seconds for reconnection."
+            )
+        self.report_message(
+            method="debug",
+            message="reconnect has ended"
+        )
         return self.is_token_valid()
 
     def __request(
@@ -425,35 +435,38 @@ class TuyaOpenAPI:
         #     pass
         if first_pass is False:
             self.report_message(
-                "warning",
+                "debug",
                 f"[IOT API][{time_taken}]SECOND PASS Request: {method} {path} PARAMS: {json.dumps(params, ensure_ascii=False, indent=2) if params is not None else ''} BODY: {json.dumps(body, ensure_ascii=False, indent=2) if body is not None else ''}, first_pass={first_pass}, access_token={access_token}",
             )
             self.report_message(
-                "warning",
+                "debug",
                 f"[IOT API][{time_taken}]SECOND PASS Response: {json.dumps(result, ensure_ascii=False, indent=2)}",
                 stack_info=True,
             )
         else:
             self.report_message(
                 "debug",
-                f"[IOT API][{time_taken}]Request: {method} {path} PARAMS: {json.dumps(params, ensure_ascii=False, indent=2) if params is not None else ''} BODY: {json.dumps(body, ensure_ascii=False, indent=2) if body is not None else ''}"
+                f"[IOT API][{time_taken}]Request: {method} {path} PARAMS: {json.dumps(params, ensure_ascii=False, indent=2) if params is not None else ''} BODY: {json.dumps(body, ensure_ascii=False, indent=2) if body is not None else ''}",
             )
             self.report_message(
                 "debug",
-                f"[IOT API][{time_taken}]Response: {json.dumps(result, ensure_ascii=False, indent=2)}"
+                f"[IOT API][{time_taken}]Response: {json.dumps(result, ensure_ascii=False, indent=2)}",
             )
             pass
 
         if result.get("code", -1) in [
             TUYA_ERROR_CODE_TOKEN_INVALID,
             TUYA_ERROR_SIGN_INVALID,
+            TUYA_ERROR_SIGN_INVALID2,
         ]:
+            self.report_message("debug", f"__request got invalid token or sign invalid {self.token_info=}, ")
             self.token_info.mark_invalid()
             if (
                 first_pass is True
                 and path.startswith(self.__login_path) is False
                 and path.startswith(self.__refresh_path) is False
             ):
+                self.report_message("debug", f"__request replaying request after token refresh {self.token_info=}")
                 return self.__request(method, path, params, body, False)
 
         return result

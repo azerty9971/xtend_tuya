@@ -80,6 +80,7 @@ LOCK_LOCKED_UNLOCKED_STATUS_DPCODES: list[XTDPCode] = [
 LOCK_MANUAL_COMMAND_DPCODES: list[XTDPCode] = [
     XTDPCode.ACCESSORY_LOCK,
     XTDPCode.BLUETOOTH_UNLOCK,
+    XTDPCode.REPLY_UNLOCK_REQUEST,
 ]
 
 # Statuses that are used to determine if the device is a lock or not

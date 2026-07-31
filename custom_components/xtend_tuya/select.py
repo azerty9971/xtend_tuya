@@ -1,7 +1,7 @@
 """Support for Tuya select."""
 
 from __future__ import annotations
-from typing import cast
+from typing import cast, Self
 from dataclasses import dataclass
 from tuya_device_handlers.definition.select import (
     SelectDefinition,
@@ -24,6 +24,7 @@ from .const import (
     TUYA_DISCOVERY_NEW,
     XTDPCode,
     XTMultiManagerPostSetupCallbackPriority,
+    LOGGER,  # noqa: F401
 )
 from .entity import (
     XTEntity,
@@ -32,7 +33,91 @@ from .entity import (
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaSelectEntity,
     TuyaSelectEntityDescription,
+    TuyaCustomerDevice,
+    TuyaDPCodeTypeInformationWrapper,
+    TuyaEnumTypeInformation,
 )
+
+class XTEnumWithFixedValuesTypeInformation(TuyaEnumTypeInformation):
+
+    @classmethod
+    def _from_json(
+        cls,
+        dpcode: str,
+        type_data: str,
+        *,
+        report_type: str | None,
+    ) -> Self | None:
+        """Load JSON string and return an EnumTypeInformation object."""
+        return cls(
+            dpcode=dpcode,
+            type_data=type_data,
+            report_type=report_type,
+            range=[],
+        )
+
+    @classmethod
+    def find_dpcode(
+        cls,
+        device: TuyaCustomerDevice,
+        dpcodes: str | tuple[str, ...] | None,
+        *,
+        prefer_function: bool = False,
+    ) -> Self | None:
+        """Find type information for a matching DP code."""
+        if dpcodes is None:
+            return None
+
+        if not isinstance(dpcodes, tuple):
+            dpcodes = (dpcodes,)
+
+        lookup_tuple = (
+            (device.function, device.status_range)
+            if prefer_function
+            else (device.status_range, device.function)
+        )
+
+        for dpcode in dpcodes:
+            report_type = (
+                status_range.report_type
+                if (status_range := device.status_range.get(dpcode))
+                else None
+            )
+            type_cls = cls
+            for device_specs in lookup_tuple:
+                if dpcode in device_specs:
+                    if type_information := type_cls._from_json(  # noqa: SLF001
+                            dpcode=dpcode,
+                            type_data="{}",
+                            report_type=report_type,
+                        ):
+                        return type_information
+        return None
+
+class XTDPCodeEnumWrapperWithFixedOptions[T = str](TuyaDPCodeTypeInformationWrapper[XTEnumWithFixedValuesTypeInformation, str, T]):
+    _DPTYPE = XTEnumWithFixedValuesTypeInformation
+    options: list[str]
+    
+    def __init__(
+        self, dpcode: str, type_information: XTEnumWithFixedValuesTypeInformation
+    ) -> None:
+        """Init DPCodeEnumWrapper."""
+        super().__init__(dpcode, type_information)
+
+    def set_fixed_options(self, options: list[str]):
+        self.options = options
+        self.type_information.range = options
+
+def xt_get_default_definition(
+    device: TuyaCustomerDevice,
+    description: TuyaSelectEntityDescription,
+) -> SelectDefinition | None:
+    definition = get_default_definition(device=device, dpcode=description.key)
+    if definition is None and description.options is not None:
+        if wrapper := XTDPCodeEnumWrapperWithFixedOptions.find_dpcode(device=device, dpcodes=description.key, prefer_function=True):
+            wrapper.set_fixed_options(description.options)
+            return SelectDefinition(select_wrapper=wrapper)
+    return definition
 
 
 @dataclass(frozen=True)
@@ -79,8 +164,7 @@ TEMPERATURE_SELECTS: tuple[XTSelectEntityDescription, ...] = (
 # default instructions set of each category end up being a select.
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
 SELECTS: dict[str, tuple[XTSelectEntityDescription, ...]] = {
-    CROSS_CATEGORY_DEVICE_DESCRIPTOR: (
-    ),
+    CROSS_CATEGORY_DEVICE_DESCRIPTOR: (),
     "cz": (
         XTSelectEntityDescription(
             key=XTDPCode.SOLAR_EN_TOTAL,
@@ -308,7 +392,7 @@ async def async_setup_entry(
                         entity_registry_enabled_default=False,
                         entity_registry_visible_default=False,
                     )
-                    if definition := get_default_definition(device, description.key):
+                    if definition := xt_get_default_definition(device, description):
                         entities.append(
                             XTSelectEntity.get_entity_instance(
                                 description=description,
@@ -360,7 +444,9 @@ async def async_setup_entry(
                                 externally_managed_dpcodes,
                             )
                             and (
-                                definition := get_default_definition(device, description.key)
+                                definition := xt_get_default_definition(
+                                    device, description
+                                )
                             )
                         )
                     )
@@ -381,8 +467,8 @@ async def async_setup_entry(
                                 externally_managed_dpcodes,
                             )
                             and (
-                                definition := get_default_definition(
-                                    device, description.key
+                                definition := xt_get_default_definition(
+                                    device, description
                                 )
                             )
                         )

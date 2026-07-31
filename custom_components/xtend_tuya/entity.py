@@ -278,6 +278,10 @@ class XTEntityDescriptorManager:
                     var_type = XTEntityDescriptorManager._get_param_type(
                         descriptors_to_add[0]
                     )
+                elif base_descriptors:
+                    var_type = XTEntityDescriptorManager._get_param_type(
+                        base_descriptors[0]
+                    )
                 base_descr_keys: dict[str, EntityDescription | None] = (
                     XTEntityDescriptorManager.get_category_dict(
                         base_descriptors, key_fields

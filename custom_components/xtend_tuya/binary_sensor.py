@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import cast
+from typing import cast, Callable
 from homeassistant.components.binary_sensor import (
     BinarySensorDeviceClass,
 )
@@ -59,6 +59,8 @@ class XTBinarySensorEntityDescription(TuyaBinarySensorEntityDescription):
 
     # duplicate the entity if handled by another integration
     ignore_other_dp_code_handler: bool = False
+
+    is_on: Callable | None = None
 
     def get_entity_instance(
         self,
@@ -190,70 +192,70 @@ BINARY_SENSORS: dict[str, tuple[XTBinarySensorEntityDescription, ...]] = {
         ),
     ),
     # QT-08W Solar Intelligent Water Valve
-    # "sfkzq": (
-    #     XTBinarySensorEntityDescription(
-    #         key=XTDPCode.MALFUNCTION,
-    #         translation_key="error",
-    #         device_class=BinarySensorDeviceClass.PROBLEM,
-    #         entity_category=EntityCategory.DIAGNOSTIC,
-    #         is_on=lambda x: None if x is None else x != 0,
-    #     ),
-    #     XTBinarySensorEntityDescription(
-    #         key=f"{XTDPCode.MALFUNCTION}_0",
-    #         dpcode=XTDPCode.MALFUNCTION,
-    #         translation_key="error_flow_meter",
-    #         device_class=BinarySensorDeviceClass.PROBLEM,
-    #         entity_category=EntityCategory.DIAGNOSTIC,
-    #         is_on=lambda x: None if x is None else (x >> 0) & 1,
-    #     ),
-    #     XTBinarySensorEntityDescription(
-    #         key=f"{XTDPCode.MALFUNCTION}_1",
-    #         dpcode=XTDPCode.MALFUNCTION,
-    #         translation_key="error_valve_low_battery",
-    #         device_class=BinarySensorDeviceClass.BATTERY,
-    #         entity_category=EntityCategory.DIAGNOSTIC,
-    #         is_on=lambda x: None if x is None else (x >> 1) & 1,
-    #     ),
-    #     XTBinarySensorEntityDescription(
-    #         key=f"{XTDPCode.MALFUNCTION}_2",
-    #         dpcode=XTDPCode.MALFUNCTION,
-    #         translation_key="error_sensor_low_battery",
-    #         device_class=BinarySensorDeviceClass.BATTERY,
-    #         entity_category=EntityCategory.DIAGNOSTIC,
-    #         is_on=lambda x: None if x is None else (x >> 2) & 1,
-    #     ),
-    #     XTBinarySensorEntityDescription(
-    #         key=f"{XTDPCode.MALFUNCTION}_3",
-    #         dpcode=XTDPCode.MALFUNCTION,
-    #         translation_key="error_sensor_offline",
-    #         device_class=BinarySensorDeviceClass.PROBLEM,
-    #         entity_category=EntityCategory.DIAGNOSTIC,
-    #         is_on=lambda x: None if x is None else (x >> 3) & 1,
-    #     ),
-    #     XTBinarySensorEntityDescription(
-    #         key=f"{XTDPCode.MALFUNCTION}_4",
-    #         dpcode=XTDPCode.MALFUNCTION,
-    #         translation_key="error_water_shortage",
-    #         device_class=BinarySensorDeviceClass.PROBLEM,
-    #         entity_category=EntityCategory.DIAGNOSTIC,
-    #         is_on=lambda x: None if x is None else (x >> 4) & 1,
-    #     ),
-    #     XTBinarySensorEntityDescription(
-    #         key=f"{XTDPCode.MALFUNCTION}_5",
-    #         dpcode=XTDPCode.MALFUNCTION,
-    #         translation_key="error_other",
-    #         device_class=BinarySensorDeviceClass.PROBLEM,
-    #         entity_category=EntityCategory.DIAGNOSTIC,
-    #         is_on=lambda x: None if x is None else (x >> 5) & 1,
-    #     ),
-    #     XTBinarySensorEntityDescription(
-    #         key=XTDPCode.VBAT_STATE,
-    #         translation_key="battery_charging",
-    #         device_class=BinarySensorDeviceClass.BATTERY_CHARGING,
-    #         entity_category=EntityCategory.DIAGNOSTIC,
-    #         is_on=lambda x: None if x is None else x > 127,
-    #     ),
-    # ),
+    "sfkzq": (
+        XTBinarySensorEntityDescription(
+            key=XTDPCode.MALFUNCTION,
+            translation_key="error",
+            device_class=BinarySensorDeviceClass.PROBLEM,
+            entity_category=EntityCategory.DIAGNOSTIC,
+            is_on=lambda x: None if x is None else x != 0,
+        ),
+        XTBinarySensorEntityDescription(
+            key=f"{XTDPCode.MALFUNCTION}_0",
+            dpcode=XTDPCode.MALFUNCTION,
+            translation_key="error_flow_meter",
+            device_class=BinarySensorDeviceClass.PROBLEM,
+            entity_category=EntityCategory.DIAGNOSTIC,
+            is_on=lambda x: None if x is None else (x >> 0) & 1,
+        ),
+        XTBinarySensorEntityDescription(
+            key=f"{XTDPCode.MALFUNCTION}_1",
+            dpcode=XTDPCode.MALFUNCTION,
+            translation_key="error_valve_low_battery",
+            device_class=BinarySensorDeviceClass.BATTERY,
+            entity_category=EntityCategory.DIAGNOSTIC,
+            is_on=lambda x: None if x is None else (x >> 1) & 1,
+        ),
+        XTBinarySensorEntityDescription(
+            key=f"{XTDPCode.MALFUNCTION}_2",
+            dpcode=XTDPCode.MALFUNCTION,
+            translation_key="error_sensor_low_battery",
+            device_class=BinarySensorDeviceClass.BATTERY,
+            entity_category=EntityCategory.DIAGNOSTIC,
+            is_on=lambda x: None if x is None else (x >> 2) & 1,
+        ),
+        XTBinarySensorEntityDescription(
+            key=f"{XTDPCode.MALFUNCTION}_3",
+            dpcode=XTDPCode.MALFUNCTION,
+            translation_key="error_sensor_offline",
+            device_class=BinarySensorDeviceClass.PROBLEM,
+            entity_category=EntityCategory.DIAGNOSTIC,
+            is_on=lambda x: None if x is None else (x >> 3) & 1,
+        ),
+        XTBinarySensorEntityDescription(
+            key=f"{XTDPCode.MALFUNCTION}_4",
+            dpcode=XTDPCode.MALFUNCTION,
+            translation_key="error_water_shortage",
+            device_class=BinarySensorDeviceClass.PROBLEM,
+            entity_category=EntityCategory.DIAGNOSTIC,
+            is_on=lambda x: None if x is None else (x >> 4) & 1,
+        ),
+        XTBinarySensorEntityDescription(
+            key=f"{XTDPCode.MALFUNCTION}_5",
+            dpcode=XTDPCode.MALFUNCTION,
+            translation_key="error_other",
+            device_class=BinarySensorDeviceClass.PROBLEM,
+            entity_category=EntityCategory.DIAGNOSTIC,
+            is_on=lambda x: None if x is None else (x >> 5) & 1,
+        ),
+        XTBinarySensorEntityDescription(
+            key=XTDPCode.VBAT_STATE,
+            translation_key="battery_charging",
+            device_class=BinarySensorDeviceClass.BATTERY_CHARGING,
+            entity_category=EntityCategory.DIAGNOSTIC,
+            is_on=lambda x: None if x is None else x > 127,
+        ),
+    ),
     "smd": (
         XTBinarySensorEntityDescription(
             key=XTDPCode.OFF,
@@ -490,7 +492,7 @@ async def async_setup_entry(
 class XTBinarySensorEntity(XTEntity, TuyaBinarySensorEntity):
     """XT Binary Sensor Entity."""
 
-    _entity_description: XTBinarySensorEntityDescription
+    entity_description: XTBinarySensorEntityDescription
 
     def __init__(
         self,
@@ -514,13 +516,18 @@ class XTBinarySensorEntity(XTEntity, TuyaBinarySensorEntity):
         )
         self.device = device
         self.device_manager = device_manager
-        self._entity_description = description
+        self.entity_description = description # type: ignore
 
     @property
     def is_on(self) -> bool | None:
-        is_on = super().is_on
-        if is_on is not None and self._entity_description.device_online:
-            dpcode = self.entity_description.dpcode or self.entity_description.key
+        dpcode = self.entity_description.dpcode or self.entity_description.key
+        raw_value = self.device.status.get(dpcode)
+        if self.entity_description.is_on is not None and raw_value is not None:
+            is_on = self.entity_description.is_on(raw_value)
+        else:
+            is_on = super().is_on
+        if is_on is not None and self.entity_description.device_online:
+            
             self.device.online_states[dpcode] = is_on
             self.device_manager.update_device_online_status(self.device.id)
         return is_on
