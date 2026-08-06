@@ -110,6 +110,23 @@ if TYPE_CHECKING:
 
 COMPOUND_KEY: list[str | tuple[str, ...]] = ["key", "dpcode"]
 
+# Liters ceiling for a single cur_cap reading. The QT-08W impeller tops out
+# at 25 L/min, so even a long (6 h) cycle can't exceed 25 * 360 = 9000 L. The
+# cur_cap DP intermittently reports a garbage spike (e.g. 177610 L) that is
+# physically impossible; drop any reading above this so the watering-volume
+# sensor and its history graph don't show the spike.
+SANE_CUR_CAP_MAX = 9000
+
+
+def filter_cur_cap_spike(value: object) -> int | None:
+    """Return cur_cap as int, or None if it's an impossible glitch spike."""
+    try:
+        v = float(value)  # type: ignore[arg-type]
+    except (TypeError, ValueError):
+        return None
+    return int(v) if v <= SANE_CUR_CAP_MAX else None
+
+
 class XTB64ToDateTimeStringWrapper(TuyaDPCodeStringWrapper[datetime]):
     def read_device_status(self, device: TuyaCustomerDevice) -> datetime | None:
         """Read device status and convert to a Home Assistant value."""
@@ -225,9 +242,21 @@ def xt_get_default_definition(
                 function_code=dpcode,
                 scale_threshold=description.recalculate_scale_for_percentage_threshold,
             )
-    return get_default_definition(
-        device=device, dpcode=dpcode, wrapper_class=description.wrapper_class
-    )
+    try:
+        return get_default_definition(
+            device=device, dpcode=dpcode, wrapper_class=description.wrapper_class
+        )
+    except (KeyError, TypeError, ValueError) as err:
+        # Upstream tuya_device_handlers raises on DPs with incomplete type_data
+        # (e.g. integer DP missing "min"). Skip the DP instead of aborting the
+        # whole post-setup callback, which would fail the entire account entry.
+        LOGGER.warning(
+            "Skipping generic sensor for device=%s dpcode=%s — incomplete DP definition (%s)",
+            getattr(device, "id", "?"),
+            dpcode,
+            err,
+        )
+        return None
 
 
 @dataclass(frozen=True)
@@ -1889,6 +1918,21 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
             device_class=SensorDeviceClass.WATER,
             native_unit_of_measurement="L",
             suggested_display_precision=0,
+            # Drop cur_cap glitch spikes (see filter_cur_cap_spike) so the
+            # detail-card volume + its graph never show an impossible value.
+            native_value=filter_cur_cap_spike,
+            # cur_cap resets to 0 each cycle; TOTAL_INCREASING lets HA
+            # long-term stats treat each reset as a new accumulator window,
+            # giving an all-time water figure. FDM5KW has no water_total DP.
+            state_class=SensorStateClass.TOTAL_INCREASING,
+            # The fdm5kw module also registers a Fdm5kwFlowRateDescription on
+            # the same cur_cap DP. Whichever descriptor reaches the platform
+            # setup first registers the handler; without this flag the other
+            # one fails XTEntity.supports_description's "dpcode already
+            # handled" gate, never spawns, and HA marks the entity as a
+            # state-restored orphan (state=unavailable, restored=True). Set
+            # on both descriptors so iteration order doesn't matter.
+            ignore_other_dp_code_handler=True,
         ),
         XTSensorEntityDescription(
             key=XTDPCode.CYC_NUM,
@@ -2085,6 +2129,19 @@ async def async_setup_entry(
     this_platform = Platform.SENSOR
     if entry.runtime_data.multi_manager is None or hass_data.manager is None:
         return
+
+    # Hub-level controllable-device quota sensor (OpenAPI hubs only).
+    _mm = entry.runtime_data.multi_manager
+    if getattr(_mm, "controllable_quota", None) is not None:
+        from .multi_manager.shared.quota import XTControllableQuotaSensor
+
+        async_add_entities(
+            [
+                XTControllableQuotaSensor(
+                    _mm.controllable_quota, entry.title or _mm.controllable_quota.hub_id
+                )
+            ]
+        )
 
     supported_descriptors, externally_managed_descriptors = cast(
         tuple[
