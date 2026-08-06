@@ -1,4 +1,5 @@
 from __future__ import annotations
+import asyncio
 import requests
 import json
 from datetime import datetime, timedelta
@@ -324,6 +325,34 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
             if device.id not in self.multi_manager.devices_shared:
                 self.multi_manager.devices_shared[device.id] = device
 
+    async def _safe_subscription_test(self, callback, *args) -> bool:
+        """Run a best-effort OpenAPI subscription probe without ever failing setup.
+
+        These probes only decide whether to raise a non-critical "not
+        subscribed" warning. A slow relay call here used to hang setup long
+        enough to be cancelled (asyncio.CancelledError), taking the whole
+        entry down. It only bit accounts that actually own the probed device
+        types (sockets, cameras), so it looked intermittent across hubs on
+        the same install. Bound each probe with a timeout and swallow any
+        error, returning True so no spurious issue is raised and setup
+        always continues. A genuine task cancellation (shutdown) still
+        propagates because CancelledError is a BaseException, not caught here.
+        """
+        try:
+            return await asyncio.wait_for(
+                XTEventLoopProtector.execute_out_of_event_loop_and_return(
+                    callback, *args
+                ),
+                timeout=15,
+            )
+        except Exception as exc:  # noqa: BLE001 - probe is best-effort
+            LOGGER.debug(
+                "Subscription probe %s skipped (%s)",
+                getattr(callback, "__name__", callback),
+                exc,
+            )
+            return True
+
     async def on_loading_finalized(
         self,
         hass: HomeAssistant,
@@ -337,11 +366,9 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
         ):
             # Verify if we are subscribed to the lock service
             if device := multi_manager.device_map.get(lock_device_id, None):
-                test_api = (
-                    await XTEventLoopProtector.execute_out_of_event_loop_and_return(
-                        self.iot_account.device_manager.test_lock_api_subscription,
-                        device,
-                    )
+                test_api = await self._safe_subscription_test(
+                    self.iot_account.device_manager.test_lock_api_subscription,
+                    device,
                 )
                 if not test_api:
                     self.multi_manager.raise_issue(
@@ -360,11 +387,9 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
         ):
             # Verify if we are subscribed to the lock service
             if device := multi_manager.device_map.get(camera_device_id, None):
-                test_api = (
-                    await XTEventLoopProtector.execute_out_of_event_loop_and_return(
-                        self.iot_account.device_manager.test_camera_api_subscription,
-                        device,
-                    )
+                test_api = await self._safe_subscription_test(
+                    self.iot_account.device_manager.test_camera_api_subscription,
+                    device,
                 )
                 if not test_api:
                     self.multi_manager.raise_issue(
@@ -384,10 +409,9 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
         ):
             # Verify if we are subscribed to the lock service
             if device := multi_manager.device_map.get(ir_hub_device_id, None):
-                test_api = (
-                    await XTEventLoopProtector.execute_out_of_event_loop_and_return(
-                        self.iot_account.device_manager.test_ir_api_subscription, device
-                    )
+                test_api = await self._safe_subscription_test(
+                    self.iot_account.device_manager.test_ir_api_subscription,
+                    device,
                 )
                 if not test_api:
                     self.multi_manager.raise_issue(
@@ -408,7 +432,7 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
             # Verify if we are subscribed to the energy statistic service
             for device_id in energy_sensor_entities:
                 if device := multi_manager.device_map.get(device_id, None):
-                    test_api = await XTEventLoopProtector.execute_out_of_event_loop_and_return(
+                    test_api = await self._safe_subscription_test(
                         self.iot_account.device_manager.test_sensor_energy_statistic_api_subscription,
                         device,
                     )
@@ -713,6 +737,8 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
                 return self.iot_account.device_manager.api.get(url, params)
             case "POST":
                 return self.iot_account.device_manager.api.post(url, params)
+            case "DELETE":
+                return self.iot_account.device_manager.api.delete(url, params)
         return None
 
     def get_webrtc_sdp_answer(
