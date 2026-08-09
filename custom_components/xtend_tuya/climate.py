@@ -74,6 +74,7 @@ XT_HVAC_TUYA_TO_TUYALIB = {
     "auto": TuyaClimateHVACMode.AUTO,
     "cold": TuyaClimateHVACMode.COOL,
     "cool": TuyaClimateHVACMode.COOL,
+    "Cool": TuyaClimateHVACMode.COOL,
     "dehumidify": TuyaClimateHVACMode.DRY,
     "Eco": TuyaClimateHVACMode.HEAT_COOL,
     "Fan": TuyaClimateHVACMode.FAN_ONLY,
