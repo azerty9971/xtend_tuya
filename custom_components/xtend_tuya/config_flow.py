@@ -194,6 +194,24 @@ class XTConfigFlows:
             data[CONF_PASSWORD_OT] = None
             return {TUYA_RESPONSE_SUCCESS: True}, data
 
+        # No-user-api mode: if no username provided, skip app login and use project-level
+        # token only. This allows xtend_tuya to be configured with Tuya IoT Platform
+        # project credentials alone, without a Tuya app account.
+        if not data.get(CONF_USERNAME_OT, ""):
+            data[CONF_AUTH_TYPE] = AuthType.SMART_HOME
+            data[CONF_APP_TYPE] = TUYA_SMART_APP
+            _nonuser_api = XTIOTOpenAPI(
+                endpoint=data[CONF_ENDPOINT_OT],
+                access_id=data[CONF_ACCESS_ID_OT],
+                access_secret=data[CONF_ACCESS_SECRET_OT],
+                shared_token_info=TuyaTokenInfo(),
+                auth_type=AuthType.SMART_HOME,
+                non_user_specific_api=True,
+            )
+            _nonuser_api.set_dev_channel("hass")
+            _resp = _nonuser_api.connect()
+            return _resp, data
+
         for app_type in ("", TUYA_SMART_APP, SMARTLIFE_APP):
             data[CONF_APP_TYPE] = app_type
             if data[CONF_APP_TYPE] == "":
