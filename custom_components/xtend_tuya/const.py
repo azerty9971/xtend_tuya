@@ -195,6 +195,7 @@ class XTLockingMechanism(StrEnum):
     AUTO = "auto"
     DOOR_OPEN = "door_open"
     DOOR_OPERATE = "door_operate"
+    TICKET_FLOW = "ticket_flow"
     DPCODE_COMMAND = "dpcode_command"
 
     def get_human_name(self, value: str) -> str:
@@ -205,6 +206,8 @@ class XTLockingMechanism(StrEnum):
                 return "door_open API"
             case XTLockingMechanism.DOOR_OPERATE:
                 return "door_operate API"
+            case XTLockingMechanism.TICKET_FLOW:
+                return "Ticket flow API"
             case XTLockingMechanism.DPCODE_COMMAND:
                 return "DPCode command"
             case _:

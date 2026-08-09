@@ -638,6 +638,12 @@ class XTIOTDeviceManager(TuyaDeviceManager):
             )
         return False
 
+    def _lock_unlock_command_ticket_flow(
+        self, device: XTDevice, lock: bool, api: XTIOTOpenAPI
+    ) -> bool:
+        # Request password ticket and run door-operate with standard boolean value
+        return self.call_door_operate(device, not lock, api)
+
     def send_lock_unlock_command_multi_api(
         self,
         device: XTDevice,
@@ -664,6 +670,8 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                 return self._lock_unlock_command_door_open(
                     device, lock, api, self.get_supported_unlock_types(device, api)
                 )
+            case XTLockingMechanism.TICKET_FLOW:
+                return self._lock_unlock_command_ticket_flow(device, lock, api)
             case XTLockingMechanism.DPCODE_COMMAND:
                 return self._lock_unlock_command_dpcode_command(device, lock, api)
             case _:
@@ -676,6 +684,8 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                 if self._lock_unlock_command_door_open(device, lock, api, unlock_types):
                     return True
                 if self._lock_unlock_command_dpcode_command(device, lock, api):
+                    return True
+                if self._lock_unlock_command_ticket_flow(device, lock, api):
                     return True
         return False
 
@@ -1054,7 +1064,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                 return ticket_id
         return None
 
-    def call_door_operate(self, device: XTDevice, open: str, api: XTIOTOpenAPI) -> bool:
+    def call_door_operate(self, device: XTDevice, open: str | bool, api: XTIOTOpenAPI) -> bool:
         if ticket_id := self.get_door_lock_password_ticket(device, api):
             api_to_use = cast(
                 XTIOTOpenAPI,
