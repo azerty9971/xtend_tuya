@@ -24,3 +24,29 @@ don't have one already please follow the following guide:
 5- Verify that the "Beta APIs" is activated:\
 ![image](https://github.com/user-attachments/assets/9f8514a2-35f2-4b1e-84b7-7ae061420ae2)\
 6- You should now be able to import energy consumption statistics using Xtend Tuya
+
+## Power and energy values
+
+Smart plugs commonly expose two different kinds of measurements:
+
+- **Power** is the instantaneous load in W. An online plug that is switched off
+  should normally report `0 W`. If the plug itself is offline, the power sensor
+  is unavailable because there is no current measurement.
+- **Consumption/energy** is a cumulative counter in kWh. It does not return to
+  zero when the plug is switched off. Home Assistant calculates the energy used
+  during a selected period from changes in this counter.
+
+Use a cumulative Consumption or Total energy entity as an individual device in
+Home Assistant's Energy dashboard. Do not use the Power entity there.
+
+Xtend Tuya retains the last known cumulative energy value while a device is
+offline. This is safe because the value is a total rather than a live
+measurement; it also prevents temporary connectivity loss from making the
+Energy dashboard statistic unavailable. Instantaneous Power, Current, and
+Voltage entities remain unavailable until the device reconnects.
+
+If a switch has no Power, Current, Voltage, Consumption, or Total energy entity,
+download its Xtend Tuya device diagnostics and check whether the device exposes
+the corresponding datapoints. Many wall switches and inexpensive USB relay
+modules do not contain metering hardware, so the integration cannot derive
+electricity usage for them.
