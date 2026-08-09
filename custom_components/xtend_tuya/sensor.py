@@ -2360,14 +2360,33 @@ class XTSensorEntity(XTEntity, TuyaSensorEntity, RestoreSensor):  # type: ignore
 
     @property
     def available(self) -> bool:  # type: ignore[override]
-        """Return True for devices that must be treated as always-online."""
+        """Return whether this sensor has a usable value."""
         if (
             self.device.id in FORCE_ALWAYS_ONLINE_BY_DEVICE_ID
             or self.device.product_id in FORCE_ALWAYS_ONLINE_BY_PID
             or self.device.category in FORCE_ALWAYS_ONLINE_BY_CATEGORY
         ):
             return True
-        return self.device.online
+        if self.device.online:
+            return True
+
+        # A cumulative energy value remains valid while its device is offline.
+        # Keeping the last known/restored value available lets the recorder and
+        # Energy dashboard continue using the statistic without pretending that
+        # instantaneous measurements (such as power) are current.
+        if (
+            self.entity_description.restoredata
+            and self.entity_description.device_class is SensorDeviceClass.ENERGY
+            and self._attr_state_class
+            in (SensorStateClass.TOTAL, SensorStateClass.TOTAL_INCREASING)
+        ):
+            dpcode = getattr(self._dpcode_wrapper, "dpcode", None)
+            return (
+                dpcode is not None
+                and (dpcode in self.device.status or self._restored_data is not None)
+            )
+
+        return False
 
     def reset_value(self, _: datetime | None, manual_call: bool = False) -> None:
         if manual_call and self.cancel_reset_after_x_seconds is not None:
