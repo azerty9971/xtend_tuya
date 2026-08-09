@@ -77,18 +77,26 @@ class ConfigEntryRuntimeData(NamedTuple):
 def get_config_entry_runtime_data(
     hass: HomeAssistant, entry: tuya_coordinator.TuyaConfigEntry | shared.XTConfigEntry, domain: str
 ) -> ConfigEntryRuntimeData | None:
-    if not entry or not hasattr(entry, "runtime_data"):
+    if not entry or getattr(entry, "runtime_data", None) is None:
         return None
     runtime_data = entry.runtime_data
-    device_manager = runtime_data.manager
-    if device_manager is not None:
-        return ConfigEntryRuntimeData(
-            device_manager=device_manager, # type: ignore
-            generic_runtime_data=runtime_data,
-            device_listener=runtime_data, # type: ignore
-        )
-    else:
+    # Resolve the manager defensively. A config entry caught mid-setup can
+    # expose a partially initialised runtime_data, and raising AttributeError
+    # from here takes down whatever asked. Both shapes are accepted: the
+    # official Tuya entry stores a bare DeviceListener carrying `manager`,
+    # while xtend_tuya's own entries store `manager` on their runtime data.
+    device_manager = None
+    if hasattr(runtime_data, "device_manager"):
+        device_manager = runtime_data.device_manager # type: ignore
+    if hasattr(runtime_data, "manager"):
+        device_manager = runtime_data.manager
+    if device_manager is None:
         return None
+    return ConfigEntryRuntimeData(
+        device_manager=device_manager, # type: ignore
+        generic_runtime_data=runtime_data,
+        device_listener=runtime_data, # type: ignore
+    )
 
 
 def get_domain_config_entries(hass: HomeAssistant, domain: str) -> list[ConfigEntry]:
