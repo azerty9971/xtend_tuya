@@ -42,10 +42,19 @@ from homeassistant.components.tuya.event import (
     TuyaEventEntity as TuyaEventEntity,
     TuyaEventEntityDescription as TuyaEventEntityDescription,
 )
-from homeassistant.components.tuya.fan import (
-    FANS as FANS_TUYA,  # noqa: F401
-    TuyaFanEntity as TuyaFanEntity,
-)
+# HA core renamed `TUYA_SUPPORT_TYPE` → `FANS` in homeassistant.components.tuya.fan
+# (consistent with EVENTS/HUMIDIFIERS/LIGHTS naming). Older HA installs still
+# export the legacy name, so try the new one first and fall back.
+try:
+    from homeassistant.components.tuya.fan import (
+        FANS as FANS_TUYA,
+        TuyaFanEntity as TuyaFanEntity,
+    )
+except ImportError:
+    from homeassistant.components.tuya.fan import (  # type: ignore[no-redef]
+        TUYA_SUPPORT_TYPE as FANS_TUYA,  # noqa: F401
+        TuyaFanEntity as TuyaFanEntity,
+    )
 from homeassistant.components.tuya.humidifier import (
     HUMIDIFIERS as HUMIDIFIERS_TUYA,  # noqa: F401
     TuyaHumidifierEntity as TuyaHumidifierEntity,
