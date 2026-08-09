@@ -87,7 +87,7 @@ def get_config_entry_runtime_data(
     # while xtend_tuya's own entries store `manager` on their runtime data.
     device_manager = None
     if hasattr(runtime_data, "device_manager"):
-        device_manager = runtime_data.device_manager
+        device_manager = runtime_data.device_manager # type: ignore
     if hasattr(runtime_data, "manager"):
         device_manager = runtime_data.manager
     if device_manager is None:

@@ -52,7 +52,7 @@ try:
     )
 except ImportError:
     from homeassistant.components.tuya.fan import (  # type: ignore[no-redef]
-        TUYA_SUPPORT_TYPE as FANS_TUYA,  # noqa: F401
+        TUYA_SUPPORT_TYPE as FANS_TUYA,  # noqa: F401 # type: ignore
         TuyaFanEntity as TuyaFanEntity,
     )
 from homeassistant.components.tuya.humidifier import (
