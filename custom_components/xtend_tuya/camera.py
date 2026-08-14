@@ -50,6 +50,9 @@ from .entity import (
     XTEntity,
     XTEntityDescriptorManager,
 )
+from .multi_manager.shared.threading import (
+    XTEventLoopProtector
+)
 
 
 class WebRTCStreamQuality(IntEnum):
@@ -366,7 +369,7 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         """Handle a WebRTC candidate."""
         if self.iot_manager is None:
             return await super().async_on_webrtc_candidate(session_id, candidate)
-        return await self.iot_manager.async_on_webrtc_candidate(
+        return await XTEventLoopProtector.execute_out_of_event_loop_and_return(self.iot_manager.async_on_webrtc_candidate, 
             session_id, candidate, self.device
         )
 
