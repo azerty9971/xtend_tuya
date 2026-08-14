@@ -219,6 +219,7 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
             XTDPCode.PHOTO_AGAIN,
             XTDPCode.MOVEMENT_DETECT_PIC,
             XTDPCode.VIDEO_REQUEST_REALTIME,
+            XTDPCode.BASIC_NIGHTVISION,
         ]
         multi_manager.device_watcher.report_message(
             device.id,
