@@ -101,9 +101,13 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if XTCameraEntity.should_entity_be_added(
+                should_be_added = XTCameraEntity.should_entity_be_added(
                     hass, device, hass_data.manager, supported_descriptors
-                ) and (description := supported_descriptors.get(device.category)):
+                )
+                description = supported_descriptors.get(device.category)
+                if description is None and should_be_added is True:
+                    description = CameraEntityDescription(key="")
+                if should_be_added is True and description is not None:
                     entity = XTCameraEntity(
                         device=device,
                         device_manager=hass_data.manager,
