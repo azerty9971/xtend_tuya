@@ -81,7 +81,7 @@ class XTEventLoopProtector:
         else:
             # In the event loop
             if is_coroutine:
-                LOGGER.warning(
+                LOGGER.debug(
                     "Non-sensical call to execute_out_of_event_loop_and_return",
                     stack_info=True,
                 )

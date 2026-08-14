@@ -50,6 +50,9 @@ from .entity import (
     XTEntity,
     XTEntityDescriptorManager,
 )
+from .multi_manager.shared.threading import (
+    XTEventLoopProtector
+)
 
 
 class WebRTCStreamQuality(IntEnum):
@@ -101,9 +104,13 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if XTCameraEntity.should_entity_be_added(
+                should_be_added = XTCameraEntity.should_entity_be_added(
                     hass, device, hass_data.manager, supported_descriptors
-                ) and (description := supported_descriptors.get(device.category)):
+                )
+                description = supported_descriptors.get(device.category)
+                if description is None and should_be_added is True:
+                    description = CameraEntityDescription(key="")
+                if should_be_added is True and description is not None:
                     entity = XTCameraEntity(
                         device=device,
                         device_manager=hass_data.manager,
@@ -219,6 +226,7 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
             XTDPCode.PHOTO_AGAIN,
             XTDPCode.MOVEMENT_DETECT_PIC,
             XTDPCode.VIDEO_REQUEST_REALTIME,
+            XTDPCode.BASIC_NIGHTVISION,
         ]
         multi_manager.device_watcher.report_message(
             device.id,
@@ -361,7 +369,7 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         """Handle a WebRTC candidate."""
         if self.iot_manager is None:
             return await super().async_on_webrtc_candidate(session_id, candidate)
-        return await self.iot_manager.async_on_webrtc_candidate(
+        return await XTEventLoopProtector.execute_out_of_event_loop_and_return(self.iot_manager.async_on_webrtc_candidate, 
             session_id, candidate, self.device
         )
 
