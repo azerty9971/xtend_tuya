@@ -25,6 +25,7 @@ from ..const import (
     XTIRRemoteInformation,
     XTIRRemoteKeysInformation,
     XTLockingMechanism,
+    MESSAGE_SOURCE_TUYA_IOT,
     MESSAGE_SOURCE_TUYA_SHARING,
     XTDeviceWatcherCategory,
     XT_DEVICE_EVENT_NOTIFY_DPCODE,
@@ -84,6 +85,7 @@ from .shared.storage.storage_manager import (
     XTStorageManager,
 )
 import custom_components.xtend_tuya.multi_manager.shared.data_entry.shared_data_entry as shared_data_entry
+from .shared.quota import ControllableQuotaTracker
 
 
 class MultiManager(TuyaManager):
@@ -100,6 +102,9 @@ class MultiManager(TuyaManager):
         self.device_watcher = DeviceWatcher(self)
         self.storage_manager = XTStorageManager(hass, config_entry, self)
         self.accounts: dict[str, XTDeviceManagerInterface] = {}
+        # Per-hub OpenAPI controllable-device quota tracker (created in
+        # setup_entry only for hubs that have a tuya_iot account).
+        self.controllable_quota: ControllableQuotaTracker | None = None
         self.master_device_map: XTDeviceMap = XTDeviceMap({})
         self.is_ready_for_messages = False
         self.pending_messages: list[tuple[str, dict]] = []
@@ -173,6 +178,22 @@ class MultiManager(TuyaManager):
         for account in self.accounts.values():
             await XTEventLoopProtector.execute_out_of_event_loop_and_return(
                 account.on_post_setup
+            )
+        # Controllable-device quota tracker, one per hub. Each xtend hub maps to
+        # one Tuya cloud project with a free-tier cap of 10 controllable devices
+        # per calendar month. We count every device this hub successfully sends a
+        # command to via send_commands. Commands issued from the SmartLife app go
+        # through Tuya's app cloud and never reach send_commands, so they are
+        # naturally excluded; reads don't go through send_commands either. The
+        # hub key is the config entry id (the OpenAPI access_id is not reliably in
+        # config_entry.options in practice — it lives in xtend storage).
+        hub_id = self.config_entry.entry_id
+        self.controllable_quota = ControllableQuotaTracker(self.hass, hub_id)
+        try:
+            await self.controllable_quota.async_load()
+        except Exception:  # noqa: BLE001 - a corrupt quota store must never break hub setup
+            LOGGER.warning(
+                "Failed to load controllable-quota store for hub %s", hub_id
             )
 
     async def setup_entity_parsers(self) -> None:
@@ -528,6 +549,23 @@ class MultiManager(TuyaManager):
             return_list = append_lists(return_list, account.query_scenes())
         return return_list
 
+    def _note_controllable_command(self, account, device_id: str) -> None:
+        """Count a successful command toward this hub's controllable-device cap.
+
+        Only commands that actually went out over an OpenAPI (tuya_iot)
+        account consume the cloud project's monthly controllable-device
+        allowance. A hub commonly also holds a tuya_sharing account, and
+        commands served by that one travel the Smart Life pathway and cost
+        nothing against the project quota, so counting them would overstate
+        usage and could trip the warning while the real allowance is
+        untouched. Thread-safe — send_commands runs in an executor.
+        """
+        if self.controllable_quota is None:
+            return
+        if account is None or account.get_type_name() != MESSAGE_SOURCE_TUYA_IOT:
+            return
+        self.controllable_quota.record(device_id)
+
     def send_commands(self, device_id: str, commands: list[dict[str, Any]]) -> bool:  # type: ignore
         virtual_function_commands: list[dict[str, Any]] = []
         regular_commands: list[dict[str, Any]] = []
@@ -572,6 +610,7 @@ class MultiManager(TuyaManager):
                     if last_command_result := account.send_command(
                         device_id, regular_command, reverse_filters=False
                     ):
+                        self._note_controllable_command(account, device_id)
                         break
 
                 # If the command failed, try using the other APIs
@@ -580,6 +619,7 @@ class MultiManager(TuyaManager):
                         if last_command_result := account.send_command(
                             device_id, regular_command, reverse_filters=True
                         ):
+                            self._note_controllable_command(account, device_id)
                             break
 
                 # If it still didn't work, try sending the command aliases if they exist
@@ -599,11 +639,13 @@ class MultiManager(TuyaManager):
                             if last_command_result := account.send_command(
                                 device_id, command, reverse_filters=False
                             ):
+                                self._note_controllable_command(account, device_id)
                                 break
                         for account in self.accounts.values():
                             if last_command_result := account.send_command(
                                 device_id, command, reverse_filters=True
                             ):
+                                self._note_controllable_command(account, device_id)
                                 break
                         if last_command_result is True:
                             break
