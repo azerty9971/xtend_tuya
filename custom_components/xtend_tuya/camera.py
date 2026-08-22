@@ -56,8 +56,8 @@ from .multi_manager.shared.threading import (
 
 
 class WebRTCStreamQuality(IntEnum):
-    HIGH_QUALITY = 2
-    LOW_QUALITY = 4
+    HIGH_QUALITY = 0
+    LOW_QUALITY = 1
 
 
 # All descriptions can be found here:
@@ -192,7 +192,9 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
             definition=definition,
         )
         if stream_quality != WebRTCStreamQuality.HIGH_QUALITY:
-            self._attr_unique_id = f"tuya.{device.id}_{stream_quality}"
+            self._attr_unique_id = f"tuya.{device.id}_low"
+        else:
+            self._attr_unique_id = f"tuya.{device.id}_high"
         self.device = device
         self.device_manager = device_manager
         self.iot_manager: XTDeviceManagerInterface | None = None
