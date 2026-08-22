@@ -275,6 +275,7 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
             ice_servers_dict: list[dict[str, str]] = json.loads(ice_servers)
             ice_list: list[RTCIceServer] = []
             for ice_server in ice_servers_dict:
+                LOGGER.warning(f"Found ICE: {ice_server}")
                 if url := ice_server.get("urls"):
                     credential = ice_server.get("credential")
                     username = ice_server.get("username")
