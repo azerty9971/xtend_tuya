@@ -835,7 +835,7 @@ class XTIOTWebRTCManager:
                         "moto_id": f"{moto_id}",
                         "tid": "",
                     },
-                    "msg": {"mode": "webrtc", "cmdValue": self._get_stream_type(device.id, session_id, resolution)},
+                    "msg": {"mode": "webrtc", "cmdValue": int(resolution)},
                 },
             }
         return None
