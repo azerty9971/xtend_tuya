@@ -130,7 +130,7 @@ class XTIOTWebRTCManager:
             return
         self._create_session_if_necessary(session_id)
         self.sdp_exchange[session_id].answer = answer
-        self.report_message(f"Got SDP answer for {session_id=}")
+        self.report_message(f"Got SDP answer for {session_id=} {answer=}")
         if callback := self.sdp_exchange[session_id].message_callback:
             sdp_answer = answer.get("sdp", "")
             sdp_answer = self.fix_answer(sdp_answer, session_id)
