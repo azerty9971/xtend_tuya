@@ -27,8 +27,20 @@ from ......const import (
 ENDLINE = "\r\n"
 
 
+class XTIOTWebRTCConfig(dict):
+    def __init__(self, *args, ttl: int = 300, **kwargs):
+        super(XTIOTWebRTCConfig, self).__init__(*args, **kwargs)
+        self.valid_until = datetime.now() + timedelta(seconds=ttl)
+
+    def is_webrtc_config_valid(self) -> bool:
+        current_time = datetime.now()
+        if self.valid_until < current_time:
+            return False
+        return True
+
+
 class XTIOTWebRTCSession:
-    webrtc_config: dict[str, Any] | None
+    webrtc_config: XTIOTWebRTCConfig | None
     original_offer: str | None
     offer: str | None
     answer: dict
@@ -131,7 +143,7 @@ class XTIOTWebRTCManager:
         resolution_payload = self.format_resolution(session_id, resolution, device)
         self.send_to_ipc_mqtt(session_id, device, json.dumps(resolution_payload))
 
-    def set_config(self, session_id: str, config: dict[str, Any]):
+    def set_config(self, session_id: str, config: XTIOTWebRTCConfig):
         self._create_session_if_necessary(session_id)
 
         # Format ICE Servers so that they can be used by GO2RTC
@@ -157,34 +169,34 @@ class XTIOTWebRTCManager:
             self.sdp_exchange[session_id] = XTIOTWebRTCSession()
 
     async def async_get_config(
-        self, device_id: str, session_id: str | None, hass: HomeAssistant | None = None
-    ) -> dict | None:
-        local_hass = hass
+        self,
+        device_id: str,
+        session_id: str | None,
+    ) -> XTIOTWebRTCConfig | None:
         if current_exchange := self.get_webrtc_session(session_id):
             if current_exchange.webrtc_config is not None:
                 return current_exchange.webrtc_config
-            if current_exchange.hass is not None:
-                local_hass = hass
-        if local_hass is not None:
-            return await XTEventLoopProtector.execute_out_of_event_loop_and_return(
-                self._get_config_from_cloud, device_id, session_id
-            )
-        else:
-            return self._get_config_from_cloud(device_id, session_id)
+        return await XTEventLoopProtector.execute_out_of_event_loop_and_return(
+            self.get_config, device_id, session_id
+        )
 
-    def get_config(self, device_id: str, session_id: str | None) -> dict | None:
+    def get_config(self, device_id: str, session_id: str | None) -> XTIOTWebRTCConfig | None:
         if current_exchange := self.get_webrtc_session(session_id):
-            if current_exchange.webrtc_config is not None:
+            if (
+                current_exchange.webrtc_config is not None
+                and current_exchange.webrtc_config.is_webrtc_config_valid()
+            ):
                 return current_exchange.webrtc_config
         elif session_id is not None:
             if current_exchange := self.get_webrtc_session(device_id):
                 if current_exchange.webrtc_config is not None:
                     self.set_config(session_id, current_exchange.webrtc_config)
+                    return current_exchange.webrtc_config
         return self._get_config_from_cloud(device_id, session_id)
 
     def _get_config_from_cloud(
         self, device_id: str, session_id: str | None
-    ) -> dict | None:
+    ) -> XTIOTWebRTCConfig | None:
         webrtc_config = self.ipc_manager.api.get(
             f"/v1.0/devices/{device_id}/webrtc-configs"
         )
@@ -200,18 +212,17 @@ class XTIOTWebRTCManager:
             print_stack=True,
         )
         if webrtc_config.get("success", False):
-            result = webrtc_config.get("result", {})
+            result = XTIOTWebRTCConfig(webrtc_config.get("result", {}))
             if session_id is not None:
                 self.set_config(session_id, result)
-            else:
-                self.set_config(device_id, result)
+            self.set_config(device_id, result)
             return result
         return None
 
     async def async_get_ice_servers(
         self, device_id: str, session_id: str | None, format: str, hass: HomeAssistant
     ) -> str | None:
-        if config := await self.async_get_config(device_id, session_id, hass):
+        if config := await self.async_get_config(device_id, session_id):
             p2p_config: dict = config.get("p2p_config", {})
             ice_str = p2p_config.get("ices", "{}")
             match format:
@@ -516,7 +527,7 @@ class XTIOTWebRTCManager:
             return None
         session_data.message_callback = send_message
         session_data.hass = hass
-        await self.async_get_config(device.id, session_id, hass)
+        await self.async_get_config(device.id, session_id)
         self.set_original_sdp_offer(session_id, offer_sdp)
         offer_changed = self.get_candidates_from_offer(session_id, offer_sdp)
         offer_changed = self.fix_offer(offer_changed, session_id)
