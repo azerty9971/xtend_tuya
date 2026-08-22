@@ -311,10 +311,10 @@ class XTIOTWebRTCManager:
     def _get_stream_type(
         self, device_id: str, session_id: str, requested_quality: XTWebRTCStreamQuality
     ) -> int:
-        Any_stream_type = 1
-        highest_res_stream_type = Any_stream_type
+        any_stream_type = 1
+        highest_res_stream_type = any_stream_type
         cur_highest = 0
-        lowest_res_stream_type = Any_stream_type
+        lowest_res_stream_type = any_stream_type
         cur_lowest = 0
         if webrtc_config := self.get_config(device_id, session_id):
             if skill := webrtc_config.get("skill"):
@@ -328,7 +328,7 @@ class XTIOTWebRTCManager:
                                 and "width" in video_details
                                 and "height" in video_details
                             ):
-                                Any_stream_type = video_details["streamType"]
+                                any_stream_type = video_details["streamType"]
                                 width = int(video_details["width"])
                                 height = int(video_details["height"])
                                 cur_value = width * height
@@ -341,12 +341,16 @@ class XTIOTWebRTCManager:
                                     cur_lowest = cur_value
                                     lowest_res_stream_type = video_details["streamType"]
                     if requested_quality == XTWebRTCStreamQuality.HIGH_QUALITY:
+                        self.report_message(f"Chosen stream_type: {highest_res_stream_type}")
                         return highest_res_stream_type
                     else:
+                        self.report_message(f"Chosen stream_type: {lowest_res_stream_type}")
                         return lowest_res_stream_type
                 except Exception:
-                    return Any_stream_type
-        return Any_stream_type
+                    self.report_message(f"Chosen stream_type (EXCEPTION): {any_stream_type}")
+                    return any_stream_type
+        self.report_message(f"Chosen stream_type (END): {any_stream_type}")
+        return any_stream_type
 
     def get_sdp_answer(
         self,
