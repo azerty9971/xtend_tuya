@@ -50,7 +50,7 @@ class DeviceWatcher:
             # "eb7390e135cc5cd63213qg": XTDeviceWatcherCategory.MQTT,
             # "vdevo172985271302839": XTDeviceWatcherCategory.PLATFORM_EVENT | XTDeviceWatcherCategory.VIRTUAL_STATE,
             # "bf022344b6e0cfd5dafh8e": XTDeviceWatcherCategory.MQTT,
-            XTDeviceWatcherSpecialDevice.NOT_LINKED_TO_A_DEVICE: XTDeviceWatcherCategory.IOT_API,
+            XTDeviceWatcherSpecialDevice.NOT_LINKED_TO_A_DEVICE: XTDeviceWatcherCategory.IOT_API | XTDeviceWatcherCategory.WEBRTC,
             # "vdevo172985271302839": XTDeviceWatcherCategory.PLATFORM_LOCK,
             # "ebf857472d1a0bd943jqag": XTDeviceWatcherCategory.MQTT | XTDeviceWatcherCategory.IOT_API | XTDeviceWatcherCategory.SHARING_API | XTDeviceWatcherCategory.STATUS_CHANGES
             # "bf970988b7a2d61f1fvhts": XTDeviceWatcherCategory.PLATFORM_LOCK | XTDeviceWatcherCategory.MQTT | XTDeviceWatcherCategory.IOT_API | XTDeviceWatcherCategory.SHARING_API | XTDeviceWatcherCategory.STATUS_CHANGES,

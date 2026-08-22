@@ -258,6 +258,7 @@ class XTDeviceWatcherCategory(Flag):
     XT_PERFORMANCE = auto()
     DEBUG = auto()
     STATUS_CHANGES = auto()
+    WEBRTC = auto()
 
     @classmethod
     def all_enum_values(cls) -> list[XTDeviceWatcherCategory]:

@@ -22,6 +22,7 @@ from .....shared.threading import (
 )
 from ......const import (
     XTDeviceWatcherCategory,
+    XTDeviceWatcherSpecialDevice,
 )
 
 ENDLINE = "\r\n"
@@ -95,6 +96,17 @@ class XTIOTWebRTCManager:
     def __init__(self, ipc_manager: ipc_man.XTIOTIPCManager) -> None:
         self.sdp_exchange: dict[str, XTIOTWebRTCSession] = {}
         self.ipc_manager = ipc_manager
+        self.multi_manager = ipc_manager.multi_manager
+
+    def report_message(
+        self, msg: str, device_id: str = XTDeviceWatcherSpecialDevice.NOT_LINKED_TO_A_DEVICE, category = XTDeviceWatcherCategory.WEBRTC, print_stack: bool = False
+    ) -> None:
+        self.multi_manager.device_watcher.report_message(
+            dev_id=device_id,
+            message=msg,
+            category=category,
+            print_stack=print_stack,
+        )
 
     def get_webrtc_session(self, session_id: str | None) -> XTIOTWebRTCSession | None:
         if session_id is None:
@@ -118,6 +130,7 @@ class XTIOTWebRTCManager:
             return
         self._create_session_if_necessary(session_id)
         self.sdp_exchange[session_id].answer = answer
+        self.report_message(f"Got SDP answer for {session_id=}")
         if callback := self.sdp_exchange[session_id].message_callback:
             sdp_answer = answer.get("sdp", "")
             sdp_answer = self.fix_answer(sdp_answer, session_id)
@@ -129,6 +142,7 @@ class XTIOTWebRTCManager:
         self._create_session_if_necessary(session_id)
         self.sdp_exchange[session_id].answer_candidates.append(candidate)
         candidate_str = cast(str, candidate.get("candidate", ""))
+        self.report_message(f"Got SDP answer candidate for {session_id=} {candidate_str=}")
         if candidate_str == "":
             self.sdp_exchange[session_id].has_all_candidates = True
         if callback := self.sdp_exchange[session_id].message_callback:
@@ -159,6 +173,7 @@ class XTIOTWebRTCManager:
         self.sdp_exchange[session_id].offer_codec_manager = XTIOTWebRTCCodecManager(
             offer
         )
+        self.report_message(f"Got SDP offer for {session_id=}")
 
     def set_original_sdp_offer(self, session_id: str, offer: str) -> None:
         self._create_session_if_necessary(session_id)
@@ -210,11 +225,10 @@ class XTIOTWebRTCManager:
             webrtc_config = self.ipc_manager.non_user_api.get(
                 f"/v1.0/devices/{device_id}/webrtc-configs"
             )
-        self.ipc_manager.multi_manager.device_watcher.report_message(
-            device_id,
-            f"webrtc_config {webrtc_config}",
-            XTDeviceWatcherCategory.IOT_API | XTDeviceWatcherCategory.PLATFORM_CAMERA,
-            None,
+        self.report_message(
+            msg=f"webrtc_config {webrtc_config}",
+            device_id=device_id,
+            category=XTDeviceWatcherCategory.IOT_API | XTDeviceWatcherCategory.PLATFORM_CAMERA,
             print_stack=True,
         )
         if webrtc_config.get("success", False):
