@@ -830,7 +830,7 @@ class XTIOTWebRTCManager:
                         "type": "resolution",
                         "from": f"{self.ipc_manager.get_from()}",
                         "to": f"{device.id}",
-                        #"sub_dev_id": "",
+                        "sub_dev_id": "",
                         "sessionid": f"{session_id}",
                         "moto_id": f"{moto_id}",
                         "tid": "",
