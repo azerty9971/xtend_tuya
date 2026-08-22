@@ -69,6 +69,7 @@ from ....const import (
     XTIRRemoteKeysInformation,
     XTDeviceWatcherCategory,
     XTDeviceWatcherSpecialDevice,
+    XTWebRTCStreamQuality,
 )
 
 
@@ -716,13 +717,13 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
         return None
 
     def get_webrtc_sdp_answer(
-        self, device_id: str, session_id: str, sdp_offer: str, channel: str
+        self, device_id: str, session_id: str, sdp_offer: str, requested_quality: XTWebRTCStreamQuality
     ) -> str | None:
         if self.iot_account is None:
             return None
         return (
             self.iot_account.device_manager.ipc_manager.webrtc_manager.get_sdp_answer(
-                device_id, session_id, sdp_offer, channel
+                device_id, session_id, sdp_offer, requested_quality,
             )
         )
 
@@ -782,6 +783,7 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
         send_message: WebRTCSendMessage,
         device: XTDevice,
         hass: HomeAssistant,
+        stream_quality: XTWebRTCStreamQuality,
     ) -> None:
         if self.iot_account is None:
             return None
@@ -791,6 +793,7 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
             send_message,
             device,
             hass,
+            stream_quality,
         )
 
     async def async_on_webrtc_candidate(

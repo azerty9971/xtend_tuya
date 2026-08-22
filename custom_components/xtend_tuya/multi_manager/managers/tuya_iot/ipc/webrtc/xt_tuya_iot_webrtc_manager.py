@@ -23,6 +23,7 @@ from .....shared.threading import (
 from ......const import (
     XTDeviceWatcherCategory,
     XTDeviceWatcherSpecialDevice,
+    XTWebRTCStreamQuality,
 )
 
 ENDLINE = "\r\n"
@@ -308,53 +309,58 @@ class XTIOTWebRTCManager:
         return None
 
     def _get_stream_type(
-        self, device_id: str, session_id: str, requested_channel: str
+        self, device_id: str, session_id: str, requested_quality: XTWebRTCStreamQuality
     ) -> int:
-        Any_stream_type = 1
-        highest_res_stream_type = Any_stream_type
-        cur_highest = 0
-        lowest_res_stream_type = Any_stream_type
-        cur_lowest = 0
-        if webrtc_config := self.get_config(device_id, session_id):
-            if skill := webrtc_config.get("skill"):
-                try:
-                    skill_json: dict = json.loads(skill)
-                    video_list: list[dict[str, Any]] | None = skill_json.get("videos")
-                    if video_list:
-                        for video_details in video_list:
-                            if (
-                                "streamType" in video_details
-                                and "width" in video_details
-                                and "height" in video_details
-                            ):
-                                Any_stream_type = video_details["streamType"]
-                                width = int(video_details["width"])
-                                height = int(video_details["height"])
-                                cur_value = width * height
-                                if cur_highest < cur_value:
-                                    cur_highest = cur_value
-                                    highest_res_stream_type = video_details[
-                                        "streamType"
-                                    ]
-                                if cur_lowest == 0 or cur_lowest > cur_value:
-                                    cur_lowest = cur_value
-                                    lowest_res_stream_type = video_details["streamType"]
-                    if requested_channel == "high":
-                        return highest_res_stream_type
-                    elif requested_channel == "low":
-                        return lowest_res_stream_type
-                    else:
-                        return int(requested_channel)
-                except Exception:
-                    return Any_stream_type
-        return Any_stream_type
+        match requested_quality:
+            case XTWebRTCStreamQuality.HIGH_QUALITY:
+                return 0
+            case _:
+                return 1
+        # Any_stream_type = 1
+        # highest_res_stream_type = Any_stream_type
+        # cur_highest = 0
+        # lowest_res_stream_type = Any_stream_type
+        # cur_lowest = 0
+        # if webrtc_config := self.get_config(device_id, session_id):
+        #     if skill := webrtc_config.get("skill"):
+        #         try:
+        #             skill_json: dict = json.loads(skill)
+        #             video_list: list[dict[str, Any]] | None = skill_json.get("videos")
+        #             if video_list:
+        #                 for video_details in video_list:
+        #                     if (
+        #                         "streamType" in video_details
+        #                         and "width" in video_details
+        #                         and "height" in video_details
+        #                     ):
+        #                         Any_stream_type = video_details["streamType"]
+        #                         width = int(video_details["width"])
+        #                         height = int(video_details["height"])
+        #                         cur_value = width * height
+        #                         if cur_highest < cur_value:
+        #                             cur_highest = cur_value
+        #                             highest_res_stream_type = video_details[
+        #                                 "streamType"
+        #                             ]
+        #                         if cur_lowest == 0 or cur_lowest > cur_value:
+        #                             cur_lowest = cur_value
+        #                             lowest_res_stream_type = video_details["streamType"]
+        #             if requested_quality == XTWebRTCStreamQuality.HIGH_QUALITY:
+        #                 return highest_res_stream_type
+        #             elif requested_quality == XTWebRTCStreamQuality.LOW_QUALITY:
+        #                 return lowest_res_stream_type
+        #             else:
+        #                 return int(requested_channel)
+        #         except Exception:
+        #             return Any_stream_type
+        # return Any_stream_type
 
     def get_sdp_answer(
         self,
         device_id: str,
         session_id: str,
         sdp_offer: str,
-        channel: str,
+        requested_quality: XTWebRTCStreamQuality,
         wait_for_answers: int = 5,
     ) -> str | None:
         sleep_step = 0.01
@@ -406,7 +412,7 @@ class XTIOTWebRTCManager:
                                 "auth": f"{auth_token}",
                                 "mode": "webrtc",
                                 "stream_type": self._get_stream_type(
-                                    device_id, session_id, channel
+                                    device_id, session_id, requested_quality
                                 ),
                             },
                         },
@@ -539,6 +545,7 @@ class XTIOTWebRTCManager:
         send_message: WebRTCSendMessage,
         device: XTDevice,
         hass: HomeAssistant,
+        stream_quality: XTWebRTCStreamQuality,
     ) -> None:
         self._create_session_if_necessary(session_id)
         session_data = self.get_webrtc_session(session_id)
@@ -553,7 +560,7 @@ class XTIOTWebRTCManager:
         self.set_sdp_offer(session_id, offer_changed)
         sdp_offer_payload = (
             await XTEventLoopProtector.execute_out_of_event_loop_and_return(
-                self.format_offer_payload, session_id, offer_changed, device
+                self.format_offer_payload, session_id, offer_changed, device, stream_quality
             )
         )
         await XTEventLoopProtector.execute_out_of_event_loop_and_return(
@@ -755,7 +762,7 @@ class XTIOTWebRTCManager:
         return answer_sdp
 
     def format_offer_payload(
-        self, session_id: str, offer_sdp: str, device: XTDevice, channel: str = "high"
+        self, session_id: str, offer_sdp: str, device: XTDevice, requested_quality: XTWebRTCStreamQuality
     ) -> dict[str, Any] | None:
         if webrtc_config := self.get_config(device.id, session_id):
             return {
@@ -776,7 +783,7 @@ class XTIOTWebRTCManager:
                         "mode": "webrtc",
                         "sdp": f"{offer_sdp}",
                         "stream_type": self._get_stream_type(
-                            device.id, session_id, channel
+                            device.id, session_id, requested_quality
                         ),
                         "auth": f"{webrtc_config.get('auth', '!!!AUTH_NOT_FOUND!!!')}",
                     },

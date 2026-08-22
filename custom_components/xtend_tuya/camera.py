@@ -42,6 +42,7 @@ from .const import (
     XTMultiManagerPostSetupCallbackPriority,
     LOGGER,  # noqa: F401
     XTDeviceWatcherCategory,
+    XTWebRTCStreamQuality,
 )
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaCameraEntity,
@@ -53,11 +54,6 @@ from .entity import (
 from .multi_manager.shared.threading import (
     XTEventLoopProtector
 )
-
-
-class WebRTCStreamQuality(IntEnum):
-    HIGH_QUALITY = 0
-    LOW_QUALITY = 1
 
 
 # All descriptions can be found here:
@@ -118,7 +114,7 @@ async def async_setup_entry(
                         definition=xt_get_default_definition(device=device),
                         hass=hass,
                         webrtc_config=None,
-                        stream_quality=WebRTCStreamQuality.HIGH_QUALITY,
+                        stream_quality=XTWebRTCStreamQuality.HIGH_QUALITY,
                     )
                     await entity.get_webrtc_config()
                     if entity.webrtc_configuration is None:
@@ -139,7 +135,7 @@ async def async_setup_entry(
                                 definition=xt_get_default_definition(device=device),
                                 hass=hass,
                                 webrtc_config=entity.webrtc_configuration,
-                                stream_quality=WebRTCStreamQuality.LOW_QUALITY,
+                                stream_quality=XTWebRTCStreamQuality.LOW_QUALITY,
                                 raw_webrtc_config=entity.raw_webrtc_config
                             )
                         )
@@ -177,7 +173,7 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         definition: CameraDefinition,
         hass: HomeAssistant,
         webrtc_config: WebRTCClientConfiguration | None = None,
-        stream_quality: WebRTCStreamQuality = WebRTCStreamQuality.HIGH_QUALITY,
+        stream_quality: XTWebRTCStreamQuality = XTWebRTCStreamQuality.HIGH_QUALITY,
         raw_webrtc_config: dict[str, Any] | None = None
     ) -> None:
         """Init XT Camera."""
@@ -193,7 +189,7 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
             description=description,
             definition=definition,
         )
-        if stream_quality != WebRTCStreamQuality.HIGH_QUALITY:
+        if stream_quality != XTWebRTCStreamQuality.HIGH_QUALITY:
             self._attr_unique_id = f"tuya.{device.id}_low"
         else:
             self._attr_unique_id = f"tuya.{device.id}_high"
@@ -344,6 +340,7 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
             send_message,
             self.device,
             self._hass,
+            self.stream_quality,
         )
 
     @callback
@@ -363,7 +360,7 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         )
 
     def send_resolution_update(
-        self, session_id: str, device: XTDevice, quality: WebRTCStreamQuality, *_: Any
+        self, session_id: str, device: XTDevice, quality: XTWebRTCStreamQuality, *_: Any
     ) -> None:
         if self.iot_manager is None:
             return None

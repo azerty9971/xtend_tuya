@@ -68,7 +68,7 @@ SERVICE_WEBRTC_SDP_EXCHANGE_SCHEMA = vol.Schema(
         vol.Required(CONF_DEVICE_ID): cv.string,
         vol.Required(CONF_SESSION_ID): cv.string,
         vol.Optional(CONF_SOURCE): cv.string,
-        vol.Optional(CONF_CHANNEL): cv.string,
+        vol.Optional(CONF_CHANNEL): int,
     }
 )
 

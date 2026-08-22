@@ -152,6 +152,10 @@ class AllowedPlugins:
         return [MESSAGE_SOURCE_TUYA_SHARING, MESSAGE_SOURCE_TUYA_IOT]
 
 
+class XTWebRTCStreamQuality(IntEnum):
+    HIGH_QUALITY = 0
+    LOW_QUALITY = 1
+
 class XTGlobalEvents(StrEnum):
     LOCK_UNLOCKED = "LOCK_UNLOCKED"
 

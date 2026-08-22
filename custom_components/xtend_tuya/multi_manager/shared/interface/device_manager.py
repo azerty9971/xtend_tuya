@@ -22,6 +22,7 @@ from ....const import (
     XTIRRemoteInformation,
     XTIRRemoteKeysInformation,
     XTLockingMechanism,
+    XTWebRTCStreamQuality,
 )
 
 
@@ -104,7 +105,7 @@ class XTDeviceManagerInfraRedInterface(ABC):
 
 class XTDeviceManagerIPCameraInterface(ABC):
     def get_webrtc_sdp_answer(
-        self, device_id: str, session_id: str, sdp_offer: str, channel: str
+        self, device_id: str, session_id: str, sdp_offer: str, requested_quality: XTWebRTCStreamQuality
     ) -> str | None:
         return None
 
@@ -131,6 +132,7 @@ class XTDeviceManagerIPCameraInterface(ABC):
         send_message: WebRTCSendMessage,
         device: shared.XTDevice,
         hass: HomeAssistant,
+        stream_quality: XTWebRTCStreamQuality,
     ) -> None:
         return None
 
