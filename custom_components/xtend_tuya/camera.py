@@ -319,21 +319,21 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
                 cancel_on_shutdown=True,
             ),
         )
-        if self.has_multiple_streams:
-            self.wait_for_candidates = async_call_later(
-                self._hass,
-                5,
-                HassJob(
-                    functools.partial(
-                        self.send_resolution_update,
-                        session_id,
-                        self.device,
-                        self.stream_quality,
-                    ),
-                    job_type=HassJobType.Callback,
-                    cancel_on_shutdown=True,
-                ),
-            )
+        # if self.has_multiple_streams:
+        #     self.wait_for_candidates = async_call_later(
+        #         self._hass,
+        #         5,
+        #         HassJob(
+        #             functools.partial(
+        #                 self.send_resolution_update,
+        #                 session_id,
+        #                 self.device,
+        #                 self.stream_quality,
+        #             ),
+        #             job_type=HassJobType.Callback,
+        #             cancel_on_shutdown=True,
+        #         ),
+        #     )
         return await self.iot_manager.async_handle_async_webrtc_offer(
             offer_sdp,
             session_id,
