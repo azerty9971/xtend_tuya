@@ -30,12 +30,15 @@ ENDLINE = "\r\n"
 
 
 class XTIOTWebRTCConfig(dict):
-    def __init__(self, *args, ttl: int = 300, **kwargs):
+    def __init__(self, webrtc_manager: XTIOTWebRTCManager, *args, ttl: int = 300, **kwargs):
         super(XTIOTWebRTCConfig, self).__init__(*args, **kwargs)
         self.valid_until = datetime.now() + timedelta(seconds=ttl)
+        self.webrtc_manager = webrtc_manager
 
     def get_protocol_version(self) -> str:
-        return self.get("protocol_version", "2.2")
+        result = self.get("protocol_version", "2.2")
+        self.webrtc_manager.report_message(f"Using protocol {result}")
+        return result
 
     def is_webrtc_config_valid(self) -> bool:
         current_time = datetime.now()
@@ -235,7 +238,7 @@ class XTIOTWebRTCManager:
             print_stack=True,
         )
         if webrtc_config.get("success", False):
-            result = XTIOTWebRTCConfig(webrtc_config.get("result", {}))
+            result = XTIOTWebRTCConfig(self, webrtc_config.get("result", {}))
             if session_id is not None:
                 self.set_config(session_id, result)
             self.set_config(device_id, result)
