@@ -34,6 +34,9 @@ class XTIOTWebRTCConfig(dict):
         super(XTIOTWebRTCConfig, self).__init__(*args, **kwargs)
         self.valid_until = datetime.now() + timedelta(seconds=ttl)
 
+    def get_protocol_version(self) -> str:
+        return self.get("protocol_version", "2.2")
+
     def is_webrtc_config_valid(self) -> bool:
         current_time = datetime.now()
         if self.valid_until < current_time:
@@ -394,7 +397,7 @@ class XTIOTWebRTCManager:
                     topic = topic.replace("moto_id", moto_id)
                     payload = {
                         "protocol": 302,
-                        "pv": "2.2",
+                        "pv": webrtc_config.get_protocol_version(),
                         "t": int(time.time()),
                         "data": {
                             "header": {
@@ -421,7 +424,7 @@ class XTIOTWebRTCManager:
                         for candidate in offer_candidates:
                             payload = {
                                 "protocol": 302,
-                                "pv": "2.2",
+                                "pv": webrtc_config.get_protocol_version(),
                                 "t": int(time.time()),
                                 "data": {
                                     "header": {
@@ -447,7 +450,7 @@ class XTIOTWebRTCManager:
                     if offer_candidates:
                         payload = {
                             "protocol": 302,
-                            "pv": "2.2",
+                            "pv": webrtc_config.get_protocol_version(),
                             "t": int(time.time()),
                             "data": {
                                 "header": {
@@ -484,7 +487,7 @@ class XTIOTWebRTCManager:
             moto_id = webrtc_config.get("moto_id")
             payload = {
                 "protocol": 302,
-                "pv": "2.2",
+                "pv": webrtc_config.get_protocol_version(),
                 "t": int(time.time()),
                 "data": {
                     "header": {
@@ -514,7 +517,7 @@ class XTIOTWebRTCManager:
             moto_id = webrtc_config.get("moto_id")
             payload = {
                 "protocol": 302,
-                "pv": "2.2",
+                "pv": webrtc_config.get_protocol_version(),
                 "t": int(time.time()),
                 "data": {
                     "header": {
@@ -767,7 +770,7 @@ class XTIOTWebRTCManager:
         if webrtc_config := self.get_config(device.id, session_id):
             return {
                 "protocol": 302,
-                "pv": "2.2",
+                "pv": webrtc_config.get_protocol_version(),
                 "t": int(time.time()),
                 "data": {
                     "header": {
@@ -798,7 +801,7 @@ class XTIOTWebRTCManager:
             moto_id = webrtc_config.get("moto_id", "!!!MOTO_ID_NOT_FOUND!!!")
             return {
                 "protocol": 302,
-                "pv": "2.2",
+                "pv": webrtc_config.get_protocol_version(),
                 "t": int(time.time()),
                 "data": {
                     "header": {
@@ -823,7 +826,7 @@ class XTIOTWebRTCManager:
             moto_id = webrtc_config.get("moto_id", "!!!MOTO_ID_NOT_FOUND!!!")
             return {
                 "protocol": 312,
-                "pv": "2.2",
+                "pv": webrtc_config.get_protocol_version(),
                 "t": int(time.time()),
                 "data": {
                     "header": {
@@ -847,7 +850,7 @@ class XTIOTWebRTCManager:
             moto_id = webrtc_config.get("moto_id", "!!!MOTO_ID_NOT_FOUND!!!")
             return {
                 "protocol": 302,
-                "pv": "2.2",
+                "pv": webrtc_config.get_protocol_version(),
                 "t": int(time.time()),
                 "data": {
                     "header": {
