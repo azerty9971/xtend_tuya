@@ -351,7 +351,8 @@ class XTIOTWebRTCManager:
         #             return any_stream_type
         # self.report_message(f"Chosen stream_type (END): {any_stream_type}")
         # return any_stream_type
-        return requested_quality
+        self.report_message(f"Chosen stream_type: {int(requested_quality)}")
+        return int(requested_quality)
 
     def get_sdp_answer(
         self,
