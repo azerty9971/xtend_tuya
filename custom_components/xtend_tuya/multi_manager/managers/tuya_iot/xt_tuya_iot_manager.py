@@ -92,7 +92,7 @@ class XTIOTDeviceManager(TuyaDeviceManager):
             self.device_manage = XTIndustrySolutionDeviceManage(api)
         self.device_map = XTDeviceMap({}, XTDeviceSourcePriority.TUYA_IOT)  # type: ignore
         self.multi_manager = multi_manager
-        self.ipc_manager = XTIOTIPCManager(api, multi_manager)
+        self.ipc_manager = XTIOTIPCManager(api, non_user_api, multi_manager)
         self.non_user_api = non_user_api
         self.api = api
         self.mq = mq
