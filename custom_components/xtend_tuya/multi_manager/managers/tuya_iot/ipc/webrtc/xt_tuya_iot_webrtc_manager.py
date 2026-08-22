@@ -180,16 +180,21 @@ class XTIOTWebRTCManager:
             self.get_config, device_id, session_id
         )
 
-    def get_config(self, device_id: str, session_id: str | None) -> XTIOTWebRTCConfig | None:
+    def get_config(
+        self, device_id: str, session_id: str | None
+    ) -> XTIOTWebRTCConfig | None:
         if current_exchange := self.get_webrtc_session(session_id):
             if (
                 current_exchange.webrtc_config is not None
                 and current_exchange.webrtc_config.is_webrtc_config_valid()
             ):
                 return current_exchange.webrtc_config
-        elif session_id is not None:
+        if session_id is not None:
             if current_exchange := self.get_webrtc_session(device_id):
-                if current_exchange.webrtc_config is not None:
+                if (
+                    current_exchange.webrtc_config is not None
+                    and current_exchange.webrtc_config.is_webrtc_config_valid()
+                ):
                     self.set_config(session_id, current_exchange.webrtc_config)
                     return current_exchange.webrtc_config
         return self._get_config_from_cloud(device_id, session_id)
