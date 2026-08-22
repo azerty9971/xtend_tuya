@@ -213,22 +213,7 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         device_manager.set_general_property(
             XTMultiManagerProperties.CAMERA_DEVICE_ID, device.id
         )
-        if self.raw_webrtc_config:
-            if audio_attribute := cast(
-                dict | None, self.raw_webrtc_config.get("audio_attributes")
-            ):
-                if call_mode := cast(list | None, audio_attribute.get("call_mode")):
-                    if 2 in call_mode:
-                        # Device supports 2 way audio
-                        self.supports_2way_audio = True
-            if not self.raw_webrtc_config.get("supports_webrtc", False):
-                # Disable WebRTC in case we don't support it
-                self.disable_webrtc()
-            if skill_str := self.raw_webrtc_config.get("skill"):
-                skill_dict: dict[str, Any] = json.loads(skill_str)
-                video_list: list[dict[str, Any]] = skill_dict.get("videos", [])
-                if len(video_list) > 1:
-                    self.has_multiple_streams = True
+        self.read_raw_webrtc_config()
 
     @staticmethod
     def should_entity_be_added(
@@ -257,6 +242,24 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         if device.category in merged_categories:
             return True
         return False
+
+    def read_raw_webrtc_config(self):
+        if self.raw_webrtc_config:
+            if audio_attribute := cast(
+                dict | None, self.raw_webrtc_config.get("audio_attributes")
+            ):
+                if call_mode := cast(list | None, audio_attribute.get("call_mode")):
+                    if 2 in call_mode:
+                        # Device supports 2 way audio
+                        self.supports_2way_audio = True
+            if not self.raw_webrtc_config.get("supports_webrtc", False):
+                # Disable WebRTC in case we don't support it
+                self.disable_webrtc()
+            if skill_str := self.raw_webrtc_config.get("skill"):
+                skill_dict: dict[str, Any] = json.loads(skill_str)
+                video_list: list[dict[str, Any]] = skill_dict.get("videos", [])
+                if len(video_list) > 1:
+                    self.has_multiple_streams = True
 
     def disable_webrtc(self):
         self._supports_native_sync_webrtc = False
@@ -300,6 +303,7 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
                         RTCIceServer(urls=url, username=username, credential=credential)
                     )
             self.webrtc_configuration.configuration.ice_servers = ice_list
+        self.read_raw_webrtc_config()
 
     async def async_handle_async_webrtc_offer(
         self, offer_sdp: str, session_id: str, send_message: WebRTCSendMessage
