@@ -370,7 +370,7 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         if self.iot_manager is None:
             return await super().async_on_webrtc_candidate(session_id, candidate)
         return await XTEventLoopProtector.execute_out_of_event_loop_and_return(self.iot_manager.async_on_webrtc_candidate, 
-            session_id, candidate, self.device
+            session_id, candidate, self.device, report_non_sense=False
         )
 
     @callback
