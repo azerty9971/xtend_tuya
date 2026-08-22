@@ -147,7 +147,7 @@ class XTDeviceManagerIPCameraInterface(ABC):
         return None
 
     def set_webrtc_resolution(
-        self, session_id: str, resolution: int, device: shared.XTDevice
+        self, session_id: str, resolution: XTWebRTCStreamQuality, device: shared.XTDevice
     ) -> None:
         return None
 

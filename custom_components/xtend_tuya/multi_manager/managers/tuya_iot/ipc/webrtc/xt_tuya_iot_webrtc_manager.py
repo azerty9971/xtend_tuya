@@ -153,7 +153,7 @@ class XTIOTWebRTCManager:
             )
 
     def set_resolution(
-        self, session_id: str, resolution: int, device: XTDevice
+        self, session_id: str, resolution: XTWebRTCStreamQuality, device: XTDevice
     ) -> None:
         resolution_payload = self.format_resolution(session_id, resolution, device)
         self.send_to_ipc_mqtt(session_id, device, json.dumps(resolution_payload))
@@ -816,7 +816,7 @@ class XTIOTWebRTCManager:
         return None
 
     def format_resolution(
-        self, session_id: str, resolution: int, device: XTDevice
+        self, session_id: str, resolution: XTWebRTCStreamQuality, device: XTDevice
     ) -> dict[str, Any] | None:
         # resolution 0 if HD, 1 is SD
         if webrtc_config := self.get_config(device.id, session_id):
@@ -835,7 +835,7 @@ class XTIOTWebRTCManager:
                         "moto_id": f"{moto_id}",
                         "tid": "",
                     },
-                    "msg": {"mode": "webrtc", "cmdValue": resolution},
+                    "msg": {"mode": "webrtc", "cmdValue": self._get_stream_type(device.id, session_id, resolution)},
                 },
             }
         return None
