@@ -835,7 +835,7 @@ class XTIOTWebRTCManager:
                         "moto_id": f"{moto_id}",
                         "tid": "",
                     },
-                    "msg": {"mode": "webrtc", "cmdValue": int(resolution)},
+                    "msg": json.dumps({"mode": "webrtc", "cmdValue": int(resolution)}),
                 },
             }
         return None
