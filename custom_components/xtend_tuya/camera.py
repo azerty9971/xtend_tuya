@@ -56,8 +56,8 @@ from .multi_manager.shared.threading import (
 
 
 class WebRTCStreamQuality(IntEnum):
-    HIGH_QUALITY = 0
-    LOW_QUALITY = 1
+    HIGH_QUALITY = 2
+    LOW_QUALITY = 4
 
 
 # All descriptions can be found here:
