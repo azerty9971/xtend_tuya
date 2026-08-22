@@ -562,6 +562,7 @@ class XTIOTWebRTCManager:
                 self.format_offer_payload, session_id, offer_changed, device, stream_quality
             )
         )
+        self.report_message(f"Sending offer payload: {sdp_offer_payload}")
         await XTEventLoopProtector.execute_out_of_event_loop_and_return(
             self.send_to_ipc_mqtt,
             session_id,
