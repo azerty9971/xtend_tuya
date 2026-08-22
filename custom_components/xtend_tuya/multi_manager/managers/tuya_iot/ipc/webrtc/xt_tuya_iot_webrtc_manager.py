@@ -163,8 +163,7 @@ class XTIOTWebRTCManager:
         # Format ICE Servers so that they can be used by GO2RTC
         p2p_config: dict = config.get("p2p_config", {})
         if ices := p2p_config.get("ices"):
-            p2p_config["ices"] = json.dumps(ices)
-            # .replace(": ", ":").replace(", ", ",")
+            p2p_config["ices"] = json.dumps(ices).replace(": ", ":").replace(", ", ",")
         self.sdp_exchange[session_id].webrtc_config = config
 
     def set_sdp_offer(self, session_id: str, offer: str) -> None:
