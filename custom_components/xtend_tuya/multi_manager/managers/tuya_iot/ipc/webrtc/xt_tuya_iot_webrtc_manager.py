@@ -36,9 +36,7 @@ class XTIOTWebRTCConfig(dict):
         self.webrtc_manager = webrtc_manager
 
     def get_protocol_version(self) -> str:
-        result = self.get("protocol_version", "2.2")
-        self.webrtc_manager.report_message(f"Using protocol {result}")
-        return result
+        return self.get("protocol_version", "2.2")
 
     def is_webrtc_config_valid(self) -> bool:
         current_time = datetime.now()
