@@ -4,7 +4,6 @@ from __future__ import annotations
 import json
 import functools
 from typing import Any, cast
-from enum import IntEnum
 from webrtc_models import (
     RTCIceCandidateInit,
     RTCIceServer,

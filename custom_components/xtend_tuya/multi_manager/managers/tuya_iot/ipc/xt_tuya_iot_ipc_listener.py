@@ -1,6 +1,5 @@
 from __future__ import annotations
 import custom_components.xtend_tuya.multi_manager.managers.tuya_iot.ipc.xt_tuya_iot_ipc_manager as ipc_man
-from .....const import LOGGER
 
 
 class XTIOTIPCListener:
@@ -8,7 +7,6 @@ class XTIOTIPCListener:
         self.ipc_manager = ipc_manager
 
     def handle_message(self, msg: dict):
-        LOGGER.warning(f"\r\nWEBRTC FROM_TUYA: {msg=}")
         protocol = msg.get("protocol")
         if not protocol:
             return

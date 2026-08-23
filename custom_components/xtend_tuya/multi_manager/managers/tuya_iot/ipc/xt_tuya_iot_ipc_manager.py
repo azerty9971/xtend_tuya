@@ -5,7 +5,6 @@ from ....multi_manager import (
 from ..xt_tuya_iot_openapi import (
     XTIOTOpenAPI,
 )
-from .....const import LOGGER
 import custom_components.xtend_tuya.multi_manager.managers.tuya_iot.ipc.xt_tuya_iot_ipc_listener as ipc
 from .xt_tuya_iot_ipc_mq import (
     XTIOTOpenMQIPC,
@@ -30,7 +29,6 @@ class XTIOTIPCManager:  # noqa: F811
         return self.mq.mq_config.username.split("cloud_")[1]
 
     def publish_to_ipc_mqtt(self, topic: str, msg: str):
-        LOGGER.warning(f"\r\nWEBRTC TO_TUYA: {msg=}")
         if self.mq.client is not None:
             publish_result = self.mq.client.publish(topic=topic, payload=msg)
             publish_result.wait_for_publish(10)
