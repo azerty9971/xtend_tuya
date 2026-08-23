@@ -153,8 +153,8 @@ class AllowedPlugins:
 
 
 class XTWebRTCStreamQuality(IntEnum):
-    HIGH_QUALITY = 0
-    LOW_QUALITY = 1
+    HIGH_QUALITY = 2
+    LOW_QUALITY = 4
 
 class XTGlobalEvents(StrEnum):
     LOCK_UNLOCKED = "LOCK_UNLOCKED"
