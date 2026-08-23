@@ -161,6 +161,7 @@ class XTIOTWebRTCManager:
     def set_resolution(
         self, session_id: str, resolution: XTWebRTCStreamQuality, device: XTDevice
     ) -> None:
+        self.report_message(f"{self.sdp_exchange[session_id]}")
         resolution_payload = self.format_resolution(session_id, resolution, device)
         self.send_to_ipc_mqtt(session_id, device, json.dumps(resolution_payload))
 
