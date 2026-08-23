@@ -436,21 +436,21 @@ class TuyaOpenAPI:
         if first_pass is False:
             self.report_message(
                 "debug",
-                f"[IOT API][{time_taken}]SECOND PASS Request: {method} {path} PARAMS: {json.dumps(params, ensure_ascii=False, indent=2) if params is not None else ''} BODY: {json.dumps(body, ensure_ascii=False, indent=2) if body is not None else ''}, first_pass={first_pass}, access_token={access_token}",
+                f"[IOT API][{time_taken}][USER:{self.non_user_specific_api is False}]SECOND PASS Request: {method} {path} PARAMS: {json.dumps(params, ensure_ascii=False, indent=2) if params is not None else ''} BODY: {json.dumps(body, ensure_ascii=False, indent=2) if body is not None else ''}, first_pass={first_pass}, access_token={access_token}",
             )
             self.report_message(
                 "debug",
-                f"[IOT API][{time_taken}]SECOND PASS Response: {json.dumps(result, ensure_ascii=False, indent=2)}",
+                f"[IOT API][{time_taken}][USER:{self.non_user_specific_api is False}]SECOND PASS Response: {json.dumps(result, ensure_ascii=False, indent=2)}",
                 stack_info=True,
             )
         else:
             self.report_message(
                 "debug",
-                f"[IOT API][{time_taken}]Request: {method} {path} PARAMS: {json.dumps(params, ensure_ascii=False, indent=2) if params is not None else ''} BODY: {json.dumps(body, ensure_ascii=False, indent=2) if body is not None else ''}",
+                f"[IOT API][{time_taken}][USER:{self.non_user_specific_api is False}]Request: {method} {path} PARAMS: {json.dumps(params, ensure_ascii=False, indent=2) if params is not None else ''} BODY: {json.dumps(body, ensure_ascii=False, indent=2) if body is not None else ''}",
             )
             self.report_message(
                 "debug",
-                f"[IOT API][{time_taken}]Response: {json.dumps(result, ensure_ascii=False, indent=2)}",
+                f"[IOT API][{time_taken}][USER:{self.non_user_specific_api is False}]Response: {json.dumps(result, ensure_ascii=False, indent=2)}",
             )
             pass
 

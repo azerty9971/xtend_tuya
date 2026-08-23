@@ -64,7 +64,7 @@ class XTEventLoopProtector:
 
     @staticmethod
     @callback
-    async def execute_out_of_event_loop_and_return(callback, *args, **kwargs) -> Any:
+    async def execute_out_of_event_loop_and_return(callback, *args, report_non_sense: bool = True, **kwargs) -> Any:
         is_coroutine: bool = inspect.iscoroutinefunction(callback)
         if XTEventLoopProtector.hass is None:
             if is_coroutine:
@@ -81,10 +81,11 @@ class XTEventLoopProtector:
         else:
             # In the event loop
             if is_coroutine:
-                LOGGER.debug(
-                    "Non-sensical call to execute_out_of_event_loop_and_return",
-                    stack_info=True,
-                )
+                if report_non_sense:
+                    LOGGER.debug(
+                        "Non-sensical call to execute_out_of_event_loop_and_return",
+                        stack_info=True,
+                    )
                 return await callback(*args, **kwargs)
             else:
                 return await XTEventLoopProtector.hass.async_add_executor_job(
