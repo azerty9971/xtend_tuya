@@ -92,7 +92,7 @@ class MultiDeviceListener:
                 LOGGER.exception(e)
                 errors.append(e)
         if errors:
-            raise ExceptionGroup("add_device_by_id signal dispatch failed", errors)
+            raise Exception("add_device_by_id signal dispatch failed", errors)
 
     def remove_device(self, device_id: str):
         device_registry = dr.async_get(self.hass)
