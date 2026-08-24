@@ -232,6 +232,8 @@ class TuyaDeviceManager:
             del self.device_map[device_id]
             for listener in self.device_listeners:
                 listener.remove_device(device.id)
+        else:
+            logger.warning(f"Received biz_code = {biz_code} for device {device.name}: {data=}")
 
     ##############################
     # Memory Cache
