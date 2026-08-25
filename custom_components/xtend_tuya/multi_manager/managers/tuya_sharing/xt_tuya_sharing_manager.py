@@ -260,7 +260,7 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
             f"[{MESSAGE_SOURCE_TUYA_SHARING}]On device report: {status=}",
             XTDeviceWatcherCategory.MQTT,
         )
-        device = self.device_map.get(device_id, None)
+        device = self.device_map.get(device_id, None) or self.multi_manager.device_map.get(device_id, None)
         if not device:
             return
         status_new = self.multi_manager.convert_device_report_status_list(
@@ -278,10 +278,9 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
         self._on_device_report_tuya_sharing(device_id, status_new)
     
     def _on_device_report_tuya_sharing(self, device_id: str, status: list[dict[str, Any]]):
-        device = self.device_map.get(device_id, None)
+        device = self.device_map.get(device_id, None) or self.multi_manager.device_map.get(device_id, None)
         if not device:
             return
-        #LOGGER.debug(f"mq _on_device_report-> {status}")
         updated_status_properties = []
         dp_timestamps = {}
         value = None
@@ -290,7 +289,7 @@ class XTSharingDeviceManager(Manager):  # noqa: F811
                 # [{'dpId': 1, 't': 1752456620499, 'value': 120}]
                 if "dpId" in item and "value" in item:
                     if item["dpId"] not in device.local_strategy:
-                        LOGGER.debug(f"mq _on_device_report unknown dpId: {item['dpId']}")
+                        LOGGER.warning(f"mq _on_device_report unknown dpId: {item['dpId']} for {device.id}, local_strategy keys: {list(device.local_strategy.keys())}")
                         continue
                     #CHANGED
                     # dp_id_item = device.local_strategy[item["dpId"]]
