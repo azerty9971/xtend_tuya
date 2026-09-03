@@ -499,11 +499,11 @@ class XTEntity(TuyaEntity):
     def mark_overriden_entities_as_disabled(hass: HomeAssistant, device: sc.XTDevice):
         device_registry = dr.async_get(hass)
         entity_registry = er.async_get(hass)
-        hass_device = device_registry.async_get_device(
+        hass_devices = device_registry.async_get_devices(
             identifiers={(DOMAIN, device.id), (DOMAIN_ORIG, device.id)}
         )
         entity_platforms = async_get_platforms(hass, DOMAIN_ORIG)
-        if hass_device:
+        for hass_device in hass_devices:
             hass_entities = er.async_entries_for_device(
                 entity_registry,
                 device_id=hass_device.id,
@@ -525,11 +525,11 @@ class XTEntity(TuyaEntity):
     ):
         device_registry = dr.async_get(hass)
         entity_registry = er.async_get(hass)
-        hass_device = device_registry.async_get_device(
+        hass_devices = device_registry.async_get_devices(
             identifiers={(DOMAIN, device.id), (DOMAIN_ORIG, device.id)}
         )
         entity_platforms = async_get_platforms(hass, DOMAIN_ORIG)
-        if hass_device:
+        for hass_device in hass_devices:
             # Pre-compute unique_ids already claimed by xtend_tuya for this device.
             # When xtend_tuya has a registry entry sharing a unique_id with an
             # official-tuya entity, do NOT mark that dpcode as handled — xtend_tuya

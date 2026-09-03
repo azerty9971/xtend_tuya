@@ -161,7 +161,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
             device.id
         )
         identifiers: set[tuple[str, str]] = set()
-        if device_registry.async_get_device({(DOMAIN_ORIG, device.id)}) is not None:
+        if device_registry.async_get_devices(identifiers={(DOMAIN_ORIG, device.id)}):
             identifiers.add((DOMAIN_ORIG, device.id))
 
         for domain_identifier in domain_identifiers:
@@ -274,7 +274,10 @@ async def cleanup_duplicated_devices(
     device_registry = dr.async_get(hass)
     entity_registry = er.async_get(hass)
     duplicate_check_table: dict[str, list] = {}
+    for device_entry in device_registry.devices:
+        LOGGER.warning(f"cleanup_duplicated_devices 1: {device_entry.id} => {device_entry}")
     for hass_dev_id, device_entry in list(device_registry.devices.items()):
+        LOGGER.warning(f"cleanup_duplicated_devices 2: {hass_dev_id} => {device_entry}")
         for item in device_entry.identifiers:
             if len(item) > 1:
                 domain = item[0]

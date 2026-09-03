@@ -62,17 +62,17 @@ class MultiDeviceListener:
         if not device.name:
             return
         device_registry = dr.async_get(self.hass)
-        device_entry = device_registry.async_get_device(
+        for device_entry in device_registry.async_get_devices(
             identifiers={(DOMAIN_ORIG, device.id), (DOMAIN, device.id)}
-        )
-        if device_entry is not None and device_entry.name != device.name:
-            self.hass.add_job(
-                partial(
-                    device_registry.async_update_device,
-                    device_entry.id,
-                    name=device.name,
+        ):
+            if device_entry.name != device.name:
+                self.hass.add_job(
+                    partial(
+                        device_registry.async_update_device,
+                        device_entry.id,
+                        name=device.name,
+                    )
                 )
-            )
 
     def add_device(self, device: sh.XTDevice):
         self.add_device_by_id(device.id)
