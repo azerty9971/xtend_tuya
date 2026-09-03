@@ -275,7 +275,7 @@ def delete_all_device_entities(
     entity_registry = er.async_get(hass)
     hass_devices: list[DeviceEntry] = []
     for device_id in device_ids:
-        if hass_device := device_registry.async_get_device(
+        for hass_device in device_registry.async_get_devices(
             identifiers={(DOMAIN, device_id), (DOMAIN_ORIG, device_id)}
         ):
             hass_devices.append(hass_device)

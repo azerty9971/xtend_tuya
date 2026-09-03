@@ -499,11 +499,11 @@ class XTEntity(TuyaEntity):
     def mark_overriden_entities_as_disabled(hass: HomeAssistant, device: sc.XTDevice):
         device_registry = dr.async_get(hass)
         entity_registry = er.async_get(hass)
-        hass_device = device_registry.async_get_device(
+        hass_devices = device_registry.async_get_devices(
             identifiers={(DOMAIN, device.id), (DOMAIN_ORIG, device.id)}
         )
         entity_platforms = async_get_platforms(hass, DOMAIN_ORIG)
-        if hass_device:
+        for hass_device in hass_devices:
             hass_entities = er.async_entries_for_device(
                 entity_registry,
                 device_id=hass_device.id,
@@ -525,11 +525,24 @@ class XTEntity(TuyaEntity):
     ):
         device_registry = dr.async_get(hass)
         entity_registry = er.async_get(hass)
-        hass_device = device_registry.async_get_device(
+        hass_devices = device_registry.async_get_devices(
             identifiers={(DOMAIN, device.id), (DOMAIN_ORIG, device.id)}
         )
         entity_platforms = async_get_platforms(hass, DOMAIN_ORIG)
-        if hass_device:
+        for hass_device in hass_devices:
+            # Pre-compute unique_ids already claimed by xtend_tuya for this device.
+            # When xtend_tuya has a registry entry sharing a unique_id with an
+            # official-tuya entity, do NOT mark that dpcode as handled — xtend_tuya
+            # must create its own live entity to back the existing registry entry.
+            xt_unique_ids = {
+                e.unique_id
+                for e in er.async_entries_for_device(
+                    entity_registry,
+                    device_id=hass_device.id,
+                    include_disabled_entities=True,
+                )
+                if e.platform == DOMAIN
+            }
             hass_entities = er.async_entries_for_device(
                 entity_registry,
                 device_id=hass_device.id,
@@ -549,9 +562,11 @@ class XTEntity(TuyaEntity):
                             dpcode = XTEntity._get_description_dpcode(
                                 entity_description
                             )
-                            XTEntity.register_handled_dpcode(
-                                device, entity_instance_platform, dpcode
-                            )
+                            orig_uid = getattr(entity_instance, "_attr_unique_id", None)
+                            if orig_uid is None or orig_uid not in xt_unique_ids:
+                                XTEntity.register_handled_dpcode(
+                                    device, entity_instance_platform, dpcode
+                                )
 
     @staticmethod
     def register_handled_dpcode(device: sc.XTDevice, platform: Platform, dpcode: str):
