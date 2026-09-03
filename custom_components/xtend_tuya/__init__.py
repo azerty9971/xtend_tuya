@@ -320,18 +320,22 @@ async def cleanup_device_registry(
     while not are_all_domain_config_loaded(hass, DOMAIN, current_entry):
         await asyncio.sleep(0.1)
     device_registry = dr.async_get(hass)
+    remove_queue: list[str] = []
     for device_entry in device_registry.devices:
         for item in device_entry.identifiers:
             if not is_device_in_domain_device_maps(
                 hass, [DOMAIN_ORIG, DOMAIN], item, None, True
             ):
-                try:
-                    device_registry.async_remove_device(device_entry.id)
-                except Exception as e:
-                    LOGGER.warning(
-                        f"Failed to remove device {device_entry.id} from registry: {e}"
-                    )
+                if device_entry.id not in remove_queue:
+                    remove_queue.append(device_entry.id)
                 break
+    for device_id in remove_queue:
+        try:
+            device_registry.async_remove_device(device_id)
+        except Exception as e:
+            LOGGER.warning(
+                f"Failed to remove device {device_id} from registry: {e}"
+            )
 
 
 def are_all_domain_config_loaded(
