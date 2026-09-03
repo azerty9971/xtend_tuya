@@ -275,9 +275,6 @@ async def cleanup_duplicated_devices(
     entity_registry = er.async_get(hass)
     duplicate_check_table: dict[str, list] = {}
     for device_entry in device_registry.devices:
-        LOGGER.warning(f"cleanup_duplicated_devices 1: {device_entry.id} => {device_entry}")
-    for hass_dev_id, device_entry in list(device_registry.devices.items()):
-        LOGGER.warning(f"cleanup_duplicated_devices 2: {hass_dev_id} => {device_entry}")
         for item in device_entry.identifiers:
             if len(item) > 1:
                 domain = item[0]
@@ -285,8 +282,8 @@ async def cleanup_duplicated_devices(
                 if domain in [DOMAIN, DOMAIN_ORIG]:
                     if device_id not in duplicate_check_table:
                         duplicate_check_table[device_id] = []
-                    if hass_dev_id not in duplicate_check_table[device_id]:
-                        duplicate_check_table[device_id].append(hass_dev_id)
+                    if device_entry.id not in duplicate_check_table[device_id]:
+                        duplicate_check_table[device_id].append(device_entry.id)
                     break
     for device_id in duplicate_check_table:
         remaining_devices = len(duplicate_check_table[device_id])
@@ -323,16 +320,16 @@ async def cleanup_device_registry(
     while not are_all_domain_config_loaded(hass, DOMAIN, current_entry):
         await asyncio.sleep(0.1)
     device_registry = dr.async_get(hass)
-    for dev_id, device_entry in list(device_registry.devices.items()):
+    for device_entry in device_registry.devices:
         for item in device_entry.identifiers:
             if not is_device_in_domain_device_maps(
                 hass, [DOMAIN_ORIG, DOMAIN], item, None, True
             ):
                 try:
-                    device_registry.async_remove_device(dev_id)
+                    device_registry.async_remove_device(device_entry.id)
                 except Exception as e:
                     LOGGER.warning(
-                        f"Failed to remove device {dev_id} from registry: {e}"
+                        f"Failed to remove device {device_entry.id} from registry: {e}"
                     )
                 break
 
