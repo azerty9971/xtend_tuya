@@ -70,6 +70,7 @@ from ....const import (
     XTDeviceWatcherCategory,
     XTDeviceWatcherSpecialDevice,
     XTWebRTCStreamQuality,
+    XTMultiManagerPostSetupCallbackPriority,
 )
 
 
@@ -159,6 +160,7 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
             auth_type=auth_type,
             non_user_specific_api=False,
         )
+        self.multi_manager.add_post_setup_callback(XTMultiManagerPostSetupCallbackPriority.PRIORITY999, api.print_request_log)
         api.set_dev_channel("hass")
         try:
             connect_non_user_api = (

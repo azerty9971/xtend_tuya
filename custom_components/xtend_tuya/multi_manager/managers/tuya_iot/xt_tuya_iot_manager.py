@@ -424,8 +424,8 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         device_properties.status = {}
         device_properties.local_strategy = {}
         device_properties.device_source_priority = XTDeviceSourcePriority.TUYA_IOT
-        response = self.api.get(f"/v2.0/cloud/thing/{device.id}/shadow/properties")
-        response2 = self.api.get(f"/v2.0/cloud/thing/{device.id}/model")
+        response = self.api.get(f"/v2.0/cloud/thing/{device.id}/shadow/properties", allow_caching=False)
+        response2 = self.api.get(f"/v2.0/cloud/thing/{device.id}/model", allow_caching=True)
         if not response.get("success") or not response2.get("success"):
             LOGGER.warning(f"Response1: {response}: {device.id=}")
             LOGGER.warning(f"Response2: {response2}: {device.id=}")

@@ -149,7 +149,7 @@ async def async_setup_entry(
         if restrict_dpcode is not None:
             return None
         hass_data.manager.add_post_setup_callback(
-            XTMultiManagerPostSetupCallbackPriority.PRIORITY_LAST,
+            XTMultiManagerPostSetupCallbackPriority.PRIORITY900,
             add_camera_devices,
             device_map,
         )

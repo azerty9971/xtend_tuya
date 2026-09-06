@@ -222,7 +222,8 @@ class XTMultiManagerPostSetupCallbackPriority(IntEnum):
     PRIORITY1 = 1
     PRIORITY2 = 2
     PRIORITY3 = 3
-    PRIORITY_LAST = 999
+    PRIORITY900 = 900
+    PRIORITY999 = 999
 
 
 # Defines the priority of the sources for the merging process

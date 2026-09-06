@@ -377,7 +377,7 @@ async def async_setup_entry(
         async_add_entities(entities)
         if restrict_dpcode is None:
             hass_data.manager.add_post_setup_callback(
-                XTMultiManagerPostSetupCallbackPriority.PRIORITY_LAST,
+                XTMultiManagerPostSetupCallbackPriority.PRIORITY900,
                 async_add_generic_entities,
                 device_map,
             )
