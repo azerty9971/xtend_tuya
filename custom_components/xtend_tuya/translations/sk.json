@@ -1,1107 +1,3283 @@
 {
-    "config": {
-        "abort": {
-            "reauth_successful": "Op\u00e4tovn\u00e9 overenie bolo \u00faspe\u0161n\u00e9"
-        },
-        "error": {
-            "invalid_auth": "Neplatn\u00e9 overenie",
-            "login_error": "Chyba pri prihlasovan\u00ed ({code}): {msg}"
-        },
-        "step": {
-            "reauth_user_code": {
-                "data": {
-                    "user_code": "Pou\u017e\u00edvate\u013esk\u00fd k\u00f3d"
-                },
-                "description": "Integr\u00e1cia Tuya teraz pou\u017e\u00edva vylep\u0161en\u00fd sp\u00f4sob prihl\u00e1senia. Ak sa chcete op\u00e4tovne prihl\u00e1si\u0165 pomocou svojho \u00fa\u010dtu Smart Life alebo Tuya Smart, mus\u00edte zada\u0165 svoj pou\u017e\u00edvate\u013esk\u00fd k\u00f3d. \n\nTento k\u00f3d n\u00e1jdete v aplik\u00e1cii Smart Life alebo Tuya Smart na obrazovke **Nastavenia** > **Konto a zabezpe\u010denie** a zadajte k\u00f3d zobrazen\u00fd v poli **Pou\u017e\u00edvate\u013esk\u00fd k\u00f3d**. Pri pou\u017e\u00edvate\u013eskom k\u00f3de sa rozli\u0161uj\u00fa mal\u00e9 a ve\u013ek\u00e9 p\u00edsmen\u00e1, nezabudnite ho zada\u0165 presne tak, ako je zobrazen\u00fd v aplik\u00e1cii."
-            },
-            "scan": {
-                "description": "Pomocou aplik\u00e1cie Smart Life alebo aplik\u00e1cie Tuya Smart naskenujte nasleduj\u00faci k\u00f3d QR a dokon\u010dite prihl\u00e1senie. Po dokon\u010den\u00ed tohto kroku v aplik\u00e1cii pokra\u010dujte na \u010fal\u0161\u00ed krok."
-            },
-            "user": {
-                "data": {
-                    "user_code": "Pou\u017e\u00edvate\u013esk\u00fd k\u00f3d"
-                },
-                "description": "Zadajte k\u00f3d pou\u017e\u00edvate\u013ea aplik\u00e1cie Smart Life alebo Tuya Smart. \n\nTento k\u00f3d n\u00e1jdete v aplik\u00e1cii Smart Life alebo Tuya Smart na obrazovke **Nastavenia** > **Konto a zabezpe\u010denie** a zadajte k\u00f3d uveden\u00fd v poli **K\u00f3d pou\u017e\u00edvate\u013ea**. Pri pou\u017e\u00edvate\u013eskom k\u00f3de sa rozli\u0161uj\u00fa mal\u00e9 a ve\u013ek\u00e9 p\u00edsmen\u00e1, nezabudnite ho zada\u0165 presne tak, ako je zobrazen\u00fd v aplik\u00e1cii."
-            }
-        }
+  "config": {
+    "abort": {
+      "reauth_successful": "Opätovné overenie bolo úspešné",
+      "ir_add_key_success": "IR key {key_name} has been added to {device_name}",
+      "ir_add_key_failed": "Could not add {key_name} to {device_name}",
+      "ir_add_device_success": "IR device {remote_name} has been added to {device_name}",
+      "ir_add_device_failed": "Could not add {remote_name} to {device_name}"
     },
-    "entity": {
-        "binary_sensor": {
-            "bag_full": {
-                "name": "Ta\u0161ka pln\u00e1"
-            },
-            "carbon_dioxide": {
-                "name": "Oxid uhli\u010dit\u00fd"
-            },
-            "carbon_monoxide": {
-                "name": "Oxid uho\u013enat\u00fd"
-            },
-            "cover_off": {
-                "name": "Kryt je pre\u010d"
-            },
-            "defrost": {
-                "name": "Odmrazovanie"
-            },
-            "drop": {
-                "name": "Drop"
-            },
-            "feeding": {
-                "name": "K\u0155menie"
-            },
-            "formaldehyde": {
-                "name": "Formaldehyd"
-            },
-            "methane": {
-                "name": "Met\u00e1n"
-            },
-            "pm25": {
-                "name": "PM2.5"
-            },
-            "pressure": {
-                "name": "Tlak"
-            },
-            "tankfull": {
-                "name": "Pln\u00e1 n\u00e1dr\u017e"
-            },
-            "tilt": {
-                "name": "Naklonenie"
-            },
-            "valve": {
-                "name": "Ventil"
-            },
-            "voc": {
-                "name": "VOCs"
-            },
-            "wet": {
-                "name": "Vlhko"
-            }
-        },
-        "button": {
-            "factory_reset": {
-                "name": "Obnovenie tov\u00e1rensk\u00e9ho nastavenia"
-            },
-            "manual_clean": {
-                "name": "Manu\u00e1lne \u010distenie"
-            },
-            "reset_duster_cloth": {
-                "name": "Resetujte handri\u010dku na prach"
-            },
-            "reset_edge_brush": {
-                "name": "Resetujte okrajov\u00fa kefu"
-            },
-            "reset_filter": {
-                "name": "Resetova\u0165 filter"
-            },
-            "reset_map": {
-                "name": "Obnovi\u0165 mapu"
-            },
-            "reset_roll_brush": {
-                "name": "Resetujte rolovaciu kefu"
-            },
-            "snooze": {
-                "name": "Odlo\u017ei\u0165"
-            }
-        },
-        "cover": {
-            "blind": {
-                "name": "Roleta"
-            },
-            "curtain": {
-                "name": "Z\u00e1clona"
-            },
-            "indexed_curtain": {
-                "name": "Z\u00e1clona {index}"
-            },
-            "indexed_door": {
-                "name": "Dvere {index}"
-            }
-        },
-        "event": {
-            "doorbell_message": {
-                "name": "Spr\u00e1va zvon\u010deka"
-            },
-            "doorbell_picture": {
-                "name": "Obr\u00e1zok zvon\u010deka"
-            },
-            "numbered_button": {
-                "name": "Tla\u010didlo {button_number}",
-                "state_attributes": {
-                    "event_type": {
-                        "state": {
-                            "click": "Kliknut\u00e9",
-                            "double_click": "Dvojit\u00e9 kliknutie",
-                            "press": "Dlho stla\u010den\u00e9"
-                        }
-                    }
-                }
-            }
-        },
-        "light": {
-            "backlight": {
-                "name": "Podsvietenie"
-            },
-            "indexed_light": {
-                "name": "Svetlo {index}"
-            },
-            "light": {
-                "name": "Svetlo"
-            },
-            "night_light": {
-                "name": "No\u010dn\u00e9 svetlo"
-            }
-        },
-        "number": {
-            "alarm_delay": {
-                "name": "Oneskorenie alarmu"
-            },
-            "alarm_duration": {
-                "name": "Trvanie alarmu"
-            },
-            "alarm_maximum": {
-                "name": "Maxim\u00e1lna hodnota alarmu"
-            },
-            "alarm_minimum": {
-                "name": "Minim\u00e1lna hodnota alarmu"
-            },
-            "arm_delay": {
-                "name": "Oneskorenie zabezpe\u010denia"
-            },
-            "battery_backup_reserve": {
-                "name": "Rezerva z\u00e1lo\u017enej bat\u00e9rie"
-            },
-            "cloud_recipe": {
-                "name": "Cloud recept"
-            },
-            "cook_temperature": {
-                "name": "Teplota varenia"
-            },
-            "cook_time": {
-                "name": "\u010cas varenia"
-            },
-            "delay_clean_time": {
-                "name": "Oneskorenie \u010distenia"
-            },
-            "down_delay": {
-                "name": "Oneskorenie smerom nadol"
-            },
-            "far_detection": {
-                "name": "\u010ealek\u00e1 detekcia"
-            },
-            "feed": {
-                "name": "K\u0155mi\u0165"
-            },
-            "heat_preservation_time": {
-                "name": "Doba uchov\u00e1vania tepla"
-            },
-            "indexed_cook_temperature": {
-                "name": "Teplota varenia {index}"
-            },
-            "indexed_irrigation_duration": {
-                "name": "Trvanie zavla\u017eovania {index}"
-            },
-            "indexed_maximum_brightness": {
-                "name": "Maxim\u00e1lny jas {index}"
-            },
-            "indexed_minimum_brightness": {
-                "name": "Minim\u00e1lny jas {index}"
-            },
-            "indexed_temperature": {
-                "name": "Teplota {index}"
-            },
-            "installation_height": {
-                "name": "V\u00fd\u0161ka in\u0161tal\u00e1cie"
-            },
-            "inverter_output_power_limit": {
-                "name": "Obmedzenie v\u00fdstupn\u00e9ho v\u00fdkonu meni\u010da"
-            },
-            "maximum_brightness": {
-                "name": "Maxim\u00e1lny jas"
-            },
-            "maximum_liquid_depth": {
-                "name": "Maxim\u00e1lna h\u013abka kvapaliny"
-            },
-            "minimum_brightness": {
-                "name": "Minim\u00e1lny jas"
-            },
-            "move_down": {
-                "name": "Posun\u00fa\u0165 dole"
-            },
-            "move_up": {
-                "name": "Posun\u00fa\u0165 hore"
-            },
-            "near_detection": {
-                "name": "Bl\u00edzka detekcia"
-            },
-            "powder": {
-                "name": "Pr\u00e1\u0161ok"
-            },
-            "sensitivity": {
-                "name": "Citlivos\u0165"
-            },
-            "siren_duration": {
-                "name": "Trvanie sir\u00e9ny"
-            },
-            "target_dis_closest": {
-                "name": "Najbli\u017e\u0161ia vzdialenos\u0165 cie\u013ea"
-            },
-            "temp_correction": {
-                "name": "Korekcia teploty"
-            },
-            "temperature": {
-                "name": "Teplota"
-            },
-            "temperature_after_boiling": {
-                "name": "Teplota po vare"
-            },
-            "time": {
-                "name": "\u010cas"
-            },
-            "voice_times": {
-                "name": "Hlasov\u00e9 \u010dasy"
-            },
-            "volume": {
-                "name": "Hlasitos\u0165"
-            },
-            "water_level": {
-                "name": "Hladina vody"
-            }
-        },
-        "select": {
-            "basic_anti_flicker": {
-                "name": "Ochrana proti blikaniu",
-                "state": {
-                    "0": "Zak\u00e1zan\u00e9",
-                    "1": "50 Hz",
-                    "2": "60 Hz"
-                }
-            },
-            "basic_nightvision": {
-                "name": "No\u010dn\u00e9 videnie",
-                "state": {
-                    "0": "Automaticky",
-                    "1": "Neakt\u00edvny",
-                    "2": "Akt\u00edvny"
-                }
-            },
-            "blanket_level": {
-                "name": "\u00darove\u0148",
-                "state": {
-                    "level_1": "N\u00edzka",
-                    "level_10": "Vysok\u00e1",
-                    "level_2": "\u00darove\u0148 2",
-                    "level_3": "\u00darove\u0148 3",
-                    "level_4": "\u00darove\u0148 4",
-                    "level_5": "\u00darove\u0148 5",
-                    "level_6": "\u00darove\u0148 6",
-                    "level_7": "\u00darove\u0148 7",
-                    "level_8": "\u00darove\u0148 8",
-                    "level_9": "\u00darove\u0148 9"
-                }
-            },
-            "brightness": {
-                "name": "Jas"
-            },
-            "concentration": {
-                "name": "Koncentr\u00e1cia"
-            },
-            "countdown": {
-                "name": "Odpo\u010d\u00edtavanie",
-                "state": {
-                    "1h": "1 hodina",
-                    "2h": "2 hodiny",
-                    "3h": "3 hodiny",
-                    "4h": "4 hodiny",
-                    "5h": "5 hod\u00edn",
-                    "6h": "6 hod\u00edn",
-                    "cancel": "Zru\u0161i\u0165"
-                }
-            },
-            "cups": {
-                "name": "Poh\u00e1re"
-            },
-            "curtain_mode": {
-                "name": "Re\u017eim",
-                "state": {
-                    "morning": "R\u00e1no",
-                    "night": "Noc"
-                }
-            },
-            "curtain_motor_mode": {
-                "name": "Motorov\u00fd re\u017eim",
-                "state": {
-                    "back": "Sp\u00e4\u0165",
-                    "forward": "Dopredu"
-                }
-            },
-            "decibel_sensitivity": {
-                "name": "Citlivos\u0165 detekcie zvuku",
-                "state": {
-                    "0": "N\u00edzka citlivos\u0165",
-                    "1": "Vysok\u00e1 citlivos\u0165"
-                }
-            },
-            "desk_level": {
-                "name": "\u00darove\u0148",
-                "state": {
-                    "level_1": "\u00darove\u0148 1",
-                    "level_2": "\u00darove\u0148 2",
-                    "level_3": "\u00darove\u0148 3",
-                    "level_4": "\u00darove\u0148 4"
-                }
-            },
-            "desk_up_down": {
-                "name": "Hore/dole",
-                "state": {
-                    "down": "Dole",
-                    "stop": "Zastavi\u0165",
-                    "up": "Hore"
-                }
-            },
-            "fingerbot_mode": {
-                "name": "Re\u017eim",
-                "state": {
-                    "click": "Stla\u010di\u0165",
-                    "switch": "Prep\u00edna\u010d"
-                }
-            },
-            "horizontal_fan_angle": {
-                "name": "Horizont\u00e1lny uhol v\u00fdkyvu klapky",
-                "state": {
-                    "30": "30\u00b0",
-                    "60": "60\u00b0",
-                    "90": "90\u00b0"
-                }
-            },
-            "humidifier_level": {
-                "name": "\u00darove\u0148 postreku",
-                "state": {
-                    "level_1": "\u00darove\u0148 1",
-                    "level_10": "\u00darove\u0148 10",
-                    "level_2": "\u00darove\u0148 2",
-                    "level_3": "\u00darove\u0148 3",
-                    "level_4": "\u00darove\u0148 4",
-                    "level_5": "\u00darove\u0148 5",
-                    "level_6": "\u00darove\u0148 6",
-                    "level_7": "\u00darove\u0148 7",
-                    "level_8": "\u00darove\u0148 8",
-                    "level_9": "\u00darove\u0148 9"
-                }
-            },
-            "humidifier_moodlighting": {
-                "name": "Osvetlenie",
-                "state": {
-                    "1": "N\u00e1lada 1",
-                    "2": "N\u00e1lada 2",
-                    "3": "N\u00e1lada 3",
-                    "4": "N\u00e1lada 4",
-                    "5": "N\u00e1lada 5"
-                }
-            },
-            "humidifier_spray_mode": {
-                "name": "Re\u017eim rozpra\u0161ovania",
-                "state": {
-                    "auto": "Auto",
-                    "health": "Zdravie",
-                    "humidity": "Vlhkos\u0165",
-                    "sleep": "Sp\u00e1nok",
-                    "work": "\u010cinnos\u0165"
-                }
-            },
-            "indexed_blanket_level": {
-                "name": "\u00darove\u0148 {index}",
-                "state": {
-                    "level_1": "N\u00edzka",
-                    "level_10": "Vysok\u00e1",
-                    "level_2": "\u00darove\u0148 2",
-                    "level_3": "\u00darove\u0148 3",
-                    "level_4": "\u00darove\u0148 4",
-                    "level_5": "\u00darove\u0148 5",
-                    "level_6": "\u00darove\u0148 6",
-                    "level_7": "\u00darove\u0148 7",
-                    "level_8": "\u00darove\u0148 8",
-                    "level_9": "\u00darove\u0148 9"
-                }
-            },
-            "indexed_led_type": {
-                "name": "Typ zdroja svetla {index}",
-                "state": {
-                    "halogen": "Halog\u00e9n",
-                    "incandescent": "\u017diarovka",
-                    "led": "LED"
-                }
-            },
-            "inverter_work_mode": {
-                "name": "Pracovn\u00fd re\u017eim meni\u010da",
-                "state": {
-                    "manual": "Manu\u00e1lny re\u017eim",
-                    "self_powered": "Vlastn\u00e9 nap\u00e1janie",
-                    "time_of_use": "\u010cas pou\u017e\u00edvania"
-                }
-            },
-            "ipc_work_mode": {
-                "name": "Re\u017eim IPC",
-                "state": {
-                    "0": "Re\u017eim n\u00edzkej spotreby",
-                    "1": "Nepretr\u017eit\u00fd pracovn\u00fd re\u017eim"
-                }
-            },
-            "led_type": {
-                "name": "Typ sveteln\u00e9ho zdroja",
-                "state": {
-                    "halogen": "Halog\u00e9n",
-                    "incandescent": "\u017diarovka",
-                    "led": "LED"
-                }
-            },
-            "light_mode": {
-                "name": "Re\u017eim sveteln\u00e9ho indik\u00e1tora",
-                "state": {
-                    "none": "Neakt\u00edvny",
-                    "pos": "Indik\u00e1cia stavu invertovan\u00e9ho prep\u00edna\u010da",
-                    "relay": "Ozna\u010duje stav zapnutia/vypnutia"
-                }
-            },
-            "material": {
-                "name": "Materi\u00e1l"
-            },
-            "mode": {
-                "name": "Re\u017eim"
-            },
-            "motion_sensitivity": {
-                "name": "Citlivos\u0165 detekcie pohybu",
-                "state": {
-                    "0": "N\u00edzka",
-                    "1": "Stredn\u00e1",
-                    "2": "Vysok\u00e1"
-                }
-            },
-            "odor_elimination_mode": {
-                "name": "Re\u017eim elimin\u00e1cie z\u00e1pachu",
-                "state": {
-                    "interim": "Priebe\u017en\u00e9",
-                    "smart": "Inteligentn\u00fd"
-                }
-            },
-            "record_mode": {
-                "name": "Re\u017eim nahr\u00e1vania",
-                "state": {
-                    "1": "Len z\u00e1znam udalost\u00ed",
-                    "2": "Nepretr\u017eit\u00e9 nahr\u00e1vanie"
-                }
-            },
-            "relay_status": {
-                "name": "Spr\u00e1vanie pri zapnut\u00ed",
-                "state": {
-                    "last": "Predch\u00e1dzaj\u00faci stav",
-                    "memory": "Predch\u00e1dzaj\u00faci stav",
-                    "off": "Neakt\u00edvny",
-                    "on": "Akt\u00edvny",
-                    "power_off": "Neakt\u00edvny",
-                    "power_on": "Akt\u00edvny"
-                }
-            },
-            "siren_mode": {
-                "name": "Re\u017eim sir\u00e9ny",
-                "state": {
-                    "alarm_light": "Svetlo",
-                    "alarm_sound": "Zvuk",
-                    "alarm_sound_light": "Zvuk a svetlo",
-                    "normal": "Norm\u00e1lne"
-                }
-            },
-            "target_humidity": {
-                "name": "Cie\u013eov\u00e1 vlhkos\u0165"
-            },
-            "temperature_level": {
-                "name": "\u00darove\u0148 teploty"
-            },
-            "vacuum_cistern": {
-                "name": "Nastavenie n\u00e1dr\u017ee na vodu",
-                "state": {
-                    "closed": "Zatvoren\u00e9",
-                    "high": "Vysok\u00e1",
-                    "low": "N\u00edzka",
-                    "middle": "Stredn\u00e1"
-                }
-            },
-            "vacuum_collection": {
-                "name": "Re\u017eim zberu prachu",
-                "state": {
-                    "large": "Ve\u013ek\u00fd",
-                    "middle": "Stredn\u00fd",
-                    "small": "Mal\u00fd"
-                }
-            },
-            "vacuum_mode": {
-                "name": "Re\u017eim",
-                "state": {
-                    "bow": "Obl\u00fak",
-                    "chargego": "N\u00e1vrat do doku",
-                    "left_bow": "Obl\u00fak v\u013eavo",
-                    "left_spiral": "\u0160pir\u00e1la v\u013eavo",
-                    "mop": "Mop",
-                    "part": "\u010cas\u0165",
-                    "partial_bow": "Obl\u00fak \u010diasto\u010dne",
-                    "pick_zone": "V\u00fdber z\u00f3ny",
-                    "point": "Bod",
-                    "pose": "Poz\u00edcia",
-                    "random": "N\u00e1hodn\u00fd",
-                    "right_bow": "Obl\u00fak vpravo",
-                    "right_spiral": "\u0160pir\u00e1la vpravo",
-                    "single": "Raz",
-                    "smart": "Smart",
-                    "spiral": "\u0160pir\u00e1la",
-                    "standby": "Pohotovostn\u00fd re\u017eim",
-                    "wall_follow": "Sledovanie steny",
-                    "zone": "Z\u00f3na"
-                }
-            },
-            "vertical_fan_angle": {
-                "name": "Vertik\u00e1lny uhol v\u00fdkyvu klapky",
-                "state": {
-                    "30": "30\u00b0",
-                    "60": "60\u00b0",
-                    "90": "90\u00b0"
-                }
-            },
-            "volume": {
-                "name": "Hlasitos\u0165"
-            },
-            "weather_delay": {
-                "name": "Me\u0161kanie po\u010dasia",
-                "state": {
-                    "120h": "120h",
-                    "144h": "144h",
-                    "168h": "168h",
-                    "24h": "24h",
-                    "48h": "48h",
-                    "72h": "72h",
-                    "96h": "96h",
-                    "cancel": "Zru\u0161i\u0165"
-                }
-            }
-        },
-        "sensor": {
-            "air_pressure": {
-                "name": "Tlak vzduchu"
-            },
-            "air_quality": {
-                "name": "Kvalita ovzdu\u0161ia",
-                "state": {
-                    "good": "Dobr\u00e9",
-                    "great": "Skvel\u00e9",
-                    "mild": "Mierne",
-                    "severe": "Z\u00e1va\u017en\u00e9"
-                }
-            },
-            "air_quality_index": {
-                "name": "Index kvality ovzdu\u0161ia",
-                "state": {
-                    "level_1": "\u00darove\u0148 1",
-                    "level_2": "\u00darove\u0148 2",
-                    "level_3": "\u00darove\u0148 3",
-                    "level_4": "\u00darove\u0148 4",
-                    "level_5": "\u00darove\u0148 5",
-                    "level_6": "\u00darove\u0148 6"
-                }
-            },
-            "battery": {
-                "name": "Bat\u00e9ria"
-            },
-            "battery_power": {
-                "name": "V\u00fdkon bat\u00e9rie"
-            },
-            "battery_soc": {
-                "name": "SOC bat\u00e9rie"
-            },
-            "battery_state": {
-                "name": "Stav bat\u00e9rie"
-            },
-            "carbon_dioxide": {
-                "name": "Oxid uhli\u010dit\u00fd"
-            },
-            "carbon_monoxide": {
-                "name": "Oxid uho\u013enat\u00fd"
-            },
-            "cat_litter_box_status": {
-                "name": "Stav",
-                "state": {
-                    "clean": "Upratovanie",
-                    "empty": "Vypr\u00e1zd\u0148ovanie",
-                    "level": "Vyrovn\u00e1vanie",
-                    "sleep": "Spanie",
-                    "standby": "Pohotovostn\u00fd re\u017eim",
-                    "uv": "Dezinfekcia"
-                }
-            },
-            "cat_weight": {
-                "name": "Hmotnos\u0165 ma\u010dky"
-            },
-            "cleaning_area": {
-                "name": "Oblas\u0165 \u010distenia"
-            },
-            "cleaning_time": {
-                "name": "\u010cas \u010distenia"
-            },
-            "concentration_carbon_dioxide": {
-                "name": "Koncentr\u00e1cia oxidu uhli\u010dit\u00e9ho"
-            },
-            "current": {
-                "name": "Pr\u00fad"
-            },
-            "current_temperature": {
-                "name": "Aktu\u00e1lna teplota"
-            },
-            "depth": {
-                "name": "H\u013abka"
-            },
-            "dew_point_temperature": {
-                "name": "Rosn\u00fd bod"
-            },
-            "duster_cloth_life": {
-                "name": "\u017divotnos\u0165 utierky na prach"
-            },
-            "excretion_time_day": {
-                "name": "Trvanie vylu\u010dovania"
-            },
-            "excretion_times_day": {
-                "name": "\u010casy vylu\u010dovania (de\u0148)"
-            },
-            "feels_like_temperature": {
-                "name": "Pocitovo"
-            },
-            "filter_duration": {
-                "name": "Trvanie filtra"
-            },
-            "filter_life": {
-                "name": "\u017divotnos\u0165 filtra"
-            },
-            "filter_utilization": {
-                "name": "Vyu\u017eitie filtra"
-            },
-            "formaldehyde": {
-                "name": "Formaldehyd"
-            },
-            "gas": {
-                "name": "Plyn"
-            },
-            "heat_index_temperature": {
-                "name": "Tepeln\u00fd index"
-            },
-            "humidity": {
-                "name": "Vlhkos\u0165"
-            },
-            "humidity_outdoor": {
-                "name": "Vonkaj\u0161ia vlhkos\u0165"
-            },
-            "illuminance": {
-                "name": "Osvetlenie"
-            },
-            "indexed_humidity_outdoor": {
-                "name": "Vonkaj\u0161\u00ed kan\u00e1l vlhkosti {index}"
-            },
-            "indexed_temperature_external": {
-                "name": "Teplotn\u00fd kan\u00e1l sondy {index}"
-            },
-            "inverter_output_power": {
-                "name": "V\u00fdstupn\u00fd v\u00fdkon meni\u010da"
-            },
-            "last_amount": {
-                "name": "Posledn\u00e1 suma"
-            },
-            "last_operation_duration": {
-                "name": "Trvanie poslednej oper\u00e1cie"
-            },
-            "lifetime_battery_charge_energy": {
-                "name": "Energia nabitia bat\u00e9rie po\u010das celej \u017eivotnosti"
-            },
-            "lifetime_battery_discharge_energy": {
-                "name": "Energia vyb\u00edjania bat\u00e9rie po\u010das jej \u017eivotnosti"
-            },
-            "lifetime_inverter_output_energy": {
-                "name": "V\u00fdstupn\u00e1 energia meni\u010da po\u010das \u017eivotnosti"
-            },
-            "lifetime_offgrid_port_energy": {
-                "name": "Energia z portu mimo siete za dobu \u017eivotnosti"
-            },
-            "lifetime_pv_energy": {
-                "name": "Celo\u017eivotn\u00e1 fotovoltick\u00e1 energia"
-            },
-            "liquid_depth": {
-                "name": "H\u013abka kvapaliny"
-            },
-            "liquid_level": {
-                "name": "Hladina kvapaliny"
-            },
-            "liquid_state": {
-                "name": "Kvapaln\u00fd stav",
-                "state": {
-                    "lower_alarm": "N\u00edzka",
-                    "normal": "Norm\u00e1lne",
-                    "upper_alarm": "Vysok\u00e1"
-                }
-            },
-            "luminosity": {
-                "name": "Svietivos\u0165"
-            },
-            "methane": {
-                "name": "Met\u00e1n"
-            },
-            "odor_elimination_status": {
-                "name": "Stav",
-                "state": {
-                    "charge_done": "Nab\u00edjanie je hotov\u00e9",
-                    "charging": "Nab\u00edja sa",
-                    "standby": "Pohotovostn\u00fd re\u017eim",
-                    "work": "Pracuje"
-                }
-            },
-            "phase_a_current": {
-                "name": "Pr\u00fad f\u00e1zy A"
-            },
-            "phase_a_power": {
-                "name": "V\u00fdkon f\u00e1zy A"
-            },
-            "phase_a_voltage": {
-                "name": "Nap\u00e4tie f\u00e1zy A"
-            },
-            "phase_b_current": {
-                "name": "Pr\u00fad f\u00e1zy B"
-            },
-            "phase_b_power": {
-                "name": "V\u00fdkon f\u00e1zy B"
-            },
-            "phase_b_voltage": {
-                "name": "Nap\u00e4tie f\u00e1zy B"
-            },
-            "phase_c_current": {
-                "name": "Pr\u00fad f\u00e1zy C"
-            },
-            "phase_c_power": {
-                "name": "V\u00fdkon f\u00e1zy C"
-            },
-            "phase_c_voltage": {
-                "name": "Nap\u00e4tie f\u00e1zy C"
-            },
-            "pm1": {
-                "name": "PM1"
-            },
-            "pm10": {
-                "name": "PM10"
-            },
-            "pm25": {
-                "name": "PM2.5"
-            },
-            "power": {
-                "name": "V\u00fdkon"
-            },
-            "precipitation_intensity": {
-                "name": "Intenzita zr\u00e1\u017eok"
-            },
-            "precipitation_today": {
-                "name": "Celkov\u00fd \u00fahrn zr\u00e1\u017eok dnes"
-            },
-            "pump_time": {
-                "name": "Trvanie vodn\u00e9ho \u010derpadla"
-            },
-            "pv_channel_power": {
-                "name": "V\u00fdkon FV kan\u00e1la {index}"
-            },
-            "remaining_time": {
-                "name": "Zost\u00e1vaj\u00faci \u010das"
-            },
-            "rolling_brush_life": {
-                "name": "\u017divotnos\u0165 val\u010dekovej kefy"
-            },
-            "side_brush_life": {
-                "name": "\u017divotnos\u0165 bo\u010dnej kefky"
-            },
-            "smoke_amount": {
-                "name": "Mno\u017estvo dymu"
-            },
-            "sous_vide_status": {
-                "name": "Stav",
-                "state": {
-                    "boiling_temp": "Teplota varu",
-                    "cooling": "Chladenie",
-                    "heating": "Vykurovanie",
-                    "heating_temp": "Teplota vykurovania",
-                    "reserve_1": "Rezerva 1",
-                    "reserve_2": "Rezerva 2",
-                    "reserve_3": "Rezerva 3",
-                    "standby": "Pohotovostn\u00fd re\u017eim",
-                    "warm": "Udr\u017eiavanie tepla"
-                }
-            },
-            "status": {
-                "name": "Stav"
-            },
-            "supply_frequency": {
-                "name": "Frekvencia nap\u00e1jania"
-            },
-            "temperature": {
-                "name": "Teplota"
-            },
-            "temperature_external": {
-                "name": "Teplota sondy"
-            },
-            "total_absorption_particles": {
-                "name": "Celkov\u00e1 absorpcia \u010dast\u00edc"
-            },
-            "total_cleaning_area": {
-                "name": "Celkov\u00e1 plocha \u010distenia"
-            },
-            "total_cleaning_time": {
-                "name": "Celkov\u00fd \u010das \u010distenia"
-            },
-            "total_cleaning_times": {
-                "name": "Celkov\u00fd \u010das \u010distenia"
-            },
-            "total_dissolved_solids": {
-                "name": "Celkov\u00fd po\u010det rozpusten\u00fdch pevn\u00fdch l\u00e1tok"
-            },
-            "total_energy": {
-                "name": "Celkov\u00e1 energia"
-            },
-            "total_operating_time": {
-                "name": "Celkov\u00fd prev\u00e1dzkov\u00fd \u010das"
-            },
-            "total_power": {
-                "name": "Celkov\u00fd v\u00fdkon"
-            },
-            "total_production": {
-                "name": "Celkov\u00e1 produkcia"
-            },
-            "total_pv_power": {
-                "name": "Celkov\u00fd fotovoltaick\u00fd v\u00fdkon"
-            },
-            "total_volatile_organic_compound": {
-                "name": "Celkov\u00e1 prchav\u00e1 organick\u00e1 zl\u00fa\u010denina"
-            },
-            "total_watering_time": {
-                "name": "Celkov\u00fd \u010das zavla\u017eovania"
-            },
-            "uv_index": {
-                "name": "UV index"
-            },
-            "uv_runtime": {
-                "name": "\u010cas behu UV"
-            },
-            "voc": {
-                "name": "Prchav\u00e9 organick\u00e9 zl\u00fa\u010deniny"
-            },
-            "voltage": {
-                "name": "Nap\u00e4tie"
-            },
-            "water_level": {
-                "name": "Hladina vody"
-            },
-            "water_level_state": {
-                "name": "Hladina vody",
-                "state": {
-                    "level_1": "N\u00edzka",
-                    "level_2": "Stredn\u00e1",
-                    "level_3": "Pln\u00e1"
-                }
-            },
-            "water_time": {
-                "name": "Trvanie pou\u017e\u00edvania vody"
-            },
-            "wind_chill_index_temperature": {
-                "name": "Index ochladzovania vetrom"
-            },
-            "wind_direction": {
-                "name": "Smer vetra"
-            }
-        },
-        "switch": {
-            "anion": {
-                "name": "Ani\u00f3n"
-            },
-            "arm_beep": {
-                "name": "P\u00edpnutie ovl\u00e1dania"
-            },
-            "auto_clean": {
-                "name": "Automatick\u00e9 \u010distenie"
-            },
-            "battery_lock": {
-                "name": "Z\u00e1mok bat\u00e9rie"
-            },
-            "child_lock": {
-                "name": "Detsk\u00fd z\u00e1mok"
-            },
-            "cry_detection": {
-                "name": "Detekcia pla\u010du"
-            },
-            "disinfection": {
-                "name": "Dezinfekcia"
-            },
-            "do_not_disturb": {
-                "name": "Neru\u0161i\u0165"
-            },
-            "energy_saving": {
-                "name": "\u00daspora energie"
-            },
-            "filter_cartridge_reset": {
-                "name": "Reset filtra\u010dnej kazety"
-            },
-            "filter_reset": {
-                "name": "Obnovenie filtra"
-            },
-            "flip": {
-                "name": "Prevr\u00e1ti\u0165"
-            },
-            "frost_protection": {
-                "name": "Ochrana proti mrazu"
-            },
-            "heat_preservation": {
-                "name": "Udr\u017eiavanie tepla"
-            },
-            "humidification": {
-                "name": "Zvlh\u010dovanie"
-            },
-            "indexed_alarm": {
-                "name": "Alarm {index}"
-            },
-            "indexed_socket": {
-                "name": "Z\u00e1suvka {index}"
-            },
-            "indexed_switch": {
-                "name": "Prep\u00edna\u010d {index}"
-            },
-            "indexed_usb": {
-                "name": "USB {index}"
-            },
-            "ionizer": {
-                "name": "Ioniz\u00e1tor"
-            },
-            "motion_alarm": {
-                "name": "Pohybov\u00fd alarm"
-            },
-            "motion_recording": {
-                "name": "Z\u00e1znam pohybu"
-            },
-            "motion_tracking": {
-                "name": "Sledovanie pohybu"
-            },
-            "music": {
-                "name": "Hudba"
-            },
-            "mute": {
-                "name": "Stlmi\u0165"
-            },
-            "mute_voice": {
-                "name": "Stlmi\u0165 hlas"
-            },
-            "natural_wind": {
-                "name": "Pr\u00edrodn\u00fd vietor"
-            },
-            "open_window_detection": {
-                "name": "Detekcia otvoren\u00e9ho okna"
-            },
-            "output_power_limit": {
-                "name": "Limit v\u00fdstupn\u00e9ho v\u00fdkonu"
-            },
-            "oxygen_bar": {
-                "name": "Kysl\u00edkov\u00fd bar"
-            },
-            "plug": {
-                "name": "Z\u00e1str\u010dka"
-            },
-            "power": {
-                "name": "V\u00fdkon"
-            },
-            "privacy_mode": {
-                "name": "Re\u017eim s\u00fakromia"
-            },
-            "pump": {
-                "name": "\u010cerpadlo"
-            },
-            "radio": {
-                "name": "R\u00e1dio"
-            },
-            "reset_of_water_usage_days": {
-                "name": "Vynulovanie dn\u00ed spotreby vody"
-            },
-            "reverse": {
-                "name": "Reverzn\u00fd"
-            },
-            "siren": {
-                "name": "Sir\u00e9na"
-            },
-            "sleep": {
-                "name": "Sp\u00e1nok"
-            },
-            "sleep_aid": {
-                "name": "Pomoc pri sp\u00e1nku"
-            },
-            "slow_feed": {
-                "name": "Pomal\u00e9 pod\u00e1vanie"
-            },
-            "snooze": {
-                "name": "Odlo\u017ei\u0165"
-            },
-            "socket": {
-                "name": "Z\u00e1suvka"
-            },
-            "sound": {
-                "name": "Zvuk"
-            },
-            "sound_detection": {
-                "name": "Detekcia zvuku"
-            },
-            "spray": {
-                "name": "Sprej"
-            },
-            "start": {
-                "name": "\u0160tart"
-            },
-            "sterilization": {
-                "name": "Steriliz\u00e1cia"
-            },
-            "switch": {
-                "name": "Prep\u00edna\u010d"
-            },
-            "time_watermark": {
-                "name": "\u010casov\u00fd vodoznak"
-            },
-            "uv_sterilization": {
-                "name": "UV steriliz\u00e1cia"
-            },
-            "video_recording": {
-                "name": "Nahr\u00e1vanie videa"
-            },
-            "voice": {
-                "name": "Hlas"
-            },
-            "water": {
-                "name": "Voda"
-            },
-            "water_pump_reset": {
-                "name": "Reset vodn\u00e9ho \u010derpadla"
-            },
-            "wide_dynamic_range": {
-                "name": "\u0160irok\u00fd dynamick\u00fd rozsah"
-            }
-        },
-        "valve": {
-            "indexed_valve": {
-                "name": "Ventil {index}"
-            },
-            "valve": {
-                "name": "Ventil"
-            }
-        }
+    "error": {
+      "invalid_auth": "Neplatné overenie",
+      "login_error": "Chyba pri prihlasovaní ({code}): {msg}"
     },
-    "exceptions": {
-        "action_dpcode_not_found": {
-            "message": "Nie je mo\u017en\u00e9 spracova\u0165 akciu, preto\u017ee zariadenie neposkytuje zodpovedaj\u00faci k\u00f3d funkcie (o\u010dak\u00e1van\u00fd k\u00f3d {expected} v {available})."
+    "step": {
+      "reauth_user_code": {
+        "data": {
+          "user_code": "Používateľský kód"
+        },
+        "description": "Integrácia Tuya teraz používa vylepšený spôsob prihlásenia. Ak sa chcete opätovne prihlásiť pomocou svojho účtu Smart Life alebo Tuya Smart, musíte zadať svoj používateľský kód. \n\nTento kód nájdete v aplikácii Smart Life alebo Tuya Smart na obrazovke **Nastavenia** > **Konto a zabezpečenie** a zadajte kód zobrazený v poli **Používateľský kód**. Pri používateľskom kóde sa rozlišujú malé a veľké písmená, nezabudnite ho zadať presne tak, ako je zobrazený v aplikácii."
+      },
+      "scan": {
+        "description": "Pomocou aplikácie Smart Life alebo aplikácie Tuya Smart naskenujte nasledujúci kód QR a dokončite prihlásenie. Po dokončení tohto kroku v aplikácii pokračujte na ďalší krok."
+      },
+      "user": {
+        "data": {
+          "user_code": "Používateľský kód"
+        },
+        "description": "Zadajte kód používateľa aplikácie Smart Life alebo Tuya Smart. \n\nTento kód nájdete v aplikácii Smart Life alebo Tuya Smart na obrazovke **Nastavenia** > **Konto a zabezpečenie** a zadajte kód uvedený v poli **Kód používateľa**. Pri používateľskom kóde sa rozlišujú malé a veľké písmená, nezabudnite ho zadať presne tak, ako je zobrazený v aplikácii."
+      },
+      "ir_add_key": {
+        "title": "New IR key for {device_name}",
+        "description": "Enter the name of the new key, then press Submit then point your remote to the hub and hit the key on your remote",
+        "data": {
+          "new_ir_key_human": "New key display name",
+          "new_ir_key_technical": "New key technical name"
+        },
+        "data_description": {
+          "new_ir_key_human": "The display text of the new key that will be added to the IR device.",
+          "new_ir_key_technical": "The technical name of the new key that will be added to the IR device."
         }
-    },
-    "issues": {
-        "deprecated_entity_new_valve": {
-            "description": "Entita Tuya `{entity}` je zastaran\u00e1, nahraden\u00e1 novou entitou valve. \nAktualizujte svoje ovl\u00e1dacie panely, automatiz\u00e1cie a skripty, zak\u00e1\u017ete `{entity}` a znovu na\u010d\u00edtajte integr\u00e1ciu/re\u0161tartujte Home Assistant, aby ste tento probl\u00e9m odstr\u00e1nili.",
-            "title": "{name} je zastaran\u00fd"
+      },
+      "ir_add_device": {
+        "title": "New IR device under {device_name}",
+        "description": "Enter the name of the new device",
+        "data": {
+          "new_ir_device_name": "New device name"
         }
+      },
+      "configure_api": {
+        "description": "Add a Tuya OpenAPI credential to improve the compatibility with some Tuya devices. Please follow the guide at the URL by clicking the button below.",
+        "data": {
+          "no_openapi": "Don't ask for OpenAPI credentials",
+          "country_code": "Country",
+          "access_id": "Tuya IoT Access ID",
+          "access_secret": "Tuya IoT Access Secret",
+          "username": "SmartLife/Tuya account",
+          "password": "SmartLife/Tuya account password"
+        },
+        "title": "Add Tuya OpenAPI credentials"
+      }
     }
+  },
+  "entity": {
+    "binary_sensor": {
+      "carbon_dioxide": {
+        "name": "Oxid uhličitý"
+      },
+      "carbon_monoxide": {
+        "name": "Oxid uhoľnatý"
+      },
+      "defrost": {
+        "name": "Odmrazovanie"
+      },
+      "drop": {
+        "name": "Drop"
+      },
+      "feeding": {
+        "name": "Kŕmenie"
+      },
+      "formaldehyde": {
+        "name": "Formaldehyd"
+      },
+      "methane": {
+        "name": "Metán"
+      },
+      "pm25": {
+        "name": "PM2.5"
+      },
+      "pressure": {
+        "name": "Tlak"
+      },
+      "tankfull": {
+        "name": "Plná nádrž"
+      },
+      "tilt": {
+        "name": "Naklonenie"
+      },
+      "valve": {
+        "name": "Ventil"
+      },
+      "voc": {
+        "name": "VOCs"
+      },
+      "wet": {
+        "name": "Vlhko"
+      },
+      "battery_charging": {
+        "name": "Battery charging"
+      },
+      "cleaning": {
+        "name": "Cleaning"
+      },
+      "cleaning_num": {
+        "name": "Number of cleaning"
+      },
+      "door_contact_state": {
+        "name": "Door contact"
+      },
+      "door_contact_state_2": {
+        "name": "Door contact 2"
+      },
+      "door_contact_state_3": {
+        "name": "Door contact 3"
+      },
+      "error": {
+        "name": "Error"
+      },
+      "error_flow_meter": {
+        "name": "Error: Flow meter"
+      },
+      "error_other": {
+        "name": "Error: Other"
+      },
+      "error_sensor_offline": {
+        "name": "Error: Sensor offline"
+      },
+      "error_sensor_low_battery": {
+        "name": "Error: Sensor low battery"
+      },
+      "error_valve_low_battery": {
+        "name": "Error: Valve low battery"
+      },
+      "error_water_shortage": {
+        "name": "Error: Water shortage"
+      },
+      "litter_occupied": {
+        "name": "Litter box occupied"
+      },
+      "lock_motor_state": {
+        "name": "Lock status"
+      },
+      "off": {
+        "name": "Off"
+      },
+      "off_bed": {
+        "name": "Out of bed"
+      },
+      "online": {
+        "name": "Device online"
+      },
+      "pir_state": {
+        "name": "Proximity sensor"
+      },
+      "power": {
+        "name": "Powered on and restarted successfully"
+      },
+      "trash_status": {
+        "name": "Garbage is full"
+      },
+      "in_clean": {
+        "name": "Auto-clean completed"
+      },
+      "dp_time_clear_flag": {
+        "name": "Scheduled clean triggered"
+      },
+      "wakeup": {
+        "name": "Woken up"
+      },
+      "xt_generic_binary_sensor": {
+        "name": "{name}"
+      },
+      "store_full_notify": {
+        "name": "Replace trash bag"
+      }
+    },
+    "button": {
+      "factory_reset": {
+        "name": "Obnovenie továrenského nastavenia"
+      },
+      "manual_clean": {
+        "name": "Manuálne čistenie"
+      },
+      "reset_duster_cloth": {
+        "name": "Resetujte handričku na prach"
+      },
+      "reset_edge_brush": {
+        "name": "Resetujte okrajovú kefu"
+      },
+      "reset_filter": {
+        "name": "Resetovať filter"
+      },
+      "reset_map": {
+        "name": "Obnoviť mapu"
+      },
+      "reset_roll_brush": {
+        "name": "Resetujte rolovaciu kefu"
+      },
+      "snooze": {
+        "name": "Odložiť"
+      },
+      "generate_dynamic_passcode": {
+        "name": "Generate Dynamic Passcode"
+      },
+      "change_litter_bag": {
+        "name": "Change litter bag"
+      },
+      "clear_energy": {
+        "name": "Clear energy"
+      },
+      "deep_clean": {
+        "name": "Deep clean"
+      },
+      "empty_litter": {
+        "name": "Empty litter box"
+      },
+      "filter_reset": {
+        "name": "Filter reset"
+      },
+      "level_cat_litter": {
+        "name": "Level cat litter"
+      },
+      "one_click_cleanup": {
+        "name": "One-click cleanup"
+      },
+      "manual_lock": {
+        "name": "Manual lock"
+      },
+      "xt_import_electrical_history": {
+        "name": "Import consumption history"
+      },
+      "xt_reset_add_ele": {
+        "name": "Reset consumption"
+      },
+      "xt_add_ir_device": {
+        "name": "Add IR device"
+      },
+      "xt_add_ir_device_key": {
+        "name": "Register new IR key"
+      },
+      "xt_generic_button": {
+        "name": "{name}"
+      }
+    },
+    "cover": {
+      "blind": {
+        "name": "Roleta"
+      },
+      "curtain": {
+        "name": "Záclona"
+      },
+      "indexed_curtain": {
+        "name": "Záclona {index}"
+      },
+      "indexed_door": {
+        "name": "Dvere {index}"
+      },
+      "curtain_2": {
+        "name": "Curtain 2"
+      },
+      "curtain_3": {
+        "name": "Curtain 3"
+      },
+      "door": {
+        "name": "Door"
+      },
+      "door_2": {
+        "name": "Door 2"
+      },
+      "door_3": {
+        "name": "Door 3"
+      }
+    },
+    "event": {
+      "numbered_button": {
+        "name": "Tlačidlo {button_number}",
+        "state_attributes": {
+          "event_type": {
+            "state": {
+              "click": "Kliknuté",
+              "double_click": "Dvojité kliknutie",
+              "press": "Dlho stlačené"
+            }
+          }
+        }
+      },
+      "alarm_lock": {
+        "name": "Lock alarm",
+        "state_attributes": {
+          "event_type": {
+            "state": {
+              "wrong_finger": "Wrong fingerprint",
+              "wrong_password": "Wrong password",
+              "wrong_card": "Wrong card",
+              "wrong_face": "Wrong face",
+              "tongue_bad": "Latch stuck",
+              "too_hot": "Too hot",
+              "unclosed_time": "Not closed after timeout",
+              "tongue_not_out": "Deadbolt stuck",
+              "pry": "Anti-pry alarm",
+              "key_in": "Not calibrated",
+              "low_battery": "Low battery",
+              "power_off": "Battery exhausted",
+              "shock": "Vibration alarm",
+              "defense": "Arm alarm",
+              "test": "Test"
+            }
+          }
+        }
+      },
+      "ipc_movement_detect": {
+        "name": "Movement detected",
+        "state_attributes": {
+          "event_type": {
+            "state": {
+              "motion": "Motion detected"
+            }
+          }
+        }
+      },
+      "unlock_user": {
+        "name": "Unlock user ({user_type})"
+      },
+      "xt_device_event_notify": {
+        "name": "Device notifications"
+      }
+    },
+    "light": {
+      "backlight": {
+        "name": "Podsvietenie"
+      },
+      "indexed_light": {
+        "name": "Svetlo {index}"
+      },
+      "light": {
+        "name": "Svetlo"
+      },
+      "night_light": {
+        "name": "Nočné svetlo"
+      },
+      "light_2": {
+        "name": "Light 2"
+      },
+      "light_3": {
+        "name": "Light 3"
+      },
+      "xt_generic_light": {
+        "name": "{name}"
+      }
+    },
+    "number": {
+      "alarm_delay": {
+        "name": "Oneskorenie alarmu"
+      },
+      "alarm_duration": {
+        "name": "Trvanie alarmu"
+      },
+      "alarm_maximum": {
+        "name": "Maximálna hodnota alarmu"
+      },
+      "alarm_minimum": {
+        "name": "Minimálna hodnota alarmu"
+      },
+      "arm_delay": {
+        "name": "Oneskorenie zabezpečenia"
+      },
+      "battery_backup_reserve": {
+        "name": "Rezerva záložnej batérie"
+      },
+      "cloud_recipe": {
+        "name": "Cloud recept"
+      },
+      "cook_temperature": {
+        "name": "Teplota varenia"
+      },
+      "cook_time": {
+        "name": "Čas varenia"
+      },
+      "delay_clean_time": {
+        "name": "Oneskorenie čistenia"
+      },
+      "down_delay": {
+        "name": "Oneskorenie smerom nadol"
+      },
+      "far_detection": {
+        "name": "Ďaleká detekcia"
+      },
+      "feed": {
+        "name": "Kŕmiť"
+      },
+      "heat_preservation_time": {
+        "name": "Doba uchovávania tepla"
+      },
+      "indexed_cook_temperature": {
+        "name": "Teplota varenia {index}"
+      },
+      "indexed_irrigation_duration": {
+        "name": "Trvanie zavlažovania {index}"
+      },
+      "indexed_maximum_brightness": {
+        "name": "Maximálny jas {index}"
+      },
+      "indexed_minimum_brightness": {
+        "name": "Minimálny jas {index}"
+      },
+      "indexed_temperature": {
+        "name": "Teplota {index}"
+      },
+      "installation_height": {
+        "name": "Výška inštalácie"
+      },
+      "inverter_output_power_limit": {
+        "name": "Obmedzenie výstupného výkonu meniča"
+      },
+      "maximum_brightness": {
+        "name": "Maximálny jas"
+      },
+      "maximum_liquid_depth": {
+        "name": "Maximálna hĺbka kvapaliny"
+      },
+      "minimum_brightness": {
+        "name": "Minimálny jas"
+      },
+      "move_down": {
+        "name": "Posunúť dole"
+      },
+      "move_up": {
+        "name": "Posunúť hore"
+      },
+      "near_detection": {
+        "name": "Blízka detekcia"
+      },
+      "powder": {
+        "name": "Prášok"
+      },
+      "sensitivity": {
+        "name": "Citlivosť"
+      },
+      "siren_duration": {
+        "name": "Trvanie sirény"
+      },
+      "target_dis_closest": {
+        "name": "Najbližšia vzdialenosť cieľa"
+      },
+      "temp_correction": {
+        "name": "Korekcia teploty"
+      },
+      "temperature": {
+        "name": "Teplota"
+      },
+      "temperature_after_boiling": {
+        "name": "Teplota po vare"
+      },
+      "time": {
+        "name": "Čas"
+      },
+      "voice_times": {
+        "name": "Hlasové časy"
+      },
+      "volume": {
+        "name": "Hlasitosť"
+      },
+      "water_level": {
+        "name": "Hladina vody"
+      },
+      "alarm_time": {
+        "name": "Alarm time"
+      },
+      "auto_lock_time": {
+        "name": "Auto lock time"
+      },
+      "b_detection_distance_max": {
+        "name": "Max breath detection distance"
+      },
+      "b_detection_distance_min": {
+        "name": "Min breath detection distance"
+      },
+      "b_sensitivity": {
+        "name": "Breath detection sensitivity"
+      },
+      "breathdistance_max": {
+        "name": "Micro-motion detection upper limit"
+      },
+      "breathdistance_min": {
+        "name": "Micro-motion detection lower limit"
+      },
+      "breathsensitivity": {
+        "name": "Micro-motion detection sensitivity"
+      },
+      "bright_value": {
+        "name": "Brightness"
+      },
+      "capacity_calibration": {
+        "name": "Capacity calibration"
+      },
+      "charge_cur_set": {
+        "name": "Charging current"
+      },
+      "countdown": {
+        "name": "Countdown"
+      },
+      "countdown_1": {
+        "name": "Countdown 1"
+      },
+      "countdown_2": {
+        "name": "Countdown 2"
+      },
+      "countdown_3": {
+        "name": "Countdown 3"
+      },
+      "countdown_4": {
+        "name": "Countdown 4"
+      },
+      "countdown_5": {
+        "name": "Countdown 5"
+      },
+      "countdown_6": {
+        "name": "Countdown 6"
+      },
+      "countdown_7": {
+        "name": "Countdown 7"
+      },
+      "countdown_8": {
+        "name": "Countdown 8"
+      },
+      "deo_end_time": {
+        "name": "Deo end time"
+      },
+      "deo_start_time": {
+        "name": "Deo start time"
+      },
+      "detection_distance_max": {
+        "name": "Max detection distance"
+      },
+      "detection_distance_min": {
+        "name": "Min detection distance"
+      },
+      "detection_sensitivity": {
+        "name": "Detection sensitivity"
+      },
+      "hold_sensitivity": {
+        "name": "Hold sensitivity"
+      },
+      "hum_sensitivity": {
+        "name": "Humidity sensitivity"
+      },
+      "humidity_calibration": {
+        "name": "Humidity calibration"
+      },
+      "liquid_depth_max": {
+        "name": "Max liquid depth"
+      },
+      "m_detection_distance_max": {
+        "name": "Max motion detection distance"
+      },
+      "m_detection_distance_min": {
+        "name": "Min motion detection distance"
+      },
+      "m_sensitivity": {
+        "name": "Motion detection sensitivity"
+      },
+      "max_set": {
+        "name": "Maximum"
+      },
+      "maxhum_set": {
+        "name": "Maximum humidity"
+      },
+      "maximum_brightness_2": {
+        "name": "Maximum brightness 2"
+      },
+      "maximum_brightness_3": {
+        "name": "Maximum brightness 3"
+      },
+      "maxtemp_set": {
+        "name": "Maximum temperature"
+      },
+      "mini_set": {
+        "name": "Minimum"
+      },
+      "minihum_set": {
+        "name": "Minimum humidity"
+      },
+      "minimum_brightness_2": {
+        "name": "Minimum brightness 2"
+      },
+      "minimum_brightness_3": {
+        "name": "Minimum brightness 3"
+      },
+      "minitemp_set": {
+        "name": "Minimum temperature"
+      },
+      "movedistance_max": {
+        "name": "Motion detection upper limit"
+      },
+      "movedistance_min": {
+        "name": "Motion detection lower limit"
+      },
+      "movesensitivity": {
+        "name": "Motion detection sensitivity"
+      },
+      "none_delay_time": {
+        "name": "Presence reset time"
+      },
+      "none_delay_time_min": {
+        "name": "Presence reset time (minutes)"
+      },
+      "none_delay_time_sec": {
+        "name": "Presence reset time (seconds)"
+      },
+      "pir_delay": {
+        "name": "PIR delay"
+      },
+      "presence_delay": {
+        "name": "Reset delay"
+      },
+      "quiet_time_end": {
+        "name": "Do not disturb (end)"
+      },
+      "quiet_time_start": {
+        "name": "Do not disturb (start)"
+      },
+      "rain_snow_delay": {
+        "name": "Rain/snow delay"
+      },
+      "recipe": {
+        "name": "Recipe #"
+      },
+      "report_sensitivity": {
+        "name": "Report sensitivity"
+      },
+      "set_16a": {
+        "name": "Set 16A"
+      },
+      "set_32a": {
+        "name": "Set 32A"
+      },
+      "set_40a": {
+        "name": "Set 40A"
+      },
+      "set_50a": {
+        "name": "Set 50A"
+      },
+      "set_define_time": {
+        "name": "Set define time"
+      },
+      "set_delay_time": {
+        "name": "Set delay time"
+      },
+      "set_time": {
+        "name": "Set time"
+      },
+      "sleep_end_time": {
+        "name": "Sleep end time"
+      },
+      "sleep_start_time": {
+        "name": "Sleep start time"
+      },
+      "sm_detection_distance_max": {
+        "name": "Max micro-motion detection distance"
+      },
+      "sm_detection_distance_min": {
+        "name": "Min micro-motion detection distance"
+      },
+      "sm_sensitivity": {
+        "name": "Micro-motion detection sensitivity"
+      },
+      "sensitivity_cz": {
+        "name": "Sensitivity CZ"
+      },
+      "sensitivity_wd": {
+        "name": "Sensitivity WD"
+      },
+      "false_alarm": {
+        "name": "False alarm threshold"
+      },
+      "study_timer": {
+        "name": "Study timer"
+      },
+      "wd_detection": {
+        "name": "WD detection distance"
+      },
+      "mov_min_detection": {
+        "name": "Min movement detection distance"
+      },
+      "micro_min_detection": {
+        "name": "Min micro-motion detection distance (ZG-205Z)"
+      },
+      "bre_min_detection": {
+        "name": "Min breathing detection distance"
+      },
+      "sand_surface_calibration": {
+        "name": "Sand surface calibration"
+      },
+      "standby_bright": {
+        "name": "Standby brightness"
+      },
+      "standby_time": {
+        "name": "Standby time"
+      },
+      "temp_calibration": {
+        "name": "Temperature calibration"
+      },
+      "temp_sensitivity": {
+        "name": "Temperature sensitivity"
+      },
+      "temp_set": {
+        "name": "Temperature"
+      },
+      "tempsc": {
+        "name": "Temperature correction"
+      },
+      "time_clear": {
+        "name": "Scheduled clean time"
+      },
+      "timer_on": {
+        "name": "Delayed power on"
+      },
+      "trigger_sensitivity": {
+        "name": "Trigger sensitivity"
+      },
+      "use_time_1": {
+        "name": "Usage time 1"
+      },
+      "use_time_2": {
+        "name": "Usage time 2"
+      },
+      "use_time_3": {
+        "name": "Usage time 3"
+      },
+      "use_time_4": {
+        "name": "Usage time 4"
+      },
+      "use_time_5": {
+        "name": "Usage time 5"
+      },
+      "use_time_6": {
+        "name": "Usage time 6"
+      },
+      "use_time_7": {
+        "name": "Usage time 7"
+      },
+      "use_time_8": {
+        "name": "Usage time 8"
+      },
+      "uv_end_time": {
+        "name": "UV end time"
+      },
+      "uv_start_time": {
+        "name": "UV start time"
+      },
+      "warm_temperature": {
+        "name": "Warm temperature"
+      },
+      "watering_duration": {
+        "name": "Watering duration"
+      },
+      "xt_generic_number": {
+        "name": "{name}"
+      }
+    },
+    "select": {
+      "basic_anti_flicker": {
+        "name": "Ochrana proti blikaniu",
+        "state": {
+          "0": "Zakázané",
+          "1": "50 Hz",
+          "2": "60 Hz"
+        }
+      },
+      "basic_nightvision": {
+        "name": "Nočné videnie",
+        "state": {
+          "0": "Automaticky",
+          "1": "Neaktívny",
+          "2": "Aktívny"
+        }
+      },
+      "blanket_level": {
+        "name": "Úroveň",
+        "state": {
+          "level_1": "Nízka",
+          "level_10": "Vysoká",
+          "level_2": "Úroveň 2",
+          "level_3": "Úroveň 3",
+          "level_4": "Úroveň 4",
+          "level_5": "Úroveň 5",
+          "level_6": "Úroveň 6",
+          "level_7": "Úroveň 7",
+          "level_8": "Úroveň 8",
+          "level_9": "Úroveň 9"
+        }
+      },
+      "brightness": {
+        "name": "Jas"
+      },
+      "concentration": {
+        "name": "Koncentrácia"
+      },
+      "countdown": {
+        "name": "Odpočítavanie",
+        "state": {
+          "1h": "1 hodina",
+          "2h": "2 hodiny",
+          "3h": "3 hodiny",
+          "4h": "4 hodiny",
+          "5h": "5 hodín",
+          "6h": "6 hodín",
+          "cancel": "Zrušiť"
+        }
+      },
+      "cups": {
+        "name": "Poháre"
+      },
+      "curtain_mode": {
+        "name": "Režim",
+        "state": {
+          "morning": "Ráno",
+          "night": "Noc"
+        }
+      },
+      "curtain_motor_mode": {
+        "name": "Motorový režim",
+        "state": {
+          "back": "Späť",
+          "forward": "Dopredu"
+        }
+      },
+      "decibel_sensitivity": {
+        "name": "Citlivosť detekcie zvuku",
+        "state": {
+          "0": "Nízka citlivosť",
+          "1": "Vysoká citlivosť"
+        }
+      },
+      "desk_level": {
+        "name": "Úroveň",
+        "state": {
+          "level_1": "Úroveň 1",
+          "level_2": "Úroveň 2",
+          "level_3": "Úroveň 3",
+          "level_4": "Úroveň 4"
+        }
+      },
+      "desk_up_down": {
+        "name": "Hore/dole",
+        "state": {
+          "down": "Dole",
+          "stop": "Zastaviť",
+          "up": "Hore"
+        }
+      },
+      "fingerbot_mode": {
+        "name": "Režim",
+        "state": {
+          "click": "Stlačiť",
+          "switch": "Prepínač"
+        }
+      },
+      "horizontal_fan_angle": {
+        "name": "Horizontálny uhol výkyvu klapky",
+        "state": {
+          "30": "30°",
+          "60": "60°",
+          "90": "90°"
+        }
+      },
+      "humidifier_level": {
+        "name": "Úroveň postreku",
+        "state": {
+          "level_1": "Úroveň 1",
+          "level_10": "Úroveň 10",
+          "level_2": "Úroveň 2",
+          "level_3": "Úroveň 3",
+          "level_4": "Úroveň 4",
+          "level_5": "Úroveň 5",
+          "level_6": "Úroveň 6",
+          "level_7": "Úroveň 7",
+          "level_8": "Úroveň 8",
+          "level_9": "Úroveň 9"
+        }
+      },
+      "humidifier_moodlighting": {
+        "name": "Osvetlenie",
+        "state": {
+          "1": "Nálada 1",
+          "2": "Nálada 2",
+          "3": "Nálada 3",
+          "4": "Nálada 4",
+          "5": "Nálada 5"
+        }
+      },
+      "humidifier_spray_mode": {
+        "name": "Režim rozprašovania",
+        "state": {
+          "auto": "Auto",
+          "health": "Zdravie",
+          "humidity": "Vlhkosť",
+          "sleep": "Spánok",
+          "work": "Činnosť"
+        }
+      },
+      "indexed_blanket_level": {
+        "name": "Úroveň {index}",
+        "state": {
+          "level_1": "Nízka",
+          "level_10": "Vysoká",
+          "level_2": "Úroveň 2",
+          "level_3": "Úroveň 3",
+          "level_4": "Úroveň 4",
+          "level_5": "Úroveň 5",
+          "level_6": "Úroveň 6",
+          "level_7": "Úroveň 7",
+          "level_8": "Úroveň 8",
+          "level_9": "Úroveň 9"
+        }
+      },
+      "indexed_led_type": {
+        "name": "Typ zdroja svetla {index}",
+        "state": {
+          "halogen": "Halogén",
+          "incandescent": "Žiarovka",
+          "led": "LED"
+        }
+      },
+      "inverter_work_mode": {
+        "name": "Pracovný režim meniča",
+        "state": {
+          "manual": "Manuálny režim",
+          "self_powered": "Vlastné napájanie",
+          "time_of_use": "Čas používania"
+        }
+      },
+      "ipc_work_mode": {
+        "name": "Režim IPC",
+        "state": {
+          "0": "Režim nízkej spotreby",
+          "1": "Nepretržitý pracovný režim"
+        }
+      },
+      "led_type": {
+        "name": "Typ svetelného zdroja",
+        "state": {
+          "halogen": "Halogén",
+          "incandescent": "Žiarovka",
+          "led": "LED"
+        }
+      },
+      "light_mode": {
+        "name": "Režim svetelného indikátora",
+        "state": {
+          "none": "Neaktívny",
+          "pos": "Indikácia stavu invertovaného prepínača",
+          "relay": "Označuje stav zapnutia/vypnutia"
+        }
+      },
+      "material": {
+        "name": "Materiál"
+      },
+      "mode": {
+        "name": "Režim"
+      },
+      "motion_sensitivity": {
+        "name": "Citlivosť detekcie pohybu",
+        "state": {
+          "0": "Nízka",
+          "1": "Stredná",
+          "2": "Vysoká"
+        }
+      },
+      "odor_elimination_mode": {
+        "name": "Režim eliminácie zápachu",
+        "state": {
+          "interim": "Priebežné",
+          "smart": "Inteligentný"
+        }
+      },
+      "record_mode": {
+        "name": "Režim nahrávania",
+        "state": {
+          "1": "Len záznam udalostí",
+          "2": "Nepretržité nahrávanie"
+        }
+      },
+      "relay_status": {
+        "name": "Správanie pri zapnutí",
+        "state": {
+          "last": "Predchádzajúci stav",
+          "memory": "Predchádzajúci stav",
+          "off": "Neaktívny",
+          "on": "Aktívny",
+          "power_off": "Neaktívny",
+          "power_on": "Aktívny"
+        }
+      },
+      "target_humidity": {
+        "name": "Cieľová vlhkosť"
+      },
+      "temperature_level": {
+        "name": "Úroveň teploty"
+      },
+      "vacuum_cistern": {
+        "name": "Nastavenie nádrže na vodu",
+        "state": {
+          "closed": "Zatvorené",
+          "high": "Vysoká",
+          "low": "Nízka",
+          "middle": "Stredná"
+        }
+      },
+      "vacuum_collection": {
+        "name": "Režim zberu prachu",
+        "state": {
+          "large": "Veľký",
+          "middle": "Stredný",
+          "small": "Malý"
+        }
+      },
+      "vacuum_mode": {
+        "name": "Režim",
+        "state": {
+          "bow": "Oblúk",
+          "chargego": "Návrat do doku",
+          "left_bow": "Oblúk vľavo",
+          "left_spiral": "Špirála vľavo",
+          "mop": "Mop",
+          "part": "Časť",
+          "partial_bow": "Oblúk čiastočne",
+          "pick_zone": "Výber zóny",
+          "point": "Bod",
+          "pose": "Pozícia",
+          "random": "Náhodný",
+          "right_bow": "Oblúk vpravo",
+          "right_spiral": "Špirála vpravo",
+          "single": "Raz",
+          "smart": "Smart",
+          "spiral": "Špirála",
+          "standby": "Pohotovostný režim",
+          "wall_follow": "Sledovanie steny",
+          "zone": "Zóna"
+        }
+      },
+      "vertical_fan_angle": {
+        "name": "Vertikálny uhol výkyvu klapky",
+        "state": {
+          "30": "30°",
+          "60": "60°",
+          "90": "90°"
+        }
+      },
+      "volume": {
+        "name": "Hlasitosť"
+      },
+      "weather_delay": {
+        "name": "Meškanie počasia",
+        "state": {
+          "120h": "120h",
+          "144h": "144h",
+          "168h": "168h",
+          "24h": "24h",
+          "48h": "48h",
+          "72h": "72h",
+          "96h": "96h",
+          "cancel": "Zrušiť"
+        }
+      },
+      "alarm_volume": {
+        "name": "Alarm volume",
+        "state": {
+          "0": "Mute",
+          "1": "Normal",
+          "2": "Loud",
+          "mute": "Mute",
+          "normal": "Normal",
+          "loud": "Loud"
+        }
+      },
+      "beep_volume": {
+        "name": "Beep volume",
+        "state": {
+          "0": "High",
+          "1": "Low",
+          "2": "Mute",
+          "high": "High",
+          "low": "Low",
+          "mute": "Mute"
+        }
+      },
+      "cat_litter_box_clean": {
+        "name": "Manual shoveling",
+        "state": {
+          "0": "Not shoveling",
+          "1": "Start manual shoveling",
+          "2": "Pause manual shoveling"
+        }
+      },
+      "cat_litter_box_empty": {
+        "name": "Manual dumping",
+        "state": {
+          "0": "Not dumping",
+          "1": "Start manual dumping",
+          "2": "Pause manual dumping"
+        }
+      },
+      "cat_litter_box_status": {
+        "name": "Status",
+        "state": {
+          "standby": "Stand by",
+          "off": "Off",
+          "waiting_cluster": "Waiting cluster",
+          "cleaning": "Cleaning",
+          "uv": "UV",
+          "deodorization": "Deodorization",
+          "sleep": "Sleep"
+        }
+      },
+      "cat_litter_box_work_mode": {
+        "name": "Cleaning mode",
+        "state": {
+          "auto_clean": "Automatic cleaning",
+          "manual_clean": "Manual cleaning",
+          "sleep": "Sleep",
+          "uv": "UV",
+          "deodorization": "Deodorization"
+        }
+      },
+      "cat_litter_type": {
+        "name": "Cat litter type",
+        "state": {
+          "mineral_cat_litter": "Mineral (Bentonite)",
+          "mix_cat_litter": "Mixed (Tofu)"
+        }
+      },
+      "cds": {
+        "name": "Sensitivity",
+        "state": {
+          "2000lux": "2000lux",
+          "300lux": "300lux",
+          "50lux": "50lux",
+          "10lux": "10lux",
+          "5lux": "5lux",
+          "now": "now"
+        }
+      },
+      "change_temp_unit": {
+        "name": "Temperature unit",
+        "state": {
+          "0": "C°",
+          "1": "F",
+          "false": "C°",
+          "true": "F",
+          "c": "C°",
+          "f": "F"
+        }
+      },
+      "currency": {
+        "name": "Currency",
+        "state": {
+          "euro": "Euro",
+          "usd": "USD",
+          "rmb": "RMB"
+        }
+      },
+      "dbl_power_set": {
+        "name": "Set power",
+        "state": {
+          "level_1": "Level 1",
+          "level_2": "Level 2",
+          "level_3": "Level 3",
+          "level_4": "Level 4",
+          "level_5": "Level 5"
+        }
+      },
+      "device_mode": {
+        "name": "Device mode",
+        "state": {
+          "0": "Automatic",
+          "1": "Manual",
+          "auto": "Automatic",
+          "manual": "Manual"
+        }
+      },
+      "doorbell_volume": {
+        "name": "Doorbell volume",
+        "state": {
+          "mute": "Mute",
+          "low": "Low",
+          "high": "High"
+        }
+      },
+      "dj_color": {
+        "name": "Color",
+        "state": {
+          "r": "Red",
+          "rg": "Yellow",
+          "g": "Green",
+          "gb": "Light blue",
+          "b": "Blue",
+          "rb": "Pink",
+          "rgb": "White",
+          "color": "Random color"
+        }
+      },
+      "dj_mode": {
+        "name": "Mode",
+        "state": {
+          "bright": "Bright",
+          "gradually": "Gradually",
+          "star": "Star",
+          "flower": "Flower",
+          "marquee": "Marquee",
+          "fireworks": "Fireworks",
+          "meteor": "Meteor",
+          "stream": "Stream"
+        }
+      },
+      "key_tone": {
+        "name": "Key tone",
+        "state": {
+          "0": "High",
+          "1": "Normal",
+          "2": "Mute",
+          "high": "High",
+          "normal": "Normal",
+          "mute": "Mute"
+        }
+      },
+      "led_type_2": {
+        "name": "Light 2 source type",
+        "state": {
+          "halogen": "Halogen",
+          "incandescent": "Incandescent",
+          "led": "LED"
+        }
+      },
+      "led_type_3": {
+        "name": "Light 3 source type",
+        "state": {
+          "halogen": "Halogen",
+          "incandescent": "Incandescent",
+          "led": "LED"
+        }
+      },
+      "pir_sensitivity": {
+        "name": "PIR sensitivity",
+        "state": {
+          "low": "Low",
+          "middle": "Medium",
+          "high": "High"
+        }
+      },
+      "qccdz_chargingoperation": {
+        "name": "Charging operation",
+        "state": {
+          "opencharging": "Open charging",
+          "closecharging": "Close charging",
+          "waitoperation": "Wait charging"
+        }
+      },
+      "qccdz_work_mode": {
+        "name": "Work mode",
+        "state": {
+          "0": "Charge now",
+          "1": "Charge to percentage",
+          "2": "Charge energy",
+          "3": "Scheduled charge",
+          "4": "Delayed charge",
+          "charge_now": "Real time charging",
+          "charge_pct": "Charge to percentage",
+          "charge_energy": "Charge energy",
+          "charge_schedule": "Scheduled charge",
+          "charge_delay": "Delayed charge"
+        }
+      },
+      "sfkzq_work_state": {
+        "name": "Work state",
+        "state": {
+          "auto": "Auto",
+          "manual": "Manual",
+          "idle": "Idle"
+        }
+      },
+      "solar_en_total": {
+        "name": "Solar energy total",
+        "state": {
+          "unknown": "Unknown",
+          "disable": "Disable",
+          "enable": "Enable"
+        }
+      },
+      "sound_mode": {
+        "name": "Sound mode",
+        "state": {
+          "0": "Ringtone 0",
+          "1": "Ringtone 1",
+          "2": "Ringtone 2",
+          "3": "Ringtone 3",
+          "4": "Ringtone 4",
+          "5": "Ringtone 5",
+          "ringtone_0": "Ringtone 0",
+          "ringtone_1": "Ringtone 1",
+          "ringtone_2": "Ringtone 2",
+          "ringtone_3": "Ringtone 3",
+          "ringtone_4": "Ringtone 4",
+          "ringtone_5": "Ringtone 5",
+          "sound_0": "Sound 0",
+          "sound_1": "Sound 1",
+          "sound_2": "Sound 2",
+          "sound_3": "Sound 3",
+          "sound_4": "Sound 4",
+          "sound_5": "Sound 5"
+        }
+      },
+      "special_function": {
+        "name": "Special function",
+        "state": {
+          "0": "Function 1",
+          "1": "Function 2",
+          "2": "Function 3",
+          "3": "Function 4",
+          "4": "Function 5",
+          "function1": "Function 1",
+          "function2": "Function 2",
+          "function3": "Function 3",
+          "function4": "Function 4",
+          "function5": "Function 5"
+        }
+      },
+      "temp_unit_convert": {
+        "name": "Temperature unit",
+        "state": {
+          "c": "Celsius",
+          "f": "Fahrenheit"
+        }
+      },
+      "temperature_unit": {
+        "name": "Temperature unit",
+        "state": {
+          "1": "°C",
+          "2": "°F"
+        }
+      },
+      "tempunit": {
+        "name": "Temperature unit",
+        "state": {
+          "centigrade": "Celsius",
+          "fahrenheit_degree": "Fahrenheit"
+        }
+      },
+      "volume_unit": {
+        "name": "Volume unit"
+      },
+      "water_control": {
+        "name": "Water control",
+        "state": {
+          "on": "On",
+          "off": "Off"
+        }
+      },
+      "xfj_mode": {
+        "name": "Mode",
+        "state": {
+          "auto": "Automatic",
+          "sleep": "Sleep",
+          "manual": "Manual"
+        }
+      },
+      "xt_generic_select": {
+        "name": "{name}"
+      },
+      "xt_lock_unlock_mechanism": {
+        "name": "Lock/unlock mechanism",
+        "state": {
+          "auto": "Automatic",
+          "door_open": "Door open",
+          "door_operate": "Door operate",
+          "ticket_flow": "Ticket flow",
+          "dpcode_command": "DPcode command"
+        }
+      }
+    },
+    "sensor": {
+      "air_pressure": {
+        "name": "Tlak vzduchu"
+      },
+      "air_quality": {
+        "name": "Kvalita ovzdušia",
+        "state": {
+          "good": "Dobré",
+          "great": "Skvelé",
+          "mild": "Mierne",
+          "severe": "Závažné",
+          "bad": "Bad",
+          "medium": "Medium"
+        }
+      },
+      "air_quality_index": {
+        "name": "Index kvality ovzdušia",
+        "state": {
+          "level_1": "Úroveň 1",
+          "level_2": "Úroveň 2",
+          "level_3": "Úroveň 3",
+          "level_4": "Úroveň 4",
+          "level_5": "Úroveň 5",
+          "level_6": "Úroveň 6"
+        }
+      },
+      "battery": {
+        "name": "Batéria"
+      },
+      "battery_power": {
+        "name": "Výkon batérie"
+      },
+      "battery_soc": {
+        "name": "SOC batérie"
+      },
+      "battery_state": {
+        "name": "Stav batérie",
+        "state": {
+          "low": "Low",
+          "middle": "Middle",
+          "high": "High"
+        }
+      },
+      "carbon_dioxide": {
+        "name": "Oxid uhličitý"
+      },
+      "carbon_monoxide": {
+        "name": "Oxid uhoľnatý"
+      },
+      "cat_litter_box_status": {
+        "name": "Stav",
+        "state": {
+          "empty": "Vyprázdňovanie",
+          "level": "Vyrovnávanie",
+          "sleep": "Spanie",
+          "standby": "Pohotovostný režim",
+          "uv": "Dezinfekcia",
+          "cleaning": "Cleaning",
+          "clock": "Clock",
+          "deodorization": "Deodorization",
+          "off": "Off",
+          "standly": "Standby",
+          "waiting_cluster": "Waiting cluster"
+        }
+      },
+      "cat_weight": {
+        "name": "Hmotnosť mačky"
+      },
+      "cleaning_area": {
+        "name": "Oblasť čistenia"
+      },
+      "cleaning_time": {
+        "name": "Čas čistenia"
+      },
+      "concentration_carbon_dioxide": {
+        "name": "Koncentrácia oxidu uhličitého"
+      },
+      "current": {
+        "name": "Prúd"
+      },
+      "current_temperature": {
+        "name": "Aktuálna teplota"
+      },
+      "depth": {
+        "name": "Hĺbka"
+      },
+      "duster_cloth_life": {
+        "name": "Životnosť utierky na prach"
+      },
+      "excretion_time_day": {
+        "name": "Trvanie vylučovania"
+      },
+      "excretion_times_day": {
+        "name": "Časy vylučovania (deň)"
+      },
+      "filter_duration": {
+        "name": "Trvanie filtra"
+      },
+      "filter_life": {
+        "name": "Životnosť filtra"
+      },
+      "filter_utilization": {
+        "name": "Využitie filtra"
+      },
+      "formaldehyde": {
+        "name": "Formaldehyd"
+      },
+      "gas": {
+        "name": "Plyn"
+      },
+      "humidity": {
+        "name": "Vlhkosť"
+      },
+      "humidity_outdoor": {
+        "name": "Vonkajšia vlhkosť"
+      },
+      "illuminance": {
+        "name": "Osvetlenie"
+      },
+      "indexed_humidity_outdoor": {
+        "name": "Vonkajší kanál vlhkosti {index}"
+      },
+      "indexed_temperature_external": {
+        "name": "Teplotný kanál sondy {index}"
+      },
+      "inverter_output_power": {
+        "name": "Výstupný výkon meniča"
+      },
+      "last_amount": {
+        "name": "Posledná suma"
+      },
+      "last_operation_duration": {
+        "name": "Trvanie poslednej operácie"
+      },
+      "lifetime_battery_charge_energy": {
+        "name": "Energia nabitia batérie počas celej životnosti"
+      },
+      "lifetime_battery_discharge_energy": {
+        "name": "Energia vybíjania batérie počas jej životnosti"
+      },
+      "lifetime_inverter_output_energy": {
+        "name": "Výstupná energia meniča počas životnosti"
+      },
+      "lifetime_offgrid_port_energy": {
+        "name": "Energia z portu mimo siete za dobu životnosti"
+      },
+      "lifetime_pv_energy": {
+        "name": "Celoživotná fotovoltická energia"
+      },
+      "liquid_depth": {
+        "name": "Hĺbka kvapaliny"
+      },
+      "liquid_level": {
+        "name": "Hladina kvapaliny"
+      },
+      "liquid_state": {
+        "name": "Kvapalný stav",
+        "state": {
+          "lower_alarm": "Nízka",
+          "normal": "Normálne",
+          "upper_alarm": "Vysoká"
+        }
+      },
+      "luminosity": {
+        "name": "Svietivosť"
+      },
+      "methane": {
+        "name": "Metán"
+      },
+      "odor_elimination_status": {
+        "name": "Stav",
+        "state": {
+          "charge_done": "Nabíjanie je hotové",
+          "charging": "Nabíja sa",
+          "standby": "Pohotovostný režim",
+          "work": "Pracuje"
+        }
+      },
+      "phase_a_current": {
+        "name": "Prúd fázy A"
+      },
+      "phase_a_power": {
+        "name": "Výkon fázy A"
+      },
+      "phase_a_voltage": {
+        "name": "Napätie fázy A"
+      },
+      "phase_b_current": {
+        "name": "Prúd fázy B"
+      },
+      "phase_b_power": {
+        "name": "Výkon fázy B"
+      },
+      "phase_b_voltage": {
+        "name": "Napätie fázy B"
+      },
+      "phase_c_current": {
+        "name": "Prúd fázy C"
+      },
+      "phase_c_power": {
+        "name": "Výkon fázy C"
+      },
+      "phase_c_voltage": {
+        "name": "Napätie fázy C"
+      },
+      "pm1": {
+        "name": "PM1"
+      },
+      "pm10": {
+        "name": "PM10"
+      },
+      "pm25": {
+        "name": "PM2.5"
+      },
+      "power": {
+        "name": "Výkon"
+      },
+      "precipitation_intensity": {
+        "name": "Intenzita zrážok"
+      },
+      "precipitation_today": {
+        "name": "Celkový úhrn zrážok dnes"
+      },
+      "pump_time": {
+        "name": "Trvanie vodného čerpadla"
+      },
+      "pv_channel_power": {
+        "name": "Výkon FV kanála {index}"
+      },
+      "remaining_time": {
+        "name": "Zostávajúci čas"
+      },
+      "rolling_brush_life": {
+        "name": "Životnosť valčekovej kefy"
+      },
+      "side_brush_life": {
+        "name": "Životnosť bočnej kefky"
+      },
+      "smoke_amount": {
+        "name": "Množstvo dymu"
+      },
+      "sous_vide_status": {
+        "name": "Stav",
+        "state": {
+          "boiling_temp": "Teplota varu",
+          "cooling": "Chladenie",
+          "heating": "Vykurovanie",
+          "heating_temp": "Teplota vykurovania",
+          "reserve_1": "Rezerva 1",
+          "reserve_2": "Rezerva 2",
+          "reserve_3": "Rezerva 3",
+          "standby": "Pohotovostný režim",
+          "warm": "Udržiavanie tepla"
+        }
+      },
+      "status": {
+        "name": "Stav"
+      },
+      "supply_frequency": {
+        "name": "Frekvencia napájania"
+      },
+      "temperature": {
+        "name": "Teplota"
+      },
+      "temperature_external": {
+        "name": "Teplota sondy"
+      },
+      "total_absorption_particles": {
+        "name": "Celková absorpcia častíc"
+      },
+      "total_cleaning_area": {
+        "name": "Celková plocha čistenia"
+      },
+      "total_cleaning_time": {
+        "name": "Celkový čas čistenia"
+      },
+      "total_cleaning_times": {
+        "name": "Celkový čas čistenia"
+      },
+      "total_dissolved_solids": {
+        "name": "Celkový počet rozpustených pevných látok"
+      },
+      "total_energy": {
+        "name": "Celková energia"
+      },
+      "total_operating_time": {
+        "name": "Celkový prevádzkový čas"
+      },
+      "total_power": {
+        "name": "Celkový výkon"
+      },
+      "total_production": {
+        "name": "Celková produkcia"
+      },
+      "total_pv_power": {
+        "name": "Celkový fotovoltaický výkon"
+      },
+      "total_volatile_organic_compound": {
+        "name": "Celková prchavá organická zlúčenina"
+      },
+      "total_watering_time": {
+        "name": "Celkový čas zavlažovania"
+      },
+      "uv_index": {
+        "name": "UV index"
+      },
+      "uv_runtime": {
+        "name": "Čas behu UV"
+      },
+      "voc": {
+        "name": "Prchavé organické zlúčeniny"
+      },
+      "voltage": {
+        "name": "Napätie"
+      },
+      "water_level": {
+        "name": "Hladina vody"
+      },
+      "water_level_state": {
+        "name": "Hladina vody",
+        "state": {
+          "level_1": "Nízka",
+          "level_2": "Stredná",
+          "level_3": "Plná"
+        }
+      },
+      "water_time": {
+        "name": "Trvanie používania vody"
+      },
+      "wind_direction": {
+        "name": "Smer vetra"
+      },
+      "dynamic_passcode": {
+        "name": "Dynamic Passcode"
+      },
+      "dynamic_passcode_expires_at": {
+        "name": "Dynamic Passcode Expiration Time"
+      },
+      "dynamic_passcode_remaining_seconds": {
+        "name": "Dynamic Passcode Remaining Time"
+      },
+      "a_current": {
+        "name": "Current A"
+      },
+      "a_voltage": {
+        "name": "Voltage A"
+      },
+      "achz": {
+        "name": "Grid Frequency"
+      },
+      "aci": {
+        "name": "Grid current"
+      },
+      "activepower": {
+        "name": "Active power"
+      },
+      "activepowera": {
+        "name": "Active power A"
+      },
+      "activepowerb": {
+        "name": "Active power B"
+      },
+      "activepowerc": {
+        "name": "Active power C"
+      },
+      "acv": {
+        "name": "Grid voltage"
+      },
+      "add_ele": {
+        "name": "Consumption {index}"
+      },
+      "add_ele_this_month": {
+        "name": "Monthly consumption {index}"
+      },
+      "add_ele_this_year": {
+        "name": "Yearly consumption {index}"
+      },
+      "add_ele_today": {
+        "name": "Daily consumption {index}"
+      },
+      "xt_add_ele": {
+        "name": "Consumption {index} (method B)"
+      },
+      "xt_add_ele_this_month": {
+        "name": "Monthly consumption {index} (method B)"
+      },
+      "xt_add_ele_this_year": {
+        "name": "Yearly consumption {index} (method B)"
+      },
+      "xt_add_ele_today": {
+        "name": "Daily consumption {index} (method B)"
+      },
+      "auto_deordrizer": {
+        "name": "Auto deordrizer"
+      },
+      "b_current": {
+        "name": "Current B"
+      },
+      "b_voltage": {
+        "name": "Voltage B"
+      },
+      "backlight_switch": {
+        "name": "Backlight Switch"
+      },
+      "balance_energy": {
+        "name": "Balance energy"
+      },
+      "battery_level": {
+        "name": "Battery level"
+      },
+      "c_current": {
+        "name": "Current C"
+      },
+      "c_voltage": {
+        "name": "Voltage C"
+      },
+      "calibration": {
+        "name": "Calibration"
+      },
+      "ch0_humidity": {
+        "name": "Base Station Humidity"
+      },
+      "ch0_temperature": {
+        "name": "Base Station Temperature"
+      },
+      "ch1_battery": {
+        "name": "Channel 1 Battery"
+      },
+      "ch1_temperature": {
+        "name": "Channel 1 Temperature"
+      },
+      "ch2_battery": {
+        "name": "Channel 2 Battery"
+      },
+      "ch2_temperature": {
+        "name": "Channel 2 Temperature"
+      },
+      "ch3_battery": {
+        "name": "Channel 3 Battery"
+      },
+      "ch3_temperature": {
+        "name": "Channel 3 Temperature"
+      },
+      "ch4_battery": {
+        "name": "Channel 4 Battery"
+      },
+      "ch4_temperature": {
+        "name": "Channel 4 Temperature"
+      },
+      "ch5_battery": {
+        "name": "Channel 5 Battery"
+      },
+      "ch5_temperature": {
+        "name": "Channel 5 Temperature"
+      },
+      "ch6_battery": {
+        "name": "Channel 6 Battery"
+      },
+      "ch6_temperature": {
+        "name": "Channel 6 Temperature"
+      },
+      "ch7_battery": {
+        "name": "Channel 7 Battery"
+      },
+      "ch7_temperature": {
+        "name": "Channel 7 Temperature"
+      },
+      "ch8_battery": {
+        "name": "Channel 8 Battery"
+      },
+      "ch8_temperature": {
+        "name": "Channel 8 Temperature"
+      },
+      "ch9_battery": {
+        "name": "Channel 9 Battery"
+      },
+      "ch9_temperature": {
+        "name": "Channel 9 Temperature"
+      },
+      "bag_change_counting": {
+        "name": "Bag change count"
+      },
+      "capacity_calibration": {
+        "name": "Capacity calibration"
+      },
+      "charge_energy": {
+        "name": "Charge energy"
+      },
+      "charge_energy_once": {
+        "name": "Charge energy (single)"
+      },
+      "child_lock": {
+        "name": "Child lock"
+      },
+      "clct_time": {
+        "name": "Collected time"
+      },
+      "clean": {
+        "name": "Clean"
+      },
+      "clean_notice": {
+        "name": "Clean notice"
+      },
+      "clean_taste": {
+        "name": "Clean taste"
+      },
+      "clean_tasteswitch": {
+        "name": "Clean taste switch"
+      },
+      "clean_time": {
+        "name": "Clean time"
+      },
+      "clean_time_switch": {
+        "name": "Clean time switch"
+      },
+      "countdown_left": {
+        "name": "Countdown left"
+      },
+      "ctime": {
+        "name": "Timer"
+      },
+      "ctime2": {
+        "name": "Timer 2"
+      },
+      "current_a": {
+        "name": "Current A"
+      },
+      "current_b": {
+        "name": "Current B"
+      },
+      "currenta": {
+        "name": "Current A"
+      },
+      "currentb": {
+        "name": "Current B"
+      },
+      "currentc": {
+        "name": "Current C"
+      },
+      "deodorization_num": {
+        "name": "Deodorization number"
+      },
+      "detection_sensitivity": {
+        "name": "Detection sensitivity"
+      },
+      "device_consumption": {
+        "name": "Device consumption"
+      },
+      "device_max_set_a": {
+        "name": "Device Max A",
+        "state": {
+          "max16a": "Max 16A",
+          "max32a": "Max 32A",
+          "max40a": "Max 40A",
+          "max50a": "Max 50A"
+        }
+      },
+      "device_power": {
+        "name": "Device power"
+      },
+      "device_temperature": {
+        "name": "Device temperature"
+      },
+      "device_temperature2": {
+        "name": "Device temperature 2"
+      },
+      "deviceid": {
+        "name": "Device ID"
+      },
+      "direction_a": {
+        "name": "Power direction A"
+      },
+      "direction_b": {
+        "name": "Power direction B"
+      },
+      "deodorization": {
+        "name": "Deodorization"
+      },
+      "eco": {
+        "name": "Eco"
+      },
+      "electric": {
+        "name": "Power production"
+      },
+      "electric_this_month": {
+        "name": "Monthly production"
+      },
+      "electric_this_year": {
+        "name": "Yearly production"
+      },
+      "electric_today": {
+        "name": "Daily production"
+      },
+      "electric_total": {
+        "name": "Total power production"
+      },
+      "empty": {
+        "name": "Empty"
+      },
+      "end_time": {
+        "name": "End time"
+      },
+      "energyconsumed": {
+        "name": "Energy consumed"
+      },
+      "energyconsumeda": {
+        "name": "Energy consumed A"
+      },
+      "energyconsumedb": {
+        "name": "Energy consumed B"
+      },
+      "energyconsumedc": {
+        "name": "Energy consumed C"
+      },
+      "fault": {
+        "name": "Fault"
+      },
+      "flow_velocity": {
+        "name": "Flow speed"
+      },
+      "frequency": {
+        "name": "Frequency"
+      },
+      "gross_generation": {
+        "name": "Gross generation"
+      },
+      "gross_generation_a": {
+        "name": "Gross generation A"
+      },
+      "gross_generation_b": {
+        "name": "Gross generation B"
+      },
+      "gross_generation_c": {
+        "name": "Gross generation C"
+      },
+      "heart_rate": {
+        "name": "Heart rate"
+      },
+      "hps_presence_state": {
+        "name": "Presence",
+        "state": {
+          "none": "none",
+          "presence": "Presence",
+          "peaceful": "Peaceful",
+          "small_move": "Small movement",
+          "large_move": "Large movement"
+        }
+      },
+      "hum_alarm": {
+        "name": "Humidity alarm",
+        "state": {
+          "loweralarm": "Low humidity",
+          "upperalarm": "High humidity",
+          "cancel": "None"
+        }
+      },
+      "induction_clean": {
+        "name": "Induction clean"
+      },
+      "induction_delay": {
+        "name": "Induction delay"
+      },
+      "induction_interval": {
+        "name": "Induction interval"
+      },
+      "jtmspro_alarm_lock": {
+        "name": "Lock alarm",
+        "state": {
+          "0": "Wrong fingerprint",
+          "1": "Wrong password",
+          "2": "Wrong card",
+          "3": "Wrong face",
+          "4": "Latch stuck",
+          "5": "Too hot",
+          "6": "Not closed after timeout",
+          "7": "Deadbolt stuck",
+          "8": "Anti-pry alarm",
+          "9": "Not calibrated",
+          "10": "Low battery",
+          "11": "Battery exhausted",
+          "12": "Vibration alarm",
+          "13": "Arm alarm",
+          "wrong_finger": "Wrong fingerprint",
+          "wrong_password": "Wrong password",
+          "wrong_card": "Wrong card",
+          "wrong_face": "Wrong face",
+          "tongue_bad": "Latch stuck",
+          "too_hot": "Too hot",
+          "unclosed_time": "Not closed after timeout",
+          "tongue_not_out": "Deadbolt stuck",
+          "pry": "Anti-pry alarm",
+          "key_in": "Not calibrated",
+          "low_battery": "Low battery",
+          "power_off": "Battery exhausted",
+          "shock": "Vibration alarm",
+          "defense": "Arm alarm"
+        }
+      },
+      "jtmspro_closed_opened": {
+        "name": "Door Open/Closed",
+        "state": {
+          "0": "Unknown",
+          "1": "Open",
+          "2": "Closed",
+          "unknown": "Unknown",
+          "open": "Open",
+          "closed": "Closed"
+        }
+      },
+      "ldr": {
+        "name": "Light intensity"
+      },
+      "liquid_level_percent": {
+        "name": "Liquid level"
+      },
+      "magnetnum": {
+        "name": "Magnet number"
+      },
+      "meter_type": {
+        "name": "Meter type",
+        "state": {
+          "unknown": "Unknown",
+          "3_phase": "3 Phases",
+          "1_phase": "1 Phase",
+          "1_phase_3_wire": "1 Phase 3 wires",
+          "other": "Other"
+        }
+      },
+      "monitoring": {
+        "name": "Monitoring"
+      },
+      "mov_status": {
+        "name": "Movement status"
+      },
+      "ms_category_alarm_lock": {
+        "name": "Keypad alarm",
+        "state": {
+          "0": "Wrong fingerprint",
+          "1": "Wrong password",
+          "2": "Wrong card",
+          "3": "Wrong face",
+          "4": "Too hot",
+          "5": "Not closed after timeout",
+          "6": "Anti-pry alarm",
+          "7": "Low battery",
+          "8": "Battery exhausted",
+          "9": "Vibration alarm",
+          "wrong_finger": "Wrong fingerprint",
+          "wrong_password": "Wrong password",
+          "wrong_card": "Wrong card",
+          "wrong_face": "Wrong face",
+          "too_hot": "Too hot",
+          "unclosed_time": "Not closed after timeout",
+          "pry": "Anti-pry alarm",
+          "low_battery": "Low battery",
+          "power_off": "Battery exhausted",
+          "shock": "Vibration alarm"
+        }
+      },
+      "msp_history": {
+        "name": "History",
+        "state": {
+          "0": "None",
+          "1": "Automatic shoveling completed",
+          "2": "Manual shoveling completed",
+          "3": "Trash bin extraction",
+          "4": "Trash bin reinstallation",
+          "5": "Start automatic deodorization",
+          "6": "Start manual deodorization",
+          "7": "Temperature in the cabin is too high",
+          "8": "The temperature inside the cabin is suitable",
+          "9": "Sand dumping completed",
+          "10": "Sand dumping canceled",
+          "11": "Litter shoveling canceled",
+          "12": "Enter Do Not Disturb mode",
+          "13": "Exit Do Not Disturb mode",
+          "14": "Cat approaches",
+          "15": "Cat leaves",
+          "16": "Starting Self-inspection",
+          "17": "Completed self-inspection",
+          "18": "Cover is not installed",
+          "19": "Cover is installed",
+          "20": "Start shoveling",
+          "21": "Start dumping",
+          "22": "Cat enters"
+        }
+      },
+      "mzj_work_status": {
+        "name": "Work status",
+        "state": {
+          "stop": "Stopped",
+          "working": "Working",
+          "complete": "Complete",
+          "0": "Stopped",
+          "1": "Working",
+          "2": "Complete"
+        }
+      },
+      "net_notice": {
+        "name": "Net notice"
+      },
+      "not_disturb": {
+        "name": "Not disturb"
+      },
+      "not_disturb_switch": {
+        "name": "Not disturb switch"
+      },
+      "notification_status": {
+        "name": "Notification status"
+      },
+      "number": {
+        "name": "Number"
+      },
+      "odourless": {
+        "name": "Odourless"
+      },
+      "off_bed_time": {
+        "name": "Time get out of bed"
+      },
+      "ozone_concentration": {
+        "name": "Ozone concentration"
+      },
+      "pedal_angle": {
+        "name": "Pedal angle"
+      },
+      "phaseflag": {
+        "name": "Phase",
+        "state": {
+          "single_phase": "Single phase",
+          "three_phase": "Three phases",
+          "no_phase": "No phase",
+          "phase_err": "Phase error"
+        }
+      },
+      "pir_radar": {
+        "name": "PIR Radar"
+      },
+      "ponud": {
+        "name": "Cat weight (lb)"
+      },
+      "power_a": {
+        "name": "Power A"
+      },
+      "power_b": {
+        "name": "Power B"
+      },
+      "power_factor": {
+        "name": "Power factor"
+      },
+      "power_factor_b": {
+        "name": "Power factor B"
+      },
+      "power_total": {
+        "name": "Total power"
+      },
+      "powerfactora": {
+        "name": "Power factor A"
+      },
+      "powerfactorb": {
+        "name": "Power factor B"
+      },
+      "powerfactorc": {
+        "name": "Power factor C"
+      },
+      "product_specifications": {
+        "name": "Product specification",
+        "state": {
+          "europe": "Europe",
+          "america": "America"
+        }
+      },
+      "pv1_curr": {
+        "name": "Panel 1 current"
+      },
+      "pv1_volt": {
+        "name": "Panel 1 voltage"
+      },
+      "pv2_curr": {
+        "name": "Panel 2 current"
+      },
+      "pv2_volt": {
+        "name": "Panel 2 voltage"
+      },
+      "pvi": {
+        "name": "Total panel 1 current"
+      },
+      "pvv": {
+        "name": "Total panel voltage"
+      },
+      "qccdz_connection_state": {
+        "name": "Connection state",
+        "state": {
+          "0": "12V",
+          "1": "12V PWN",
+          "2": "9V",
+          "3": "9V PWM",
+          "4": "6V",
+          "5": "6V PWM",
+          "6": "Error",
+          "controlpi_12v": "12V",
+          "controlpi_12v_pwm": "12V PWN",
+          "controlpi_9v": "9V",
+          "controlpi_9v_pwm": "9V PWM",
+          "controlpi_6v": "6V",
+          "controlpi_6v_pwm": "6V PWM",
+          "controlpi_error": "Error"
+        }
+      },
+      "qccdz_devicestate": {
+        "name": "Device state",
+        "state": {
+          "no_connet": "Not connected",
+          "connect": "Connected",
+          "charing": "Charging",
+          "wait_rfid": "Waiting for RFID",
+          "finish": "Finished",
+          "wait_charing": "Charge waiting",
+          "error": "Error"
+        }
+      },
+      "qccdz_work_state": {
+        "name": "Work state",
+        "state": {
+          "0": "Charger is free",
+          "1": "Charger inserted",
+          "2": "Charger is free (fault)",
+          "3": "Charger is waiting",
+          "4": "Charger is charging",
+          "5": "Charger is paused",
+          "6": "Charger has finished",
+          "7": "Charger fault",
+          "charger_free": "Charger is free",
+          "charger_insert": "Charger inserted",
+          "charger_free_fault": "Charger is free (fault)",
+          "charger_wait": "Charger is waiting",
+          "charger_charging": "Charger is charging",
+          "charger_pause": "Charger is paused",
+          "charger_end": "Charger has finished",
+          "charger_fault": "Charger fault"
+        }
+      },
+      "reactivepower": {
+        "name": "Reactive power"
+      },
+      "reactivepowera": {
+        "name": "Reactive power A"
+      },
+      "reactivepowerb": {
+        "name": "Reactive power B"
+      },
+      "reactivepowerc": {
+        "name": "Reactive power C"
+      },
+      "releases": {
+        "name": "Release"
+      },
+      "respiratory_rate": {
+        "name": "Respiratory rate"
+      },
+      "sand_surface_calibration": {
+        "name": "Sand surface calibration"
+      },
+      "sigle_phase_power": {
+        "name": "Single phase power"
+      },
+      "sleep_stage": {
+        "name": "Sleep stage",
+        "state": {
+          "sleep": "Sleep",
+          "awake": "Awake",
+          "0": "Sleep",
+          "1": "Awake"
+        }
+      },
+      "smart_clean": {
+        "name": "Smart clean"
+      },
+      "start_time": {
+        "name": "Start time"
+      },
+      "store_full_notify": {
+        "name": "Store full notify"
+      },
+      "switch_alarm_sound": {
+        "name": "Switch Alarm Sound"
+      },
+      "system_version": {
+        "name": "System version"
+      },
+      "target_distance": {
+        "name": "Target distance"
+      },
+      "temp_alarm": {
+        "name": "Temperature alarm",
+        "state": {
+          "loweralarm": "Low temperature",
+          "upperalarm": "High temperature",
+          "cancel": "None"
+        }
+      },
+      "temp_bottom": {
+        "name": "Min temperature"
+      },
+      "temp_show": {
+        "name": "Current temperature"
+      },
+      "temp_top": {
+        "name": "Max temperature"
+      },
+      "temp_unit_convert": {
+        "name": "Temperature unit",
+        "state": {
+          "c": "Celsius",
+          "f": "Fahrenheit"
+        }
+      },
+      "time": {
+        "name": "Time"
+      },
+      "time_get_in_bed": {
+        "name": "Time get in bed"
+      },
+      "toilet_notice": {
+        "name": "Toilet notice"
+      },
+      "total_forward_energy": {
+        "name": "Total forward energy"
+      },
+      "trash_status": {
+        "name": "Trash status"
+      },
+      "tvoc": {
+        "name": "TVOC"
+      },
+      "unit": {
+        "name": "Unit"
+      },
+      "unit_switch": {
+        "name": "Weight unit",
+        "state": {
+          "kg": "Kilograms",
+          "lb": "Pounds"
+        }
+      },
+      "unlock_card": {
+        "name": "Card unlock user"
+      },
+      "unlock_face": {
+        "name": "Face unlock user"
+      },
+      "unlock_finger_vein": {
+        "name": "Finger vein unlock user"
+      },
+      "unlock_fingerprint": {
+        "name": "Fingerprint unlock user"
+      },
+      "unlock_hand": {
+        "name": "Hand unlock user"
+      },
+      "unlock_password": {
+        "name": "Password unlock user"
+      },
+      "usage_times": {
+        "name": "Usage times"
+      },
+      "voltage_a": {
+        "name": "Voltage A"
+      },
+      "water_once": {
+        "name": "Instant flow rate"
+      },
+      "water_total": {
+        "name": "Total flow"
+      },
+      "water_use_data": {
+        "name": "Water used"
+      },
+      "watering_cycle": {
+        "name": "Watering cycle"
+      },
+      "watering_task": {
+        "name": "Watering task",
+        "state": {
+          "0": "None",
+          "1": "Single duration",
+          "2": "Cycle duration",
+          "3": "Single volume",
+          "4": "Cycle volume"
+        }
+      },
+      "watering_volume": {
+        "name": "Watering volume"
+      },
+      "wnykq_ir_control": {
+        "name": "IR control",
+        "state": {
+          "0": "Study",
+          "1": "Stop",
+          "2": "Success",
+          "3": "Fail",
+          "study": "Study",
+          "stop": "Stop",
+          "success": "Success",
+          "fail": "Fail"
+        }
+      },
+      "work_stat": {
+        "name": "Work stat"
+      },
+      "xt_cover_invert_control": {
+        "name": "Cover controls inverted"
+      },
+      "xt_cover_invert_status": {
+        "name": "Cover status inverted"
+      },
+      "xt_generic_sensor": {
+        "name": "{name}"
+      },
+      "current2": {
+        "name": "Current 2"
+      },
+      "detection_near": {
+        "name": "Detection near"
+      },
+      "distance": {
+        "name": "Target distance"
+      },
+      "power2": {
+        "name": "Power 2"
+      },
+      "total_energy_today": {
+        "name": "Daily total energy"
+      },
+      "total_energy_this_month": {
+        "name": "Monthly total energy"
+      },
+      "total_energy_this_year": {
+        "name": "Yearly total energy"
+      },
+      "xt_total_energy": {
+        "name": "Total energy (method B)"
+      },
+      "xt_total_energy_today": {
+        "name": "Daily total energy (method B)"
+      },
+      "xt_total_energy_this_month": {
+        "name": "Monthly total energy (method B)"
+      },
+      "xt_total_energy_this_year": {
+        "name": "Yearly total energy (method B)"
+      },
+      "voltage2": {
+        "name": "Voltage 2"
+      },
+      "xt_lock_unlock_mechanism": {
+        "name": "Lock/unlock mechanism",
+        "state": {
+          "auto": "Automatic",
+          "door_open": "Door open",
+          "door_operate": "Door operate",
+          "ticket_flow": "Ticket flow",
+          "dpcode_command": "DPcode command"
+        }
+      }
+    },
+    "switch": {
+      "anion": {
+        "name": "Anión"
+      },
+      "arm_beep": {
+        "name": "Pípnutie ovládania"
+      },
+      "auto_clean": {
+        "name": "Automatické čistenie"
+      },
+      "battery_lock": {
+        "name": "Zámok batérie"
+      },
+      "child_lock": {
+        "name": "Detský zámok"
+      },
+      "cry_detection": {
+        "name": "Detekcia plaču"
+      },
+      "disinfection": {
+        "name": "Dezinfekcia"
+      },
+      "do_not_disturb": {
+        "name": "Nerušiť"
+      },
+      "energy_saving": {
+        "name": "Úspora energie"
+      },
+      "filter_cartridge_reset": {
+        "name": "Reset filtračnej kazety"
+      },
+      "filter_reset": {
+        "name": "Obnovenie filtra"
+      },
+      "flip": {
+        "name": "Prevrátiť"
+      },
+      "frost_protection": {
+        "name": "Ochrana proti mrazu"
+      },
+      "heat_preservation": {
+        "name": "Udržiavanie tepla"
+      },
+      "humidification": {
+        "name": "Zvlhčovanie"
+      },
+      "indexed_alarm": {
+        "name": "Alarm {index}"
+      },
+      "indexed_socket": {
+        "name": "Zásuvka {index}"
+      },
+      "indexed_switch": {
+        "name": "Prepínač {index}"
+      },
+      "indexed_usb": {
+        "name": "USB {index}"
+      },
+      "ionizer": {
+        "name": "Ionizátor"
+      },
+      "motion_alarm": {
+        "name": "Pohybový alarm"
+      },
+      "motion_recording": {
+        "name": "Záznam pohybu"
+      },
+      "motion_tracking": {
+        "name": "Sledovanie pohybu"
+      },
+      "music": {
+        "name": "Hudba"
+      },
+      "mute": {
+        "name": "Stlmiť"
+      },
+      "mute_voice": {
+        "name": "Stlmiť hlas"
+      },
+      "natural_wind": {
+        "name": "Prírodný vietor"
+      },
+      "open_window_detection": {
+        "name": "Detekcia otvoreného okna"
+      },
+      "output_power_limit": {
+        "name": "Limit výstupného výkonu"
+      },
+      "oxygen_bar": {
+        "name": "Kyslíkový bar"
+      },
+      "plug": {
+        "name": "Zástrčka"
+      },
+      "power": {
+        "name": "Výkon"
+      },
+      "privacy_mode": {
+        "name": "Režim súkromia"
+      },
+      "pump": {
+        "name": "Čerpadlo"
+      },
+      "radio": {
+        "name": "Rádio"
+      },
+      "reset_of_water_usage_days": {
+        "name": "Vynulovanie dní spotreby vody"
+      },
+      "reverse": {
+        "name": "Reverzný"
+      },
+      "siren": {
+        "name": "Siréna"
+      },
+      "sleep": {
+        "name": "Spánok"
+      },
+      "sleep_aid": {
+        "name": "Pomoc pri spánku"
+      },
+      "slow_feed": {
+        "name": "Pomalé podávanie"
+      },
+      "snooze": {
+        "name": "Odložiť"
+      },
+      "socket": {
+        "name": "Zásuvka"
+      },
+      "sound": {
+        "name": "Zvuk"
+      },
+      "sound_detection": {
+        "name": "Detekcia zvuku"
+      },
+      "spray": {
+        "name": "Sprej"
+      },
+      "start": {
+        "name": "Štart"
+      },
+      "sterilization": {
+        "name": "Sterilizácia"
+      },
+      "switch": {
+        "name": "Prepínač"
+      },
+      "time_watermark": {
+        "name": "Časový vodoznak"
+      },
+      "uv_sterilization": {
+        "name": "UV sterilizácia"
+      },
+      "video_recording": {
+        "name": "Nahrávanie videa"
+      },
+      "voice": {
+        "name": "Hlas"
+      },
+      "water": {
+        "name": "Voda"
+      },
+      "water_pump_reset": {
+        "name": "Reset vodného čerpadla"
+      },
+      "wide_dynamic_range": {
+        "name": "Široký dynamický rozsah"
+      },
+      "alarm_1": {
+        "name": "Alarm 1"
+      },
+      "alarm_2": {
+        "name": "Alarm 2"
+      },
+      "alarm_3": {
+        "name": "Alarm 3"
+      },
+      "alarm_4": {
+        "name": "Alarm 4"
+      },
+      "alarm_switch": {
+        "name": "Alarm switch"
+      },
+      "auto_deordrizer": {
+        "name": "Auto deordrizer"
+      },
+      "automatic_lock": {
+        "name": "Automatic lock"
+      },
+      "beep": {
+        "name": "Beep"
+      },
+      "calibration": {
+        "name": "Calibration"
+      },
+      "clean": {
+        "name": "Clean"
+      },
+      "clean_notice": {
+        "name": "Clean notice"
+      },
+      "clean_taste": {
+        "name": "Clean taste"
+      },
+      "clean_tasteswitch": {
+        "name": "Clean taste Switch"
+      },
+      "clean_time": {
+        "name": "Clean time"
+      },
+      "clean_time_switch": {
+        "name": "Clean time switch"
+      },
+      "control_skip": {
+        "name": "Skip control"
+      },
+      "deep_clean": {
+        "name": "Double cleaning"
+      },
+      "deodorization": {
+        "name": "Deodorization"
+      },
+      "developer_mode": {
+        "name": "Developer mode"
+      },
+      "empty": {
+        "name": "Empty"
+      },
+      "factory_reset": {
+        "name": "Factory reset"
+      },
+      "false_breath": {
+        "name": "False breath filter"
+      },
+      "id_verification_set": {
+        "name": "Set ID verification"
+      },
+      "indicator_light": {
+        "name": "Indicator light"
+      },
+      "induction_clean": {
+        "name": "Induction Clean"
+      },
+      "infrared_sensor_switch": {
+        "name": "Infrared sensor"
+      },
+      "key_rec": {
+        "name": "Key tone"
+      },
+      "light": {
+        "name": "Light"
+      },
+      "manual_clean": {
+        "name": "Manual clean"
+      },
+      "net_notice": {
+        "name": "Net notice"
+      },
+      "not_disturb": {
+        "name": "Not disturb"
+      },
+      "not_disturb_switch": {
+        "name": "Not disturb Switch"
+      },
+      "odourless": {
+        "name": "Odourless"
+      },
+      "one_click_cleanup": {
+        "name": "One click cleanup"
+      },
+      "photo_again": {
+        "name": "Take another photo"
+      },
+      "pump_auto": {
+        "name": "Pump auto"
+      },
+      "pump_mode": {
+        "name": "Pump drainage/supply"
+      },
+      "pump_switch": {
+        "name": "Pump switch"
+      },
+      "quiet_timing_on": {
+        "name": "Do not disturb"
+      },
+      "reboot": {
+        "name": "Reboot"
+      },
+      "rfid": {
+        "name": "RFID"
+      },
+      "rtc_lock": {
+        "name": "RTC lock"
+      },
+      "sleep_mode": {
+        "name": "Sleep mode"
+      },
+      "sleeping": {
+        "name": "Sleep"
+      },
+      "smart_clean": {
+        "name": "Smart clean"
+      },
+      "socket_1": {
+        "name": "Socket 1"
+      },
+      "socket_2": {
+        "name": "Socket 2"
+      },
+      "socket_3": {
+        "name": "Socket 3"
+      },
+      "socket_4": {
+        "name": "Socket 4"
+      },
+      "socket_5": {
+        "name": "Socket 5"
+      },
+      "socket_6": {
+        "name": "Socket 6"
+      },
+      "store_full_notify": {
+        "name": "Store full notify"
+      },
+      "switch_1": {
+        "name": "Switch 1"
+      },
+      "switch_2": {
+        "name": "Switch 2"
+      },
+      "switch_3": {
+        "name": "Switch 3"
+      },
+      "switch_4": {
+        "name": "Switch 4"
+      },
+      "switch_5": {
+        "name": "Switch 5"
+      },
+      "switch_6": {
+        "name": "Switch 6"
+      },
+      "switch_7": {
+        "name": "Switch 7"
+      },
+      "switch_8": {
+        "name": "Switch 8"
+      },
+      "switch_enabled": {
+        "name": "Switch enabled"
+      },
+      "switch_pir": {
+        "name": "Switch PIR"
+      },
+      "thin_feces": {
+        "name": "Deep cleaning"
+      },
+      "toilet_notice": {
+        "name": "Toilet notice"
+      },
+      "unit": {
+        "name": "Unit"
+      },
+      "usb_1": {
+        "name": "USB 1"
+      },
+      "usb_2": {
+        "name": "USB 2"
+      },
+      "usb_3": {
+        "name": "USB 3"
+      },
+      "usb_4": {
+        "name": "USB 4"
+      },
+      "usb_5": {
+        "name": "USB 5"
+      },
+      "usb_6": {
+        "name": "USB 6"
+      },
+      "uv": {
+        "name": "UV"
+      },
+      "uv_light": {
+        "name": "UV light"
+      },
+      "valve": {
+        "name": "Valve"
+      },
+      "xt_cover_invert_control": {
+        "name": "Invert cover controls"
+      },
+      "xt_cover_invert_status": {
+        "name": "Invert cover status"
+      },
+      "xt_generic_switch": {
+        "name": "{name}"
+      },
+      "sleep_new": {
+        "name": "Sleep mode"
+      }
+    },
+    "valve": {
+      "indexed_valve": {
+        "name": "Ventil {index}"
+      },
+      "valve": {
+        "name": "Ventil"
+      }
+    },
+    "climate": {
+      "mode": {
+        "name": "Mode",
+        "state": {
+          "auto": "Automatic",
+          "cold": "Cold",
+          "freeze": "Freeze",
+          "heat": "Heat",
+          "hot": "Hot",
+          "manual": "Manual",
+          "wet": "Wet",
+          "wind": "Wind",
+          "on": "On",
+          "off": "Off"
+        }
+      }
+    },
+    "lock": {
+      "operate_lock": {
+        "name": "Operate lock"
+      }
+    },
+    "remote": {
+      "xt_generic_remote": {
+        "name": "{name}"
+      }
+    },
+    "time": {
+      "countdown_1": {
+        "name": "Countdown 1"
+      },
+      "countdown_2": {
+        "name": "Countdown 2"
+      },
+      "countdown_3": {
+        "name": "Countdown 3"
+      },
+      "countdown_4": {
+        "name": "Countdown 4"
+      },
+      "countdown_5": {
+        "name": "Countdown 5"
+      },
+      "countdown_6": {
+        "name": "Countdown 6"
+      },
+      "countdown_7": {
+        "name": "Countdown 7"
+      },
+      "countdown_8": {
+        "name": "Countdown 8"
+      }
+    }
+  },
+  "issues": {
+    "service_deprecation_turn_off": {
+      "title": "Tuya vacuum support for vacuum.turn_off is being removed",
+      "fix_flow": {
+        "step": {
+          "confirm": {
+            "title": "Tuya vacuum support for vacuum.turn_off is being removed",
+            "description": "Tuya vacuum support for the vacuum.turn_off service is deprecated and will be removed in Home Assistant 2024.2; Please adjust any automation or script that uses the service to instead call vacuum.stop and select submit below to mark this issue as resolved."
+          }
+        }
+      }
+    },
+    "service_deprecation_turn_on": {
+      "title": "Tuya vacuum support for vacuum.turn_on is being removed",
+      "fix_flow": {
+        "step": {
+          "confirm": {
+            "title": "Tuya vacuum support for vacuum.turn_on is being removed",
+            "description": "Tuya vacuum support for the vacuum.turn_on service is deprecated and will be removed in Home Assistant 2024.2; Please adjust any automation or script that uses the service to instead call vacuum.start and select submit below to mark this issue as resolved."
+          }
+        }
+      }
+    },
+    "tuya_iot_failed_request": {
+      "title": "Tuya OpenAPI request failed",
+      "description": "The integration \"{name}\" (`{config_entry_id}`) could not connect to the Tuya OpenAPI service (request failed)\n\nTo fix this error, check that your HA can access the internet and that there is no firewall in between HA and Tuya OpenAPI endpoints."
+    },
+    "tuya_iot_failed_login": {
+      "title": "Tuya OpenAPI credentials expired",
+      "description": "The integration \"{name}\" (`{config_entry_id}`) could not connect to the Tuya OpenAPI service (credentials expired)\n\nTo fix this error please follow the guide at the URL by clicking the button below, then restart Home Assistant."
+    },
+    "tuya_iot_not_configured": {
+      "title": "Tuya OpenAPI account not configured",
+      "description": "The integration \"{name}\" (`{config_entry_id}`) Does not have Tuya OpenAPI credentials\n\nWithout this, a lot of entities might be missing in your devices.\n\nTo fix this warning please follow the guide at the URL by clicking the button below, then restart Home Assistant."
+    },
+    "tuya_iot_lock_not_subscribed": {
+      "title": "Tuya OpenAPI account badly configured (lock)",
+      "description": "The integration \"{name}\" (`{config_entry_id}`) Does not have a Tuya OpenAPI account that is subscribed to the Smart Lock Open Service\n\nWithout this, locks will not function properly.\n\nTo fix this warning please follow the guide at the URL by clicking the button below, then restart Home Assistant."
+    },
+    "tuya_iot_camera_not_subscribed": {
+      "title": "Tuya OpenAPI account badly configured (camera)",
+      "description": "The integration \"{name}\" (`{config_entry_id}`) Does not have a Tuya OpenAPI account that is subscribed to the IoT Video Live Stream service\n\nWithout this, cameras will not function properly.\n\nTo fix this warning please follow the guide at the URL by clicking the button below, then restart Home Assistant."
+    },
+    "tuya_iot_ir_not_subscribed": {
+      "title": "Tuya OpenAPI account badly configured (IR)",
+      "description": "The integration \"{name}\" (`{config_entry_id}`) Does not have a Tuya OpenAPI account that is subscribed to the IR Control Hub Open Service service\n\nWithout this, IR devices will not function properly.\n\nTo fix this warning please follow the guide at the URL by clicking the button below, then restart Home Assistant."
+    },
+    "tuya_iot_sensor_energy_stat_not_subscribed": {
+      "title": "Tuya OpenAPI account badly configured (Energy stat)",
+      "description": "The integration \"{name}\" (`{config_entry_id}`) Does not have a Tuya OpenAPI account that is subscribed to the Beta API service\n\nWithout this, fetching energy sensor consumption history will not function properly.\n\nTo fix this warning please follow the guide at the URL by clicking the button below, then restart Home Assistant."
+    },
+    "tuya_iot_mqtt_failed_login": {
+      "title": "Tuya OpenAPI MQTT Not authorized",
+      "description": "The integration \"{name}\" (`{config_entry_id}`) could not connect to the Tuya OpenAPI MQTT queue, something is wrong in your configuration\n\nTo fix this error please follow the guide at the URL by clicking the button below, then restart Home Assistant."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Xtend Tuya Settings",
+        "description": "Select the settings you want to configure.",
+        "menu_options": {
+          "configure_api": "API Credentials",
+          "device_settings": "Device Settings"
+        }
+      },
+      "configure_api": {
+        "title": "Add Tuya OpenAPI credentials",
+        "description": "Add a Tuya OpenAPI credential to improve the compatibility with some Tuya devices. Please follow the guide at the URL by clicking the button below.",
+        "data": {
+          "no_openapi": "Don't ask for OpenAPI credentials",
+          "country_code": "Country",
+          "access_id": "Tuya IoT Access ID",
+          "access_secret": "Tuya IoT Access Secret",
+          "username": "SmartLife/Tuya account",
+          "password": "SmartLife/Tuya account password"
+        }
+      },
+      "device_settings": {
+        "title": "Configuration category",
+        "menu_options": {
+          "select_climate_device": "Climate options",
+          "select_cover_device": "Cover options",
+          "select_lock_device": "Lock options"
+        }
+      },
+      "select_device": {
+        "title": "Select device",
+        "description": "Select a device to configure.",
+        "data": {
+          "device": "Device"
+        }
+      },
+      "configure": {
+        "title": "Add Tuya OpenAPI credentials",
+        "description": "Add a Tuya OpenAPI credential to improve the compatibility with some Tuya devices. Please follow the guide at the URL by clicking the button below.",
+        "data": {
+          "no_openapi": "Don't ask for OpenAPI credentials",
+          "country_code": "Country",
+          "access_id": "Tuya IoT Access ID",
+          "access_secret": "Tuya IoT Access Secret",
+          "username": "SmartLife/Tuya account",
+          "password": "SmartLife/Tuya account password"
+        }
+      },
+      "select_climate_device": {
+        "title": "Select Device",
+        "description": "Select a climate device to configure.",
+        "data": {
+          "device": "Device"
+        }
+      },
+      "select_cover_device": {
+        "title": "Select Device",
+        "description": "Select a cover device to configure.",
+        "data": {
+          "device": "Device"
+        }
+      },
+      "select_lock_device": {
+        "title": "Select Device",
+        "description": "Select a lock device to configure.",
+        "data": {
+          "device": "Device"
+        }
+      },
+      "climate_device_settings": {
+        "title": "Configure {device_name}",
+        "description": "Set the properties of the device",
+        "data": {
+          "current_temperature_value_multiplicator": "Current temperature multiplier",
+          "current_humidity_value_multiplicator": "Current humidity multiplier",
+          "target_temperature_value_multiplicator": "Target temperature multiplier",
+          "target_humidity_value_multiplicator": "Target humidity multiplier"
+        }
+      },
+      "cover_device_settings": {
+        "title": "Configure {device_name}",
+        "description": "Set the properties of the device",
+        "data": {
+          "invert_control": "Invert the control of the device",
+          "invert_status": "Invert the reported status of the device",
+          "open_time": "Time from opened to closed (seconds)",
+          "update_interval": "Status refresh interval",
+          "force_virtual_position": "Force use of virtual position",
+          "no_precise_position": "Device doesn't support precise positioning"
+        }
+      },
+      "lock_device_settings": {
+        "title": "Configure {device_name}",
+        "description": "Set the properties of the device",
+        "data": {
+          "temporary_unlock_time": "Seconds the lock stays opened",
+          "lock_unlock_mecanism": "Force unlock mecanism",
+          "lock_status_dpcode": "DPCode that represents the lock open/closed status"
+        }
+      }
+    },
+    "abort": {
+      "climate_entity_not_found": "No climate entity found for the selected device. Please select a device with a climate entity to configure.",
+      "lock_entity_not_found": "No lock entity found for the selected device. Please select a device with a lock entity to configure.",
+      "no_devices_found": "No devices found for this configuration category.",
+      "device_not_selected": "No device selected. Please select a device to configure.",
+      "device_not_found": "Selected device not found. Please select a valid device to configure.",
+      "no_configurable_properties": "The selected device does not have configurable properties.",
+      "no_multi_manager": "No Multi Manager stored, please contact the developer."
+    }
+  },
+  "services": {
+    "create_temporary_password": {
+      "name": "Create Temporary Password",
+      "description": "Creates a time-restricted temporary passcode for a Tuya smart lock.",
+      "fields": {
+        "device_id": {
+          "name": "Device",
+          "description": "The Tuya smart lock device."
+        },
+        "password": {
+          "name": "Password / PIN",
+          "description": "The 6-8 digit numeric passcode to create (e.g. 1266455)."
+        },
+        "name": {
+          "name": "Name / Alias",
+          "description": "An optional name or label for the temporary passcode."
+        },
+        "effective_time": {
+          "name": "Effective Date & Time",
+          "description": "Start date and time (defaults to now)."
+        },
+        "invalid_time": {
+          "name": "Expiration Date & Time",
+          "description": "Expiration date and time (defaults to 24h from now)."
+        }
+      }
+    },
+    "get_dynamic_passcode": {
+      "name": "Get Dynamic Passcode",
+      "description": "Fetches a new 5-minute dynamic passcode for a Tuya smart lock on demand."
+    },
+    "get_temporary_passwords": {
+      "name": "Get Temporary Passwords",
+      "description": "Fetches all active temporary passcodes created for a Tuya smart lock.",
+      "fields": {
+        "device_id": {
+          "name": "Device",
+          "description": "The Tuya smart lock device."
+        }
+      }
+    },
+    "delete_temporary_password": {
+      "name": "Delete Temporary Password",
+      "description": "Deletes a temporary passcode from a Tuya smart lock by password ID.",
+      "fields": {
+        "device_id": {
+          "name": "Device",
+          "description": "The Tuya smart lock device."
+        },
+        "password_id": {
+          "name": "Password ID",
+          "description": "The numeric ID of the temporary password to delete."
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "invalid_pin": {
+      "message": "The PIN must be purely numeric and contain between 6 and 8 digits."
+    },
+    "missing_device_param": {
+      "message": "Missing required parameter: device."
+    },
+    "missing_password_param": {
+      "message": "Missing required parameter: password."
+    },
+    "missing_device_and_password": {
+      "message": "Missing required parameters: device and password are required."
+    },
+    "missing_device_and_password_id": {
+      "message": "Missing required parameters: device and password_id are required."
+    },
+    "device_not_found": {
+      "message": "Device '{device_id}' not found in Xtend Tuya integration."
+    },
+    "no_tuya_account": {
+      "message": "No valid Tuya account found for device {device}."
+    },
+    "lock_requires_7_digits": {
+      "message": "Tuya API Error for device {device}: Incorrect passcode length (code {code}). This lock requires a numeric PIN of exactly 7 digits (you entered {length} digits)."
+    },
+    "smart_lock_service_unauthorized": {
+      "message": "Tuya API Error for device {device}: No permissions (code {code}). Missing 'Smart Lock Service' authorization in iot.tuya.com (Cloud > Development > Your Project > Service API)."
+    },
+    "invalid_lock_parameters": {
+      "message": "Tuya API Error for device {device}: Invalid parameters (code {code}). Verify that the PIN and dates are valid for this lock."
+    },
+    "tuya_api_error": {
+      "message": "Tuya API Error for device {device}: {msg} (code {code})."
+    },
+    "action_error": {
+      "message": "Error performing {action}: {error}."
+    }
+  }
 }

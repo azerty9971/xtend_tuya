@@ -226,6 +226,36 @@ class XTDeviceManagerLockManagementInterface(ABC):
     def send_lock_unlock_command(self, device: shared.XTDevice, lock: bool, force_unlock_mechanism: XTLockingMechanism = XTLockingMechanism.AUTO) -> bool:
         return False
 
+    def call_door_operate(self, device: shared.XTDevice, open: str | bool, api: Any | None = None) -> bool:
+        return False
+
+    def call_door_open(self, device: shared.XTDevice, api: Any | None = None) -> bool:
+        return False
+
+    def get_door_lock_password_ticket(self, device: shared.XTDevice, api: Any | None = None) -> dict[str, Any] | None:
+        return None
+
+    def create_temporary_password(
+        self,
+        device: shared.XTDevice,
+        password: str,
+        name: str | None = None,
+        effective_time: int | None = None,
+        invalid_time: int | None = None,
+        api: Any | None = None,
+    ) -> dict[str, Any] | None:
+        return None
+
+    def get_dynamic_password(self, device: shared.XTDevice, api: Any | None = None) -> dict[str, Any] | None:
+        return None
+
+    def get_temporary_passwords(self, device: shared.XTDevice, api: Any | None = None) -> list[dict[str, Any]]:
+        return []
+
+    def delete_temporary_password(self, device: shared.XTDevice, password_id: int | str, api: Any | None = None) -> dict[str, Any] | None:
+        return None
+
+
 
 class XTDeviceManagerMultiManagerManagementInterface(ABC):
     def unload(self):

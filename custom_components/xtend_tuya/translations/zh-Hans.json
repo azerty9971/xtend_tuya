@@ -1,1104 +1,3283 @@
 {
-    "config": {
-        "abort": {
-            "reauth_successful": "\u91cd\u65b0\u8ba4\u8bc1\u6210\u529f"
-        },
-        "error": {
-            "invalid_auth": "\u8eab\u4efd\u9a8c\u8bc1\u65e0\u6548",
-            "login_error": "\u767b\u5f55\u5931\u8d25({code}): {msg}"
-        },
-        "step": {
-            "reauth_user_code": {
-                "data": {
-                    "user_code": "\u7528\u6237\u4ee3\u7801"
-                },
-                "description": "Tuya \u96c6\u6210\u73b0\u5728\u4f7f\u7528\u6539\u8fdb\u7684\u767b\u5f55\u65b9\u6cd5\u3002\u8981\u4f7f\u7528\u60a8\u7684 Smart Life \u6216 Tuya Smart \u8d26\u6237\u91cd\u65b0\u8fdb\u884c\u8eab\u4efd\u9a8c\u8bc1\uff0c\u60a8\u9700\u8981\u8f93\u5165\u60a8\u7684\u7528\u6237\u4ee3\u7801\u3002\n\n\u60a8\u53ef\u4ee5\u5728 Smart Life \u5e94\u7528\u7a0b\u5e8f\u6216 Tyya Smart \u5e94\u7528\u7a0b\u5e8f\u7684\u201d\u8bbe\u7f6e\u201c>\u201d\u8d26\u6237\u548c\u5b89\u5168\u201c\u5c4f\u5e55\u4e2d\u627e\u5230\u6b64\u4ee3\u7801\uff0c\u8f93\u5165\u201d\u7528\u6237\u4ee3\u7801\u201c\u5b57\u6bb5\u663e\u793a\u7684\u4ee3\u7801\u5373\u53ef\u3002\u7528\u6237\u4ee3\u7801\u533a\u5206\u5927\u5c0f\u5199\uff0c\u8f93\u5165\u65f6\u8bf7\u52a1\u5fc5\u4e0e\u5e94\u7528\u7a0b\u5e8f\u4e2d\u663e\u793a\u7684\u4ee3\u7801\u5b8c\u5168\u4e00\u81f4\u3002"
-            },
-            "scan": {
-                "description": "\u4f7f\u7528 Smart Life \u5e94\u7528\u7a0b\u5e8f\u6216 Tuya Smart \u5e94\u7528\u7a0b\u5e8f\u626b\u63cf\u4ee5\u4e0b\u4e8c\u7ef4\u7801\u5b8c\u6210\u767b\u5f55\u3002\n\n\u5728\u5e94\u7528\u7a0b\u5e8f\u4e2d\u5b8c\u6210\u6b64\u6b65\u9aa4\u540e\uff0c\u7ee7\u7eed\u4e0b\u4e00\u6b65\u3002"
-            },
-            "user": {
-                "data": {
-                    "user_code": "\u7528\u6237\u4ee3\u7801"
-                },
-                "description": "\u8f93\u5165\u60a8\u7684 Smart Life \u6216 Tuya Smart \u7528\u6237\u4ee3\u7801\u3002 \n\n\u60a8\u53ef\u4ee5\u5728 Smart Lift \u5e94\u7528\u6216 Tuya Smart \u5e94\u7528\u4e2d\uff0cSettings\uff08\u8bbe\u7f6e\uff09> Account and Security\uff08\u8d26\u6237\u548c\u5b89\u5168\uff09\u5c4f\u5e55\u4e0a\u627e\u5230\u6b64\u4ee3\u7801\uff0c\u5728\u201c\u7528\u6237\u4ee3\u7801\u201d\u5b57\u6bb5\u4e2d\u8f93\u5165\u6b64\u4ee3\u7801\u3002\u7528\u6237\u4ee3\u7801\u533a\u5206\u5927\u5c0f\u5199\uff0c\u8bf7\u52a1\u5fc5\u51c6\u786e\u8f93\u5165\uff0c\u4e0e\u5e94\u7528\u4e2d\u663e\u793a\u7684\u4ee3\u7801\u4e00\u81f4\u3002"
-            }
-        }
+  "config": {
+    "abort": {
+      "reauth_successful": "重新认证成功",
+      "ir_add_key_success": "IR key {key_name} has been added to {device_name}",
+      "ir_add_key_failed": "Could not add {key_name} to {device_name}",
+      "ir_add_device_success": "IR device {remote_name} has been added to {device_name}",
+      "ir_add_device_failed": "Could not add {remote_name} to {device_name}"
     },
-    "entity": {
-        "binary_sensor": {
-            "bag_full": {
-                "name": "\u6ee1\u888b"
-            },
-            "carbon_dioxide": {
-                "name": "\u4e8c\u6c27\u5316\u78b3"
-            },
-            "carbon_monoxide": {
-                "name": "\u4e00\u6c27\u5316\u78b3"
-            },
-            "cover_off": {
-                "name": "\u76d6\u4f4f"
-            },
-            "defrost": {
-                "name": "\u9664\u971c"
-            },
-            "drop": {
-                "name": "\u6389\u843d"
-            },
-            "feeding": {
-                "name": "\u6295\u5582\u4e2d"
-            },
-            "formaldehyde": {
-                "name": "\u7532\u919b"
-            },
-            "methane": {
-                "name": "\u7532\u70f7"
-            },
-            "pm25": {
-                "name": "PM2.5"
-            },
-            "pressure": {
-                "name": "\u538b\u529b"
-            },
-            "tankfull": {
-                "name": "\u7bb1\u5df2\u6ee1"
-            },
-            "tilt": {
-                "name": "\u503e\u659c"
-            },
-            "valve": {
-                "name": "\u9600\u95e8"
-            },
-            "voc": {
-                "name": "VOCs"
-            },
-            "wet": {
-                "name": "\u6f6e\u6e7f"
-            }
-        },
-        "button": {
-            "factory_reset": {
-                "name": "\u6062\u590d\u51fa\u5382\u8bbe\u7f6e"
-            },
-            "manual_clean": {
-                "name": "\u624b\u52a8\u6e05\u6d01"
-            },
-            "reset_duster_cloth": {
-                "name": "\u91cd\u7f6e\u9664\u5c18\u5e03"
-            },
-            "reset_edge_brush": {
-                "name": "\u91cd\u7f6e\u8fb9\u5237"
-            },
-            "reset_filter": {
-                "name": "\u91cd\u7f6e\u6ee4\u7f51"
-            },
-            "reset_map": {
-                "name": "\u91cd\u7f6e\u5730\u56fe"
-            },
-            "reset_roll_brush": {
-                "name": "\u91cd\u7f6e\u6eda\u5237"
-            },
-            "snooze": {
-                "name": "\u6253\u76f9"
-            }
-        },
-        "cover": {
-            "blind": {
-                "name": "\u767e\u53f6\u5e18"
-            },
-            "curtain": {
-                "name": "\u7a97\u5e18"
-            },
-            "indexed_curtain": {
-                "name": "\u7a97\u5e18 {index}"
-            },
-            "indexed_door": {
-                "name": "\u95e8 {index}"
-            }
-        },
-        "event": {
-            "doorbell_message": {
-                "name": "\u95e8\u94c3\u6d88\u606f"
-            },
-            "doorbell_picture": {
-                "name": "\u95e8\u94c3\u56fe\u7247"
-            },
-            "numbered_button": {
-                "name": "\u6309\u94ae {button_number}",
-                "state_attributes": {
-                    "event_type": {
-                        "state": {
-                            "click": "\u5df2\u70b9\u51fb",
-                            "double_click": "\u5df2\u53cc\u51fb",
-                            "press": "\u5df2\u957f\u6309"
-                        }
-                    }
-                }
-            }
-        },
-        "light": {
-            "backlight": {
-                "name": "\u80cc\u5149"
-            },
-            "indexed_light": {
-                "name": "\u706f {index}"
-            },
-            "light": {
-                "name": "\u706f\u5149"
-            },
-            "night_light": {
-                "name": "\u591c\u706f"
-            }
-        },
-        "number": {
-            "alarm_delay": {
-                "name": "\u62a5\u8b66\u5ef6\u8fdf"
-            },
-            "alarm_duration": {
-                "name": "\u8b66\u62a5\u65f6\u957f"
-            },
-            "alarm_maximum": {
-                "name": "\u62a5\u8b66\u6700\u5927\u503c"
-            },
-            "alarm_minimum": {
-                "name": "\u62a5\u8b66\u6700\u5c0f\u503c"
-            },
-            "arm_delay": {
-                "name": "\u5e03\u9632\u5ef6\u8fdf"
-            },
-            "battery_backup_reserve": {
-                "name": "\u7535\u6c60\u5907\u7528\u50a8\u5907"
-            },
-            "cloud_recipe": {
-                "name": "\u4e91\u914d\u65b9"
-            },
-            "cook_temperature": {
-                "name": "\u70f9\u996a\u6e29\u5ea6"
-            },
-            "cook_time": {
-                "name": "\u70f9\u996a\u65f6\u95f4"
-            },
-            "delay_clean_time": {
-                "name": "\u5ef6\u8fdf\u6e05\u6d01\u65f6\u95f4"
-            },
-            "down_delay": {
-                "name": "\u4e0b\u884c\u5ef6\u8fdf"
-            },
-            "far_detection": {
-                "name": "\u8fdc\u8ddd\u79bb\u68c0\u6d4b"
-            },
-            "feed": {
-                "name": "\u6295\u5582"
-            },
-            "heat_preservation_time": {
-                "name": "\u4fdd\u6e29\u65f6\u95f4"
-            },
-            "indexed_cook_temperature": {
-                "name": "\u70f9\u996a\u6e29\u5ea6 {index}"
-            },
-            "indexed_irrigation_duration": {
-                "name": "\u704c\u6e89\u65f6\u957f {index}"
-            },
-            "indexed_maximum_brightness": {
-                "name": "\u6700\u9ad8\u4eae\u5ea6 {index}"
-            },
-            "indexed_minimum_brightness": {
-                "name": "\u6700\u4f4e\u4eae\u5ea6 {index}"
-            },
-            "indexed_temperature": {
-                "name": "\u6e29\u5ea6 {index}"
-            },
-            "installation_height": {
-                "name": "\u5b89\u88c5\u9ad8\u5ea6"
-            },
-            "inverter_output_power_limit": {
-                "name": "\u9006\u53d8\u5668\u8f93\u51fa\u529f\u7387\u9650\u5236"
-            },
-            "maximum_brightness": {
-                "name": "\u6700\u9ad8\u4eae\u5ea6"
-            },
-            "maximum_liquid_depth": {
-                "name": "\u6700\u5927\u6db2\u6df1"
-            },
-            "minimum_brightness": {
-                "name": "\u6700\u4f4e\u4eae\u5ea6"
-            },
-            "move_down": {
-                "name": "\u4e0b\u79fb"
-            },
-            "move_up": {
-                "name": "\u4e0a\u79fb"
-            },
-            "near_detection": {
-                "name": "\u8fd1\u8ddd\u79bb\u68c0\u6d4b"
-            },
-            "powder": {
-                "name": "\u7c89\u672b"
-            },
-            "sensitivity": {
-                "name": "\u7075\u654f\u5ea6"
-            },
-            "siren_duration": {
-                "name": "\u8b66\u7b1b\u65f6\u957f"
-            },
-            "target_dis_closest": {
-                "name": "\u6700\u8fd1\u76ee\u6807\u8ddd\u79bb"
-            },
-            "temp_correction": {
-                "name": "\u6e29\u5ea6\u6821\u6b63"
-            },
-            "temperature": {
-                "name": "\u6e29\u5ea6"
-            },
-            "temperature_after_boiling": {
-                "name": "\u6cb8\u817e\u540e\u6e29\u5ea6"
-            },
-            "time": {
-                "name": "\u65f6\u95f4"
-            },
-            "voice_times": {
-                "name": "\u8bed\u97f3\u6b21\u6570"
-            },
-            "volume": {
-                "name": "\u97f3\u91cf"
-            },
-            "water_level": {
-                "name": "\u6c34\u4f4d"
-            }
-        },
-        "select": {
-            "basic_anti_flicker": {
-                "name": "\u9632\u95ea\u70c1",
-                "state": {
-                    "0": "\u5df2\u7981\u7528",
-                    "1": "50 Hz",
-                    "2": "60 Hz"
-                }
-            },
-            "basic_nightvision": {
-                "name": "\u591c\u89c6",
-                "state": {
-                    "0": "\u81ea\u52a8",
-                    "1": "\u5173\u95ed",
-                    "2": "\u5f00\u542f"
-                }
-            },
-            "blanket_level": {
-                "name": "\u7ea7\u522b",
-                "state": {
-                    "level_1": "\u4f4e",
-                    "level_10": "\u9ad8",
-                    "level_2": "2 \u7ea7",
-                    "level_3": "3 \u7ea7",
-                    "level_4": "4 \u7ea7",
-                    "level_5": "5 \u7ea7",
-                    "level_6": "6 \u7ea7",
-                    "level_7": "7 \u7ea7",
-                    "level_8": "8 \u7ea7",
-                    "level_9": "9 \u7ea7"
-                }
-            },
-            "brightness": {
-                "name": "\u4eae\u5ea6"
-            },
-            "concentration": {
-                "name": "\u6d53\u5ea6"
-            },
-            "countdown": {
-                "name": "\u5012\u8ba1\u65f6",
-                "state": {
-                    "1h": "1 \u5c0f\u65f6",
-                    "2h": "2 \u5c0f\u65f6",
-                    "3h": "3 \u5c0f\u65f6",
-                    "4h": "4 \u5c0f\u65f6",
-                    "5h": "5 \u5c0f\u65f6",
-                    "6h": "6 \u5c0f\u65f6",
-                    "cancel": "\u53d6\u6d88"
-                }
-            },
-            "cups": {
-                "name": "\u676f\u5b50"
-            },
-            "curtain_mode": {
-                "name": "\u6a21\u5f0f",
-                "state": {
-                    "morning": "\u65e9\u6668",
-                    "night": "\u591c\u95f4"
-                }
-            },
-            "curtain_motor_mode": {
-                "name": "\u7535\u673a\u6a21\u5f0f",
-                "state": {
-                    "back": "\u540e\u9000",
-                    "forward": "\u524d\u8fdb"
-                }
-            },
-            "decibel_sensitivity": {
-                "name": "\u58f0\u97f3\u68c0\u6d4b\u7075\u654f\u5ea6",
-                "state": {
-                    "0": "\u4f4e\u7075\u654f\u5ea6",
-                    "1": "\u9ad8\u7075\u654f\u5ea6"
-                }
-            },
-            "desk_level": {
-                "name": "\u7ea7\u522b",
-                "state": {
-                    "level_1": "1 \u7ea7",
-                    "level_2": "2 \u7ea7",
-                    "level_3": "3 \u7ea7",
-                    "level_4": "4 \u7ea7"
-                }
-            },
-            "desk_up_down": {
-                "name": "\u4e0a/\u4e0b",
-                "state": {
-                    "down": "\u4e0b",
-                    "stop": "\u505c\u6b62",
-                    "up": "\u4e0a"
-                }
-            },
-            "fingerbot_mode": {
-                "name": "\u6a21\u5f0f",
-                "state": {
-                    "click": "\u63a8",
-                    "switch": "\u5f00\u5173"
-                }
-            },
-            "horizontal_fan_angle": {
-                "name": "\u6c34\u5e73\u6446\u52a8\u89d2\u5ea6",
-                "state": {
-                    "30": "30\u00b0",
-                    "60": "60\u00b0",
-                    "90": "90\u00b0"
-                }
-            },
-            "humidifier_level": {
-                "name": "\u55b7\u96fe\u7ea7\u522b",
-                "state": {
-                    "level_1": "\u7b49\u7ea7 1",
-                    "level_10": "\u7b49\u7ea7 10",
-                    "level_2": "\u7b49\u7ea7 2",
-                    "level_3": "\u7b49\u7ea7 3",
-                    "level_4": "\u7b49\u7ea7 4",
-                    "level_5": "\u7b49\u7ea7 5",
-                    "level_6": "\u7b49\u7ea7 6",
-                    "level_7": "\u7b49\u7ea7 7",
-                    "level_8": "\u7b49\u7ea7 8",
-                    "level_9": "\u7b49\u7ea7 9"
-                }
-            },
-            "humidifier_moodlighting": {
-                "name": "\u6c1b\u56f4\u706f",
-                "state": {
-                    "1": "\u6c1b\u56f4 1",
-                    "2": "\u6c1b\u56f4 2",
-                    "3": "\u6c1b\u56f4 3",
-                    "4": "\u6c1b\u56f4 4",
-                    "5": "\u6c1b\u56f4 5"
-                }
-            },
-            "humidifier_spray_mode": {
-                "name": "\u55b7\u96fe\u6a21\u5f0f",
-                "state": {
-                    "auto": "\u81ea\u52a8",
-                    "health": "\u5065\u5eb7\u6a21\u5f0f",
-                    "humidity": "\u6e7f\u5ea6",
-                    "sleep": "\u7761\u7720\u6a21\u5f0f",
-                    "work": "\u5de5\u4f5c\u6a21\u5f0f"
-                }
-            },
-            "indexed_blanket_level": {
-                "name": "{index} \u7ea7",
-                "state": {
-                    "level_1": "\u4f4e",
-                    "level_10": "\u9ad8",
-                    "level_2": "2 \u7ea7",
-                    "level_3": "3 \u7ea7",
-                    "level_4": "4 \u7ea7",
-                    "level_5": "5 \u7ea7",
-                    "level_6": "6 \u7ea7",
-                    "level_7": "7 \u7ea7",
-                    "level_8": "8 \u7ea7",
-                    "level_9": "9 \u7ea7"
-                }
-            },
-            "indexed_led_type": {
-                "name": "\u706f {index} \u6e90\u7c7b\u578b",
-                "state": {
-                    "halogen": "\u5364\u7d20\u706f",
-                    "incandescent": "\u767d\u70bd\u706f",
-                    "led": "LED"
-                }
-            },
-            "inverter_work_mode": {
-                "name": "\u9006\u53d8\u5668\u5de5\u4f5c\u6a21\u5f0f",
-                "state": {
-                    "manual": "\u624b\u52a8\u6a21\u5f0f",
-                    "self_powered": "\u81ea\u4f9b\u7535",
-                    "time_of_use": "\u4f7f\u7528\u65f6\u95f4"
-                }
-            },
-            "ipc_work_mode": {
-                "name": "IPC \u6a21\u5f0f",
-                "state": {
-                    "0": "\u4f4e\u529f\u8017\u6a21\u5f0f",
-                    "1": "\u6301\u7eed\u5de5\u4f5c\u6a21\u5f0f"
-                }
-            },
-            "led_type": {
-                "name": "\u706f\u5149\u5149\u6e90\u7c7b\u578b",
-                "state": {
-                    "halogen": "\u5364\u7d20\u706f",
-                    "incandescent": "\u767d\u70bd\u706f",
-                    "led": "LED"
-                }
-            },
-            "light_mode": {
-                "name": "\u6307\u793a\u706f\u6a21\u5f0f",
-                "state": {
-                    "none": "\u5173\u95ed",
-                    "pos": "\u6307\u793a\u53cd\u8f6c\u5f00\u5173\u72b6\u6001",
-                    "relay": "\u6307\u793a\u5f00\u5173\u72b6\u6001"
-                }
-            },
-            "material": {
-                "name": "\u6750\u6599"
-            },
-            "mode": {
-                "name": "\u6a21\u5f0f"
-            },
-            "motion_sensitivity": {
-                "name": "\u8fd0\u52a8\u4fa6\u6d4b\u7075\u654f\u5ea6",
-                "state": {
-                    "0": "\u4f4e",
-                    "1": "\u4e2d",
-                    "2": "\u9ad8"
-                }
-            },
-            "odor_elimination_mode": {
-                "name": "\u9664\u81ed\u6a21\u5f0f",
-                "state": {
-                    "interim": "\u4e34\u65f6",
-                    "smart": "\u667a\u80fd"
-                }
-            },
-            "record_mode": {
-                "name": "\u5f55\u5236\u6a21\u5f0f",
-                "state": {
-                    "1": "\u4ec5\u5f55\u5236\u4e8b\u4ef6",
-                    "2": "\u6301\u7eed\u5f55\u5236"
-                }
-            },
-            "relay_status": {
-                "state": {
-                    "off": "\u5173\u95ed",
-                    "on": "\u5f00\u542f",
-                    "power_off": "\u5173\u95ed",
-                    "power_on": "\u5f00\u542f"
-                }
-            },
-            "siren_mode": {
-                "name": "\u8b66\u7b1b\u6a21\u5f0f",
-                "state": {
-                    "alarm_light": "\u706f\u5149",
-                    "alarm_sound": "\u58f0\u97f3",
-                    "alarm_sound_light": "\u58f0\u5149",
-                    "normal": "\u6b63\u5e38"
-                }
-            },
-            "target_humidity": {
-                "name": "\u8bbe\u5b9a\u6e7f\u5ea6"
-            },
-            "temperature_level": {
-                "name": "\u6e29\u5ea6\u7b49\u7ea7"
-            },
-            "vacuum_cistern": {
-                "name": "\u6c34\u7bb1\u8c03\u8282",
-                "state": {
-                    "closed": "\u5df2\u5173\u95ed",
-                    "high": "\u9ad8",
-                    "low": "\u4f4e",
-                    "middle": "\u4e2d"
-                }
-            },
-            "vacuum_collection": {
-                "name": "\u96c6\u5c18\u6a21\u5f0f",
-                "state": {
-                    "large": "\u5927",
-                    "middle": "\u4e2d",
-                    "small": "\u5c0f"
-                }
-            },
-            "vacuum_mode": {
-                "name": "\u6a21\u5f0f",
-                "state": {
-                    "bow": "\u5f2f\u66f2",
-                    "chargego": "\u8fd4\u56de\u5230\u57fa\u5ea7",
-                    "left_bow": "\u5411\u5de6\u5f2f\u66f2",
-                    "left_spiral": "\u5411\u5de6\u87ba\u65cb",
-                    "mop": "\u62d6\u5730",
-                    "part": "\u90e8\u5206",
-                    "partial_bow": "\u5c40\u90e8\u5f2f\u66f2",
-                    "pick_zone": "\u9009\u62e9\u533a\u57df",
-                    "point": "\u70b9",
-                    "pose": "\u59ff\u52bf",
-                    "random": "\u968f\u673a",
-                    "right_bow": "\u5411\u53f3\u5f2f\u66f2",
-                    "right_spiral": "\u5411\u53f3\u87ba\u65cb",
-                    "single": "\u5355\u6b21",
-                    "smart": "\u667a\u80fd",
-                    "spiral": "\u87ba\u65cb",
-                    "standby": "\u5f85\u673a",
-                    "wall_follow": "\u6cbf\u5899",
-                    "zone": "\u533a\u57df"
-                }
-            },
-            "vertical_fan_angle": {
-                "name": "\u5782\u76f4\u6446\u52a8\u89d2\u5ea6",
-                "state": {
-                    "30": "30\u00b0",
-                    "60": "60\u00b0",
-                    "90": "90\u00b0"
-                }
-            },
-            "volume": {
-                "name": "\u97f3\u91cf"
-            },
-            "weather_delay": {
-                "name": "\u5929\u6c14\u5ef6\u8bef",
-                "state": {
-                    "120h": "120 \u5c0f\u65f6",
-                    "144h": "144 \u5c0f\u65f6",
-                    "168h": "168 \u5c0f\u65f6",
-                    "24h": "24 \u5c0f\u65f6",
-                    "48h": "48 \u5c0f\u65f6",
-                    "72h": "72 \u5c0f\u65f6",
-                    "96h": "96 \u5c0f\u65f6",
-                    "cancel": "\u53d6\u6d88"
-                }
-            }
-        },
-        "sensor": {
-            "air_pressure": {
-                "name": "\u5927\u6c14\u538b"
-            },
-            "air_quality": {
-                "name": "\u7a7a\u6c14\u8d28\u91cf",
-                "state": {
-                    "good": "\u826f\u597d",
-                    "great": "\u6781\u4f73",
-                    "mild": "\u8f7b\u5fae",
-                    "severe": "\u4e25\u91cd"
-                }
-            },
-            "air_quality_index": {
-                "name": "\u7a7a\u6c14\u8d28\u91cf\u6307\u6570",
-                "state": {
-                    "level_1": "1 \u7ea7",
-                    "level_2": "2 \u7ea7",
-                    "level_3": "3 \u7ea7",
-                    "level_4": "4 \u7ea7",
-                    "level_5": "5 \u7ea7",
-                    "level_6": "6 \u7ea7"
-                }
-            },
-            "battery": {
-                "name": "\u7535\u6c60"
-            },
-            "battery_power": {
-                "name": "\u7535\u6c60\u529f\u7387"
-            },
-            "battery_soc": {
-                "name": "\u7535\u6c60 SOC"
-            },
-            "battery_state": {
-                "name": "\u7535\u6c60\u72b6\u6001"
-            },
-            "carbon_dioxide": {
-                "name": "\u4e8c\u6c27\u5316\u78b3"
-            },
-            "carbon_monoxide": {
-                "name": "\u4e00\u6c27\u5316\u78b3"
-            },
-            "cat_litter_box_status": {
-                "name": "\u72b6\u6001",
-                "state": {
-                    "clean": "\u6e05\u6d01\u4e2d",
-                    "empty": "\u6e05\u7a7a\u4e2d",
-                    "level": "\u8c03\u5e73\u4e2d",
-                    "sleep": "\u4f11\u7720\u4e2d",
-                    "standby": "\u5f85\u673a",
-                    "uv": "\u6d88\u6bd2\u4e2d"
-                }
-            },
-            "cat_weight": {
-                "name": "\u732b\u4f53\u91cd"
-            },
-            "cleaning_area": {
-                "name": "\u6e05\u6d01\u533a\u57df"
-            },
-            "cleaning_time": {
-                "name": "\u6e05\u626b\u65f6\u95f4"
-            },
-            "concentration_carbon_dioxide": {
-                "name": "\u4e8c\u6c27\u5316\u78b3\u6d53\u5ea6"
-            },
-            "current": {
-                "name": "\u7535\u6d41"
-            },
-            "current_temperature": {
-                "name": "\u5f53\u524d\u6e29\u5ea6"
-            },
-            "depth": {
-                "name": "\u6df1\u5ea6"
-            },
-            "dew_point_temperature": {
-                "name": "\u9732\u70b9"
-            },
-            "duster_cloth_life": {
-                "name": "\u9664\u5c18\u5e03\u5bff\u547d"
-            },
-            "excretion_time_day": {
-                "name": "\u6392\u6cc4\u65f6\u957f"
-            },
-            "excretion_times_day": {
-                "name": "\u6392\u6cc4\u6b21\u6570\uff08\u5929\uff09"
-            },
-            "feels_like_temperature": {
-                "name": "\u4f53\u611f"
-            },
-            "filter_duration": {
-                "name": "\u8fc7\u6ee4\u65f6\u957f"
-            },
-            "filter_life": {
-                "name": "\u6ee4\u7f51\u5bff\u547d"
-            },
-            "filter_utilization": {
-                "name": "\u6ee4\u7f51\u5229\u7528\u7387"
-            },
-            "formaldehyde": {
-                "name": "\u7532\u919b"
-            },
-            "gas": {
-                "name": "\u71c3\u6c14"
-            },
-            "heat_index_temperature": {
-                "name": "\u70ed\u5ea6\u6307\u6570"
-            },
-            "humidity": {
-                "name": "\u6e7f\u5ea6"
-            },
-            "humidity_outdoor": {
-                "name": "\u5ba4\u5916\u6e7f\u5ea6"
-            },
-            "illuminance": {
-                "name": "\u7167\u5ea6"
-            },
-            "indexed_humidity_outdoor": {
-                "name": "\u5ba4\u5916\u6e7f\u5ea6\u901a\u9053 {index}"
-            },
-            "indexed_temperature_external": {
-                "name": "\u63a2\u5934\u6e29\u5ea6\u901a\u9053 {index}"
-            },
-            "inverter_output_power": {
-                "name": "\u9006\u53d8\u5668\u8f93\u51fa\u529f\u7387"
-            },
-            "last_amount": {
-                "name": "\u4e0a\u6b21\u6570\u91cf"
-            },
-            "last_operation_duration": {
-                "name": "\u4e0a\u6b21\u64cd\u4f5c\u65f6\u957f"
-            },
-            "lifetime_battery_charge_energy": {
-                "name": "\u7ec8\u8eab\u7535\u6c60\u5145\u7535\u80fd\u91cf"
-            },
-            "lifetime_battery_discharge_energy": {
-                "name": "\u7ec8\u8eab\u7535\u6c60\u653e\u7535\u80fd\u91cf"
-            },
-            "lifetime_inverter_output_energy": {
-                "name": "\u7ec8\u8eab\u9006\u53d8\u5668\u8f93\u51fa\u80fd\u91cf"
-            },
-            "lifetime_offgrid_port_energy": {
-                "name": "\u7ec8\u8eab\u79bb\u7f51\u7aef\u53e3\u80fd\u6e90"
-            },
-            "lifetime_pv_energy": {
-                "name": "\u7ec8\u8eab\u5149\u4f0f\u80fd\u6e90"
-            },
-            "liquid_depth": {
-                "name": "\u6db2\u6df1"
-            },
-            "liquid_level": {
-                "name": "\u6db2\u4f4d"
-            },
-            "liquid_state": {
-                "name": "\u6db2\u6001",
-                "state": {
-                    "lower_alarm": "\u4f4e",
-                    "normal": "\u6b63\u5e38",
-                    "upper_alarm": "\u9ad8"
-                }
-            },
-            "luminosity": {
-                "name": "\u5149\u5ea6"
-            },
-            "methane": {
-                "name": "\u7532\u70f7"
-            },
-            "odor_elimination_status": {
-                "name": "\u72b6\u6001",
-                "state": {
-                    "charge_done": "\u5145\u7535\u5b8c\u6210",
-                    "charging": "\u5145\u7535\u4e2d",
-                    "standby": "\u5f85\u673a",
-                    "work": "\u5de5\u4f5c\u4e2d"
-                }
-            },
-            "phase_a_current": {
-                "name": "\u76f8\u4f4d A \u7535\u6d41"
-            },
-            "phase_a_power": {
-                "name": "\u76f8\u4f4d A \u529f\u7387"
-            },
-            "phase_a_voltage": {
-                "name": "\u76f8\u4f4d A \u7535\u538b"
-            },
-            "phase_b_current": {
-                "name": "\u76f8\u4f4d B \u7535\u6d41"
-            },
-            "phase_b_power": {
-                "name": "\u76f8\u4f4d B \u529f\u7387"
-            },
-            "phase_b_voltage": {
-                "name": "\u76f8\u4f4d B \u7535\u538b"
-            },
-            "phase_c_current": {
-                "name": "\u76f8\u4f4d C \u7535\u6d41"
-            },
-            "phase_c_power": {
-                "name": "\u76f8\u4f4d C \u529f\u7387"
-            },
-            "phase_c_voltage": {
-                "name": "\u76f8\u4f4d C \u7535\u538b"
-            },
-            "pm1": {
-                "name": "PM1"
-            },
-            "pm10": {
-                "name": "PM10"
-            },
-            "pm25": {
-                "name": "PM2.5"
-            },
-            "power": {
-                "name": "\u7535\u6e90"
-            },
-            "precipitation_intensity": {
-                "name": "\u964d\u6c34\u5f3a\u5ea6"
-            },
-            "precipitation_today": {
-                "name": "\u4eca\u65e5\u603b\u964d\u6c34\u91cf"
-            },
-            "pump_time": {
-                "name": "\u6c34\u6cf5\u65f6\u957f"
-            },
-            "pv_channel_power": {
-                "name": "\u5149\u4f0f\u901a\u9053 {index} \u529f\u7387"
-            },
-            "remaining_time": {
-                "name": "\u5269\u4f59\u65f6\u95f4"
-            },
-            "rolling_brush_life": {
-                "name": "\u6eda\u5237\u5bff\u547d"
-            },
-            "side_brush_life": {
-                "name": "\u8fb9\u5237\u5bff\u547d"
-            },
-            "smoke_amount": {
-                "name": "\u70df\u91cf"
-            },
-            "sous_vide_status": {
-                "name": "\u72b6\u6001",
-                "state": {
-                    "boiling_temp": "\u6cb8\u817e\u6e29\u5ea6",
-                    "cooling": "\u5236\u51b7",
-                    "heating": "\u4f9b\u6696",
-                    "heating_temp": "\u4f9b\u6696\u6e29\u5ea6",
-                    "reserve_1": "\u9884\u75591",
-                    "reserve_2": "\u9884\u75592",
-                    "reserve_3": "\u9884\u75593",
-                    "standby": "\u5f85\u673a",
-                    "warm": "\u4fdd\u6e29"
-                }
-            },
-            "status": {
-                "name": "\u72b6\u6001"
-            },
-            "supply_frequency": {
-                "name": "\u4f9b\u7535\u9891\u7387"
-            },
-            "temperature": {
-                "name": "\u6e29\u5ea6"
-            },
-            "temperature_external": {
-                "name": "\u63a2\u5934\u6e29\u5ea6"
-            },
-            "total_absorption_particles": {
-                "name": "\u9897\u7c92\u7269\u603b\u5438\u6536\u91cf"
-            },
-            "total_cleaning_area": {
-                "name": "\u603b\u6e05\u6d01\u9762\u79ef"
-            },
-            "total_cleaning_time": {
-                "name": "\u603b\u6e05\u626b\u65f6\u95f4"
-            },
-            "total_cleaning_times": {
-                "name": "\u603b\u6e05\u626b\u6b21\u6570"
-            },
-            "total_dissolved_solids": {
-                "name": "\u603b\u6eb6\u89e3\u56fa\u4f53"
-            },
-            "total_energy": {
-                "name": "\u603b\u80fd\u91cf"
-            },
-            "total_operating_time": {
-                "name": "\u603b\u8fd0\u884c\u65f6\u95f4"
-            },
-            "total_power": {
-                "name": "\u603b\u529f\u7387"
-            },
-            "total_production": {
-                "name": "\u603b\u4ea7\u51fa"
-            },
-            "total_pv_power": {
-                "name": "\u5149\u4f0f\u603b\u529f\u7387"
-            },
-            "total_volatile_organic_compound": {
-                "name": "\u603b\u6325\u53d1\u6027\u6709\u673a\u5316\u5408\u7269"
-            },
-            "total_watering_time": {
-                "name": "\u603b\u6d47\u6c34\u65f6\u95f4"
-            },
-            "uv_index": {
-                "name": "\u7d2b\u5916\u7ebf\u6307\u6570"
-            },
-            "uv_runtime": {
-                "name": "UV \u8fd0\u884c\u65f6"
-            },
-            "voc": {
-                "name": "\u6325\u53d1\u6027\u6709\u673a\u5316\u5408\u7269"
-            },
-            "voltage": {
-                "name": "\u7535\u538b"
-            },
-            "water_level": {
-                "name": "\u6c34\u4f4d"
-            },
-            "water_level_state": {
-                "name": "\u6c34\u4f4d",
-                "state": {
-                    "level_1": "\u4f4e",
-                    "level_2": "\u4e2d",
-                    "level_3": "\u6ee1"
-                }
-            },
-            "water_time": {
-                "name": "\u7528\u6c34\u65f6\u957f"
-            },
-            "wind_chill_index_temperature": {
-                "name": "\u98ce\u5bd2\u6307\u6570"
-            },
-            "wind_direction": {
-                "name": "\u98ce\u5411"
-            }
-        },
-        "switch": {
-            "anion": {
-                "name": "\u8d1f\u79bb\u5b50"
-            },
-            "arm_beep": {
-                "name": "\u5e03\u9632\u8702\u9e23"
-            },
-            "auto_clean": {
-                "name": "\u81ea\u52a8\u6e05\u6d01"
-            },
-            "battery_lock": {
-                "name": "\u7535\u6c60\u9501"
-            },
-            "child_lock": {
-                "name": "\u513f\u7ae5\u9501"
-            },
-            "cry_detection": {
-                "name": "\u54ed\u58f0\u68c0\u6d4b"
-            },
-            "disinfection": {
-                "name": "\u6d88\u6bd2"
-            },
-            "do_not_disturb": {
-                "name": "\u8bf7\u52ff\u6253\u6270"
-            },
-            "energy_saving": {
-                "name": "\u8282\u80fd"
-            },
-            "filter_cartridge_reset": {
-                "name": "\u6ee4\u82af\u590d\u4f4d"
-            },
-            "filter_reset": {
-                "name": "\u6ee4\u7f51\u590d\u4f4d"
-            },
-            "flip": {
-                "name": "\u7ffb\u8f6c"
-            },
-            "frost_protection": {
-                "name": "\u9632\u971c\u51bb"
-            },
-            "heat_preservation": {
-                "name": "\u4fdd\u6e29"
-            },
-            "humidification": {
-                "name": "\u52a0\u6e7f"
-            },
-            "indexed_alarm": {
-                "name": "\u8b66\u62a5 {index}"
-            },
-            "indexed_socket": {
-                "name": "\u63d2\u5ea7 {index}"
-            },
-            "indexed_switch": {
-                "name": "\u5f00\u5173 {index}"
-            },
-            "indexed_usb": {
-                "name": "USB {index}"
-            },
-            "ionizer": {
-                "name": "\u8d1f\u79bb\u5b50\u53d1\u751f\u5668"
-            },
-            "motion_alarm": {
-                "name": "\u8fd0\u52a8\u62a5\u8b66"
-            },
-            "motion_recording": {
-                "name": "\u8fd0\u52a8\u5f55\u5236"
-            },
-            "motion_tracking": {
-                "name": "\u8fd0\u52a8\u8ffd\u8e2a"
-            },
-            "music": {
-                "name": "\u97f3\u4e50"
-            },
-            "mute": {
-                "name": "\u9759\u97f3"
-            },
-            "mute_voice": {
-                "name": "\u9759\u97f3\u8bed\u97f3"
-            },
-            "natural_wind": {
-                "name": "\u81ea\u7136\u98ce"
-            },
-            "open_window_detection": {
-                "name": "\u5f00\u7a97\u68c0\u6d4b"
-            },
-            "output_power_limit": {
-                "name": "\u8f93\u51fa\u529f\u7387\u9650\u5236"
-            },
-            "oxygen_bar": {
-                "name": "\u6c27\u5427"
-            },
-            "plug": {
-                "name": "\u63d2\u5934"
-            },
-            "power": {
-                "name": "\u7535\u6e90"
-            },
-            "privacy_mode": {
-                "name": "\u9690\u79c1\u6a21\u5f0f"
-            },
-            "pump": {
-                "name": "\u6cf5"
-            },
-            "radio": {
-                "name": "\u65e0\u7ebf\u7535"
-            },
-            "reset_of_water_usage_days": {
-                "name": "\u91cd\u7f6e\u7528\u6c34\u5929\u6570"
-            },
-            "reverse": {
-                "name": "\u53cd\u5411"
-            },
-            "siren": {
-                "name": "\u8b66\u7b1b"
-            },
-            "sleep": {
-                "name": "\u7761\u7720"
-            },
-            "sleep_aid": {
-                "name": "\u7761\u7720\u8f85\u52a9"
-            },
-            "slow_feed": {
-                "name": "\u7f13\u6162\u6295\u5582"
-            },
-            "snooze": {
-                "name": "\u6253\u76f9"
-            },
-            "socket": {
-                "name": "\u63d2\u5ea7"
-            },
-            "sound": {
-                "name": "\u58f0\u97f3"
-            },
-            "sound_detection": {
-                "name": "\u58f0\u97f3\u68c0\u6d4b"
-            },
-            "spray": {
-                "name": "\u55b7\u96fe"
-            },
-            "start": {
-                "name": "\u542f\u52a8"
-            },
-            "sterilization": {
-                "name": "\u706d\u83cc"
-            },
-            "switch": {
-                "name": "\u5f00\u5173"
-            },
-            "time_watermark": {
-                "name": "\u65f6\u95f4\u6c34\u5370"
-            },
-            "uv_sterilization": {
-                "name": "\u7d2b\u5916\u7ebf\u6740\u83cc"
-            },
-            "video_recording": {
-                "name": "\u5f55\u50cf"
-            },
-            "voice": {
-                "name": "\u58f0\u97f3"
-            },
-            "water": {
-                "name": "\u4f9b\u6c34"
-            },
-            "water_pump_reset": {
-                "name": "\u6c34\u6cf5\u590d\u4f4d"
-            },
-            "wide_dynamic_range": {
-                "name": "\u5bbd\u52a8\u6001\u8303\u56f4"
-            }
-        },
-        "valve": {
-            "indexed_valve": {
-                "name": "\u9600\u95e8 {index}"
-            },
-            "valve": {
-                "name": "\u9600\u95e8"
-            }
-        }
+    "error": {
+      "invalid_auth": "身份验证无效",
+      "login_error": "登录失败({code}): {msg}"
     },
-    "exceptions": {
-        "action_dpcode_not_found": {
-            "message": "\u65e0\u6cd5\u5904\u7406\u52a8\u4f5c\uff0c\u56e0\u4e3a\u8bbe\u5907\u672a\u63d0\u4f9b\u76f8\u5e94\u7684\u529f\u80fd\u4ee3\u7801\uff08\u5e94\u5f53\u662f {available} \u4e2d\u7684 {expected} \u4e4b\u4e00\uff09 \u3002"
+    "step": {
+      "reauth_user_code": {
+        "data": {
+          "user_code": "用户代码"
+        },
+        "description": "Tuya 集成现在使用改进的登录方法。要使用您的 Smart Life 或 Tuya Smart 账户重新进行身份验证，您需要输入您的用户代码。\n\n您可以在 Smart Life 应用程序或 Tyya Smart 应用程序的”设置“>”账户和安全“屏幕中找到此代码，输入”用户代码“字段显示的代码即可。用户代码区分大小写，输入时请务必与应用程序中显示的代码完全一致。"
+      },
+      "scan": {
+        "description": "使用 Smart Life 应用程序或 Tuya Smart 应用程序扫描以下二维码完成登录。\n\n在应用程序中完成此步骤后，继续下一步。"
+      },
+      "user": {
+        "data": {
+          "user_code": "用户代码"
+        },
+        "description": "输入您的 Smart Life 或 Tuya Smart 用户代码。 \n\n您可以在 Smart Lift 应用或 Tuya Smart 应用中，Settings（设置）> Account and Security（账户和安全）屏幕上找到此代码，在“用户代码”字段中输入此代码。用户代码区分大小写，请务必准确输入，与应用中显示的代码一致。"
+      },
+      "ir_add_key": {
+        "title": "New IR key for {device_name}",
+        "description": "Enter the name of the new key, then press Submit then point your remote to the hub and hit the key on your remote",
+        "data": {
+          "new_ir_key_human": "New key display name",
+          "new_ir_key_technical": "New key technical name"
+        },
+        "data_description": {
+          "new_ir_key_human": "The display text of the new key that will be added to the IR device.",
+          "new_ir_key_technical": "The technical name of the new key that will be added to the IR device."
         }
-    },
-    "issues": {
-        "deprecated_entity_new_valve": {
-            "description": "Tuya \u5b9e\u4f53 \u201c{entity}\u201d \u5df2\u5f03\u7528\uff0c\u7531\u65b0\u7684\u9600\u95e8\u5b9e\u4f53\u53d6\u4ee3\u3002\n\u8bf7\u66f4\u65b0\u60a8\u7684\u4eea\u8868\u677f\u3001\u81ea\u52a8\u5316\u548c\u811a\u672c\uff0c\u7981\u7528 \u201c{entity}\u201d \u5e76\u91cd\u65b0\u52a0\u8f7d\u96c6\u6210/\u91cd\u65b0\u542f\u52a8 Home Assistant \u4ee5\u89e3\u51b3\u6b64\u95ee\u9898\u3002",
-            "title": "\u201c{name}\u201d\u5df2\u5f03\u7528"
+      },
+      "ir_add_device": {
+        "title": "New IR device under {device_name}",
+        "description": "Enter the name of the new device",
+        "data": {
+          "new_ir_device_name": "New device name"
         }
+      },
+      "configure_api": {
+        "description": "Add a Tuya OpenAPI credential to improve the compatibility with some Tuya devices. Please follow the guide at the URL by clicking the button below.",
+        "data": {
+          "no_openapi": "Don't ask for OpenAPI credentials",
+          "country_code": "Country",
+          "access_id": "Tuya IoT Access ID",
+          "access_secret": "Tuya IoT Access Secret",
+          "username": "SmartLife/Tuya account",
+          "password": "SmartLife/Tuya account password"
+        },
+        "title": "Add Tuya OpenAPI credentials"
+      }
     }
+  },
+  "entity": {
+    "binary_sensor": {
+      "carbon_dioxide": {
+        "name": "二氧化碳"
+      },
+      "carbon_monoxide": {
+        "name": "一氧化碳"
+      },
+      "defrost": {
+        "name": "除霜"
+      },
+      "drop": {
+        "name": "掉落"
+      },
+      "feeding": {
+        "name": "投喂中"
+      },
+      "formaldehyde": {
+        "name": "甲醛"
+      },
+      "methane": {
+        "name": "甲烷"
+      },
+      "pm25": {
+        "name": "PM2.5"
+      },
+      "pressure": {
+        "name": "压力"
+      },
+      "tankfull": {
+        "name": "箱已满"
+      },
+      "tilt": {
+        "name": "倾斜"
+      },
+      "valve": {
+        "name": "阀门"
+      },
+      "voc": {
+        "name": "VOCs"
+      },
+      "wet": {
+        "name": "潮湿"
+      },
+      "battery_charging": {
+        "name": "Battery charging"
+      },
+      "cleaning": {
+        "name": "Cleaning"
+      },
+      "cleaning_num": {
+        "name": "Number of cleaning"
+      },
+      "door_contact_state": {
+        "name": "Door contact"
+      },
+      "door_contact_state_2": {
+        "name": "Door contact 2"
+      },
+      "door_contact_state_3": {
+        "name": "Door contact 3"
+      },
+      "error": {
+        "name": "Error"
+      },
+      "error_flow_meter": {
+        "name": "Error: Flow meter"
+      },
+      "error_other": {
+        "name": "Error: Other"
+      },
+      "error_sensor_offline": {
+        "name": "Error: Sensor offline"
+      },
+      "error_sensor_low_battery": {
+        "name": "Error: Sensor low battery"
+      },
+      "error_valve_low_battery": {
+        "name": "Error: Valve low battery"
+      },
+      "error_water_shortage": {
+        "name": "Error: Water shortage"
+      },
+      "litter_occupied": {
+        "name": "Litter box occupied"
+      },
+      "lock_motor_state": {
+        "name": "Lock status"
+      },
+      "off": {
+        "name": "Off"
+      },
+      "off_bed": {
+        "name": "Out of bed"
+      },
+      "online": {
+        "name": "Device online"
+      },
+      "pir_state": {
+        "name": "Proximity sensor"
+      },
+      "power": {
+        "name": "Powered on and restarted successfully"
+      },
+      "trash_status": {
+        "name": "Garbage is full"
+      },
+      "in_clean": {
+        "name": "Auto-clean completed"
+      },
+      "dp_time_clear_flag": {
+        "name": "Scheduled clean triggered"
+      },
+      "wakeup": {
+        "name": "Woken up"
+      },
+      "xt_generic_binary_sensor": {
+        "name": "{name}"
+      },
+      "store_full_notify": {
+        "name": "Replace trash bag"
+      }
+    },
+    "button": {
+      "factory_reset": {
+        "name": "恢复出厂设置"
+      },
+      "manual_clean": {
+        "name": "手动清洁"
+      },
+      "reset_duster_cloth": {
+        "name": "重置除尘布"
+      },
+      "reset_edge_brush": {
+        "name": "重置边刷"
+      },
+      "reset_filter": {
+        "name": "重置滤网"
+      },
+      "reset_map": {
+        "name": "重置地图"
+      },
+      "reset_roll_brush": {
+        "name": "重置滚刷"
+      },
+      "snooze": {
+        "name": "打盹"
+      },
+      "generate_dynamic_passcode": {
+        "name": "Generate Dynamic Passcode"
+      },
+      "change_litter_bag": {
+        "name": "Change litter bag"
+      },
+      "clear_energy": {
+        "name": "Clear energy"
+      },
+      "deep_clean": {
+        "name": "Deep clean"
+      },
+      "empty_litter": {
+        "name": "Empty litter box"
+      },
+      "filter_reset": {
+        "name": "Filter reset"
+      },
+      "level_cat_litter": {
+        "name": "Level cat litter"
+      },
+      "one_click_cleanup": {
+        "name": "One-click cleanup"
+      },
+      "manual_lock": {
+        "name": "Manual lock"
+      },
+      "xt_import_electrical_history": {
+        "name": "Import consumption history"
+      },
+      "xt_reset_add_ele": {
+        "name": "Reset consumption"
+      },
+      "xt_add_ir_device": {
+        "name": "Add IR device"
+      },
+      "xt_add_ir_device_key": {
+        "name": "Register new IR key"
+      },
+      "xt_generic_button": {
+        "name": "{name}"
+      }
+    },
+    "cover": {
+      "blind": {
+        "name": "百叶帘"
+      },
+      "curtain": {
+        "name": "窗帘"
+      },
+      "indexed_curtain": {
+        "name": "窗帘 {index}"
+      },
+      "indexed_door": {
+        "name": "门 {index}"
+      },
+      "curtain_2": {
+        "name": "Curtain 2"
+      },
+      "curtain_3": {
+        "name": "Curtain 3"
+      },
+      "door": {
+        "name": "Door"
+      },
+      "door_2": {
+        "name": "Door 2"
+      },
+      "door_3": {
+        "name": "Door 3"
+      }
+    },
+    "event": {
+      "numbered_button": {
+        "name": "按钮 {button_number}",
+        "state_attributes": {
+          "event_type": {
+            "state": {
+              "click": "已点击",
+              "double_click": "已双击",
+              "press": "已长按"
+            }
+          }
+        }
+      },
+      "alarm_lock": {
+        "name": "Lock alarm",
+        "state_attributes": {
+          "event_type": {
+            "state": {
+              "wrong_finger": "Wrong fingerprint",
+              "wrong_password": "Wrong password",
+              "wrong_card": "Wrong card",
+              "wrong_face": "Wrong face",
+              "tongue_bad": "Latch stuck",
+              "too_hot": "Too hot",
+              "unclosed_time": "Not closed after timeout",
+              "tongue_not_out": "Deadbolt stuck",
+              "pry": "Anti-pry alarm",
+              "key_in": "Not calibrated",
+              "low_battery": "Low battery",
+              "power_off": "Battery exhausted",
+              "shock": "Vibration alarm",
+              "defense": "Arm alarm",
+              "test": "Test"
+            }
+          }
+        }
+      },
+      "ipc_movement_detect": {
+        "name": "Movement detected",
+        "state_attributes": {
+          "event_type": {
+            "state": {
+              "motion": "Motion detected"
+            }
+          }
+        }
+      },
+      "unlock_user": {
+        "name": "Unlock user ({user_type})"
+      },
+      "xt_device_event_notify": {
+        "name": "Device notifications"
+      }
+    },
+    "light": {
+      "backlight": {
+        "name": "背光"
+      },
+      "indexed_light": {
+        "name": "灯 {index}"
+      },
+      "light": {
+        "name": "灯光"
+      },
+      "night_light": {
+        "name": "夜灯"
+      },
+      "light_2": {
+        "name": "Light 2"
+      },
+      "light_3": {
+        "name": "Light 3"
+      },
+      "xt_generic_light": {
+        "name": "{name}"
+      }
+    },
+    "number": {
+      "alarm_delay": {
+        "name": "报警延迟"
+      },
+      "alarm_duration": {
+        "name": "警报时长"
+      },
+      "alarm_maximum": {
+        "name": "报警最大值"
+      },
+      "alarm_minimum": {
+        "name": "报警最小值"
+      },
+      "arm_delay": {
+        "name": "布防延迟"
+      },
+      "battery_backup_reserve": {
+        "name": "电池备用储备"
+      },
+      "cloud_recipe": {
+        "name": "云配方"
+      },
+      "cook_temperature": {
+        "name": "烹饪温度"
+      },
+      "cook_time": {
+        "name": "烹饪时间"
+      },
+      "delay_clean_time": {
+        "name": "延迟清洁时间"
+      },
+      "down_delay": {
+        "name": "下行延迟"
+      },
+      "far_detection": {
+        "name": "远距离检测"
+      },
+      "feed": {
+        "name": "投喂"
+      },
+      "heat_preservation_time": {
+        "name": "保温时间"
+      },
+      "indexed_cook_temperature": {
+        "name": "烹饪温度 {index}"
+      },
+      "indexed_irrigation_duration": {
+        "name": "灌溉时长 {index}"
+      },
+      "indexed_maximum_brightness": {
+        "name": "最高亮度 {index}"
+      },
+      "indexed_minimum_brightness": {
+        "name": "最低亮度 {index}"
+      },
+      "indexed_temperature": {
+        "name": "温度 {index}"
+      },
+      "installation_height": {
+        "name": "安装高度"
+      },
+      "inverter_output_power_limit": {
+        "name": "逆变器输出功率限制"
+      },
+      "maximum_brightness": {
+        "name": "最高亮度"
+      },
+      "maximum_liquid_depth": {
+        "name": "最大液深"
+      },
+      "minimum_brightness": {
+        "name": "最低亮度"
+      },
+      "move_down": {
+        "name": "下移"
+      },
+      "move_up": {
+        "name": "上移"
+      },
+      "near_detection": {
+        "name": "近距离检测"
+      },
+      "powder": {
+        "name": "粉末"
+      },
+      "sensitivity": {
+        "name": "灵敏度"
+      },
+      "siren_duration": {
+        "name": "警笛时长"
+      },
+      "target_dis_closest": {
+        "name": "最近目标距离"
+      },
+      "temp_correction": {
+        "name": "温度校正"
+      },
+      "temperature": {
+        "name": "温度"
+      },
+      "temperature_after_boiling": {
+        "name": "沸腾后温度"
+      },
+      "time": {
+        "name": "时间"
+      },
+      "voice_times": {
+        "name": "语音次数"
+      },
+      "volume": {
+        "name": "音量"
+      },
+      "water_level": {
+        "name": "水位"
+      },
+      "alarm_time": {
+        "name": "Alarm time"
+      },
+      "auto_lock_time": {
+        "name": "Auto lock time"
+      },
+      "b_detection_distance_max": {
+        "name": "Max breath detection distance"
+      },
+      "b_detection_distance_min": {
+        "name": "Min breath detection distance"
+      },
+      "b_sensitivity": {
+        "name": "Breath detection sensitivity"
+      },
+      "breathdistance_max": {
+        "name": "Micro-motion detection upper limit"
+      },
+      "breathdistance_min": {
+        "name": "Micro-motion detection lower limit"
+      },
+      "breathsensitivity": {
+        "name": "Micro-motion detection sensitivity"
+      },
+      "bright_value": {
+        "name": "Brightness"
+      },
+      "capacity_calibration": {
+        "name": "Capacity calibration"
+      },
+      "charge_cur_set": {
+        "name": "Charging current"
+      },
+      "countdown": {
+        "name": "Countdown"
+      },
+      "countdown_1": {
+        "name": "Countdown 1"
+      },
+      "countdown_2": {
+        "name": "Countdown 2"
+      },
+      "countdown_3": {
+        "name": "Countdown 3"
+      },
+      "countdown_4": {
+        "name": "Countdown 4"
+      },
+      "countdown_5": {
+        "name": "Countdown 5"
+      },
+      "countdown_6": {
+        "name": "Countdown 6"
+      },
+      "countdown_7": {
+        "name": "Countdown 7"
+      },
+      "countdown_8": {
+        "name": "Countdown 8"
+      },
+      "deo_end_time": {
+        "name": "Deo end time"
+      },
+      "deo_start_time": {
+        "name": "Deo start time"
+      },
+      "detection_distance_max": {
+        "name": "Max detection distance"
+      },
+      "detection_distance_min": {
+        "name": "Min detection distance"
+      },
+      "detection_sensitivity": {
+        "name": "Detection sensitivity"
+      },
+      "hold_sensitivity": {
+        "name": "Hold sensitivity"
+      },
+      "hum_sensitivity": {
+        "name": "Humidity sensitivity"
+      },
+      "humidity_calibration": {
+        "name": "Humidity calibration"
+      },
+      "liquid_depth_max": {
+        "name": "Max liquid depth"
+      },
+      "m_detection_distance_max": {
+        "name": "Max motion detection distance"
+      },
+      "m_detection_distance_min": {
+        "name": "Min motion detection distance"
+      },
+      "m_sensitivity": {
+        "name": "Motion detection sensitivity"
+      },
+      "max_set": {
+        "name": "Maximum"
+      },
+      "maxhum_set": {
+        "name": "Maximum humidity"
+      },
+      "maximum_brightness_2": {
+        "name": "Maximum brightness 2"
+      },
+      "maximum_brightness_3": {
+        "name": "Maximum brightness 3"
+      },
+      "maxtemp_set": {
+        "name": "Maximum temperature"
+      },
+      "mini_set": {
+        "name": "Minimum"
+      },
+      "minihum_set": {
+        "name": "Minimum humidity"
+      },
+      "minimum_brightness_2": {
+        "name": "Minimum brightness 2"
+      },
+      "minimum_brightness_3": {
+        "name": "Minimum brightness 3"
+      },
+      "minitemp_set": {
+        "name": "Minimum temperature"
+      },
+      "movedistance_max": {
+        "name": "Motion detection upper limit"
+      },
+      "movedistance_min": {
+        "name": "Motion detection lower limit"
+      },
+      "movesensitivity": {
+        "name": "Motion detection sensitivity"
+      },
+      "none_delay_time": {
+        "name": "Presence reset time"
+      },
+      "none_delay_time_min": {
+        "name": "Presence reset time (minutes)"
+      },
+      "none_delay_time_sec": {
+        "name": "Presence reset time (seconds)"
+      },
+      "pir_delay": {
+        "name": "PIR delay"
+      },
+      "presence_delay": {
+        "name": "Reset delay"
+      },
+      "quiet_time_end": {
+        "name": "Do not disturb (end)"
+      },
+      "quiet_time_start": {
+        "name": "Do not disturb (start)"
+      },
+      "rain_snow_delay": {
+        "name": "Rain/snow delay"
+      },
+      "recipe": {
+        "name": "Recipe #"
+      },
+      "report_sensitivity": {
+        "name": "Report sensitivity"
+      },
+      "set_16a": {
+        "name": "Set 16A"
+      },
+      "set_32a": {
+        "name": "Set 32A"
+      },
+      "set_40a": {
+        "name": "Set 40A"
+      },
+      "set_50a": {
+        "name": "Set 50A"
+      },
+      "set_define_time": {
+        "name": "Set define time"
+      },
+      "set_delay_time": {
+        "name": "Set delay time"
+      },
+      "set_time": {
+        "name": "Set time"
+      },
+      "sleep_end_time": {
+        "name": "Sleep end time"
+      },
+      "sleep_start_time": {
+        "name": "Sleep start time"
+      },
+      "sm_detection_distance_max": {
+        "name": "Max micro-motion detection distance"
+      },
+      "sm_detection_distance_min": {
+        "name": "Min micro-motion detection distance"
+      },
+      "sm_sensitivity": {
+        "name": "Micro-motion detection sensitivity"
+      },
+      "sensitivity_cz": {
+        "name": "Sensitivity CZ"
+      },
+      "sensitivity_wd": {
+        "name": "Sensitivity WD"
+      },
+      "false_alarm": {
+        "name": "False alarm threshold"
+      },
+      "study_timer": {
+        "name": "Study timer"
+      },
+      "wd_detection": {
+        "name": "WD detection distance"
+      },
+      "mov_min_detection": {
+        "name": "Min movement detection distance"
+      },
+      "micro_min_detection": {
+        "name": "Min micro-motion detection distance (ZG-205Z)"
+      },
+      "bre_min_detection": {
+        "name": "Min breathing detection distance"
+      },
+      "sand_surface_calibration": {
+        "name": "Sand surface calibration"
+      },
+      "standby_bright": {
+        "name": "Standby brightness"
+      },
+      "standby_time": {
+        "name": "Standby time"
+      },
+      "temp_calibration": {
+        "name": "Temperature calibration"
+      },
+      "temp_sensitivity": {
+        "name": "Temperature sensitivity"
+      },
+      "temp_set": {
+        "name": "Temperature"
+      },
+      "tempsc": {
+        "name": "Temperature correction"
+      },
+      "time_clear": {
+        "name": "Scheduled clean time"
+      },
+      "timer_on": {
+        "name": "Delayed power on"
+      },
+      "trigger_sensitivity": {
+        "name": "Trigger sensitivity"
+      },
+      "use_time_1": {
+        "name": "Usage time 1"
+      },
+      "use_time_2": {
+        "name": "Usage time 2"
+      },
+      "use_time_3": {
+        "name": "Usage time 3"
+      },
+      "use_time_4": {
+        "name": "Usage time 4"
+      },
+      "use_time_5": {
+        "name": "Usage time 5"
+      },
+      "use_time_6": {
+        "name": "Usage time 6"
+      },
+      "use_time_7": {
+        "name": "Usage time 7"
+      },
+      "use_time_8": {
+        "name": "Usage time 8"
+      },
+      "uv_end_time": {
+        "name": "UV end time"
+      },
+      "uv_start_time": {
+        "name": "UV start time"
+      },
+      "warm_temperature": {
+        "name": "Warm temperature"
+      },
+      "watering_duration": {
+        "name": "Watering duration"
+      },
+      "xt_generic_number": {
+        "name": "{name}"
+      }
+    },
+    "select": {
+      "basic_anti_flicker": {
+        "name": "防闪烁",
+        "state": {
+          "0": "已禁用",
+          "1": "50 Hz",
+          "2": "60 Hz"
+        }
+      },
+      "basic_nightvision": {
+        "name": "夜视",
+        "state": {
+          "0": "自动",
+          "1": "关闭",
+          "2": "开启"
+        }
+      },
+      "blanket_level": {
+        "name": "级别",
+        "state": {
+          "level_1": "低",
+          "level_10": "高",
+          "level_2": "2 级",
+          "level_3": "3 级",
+          "level_4": "4 级",
+          "level_5": "5 级",
+          "level_6": "6 级",
+          "level_7": "7 级",
+          "level_8": "8 级",
+          "level_9": "9 级"
+        }
+      },
+      "brightness": {
+        "name": "亮度"
+      },
+      "concentration": {
+        "name": "浓度"
+      },
+      "countdown": {
+        "name": "倒计时",
+        "state": {
+          "1h": "1 小时",
+          "2h": "2 小时",
+          "3h": "3 小时",
+          "4h": "4 小时",
+          "5h": "5 小时",
+          "6h": "6 小时",
+          "cancel": "取消"
+        }
+      },
+      "cups": {
+        "name": "杯子"
+      },
+      "curtain_mode": {
+        "name": "模式",
+        "state": {
+          "morning": "早晨",
+          "night": "夜间"
+        }
+      },
+      "curtain_motor_mode": {
+        "name": "电机模式",
+        "state": {
+          "back": "后退",
+          "forward": "前进"
+        }
+      },
+      "decibel_sensitivity": {
+        "name": "声音检测灵敏度",
+        "state": {
+          "0": "低灵敏度",
+          "1": "高灵敏度"
+        }
+      },
+      "desk_level": {
+        "name": "级别",
+        "state": {
+          "level_1": "1 级",
+          "level_2": "2 级",
+          "level_3": "3 级",
+          "level_4": "4 级"
+        }
+      },
+      "desk_up_down": {
+        "name": "上/下",
+        "state": {
+          "down": "下",
+          "stop": "停止",
+          "up": "上"
+        }
+      },
+      "fingerbot_mode": {
+        "name": "模式",
+        "state": {
+          "click": "推",
+          "switch": "开关"
+        }
+      },
+      "horizontal_fan_angle": {
+        "name": "水平摆动角度",
+        "state": {
+          "30": "30°",
+          "60": "60°",
+          "90": "90°"
+        }
+      },
+      "humidifier_level": {
+        "name": "喷雾级别",
+        "state": {
+          "level_1": "等级 1",
+          "level_10": "等级 10",
+          "level_2": "等级 2",
+          "level_3": "等级 3",
+          "level_4": "等级 4",
+          "level_5": "等级 5",
+          "level_6": "等级 6",
+          "level_7": "等级 7",
+          "level_8": "等级 8",
+          "level_9": "等级 9"
+        }
+      },
+      "humidifier_moodlighting": {
+        "name": "氛围灯",
+        "state": {
+          "1": "氛围 1",
+          "2": "氛围 2",
+          "3": "氛围 3",
+          "4": "氛围 4",
+          "5": "氛围 5"
+        }
+      },
+      "humidifier_spray_mode": {
+        "name": "喷雾模式",
+        "state": {
+          "auto": "自动",
+          "health": "健康模式",
+          "humidity": "湿度",
+          "sleep": "睡眠模式",
+          "work": "工作模式"
+        }
+      },
+      "indexed_blanket_level": {
+        "name": "{index} 级",
+        "state": {
+          "level_1": "低",
+          "level_10": "高",
+          "level_2": "2 级",
+          "level_3": "3 级",
+          "level_4": "4 级",
+          "level_5": "5 级",
+          "level_6": "6 级",
+          "level_7": "7 级",
+          "level_8": "8 级",
+          "level_9": "9 级"
+        }
+      },
+      "indexed_led_type": {
+        "name": "灯 {index} 源类型",
+        "state": {
+          "halogen": "卤素灯",
+          "incandescent": "白炽灯",
+          "led": "LED"
+        }
+      },
+      "inverter_work_mode": {
+        "name": "逆变器工作模式",
+        "state": {
+          "manual": "手动模式",
+          "self_powered": "自供电",
+          "time_of_use": "使用时间"
+        }
+      },
+      "ipc_work_mode": {
+        "name": "IPC 模式",
+        "state": {
+          "0": "低功耗模式",
+          "1": "持续工作模式"
+        }
+      },
+      "led_type": {
+        "name": "灯光光源类型",
+        "state": {
+          "halogen": "卤素灯",
+          "incandescent": "白炽灯",
+          "led": "LED"
+        }
+      },
+      "light_mode": {
+        "name": "指示灯模式",
+        "state": {
+          "none": "关闭",
+          "pos": "指示反转开关状态",
+          "relay": "指示开关状态"
+        }
+      },
+      "material": {
+        "name": "材料"
+      },
+      "mode": {
+        "name": "模式"
+      },
+      "motion_sensitivity": {
+        "name": "运动侦测灵敏度",
+        "state": {
+          "0": "低",
+          "1": "中",
+          "2": "高"
+        }
+      },
+      "odor_elimination_mode": {
+        "name": "除臭模式",
+        "state": {
+          "interim": "临时",
+          "smart": "智能"
+        }
+      },
+      "record_mode": {
+        "name": "录制模式",
+        "state": {
+          "1": "仅录制事件",
+          "2": "持续录制"
+        }
+      },
+      "relay_status": {
+        "state": {
+          "off": "关闭",
+          "on": "开启",
+          "power_off": "关闭",
+          "power_on": "开启",
+          "last": "Remember last state",
+          "memory": "Remember last state"
+        },
+        "name": "Power on behavior"
+      },
+      "target_humidity": {
+        "name": "设定湿度"
+      },
+      "temperature_level": {
+        "name": "温度等级"
+      },
+      "vacuum_cistern": {
+        "name": "水箱调节",
+        "state": {
+          "closed": "已关闭",
+          "high": "高",
+          "low": "低",
+          "middle": "中"
+        }
+      },
+      "vacuum_collection": {
+        "name": "集尘模式",
+        "state": {
+          "large": "大",
+          "middle": "中",
+          "small": "小"
+        }
+      },
+      "vacuum_mode": {
+        "name": "模式",
+        "state": {
+          "bow": "弯曲",
+          "chargego": "返回到基座",
+          "left_bow": "向左弯曲",
+          "left_spiral": "向左螺旋",
+          "mop": "拖地",
+          "part": "部分",
+          "partial_bow": "局部弯曲",
+          "pick_zone": "选择区域",
+          "point": "点",
+          "pose": "姿势",
+          "random": "随机",
+          "right_bow": "向右弯曲",
+          "right_spiral": "向右螺旋",
+          "single": "单次",
+          "smart": "智能",
+          "spiral": "螺旋",
+          "standby": "待机",
+          "wall_follow": "沿墙",
+          "zone": "区域"
+        }
+      },
+      "vertical_fan_angle": {
+        "name": "垂直摆动角度",
+        "state": {
+          "30": "30°",
+          "60": "60°",
+          "90": "90°"
+        }
+      },
+      "volume": {
+        "name": "音量"
+      },
+      "weather_delay": {
+        "name": "天气延误",
+        "state": {
+          "120h": "120 小时",
+          "144h": "144 小时",
+          "168h": "168 小时",
+          "24h": "24 小时",
+          "48h": "48 小时",
+          "72h": "72 小时",
+          "96h": "96 小时",
+          "cancel": "取消"
+        }
+      },
+      "alarm_volume": {
+        "name": "Alarm volume",
+        "state": {
+          "0": "Mute",
+          "1": "Normal",
+          "2": "Loud",
+          "mute": "Mute",
+          "normal": "Normal",
+          "loud": "Loud"
+        }
+      },
+      "beep_volume": {
+        "name": "Beep volume",
+        "state": {
+          "0": "High",
+          "1": "Low",
+          "2": "Mute",
+          "high": "High",
+          "low": "Low",
+          "mute": "Mute"
+        }
+      },
+      "cat_litter_box_clean": {
+        "name": "Manual shoveling",
+        "state": {
+          "0": "Not shoveling",
+          "1": "Start manual shoveling",
+          "2": "Pause manual shoveling"
+        }
+      },
+      "cat_litter_box_empty": {
+        "name": "Manual dumping",
+        "state": {
+          "0": "Not dumping",
+          "1": "Start manual dumping",
+          "2": "Pause manual dumping"
+        }
+      },
+      "cat_litter_box_status": {
+        "name": "Status",
+        "state": {
+          "standby": "Stand by",
+          "off": "Off",
+          "waiting_cluster": "Waiting cluster",
+          "cleaning": "Cleaning",
+          "uv": "UV",
+          "deodorization": "Deodorization",
+          "sleep": "Sleep"
+        }
+      },
+      "cat_litter_box_work_mode": {
+        "name": "Cleaning mode",
+        "state": {
+          "auto_clean": "Automatic cleaning",
+          "manual_clean": "Manual cleaning",
+          "sleep": "Sleep",
+          "uv": "UV",
+          "deodorization": "Deodorization"
+        }
+      },
+      "cat_litter_type": {
+        "name": "Cat litter type",
+        "state": {
+          "mineral_cat_litter": "Mineral (Bentonite)",
+          "mix_cat_litter": "Mixed (Tofu)"
+        }
+      },
+      "cds": {
+        "name": "Sensitivity",
+        "state": {
+          "2000lux": "2000lux",
+          "300lux": "300lux",
+          "50lux": "50lux",
+          "10lux": "10lux",
+          "5lux": "5lux",
+          "now": "now"
+        }
+      },
+      "change_temp_unit": {
+        "name": "Temperature unit",
+        "state": {
+          "0": "C°",
+          "1": "F",
+          "false": "C°",
+          "true": "F",
+          "c": "C°",
+          "f": "F"
+        }
+      },
+      "currency": {
+        "name": "Currency",
+        "state": {
+          "euro": "Euro",
+          "usd": "USD",
+          "rmb": "RMB"
+        }
+      },
+      "dbl_power_set": {
+        "name": "Set power",
+        "state": {
+          "level_1": "Level 1",
+          "level_2": "Level 2",
+          "level_3": "Level 3",
+          "level_4": "Level 4",
+          "level_5": "Level 5"
+        }
+      },
+      "device_mode": {
+        "name": "Device mode",
+        "state": {
+          "0": "Automatic",
+          "1": "Manual",
+          "auto": "Automatic",
+          "manual": "Manual"
+        }
+      },
+      "doorbell_volume": {
+        "name": "Doorbell volume",
+        "state": {
+          "mute": "Mute",
+          "low": "Low",
+          "high": "High"
+        }
+      },
+      "dj_color": {
+        "name": "Color",
+        "state": {
+          "r": "Red",
+          "rg": "Yellow",
+          "g": "Green",
+          "gb": "Light blue",
+          "b": "Blue",
+          "rb": "Pink",
+          "rgb": "White",
+          "color": "Random color"
+        }
+      },
+      "dj_mode": {
+        "name": "Mode",
+        "state": {
+          "bright": "Bright",
+          "gradually": "Gradually",
+          "star": "Star",
+          "flower": "Flower",
+          "marquee": "Marquee",
+          "fireworks": "Fireworks",
+          "meteor": "Meteor",
+          "stream": "Stream"
+        }
+      },
+      "key_tone": {
+        "name": "Key tone",
+        "state": {
+          "0": "High",
+          "1": "Normal",
+          "2": "Mute",
+          "high": "High",
+          "normal": "Normal",
+          "mute": "Mute"
+        }
+      },
+      "led_type_2": {
+        "name": "Light 2 source type",
+        "state": {
+          "halogen": "Halogen",
+          "incandescent": "Incandescent",
+          "led": "LED"
+        }
+      },
+      "led_type_3": {
+        "name": "Light 3 source type",
+        "state": {
+          "halogen": "Halogen",
+          "incandescent": "Incandescent",
+          "led": "LED"
+        }
+      },
+      "pir_sensitivity": {
+        "name": "PIR sensitivity",
+        "state": {
+          "low": "Low",
+          "middle": "Medium",
+          "high": "High"
+        }
+      },
+      "qccdz_chargingoperation": {
+        "name": "Charging operation",
+        "state": {
+          "opencharging": "Open charging",
+          "closecharging": "Close charging",
+          "waitoperation": "Wait charging"
+        }
+      },
+      "qccdz_work_mode": {
+        "name": "Work mode",
+        "state": {
+          "0": "Charge now",
+          "1": "Charge to percentage",
+          "2": "Charge energy",
+          "3": "Scheduled charge",
+          "4": "Delayed charge",
+          "charge_now": "Real time charging",
+          "charge_pct": "Charge to percentage",
+          "charge_energy": "Charge energy",
+          "charge_schedule": "Scheduled charge",
+          "charge_delay": "Delayed charge"
+        }
+      },
+      "sfkzq_work_state": {
+        "name": "Work state",
+        "state": {
+          "auto": "Auto",
+          "manual": "Manual",
+          "idle": "Idle"
+        }
+      },
+      "solar_en_total": {
+        "name": "Solar energy total",
+        "state": {
+          "unknown": "Unknown",
+          "disable": "Disable",
+          "enable": "Enable"
+        }
+      },
+      "sound_mode": {
+        "name": "Sound mode",
+        "state": {
+          "0": "Ringtone 0",
+          "1": "Ringtone 1",
+          "2": "Ringtone 2",
+          "3": "Ringtone 3",
+          "4": "Ringtone 4",
+          "5": "Ringtone 5",
+          "ringtone_0": "Ringtone 0",
+          "ringtone_1": "Ringtone 1",
+          "ringtone_2": "Ringtone 2",
+          "ringtone_3": "Ringtone 3",
+          "ringtone_4": "Ringtone 4",
+          "ringtone_5": "Ringtone 5",
+          "sound_0": "Sound 0",
+          "sound_1": "Sound 1",
+          "sound_2": "Sound 2",
+          "sound_3": "Sound 3",
+          "sound_4": "Sound 4",
+          "sound_5": "Sound 5"
+        }
+      },
+      "special_function": {
+        "name": "Special function",
+        "state": {
+          "0": "Function 1",
+          "1": "Function 2",
+          "2": "Function 3",
+          "3": "Function 4",
+          "4": "Function 5",
+          "function1": "Function 1",
+          "function2": "Function 2",
+          "function3": "Function 3",
+          "function4": "Function 4",
+          "function5": "Function 5"
+        }
+      },
+      "temp_unit_convert": {
+        "name": "Temperature unit",
+        "state": {
+          "c": "Celsius",
+          "f": "Fahrenheit"
+        }
+      },
+      "temperature_unit": {
+        "name": "Temperature unit",
+        "state": {
+          "1": "°C",
+          "2": "°F"
+        }
+      },
+      "tempunit": {
+        "name": "Temperature unit",
+        "state": {
+          "centigrade": "Celsius",
+          "fahrenheit_degree": "Fahrenheit"
+        }
+      },
+      "volume_unit": {
+        "name": "Volume unit"
+      },
+      "water_control": {
+        "name": "Water control",
+        "state": {
+          "on": "On",
+          "off": "Off"
+        }
+      },
+      "xfj_mode": {
+        "name": "Mode",
+        "state": {
+          "auto": "Automatic",
+          "sleep": "Sleep",
+          "manual": "Manual"
+        }
+      },
+      "xt_generic_select": {
+        "name": "{name}"
+      },
+      "xt_lock_unlock_mechanism": {
+        "name": "Lock/unlock mechanism",
+        "state": {
+          "auto": "Automatic",
+          "door_open": "Door open",
+          "door_operate": "Door operate",
+          "ticket_flow": "Ticket flow",
+          "dpcode_command": "DPcode command"
+        }
+      }
+    },
+    "sensor": {
+      "air_pressure": {
+        "name": "大气压"
+      },
+      "air_quality": {
+        "name": "空气质量",
+        "state": {
+          "good": "良好",
+          "great": "极佳",
+          "mild": "轻微",
+          "severe": "严重",
+          "bad": "Bad",
+          "medium": "Medium"
+        }
+      },
+      "air_quality_index": {
+        "name": "空气质量指数",
+        "state": {
+          "level_1": "1 级",
+          "level_2": "2 级",
+          "level_3": "3 级",
+          "level_4": "4 级",
+          "level_5": "5 级",
+          "level_6": "6 级"
+        }
+      },
+      "battery": {
+        "name": "电池"
+      },
+      "battery_power": {
+        "name": "电池功率"
+      },
+      "battery_soc": {
+        "name": "电池 SOC"
+      },
+      "battery_state": {
+        "name": "电池状态",
+        "state": {
+          "low": "Low",
+          "middle": "Middle",
+          "high": "High"
+        }
+      },
+      "carbon_dioxide": {
+        "name": "二氧化碳"
+      },
+      "carbon_monoxide": {
+        "name": "一氧化碳"
+      },
+      "cat_litter_box_status": {
+        "name": "状态",
+        "state": {
+          "empty": "清空中",
+          "level": "调平中",
+          "sleep": "休眠中",
+          "standby": "待机",
+          "uv": "消毒中",
+          "cleaning": "Cleaning",
+          "clock": "Clock",
+          "deodorization": "Deodorization",
+          "off": "Off",
+          "standly": "Standby",
+          "waiting_cluster": "Waiting cluster"
+        }
+      },
+      "cat_weight": {
+        "name": "猫体重"
+      },
+      "cleaning_area": {
+        "name": "清洁区域"
+      },
+      "cleaning_time": {
+        "name": "清扫时间"
+      },
+      "concentration_carbon_dioxide": {
+        "name": "二氧化碳浓度"
+      },
+      "current": {
+        "name": "电流"
+      },
+      "current_temperature": {
+        "name": "当前温度"
+      },
+      "depth": {
+        "name": "深度"
+      },
+      "duster_cloth_life": {
+        "name": "除尘布寿命"
+      },
+      "excretion_time_day": {
+        "name": "排泄时长"
+      },
+      "excretion_times_day": {
+        "name": "排泄次数（天）"
+      },
+      "filter_duration": {
+        "name": "过滤时长"
+      },
+      "filter_life": {
+        "name": "滤网寿命"
+      },
+      "filter_utilization": {
+        "name": "滤网利用率"
+      },
+      "formaldehyde": {
+        "name": "甲醛"
+      },
+      "gas": {
+        "name": "燃气"
+      },
+      "humidity": {
+        "name": "湿度"
+      },
+      "humidity_outdoor": {
+        "name": "室外湿度"
+      },
+      "illuminance": {
+        "name": "照度"
+      },
+      "indexed_humidity_outdoor": {
+        "name": "室外湿度通道 {index}"
+      },
+      "indexed_temperature_external": {
+        "name": "探头温度通道 {index}"
+      },
+      "inverter_output_power": {
+        "name": "逆变器输出功率"
+      },
+      "last_amount": {
+        "name": "上次数量"
+      },
+      "last_operation_duration": {
+        "name": "上次操作时长"
+      },
+      "lifetime_battery_charge_energy": {
+        "name": "终身电池充电能量"
+      },
+      "lifetime_battery_discharge_energy": {
+        "name": "终身电池放电能量"
+      },
+      "lifetime_inverter_output_energy": {
+        "name": "终身逆变器输出能量"
+      },
+      "lifetime_offgrid_port_energy": {
+        "name": "终身离网端口能源"
+      },
+      "lifetime_pv_energy": {
+        "name": "终身光伏能源"
+      },
+      "liquid_depth": {
+        "name": "液深"
+      },
+      "liquid_level": {
+        "name": "液位"
+      },
+      "liquid_state": {
+        "name": "液态",
+        "state": {
+          "lower_alarm": "低",
+          "normal": "正常",
+          "upper_alarm": "高"
+        }
+      },
+      "luminosity": {
+        "name": "光度"
+      },
+      "methane": {
+        "name": "甲烷"
+      },
+      "odor_elimination_status": {
+        "name": "状态",
+        "state": {
+          "charge_done": "充电完成",
+          "charging": "充电中",
+          "standby": "待机",
+          "work": "工作中"
+        }
+      },
+      "phase_a_current": {
+        "name": "相位 A 电流"
+      },
+      "phase_a_power": {
+        "name": "相位 A 功率"
+      },
+      "phase_a_voltage": {
+        "name": "相位 A 电压"
+      },
+      "phase_b_current": {
+        "name": "相位 B 电流"
+      },
+      "phase_b_power": {
+        "name": "相位 B 功率"
+      },
+      "phase_b_voltage": {
+        "name": "相位 B 电压"
+      },
+      "phase_c_current": {
+        "name": "相位 C 电流"
+      },
+      "phase_c_power": {
+        "name": "相位 C 功率"
+      },
+      "phase_c_voltage": {
+        "name": "相位 C 电压"
+      },
+      "pm1": {
+        "name": "PM1"
+      },
+      "pm10": {
+        "name": "PM10"
+      },
+      "pm25": {
+        "name": "PM2.5"
+      },
+      "power": {
+        "name": "电源"
+      },
+      "precipitation_intensity": {
+        "name": "降水强度"
+      },
+      "precipitation_today": {
+        "name": "今日总降水量"
+      },
+      "pump_time": {
+        "name": "水泵时长"
+      },
+      "pv_channel_power": {
+        "name": "光伏通道 {index} 功率"
+      },
+      "remaining_time": {
+        "name": "剩余时间"
+      },
+      "rolling_brush_life": {
+        "name": "滚刷寿命"
+      },
+      "side_brush_life": {
+        "name": "边刷寿命"
+      },
+      "smoke_amount": {
+        "name": "烟量"
+      },
+      "sous_vide_status": {
+        "name": "状态",
+        "state": {
+          "boiling_temp": "沸腾温度",
+          "cooling": "制冷",
+          "heating": "供暖",
+          "heating_temp": "供暖温度",
+          "reserve_1": "预留1",
+          "reserve_2": "预留2",
+          "reserve_3": "预留3",
+          "standby": "待机",
+          "warm": "保温"
+        }
+      },
+      "status": {
+        "name": "状态"
+      },
+      "supply_frequency": {
+        "name": "供电频率"
+      },
+      "temperature": {
+        "name": "温度"
+      },
+      "temperature_external": {
+        "name": "探头温度"
+      },
+      "total_absorption_particles": {
+        "name": "颗粒物总吸收量"
+      },
+      "total_cleaning_area": {
+        "name": "总清洁面积"
+      },
+      "total_cleaning_time": {
+        "name": "总清扫时间"
+      },
+      "total_cleaning_times": {
+        "name": "总清扫次数"
+      },
+      "total_dissolved_solids": {
+        "name": "总溶解固体"
+      },
+      "total_energy": {
+        "name": "总能量"
+      },
+      "total_operating_time": {
+        "name": "总运行时间"
+      },
+      "total_power": {
+        "name": "总功率"
+      },
+      "total_production": {
+        "name": "总产出"
+      },
+      "total_pv_power": {
+        "name": "光伏总功率"
+      },
+      "total_volatile_organic_compound": {
+        "name": "总挥发性有机化合物"
+      },
+      "total_watering_time": {
+        "name": "总浇水时间"
+      },
+      "uv_index": {
+        "name": "紫外线指数"
+      },
+      "uv_runtime": {
+        "name": "UV 运行时"
+      },
+      "voc": {
+        "name": "挥发性有机化合物"
+      },
+      "voltage": {
+        "name": "电压"
+      },
+      "water_level": {
+        "name": "水位"
+      },
+      "water_level_state": {
+        "name": "水位",
+        "state": {
+          "level_1": "低",
+          "level_2": "中",
+          "level_3": "满"
+        }
+      },
+      "water_time": {
+        "name": "用水时长"
+      },
+      "wind_direction": {
+        "name": "风向"
+      },
+      "dynamic_passcode": {
+        "name": "Dynamic Passcode"
+      },
+      "dynamic_passcode_expires_at": {
+        "name": "Dynamic Passcode Expiration Time"
+      },
+      "dynamic_passcode_remaining_seconds": {
+        "name": "Dynamic Passcode Remaining Time"
+      },
+      "a_current": {
+        "name": "Current A"
+      },
+      "a_voltage": {
+        "name": "Voltage A"
+      },
+      "achz": {
+        "name": "Grid Frequency"
+      },
+      "aci": {
+        "name": "Grid current"
+      },
+      "activepower": {
+        "name": "Active power"
+      },
+      "activepowera": {
+        "name": "Active power A"
+      },
+      "activepowerb": {
+        "name": "Active power B"
+      },
+      "activepowerc": {
+        "name": "Active power C"
+      },
+      "acv": {
+        "name": "Grid voltage"
+      },
+      "add_ele": {
+        "name": "Consumption {index}"
+      },
+      "add_ele_this_month": {
+        "name": "Monthly consumption {index}"
+      },
+      "add_ele_this_year": {
+        "name": "Yearly consumption {index}"
+      },
+      "add_ele_today": {
+        "name": "Daily consumption {index}"
+      },
+      "xt_add_ele": {
+        "name": "Consumption {index} (method B)"
+      },
+      "xt_add_ele_this_month": {
+        "name": "Monthly consumption {index} (method B)"
+      },
+      "xt_add_ele_this_year": {
+        "name": "Yearly consumption {index} (method B)"
+      },
+      "xt_add_ele_today": {
+        "name": "Daily consumption {index} (method B)"
+      },
+      "auto_deordrizer": {
+        "name": "Auto deordrizer"
+      },
+      "b_current": {
+        "name": "Current B"
+      },
+      "b_voltage": {
+        "name": "Voltage B"
+      },
+      "backlight_switch": {
+        "name": "Backlight Switch"
+      },
+      "balance_energy": {
+        "name": "Balance energy"
+      },
+      "battery_level": {
+        "name": "Battery level"
+      },
+      "c_current": {
+        "name": "Current C"
+      },
+      "c_voltage": {
+        "name": "Voltage C"
+      },
+      "calibration": {
+        "name": "Calibration"
+      },
+      "ch0_humidity": {
+        "name": "Base Station Humidity"
+      },
+      "ch0_temperature": {
+        "name": "Base Station Temperature"
+      },
+      "ch1_battery": {
+        "name": "Channel 1 Battery"
+      },
+      "ch1_temperature": {
+        "name": "Channel 1 Temperature"
+      },
+      "ch2_battery": {
+        "name": "Channel 2 Battery"
+      },
+      "ch2_temperature": {
+        "name": "Channel 2 Temperature"
+      },
+      "ch3_battery": {
+        "name": "Channel 3 Battery"
+      },
+      "ch3_temperature": {
+        "name": "Channel 3 Temperature"
+      },
+      "ch4_battery": {
+        "name": "Channel 4 Battery"
+      },
+      "ch4_temperature": {
+        "name": "Channel 4 Temperature"
+      },
+      "ch5_battery": {
+        "name": "Channel 5 Battery"
+      },
+      "ch5_temperature": {
+        "name": "Channel 5 Temperature"
+      },
+      "ch6_battery": {
+        "name": "Channel 6 Battery"
+      },
+      "ch6_temperature": {
+        "name": "Channel 6 Temperature"
+      },
+      "ch7_battery": {
+        "name": "Channel 7 Battery"
+      },
+      "ch7_temperature": {
+        "name": "Channel 7 Temperature"
+      },
+      "ch8_battery": {
+        "name": "Channel 8 Battery"
+      },
+      "ch8_temperature": {
+        "name": "Channel 8 Temperature"
+      },
+      "ch9_battery": {
+        "name": "Channel 9 Battery"
+      },
+      "ch9_temperature": {
+        "name": "Channel 9 Temperature"
+      },
+      "bag_change_counting": {
+        "name": "Bag change count"
+      },
+      "capacity_calibration": {
+        "name": "Capacity calibration"
+      },
+      "charge_energy": {
+        "name": "Charge energy"
+      },
+      "charge_energy_once": {
+        "name": "Charge energy (single)"
+      },
+      "child_lock": {
+        "name": "Child lock"
+      },
+      "clct_time": {
+        "name": "Collected time"
+      },
+      "clean": {
+        "name": "Clean"
+      },
+      "clean_notice": {
+        "name": "Clean notice"
+      },
+      "clean_taste": {
+        "name": "Clean taste"
+      },
+      "clean_tasteswitch": {
+        "name": "Clean taste switch"
+      },
+      "clean_time": {
+        "name": "Clean time"
+      },
+      "clean_time_switch": {
+        "name": "Clean time switch"
+      },
+      "countdown_left": {
+        "name": "Countdown left"
+      },
+      "ctime": {
+        "name": "Timer"
+      },
+      "ctime2": {
+        "name": "Timer 2"
+      },
+      "current_a": {
+        "name": "Current A"
+      },
+      "current_b": {
+        "name": "Current B"
+      },
+      "currenta": {
+        "name": "Current A"
+      },
+      "currentb": {
+        "name": "Current B"
+      },
+      "currentc": {
+        "name": "Current C"
+      },
+      "deodorization_num": {
+        "name": "Deodorization number"
+      },
+      "detection_sensitivity": {
+        "name": "Detection sensitivity"
+      },
+      "device_consumption": {
+        "name": "Device consumption"
+      },
+      "device_max_set_a": {
+        "name": "Device Max A",
+        "state": {
+          "max16a": "Max 16A",
+          "max32a": "Max 32A",
+          "max40a": "Max 40A",
+          "max50a": "Max 50A"
+        }
+      },
+      "device_power": {
+        "name": "Device power"
+      },
+      "device_temperature": {
+        "name": "Device temperature"
+      },
+      "device_temperature2": {
+        "name": "Device temperature 2"
+      },
+      "deviceid": {
+        "name": "Device ID"
+      },
+      "direction_a": {
+        "name": "Power direction A"
+      },
+      "direction_b": {
+        "name": "Power direction B"
+      },
+      "deodorization": {
+        "name": "Deodorization"
+      },
+      "eco": {
+        "name": "Eco"
+      },
+      "electric": {
+        "name": "Power production"
+      },
+      "electric_this_month": {
+        "name": "Monthly production"
+      },
+      "electric_this_year": {
+        "name": "Yearly production"
+      },
+      "electric_today": {
+        "name": "Daily production"
+      },
+      "electric_total": {
+        "name": "Total power production"
+      },
+      "empty": {
+        "name": "Empty"
+      },
+      "end_time": {
+        "name": "End time"
+      },
+      "energyconsumed": {
+        "name": "Energy consumed"
+      },
+      "energyconsumeda": {
+        "name": "Energy consumed A"
+      },
+      "energyconsumedb": {
+        "name": "Energy consumed B"
+      },
+      "energyconsumedc": {
+        "name": "Energy consumed C"
+      },
+      "fault": {
+        "name": "Fault"
+      },
+      "flow_velocity": {
+        "name": "Flow speed"
+      },
+      "frequency": {
+        "name": "Frequency"
+      },
+      "gross_generation": {
+        "name": "Gross generation"
+      },
+      "gross_generation_a": {
+        "name": "Gross generation A"
+      },
+      "gross_generation_b": {
+        "name": "Gross generation B"
+      },
+      "gross_generation_c": {
+        "name": "Gross generation C"
+      },
+      "heart_rate": {
+        "name": "Heart rate"
+      },
+      "hps_presence_state": {
+        "name": "Presence",
+        "state": {
+          "none": "none",
+          "presence": "Presence",
+          "peaceful": "Peaceful",
+          "small_move": "Small movement",
+          "large_move": "Large movement"
+        }
+      },
+      "hum_alarm": {
+        "name": "Humidity alarm",
+        "state": {
+          "loweralarm": "Low humidity",
+          "upperalarm": "High humidity",
+          "cancel": "None"
+        }
+      },
+      "induction_clean": {
+        "name": "Induction clean"
+      },
+      "induction_delay": {
+        "name": "Induction delay"
+      },
+      "induction_interval": {
+        "name": "Induction interval"
+      },
+      "jtmspro_alarm_lock": {
+        "name": "Lock alarm",
+        "state": {
+          "0": "Wrong fingerprint",
+          "1": "Wrong password",
+          "2": "Wrong card",
+          "3": "Wrong face",
+          "4": "Latch stuck",
+          "5": "Too hot",
+          "6": "Not closed after timeout",
+          "7": "Deadbolt stuck",
+          "8": "Anti-pry alarm",
+          "9": "Not calibrated",
+          "10": "Low battery",
+          "11": "Battery exhausted",
+          "12": "Vibration alarm",
+          "13": "Arm alarm",
+          "wrong_finger": "Wrong fingerprint",
+          "wrong_password": "Wrong password",
+          "wrong_card": "Wrong card",
+          "wrong_face": "Wrong face",
+          "tongue_bad": "Latch stuck",
+          "too_hot": "Too hot",
+          "unclosed_time": "Not closed after timeout",
+          "tongue_not_out": "Deadbolt stuck",
+          "pry": "Anti-pry alarm",
+          "key_in": "Not calibrated",
+          "low_battery": "Low battery",
+          "power_off": "Battery exhausted",
+          "shock": "Vibration alarm",
+          "defense": "Arm alarm"
+        }
+      },
+      "jtmspro_closed_opened": {
+        "name": "Door Open/Closed",
+        "state": {
+          "0": "Unknown",
+          "1": "Open",
+          "2": "Closed",
+          "unknown": "Unknown",
+          "open": "Open",
+          "closed": "Closed"
+        }
+      },
+      "ldr": {
+        "name": "Light intensity"
+      },
+      "liquid_level_percent": {
+        "name": "Liquid level"
+      },
+      "magnetnum": {
+        "name": "Magnet number"
+      },
+      "meter_type": {
+        "name": "Meter type",
+        "state": {
+          "unknown": "Unknown",
+          "3_phase": "3 Phases",
+          "1_phase": "1 Phase",
+          "1_phase_3_wire": "1 Phase 3 wires",
+          "other": "Other"
+        }
+      },
+      "monitoring": {
+        "name": "Monitoring"
+      },
+      "mov_status": {
+        "name": "Movement status"
+      },
+      "ms_category_alarm_lock": {
+        "name": "Keypad alarm",
+        "state": {
+          "0": "Wrong fingerprint",
+          "1": "Wrong password",
+          "2": "Wrong card",
+          "3": "Wrong face",
+          "4": "Too hot",
+          "5": "Not closed after timeout",
+          "6": "Anti-pry alarm",
+          "7": "Low battery",
+          "8": "Battery exhausted",
+          "9": "Vibration alarm",
+          "wrong_finger": "Wrong fingerprint",
+          "wrong_password": "Wrong password",
+          "wrong_card": "Wrong card",
+          "wrong_face": "Wrong face",
+          "too_hot": "Too hot",
+          "unclosed_time": "Not closed after timeout",
+          "pry": "Anti-pry alarm",
+          "low_battery": "Low battery",
+          "power_off": "Battery exhausted",
+          "shock": "Vibration alarm"
+        }
+      },
+      "msp_history": {
+        "name": "History",
+        "state": {
+          "0": "None",
+          "1": "Automatic shoveling completed",
+          "2": "Manual shoveling completed",
+          "3": "Trash bin extraction",
+          "4": "Trash bin reinstallation",
+          "5": "Start automatic deodorization",
+          "6": "Start manual deodorization",
+          "7": "Temperature in the cabin is too high",
+          "8": "The temperature inside the cabin is suitable",
+          "9": "Sand dumping completed",
+          "10": "Sand dumping canceled",
+          "11": "Litter shoveling canceled",
+          "12": "Enter Do Not Disturb mode",
+          "13": "Exit Do Not Disturb mode",
+          "14": "Cat approaches",
+          "15": "Cat leaves",
+          "16": "Starting Self-inspection",
+          "17": "Completed self-inspection",
+          "18": "Cover is not installed",
+          "19": "Cover is installed",
+          "20": "Start shoveling",
+          "21": "Start dumping",
+          "22": "Cat enters"
+        }
+      },
+      "mzj_work_status": {
+        "name": "Work status",
+        "state": {
+          "stop": "Stopped",
+          "working": "Working",
+          "complete": "Complete",
+          "0": "Stopped",
+          "1": "Working",
+          "2": "Complete"
+        }
+      },
+      "net_notice": {
+        "name": "Net notice"
+      },
+      "not_disturb": {
+        "name": "Not disturb"
+      },
+      "not_disturb_switch": {
+        "name": "Not disturb switch"
+      },
+      "notification_status": {
+        "name": "Notification status"
+      },
+      "number": {
+        "name": "Number"
+      },
+      "odourless": {
+        "name": "Odourless"
+      },
+      "off_bed_time": {
+        "name": "Time get out of bed"
+      },
+      "ozone_concentration": {
+        "name": "Ozone concentration"
+      },
+      "pedal_angle": {
+        "name": "Pedal angle"
+      },
+      "phaseflag": {
+        "name": "Phase",
+        "state": {
+          "single_phase": "Single phase",
+          "three_phase": "Three phases",
+          "no_phase": "No phase",
+          "phase_err": "Phase error"
+        }
+      },
+      "pir_radar": {
+        "name": "PIR Radar"
+      },
+      "ponud": {
+        "name": "Cat weight (lb)"
+      },
+      "power_a": {
+        "name": "Power A"
+      },
+      "power_b": {
+        "name": "Power B"
+      },
+      "power_factor": {
+        "name": "Power factor"
+      },
+      "power_factor_b": {
+        "name": "Power factor B"
+      },
+      "power_total": {
+        "name": "Total power"
+      },
+      "powerfactora": {
+        "name": "Power factor A"
+      },
+      "powerfactorb": {
+        "name": "Power factor B"
+      },
+      "powerfactorc": {
+        "name": "Power factor C"
+      },
+      "product_specifications": {
+        "name": "Product specification",
+        "state": {
+          "europe": "Europe",
+          "america": "America"
+        }
+      },
+      "pv1_curr": {
+        "name": "Panel 1 current"
+      },
+      "pv1_volt": {
+        "name": "Panel 1 voltage"
+      },
+      "pv2_curr": {
+        "name": "Panel 2 current"
+      },
+      "pv2_volt": {
+        "name": "Panel 2 voltage"
+      },
+      "pvi": {
+        "name": "Total panel 1 current"
+      },
+      "pvv": {
+        "name": "Total panel voltage"
+      },
+      "qccdz_connection_state": {
+        "name": "Connection state",
+        "state": {
+          "0": "12V",
+          "1": "12V PWN",
+          "2": "9V",
+          "3": "9V PWM",
+          "4": "6V",
+          "5": "6V PWM",
+          "6": "Error",
+          "controlpi_12v": "12V",
+          "controlpi_12v_pwm": "12V PWN",
+          "controlpi_9v": "9V",
+          "controlpi_9v_pwm": "9V PWM",
+          "controlpi_6v": "6V",
+          "controlpi_6v_pwm": "6V PWM",
+          "controlpi_error": "Error"
+        }
+      },
+      "qccdz_devicestate": {
+        "name": "Device state",
+        "state": {
+          "no_connet": "Not connected",
+          "connect": "Connected",
+          "charing": "Charging",
+          "wait_rfid": "Waiting for RFID",
+          "finish": "Finished",
+          "wait_charing": "Charge waiting",
+          "error": "Error"
+        }
+      },
+      "qccdz_work_state": {
+        "name": "Work state",
+        "state": {
+          "0": "Charger is free",
+          "1": "Charger inserted",
+          "2": "Charger is free (fault)",
+          "3": "Charger is waiting",
+          "4": "Charger is charging",
+          "5": "Charger is paused",
+          "6": "Charger has finished",
+          "7": "Charger fault",
+          "charger_free": "Charger is free",
+          "charger_insert": "Charger inserted",
+          "charger_free_fault": "Charger is free (fault)",
+          "charger_wait": "Charger is waiting",
+          "charger_charging": "Charger is charging",
+          "charger_pause": "Charger is paused",
+          "charger_end": "Charger has finished",
+          "charger_fault": "Charger fault"
+        }
+      },
+      "reactivepower": {
+        "name": "Reactive power"
+      },
+      "reactivepowera": {
+        "name": "Reactive power A"
+      },
+      "reactivepowerb": {
+        "name": "Reactive power B"
+      },
+      "reactivepowerc": {
+        "name": "Reactive power C"
+      },
+      "releases": {
+        "name": "Release"
+      },
+      "respiratory_rate": {
+        "name": "Respiratory rate"
+      },
+      "sand_surface_calibration": {
+        "name": "Sand surface calibration"
+      },
+      "sigle_phase_power": {
+        "name": "Single phase power"
+      },
+      "sleep_stage": {
+        "name": "Sleep stage",
+        "state": {
+          "sleep": "Sleep",
+          "awake": "Awake",
+          "0": "Sleep",
+          "1": "Awake"
+        }
+      },
+      "smart_clean": {
+        "name": "Smart clean"
+      },
+      "start_time": {
+        "name": "Start time"
+      },
+      "store_full_notify": {
+        "name": "Store full notify"
+      },
+      "switch_alarm_sound": {
+        "name": "Switch Alarm Sound"
+      },
+      "system_version": {
+        "name": "System version"
+      },
+      "target_distance": {
+        "name": "Target distance"
+      },
+      "temp_alarm": {
+        "name": "Temperature alarm",
+        "state": {
+          "loweralarm": "Low temperature",
+          "upperalarm": "High temperature",
+          "cancel": "None"
+        }
+      },
+      "temp_bottom": {
+        "name": "Min temperature"
+      },
+      "temp_show": {
+        "name": "Current temperature"
+      },
+      "temp_top": {
+        "name": "Max temperature"
+      },
+      "temp_unit_convert": {
+        "name": "Temperature unit",
+        "state": {
+          "c": "Celsius",
+          "f": "Fahrenheit"
+        }
+      },
+      "time": {
+        "name": "Time"
+      },
+      "time_get_in_bed": {
+        "name": "Time get in bed"
+      },
+      "toilet_notice": {
+        "name": "Toilet notice"
+      },
+      "total_forward_energy": {
+        "name": "Total forward energy"
+      },
+      "trash_status": {
+        "name": "Trash status"
+      },
+      "tvoc": {
+        "name": "TVOC"
+      },
+      "unit": {
+        "name": "Unit"
+      },
+      "unit_switch": {
+        "name": "Weight unit",
+        "state": {
+          "kg": "Kilograms",
+          "lb": "Pounds"
+        }
+      },
+      "unlock_card": {
+        "name": "Card unlock user"
+      },
+      "unlock_face": {
+        "name": "Face unlock user"
+      },
+      "unlock_finger_vein": {
+        "name": "Finger vein unlock user"
+      },
+      "unlock_fingerprint": {
+        "name": "Fingerprint unlock user"
+      },
+      "unlock_hand": {
+        "name": "Hand unlock user"
+      },
+      "unlock_password": {
+        "name": "Password unlock user"
+      },
+      "usage_times": {
+        "name": "Usage times"
+      },
+      "voltage_a": {
+        "name": "Voltage A"
+      },
+      "water_once": {
+        "name": "Instant flow rate"
+      },
+      "water_total": {
+        "name": "Total flow"
+      },
+      "water_use_data": {
+        "name": "Water used"
+      },
+      "watering_cycle": {
+        "name": "Watering cycle"
+      },
+      "watering_task": {
+        "name": "Watering task",
+        "state": {
+          "0": "None",
+          "1": "Single duration",
+          "2": "Cycle duration",
+          "3": "Single volume",
+          "4": "Cycle volume"
+        }
+      },
+      "watering_volume": {
+        "name": "Watering volume"
+      },
+      "wnykq_ir_control": {
+        "name": "IR control",
+        "state": {
+          "0": "Study",
+          "1": "Stop",
+          "2": "Success",
+          "3": "Fail",
+          "study": "Study",
+          "stop": "Stop",
+          "success": "Success",
+          "fail": "Fail"
+        }
+      },
+      "work_stat": {
+        "name": "Work stat"
+      },
+      "xt_cover_invert_control": {
+        "name": "Cover controls inverted"
+      },
+      "xt_cover_invert_status": {
+        "name": "Cover status inverted"
+      },
+      "xt_generic_sensor": {
+        "name": "{name}"
+      },
+      "current2": {
+        "name": "Current 2"
+      },
+      "detection_near": {
+        "name": "Detection near"
+      },
+      "distance": {
+        "name": "Target distance"
+      },
+      "power2": {
+        "name": "Power 2"
+      },
+      "total_energy_today": {
+        "name": "Daily total energy"
+      },
+      "total_energy_this_month": {
+        "name": "Monthly total energy"
+      },
+      "total_energy_this_year": {
+        "name": "Yearly total energy"
+      },
+      "xt_total_energy": {
+        "name": "Total energy (method B)"
+      },
+      "xt_total_energy_today": {
+        "name": "Daily total energy (method B)"
+      },
+      "xt_total_energy_this_month": {
+        "name": "Monthly total energy (method B)"
+      },
+      "xt_total_energy_this_year": {
+        "name": "Yearly total energy (method B)"
+      },
+      "voltage2": {
+        "name": "Voltage 2"
+      },
+      "xt_lock_unlock_mechanism": {
+        "name": "Lock/unlock mechanism",
+        "state": {
+          "auto": "Automatic",
+          "door_open": "Door open",
+          "door_operate": "Door operate",
+          "ticket_flow": "Ticket flow",
+          "dpcode_command": "DPcode command"
+        }
+      }
+    },
+    "switch": {
+      "anion": {
+        "name": "负离子"
+      },
+      "arm_beep": {
+        "name": "布防蜂鸣"
+      },
+      "auto_clean": {
+        "name": "自动清洁"
+      },
+      "battery_lock": {
+        "name": "电池锁"
+      },
+      "child_lock": {
+        "name": "儿童锁"
+      },
+      "cry_detection": {
+        "name": "哭声检测"
+      },
+      "disinfection": {
+        "name": "消毒"
+      },
+      "do_not_disturb": {
+        "name": "请勿打扰"
+      },
+      "energy_saving": {
+        "name": "节能"
+      },
+      "filter_cartridge_reset": {
+        "name": "滤芯复位"
+      },
+      "filter_reset": {
+        "name": "滤网复位"
+      },
+      "flip": {
+        "name": "翻转"
+      },
+      "frost_protection": {
+        "name": "防霜冻"
+      },
+      "heat_preservation": {
+        "name": "保温"
+      },
+      "humidification": {
+        "name": "加湿"
+      },
+      "indexed_alarm": {
+        "name": "警报 {index}"
+      },
+      "indexed_socket": {
+        "name": "插座 {index}"
+      },
+      "indexed_switch": {
+        "name": "开关 {index}"
+      },
+      "indexed_usb": {
+        "name": "USB {index}"
+      },
+      "ionizer": {
+        "name": "负离子发生器"
+      },
+      "motion_alarm": {
+        "name": "运动报警"
+      },
+      "motion_recording": {
+        "name": "运动录制"
+      },
+      "motion_tracking": {
+        "name": "运动追踪"
+      },
+      "music": {
+        "name": "音乐"
+      },
+      "mute": {
+        "name": "静音"
+      },
+      "mute_voice": {
+        "name": "静音语音"
+      },
+      "natural_wind": {
+        "name": "自然风"
+      },
+      "open_window_detection": {
+        "name": "开窗检测"
+      },
+      "output_power_limit": {
+        "name": "输出功率限制"
+      },
+      "oxygen_bar": {
+        "name": "氧吧"
+      },
+      "plug": {
+        "name": "插头"
+      },
+      "power": {
+        "name": "电源"
+      },
+      "privacy_mode": {
+        "name": "隐私模式"
+      },
+      "pump": {
+        "name": "泵"
+      },
+      "radio": {
+        "name": "无线电"
+      },
+      "reset_of_water_usage_days": {
+        "name": "重置用水天数"
+      },
+      "reverse": {
+        "name": "反向"
+      },
+      "siren": {
+        "name": "警笛"
+      },
+      "sleep": {
+        "name": "睡眠"
+      },
+      "sleep_aid": {
+        "name": "睡眠辅助"
+      },
+      "slow_feed": {
+        "name": "缓慢投喂"
+      },
+      "snooze": {
+        "name": "打盹"
+      },
+      "socket": {
+        "name": "插座"
+      },
+      "sound": {
+        "name": "声音"
+      },
+      "sound_detection": {
+        "name": "声音检测"
+      },
+      "spray": {
+        "name": "喷雾"
+      },
+      "start": {
+        "name": "启动"
+      },
+      "sterilization": {
+        "name": "灭菌"
+      },
+      "switch": {
+        "name": "开关"
+      },
+      "time_watermark": {
+        "name": "时间水印"
+      },
+      "uv_sterilization": {
+        "name": "紫外线杀菌"
+      },
+      "video_recording": {
+        "name": "录像"
+      },
+      "voice": {
+        "name": "声音"
+      },
+      "water": {
+        "name": "供水"
+      },
+      "water_pump_reset": {
+        "name": "水泵复位"
+      },
+      "wide_dynamic_range": {
+        "name": "宽动态范围"
+      },
+      "alarm_1": {
+        "name": "Alarm 1"
+      },
+      "alarm_2": {
+        "name": "Alarm 2"
+      },
+      "alarm_3": {
+        "name": "Alarm 3"
+      },
+      "alarm_4": {
+        "name": "Alarm 4"
+      },
+      "alarm_switch": {
+        "name": "Alarm switch"
+      },
+      "auto_deordrizer": {
+        "name": "Auto deordrizer"
+      },
+      "automatic_lock": {
+        "name": "Automatic lock"
+      },
+      "beep": {
+        "name": "Beep"
+      },
+      "calibration": {
+        "name": "Calibration"
+      },
+      "clean": {
+        "name": "Clean"
+      },
+      "clean_notice": {
+        "name": "Clean notice"
+      },
+      "clean_taste": {
+        "name": "Clean taste"
+      },
+      "clean_tasteswitch": {
+        "name": "Clean taste Switch"
+      },
+      "clean_time": {
+        "name": "Clean time"
+      },
+      "clean_time_switch": {
+        "name": "Clean time switch"
+      },
+      "control_skip": {
+        "name": "Skip control"
+      },
+      "deep_clean": {
+        "name": "Double cleaning"
+      },
+      "deodorization": {
+        "name": "Deodorization"
+      },
+      "developer_mode": {
+        "name": "Developer mode"
+      },
+      "empty": {
+        "name": "Empty"
+      },
+      "factory_reset": {
+        "name": "Factory reset"
+      },
+      "false_breath": {
+        "name": "False breath filter"
+      },
+      "id_verification_set": {
+        "name": "Set ID verification"
+      },
+      "indicator_light": {
+        "name": "Indicator light"
+      },
+      "induction_clean": {
+        "name": "Induction Clean"
+      },
+      "infrared_sensor_switch": {
+        "name": "Infrared sensor"
+      },
+      "key_rec": {
+        "name": "Key tone"
+      },
+      "light": {
+        "name": "Light"
+      },
+      "manual_clean": {
+        "name": "Manual clean"
+      },
+      "net_notice": {
+        "name": "Net notice"
+      },
+      "not_disturb": {
+        "name": "Not disturb"
+      },
+      "not_disturb_switch": {
+        "name": "Not disturb Switch"
+      },
+      "odourless": {
+        "name": "Odourless"
+      },
+      "one_click_cleanup": {
+        "name": "One click cleanup"
+      },
+      "photo_again": {
+        "name": "Take another photo"
+      },
+      "pump_auto": {
+        "name": "Pump auto"
+      },
+      "pump_mode": {
+        "name": "Pump drainage/supply"
+      },
+      "pump_switch": {
+        "name": "Pump switch"
+      },
+      "quiet_timing_on": {
+        "name": "Do not disturb"
+      },
+      "reboot": {
+        "name": "Reboot"
+      },
+      "rfid": {
+        "name": "RFID"
+      },
+      "rtc_lock": {
+        "name": "RTC lock"
+      },
+      "sleep_mode": {
+        "name": "Sleep mode"
+      },
+      "sleeping": {
+        "name": "Sleep"
+      },
+      "smart_clean": {
+        "name": "Smart clean"
+      },
+      "socket_1": {
+        "name": "Socket 1"
+      },
+      "socket_2": {
+        "name": "Socket 2"
+      },
+      "socket_3": {
+        "name": "Socket 3"
+      },
+      "socket_4": {
+        "name": "Socket 4"
+      },
+      "socket_5": {
+        "name": "Socket 5"
+      },
+      "socket_6": {
+        "name": "Socket 6"
+      },
+      "store_full_notify": {
+        "name": "Store full notify"
+      },
+      "switch_1": {
+        "name": "Switch 1"
+      },
+      "switch_2": {
+        "name": "Switch 2"
+      },
+      "switch_3": {
+        "name": "Switch 3"
+      },
+      "switch_4": {
+        "name": "Switch 4"
+      },
+      "switch_5": {
+        "name": "Switch 5"
+      },
+      "switch_6": {
+        "name": "Switch 6"
+      },
+      "switch_7": {
+        "name": "Switch 7"
+      },
+      "switch_8": {
+        "name": "Switch 8"
+      },
+      "switch_enabled": {
+        "name": "Switch enabled"
+      },
+      "switch_pir": {
+        "name": "Switch PIR"
+      },
+      "thin_feces": {
+        "name": "Deep cleaning"
+      },
+      "toilet_notice": {
+        "name": "Toilet notice"
+      },
+      "unit": {
+        "name": "Unit"
+      },
+      "usb_1": {
+        "name": "USB 1"
+      },
+      "usb_2": {
+        "name": "USB 2"
+      },
+      "usb_3": {
+        "name": "USB 3"
+      },
+      "usb_4": {
+        "name": "USB 4"
+      },
+      "usb_5": {
+        "name": "USB 5"
+      },
+      "usb_6": {
+        "name": "USB 6"
+      },
+      "uv": {
+        "name": "UV"
+      },
+      "uv_light": {
+        "name": "UV light"
+      },
+      "valve": {
+        "name": "Valve"
+      },
+      "xt_cover_invert_control": {
+        "name": "Invert cover controls"
+      },
+      "xt_cover_invert_status": {
+        "name": "Invert cover status"
+      },
+      "xt_generic_switch": {
+        "name": "{name}"
+      },
+      "sleep_new": {
+        "name": "Sleep mode"
+      }
+    },
+    "valve": {
+      "indexed_valve": {
+        "name": "阀门 {index}"
+      },
+      "valve": {
+        "name": "阀门"
+      }
+    },
+    "climate": {
+      "mode": {
+        "name": "Mode",
+        "state": {
+          "auto": "Automatic",
+          "cold": "Cold",
+          "freeze": "Freeze",
+          "heat": "Heat",
+          "hot": "Hot",
+          "manual": "Manual",
+          "wet": "Wet",
+          "wind": "Wind",
+          "on": "On",
+          "off": "Off"
+        }
+      }
+    },
+    "lock": {
+      "operate_lock": {
+        "name": "Operate lock"
+      }
+    },
+    "remote": {
+      "xt_generic_remote": {
+        "name": "{name}"
+      }
+    },
+    "time": {
+      "countdown_1": {
+        "name": "Countdown 1"
+      },
+      "countdown_2": {
+        "name": "Countdown 2"
+      },
+      "countdown_3": {
+        "name": "Countdown 3"
+      },
+      "countdown_4": {
+        "name": "Countdown 4"
+      },
+      "countdown_5": {
+        "name": "Countdown 5"
+      },
+      "countdown_6": {
+        "name": "Countdown 6"
+      },
+      "countdown_7": {
+        "name": "Countdown 7"
+      },
+      "countdown_8": {
+        "name": "Countdown 8"
+      }
+    }
+  },
+  "issues": {
+    "service_deprecation_turn_off": {
+      "title": "Tuya vacuum support for vacuum.turn_off is being removed",
+      "fix_flow": {
+        "step": {
+          "confirm": {
+            "title": "Tuya vacuum support for vacuum.turn_off is being removed",
+            "description": "Tuya vacuum support for the vacuum.turn_off service is deprecated and will be removed in Home Assistant 2024.2; Please adjust any automation or script that uses the service to instead call vacuum.stop and select submit below to mark this issue as resolved."
+          }
+        }
+      }
+    },
+    "service_deprecation_turn_on": {
+      "title": "Tuya vacuum support for vacuum.turn_on is being removed",
+      "fix_flow": {
+        "step": {
+          "confirm": {
+            "title": "Tuya vacuum support for vacuum.turn_on is being removed",
+            "description": "Tuya vacuum support for the vacuum.turn_on service is deprecated and will be removed in Home Assistant 2024.2; Please adjust any automation or script that uses the service to instead call vacuum.start and select submit below to mark this issue as resolved."
+          }
+        }
+      }
+    },
+    "tuya_iot_failed_request": {
+      "title": "Tuya OpenAPI request failed",
+      "description": "The integration \"{name}\" (`{config_entry_id}`) could not connect to the Tuya OpenAPI service (request failed)\n\nTo fix this error, check that your HA can access the internet and that there is no firewall in between HA and Tuya OpenAPI endpoints."
+    },
+    "tuya_iot_failed_login": {
+      "title": "Tuya OpenAPI credentials expired",
+      "description": "The integration \"{name}\" (`{config_entry_id}`) could not connect to the Tuya OpenAPI service (credentials expired)\n\nTo fix this error please follow the guide at the URL by clicking the button below, then restart Home Assistant."
+    },
+    "tuya_iot_not_configured": {
+      "title": "Tuya OpenAPI account not configured",
+      "description": "The integration \"{name}\" (`{config_entry_id}`) Does not have Tuya OpenAPI credentials\n\nWithout this, a lot of entities might be missing in your devices.\n\nTo fix this warning please follow the guide at the URL by clicking the button below, then restart Home Assistant."
+    },
+    "tuya_iot_lock_not_subscribed": {
+      "title": "Tuya OpenAPI account badly configured (lock)",
+      "description": "The integration \"{name}\" (`{config_entry_id}`) Does not have a Tuya OpenAPI account that is subscribed to the Smart Lock Open Service\n\nWithout this, locks will not function properly.\n\nTo fix this warning please follow the guide at the URL by clicking the button below, then restart Home Assistant."
+    },
+    "tuya_iot_camera_not_subscribed": {
+      "title": "Tuya OpenAPI account badly configured (camera)",
+      "description": "The integration \"{name}\" (`{config_entry_id}`) Does not have a Tuya OpenAPI account that is subscribed to the IoT Video Live Stream service\n\nWithout this, cameras will not function properly.\n\nTo fix this warning please follow the guide at the URL by clicking the button below, then restart Home Assistant."
+    },
+    "tuya_iot_ir_not_subscribed": {
+      "title": "Tuya OpenAPI account badly configured (IR)",
+      "description": "The integration \"{name}\" (`{config_entry_id}`) Does not have a Tuya OpenAPI account that is subscribed to the IR Control Hub Open Service service\n\nWithout this, IR devices will not function properly.\n\nTo fix this warning please follow the guide at the URL by clicking the button below, then restart Home Assistant."
+    },
+    "tuya_iot_sensor_energy_stat_not_subscribed": {
+      "title": "Tuya OpenAPI account badly configured (Energy stat)",
+      "description": "The integration \"{name}\" (`{config_entry_id}`) Does not have a Tuya OpenAPI account that is subscribed to the Beta API service\n\nWithout this, fetching energy sensor consumption history will not function properly.\n\nTo fix this warning please follow the guide at the URL by clicking the button below, then restart Home Assistant."
+    },
+    "tuya_iot_mqtt_failed_login": {
+      "title": "Tuya OpenAPI MQTT Not authorized",
+      "description": "The integration \"{name}\" (`{config_entry_id}`) could not connect to the Tuya OpenAPI MQTT queue, something is wrong in your configuration\n\nTo fix this error please follow the guide at the URL by clicking the button below, then restart Home Assistant."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Xtend Tuya Settings",
+        "description": "Select the settings you want to configure.",
+        "menu_options": {
+          "configure_api": "API Credentials",
+          "device_settings": "Device Settings"
+        }
+      },
+      "configure_api": {
+        "title": "Add Tuya OpenAPI credentials",
+        "description": "Add a Tuya OpenAPI credential to improve the compatibility with some Tuya devices. Please follow the guide at the URL by clicking the button below.",
+        "data": {
+          "no_openapi": "Don't ask for OpenAPI credentials",
+          "country_code": "Country",
+          "access_id": "Tuya IoT Access ID",
+          "access_secret": "Tuya IoT Access Secret",
+          "username": "SmartLife/Tuya account",
+          "password": "SmartLife/Tuya account password"
+        }
+      },
+      "device_settings": {
+        "title": "Configuration category",
+        "menu_options": {
+          "select_climate_device": "Climate options",
+          "select_cover_device": "Cover options",
+          "select_lock_device": "Lock options"
+        }
+      },
+      "select_device": {
+        "title": "Select device",
+        "description": "Select a device to configure.",
+        "data": {
+          "device": "Device"
+        }
+      },
+      "configure": {
+        "title": "Add Tuya OpenAPI credentials",
+        "description": "Add a Tuya OpenAPI credential to improve the compatibility with some Tuya devices. Please follow the guide at the URL by clicking the button below.",
+        "data": {
+          "no_openapi": "Don't ask for OpenAPI credentials",
+          "country_code": "Country",
+          "access_id": "Tuya IoT Access ID",
+          "access_secret": "Tuya IoT Access Secret",
+          "username": "SmartLife/Tuya account",
+          "password": "SmartLife/Tuya account password"
+        }
+      },
+      "select_climate_device": {
+        "title": "Select Device",
+        "description": "Select a climate device to configure.",
+        "data": {
+          "device": "Device"
+        }
+      },
+      "select_cover_device": {
+        "title": "Select Device",
+        "description": "Select a cover device to configure.",
+        "data": {
+          "device": "Device"
+        }
+      },
+      "select_lock_device": {
+        "title": "Select Device",
+        "description": "Select a lock device to configure.",
+        "data": {
+          "device": "Device"
+        }
+      },
+      "climate_device_settings": {
+        "title": "Configure {device_name}",
+        "description": "Set the properties of the device",
+        "data": {
+          "current_temperature_value_multiplicator": "Current temperature multiplier",
+          "current_humidity_value_multiplicator": "Current humidity multiplier",
+          "target_temperature_value_multiplicator": "Target temperature multiplier",
+          "target_humidity_value_multiplicator": "Target humidity multiplier"
+        }
+      },
+      "cover_device_settings": {
+        "title": "Configure {device_name}",
+        "description": "Set the properties of the device",
+        "data": {
+          "invert_control": "Invert the control of the device",
+          "invert_status": "Invert the reported status of the device",
+          "open_time": "Time from opened to closed (seconds)",
+          "update_interval": "Status refresh interval",
+          "force_virtual_position": "Force use of virtual position",
+          "no_precise_position": "Device doesn't support precise positioning"
+        }
+      },
+      "lock_device_settings": {
+        "title": "Configure {device_name}",
+        "description": "Set the properties of the device",
+        "data": {
+          "temporary_unlock_time": "Seconds the lock stays opened",
+          "lock_unlock_mecanism": "Force unlock mecanism",
+          "lock_status_dpcode": "DPCode that represents the lock open/closed status"
+        }
+      }
+    },
+    "abort": {
+      "climate_entity_not_found": "No climate entity found for the selected device. Please select a device with a climate entity to configure.",
+      "lock_entity_not_found": "No lock entity found for the selected device. Please select a device with a lock entity to configure.",
+      "no_devices_found": "No devices found for this configuration category.",
+      "device_not_selected": "No device selected. Please select a device to configure.",
+      "device_not_found": "Selected device not found. Please select a valid device to configure.",
+      "no_configurable_properties": "The selected device does not have configurable properties.",
+      "no_multi_manager": "No Multi Manager stored, please contact the developer."
+    }
+  },
+  "services": {
+    "create_temporary_password": {
+      "name": "Create Temporary Password",
+      "description": "Creates a time-restricted temporary passcode for a Tuya smart lock.",
+      "fields": {
+        "device_id": {
+          "name": "Device",
+          "description": "The Tuya smart lock device."
+        },
+        "password": {
+          "name": "Password / PIN",
+          "description": "The 6-8 digit numeric passcode to create (e.g. 1266455)."
+        },
+        "name": {
+          "name": "Name / Alias",
+          "description": "An optional name or label for the temporary passcode."
+        },
+        "effective_time": {
+          "name": "Effective Date & Time",
+          "description": "Start date and time (defaults to now)."
+        },
+        "invalid_time": {
+          "name": "Expiration Date & Time",
+          "description": "Expiration date and time (defaults to 24h from now)."
+        }
+      }
+    },
+    "get_dynamic_passcode": {
+      "name": "Get Dynamic Passcode",
+      "description": "Fetches a new 5-minute dynamic passcode for a Tuya smart lock on demand."
+    },
+    "get_temporary_passwords": {
+      "name": "Get Temporary Passwords",
+      "description": "Fetches all active temporary passcodes created for a Tuya smart lock.",
+      "fields": {
+        "device_id": {
+          "name": "Device",
+          "description": "The Tuya smart lock device."
+        }
+      }
+    },
+    "delete_temporary_password": {
+      "name": "Delete Temporary Password",
+      "description": "Deletes a temporary passcode from a Tuya smart lock by password ID.",
+      "fields": {
+        "device_id": {
+          "name": "Device",
+          "description": "The Tuya smart lock device."
+        },
+        "password_id": {
+          "name": "Password ID",
+          "description": "The numeric ID of the temporary password to delete."
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "invalid_pin": {
+      "message": "The PIN must be purely numeric and contain between 6 and 8 digits."
+    },
+    "missing_device_param": {
+      "message": "Missing required parameter: device."
+    },
+    "missing_password_param": {
+      "message": "Missing required parameter: password."
+    },
+    "missing_device_and_password": {
+      "message": "Missing required parameters: device and password are required."
+    },
+    "missing_device_and_password_id": {
+      "message": "Missing required parameters: device and password_id are required."
+    },
+    "device_not_found": {
+      "message": "Device '{device_id}' not found in Xtend Tuya integration."
+    },
+    "no_tuya_account": {
+      "message": "No valid Tuya account found for device {device}."
+    },
+    "lock_requires_7_digits": {
+      "message": "Tuya API Error for device {device}: Incorrect passcode length (code {code}). This lock requires a numeric PIN of exactly 7 digits (you entered {length} digits)."
+    },
+    "smart_lock_service_unauthorized": {
+      "message": "Tuya API Error for device {device}: No permissions (code {code}). Missing 'Smart Lock Service' authorization in iot.tuya.com (Cloud > Development > Your Project > Service API)."
+    },
+    "invalid_lock_parameters": {
+      "message": "Tuya API Error for device {device}: Invalid parameters (code {code}). Verify that the PIN and dates are valid for this lock."
+    },
+    "tuya_api_error": {
+      "message": "Tuya API Error for device {device}: {msg} (code {code})."
+    },
+    "action_error": {
+      "message": "Error performing {action}: {error}."
+    }
+  }
 }

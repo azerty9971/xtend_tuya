@@ -63,3 +63,68 @@ webrtc_debug:
       required: false
       example: "tuya_iot"
       default: "tuya_iot"
+
+create_temporary_password:
+  name: "Create Temporary Password"
+  description: "Creates a time-restricted temporary passcode for a Tuya smart lock."
+  target:
+    device:
+      integration: xtend_tuya
+  fields:
+    password:
+      required: true
+      name: "Password / PIN"
+      description: "The 6-8 digit numeric passcode to create (e.g. 1266455)."
+      example: "1266455"
+      selector:
+        text:
+          type: "password"
+    name:
+      required: false
+      name: "Name / Alias"
+      description: "An optional name or label for the passcode."
+      example: "Guest PIN"
+      default: "HA Temp Password"
+      selector:
+        text: {}
+    effective_time:
+      required: false
+      name: "Effective Date & Time"
+      description: "Optional start date and time. Defaults to now if omitted."
+      selector:
+        datetime: {}
+    invalid_time:
+      required: false
+      name: "Expiration Date & Time"
+      description: "Optional expiration date and time. Defaults to 24 hours from now if omitted."
+      selector:
+        datetime: {}
+
+get_dynamic_passcode:
+  name: "Get Dynamic Passcode"
+  description: "Fetches a new 5-minute dynamic passcode for a Tuya smart lock on demand and updates the entity."
+  target:
+    device:
+      integration: xtend_tuya
+
+get_temporary_passwords:
+  name: "Get Temporary Passwords"
+  description: "Fetches all active temporary passcodes created for a Tuya smart lock."
+  target:
+    device:
+      integration: xtend_tuya
+
+delete_temporary_password:
+  name: "Delete Temporary Password"
+  description: "Deletes a temporary passcode from a Tuya smart lock by password ID."
+  target:
+    device:
+      integration: xtend_tuya
+  fields:
+    password_id:
+      required: true
+      name: "Password ID"
+      description: "The numeric ID of the temporary password to delete."
+      example: "1179250913"
+      selector:
+        text: {}

@@ -1,1090 +1,3283 @@
 {
-    "config": {
-        "abort": {
-            "reauth_successful": "D'\u00e9irigh leis an athfh\u00edordheimhni\u00fa"
-        },
-        "error": {
-            "invalid_auth": "F\u00edordheimhni\u00fa neamhbhail\u00ed",
-            "login_error": "Earr\u00e1id log\u00e1la isteach ({code}): {msg}"
-        },
-        "step": {
-            "reauth_user_code": {
-                "data": {
-                    "user_code": "C\u00f3d \u00fas\u00e1ideora"
-                },
-                "description": "\u00das\u00e1ideann comhth\u00e1th\u00fa Tuya modh log\u00e1la isteach feabhsaithe anois. Chun athfh\u00edordheimhni\u00fa le do chuntas Smart Life n\u00f3 Tuya Smart, n\u00ed m\u00f3r duit do ch\u00f3d \u00fas\u00e1ideora a iontr\u00e1il.\n\nIs f\u00e9idir leat an c\u00f3d seo a fh\u00e1il san aip Smart Life n\u00f3 san aip Tuya Smart i **Socruithe** > **Cuntas agus Sl\u00e1nd\u00e1il** an sc\u00e1ile\u00e1n, agus an c\u00f3d a thaispe\u00e1ntar sa r\u00e9imse **C\u00f3d \u00das\u00e1ideora** a iontr\u00e1il. T\u00e1 an c\u00f3d \u00fas\u00e1ideora \u00edogair \u00f3 thaobh c\u00e1s de, d\u00e9an cinnte \u00e9 a iontr\u00e1il d\u00edreach mar a thaispe\u00e1ntar san aip."
-            },
-            "scan": {
-                "description": "Bain \u00fas\u00e1id as an aip Smart Life n\u00f3 as an aip Tuya Smart chun an c\u00f3d QR seo a leanas a scanadh chun an log\u00e1il isteach a chr\u00edochn\u00fa.\n\nLean ar aghaidh go dt\u00ed an ch\u00e9ad ch\u00e9im eile a luaithe a bheidh an ch\u00e9im seo cr\u00edochnaithe agat san aip."
-            },
-            "user": {
-                "data": {
-                    "user_code": "C\u00f3d \u00fas\u00e1ideora"
-                },
-                "description": "Cuir isteach do ch\u00f3d \u00fas\u00e1ideora Smart Life n\u00f3 Tuya Smart.\n\nIs f\u00e9idir leat an c\u00f3d seo a fh\u00e1il san aip Smart Life n\u00f3 san aip Tuya Smart i **Socruithe** > **Cuntas agus Sl\u00e1nd\u00e1il**, agus cuir isteach an c\u00f3d a thaispe\u00e1ntar sa r\u00e9imse **C\u00f3d \u00das\u00e1ideora**. T\u00e1 an c\u00f3d \u00fas\u00e1ideora \u00edogair \u00f3 thaobh c\u00e1s de, d\u00e9an cinnte \u00e9 a iontr\u00e1il d\u00edreach mar a thaispe\u00e1ntar san aip."
-            }
-        }
+  "config": {
+    "abort": {
+      "reauth_successful": "D'éirigh leis an athfhíordheimhniú",
+      "ir_add_key_success": "IR key {key_name} has been added to {device_name}",
+      "ir_add_key_failed": "Could not add {key_name} to {device_name}",
+      "ir_add_device_success": "IR device {remote_name} has been added to {device_name}",
+      "ir_add_device_failed": "Could not add {remote_name} to {device_name}"
     },
-    "entity": {
-        "binary_sensor": {
-            "bag_full": {
-                "name": "M\u00e1la l\u00e1n"
-            },
-            "carbon_dioxide": {
-                "name": "D\u00e9-ocsa\u00edd charb\u00f3in"
-            },
-            "carbon_monoxide": {
-                "name": "Aonocsa\u00edd charb\u00f3in"
-            },
-            "cover_off": {
-                "name": "Cl\u00fadaigh"
-            },
-            "defrost": {
-                "name": "D\u00edreoite"
-            },
-            "drop": {
-                "name": "Titim"
-            },
-            "feeding": {
-                "name": "Beath\u00fa"
-            },
-            "formaldehyde": {
-                "name": "Formaild\u00e9ad"
-            },
-            "methane": {
-                "name": "Meat\u00e1n"
-            },
-            "pm25": {
-                "name": "PM2.5"
-            },
-            "pressure": {
-                "name": "Br\u00fa"
-            },
-            "tankfull": {
-                "name": "Umar l\u00e1n"
-            },
-            "tilt": {
-                "name": "Claonadh"
-            },
-            "valve": {
-                "name": "Comhla"
-            },
-            "voc": {
-                "name": "VOCanna"
-            },
-            "wet": {
-                "name": "Fliuch"
-            }
-        },
-        "button": {
-            "factory_reset": {
-                "name": "Athshocr\u00fa monarchan"
-            },
-            "manual_clean": {
-                "name": "Glanadh de l\u00e1imh"
-            },
-            "reset_duster_cloth": {
-                "name": "Athshocraigh \u00e9adach deannaigh"
-            },
-            "reset_edge_brush": {
-                "name": "Athshocraigh scuab imeall"
-            },
-            "reset_filter": {
-                "name": "Athshocraigh an scagaire"
-            },
-            "reset_map": {
-                "name": "Athshocraigh an l\u00e9arsc\u00e1il"
-            },
-            "reset_roll_brush": {
-                "name": "Athshocraigh scuab rolla"
-            },
-            "snooze": {
-                "name": "Codladh beag"
-            }
-        },
-        "cover": {
-            "blind": {
-                "name": "Dall"
-            },
-            "curtain": {
-                "name": "Cuirt\u00edn"
-            },
-            "indexed_curtain": {
-                "name": "Cuirt\u00edn {index}"
-            },
-            "indexed_door": {
-                "name": "Doras {index}"
-            }
-        },
-        "event": {
-            "doorbell_message": {
-                "name": "Teachtaireacht cloig\u00edn dorais"
-            },
-            "doorbell_picture": {
-                "name": "Picti\u00far clog dorais"
-            },
-            "numbered_button": {
-                "name": "Cnaipe {button_number}",
-                "state_attributes": {
-                    "event_type": {
-                        "state": {
-                            "click": "Clice\u00e1ladh",
-                            "double_click": "Clice\u00e1il faoi dh\u00f3",
-                            "press": "Br\u00faite go fada"
-                        }
-                    }
-                }
-            }
-        },
-        "light": {
-            "backlight": {
-                "name": "C\u00falsholas"
-            },
-            "indexed_light": {
-                "name": "Solas {index}"
-            },
-            "light": {
-                "name": "Solas"
-            },
-            "night_light": {
-                "name": "Solas o\u00edche"
-            }
-        },
-        "number": {
-            "alarm_delay": {
-                "name": "Moill al\u00e1raim"
-            },
-            "alarm_duration": {
-                "name": "Fad an al\u00e1raim"
-            },
-            "alarm_maximum": {
-                "name": "Uasmh\u00e9id al\u00e1raim"
-            },
-            "alarm_minimum": {
-                "name": "\u00cdosmh\u00e9id al\u00e1raim"
-            },
-            "arm_delay": {
-                "name": "Moill l\u00e1imhe"
-            },
-            "battery_backup_reserve": {
-                "name": "C\u00faltaca ceallra\u00ed"
-            },
-            "cloud_recipe": {
-                "name": "Oideas scamall"
-            },
-            "delay_clean_time": {
-                "name": "Moill ar an am glantach\u00e1in"
-            },
-            "down_delay": {
-                "name": "Moill s\u00edos"
-            },
-            "far_detection": {
-                "name": "Brath i bhfad i gc\u00e9in"
-            },
-            "feed": {
-                "name": "Fotha"
-            },
-            "heat_preservation_time": {
-                "name": "Am caomhnaithe teasa"
-            },
-            "indexed_cook_temperature": {
-                "name": "Teocht ch\u00f3caireachta {index}"
-            },
-            "indexed_irrigation_duration": {
-                "name": "Fad uisci\u00fach\u00e1in {index}"
-            },
-            "indexed_maximum_brightness": {
-                "name": "Uasmh\u00e9id gile {index}"
-            },
-            "indexed_minimum_brightness": {
-                "name": "\u00cdosmh\u00e9id gile {index}"
-            },
-            "indexed_temperature": {
-                "name": "Teocht {index}"
-            },
-            "installation_height": {
-                "name": "Airde suite\u00e1la"
-            },
-            "inverter_output_power_limit": {
-                "name": "Teorainn chumhachta aschuir inbh\u00e9art\u00f3ra"
-            },
-            "maximum_brightness": {
-                "name": "Uasmh\u00e9id gile"
-            },
-            "maximum_liquid_depth": {
-                "name": "Doimhneacht leachtach uasta"
-            },
-            "minimum_brightness": {
-                "name": "\u00cdosmh\u00e9id gile"
-            },
-            "move_down": {
-                "name": "Bog s\u00edos"
-            },
-            "move_up": {
-                "name": "Bog suas"
-            },
-            "near_detection": {
-                "name": "Brath gar"
-            },
-            "powder": {
-                "name": "P\u00fadar"
-            },
-            "sensitivity": {
-                "name": "\u00cdogaireacht"
-            },
-            "siren_duration": {
-                "name": "Fad na sir\u00e9ine"
-            },
-            "temp_correction": {
-                "name": "Ceart\u00fa teochta"
-            },
-            "temperature": {
-                "name": "Teocht"
-            },
-            "temperature_after_boiling": {
-                "name": "Teocht tar \u00e9is fiuchta"
-            },
-            "time": {
-                "name": "Am"
-            },
-            "voice_times": {
-                "name": "Amanna gutha"
-            },
-            "volume": {
-                "name": "Toirt"
-            },
-            "water_level": {
-                "name": "Leibh\u00e9al an uisce"
-            }
-        },
-        "select": {
-            "basic_anti_flicker": {
-                "name": "Frith-fhliuchra",
-                "state": {
-                    "0": "D\u00edchumasaithe",
-                    "1": "50 Hz",
-                    "2": "60 Hz"
-                }
-            },
-            "basic_nightvision": {
-                "name": "F\u00eds o\u00edche",
-                "state": {
-                    "0": "Uathoibr\u00edoch",
-                    "1": "As",
-                    "2": "Ar si\u00fal"
-                }
-            },
-            "blanket_level": {
-                "name": "Leibh\u00e9al",
-                "state": {
-                    "level_2": "Leibh\u00e9al 2",
-                    "level_3": "Leibh\u00e9al 4",
-                    "level_4": "Leibh\u00e9al 4",
-                    "level_5": "Leibh\u00e9al 5",
-                    "level_6": "Leibh\u00e9al 6",
-                    "level_7": "Leibh\u00e9al 7",
-                    "level_8": "Leibh\u00e9al 8",
-                    "level_9": "Leibh\u00e9al 9"
-                }
-            },
-            "brightness": {
-                "name": "Gile"
-            },
-            "concentration": {
-                "name": "Ti\u00fachan"
-            },
-            "countdown": {
-                "name": "Comhaireamh s\u00edos",
-                "state": {
-                    "1h": "1 uair an chloig",
-                    "2h": "2 uair an chloig",
-                    "3h": "3 uair an chloig",
-                    "4h": "4 uair an chloig",
-                    "5h": "5 uair an chloig",
-                    "6h": "6 uair an chloig",
-                    "cancel": "Cealaigh"
-                }
-            },
-            "cups": {
-                "name": "Cup\u00e1in"
-            },
-            "curtain_mode": {
-                "name": "M\u00f3d",
-                "state": {
-                    "morning": "Maidin",
-                    "night": "O\u00edche"
-                }
-            },
-            "curtain_motor_mode": {
-                "name": "M\u00f3d m\u00f3tair",
-                "state": {
-                    "back": "Ar ais",
-                    "forward": "Ar Aghaidh"
-                }
-            },
-            "decibel_sensitivity": {
-                "name": "\u00cdogaireacht braite fuaime",
-                "state": {
-                    "0": "\u00cdogaireacht \u00edseal",
-                    "1": "\u00cdogaireacht ard"
-                }
-            },
-            "desk_level": {
-                "name": "leibh\u00e9al",
-                "state": {
-                    "level_1": "Leibh\u00e9al 1",
-                    "level_2": "Leibh\u00e9al 2",
-                    "level_3": "Leibh\u00e9al 3",
-                    "level_4": "Leibh\u00e9al 4"
-                }
-            },
-            "desk_up_down": {
-                "name": "Suas/S\u00edos",
-                "state": {
-                    "down": "S\u00edos",
-                    "stop": "Stad",
-                    "up": "Suas"
-                }
-            },
-            "fingerbot_mode": {
-                "name": "M\u00f3d",
-                "state": {
-                    "click": "Br\u00faigh",
-                    "switch": "Lasc"
-                }
-            },
-            "horizontal_fan_angle": {
-                "name": "Uillinn flap luasctha cothrom\u00e1nach",
-                "state": {
-                    "30": "30\u00b0",
-                    "60": "60\u00b0",
-                    "90": "90\u00b0"
-                }
-            },
-            "humidifier_level": {
-                "name": "Leibh\u00e9al sprae\u00e1la",
-                "state": {
-                    "level_1": "Leibh\u00e9al 1",
-                    "level_10": "Leibh\u00e9al 10",
-                    "level_2": "Leibh\u00e9al 2",
-                    "level_3": "Leibh\u00e9al 3",
-                    "level_4": "Leibh\u00e9al 4",
-                    "level_5": "Leibh\u00e9al 5",
-                    "level_6": "Leibh\u00e9al 6",
-                    "level_7": "Leibh\u00e9al 7",
-                    "level_8": "Leibh\u00e9al 8",
-                    "level_9": "Leibh\u00e9al 9"
-                }
-            },
-            "humidifier_moodlighting": {
-                "name": "Soilsi\u00fa gi\u00famar",
-                "state": {
-                    "1": "Gi\u00famar 1",
-                    "2": "Gi\u00famar 2",
-                    "3": "Gi\u00famar 3",
-                    "4": "Gi\u00famar 4",
-                    "5": "Gi\u00famar 5"
-                }
-            },
-            "humidifier_spray_mode": {
-                "name": "M\u00f3d sprae\u00e1la",
-                "state": {
-                    "auto": "Uath",
-                    "health": "Sl\u00e1inte",
-                    "humidity": "Taise",
-                    "sleep": "Codladh",
-                    "work": "Obair"
-                }
-            },
-            "indexed_blanket_level": {
-                "name": "Leibh\u00e9al {index}",
-                "state": {
-                    "level_1": "\u00cdseal",
-                    "level_10": "Ard",
-                    "level_2": "Leibh\u00e9al 2",
-                    "level_3": "Leibh\u00e9al 4",
-                    "level_4": "Leibh\u00e9al 4",
-                    "level_5": "Leibh\u00e9al 5",
-                    "level_6": "Leibh\u00e9al 6",
-                    "level_7": "Leibh\u00e9al 7",
-                    "level_8": "Leibh\u00e9al 8",
-                    "level_9": "Leibh\u00e9al 9"
-                }
-            },
-            "indexed_led_type": {
-                "name": "Cine\u00e1l foinse solais {index}",
-                "state": {
-                    "halogen": "Halaigin",
-                    "incandescent": "Gealbhruthach",
-                    "led": "LED"
-                }
-            },
-            "inverter_work_mode": {
-                "name": "M\u00f3d oibre inbh\u00e9art\u00f3ra",
-                "state": {
-                    "manual": "M\u00f3d l\u00e1imhe",
-                    "self_powered": "F\u00e9inchumhachtaithe",
-                    "time_of_use": "Am \u00fas\u00e1ide"
-                }
-            },
-            "ipc_work_mode": {
-                "name": "M\u00f3d IPC",
-                "state": {
-                    "0": "M\u00f3d \u00edsealchumhachta",
-                    "1": "M\u00f3d oibre lean\u00fanach"
-                }
-            },
-            "led_type": {
-                "name": "Cine\u00e1l foinse solais",
-                "state": {
-                    "halogen": "Halaigin",
-                    "incandescent": "Gealbhruthach",
-                    "led": "LED"
-                }
-            },
-            "light_mode": {
-                "name": "M\u00f3d solais t\u00e1scaire",
-                "state": {
-                    "none": "As",
-                    "pos": "L\u00e9irigh staid an lasc inbh\u00e9artaithe",
-                    "relay": "L\u00e9irigh staid an lasctha ar si\u00fal/as"
-                }
-            },
-            "material": {
-                "name": "\u00c1bhar"
-            },
-            "mode": {
-                "name": "M\u00f3d"
-            },
-            "motion_sensitivity": {
-                "name": "\u00cdogaireacht braite gluaisne",
-                "state": {
-                    "0": "\u00cdseal",
-                    "1": "Me\u00e1nach",
-                    "2": "Ard"
-                }
-            },
-            "odor_elimination_mode": {
-                "name": "M\u00f3d deireadh a chur le boladh",
-                "state": {
-                    "interim": "Eatramhach",
-                    "smart": "Cliste"
-                }
-            },
-            "record_mode": {
-                "name": "M\u00f3d taifeadta",
-                "state": {
-                    "1": "Taifead imeachta\u00ed amh\u00e1in",
-                    "2": "Taifeadadh lean\u00fanach"
-                }
-            },
-            "relay_status": {
-                "state": {
-                    "off": "As",
-                    "on": "Ar si\u00fal",
-                    "power_off": "As",
-                    "power_on": "Ar si\u00fal"
-                }
-            },
-            "siren_mode": {
-                "name": "M\u00f3d sir\u00e9in",
-                "state": {
-                    "alarm_light": "Solas",
-                    "alarm_sound": "Fuaim",
-                    "alarm_sound_light": "Fuaim & solas",
-                    "normal": "Gn\u00e1th"
-                }
-            },
-            "target_humidity": {
-                "name": "Taise sprice"
-            },
-            "temperature_level": {
-                "name": "Leibh\u00e9al teochta"
-            },
-            "vacuum_cistern": {
-                "name": "Coigeart\u00fa umar uisce",
-                "state": {
-                    "closed": "D\u00fanta",
-                    "high": "Ard",
-                    "low": "\u00cdseal",
-                    "middle": "L\u00e1r"
-                }
-            },
-            "vacuum_collection": {
-                "name": "M\u00f3d baili\u00fach\u00e1in deannaigh",
-                "state": {
-                    "large": "M\u00f3r",
-                    "middle": "L\u00e1r",
-                    "small": "Beag"
-                }
-            },
-            "vacuum_mode": {
-                "name": "M\u00f3d",
-                "state": {
-                    "bow": "Bogha",
-                    "chargego": "Fill ar ais chuig an duga",
-                    "left_bow": "Bogha ar chl\u00e9",
-                    "left_spiral": "B\u00edseach ar chl\u00e9",
-                    "mop": "Mop",
-                    "part": "Cuid",
-                    "partial_bow": "Bogha go p\u00e1irteach",
-                    "pick_zone": "Crios piocadh",
-                    "point": "Pointe",
-                    "pose": "Staidi\u00fair",
-                    "random": "Randamach",
-                    "right_bow": "Bogha ar dheis",
-                    "right_spiral": "Sprial ar dheis",
-                    "single": "Singil",
-                    "smart": "Cliste",
-                    "spiral": "B\u00edorlach",
-                    "standby": "Fuireachas",
-                    "wall_follow": "Lean an balla",
-                    "zone": "Crios"
-                }
-            },
-            "vertical_fan_angle": {
-                "name": "Uillinn flap luasctha ingearach",
-                "state": {
-                    "30": "30\u00b0",
-                    "60": "60\u00b0",
-                    "90": "90\u00b0"
-                }
-            },
-            "volume": {
-                "name": "Toirt"
-            },
-            "weather_delay": {
-                "name": "Moill aimsire",
-                "state": {
-                    "120h": "120 uair",
-                    "144h": "144 uair",
-                    "168h": "168 uair",
-                    "24h": "24 uair",
-                    "48h": "48 uair",
-                    "72h": "72 uair",
-                    "96h": "96 uair",
-                    "cancel": "Cealaigh"
-                }
-            }
-        },
-        "sensor": {
-            "air_pressure": {
-                "name": "Br\u00fa aeir"
-            },
-            "air_quality": {
-                "name": "C\u00e1il\u00edocht an aeir",
-                "state": {
-                    "good": "Maith",
-                    "great": "Iontach",
-                    "mild": "\u00c9adrom",
-                    "severe": "Trom"
-                }
-            },
-            "air_quality_index": {
-                "name": "Inn\u00e9acs c\u00e1il\u00edochta aeir",
-                "state": {
-                    "level_1": "Leibh\u00e9al 1",
-                    "level_2": "Leibh\u00e9al 2",
-                    "level_3": "Leibh\u00e9al 3",
-                    "level_4": "Leibh\u00e9al 4",
-                    "level_5": "Leibh\u00e9al 5",
-                    "level_6": "Leibh\u00e9al 6"
-                }
-            },
-            "battery": {
-                "name": "Ceallra\u00ed"
-            },
-            "battery_power": {
-                "name": "Cumhacht ceallra\u00ed"
-            },
-            "battery_soc": {
-                "name": "SOC Ceallra\u00ed"
-            },
-            "battery_state": {
-                "name": "Staid na ceallra\u00ed"
-            },
-            "carbon_dioxide": {
-                "name": "D\u00e9-ocsa\u00edd charb\u00f3in"
-            },
-            "carbon_monoxide": {
-                "name": "Aonocsa\u00edd charb\u00f3in"
-            },
-            "cat_litter_box_status": {
-                "name": "St\u00e1das",
-                "state": {
-                    "clean": "Glanadh",
-                    "empty": "Ag folmh\u00fa",
-                    "level": "Leibh\u00e9al\u00fa",
-                    "sleep": "Codladh",
-                    "standby": "Fuireachas",
-                    "uv": "Sl\u00e1int\u00edocht"
-                }
-            },
-            "cat_weight": {
-                "name": "Me\u00e1chan cait"
-            },
-            "cleaning_area": {
-                "name": "Limist\u00e9ar glantach\u00e1in"
-            },
-            "cleaning_time": {
-                "name": "Am glantach\u00e1in"
-            },
-            "concentration_carbon_dioxide": {
-                "name": "Ti\u00fachan d\u00e9-ocsa\u00edd charb\u00f3in"
-            },
-            "current": {
-                "name": "Reatha"
-            },
-            "current_temperature": {
-                "name": "Teocht reatha"
-            },
-            "depth": {
-                "name": "Doimhneacht"
-            },
-            "dew_point_temperature": {
-                "name": "Pointe dr\u00fachta"
-            },
-            "duster_cloth_life": {
-                "name": "Saolr\u00e9 \u00e9adach duster"
-            },
-            "excretion_times_day": {
-                "name": "Amanna eisfhearadh (i rith an lae)"
-            },
-            "feels_like_temperature": {
-                "name": "Motha\u00edonn s\u00e9 cos\u00fail"
-            },
-            "filter_duration": {
-                "name": "Fad an scagaire"
-            },
-            "filter_life": {
-                "name": "Saolr\u00e9 an scagaire"
-            },
-            "filter_utilization": {
-                "name": "\u00das\u00e1id scagaire"
-            },
-            "formaldehyde": {
-                "name": "Formaild\u00e9ad"
-            },
-            "gas": {
-                "name": "G\u00e1s"
-            },
-            "heat_index_temperature": {
-                "name": "Inn\u00e9acs teasa"
-            },
-            "humidity": {
-                "name": "Taise"
-            },
-            "humidity_outdoor": {
-                "name": "Taise lasmuigh"
-            },
-            "illuminance": {
-                "name": "Soilsi\u00fa"
-            },
-            "indexed_humidity_outdoor": {
-                "name": "Cain\u00e9al taise lasmuigh {index}"
-            },
-            "indexed_temperature_external": {
-                "name": "Cain\u00e9al teochta braiteora {index}"
-            },
-            "inverter_output_power": {
-                "name": "Cumhacht aschuir inbh\u00e9art\u00f3ra"
-            },
-            "last_amount": {
-                "name": "An m\u00e9id deireanach"
-            },
-            "last_operation_duration": {
-                "name": "Fad na hoibr\u00edochta deireana\u00ed"
-            },
-            "lifetime_battery_charge_energy": {
-                "name": "Fuinneamh muirir ceallra\u00ed ar feadh an tsaoil"
-            },
-            "lifetime_battery_discharge_energy": {
-                "name": "Fuinneamh urscaoilte ceallra\u00ed ar feadh an tsaoil"
-            },
-            "lifetime_inverter_output_energy": {
-                "name": "Fuinneamh aschuir inverter ar feadh an tsaoil"
-            },
-            "lifetime_offgrid_port_energy": {
-                "name": "Fuinneamh calafoirt lasmuigh den ghreille ar feadh an tsaoil"
-            },
-            "lifetime_pv_energy": {
-                "name": "Fuinneamh PV ar feadh an tsaoil"
-            },
-            "liquid_depth": {
-                "name": "Doimhneacht leachtach"
-            },
-            "liquid_level": {
-                "name": "Leibh\u00e9al leachtach"
-            },
-            "liquid_state": {
-                "name": "Staid leachtach",
-                "state": {
-                    "lower_alarm": "\u00cdseal",
-                    "normal": "Gn\u00e1th",
-                    "upper_alarm": "Ard"
-                }
-            },
-            "luminosity": {
-                "name": "Lonr\u00falacht"
-            },
-            "methane": {
-                "name": "Meat\u00e1n"
-            },
-            "odor_elimination_status": {
-                "name": "St\u00e1das",
-                "state": {
-                    "charge_done": "Muirear d\u00e9anta",
-                    "charging": "Muirear\u00fa",
-                    "standby": "Fuireachas",
-                    "work": "Ag obair"
-                }
-            },
-            "phase_a_current": {
-                "name": "C\u00e9im A reatha"
-            },
-            "phase_a_power": {
-                "name": "Cumhacht C\u00e9im A"
-            },
-            "phase_a_voltage": {
-                "name": "Voltas C\u00e9im A"
-            },
-            "phase_b_current": {
-                "name": "C\u00e9im B reatha"
-            },
-            "phase_b_power": {
-                "name": "Cumhacht C\u00e9im B"
-            },
-            "phase_b_voltage": {
-                "name": "Voltas C\u00e9im B"
-            },
-            "phase_c_current": {
-                "name": "C\u00e9im C reatha"
-            },
-            "phase_c_power": {
-                "name": "Cumhacht C\u00e9im C"
-            },
-            "phase_c_voltage": {
-                "name": "Voltas C\u00e9im C"
-            },
-            "pm1": {
-                "name": "PM1"
-            },
-            "pm10": {
-                "name": "PM10"
-            },
-            "pm25": {
-                "name": "PM2.5"
-            },
-            "power": {
-                "name": "Cumhacht"
-            },
-            "precipitation_intensity": {
-                "name": "D\u00e9ine fheasachta"
-            },
-            "precipitation_today": {
-                "name": "Deascadh ioml\u00e1n inniu"
-            },
-            "pump_time": {
-                "name": "Fad an chaid\u00e9il uisce"
-            },
-            "pv_channel_power": {
-                "name": "Cumhacht cain\u00e9al PV {index}"
-            },
-            "remaining_time": {
-                "name": "Am at\u00e1 f\u00e1gtha"
-            },
-            "rolling_brush_life": {
-                "name": "Saolr\u00e9 scuab rollta"
-            },
-            "side_brush_life": {
-                "name": "Saolr\u00e9 scuab taobh"
-            },
-            "smoke_amount": {
-                "name": "M\u00e9id deataigh"
-            },
-            "sous_vide_status": {
-                "name": "St\u00e1das",
-                "state": {
-                    "boiling_temp": "Teocht fiuchta",
-                    "cooling": "Fuar\u00fa",
-                    "heating": "T\u00e9amh",
-                    "heating_temp": "Teocht t\u00e9imh",
-                    "reserve_1": "C\u00falchiste 1",
-                    "reserve_2": "C\u00falchiste 2",
-                    "reserve_3": "C\u00falchiste 3",
-                    "standby": "Fuireachas",
-                    "warm": "Caomhn\u00fa teasa"
-                }
-            },
-            "status": {
-                "name": "St\u00e1das"
-            },
-            "supply_frequency": {
-                "name": "Minic\u00edocht sol\u00e1thair"
-            },
-            "temperature": {
-                "name": "Teocht"
-            },
-            "temperature_external": {
-                "name": "Teocht an t\u00f3iread\u00f3ra"
-            },
-            "total_absorption_particles": {
-                "name": "Ions\u00fa ioml\u00e1n na gc\u00e1ithn\u00edn\u00ed"
-            },
-            "total_cleaning_area": {
-                "name": "Limist\u00e9ar glantach\u00e1in ioml\u00e1n"
-            },
-            "total_cleaning_time": {
-                "name": "Am glantach\u00e1in ioml\u00e1n"
-            },
-            "total_cleaning_times": {
-                "name": "Amanna glantach\u00e1in ioml\u00e1na"
-            },
-            "total_dissolved_solids": {
-                "name": "Solaid thuaslagtha ioml\u00e1na"
-            },
-            "total_energy": {
-                "name": "Fuinneamh ioml\u00e1n"
-            },
-            "total_operating_time": {
-                "name": "Am oibri\u00fach\u00e1in ioml\u00e1n"
-            },
-            "total_power": {
-                "name": "Cumhacht ioml\u00e1n"
-            },
-            "total_production": {
-                "name": "T\u00e1irgeadh ioml\u00e1n"
-            },
-            "total_pv_power": {
-                "name": "Cumhacht ioml\u00e1n PV"
-            },
-            "total_volatile_organic_compound": {
-                "name": "Comhdh\u00fail org\u00e1nach so-ghalaithe ioml\u00e1n"
-            },
-            "total_watering_time": {
-                "name": "Am ioml\u00e1n uisce"
-            },
-            "uv_index": {
-                "name": "Inn\u00e9acs UV"
-            },
-            "uv_runtime": {
-                "name": "Am rith UV"
-            },
-            "voc": {
-                "name": "Comhdh\u00faile org\u00e1nacha so-ghalaithe"
-            },
-            "voltage": {
-                "name": "Voltas"
-            },
-            "water_level": {
-                "name": "Leibh\u00e9al an uisce"
-            },
-            "water_level_state": {
-                "name": "Leibh\u00e9al an uisce",
-                "state": {
-                    "level_1": "\u00cdseal",
-                    "level_2": "Me\u00e1nach",
-                    "level_3": "L\u00e1n"
-                }
-            },
-            "water_time": {
-                "name": "Fad \u00fas\u00e1ide uisce"
-            },
-            "wind_chill_index_temperature": {
-                "name": "Inn\u00e9acs fuaraithe gaoithe"
-            },
-            "wind_direction": {
-                "name": "Treo na gaoithe"
-            }
-        },
-        "switch": {
-            "anion": {
-                "name": "Anion"
-            },
-            "arm_beep": {
-                "name": "Arm\u00e1il b\u00edp"
-            },
-            "auto_clean": {
-                "name": "Glanadh uathoibr\u00edoch"
-            },
-            "battery_lock": {
-                "name": "Glas ceallra\u00ed"
-            },
-            "child_lock": {
-                "name": "Glas leana\u00ed"
-            },
-            "cry_detection": {
-                "name": "Brath caointe"
-            },
-            "disinfection": {
-                "name": "D\u00edghalr\u00fa"
-            },
-            "do_not_disturb": {
-                "name": "N\u00e1 cuir isteach"
-            },
-            "energy_saving": {
-                "name": "Coigilt fuinnimh"
-            },
-            "filter_cartridge_reset": {
-                "name": "Athshocr\u00fa cart\u00fas scagaire"
-            },
-            "filter_reset": {
-                "name": "Athshocr\u00fa scagaire"
-            },
-            "flip": {
-                "name": "Smeach"
-            },
-            "frost_protection": {
-                "name": "Cosaint sioc"
-            },
-            "heat_preservation": {
-                "name": "Caomhn\u00fa teasa"
-            },
-            "humidification": {
-                "name": "Taisi\u00fa"
-            },
-            "indexed_alarm": {
-                "name": "Al\u00e1ram {index}"
-            },
-            "indexed_socket": {
-                "name": "Soic\u00e9ad {index}"
-            },
-            "indexed_switch": {
-                "name": "Athraigh {index}"
-            },
-            "indexed_usb": {
-                "name": "USB {index}"
-            },
-            "ionizer": {
-                "name": "Ianaitheoir"
-            },
-            "motion_alarm": {
-                "name": "Al\u00e1ram gluaisne"
-            },
-            "motion_recording": {
-                "name": "Taifeadadh gluaisne"
-            },
-            "motion_tracking": {
-                "name": "Rian\u00fa gluaisne"
-            },
-            "music": {
-                "name": "Ceol"
-            },
-            "mute": {
-                "name": "Balbhaigh"
-            },
-            "mute_voice": {
-                "name": "Guth balbh"
-            },
-            "natural_wind": {
-                "name": "Gaoth n\u00e1d\u00fartha"
-            },
-            "open_window_detection": {
-                "name": "Brath fuinneoige oscailte"
-            },
-            "output_power_limit": {
-                "name": "Teorainn chumhachta aschuir"
-            },
-            "oxygen_bar": {
-                "name": "Barra ocsaigine"
-            },
-            "plug": {
-                "name": "Breise\u00e1n"
-            },
-            "power": {
-                "name": "Cumhacht"
-            },
-            "privacy_mode": {
-                "name": "M\u00f3d pr\u00edobh\u00e1ideachta"
-            },
-            "pump": {
-                "name": "Caid\u00e9al"
-            },
-            "radio": {
-                "name": "Raidi\u00f3"
-            },
-            "reset_of_water_usage_days": {
-                "name": "Athshocr\u00fa laethanta \u00fas\u00e1ide uisce"
-            },
-            "reverse": {
-                "name": "Droim ar ais"
-            },
-            "siren": {
-                "name": "Bonn\u00e1n"
-            },
-            "sleep": {
-                "name": "Codladh"
-            },
-            "sleep_aid": {
-                "name": "C\u00fanamh codlata"
-            },
-            "slow_feed": {
-                "name": "Beath\u00fa mall"
-            },
-            "snooze": {
-                "name": "Codladh"
-            },
-            "socket": {
-                "name": "Soic\u00e9ad"
-            },
-            "sound": {
-                "name": "Fuaim"
-            },
-            "sound_detection": {
-                "name": "Brath fuaime"
-            },
-            "spray": {
-                "name": "Sprae\u00e1il"
-            },
-            "start": {
-                "name": "Tosaigh"
-            },
-            "sterilization": {
-                "name": "Steirili\u00fa"
-            },
-            "switch": {
-                "name": "Lasc"
-            },
-            "time_watermark": {
-                "name": "Uisce uisce ama"
-            },
-            "uv_sterilization": {
-                "name": "Steirili\u00fa UV"
-            },
-            "video_recording": {
-                "name": "Taifeadadh f\u00edse"
-            },
-            "voice": {
-                "name": "Guth"
-            },
-            "water": {
-                "name": "Uisce"
-            },
-            "water_pump_reset": {
-                "name": "Athshocr\u00fa caid\u00e9il uisce"
-            },
-            "wide_dynamic_range": {
-                "name": "Raon dinimici\u00fail leathan"
-            }
-        },
-        "valve": {
-            "indexed_valve": {
-                "name": "Comhla {index}"
-            },
-            "valve": {
-                "name": "Comhla"
-            }
-        }
+    "error": {
+      "invalid_auth": "Fíordheimhniú neamhbhailí",
+      "login_error": "Earráid logála isteach ({code}): {msg}"
     },
-    "exceptions": {
-        "action_dpcode_not_found": {
-            "message": "N\u00ed f\u00e9idir an gn\u00edomh a phr\u00f3ise\u00e1il mar nach sol\u00e1thra\u00edonn an gl\u00e9as c\u00f3d feidhme comhfhreagrach (bh\u00edothas ag s\u00fail le ceann de {expected} i {available})."
+    "step": {
+      "reauth_user_code": {
+        "data": {
+          "user_code": "Cód úsáideora"
+        },
+        "description": "Úsáideann comhtháthú Tuya modh logála isteach feabhsaithe anois. Chun athfhíordheimhniú le do chuntas Smart Life nó Tuya Smart, ní mór duit do chód úsáideora a iontráil.\n\nIs féidir leat an cód seo a fháil san aip Smart Life nó san aip Tuya Smart i **Socruithe** > **Cuntas agus Slándáil** an scáileán, agus an cód a thaispeántar sa réimse **Cód Úsáideora** a iontráil. Tá an cód úsáideora íogair ó thaobh cás de, déan cinnte é a iontráil díreach mar a thaispeántar san aip."
+      },
+      "scan": {
+        "description": "Bain úsáid as an aip Smart Life nó as an aip Tuya Smart chun an cód QR seo a leanas a scanadh chun an logáil isteach a chríochnú.\n\nLean ar aghaidh go dtí an chéad chéim eile a luaithe a bheidh an chéim seo críochnaithe agat san aip."
+      },
+      "user": {
+        "data": {
+          "user_code": "Cód úsáideora"
+        },
+        "description": "Cuir isteach do chód úsáideora Smart Life nó Tuya Smart.\n\nIs féidir leat an cód seo a fháil san aip Smart Life nó san aip Tuya Smart i **Socruithe** > **Cuntas agus Slándáil**, agus cuir isteach an cód a thaispeántar sa réimse **Cód Úsáideora**. Tá an cód úsáideora íogair ó thaobh cás de, déan cinnte é a iontráil díreach mar a thaispeántar san aip."
+      },
+      "ir_add_key": {
+        "title": "New IR key for {device_name}",
+        "description": "Enter the name of the new key, then press Submit then point your remote to the hub and hit the key on your remote",
+        "data": {
+          "new_ir_key_human": "New key display name",
+          "new_ir_key_technical": "New key technical name"
+        },
+        "data_description": {
+          "new_ir_key_human": "The display text of the new key that will be added to the IR device.",
+          "new_ir_key_technical": "The technical name of the new key that will be added to the IR device."
         }
-    },
-    "issues": {
-        "deprecated_entity_new_valve": {
-            "description": "T\u00e1 an t-eintiteas Tuya `{entity}` imithe i l\u00e9ig, agus t\u00e1 eintiteas comhla nua ina \u00e1it.\nNuashonraigh do phain\u00e9il rialaithe, uathoibrithe agus scripteanna, d\u00edchumasaigh `{entity}` agus athl\u00f3d\u00e1il an comhth\u00e1th\u00fa/atosaigh Home Assistant chun an fhadhb seo a r\u00e9iteach.",
-            "title": "T\u00e1 {name} imithe i l\u00e9ig"
+      },
+      "ir_add_device": {
+        "title": "New IR device under {device_name}",
+        "description": "Enter the name of the new device",
+        "data": {
+          "new_ir_device_name": "New device name"
         }
+      },
+      "configure_api": {
+        "description": "Add a Tuya OpenAPI credential to improve the compatibility with some Tuya devices. Please follow the guide at the URL by clicking the button below.",
+        "data": {
+          "no_openapi": "Don't ask for OpenAPI credentials",
+          "country_code": "Country",
+          "access_id": "Tuya IoT Access ID",
+          "access_secret": "Tuya IoT Access Secret",
+          "username": "SmartLife/Tuya account",
+          "password": "SmartLife/Tuya account password"
+        },
+        "title": "Add Tuya OpenAPI credentials"
+      }
     }
+  },
+  "entity": {
+    "binary_sensor": {
+      "carbon_dioxide": {
+        "name": "Dé-ocsaíd charbóin"
+      },
+      "carbon_monoxide": {
+        "name": "Aonocsaíd charbóin"
+      },
+      "defrost": {
+        "name": "Díreoite"
+      },
+      "drop": {
+        "name": "Titim"
+      },
+      "feeding": {
+        "name": "Beathú"
+      },
+      "formaldehyde": {
+        "name": "Formaildéad"
+      },
+      "methane": {
+        "name": "Meatán"
+      },
+      "pm25": {
+        "name": "PM2.5"
+      },
+      "pressure": {
+        "name": "Brú"
+      },
+      "tankfull": {
+        "name": "Umar lán"
+      },
+      "tilt": {
+        "name": "Claonadh"
+      },
+      "valve": {
+        "name": "Comhla"
+      },
+      "voc": {
+        "name": "VOCanna"
+      },
+      "wet": {
+        "name": "Fliuch"
+      },
+      "battery_charging": {
+        "name": "Battery charging"
+      },
+      "cleaning": {
+        "name": "Cleaning"
+      },
+      "cleaning_num": {
+        "name": "Number of cleaning"
+      },
+      "door_contact_state": {
+        "name": "Door contact"
+      },
+      "door_contact_state_2": {
+        "name": "Door contact 2"
+      },
+      "door_contact_state_3": {
+        "name": "Door contact 3"
+      },
+      "error": {
+        "name": "Error"
+      },
+      "error_flow_meter": {
+        "name": "Error: Flow meter"
+      },
+      "error_other": {
+        "name": "Error: Other"
+      },
+      "error_sensor_offline": {
+        "name": "Error: Sensor offline"
+      },
+      "error_sensor_low_battery": {
+        "name": "Error: Sensor low battery"
+      },
+      "error_valve_low_battery": {
+        "name": "Error: Valve low battery"
+      },
+      "error_water_shortage": {
+        "name": "Error: Water shortage"
+      },
+      "litter_occupied": {
+        "name": "Litter box occupied"
+      },
+      "lock_motor_state": {
+        "name": "Lock status"
+      },
+      "off": {
+        "name": "Off"
+      },
+      "off_bed": {
+        "name": "Out of bed"
+      },
+      "online": {
+        "name": "Device online"
+      },
+      "pir_state": {
+        "name": "Proximity sensor"
+      },
+      "power": {
+        "name": "Powered on and restarted successfully"
+      },
+      "trash_status": {
+        "name": "Garbage is full"
+      },
+      "in_clean": {
+        "name": "Auto-clean completed"
+      },
+      "dp_time_clear_flag": {
+        "name": "Scheduled clean triggered"
+      },
+      "wakeup": {
+        "name": "Woken up"
+      },
+      "xt_generic_binary_sensor": {
+        "name": "{name}"
+      },
+      "store_full_notify": {
+        "name": "Replace trash bag"
+      }
+    },
+    "button": {
+      "factory_reset": {
+        "name": "Athshocrú monarchan"
+      },
+      "manual_clean": {
+        "name": "Glanadh de láimh"
+      },
+      "reset_duster_cloth": {
+        "name": "Athshocraigh éadach deannaigh"
+      },
+      "reset_edge_brush": {
+        "name": "Athshocraigh scuab imeall"
+      },
+      "reset_filter": {
+        "name": "Athshocraigh an scagaire"
+      },
+      "reset_map": {
+        "name": "Athshocraigh an léarscáil"
+      },
+      "reset_roll_brush": {
+        "name": "Athshocraigh scuab rolla"
+      },
+      "snooze": {
+        "name": "Codladh beag"
+      },
+      "generate_dynamic_passcode": {
+        "name": "Generate Dynamic Passcode"
+      },
+      "change_litter_bag": {
+        "name": "Change litter bag"
+      },
+      "clear_energy": {
+        "name": "Clear energy"
+      },
+      "deep_clean": {
+        "name": "Deep clean"
+      },
+      "empty_litter": {
+        "name": "Empty litter box"
+      },
+      "filter_reset": {
+        "name": "Filter reset"
+      },
+      "level_cat_litter": {
+        "name": "Level cat litter"
+      },
+      "one_click_cleanup": {
+        "name": "One-click cleanup"
+      },
+      "manual_lock": {
+        "name": "Manual lock"
+      },
+      "xt_import_electrical_history": {
+        "name": "Import consumption history"
+      },
+      "xt_reset_add_ele": {
+        "name": "Reset consumption"
+      },
+      "xt_add_ir_device": {
+        "name": "Add IR device"
+      },
+      "xt_add_ir_device_key": {
+        "name": "Register new IR key"
+      },
+      "xt_generic_button": {
+        "name": "{name}"
+      }
+    },
+    "cover": {
+      "blind": {
+        "name": "Dall"
+      },
+      "curtain": {
+        "name": "Cuirtín"
+      },
+      "indexed_curtain": {
+        "name": "Cuirtín {index}"
+      },
+      "indexed_door": {
+        "name": "Doras {index}"
+      },
+      "curtain_2": {
+        "name": "Curtain 2"
+      },
+      "curtain_3": {
+        "name": "Curtain 3"
+      },
+      "door": {
+        "name": "Door"
+      },
+      "door_2": {
+        "name": "Door 2"
+      },
+      "door_3": {
+        "name": "Door 3"
+      }
+    },
+    "event": {
+      "numbered_button": {
+        "name": "Cnaipe {button_number}",
+        "state_attributes": {
+          "event_type": {
+            "state": {
+              "click": "Cliceáladh",
+              "double_click": "Cliceáil faoi dhó",
+              "press": "Brúite go fada"
+            }
+          }
+        }
+      },
+      "alarm_lock": {
+        "name": "Lock alarm",
+        "state_attributes": {
+          "event_type": {
+            "state": {
+              "wrong_finger": "Wrong fingerprint",
+              "wrong_password": "Wrong password",
+              "wrong_card": "Wrong card",
+              "wrong_face": "Wrong face",
+              "tongue_bad": "Latch stuck",
+              "too_hot": "Too hot",
+              "unclosed_time": "Not closed after timeout",
+              "tongue_not_out": "Deadbolt stuck",
+              "pry": "Anti-pry alarm",
+              "key_in": "Not calibrated",
+              "low_battery": "Low battery",
+              "power_off": "Battery exhausted",
+              "shock": "Vibration alarm",
+              "defense": "Arm alarm",
+              "test": "Test"
+            }
+          }
+        }
+      },
+      "ipc_movement_detect": {
+        "name": "Movement detected",
+        "state_attributes": {
+          "event_type": {
+            "state": {
+              "motion": "Motion detected"
+            }
+          }
+        }
+      },
+      "unlock_user": {
+        "name": "Unlock user ({user_type})"
+      },
+      "xt_device_event_notify": {
+        "name": "Device notifications"
+      }
+    },
+    "light": {
+      "backlight": {
+        "name": "Cúlsholas"
+      },
+      "indexed_light": {
+        "name": "Solas {index}"
+      },
+      "light": {
+        "name": "Solas"
+      },
+      "night_light": {
+        "name": "Solas oíche"
+      },
+      "light_2": {
+        "name": "Light 2"
+      },
+      "light_3": {
+        "name": "Light 3"
+      },
+      "xt_generic_light": {
+        "name": "{name}"
+      }
+    },
+    "number": {
+      "alarm_delay": {
+        "name": "Moill aláraim"
+      },
+      "alarm_duration": {
+        "name": "Fad an aláraim"
+      },
+      "alarm_maximum": {
+        "name": "Uasmhéid aláraim"
+      },
+      "alarm_minimum": {
+        "name": "Íosmhéid aláraim"
+      },
+      "arm_delay": {
+        "name": "Moill láimhe"
+      },
+      "battery_backup_reserve": {
+        "name": "Cúltaca ceallraí"
+      },
+      "cloud_recipe": {
+        "name": "Oideas scamall"
+      },
+      "delay_clean_time": {
+        "name": "Moill ar an am glantacháin"
+      },
+      "down_delay": {
+        "name": "Moill síos"
+      },
+      "far_detection": {
+        "name": "Brath i bhfad i gcéin"
+      },
+      "feed": {
+        "name": "Fotha"
+      },
+      "heat_preservation_time": {
+        "name": "Am caomhnaithe teasa"
+      },
+      "indexed_cook_temperature": {
+        "name": "Teocht chócaireachta {index}"
+      },
+      "indexed_irrigation_duration": {
+        "name": "Fad uisciúcháin {index}"
+      },
+      "indexed_maximum_brightness": {
+        "name": "Uasmhéid gile {index}"
+      },
+      "indexed_minimum_brightness": {
+        "name": "Íosmhéid gile {index}"
+      },
+      "indexed_temperature": {
+        "name": "Teocht {index}"
+      },
+      "installation_height": {
+        "name": "Airde suiteála"
+      },
+      "inverter_output_power_limit": {
+        "name": "Teorainn chumhachta aschuir inbhéartóra"
+      },
+      "maximum_brightness": {
+        "name": "Uasmhéid gile"
+      },
+      "maximum_liquid_depth": {
+        "name": "Doimhneacht leachtach uasta"
+      },
+      "minimum_brightness": {
+        "name": "Íosmhéid gile"
+      },
+      "move_down": {
+        "name": "Bog síos"
+      },
+      "move_up": {
+        "name": "Bog suas"
+      },
+      "near_detection": {
+        "name": "Brath gar"
+      },
+      "powder": {
+        "name": "Púdar"
+      },
+      "sensitivity": {
+        "name": "Íogaireacht"
+      },
+      "siren_duration": {
+        "name": "Fad na siréine"
+      },
+      "temp_correction": {
+        "name": "Ceartú teochta"
+      },
+      "temperature": {
+        "name": "Teocht"
+      },
+      "temperature_after_boiling": {
+        "name": "Teocht tar éis fiuchta"
+      },
+      "time": {
+        "name": "Am"
+      },
+      "voice_times": {
+        "name": "Amanna gutha"
+      },
+      "volume": {
+        "name": "Toirt"
+      },
+      "water_level": {
+        "name": "Leibhéal an uisce"
+      },
+      "alarm_time": {
+        "name": "Alarm time"
+      },
+      "auto_lock_time": {
+        "name": "Auto lock time"
+      },
+      "b_detection_distance_max": {
+        "name": "Max breath detection distance"
+      },
+      "b_detection_distance_min": {
+        "name": "Min breath detection distance"
+      },
+      "b_sensitivity": {
+        "name": "Breath detection sensitivity"
+      },
+      "breathdistance_max": {
+        "name": "Micro-motion detection upper limit"
+      },
+      "breathdistance_min": {
+        "name": "Micro-motion detection lower limit"
+      },
+      "breathsensitivity": {
+        "name": "Micro-motion detection sensitivity"
+      },
+      "bright_value": {
+        "name": "Brightness"
+      },
+      "capacity_calibration": {
+        "name": "Capacity calibration"
+      },
+      "charge_cur_set": {
+        "name": "Charging current"
+      },
+      "countdown": {
+        "name": "Countdown"
+      },
+      "countdown_1": {
+        "name": "Countdown 1"
+      },
+      "countdown_2": {
+        "name": "Countdown 2"
+      },
+      "countdown_3": {
+        "name": "Countdown 3"
+      },
+      "countdown_4": {
+        "name": "Countdown 4"
+      },
+      "countdown_5": {
+        "name": "Countdown 5"
+      },
+      "countdown_6": {
+        "name": "Countdown 6"
+      },
+      "countdown_7": {
+        "name": "Countdown 7"
+      },
+      "countdown_8": {
+        "name": "Countdown 8"
+      },
+      "deo_end_time": {
+        "name": "Deo end time"
+      },
+      "deo_start_time": {
+        "name": "Deo start time"
+      },
+      "detection_distance_max": {
+        "name": "Max detection distance"
+      },
+      "detection_distance_min": {
+        "name": "Min detection distance"
+      },
+      "detection_sensitivity": {
+        "name": "Detection sensitivity"
+      },
+      "hold_sensitivity": {
+        "name": "Hold sensitivity"
+      },
+      "hum_sensitivity": {
+        "name": "Humidity sensitivity"
+      },
+      "humidity_calibration": {
+        "name": "Humidity calibration"
+      },
+      "liquid_depth_max": {
+        "name": "Max liquid depth"
+      },
+      "m_detection_distance_max": {
+        "name": "Max motion detection distance"
+      },
+      "m_detection_distance_min": {
+        "name": "Min motion detection distance"
+      },
+      "m_sensitivity": {
+        "name": "Motion detection sensitivity"
+      },
+      "max_set": {
+        "name": "Maximum"
+      },
+      "maxhum_set": {
+        "name": "Maximum humidity"
+      },
+      "maximum_brightness_2": {
+        "name": "Maximum brightness 2"
+      },
+      "maximum_brightness_3": {
+        "name": "Maximum brightness 3"
+      },
+      "maxtemp_set": {
+        "name": "Maximum temperature"
+      },
+      "mini_set": {
+        "name": "Minimum"
+      },
+      "minihum_set": {
+        "name": "Minimum humidity"
+      },
+      "minimum_brightness_2": {
+        "name": "Minimum brightness 2"
+      },
+      "minimum_brightness_3": {
+        "name": "Minimum brightness 3"
+      },
+      "minitemp_set": {
+        "name": "Minimum temperature"
+      },
+      "movedistance_max": {
+        "name": "Motion detection upper limit"
+      },
+      "movedistance_min": {
+        "name": "Motion detection lower limit"
+      },
+      "movesensitivity": {
+        "name": "Motion detection sensitivity"
+      },
+      "none_delay_time": {
+        "name": "Presence reset time"
+      },
+      "none_delay_time_min": {
+        "name": "Presence reset time (minutes)"
+      },
+      "none_delay_time_sec": {
+        "name": "Presence reset time (seconds)"
+      },
+      "pir_delay": {
+        "name": "PIR delay"
+      },
+      "presence_delay": {
+        "name": "Reset delay"
+      },
+      "quiet_time_end": {
+        "name": "Do not disturb (end)"
+      },
+      "quiet_time_start": {
+        "name": "Do not disturb (start)"
+      },
+      "rain_snow_delay": {
+        "name": "Rain/snow delay"
+      },
+      "recipe": {
+        "name": "Recipe #"
+      },
+      "report_sensitivity": {
+        "name": "Report sensitivity"
+      },
+      "set_16a": {
+        "name": "Set 16A"
+      },
+      "set_32a": {
+        "name": "Set 32A"
+      },
+      "set_40a": {
+        "name": "Set 40A"
+      },
+      "set_50a": {
+        "name": "Set 50A"
+      },
+      "set_define_time": {
+        "name": "Set define time"
+      },
+      "set_delay_time": {
+        "name": "Set delay time"
+      },
+      "set_time": {
+        "name": "Set time"
+      },
+      "sleep_end_time": {
+        "name": "Sleep end time"
+      },
+      "sleep_start_time": {
+        "name": "Sleep start time"
+      },
+      "sm_detection_distance_max": {
+        "name": "Max micro-motion detection distance"
+      },
+      "sm_detection_distance_min": {
+        "name": "Min micro-motion detection distance"
+      },
+      "sm_sensitivity": {
+        "name": "Micro-motion detection sensitivity"
+      },
+      "sensitivity_cz": {
+        "name": "Sensitivity CZ"
+      },
+      "sensitivity_wd": {
+        "name": "Sensitivity WD"
+      },
+      "false_alarm": {
+        "name": "False alarm threshold"
+      },
+      "study_timer": {
+        "name": "Study timer"
+      },
+      "wd_detection": {
+        "name": "WD detection distance"
+      },
+      "mov_min_detection": {
+        "name": "Min movement detection distance"
+      },
+      "micro_min_detection": {
+        "name": "Min micro-motion detection distance (ZG-205Z)"
+      },
+      "bre_min_detection": {
+        "name": "Min breathing detection distance"
+      },
+      "sand_surface_calibration": {
+        "name": "Sand surface calibration"
+      },
+      "standby_bright": {
+        "name": "Standby brightness"
+      },
+      "standby_time": {
+        "name": "Standby time"
+      },
+      "temp_calibration": {
+        "name": "Temperature calibration"
+      },
+      "temp_sensitivity": {
+        "name": "Temperature sensitivity"
+      },
+      "temp_set": {
+        "name": "Temperature"
+      },
+      "tempsc": {
+        "name": "Temperature correction"
+      },
+      "time_clear": {
+        "name": "Scheduled clean time"
+      },
+      "timer_on": {
+        "name": "Delayed power on"
+      },
+      "trigger_sensitivity": {
+        "name": "Trigger sensitivity"
+      },
+      "use_time_1": {
+        "name": "Usage time 1"
+      },
+      "use_time_2": {
+        "name": "Usage time 2"
+      },
+      "use_time_3": {
+        "name": "Usage time 3"
+      },
+      "use_time_4": {
+        "name": "Usage time 4"
+      },
+      "use_time_5": {
+        "name": "Usage time 5"
+      },
+      "use_time_6": {
+        "name": "Usage time 6"
+      },
+      "use_time_7": {
+        "name": "Usage time 7"
+      },
+      "use_time_8": {
+        "name": "Usage time 8"
+      },
+      "uv_end_time": {
+        "name": "UV end time"
+      },
+      "uv_start_time": {
+        "name": "UV start time"
+      },
+      "warm_temperature": {
+        "name": "Warm temperature"
+      },
+      "watering_duration": {
+        "name": "Watering duration"
+      },
+      "xt_generic_number": {
+        "name": "{name}"
+      },
+      "cook_temperature": {
+        "name": "Cooking temperature"
+      },
+      "cook_time": {
+        "name": "Cooking time"
+      },
+      "target_dis_closest": {
+        "name": "Closest target distance"
+      }
+    },
+    "select": {
+      "basic_anti_flicker": {
+        "name": "Frith-fhliuchra",
+        "state": {
+          "0": "Díchumasaithe",
+          "1": "50 Hz",
+          "2": "60 Hz"
+        }
+      },
+      "basic_nightvision": {
+        "name": "Fís oíche",
+        "state": {
+          "0": "Uathoibríoch",
+          "1": "As",
+          "2": "Ar siúl"
+        }
+      },
+      "blanket_level": {
+        "name": "Leibhéal",
+        "state": {
+          "level_2": "Leibhéal 2",
+          "level_3": "Leibhéal 4",
+          "level_4": "Leibhéal 4",
+          "level_5": "Leibhéal 5",
+          "level_6": "Leibhéal 6",
+          "level_7": "Leibhéal 7",
+          "level_8": "Leibhéal 8",
+          "level_9": "Leibhéal 9",
+          "level_1": "Low",
+          "level_10": "High"
+        }
+      },
+      "brightness": {
+        "name": "Gile"
+      },
+      "concentration": {
+        "name": "Tiúchan"
+      },
+      "countdown": {
+        "name": "Comhaireamh síos",
+        "state": {
+          "1h": "1 uair an chloig",
+          "2h": "2 uair an chloig",
+          "3h": "3 uair an chloig",
+          "4h": "4 uair an chloig",
+          "5h": "5 uair an chloig",
+          "6h": "6 uair an chloig",
+          "cancel": "Cealaigh"
+        }
+      },
+      "cups": {
+        "name": "Cupáin"
+      },
+      "curtain_mode": {
+        "name": "Mód",
+        "state": {
+          "morning": "Maidin",
+          "night": "Oíche"
+        }
+      },
+      "curtain_motor_mode": {
+        "name": "Mód mótair",
+        "state": {
+          "back": "Ar ais",
+          "forward": "Ar Aghaidh"
+        }
+      },
+      "decibel_sensitivity": {
+        "name": "Íogaireacht braite fuaime",
+        "state": {
+          "0": "Íogaireacht íseal",
+          "1": "Íogaireacht ard"
+        }
+      },
+      "desk_level": {
+        "name": "leibhéal",
+        "state": {
+          "level_1": "Leibhéal 1",
+          "level_2": "Leibhéal 2",
+          "level_3": "Leibhéal 3",
+          "level_4": "Leibhéal 4"
+        }
+      },
+      "desk_up_down": {
+        "name": "Suas/Síos",
+        "state": {
+          "down": "Síos",
+          "stop": "Stad",
+          "up": "Suas"
+        }
+      },
+      "fingerbot_mode": {
+        "name": "Mód",
+        "state": {
+          "click": "Brúigh",
+          "switch": "Lasc"
+        }
+      },
+      "horizontal_fan_angle": {
+        "name": "Uillinn flap luasctha cothrománach",
+        "state": {
+          "30": "30°",
+          "60": "60°",
+          "90": "90°"
+        }
+      },
+      "humidifier_level": {
+        "name": "Leibhéal spraeála",
+        "state": {
+          "level_1": "Leibhéal 1",
+          "level_10": "Leibhéal 10",
+          "level_2": "Leibhéal 2",
+          "level_3": "Leibhéal 3",
+          "level_4": "Leibhéal 4",
+          "level_5": "Leibhéal 5",
+          "level_6": "Leibhéal 6",
+          "level_7": "Leibhéal 7",
+          "level_8": "Leibhéal 8",
+          "level_9": "Leibhéal 9"
+        }
+      },
+      "humidifier_moodlighting": {
+        "name": "Soilsiú giúmar",
+        "state": {
+          "1": "Giúmar 1",
+          "2": "Giúmar 2",
+          "3": "Giúmar 3",
+          "4": "Giúmar 4",
+          "5": "Giúmar 5"
+        }
+      },
+      "humidifier_spray_mode": {
+        "name": "Mód spraeála",
+        "state": {
+          "auto": "Uath",
+          "health": "Sláinte",
+          "humidity": "Taise",
+          "sleep": "Codladh",
+          "work": "Obair"
+        }
+      },
+      "indexed_blanket_level": {
+        "name": "Leibhéal {index}",
+        "state": {
+          "level_1": "Íseal",
+          "level_10": "Ard",
+          "level_2": "Leibhéal 2",
+          "level_3": "Leibhéal 4",
+          "level_4": "Leibhéal 4",
+          "level_5": "Leibhéal 5",
+          "level_6": "Leibhéal 6",
+          "level_7": "Leibhéal 7",
+          "level_8": "Leibhéal 8",
+          "level_9": "Leibhéal 9"
+        }
+      },
+      "indexed_led_type": {
+        "name": "Cineál foinse solais {index}",
+        "state": {
+          "halogen": "Halaigin",
+          "incandescent": "Gealbhruthach",
+          "led": "LED"
+        }
+      },
+      "inverter_work_mode": {
+        "name": "Mód oibre inbhéartóra",
+        "state": {
+          "manual": "Mód láimhe",
+          "self_powered": "Féinchumhachtaithe",
+          "time_of_use": "Am úsáide"
+        }
+      },
+      "ipc_work_mode": {
+        "name": "Mód IPC",
+        "state": {
+          "0": "Mód ísealchumhachta",
+          "1": "Mód oibre leanúnach"
+        }
+      },
+      "led_type": {
+        "name": "Cineál foinse solais",
+        "state": {
+          "halogen": "Halaigin",
+          "incandescent": "Gealbhruthach",
+          "led": "LED"
+        }
+      },
+      "light_mode": {
+        "name": "Mód solais táscaire",
+        "state": {
+          "none": "As",
+          "pos": "Léirigh staid an lasc inbhéartaithe",
+          "relay": "Léirigh staid an lasctha ar siúl/as"
+        }
+      },
+      "material": {
+        "name": "Ábhar"
+      },
+      "mode": {
+        "name": "Mód"
+      },
+      "motion_sensitivity": {
+        "name": "Íogaireacht braite gluaisne",
+        "state": {
+          "0": "Íseal",
+          "1": "Meánach",
+          "2": "Ard"
+        }
+      },
+      "odor_elimination_mode": {
+        "name": "Mód deireadh a chur le boladh",
+        "state": {
+          "interim": "Eatramhach",
+          "smart": "Cliste"
+        }
+      },
+      "record_mode": {
+        "name": "Mód taifeadta",
+        "state": {
+          "1": "Taifead imeachtaí amháin",
+          "2": "Taifeadadh leanúnach"
+        }
+      },
+      "relay_status": {
+        "state": {
+          "off": "As",
+          "on": "Ar siúl",
+          "power_off": "As",
+          "power_on": "Ar siúl",
+          "last": "Remember last state",
+          "memory": "Remember last state"
+        },
+        "name": "Power on behavior"
+      },
+      "target_humidity": {
+        "name": "Taise sprice"
+      },
+      "temperature_level": {
+        "name": "Leibhéal teochta"
+      },
+      "vacuum_cistern": {
+        "name": "Coigeartú umar uisce",
+        "state": {
+          "closed": "Dúnta",
+          "high": "Ard",
+          "low": "Íseal",
+          "middle": "Lár"
+        }
+      },
+      "vacuum_collection": {
+        "name": "Mód bailiúcháin deannaigh",
+        "state": {
+          "large": "Mór",
+          "middle": "Lár",
+          "small": "Beag"
+        }
+      },
+      "vacuum_mode": {
+        "name": "Mód",
+        "state": {
+          "bow": "Bogha",
+          "chargego": "Fill ar ais chuig an duga",
+          "left_bow": "Bogha ar chlé",
+          "left_spiral": "Bíseach ar chlé",
+          "mop": "Mop",
+          "part": "Cuid",
+          "partial_bow": "Bogha go páirteach",
+          "pick_zone": "Crios piocadh",
+          "point": "Pointe",
+          "pose": "Staidiúir",
+          "random": "Randamach",
+          "right_bow": "Bogha ar dheis",
+          "right_spiral": "Sprial ar dheis",
+          "single": "Singil",
+          "smart": "Cliste",
+          "spiral": "Bíorlach",
+          "standby": "Fuireachas",
+          "wall_follow": "Lean an balla",
+          "zone": "Crios"
+        }
+      },
+      "vertical_fan_angle": {
+        "name": "Uillinn flap luasctha ingearach",
+        "state": {
+          "30": "30°",
+          "60": "60°",
+          "90": "90°"
+        }
+      },
+      "volume": {
+        "name": "Toirt"
+      },
+      "weather_delay": {
+        "name": "Moill aimsire",
+        "state": {
+          "120h": "120 uair",
+          "144h": "144 uair",
+          "168h": "168 uair",
+          "24h": "24 uair",
+          "48h": "48 uair",
+          "72h": "72 uair",
+          "96h": "96 uair",
+          "cancel": "Cealaigh"
+        }
+      },
+      "alarm_volume": {
+        "name": "Alarm volume",
+        "state": {
+          "0": "Mute",
+          "1": "Normal",
+          "2": "Loud",
+          "mute": "Mute",
+          "normal": "Normal",
+          "loud": "Loud"
+        }
+      },
+      "beep_volume": {
+        "name": "Beep volume",
+        "state": {
+          "0": "High",
+          "1": "Low",
+          "2": "Mute",
+          "high": "High",
+          "low": "Low",
+          "mute": "Mute"
+        }
+      },
+      "cat_litter_box_clean": {
+        "name": "Manual shoveling",
+        "state": {
+          "0": "Not shoveling",
+          "1": "Start manual shoveling",
+          "2": "Pause manual shoveling"
+        }
+      },
+      "cat_litter_box_empty": {
+        "name": "Manual dumping",
+        "state": {
+          "0": "Not dumping",
+          "1": "Start manual dumping",
+          "2": "Pause manual dumping"
+        }
+      },
+      "cat_litter_box_status": {
+        "name": "Status",
+        "state": {
+          "standby": "Stand by",
+          "off": "Off",
+          "waiting_cluster": "Waiting cluster",
+          "cleaning": "Cleaning",
+          "uv": "UV",
+          "deodorization": "Deodorization",
+          "sleep": "Sleep"
+        }
+      },
+      "cat_litter_box_work_mode": {
+        "name": "Cleaning mode",
+        "state": {
+          "auto_clean": "Automatic cleaning",
+          "manual_clean": "Manual cleaning",
+          "sleep": "Sleep",
+          "uv": "UV",
+          "deodorization": "Deodorization"
+        }
+      },
+      "cat_litter_type": {
+        "name": "Cat litter type",
+        "state": {
+          "mineral_cat_litter": "Mineral (Bentonite)",
+          "mix_cat_litter": "Mixed (Tofu)"
+        }
+      },
+      "cds": {
+        "name": "Sensitivity",
+        "state": {
+          "2000lux": "2000lux",
+          "300lux": "300lux",
+          "50lux": "50lux",
+          "10lux": "10lux",
+          "5lux": "5lux",
+          "now": "now"
+        }
+      },
+      "change_temp_unit": {
+        "name": "Temperature unit",
+        "state": {
+          "0": "C°",
+          "1": "F",
+          "false": "C°",
+          "true": "F",
+          "c": "C°",
+          "f": "F"
+        }
+      },
+      "currency": {
+        "name": "Currency",
+        "state": {
+          "euro": "Euro",
+          "usd": "USD",
+          "rmb": "RMB"
+        }
+      },
+      "dbl_power_set": {
+        "name": "Set power",
+        "state": {
+          "level_1": "Level 1",
+          "level_2": "Level 2",
+          "level_3": "Level 3",
+          "level_4": "Level 4",
+          "level_5": "Level 5"
+        }
+      },
+      "device_mode": {
+        "name": "Device mode",
+        "state": {
+          "0": "Automatic",
+          "1": "Manual",
+          "auto": "Automatic",
+          "manual": "Manual"
+        }
+      },
+      "doorbell_volume": {
+        "name": "Doorbell volume",
+        "state": {
+          "mute": "Mute",
+          "low": "Low",
+          "high": "High"
+        }
+      },
+      "dj_color": {
+        "name": "Color",
+        "state": {
+          "r": "Red",
+          "rg": "Yellow",
+          "g": "Green",
+          "gb": "Light blue",
+          "b": "Blue",
+          "rb": "Pink",
+          "rgb": "White",
+          "color": "Random color"
+        }
+      },
+      "dj_mode": {
+        "name": "Mode",
+        "state": {
+          "bright": "Bright",
+          "gradually": "Gradually",
+          "star": "Star",
+          "flower": "Flower",
+          "marquee": "Marquee",
+          "fireworks": "Fireworks",
+          "meteor": "Meteor",
+          "stream": "Stream"
+        }
+      },
+      "key_tone": {
+        "name": "Key tone",
+        "state": {
+          "0": "High",
+          "1": "Normal",
+          "2": "Mute",
+          "high": "High",
+          "normal": "Normal",
+          "mute": "Mute"
+        }
+      },
+      "led_type_2": {
+        "name": "Light 2 source type",
+        "state": {
+          "halogen": "Halogen",
+          "incandescent": "Incandescent",
+          "led": "LED"
+        }
+      },
+      "led_type_3": {
+        "name": "Light 3 source type",
+        "state": {
+          "halogen": "Halogen",
+          "incandescent": "Incandescent",
+          "led": "LED"
+        }
+      },
+      "pir_sensitivity": {
+        "name": "PIR sensitivity",
+        "state": {
+          "low": "Low",
+          "middle": "Medium",
+          "high": "High"
+        }
+      },
+      "qccdz_chargingoperation": {
+        "name": "Charging operation",
+        "state": {
+          "opencharging": "Open charging",
+          "closecharging": "Close charging",
+          "waitoperation": "Wait charging"
+        }
+      },
+      "qccdz_work_mode": {
+        "name": "Work mode",
+        "state": {
+          "0": "Charge now",
+          "1": "Charge to percentage",
+          "2": "Charge energy",
+          "3": "Scheduled charge",
+          "4": "Delayed charge",
+          "charge_now": "Real time charging",
+          "charge_pct": "Charge to percentage",
+          "charge_energy": "Charge energy",
+          "charge_schedule": "Scheduled charge",
+          "charge_delay": "Delayed charge"
+        }
+      },
+      "sfkzq_work_state": {
+        "name": "Work state",
+        "state": {
+          "auto": "Auto",
+          "manual": "Manual",
+          "idle": "Idle"
+        }
+      },
+      "solar_en_total": {
+        "name": "Solar energy total",
+        "state": {
+          "unknown": "Unknown",
+          "disable": "Disable",
+          "enable": "Enable"
+        }
+      },
+      "sound_mode": {
+        "name": "Sound mode",
+        "state": {
+          "0": "Ringtone 0",
+          "1": "Ringtone 1",
+          "2": "Ringtone 2",
+          "3": "Ringtone 3",
+          "4": "Ringtone 4",
+          "5": "Ringtone 5",
+          "ringtone_0": "Ringtone 0",
+          "ringtone_1": "Ringtone 1",
+          "ringtone_2": "Ringtone 2",
+          "ringtone_3": "Ringtone 3",
+          "ringtone_4": "Ringtone 4",
+          "ringtone_5": "Ringtone 5",
+          "sound_0": "Sound 0",
+          "sound_1": "Sound 1",
+          "sound_2": "Sound 2",
+          "sound_3": "Sound 3",
+          "sound_4": "Sound 4",
+          "sound_5": "Sound 5"
+        }
+      },
+      "special_function": {
+        "name": "Special function",
+        "state": {
+          "0": "Function 1",
+          "1": "Function 2",
+          "2": "Function 3",
+          "3": "Function 4",
+          "4": "Function 5",
+          "function1": "Function 1",
+          "function2": "Function 2",
+          "function3": "Function 3",
+          "function4": "Function 4",
+          "function5": "Function 5"
+        }
+      },
+      "temp_unit_convert": {
+        "name": "Temperature unit",
+        "state": {
+          "c": "Celsius",
+          "f": "Fahrenheit"
+        }
+      },
+      "temperature_unit": {
+        "name": "Temperature unit",
+        "state": {
+          "1": "°C",
+          "2": "°F"
+        }
+      },
+      "tempunit": {
+        "name": "Temperature unit",
+        "state": {
+          "centigrade": "Celsius",
+          "fahrenheit_degree": "Fahrenheit"
+        }
+      },
+      "volume_unit": {
+        "name": "Volume unit"
+      },
+      "water_control": {
+        "name": "Water control",
+        "state": {
+          "on": "On",
+          "off": "Off"
+        }
+      },
+      "xfj_mode": {
+        "name": "Mode",
+        "state": {
+          "auto": "Automatic",
+          "sleep": "Sleep",
+          "manual": "Manual"
+        }
+      },
+      "xt_generic_select": {
+        "name": "{name}"
+      },
+      "xt_lock_unlock_mechanism": {
+        "name": "Lock/unlock mechanism",
+        "state": {
+          "auto": "Automatic",
+          "door_open": "Door open",
+          "door_operate": "Door operate",
+          "ticket_flow": "Ticket flow",
+          "dpcode_command": "DPcode command"
+        }
+      }
+    },
+    "sensor": {
+      "air_pressure": {
+        "name": "Brú aeir"
+      },
+      "air_quality": {
+        "name": "Cáilíocht an aeir",
+        "state": {
+          "good": "Maith",
+          "great": "Iontach",
+          "mild": "Éadrom",
+          "severe": "Trom",
+          "bad": "Bad",
+          "medium": "Medium"
+        }
+      },
+      "air_quality_index": {
+        "name": "Innéacs cáilíochta aeir",
+        "state": {
+          "level_1": "Leibhéal 1",
+          "level_2": "Leibhéal 2",
+          "level_3": "Leibhéal 3",
+          "level_4": "Leibhéal 4",
+          "level_5": "Leibhéal 5",
+          "level_6": "Leibhéal 6"
+        }
+      },
+      "battery": {
+        "name": "Ceallraí"
+      },
+      "battery_power": {
+        "name": "Cumhacht ceallraí"
+      },
+      "battery_soc": {
+        "name": "SOC Ceallraí"
+      },
+      "battery_state": {
+        "name": "Staid na ceallraí",
+        "state": {
+          "low": "Low",
+          "middle": "Middle",
+          "high": "High"
+        }
+      },
+      "carbon_dioxide": {
+        "name": "Dé-ocsaíd charbóin"
+      },
+      "carbon_monoxide": {
+        "name": "Aonocsaíd charbóin"
+      },
+      "cat_litter_box_status": {
+        "name": "Stádas",
+        "state": {
+          "empty": "Ag folmhú",
+          "level": "Leibhéalú",
+          "sleep": "Codladh",
+          "standby": "Fuireachas",
+          "uv": "Sláintíocht",
+          "cleaning": "Cleaning",
+          "clock": "Clock",
+          "deodorization": "Deodorization",
+          "off": "Off",
+          "standly": "Standby",
+          "waiting_cluster": "Waiting cluster"
+        }
+      },
+      "cat_weight": {
+        "name": "Meáchan cait"
+      },
+      "cleaning_area": {
+        "name": "Limistéar glantacháin"
+      },
+      "cleaning_time": {
+        "name": "Am glantacháin"
+      },
+      "concentration_carbon_dioxide": {
+        "name": "Tiúchan dé-ocsaíd charbóin"
+      },
+      "current": {
+        "name": "Reatha"
+      },
+      "current_temperature": {
+        "name": "Teocht reatha"
+      },
+      "depth": {
+        "name": "Doimhneacht"
+      },
+      "duster_cloth_life": {
+        "name": "Saolré éadach duster"
+      },
+      "excretion_times_day": {
+        "name": "Amanna eisfhearadh (i rith an lae)"
+      },
+      "filter_duration": {
+        "name": "Fad an scagaire"
+      },
+      "filter_life": {
+        "name": "Saolré an scagaire"
+      },
+      "filter_utilization": {
+        "name": "Úsáid scagaire"
+      },
+      "formaldehyde": {
+        "name": "Formaildéad"
+      },
+      "gas": {
+        "name": "Gás"
+      },
+      "humidity": {
+        "name": "Taise"
+      },
+      "humidity_outdoor": {
+        "name": "Taise lasmuigh"
+      },
+      "illuminance": {
+        "name": "Soilsiú"
+      },
+      "indexed_humidity_outdoor": {
+        "name": "Cainéal taise lasmuigh {index}"
+      },
+      "indexed_temperature_external": {
+        "name": "Cainéal teochta braiteora {index}"
+      },
+      "inverter_output_power": {
+        "name": "Cumhacht aschuir inbhéartóra"
+      },
+      "last_amount": {
+        "name": "An méid deireanach"
+      },
+      "last_operation_duration": {
+        "name": "Fad na hoibríochta deireanaí"
+      },
+      "lifetime_battery_charge_energy": {
+        "name": "Fuinneamh muirir ceallraí ar feadh an tsaoil"
+      },
+      "lifetime_battery_discharge_energy": {
+        "name": "Fuinneamh urscaoilte ceallraí ar feadh an tsaoil"
+      },
+      "lifetime_inverter_output_energy": {
+        "name": "Fuinneamh aschuir inverter ar feadh an tsaoil"
+      },
+      "lifetime_offgrid_port_energy": {
+        "name": "Fuinneamh calafoirt lasmuigh den ghreille ar feadh an tsaoil"
+      },
+      "lifetime_pv_energy": {
+        "name": "Fuinneamh PV ar feadh an tsaoil"
+      },
+      "liquid_depth": {
+        "name": "Doimhneacht leachtach"
+      },
+      "liquid_level": {
+        "name": "Leibhéal leachtach"
+      },
+      "liquid_state": {
+        "name": "Staid leachtach",
+        "state": {
+          "lower_alarm": "Íseal",
+          "normal": "Gnáth",
+          "upper_alarm": "Ard"
+        }
+      },
+      "luminosity": {
+        "name": "Lonrúlacht"
+      },
+      "methane": {
+        "name": "Meatán"
+      },
+      "odor_elimination_status": {
+        "name": "Stádas",
+        "state": {
+          "charge_done": "Muirear déanta",
+          "charging": "Muirearú",
+          "standby": "Fuireachas",
+          "work": "Ag obair"
+        }
+      },
+      "phase_a_current": {
+        "name": "Céim A reatha"
+      },
+      "phase_a_power": {
+        "name": "Cumhacht Céim A"
+      },
+      "phase_a_voltage": {
+        "name": "Voltas Céim A"
+      },
+      "phase_b_current": {
+        "name": "Céim B reatha"
+      },
+      "phase_b_power": {
+        "name": "Cumhacht Céim B"
+      },
+      "phase_b_voltage": {
+        "name": "Voltas Céim B"
+      },
+      "phase_c_current": {
+        "name": "Céim C reatha"
+      },
+      "phase_c_power": {
+        "name": "Cumhacht Céim C"
+      },
+      "phase_c_voltage": {
+        "name": "Voltas Céim C"
+      },
+      "pm1": {
+        "name": "PM1"
+      },
+      "pm10": {
+        "name": "PM10"
+      },
+      "pm25": {
+        "name": "PM2.5"
+      },
+      "power": {
+        "name": "Cumhacht"
+      },
+      "precipitation_intensity": {
+        "name": "Déine fheasachta"
+      },
+      "precipitation_today": {
+        "name": "Deascadh iomlán inniu"
+      },
+      "pump_time": {
+        "name": "Fad an chaidéil uisce"
+      },
+      "pv_channel_power": {
+        "name": "Cumhacht cainéal PV {index}"
+      },
+      "remaining_time": {
+        "name": "Am atá fágtha"
+      },
+      "rolling_brush_life": {
+        "name": "Saolré scuab rollta"
+      },
+      "side_brush_life": {
+        "name": "Saolré scuab taobh"
+      },
+      "smoke_amount": {
+        "name": "Méid deataigh"
+      },
+      "sous_vide_status": {
+        "name": "Stádas",
+        "state": {
+          "boiling_temp": "Teocht fiuchta",
+          "cooling": "Fuarú",
+          "heating": "Téamh",
+          "heating_temp": "Teocht téimh",
+          "reserve_1": "Cúlchiste 1",
+          "reserve_2": "Cúlchiste 2",
+          "reserve_3": "Cúlchiste 3",
+          "standby": "Fuireachas",
+          "warm": "Caomhnú teasa"
+        }
+      },
+      "status": {
+        "name": "Stádas"
+      },
+      "supply_frequency": {
+        "name": "Minicíocht soláthair"
+      },
+      "temperature": {
+        "name": "Teocht"
+      },
+      "temperature_external": {
+        "name": "Teocht an tóireadóra"
+      },
+      "total_absorption_particles": {
+        "name": "Ionsú iomlán na gcáithníní"
+      },
+      "total_cleaning_area": {
+        "name": "Limistéar glantacháin iomlán"
+      },
+      "total_cleaning_time": {
+        "name": "Am glantacháin iomlán"
+      },
+      "total_cleaning_times": {
+        "name": "Amanna glantacháin iomlána"
+      },
+      "total_dissolved_solids": {
+        "name": "Solaid thuaslagtha iomlána"
+      },
+      "total_energy": {
+        "name": "Fuinneamh iomlán"
+      },
+      "total_operating_time": {
+        "name": "Am oibriúcháin iomlán"
+      },
+      "total_power": {
+        "name": "Cumhacht iomlán"
+      },
+      "total_production": {
+        "name": "Táirgeadh iomlán"
+      },
+      "total_pv_power": {
+        "name": "Cumhacht iomlán PV"
+      },
+      "total_volatile_organic_compound": {
+        "name": "Comhdhúil orgánach so-ghalaithe iomlán"
+      },
+      "total_watering_time": {
+        "name": "Am iomlán uisce"
+      },
+      "uv_index": {
+        "name": "Innéacs UV"
+      },
+      "uv_runtime": {
+        "name": "Am rith UV"
+      },
+      "voc": {
+        "name": "Comhdhúile orgánacha so-ghalaithe"
+      },
+      "voltage": {
+        "name": "Voltas"
+      },
+      "water_level": {
+        "name": "Leibhéal an uisce"
+      },
+      "water_level_state": {
+        "name": "Leibhéal an uisce",
+        "state": {
+          "level_1": "Íseal",
+          "level_2": "Meánach",
+          "level_3": "Lán"
+        }
+      },
+      "water_time": {
+        "name": "Fad úsáide uisce"
+      },
+      "wind_direction": {
+        "name": "Treo na gaoithe"
+      },
+      "dynamic_passcode": {
+        "name": "Dynamic Passcode"
+      },
+      "dynamic_passcode_expires_at": {
+        "name": "Dynamic Passcode Expiration Time"
+      },
+      "dynamic_passcode_remaining_seconds": {
+        "name": "Dynamic Passcode Remaining Time"
+      },
+      "a_current": {
+        "name": "Current A"
+      },
+      "a_voltage": {
+        "name": "Voltage A"
+      },
+      "achz": {
+        "name": "Grid Frequency"
+      },
+      "aci": {
+        "name": "Grid current"
+      },
+      "activepower": {
+        "name": "Active power"
+      },
+      "activepowera": {
+        "name": "Active power A"
+      },
+      "activepowerb": {
+        "name": "Active power B"
+      },
+      "activepowerc": {
+        "name": "Active power C"
+      },
+      "acv": {
+        "name": "Grid voltage"
+      },
+      "add_ele": {
+        "name": "Consumption {index}"
+      },
+      "add_ele_this_month": {
+        "name": "Monthly consumption {index}"
+      },
+      "add_ele_this_year": {
+        "name": "Yearly consumption {index}"
+      },
+      "add_ele_today": {
+        "name": "Daily consumption {index}"
+      },
+      "xt_add_ele": {
+        "name": "Consumption {index} (method B)"
+      },
+      "xt_add_ele_this_month": {
+        "name": "Monthly consumption {index} (method B)"
+      },
+      "xt_add_ele_this_year": {
+        "name": "Yearly consumption {index} (method B)"
+      },
+      "xt_add_ele_today": {
+        "name": "Daily consumption {index} (method B)"
+      },
+      "auto_deordrizer": {
+        "name": "Auto deordrizer"
+      },
+      "b_current": {
+        "name": "Current B"
+      },
+      "b_voltage": {
+        "name": "Voltage B"
+      },
+      "backlight_switch": {
+        "name": "Backlight Switch"
+      },
+      "balance_energy": {
+        "name": "Balance energy"
+      },
+      "battery_level": {
+        "name": "Battery level"
+      },
+      "c_current": {
+        "name": "Current C"
+      },
+      "c_voltage": {
+        "name": "Voltage C"
+      },
+      "calibration": {
+        "name": "Calibration"
+      },
+      "ch0_humidity": {
+        "name": "Base Station Humidity"
+      },
+      "ch0_temperature": {
+        "name": "Base Station Temperature"
+      },
+      "ch1_battery": {
+        "name": "Channel 1 Battery"
+      },
+      "ch1_temperature": {
+        "name": "Channel 1 Temperature"
+      },
+      "ch2_battery": {
+        "name": "Channel 2 Battery"
+      },
+      "ch2_temperature": {
+        "name": "Channel 2 Temperature"
+      },
+      "ch3_battery": {
+        "name": "Channel 3 Battery"
+      },
+      "ch3_temperature": {
+        "name": "Channel 3 Temperature"
+      },
+      "ch4_battery": {
+        "name": "Channel 4 Battery"
+      },
+      "ch4_temperature": {
+        "name": "Channel 4 Temperature"
+      },
+      "ch5_battery": {
+        "name": "Channel 5 Battery"
+      },
+      "ch5_temperature": {
+        "name": "Channel 5 Temperature"
+      },
+      "ch6_battery": {
+        "name": "Channel 6 Battery"
+      },
+      "ch6_temperature": {
+        "name": "Channel 6 Temperature"
+      },
+      "ch7_battery": {
+        "name": "Channel 7 Battery"
+      },
+      "ch7_temperature": {
+        "name": "Channel 7 Temperature"
+      },
+      "ch8_battery": {
+        "name": "Channel 8 Battery"
+      },
+      "ch8_temperature": {
+        "name": "Channel 8 Temperature"
+      },
+      "ch9_battery": {
+        "name": "Channel 9 Battery"
+      },
+      "ch9_temperature": {
+        "name": "Channel 9 Temperature"
+      },
+      "bag_change_counting": {
+        "name": "Bag change count"
+      },
+      "capacity_calibration": {
+        "name": "Capacity calibration"
+      },
+      "charge_energy": {
+        "name": "Charge energy"
+      },
+      "charge_energy_once": {
+        "name": "Charge energy (single)"
+      },
+      "child_lock": {
+        "name": "Child lock"
+      },
+      "clct_time": {
+        "name": "Collected time"
+      },
+      "clean": {
+        "name": "Clean"
+      },
+      "clean_notice": {
+        "name": "Clean notice"
+      },
+      "clean_taste": {
+        "name": "Clean taste"
+      },
+      "clean_tasteswitch": {
+        "name": "Clean taste switch"
+      },
+      "clean_time": {
+        "name": "Clean time"
+      },
+      "clean_time_switch": {
+        "name": "Clean time switch"
+      },
+      "countdown_left": {
+        "name": "Countdown left"
+      },
+      "ctime": {
+        "name": "Timer"
+      },
+      "ctime2": {
+        "name": "Timer 2"
+      },
+      "current_a": {
+        "name": "Current A"
+      },
+      "current_b": {
+        "name": "Current B"
+      },
+      "currenta": {
+        "name": "Current A"
+      },
+      "currentb": {
+        "name": "Current B"
+      },
+      "currentc": {
+        "name": "Current C"
+      },
+      "deodorization_num": {
+        "name": "Deodorization number"
+      },
+      "detection_sensitivity": {
+        "name": "Detection sensitivity"
+      },
+      "device_consumption": {
+        "name": "Device consumption"
+      },
+      "device_max_set_a": {
+        "name": "Device Max A",
+        "state": {
+          "max16a": "Max 16A",
+          "max32a": "Max 32A",
+          "max40a": "Max 40A",
+          "max50a": "Max 50A"
+        }
+      },
+      "device_power": {
+        "name": "Device power"
+      },
+      "device_temperature": {
+        "name": "Device temperature"
+      },
+      "device_temperature2": {
+        "name": "Device temperature 2"
+      },
+      "deviceid": {
+        "name": "Device ID"
+      },
+      "direction_a": {
+        "name": "Power direction A"
+      },
+      "direction_b": {
+        "name": "Power direction B"
+      },
+      "deodorization": {
+        "name": "Deodorization"
+      },
+      "eco": {
+        "name": "Eco"
+      },
+      "electric": {
+        "name": "Power production"
+      },
+      "electric_this_month": {
+        "name": "Monthly production"
+      },
+      "electric_this_year": {
+        "name": "Yearly production"
+      },
+      "electric_today": {
+        "name": "Daily production"
+      },
+      "electric_total": {
+        "name": "Total power production"
+      },
+      "empty": {
+        "name": "Empty"
+      },
+      "end_time": {
+        "name": "End time"
+      },
+      "energyconsumed": {
+        "name": "Energy consumed"
+      },
+      "energyconsumeda": {
+        "name": "Energy consumed A"
+      },
+      "energyconsumedb": {
+        "name": "Energy consumed B"
+      },
+      "energyconsumedc": {
+        "name": "Energy consumed C"
+      },
+      "excretion_time_day": {
+        "name": "Duration of excretion"
+      },
+      "fault": {
+        "name": "Fault"
+      },
+      "flow_velocity": {
+        "name": "Flow speed"
+      },
+      "frequency": {
+        "name": "Frequency"
+      },
+      "gross_generation": {
+        "name": "Gross generation"
+      },
+      "gross_generation_a": {
+        "name": "Gross generation A"
+      },
+      "gross_generation_b": {
+        "name": "Gross generation B"
+      },
+      "gross_generation_c": {
+        "name": "Gross generation C"
+      },
+      "heart_rate": {
+        "name": "Heart rate"
+      },
+      "hps_presence_state": {
+        "name": "Presence",
+        "state": {
+          "none": "none",
+          "presence": "Presence",
+          "peaceful": "Peaceful",
+          "small_move": "Small movement",
+          "large_move": "Large movement"
+        }
+      },
+      "hum_alarm": {
+        "name": "Humidity alarm",
+        "state": {
+          "loweralarm": "Low humidity",
+          "upperalarm": "High humidity",
+          "cancel": "None"
+        }
+      },
+      "induction_clean": {
+        "name": "Induction clean"
+      },
+      "induction_delay": {
+        "name": "Induction delay"
+      },
+      "induction_interval": {
+        "name": "Induction interval"
+      },
+      "jtmspro_alarm_lock": {
+        "name": "Lock alarm",
+        "state": {
+          "0": "Wrong fingerprint",
+          "1": "Wrong password",
+          "2": "Wrong card",
+          "3": "Wrong face",
+          "4": "Latch stuck",
+          "5": "Too hot",
+          "6": "Not closed after timeout",
+          "7": "Deadbolt stuck",
+          "8": "Anti-pry alarm",
+          "9": "Not calibrated",
+          "10": "Low battery",
+          "11": "Battery exhausted",
+          "12": "Vibration alarm",
+          "13": "Arm alarm",
+          "wrong_finger": "Wrong fingerprint",
+          "wrong_password": "Wrong password",
+          "wrong_card": "Wrong card",
+          "wrong_face": "Wrong face",
+          "tongue_bad": "Latch stuck",
+          "too_hot": "Too hot",
+          "unclosed_time": "Not closed after timeout",
+          "tongue_not_out": "Deadbolt stuck",
+          "pry": "Anti-pry alarm",
+          "key_in": "Not calibrated",
+          "low_battery": "Low battery",
+          "power_off": "Battery exhausted",
+          "shock": "Vibration alarm",
+          "defense": "Arm alarm"
+        }
+      },
+      "jtmspro_closed_opened": {
+        "name": "Door Open/Closed",
+        "state": {
+          "0": "Unknown",
+          "1": "Open",
+          "2": "Closed",
+          "unknown": "Unknown",
+          "open": "Open",
+          "closed": "Closed"
+        }
+      },
+      "ldr": {
+        "name": "Light intensity"
+      },
+      "liquid_level_percent": {
+        "name": "Liquid level"
+      },
+      "magnetnum": {
+        "name": "Magnet number"
+      },
+      "meter_type": {
+        "name": "Meter type",
+        "state": {
+          "unknown": "Unknown",
+          "3_phase": "3 Phases",
+          "1_phase": "1 Phase",
+          "1_phase_3_wire": "1 Phase 3 wires",
+          "other": "Other"
+        }
+      },
+      "monitoring": {
+        "name": "Monitoring"
+      },
+      "mov_status": {
+        "name": "Movement status"
+      },
+      "ms_category_alarm_lock": {
+        "name": "Keypad alarm",
+        "state": {
+          "0": "Wrong fingerprint",
+          "1": "Wrong password",
+          "2": "Wrong card",
+          "3": "Wrong face",
+          "4": "Too hot",
+          "5": "Not closed after timeout",
+          "6": "Anti-pry alarm",
+          "7": "Low battery",
+          "8": "Battery exhausted",
+          "9": "Vibration alarm",
+          "wrong_finger": "Wrong fingerprint",
+          "wrong_password": "Wrong password",
+          "wrong_card": "Wrong card",
+          "wrong_face": "Wrong face",
+          "too_hot": "Too hot",
+          "unclosed_time": "Not closed after timeout",
+          "pry": "Anti-pry alarm",
+          "low_battery": "Low battery",
+          "power_off": "Battery exhausted",
+          "shock": "Vibration alarm"
+        }
+      },
+      "msp_history": {
+        "name": "History",
+        "state": {
+          "0": "None",
+          "1": "Automatic shoveling completed",
+          "2": "Manual shoveling completed",
+          "3": "Trash bin extraction",
+          "4": "Trash bin reinstallation",
+          "5": "Start automatic deodorization",
+          "6": "Start manual deodorization",
+          "7": "Temperature in the cabin is too high",
+          "8": "The temperature inside the cabin is suitable",
+          "9": "Sand dumping completed",
+          "10": "Sand dumping canceled",
+          "11": "Litter shoveling canceled",
+          "12": "Enter Do Not Disturb mode",
+          "13": "Exit Do Not Disturb mode",
+          "14": "Cat approaches",
+          "15": "Cat leaves",
+          "16": "Starting Self-inspection",
+          "17": "Completed self-inspection",
+          "18": "Cover is not installed",
+          "19": "Cover is installed",
+          "20": "Start shoveling",
+          "21": "Start dumping",
+          "22": "Cat enters"
+        }
+      },
+      "mzj_work_status": {
+        "name": "Work status",
+        "state": {
+          "stop": "Stopped",
+          "working": "Working",
+          "complete": "Complete",
+          "0": "Stopped",
+          "1": "Working",
+          "2": "Complete"
+        }
+      },
+      "net_notice": {
+        "name": "Net notice"
+      },
+      "not_disturb": {
+        "name": "Not disturb"
+      },
+      "not_disturb_switch": {
+        "name": "Not disturb switch"
+      },
+      "notification_status": {
+        "name": "Notification status"
+      },
+      "number": {
+        "name": "Number"
+      },
+      "odourless": {
+        "name": "Odourless"
+      },
+      "off_bed_time": {
+        "name": "Time get out of bed"
+      },
+      "ozone_concentration": {
+        "name": "Ozone concentration"
+      },
+      "pedal_angle": {
+        "name": "Pedal angle"
+      },
+      "phaseflag": {
+        "name": "Phase",
+        "state": {
+          "single_phase": "Single phase",
+          "three_phase": "Three phases",
+          "no_phase": "No phase",
+          "phase_err": "Phase error"
+        }
+      },
+      "pir_radar": {
+        "name": "PIR Radar"
+      },
+      "ponud": {
+        "name": "Cat weight (lb)"
+      },
+      "power_a": {
+        "name": "Power A"
+      },
+      "power_b": {
+        "name": "Power B"
+      },
+      "power_factor": {
+        "name": "Power factor"
+      },
+      "power_factor_b": {
+        "name": "Power factor B"
+      },
+      "power_total": {
+        "name": "Total power"
+      },
+      "powerfactora": {
+        "name": "Power factor A"
+      },
+      "powerfactorb": {
+        "name": "Power factor B"
+      },
+      "powerfactorc": {
+        "name": "Power factor C"
+      },
+      "product_specifications": {
+        "name": "Product specification",
+        "state": {
+          "europe": "Europe",
+          "america": "America"
+        }
+      },
+      "pv1_curr": {
+        "name": "Panel 1 current"
+      },
+      "pv1_volt": {
+        "name": "Panel 1 voltage"
+      },
+      "pv2_curr": {
+        "name": "Panel 2 current"
+      },
+      "pv2_volt": {
+        "name": "Panel 2 voltage"
+      },
+      "pvi": {
+        "name": "Total panel 1 current"
+      },
+      "pvv": {
+        "name": "Total panel voltage"
+      },
+      "qccdz_connection_state": {
+        "name": "Connection state",
+        "state": {
+          "0": "12V",
+          "1": "12V PWN",
+          "2": "9V",
+          "3": "9V PWM",
+          "4": "6V",
+          "5": "6V PWM",
+          "6": "Error",
+          "controlpi_12v": "12V",
+          "controlpi_12v_pwm": "12V PWN",
+          "controlpi_9v": "9V",
+          "controlpi_9v_pwm": "9V PWM",
+          "controlpi_6v": "6V",
+          "controlpi_6v_pwm": "6V PWM",
+          "controlpi_error": "Error"
+        }
+      },
+      "qccdz_devicestate": {
+        "name": "Device state",
+        "state": {
+          "no_connet": "Not connected",
+          "connect": "Connected",
+          "charing": "Charging",
+          "wait_rfid": "Waiting for RFID",
+          "finish": "Finished",
+          "wait_charing": "Charge waiting",
+          "error": "Error"
+        }
+      },
+      "qccdz_work_state": {
+        "name": "Work state",
+        "state": {
+          "0": "Charger is free",
+          "1": "Charger inserted",
+          "2": "Charger is free (fault)",
+          "3": "Charger is waiting",
+          "4": "Charger is charging",
+          "5": "Charger is paused",
+          "6": "Charger has finished",
+          "7": "Charger fault",
+          "charger_free": "Charger is free",
+          "charger_insert": "Charger inserted",
+          "charger_free_fault": "Charger is free (fault)",
+          "charger_wait": "Charger is waiting",
+          "charger_charging": "Charger is charging",
+          "charger_pause": "Charger is paused",
+          "charger_end": "Charger has finished",
+          "charger_fault": "Charger fault"
+        }
+      },
+      "reactivepower": {
+        "name": "Reactive power"
+      },
+      "reactivepowera": {
+        "name": "Reactive power A"
+      },
+      "reactivepowerb": {
+        "name": "Reactive power B"
+      },
+      "reactivepowerc": {
+        "name": "Reactive power C"
+      },
+      "releases": {
+        "name": "Release"
+      },
+      "respiratory_rate": {
+        "name": "Respiratory rate"
+      },
+      "sand_surface_calibration": {
+        "name": "Sand surface calibration"
+      },
+      "sigle_phase_power": {
+        "name": "Single phase power"
+      },
+      "sleep_stage": {
+        "name": "Sleep stage",
+        "state": {
+          "sleep": "Sleep",
+          "awake": "Awake",
+          "0": "Sleep",
+          "1": "Awake"
+        }
+      },
+      "smart_clean": {
+        "name": "Smart clean"
+      },
+      "start_time": {
+        "name": "Start time"
+      },
+      "store_full_notify": {
+        "name": "Store full notify"
+      },
+      "switch_alarm_sound": {
+        "name": "Switch Alarm Sound"
+      },
+      "system_version": {
+        "name": "System version"
+      },
+      "target_distance": {
+        "name": "Target distance"
+      },
+      "temp_alarm": {
+        "name": "Temperature alarm",
+        "state": {
+          "loweralarm": "Low temperature",
+          "upperalarm": "High temperature",
+          "cancel": "None"
+        }
+      },
+      "temp_bottom": {
+        "name": "Min temperature"
+      },
+      "temp_show": {
+        "name": "Current temperature"
+      },
+      "temp_top": {
+        "name": "Max temperature"
+      },
+      "temp_unit_convert": {
+        "name": "Temperature unit",
+        "state": {
+          "c": "Celsius",
+          "f": "Fahrenheit"
+        }
+      },
+      "time": {
+        "name": "Time"
+      },
+      "time_get_in_bed": {
+        "name": "Time get in bed"
+      },
+      "toilet_notice": {
+        "name": "Toilet notice"
+      },
+      "total_forward_energy": {
+        "name": "Total forward energy"
+      },
+      "trash_status": {
+        "name": "Trash status"
+      },
+      "tvoc": {
+        "name": "TVOC"
+      },
+      "unit": {
+        "name": "Unit"
+      },
+      "unit_switch": {
+        "name": "Weight unit",
+        "state": {
+          "kg": "Kilograms",
+          "lb": "Pounds"
+        }
+      },
+      "unlock_card": {
+        "name": "Card unlock user"
+      },
+      "unlock_face": {
+        "name": "Face unlock user"
+      },
+      "unlock_finger_vein": {
+        "name": "Finger vein unlock user"
+      },
+      "unlock_fingerprint": {
+        "name": "Fingerprint unlock user"
+      },
+      "unlock_hand": {
+        "name": "Hand unlock user"
+      },
+      "unlock_password": {
+        "name": "Password unlock user"
+      },
+      "usage_times": {
+        "name": "Usage times"
+      },
+      "voltage_a": {
+        "name": "Voltage A"
+      },
+      "water_once": {
+        "name": "Instant flow rate"
+      },
+      "water_total": {
+        "name": "Total flow"
+      },
+      "water_use_data": {
+        "name": "Water used"
+      },
+      "watering_cycle": {
+        "name": "Watering cycle"
+      },
+      "watering_task": {
+        "name": "Watering task",
+        "state": {
+          "0": "None",
+          "1": "Single duration",
+          "2": "Cycle duration",
+          "3": "Single volume",
+          "4": "Cycle volume"
+        }
+      },
+      "watering_volume": {
+        "name": "Watering volume"
+      },
+      "wnykq_ir_control": {
+        "name": "IR control",
+        "state": {
+          "0": "Study",
+          "1": "Stop",
+          "2": "Success",
+          "3": "Fail",
+          "study": "Study",
+          "stop": "Stop",
+          "success": "Success",
+          "fail": "Fail"
+        }
+      },
+      "work_stat": {
+        "name": "Work stat"
+      },
+      "xt_cover_invert_control": {
+        "name": "Cover controls inverted"
+      },
+      "xt_cover_invert_status": {
+        "name": "Cover status inverted"
+      },
+      "xt_generic_sensor": {
+        "name": "{name}"
+      },
+      "current2": {
+        "name": "Current 2"
+      },
+      "detection_near": {
+        "name": "Detection near"
+      },
+      "distance": {
+        "name": "Target distance"
+      },
+      "power2": {
+        "name": "Power 2"
+      },
+      "total_energy_today": {
+        "name": "Daily total energy"
+      },
+      "total_energy_this_month": {
+        "name": "Monthly total energy"
+      },
+      "total_energy_this_year": {
+        "name": "Yearly total energy"
+      },
+      "xt_total_energy": {
+        "name": "Total energy (method B)"
+      },
+      "xt_total_energy_today": {
+        "name": "Daily total energy (method B)"
+      },
+      "xt_total_energy_this_month": {
+        "name": "Monthly total energy (method B)"
+      },
+      "xt_total_energy_this_year": {
+        "name": "Yearly total energy (method B)"
+      },
+      "voltage2": {
+        "name": "Voltage 2"
+      },
+      "xt_lock_unlock_mechanism": {
+        "name": "Lock/unlock mechanism",
+        "state": {
+          "auto": "Automatic",
+          "door_open": "Door open",
+          "door_operate": "Door operate",
+          "ticket_flow": "Ticket flow",
+          "dpcode_command": "DPcode command"
+        }
+      }
+    },
+    "switch": {
+      "anion": {
+        "name": "Anion"
+      },
+      "arm_beep": {
+        "name": "Armáil bíp"
+      },
+      "auto_clean": {
+        "name": "Glanadh uathoibríoch"
+      },
+      "battery_lock": {
+        "name": "Glas ceallraí"
+      },
+      "child_lock": {
+        "name": "Glas leanaí"
+      },
+      "cry_detection": {
+        "name": "Brath caointe"
+      },
+      "disinfection": {
+        "name": "Díghalrú"
+      },
+      "do_not_disturb": {
+        "name": "Ná cuir isteach"
+      },
+      "energy_saving": {
+        "name": "Coigilt fuinnimh"
+      },
+      "filter_cartridge_reset": {
+        "name": "Athshocrú cartús scagaire"
+      },
+      "filter_reset": {
+        "name": "Athshocrú scagaire"
+      },
+      "flip": {
+        "name": "Smeach"
+      },
+      "frost_protection": {
+        "name": "Cosaint sioc"
+      },
+      "heat_preservation": {
+        "name": "Caomhnú teasa"
+      },
+      "humidification": {
+        "name": "Taisiú"
+      },
+      "indexed_alarm": {
+        "name": "Aláram {index}"
+      },
+      "indexed_socket": {
+        "name": "Soicéad {index}"
+      },
+      "indexed_switch": {
+        "name": "Athraigh {index}"
+      },
+      "indexed_usb": {
+        "name": "USB {index}"
+      },
+      "ionizer": {
+        "name": "Ianaitheoir"
+      },
+      "motion_alarm": {
+        "name": "Aláram gluaisne"
+      },
+      "motion_recording": {
+        "name": "Taifeadadh gluaisne"
+      },
+      "motion_tracking": {
+        "name": "Rianú gluaisne"
+      },
+      "music": {
+        "name": "Ceol"
+      },
+      "mute": {
+        "name": "Balbhaigh"
+      },
+      "mute_voice": {
+        "name": "Guth balbh"
+      },
+      "natural_wind": {
+        "name": "Gaoth nádúrtha"
+      },
+      "open_window_detection": {
+        "name": "Brath fuinneoige oscailte"
+      },
+      "output_power_limit": {
+        "name": "Teorainn chumhachta aschuir"
+      },
+      "oxygen_bar": {
+        "name": "Barra ocsaigine"
+      },
+      "plug": {
+        "name": "Breiseán"
+      },
+      "power": {
+        "name": "Cumhacht"
+      },
+      "privacy_mode": {
+        "name": "Mód príobháideachta"
+      },
+      "pump": {
+        "name": "Caidéal"
+      },
+      "radio": {
+        "name": "Raidió"
+      },
+      "reset_of_water_usage_days": {
+        "name": "Athshocrú laethanta úsáide uisce"
+      },
+      "reverse": {
+        "name": "Droim ar ais"
+      },
+      "siren": {
+        "name": "Bonnán"
+      },
+      "sleep": {
+        "name": "Codladh"
+      },
+      "sleep_aid": {
+        "name": "Cúnamh codlata"
+      },
+      "slow_feed": {
+        "name": "Beathú mall"
+      },
+      "snooze": {
+        "name": "Codladh"
+      },
+      "socket": {
+        "name": "Soicéad"
+      },
+      "sound": {
+        "name": "Fuaim"
+      },
+      "sound_detection": {
+        "name": "Brath fuaime"
+      },
+      "spray": {
+        "name": "Spraeáil"
+      },
+      "start": {
+        "name": "Tosaigh"
+      },
+      "sterilization": {
+        "name": "Steiriliú"
+      },
+      "switch": {
+        "name": "Lasc"
+      },
+      "time_watermark": {
+        "name": "Uisce uisce ama"
+      },
+      "uv_sterilization": {
+        "name": "Steiriliú UV"
+      },
+      "video_recording": {
+        "name": "Taifeadadh físe"
+      },
+      "voice": {
+        "name": "Guth"
+      },
+      "water": {
+        "name": "Uisce"
+      },
+      "water_pump_reset": {
+        "name": "Athshocrú caidéil uisce"
+      },
+      "wide_dynamic_range": {
+        "name": "Raon dinimiciúil leathan"
+      },
+      "alarm_1": {
+        "name": "Alarm 1"
+      },
+      "alarm_2": {
+        "name": "Alarm 2"
+      },
+      "alarm_3": {
+        "name": "Alarm 3"
+      },
+      "alarm_4": {
+        "name": "Alarm 4"
+      },
+      "alarm_switch": {
+        "name": "Alarm switch"
+      },
+      "auto_deordrizer": {
+        "name": "Auto deordrizer"
+      },
+      "automatic_lock": {
+        "name": "Automatic lock"
+      },
+      "beep": {
+        "name": "Beep"
+      },
+      "calibration": {
+        "name": "Calibration"
+      },
+      "clean": {
+        "name": "Clean"
+      },
+      "clean_notice": {
+        "name": "Clean notice"
+      },
+      "clean_taste": {
+        "name": "Clean taste"
+      },
+      "clean_tasteswitch": {
+        "name": "Clean taste Switch"
+      },
+      "clean_time": {
+        "name": "Clean time"
+      },
+      "clean_time_switch": {
+        "name": "Clean time switch"
+      },
+      "control_skip": {
+        "name": "Skip control"
+      },
+      "deep_clean": {
+        "name": "Double cleaning"
+      },
+      "deodorization": {
+        "name": "Deodorization"
+      },
+      "developer_mode": {
+        "name": "Developer mode"
+      },
+      "empty": {
+        "name": "Empty"
+      },
+      "factory_reset": {
+        "name": "Factory reset"
+      },
+      "false_breath": {
+        "name": "False breath filter"
+      },
+      "id_verification_set": {
+        "name": "Set ID verification"
+      },
+      "indicator_light": {
+        "name": "Indicator light"
+      },
+      "induction_clean": {
+        "name": "Induction Clean"
+      },
+      "infrared_sensor_switch": {
+        "name": "Infrared sensor"
+      },
+      "key_rec": {
+        "name": "Key tone"
+      },
+      "light": {
+        "name": "Light"
+      },
+      "manual_clean": {
+        "name": "Manual clean"
+      },
+      "net_notice": {
+        "name": "Net notice"
+      },
+      "not_disturb": {
+        "name": "Not disturb"
+      },
+      "not_disturb_switch": {
+        "name": "Not disturb Switch"
+      },
+      "odourless": {
+        "name": "Odourless"
+      },
+      "one_click_cleanup": {
+        "name": "One click cleanup"
+      },
+      "photo_again": {
+        "name": "Take another photo"
+      },
+      "pump_auto": {
+        "name": "Pump auto"
+      },
+      "pump_mode": {
+        "name": "Pump drainage/supply"
+      },
+      "pump_switch": {
+        "name": "Pump switch"
+      },
+      "quiet_timing_on": {
+        "name": "Do not disturb"
+      },
+      "reboot": {
+        "name": "Reboot"
+      },
+      "rfid": {
+        "name": "RFID"
+      },
+      "rtc_lock": {
+        "name": "RTC lock"
+      },
+      "sleep_mode": {
+        "name": "Sleep mode"
+      },
+      "sleeping": {
+        "name": "Sleep"
+      },
+      "smart_clean": {
+        "name": "Smart clean"
+      },
+      "socket_1": {
+        "name": "Socket 1"
+      },
+      "socket_2": {
+        "name": "Socket 2"
+      },
+      "socket_3": {
+        "name": "Socket 3"
+      },
+      "socket_4": {
+        "name": "Socket 4"
+      },
+      "socket_5": {
+        "name": "Socket 5"
+      },
+      "socket_6": {
+        "name": "Socket 6"
+      },
+      "store_full_notify": {
+        "name": "Store full notify"
+      },
+      "switch_1": {
+        "name": "Switch 1"
+      },
+      "switch_2": {
+        "name": "Switch 2"
+      },
+      "switch_3": {
+        "name": "Switch 3"
+      },
+      "switch_4": {
+        "name": "Switch 4"
+      },
+      "switch_5": {
+        "name": "Switch 5"
+      },
+      "switch_6": {
+        "name": "Switch 6"
+      },
+      "switch_7": {
+        "name": "Switch 7"
+      },
+      "switch_8": {
+        "name": "Switch 8"
+      },
+      "switch_enabled": {
+        "name": "Switch enabled"
+      },
+      "switch_pir": {
+        "name": "Switch PIR"
+      },
+      "thin_feces": {
+        "name": "Deep cleaning"
+      },
+      "toilet_notice": {
+        "name": "Toilet notice"
+      },
+      "unit": {
+        "name": "Unit"
+      },
+      "usb_1": {
+        "name": "USB 1"
+      },
+      "usb_2": {
+        "name": "USB 2"
+      },
+      "usb_3": {
+        "name": "USB 3"
+      },
+      "usb_4": {
+        "name": "USB 4"
+      },
+      "usb_5": {
+        "name": "USB 5"
+      },
+      "usb_6": {
+        "name": "USB 6"
+      },
+      "uv": {
+        "name": "UV"
+      },
+      "uv_light": {
+        "name": "UV light"
+      },
+      "valve": {
+        "name": "Valve"
+      },
+      "xt_cover_invert_control": {
+        "name": "Invert cover controls"
+      },
+      "xt_cover_invert_status": {
+        "name": "Invert cover status"
+      },
+      "xt_generic_switch": {
+        "name": "{name}"
+      },
+      "sleep_new": {
+        "name": "Sleep mode"
+      }
+    },
+    "valve": {
+      "indexed_valve": {
+        "name": "Comhla {index}"
+      },
+      "valve": {
+        "name": "Comhla"
+      }
+    },
+    "climate": {
+      "mode": {
+        "name": "Mode",
+        "state": {
+          "auto": "Automatic",
+          "cold": "Cold",
+          "freeze": "Freeze",
+          "heat": "Heat",
+          "hot": "Hot",
+          "manual": "Manual",
+          "wet": "Wet",
+          "wind": "Wind",
+          "on": "On",
+          "off": "Off"
+        }
+      }
+    },
+    "lock": {
+      "operate_lock": {
+        "name": "Operate lock"
+      }
+    },
+    "remote": {
+      "xt_generic_remote": {
+        "name": "{name}"
+      }
+    },
+    "time": {
+      "countdown_1": {
+        "name": "Countdown 1"
+      },
+      "countdown_2": {
+        "name": "Countdown 2"
+      },
+      "countdown_3": {
+        "name": "Countdown 3"
+      },
+      "countdown_4": {
+        "name": "Countdown 4"
+      },
+      "countdown_5": {
+        "name": "Countdown 5"
+      },
+      "countdown_6": {
+        "name": "Countdown 6"
+      },
+      "countdown_7": {
+        "name": "Countdown 7"
+      },
+      "countdown_8": {
+        "name": "Countdown 8"
+      }
+    }
+  },
+  "issues": {
+    "service_deprecation_turn_off": {
+      "title": "Tuya vacuum support for vacuum.turn_off is being removed",
+      "fix_flow": {
+        "step": {
+          "confirm": {
+            "title": "Tuya vacuum support for vacuum.turn_off is being removed",
+            "description": "Tuya vacuum support for the vacuum.turn_off service is deprecated and will be removed in Home Assistant 2024.2; Please adjust any automation or script that uses the service to instead call vacuum.stop and select submit below to mark this issue as resolved."
+          }
+        }
+      }
+    },
+    "service_deprecation_turn_on": {
+      "title": "Tuya vacuum support for vacuum.turn_on is being removed",
+      "fix_flow": {
+        "step": {
+          "confirm": {
+            "title": "Tuya vacuum support for vacuum.turn_on is being removed",
+            "description": "Tuya vacuum support for the vacuum.turn_on service is deprecated and will be removed in Home Assistant 2024.2; Please adjust any automation or script that uses the service to instead call vacuum.start and select submit below to mark this issue as resolved."
+          }
+        }
+      }
+    },
+    "tuya_iot_failed_request": {
+      "title": "Tuya OpenAPI request failed",
+      "description": "The integration \"{name}\" (`{config_entry_id}`) could not connect to the Tuya OpenAPI service (request failed)\n\nTo fix this error, check that your HA can access the internet and that there is no firewall in between HA and Tuya OpenAPI endpoints."
+    },
+    "tuya_iot_failed_login": {
+      "title": "Tuya OpenAPI credentials expired",
+      "description": "The integration \"{name}\" (`{config_entry_id}`) could not connect to the Tuya OpenAPI service (credentials expired)\n\nTo fix this error please follow the guide at the URL by clicking the button below, then restart Home Assistant."
+    },
+    "tuya_iot_not_configured": {
+      "title": "Tuya OpenAPI account not configured",
+      "description": "The integration \"{name}\" (`{config_entry_id}`) Does not have Tuya OpenAPI credentials\n\nWithout this, a lot of entities might be missing in your devices.\n\nTo fix this warning please follow the guide at the URL by clicking the button below, then restart Home Assistant."
+    },
+    "tuya_iot_lock_not_subscribed": {
+      "title": "Tuya OpenAPI account badly configured (lock)",
+      "description": "The integration \"{name}\" (`{config_entry_id}`) Does not have a Tuya OpenAPI account that is subscribed to the Smart Lock Open Service\n\nWithout this, locks will not function properly.\n\nTo fix this warning please follow the guide at the URL by clicking the button below, then restart Home Assistant."
+    },
+    "tuya_iot_camera_not_subscribed": {
+      "title": "Tuya OpenAPI account badly configured (camera)",
+      "description": "The integration \"{name}\" (`{config_entry_id}`) Does not have a Tuya OpenAPI account that is subscribed to the IoT Video Live Stream service\n\nWithout this, cameras will not function properly.\n\nTo fix this warning please follow the guide at the URL by clicking the button below, then restart Home Assistant."
+    },
+    "tuya_iot_ir_not_subscribed": {
+      "title": "Tuya OpenAPI account badly configured (IR)",
+      "description": "The integration \"{name}\" (`{config_entry_id}`) Does not have a Tuya OpenAPI account that is subscribed to the IR Control Hub Open Service service\n\nWithout this, IR devices will not function properly.\n\nTo fix this warning please follow the guide at the URL by clicking the button below, then restart Home Assistant."
+    },
+    "tuya_iot_sensor_energy_stat_not_subscribed": {
+      "title": "Tuya OpenAPI account badly configured (Energy stat)",
+      "description": "The integration \"{name}\" (`{config_entry_id}`) Does not have a Tuya OpenAPI account that is subscribed to the Beta API service\n\nWithout this, fetching energy sensor consumption history will not function properly.\n\nTo fix this warning please follow the guide at the URL by clicking the button below, then restart Home Assistant."
+    },
+    "tuya_iot_mqtt_failed_login": {
+      "title": "Tuya OpenAPI MQTT Not authorized",
+      "description": "The integration \"{name}\" (`{config_entry_id}`) could not connect to the Tuya OpenAPI MQTT queue, something is wrong in your configuration\n\nTo fix this error please follow the guide at the URL by clicking the button below, then restart Home Assistant."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Xtend Tuya Settings",
+        "description": "Select the settings you want to configure.",
+        "menu_options": {
+          "configure_api": "API Credentials",
+          "device_settings": "Device Settings"
+        }
+      },
+      "configure_api": {
+        "title": "Add Tuya OpenAPI credentials",
+        "description": "Add a Tuya OpenAPI credential to improve the compatibility with some Tuya devices. Please follow the guide at the URL by clicking the button below.",
+        "data": {
+          "no_openapi": "Don't ask for OpenAPI credentials",
+          "country_code": "Country",
+          "access_id": "Tuya IoT Access ID",
+          "access_secret": "Tuya IoT Access Secret",
+          "username": "SmartLife/Tuya account",
+          "password": "SmartLife/Tuya account password"
+        }
+      },
+      "device_settings": {
+        "title": "Configuration category",
+        "menu_options": {
+          "select_climate_device": "Climate options",
+          "select_cover_device": "Cover options",
+          "select_lock_device": "Lock options"
+        }
+      },
+      "select_device": {
+        "title": "Select device",
+        "description": "Select a device to configure.",
+        "data": {
+          "device": "Device"
+        }
+      },
+      "configure": {
+        "title": "Add Tuya OpenAPI credentials",
+        "description": "Add a Tuya OpenAPI credential to improve the compatibility with some Tuya devices. Please follow the guide at the URL by clicking the button below.",
+        "data": {
+          "no_openapi": "Don't ask for OpenAPI credentials",
+          "country_code": "Country",
+          "access_id": "Tuya IoT Access ID",
+          "access_secret": "Tuya IoT Access Secret",
+          "username": "SmartLife/Tuya account",
+          "password": "SmartLife/Tuya account password"
+        }
+      },
+      "select_climate_device": {
+        "title": "Select Device",
+        "description": "Select a climate device to configure.",
+        "data": {
+          "device": "Device"
+        }
+      },
+      "select_cover_device": {
+        "title": "Select Device",
+        "description": "Select a cover device to configure.",
+        "data": {
+          "device": "Device"
+        }
+      },
+      "select_lock_device": {
+        "title": "Select Device",
+        "description": "Select a lock device to configure.",
+        "data": {
+          "device": "Device"
+        }
+      },
+      "climate_device_settings": {
+        "title": "Configure {device_name}",
+        "description": "Set the properties of the device",
+        "data": {
+          "current_temperature_value_multiplicator": "Current temperature multiplier",
+          "current_humidity_value_multiplicator": "Current humidity multiplier",
+          "target_temperature_value_multiplicator": "Target temperature multiplier",
+          "target_humidity_value_multiplicator": "Target humidity multiplier"
+        }
+      },
+      "cover_device_settings": {
+        "title": "Configure {device_name}",
+        "description": "Set the properties of the device",
+        "data": {
+          "invert_control": "Invert the control of the device",
+          "invert_status": "Invert the reported status of the device",
+          "open_time": "Time from opened to closed (seconds)",
+          "update_interval": "Status refresh interval",
+          "force_virtual_position": "Force use of virtual position",
+          "no_precise_position": "Device doesn't support precise positioning"
+        }
+      },
+      "lock_device_settings": {
+        "title": "Configure {device_name}",
+        "description": "Set the properties of the device",
+        "data": {
+          "temporary_unlock_time": "Seconds the lock stays opened",
+          "lock_unlock_mecanism": "Force unlock mecanism",
+          "lock_status_dpcode": "DPCode that represents the lock open/closed status"
+        }
+      }
+    },
+    "abort": {
+      "climate_entity_not_found": "No climate entity found for the selected device. Please select a device with a climate entity to configure.",
+      "lock_entity_not_found": "No lock entity found for the selected device. Please select a device with a lock entity to configure.",
+      "no_devices_found": "No devices found for this configuration category.",
+      "device_not_selected": "No device selected. Please select a device to configure.",
+      "device_not_found": "Selected device not found. Please select a valid device to configure.",
+      "no_configurable_properties": "The selected device does not have configurable properties.",
+      "no_multi_manager": "No Multi Manager stored, please contact the developer."
+    }
+  },
+  "services": {
+    "create_temporary_password": {
+      "name": "Create Temporary Password",
+      "description": "Creates a time-restricted temporary passcode for a Tuya smart lock.",
+      "fields": {
+        "device_id": {
+          "name": "Device",
+          "description": "The Tuya smart lock device."
+        },
+        "password": {
+          "name": "Password / PIN",
+          "description": "The 6-8 digit numeric passcode to create (e.g. 1266455)."
+        },
+        "name": {
+          "name": "Name / Alias",
+          "description": "An optional name or label for the temporary passcode."
+        },
+        "effective_time": {
+          "name": "Effective Date & Time",
+          "description": "Start date and time (defaults to now)."
+        },
+        "invalid_time": {
+          "name": "Expiration Date & Time",
+          "description": "Expiration date and time (defaults to 24h from now)."
+        }
+      }
+    },
+    "get_dynamic_passcode": {
+      "name": "Get Dynamic Passcode",
+      "description": "Fetches a new 5-minute dynamic passcode for a Tuya smart lock on demand."
+    },
+    "get_temporary_passwords": {
+      "name": "Get Temporary Passwords",
+      "description": "Fetches all active temporary passcodes created for a Tuya smart lock.",
+      "fields": {
+        "device_id": {
+          "name": "Device",
+          "description": "The Tuya smart lock device."
+        }
+      }
+    },
+    "delete_temporary_password": {
+      "name": "Delete Temporary Password",
+      "description": "Deletes a temporary passcode from a Tuya smart lock by password ID.",
+      "fields": {
+        "device_id": {
+          "name": "Device",
+          "description": "The Tuya smart lock device."
+        },
+        "password_id": {
+          "name": "Password ID",
+          "description": "The numeric ID of the temporary password to delete."
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "invalid_pin": {
+      "message": "The PIN must be purely numeric and contain between 6 and 8 digits."
+    },
+    "missing_device_param": {
+      "message": "Missing required parameter: device."
+    },
+    "missing_password_param": {
+      "message": "Missing required parameter: password."
+    },
+    "missing_device_and_password": {
+      "message": "Missing required parameters: device and password are required."
+    },
+    "missing_device_and_password_id": {
+      "message": "Missing required parameters: device and password_id are required."
+    },
+    "device_not_found": {
+      "message": "Device '{device_id}' not found in Xtend Tuya integration."
+    },
+    "no_tuya_account": {
+      "message": "No valid Tuya account found for device {device}."
+    },
+    "lock_requires_7_digits": {
+      "message": "Tuya API Error for device {device}: Incorrect passcode length (code {code}). This lock requires a numeric PIN of exactly 7 digits (you entered {length} digits)."
+    },
+    "smart_lock_service_unauthorized": {
+      "message": "Tuya API Error for device {device}: No permissions (code {code}). Missing 'Smart Lock Service' authorization in iot.tuya.com (Cloud > Development > Your Project > Service API)."
+    },
+    "invalid_lock_parameters": {
+      "message": "Tuya API Error for device {device}: Invalid parameters (code {code}). Verify that the PIN and dates are valid for this lock."
+    },
+    "tuya_api_error": {
+      "message": "Tuya API Error for device {device}: {msg} (code {code})."
+    },
+    "action_error": {
+      "message": "Error performing {action}: {error}."
+    }
+  }
 }
