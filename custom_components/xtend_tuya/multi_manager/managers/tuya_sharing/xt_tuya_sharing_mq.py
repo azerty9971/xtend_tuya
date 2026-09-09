@@ -101,6 +101,9 @@ class XTSharingMQ(SharingMQ):
         if url.scheme == "ssl":
             mqttc.tls_set()
 
+        if url.hostname is None or url.port is None:
+            raise Exception("Could not initialize MQTT client (hostname/port is None)")
+
         mqttc.connect(url.hostname, url.port)
 
         mqttc.loop_start()

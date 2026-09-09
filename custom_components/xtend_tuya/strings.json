@@ -514,6 +514,9 @@
             "blind": {
                 "name": "Blind"
             },
+            "window_opener": {
+                "name": "Window opener"
+            },
             "curtain": {
                 "name": "Curtain"
             },

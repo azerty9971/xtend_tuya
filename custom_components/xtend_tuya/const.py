@@ -152,6 +152,10 @@ class AllowedPlugins:
         return [MESSAGE_SOURCE_TUYA_SHARING, MESSAGE_SOURCE_TUYA_IOT]
 
 
+class XTWebRTCStreamQuality(IntEnum):
+    HIGH_QUALITY = 0
+    LOW_QUALITY = 1
+
 class XTGlobalEvents(StrEnum):
     LOCK_UNLOCKED = "LOCK_UNLOCKED"
 
@@ -258,6 +262,7 @@ class XTDeviceWatcherCategory(Flag):
     XT_PERFORMANCE = auto()
     DEBUG = auto()
     STATUS_CHANGES = auto()
+    WEBRTC = auto()
 
     @classmethod
     def all_enum_values(cls) -> list[XTDeviceWatcherCategory]:
@@ -1140,7 +1145,9 @@ class XTDPCode(StrEnum):
     WATER_ONCE = "water_once"
     WATER_TOTAL = "water_total"
     WATER_USE_DATA = "water_use_data"
+    WD_CONTROL = "wd_control"
     WD_DETECTION = "wd_detection"
+    WD_PERCENT_CONTROL = "wd_percent_control"
     WEATHER_SWITCH = "weather_switch"
     WINDSHAKE = "windshake"
     WINDSHAKE1 = "windshake1"

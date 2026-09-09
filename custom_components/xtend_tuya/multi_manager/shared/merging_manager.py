@@ -36,8 +36,18 @@ class XTMergingManager:
 
         # if multi_manager:
         #    multi_manager.device_watcher.report_message(device1.id, f"About to merge {device1.source}:{device1}\r\n\r\nand\r\n\r\n{device2.source}:{device2}", device1)
-        higher_bak = copy.deepcopy(higher_priority)
-        lower_bak = copy.deepcopy(lower_priority)
+        should_copy = False
+        if multi_manager is not None and multi_manager.device_watcher.is_watched(device1.id, [XTDeviceWatcherCategory.CLOUD_FIX]):
+            should_copy = True
+        if device1.force_compatibility is True or device2.force_compatibility is True:
+            should_copy = True
+        if should_copy:
+            higher_bak = copy.deepcopy(higher_priority)
+            lower_bak = copy.deepcopy(lower_priority)
+        else:
+            higher_bak = None
+            lower_bak = None
+
 
         # Make both devices compliant
         XTMergingManager._fix_incorrect_valuedescr(higher_priority, lower_priority)
@@ -76,20 +86,21 @@ class XTMergingManager:
             "local_strategy",
         )
         if msg_queue:
-            if multi_manager is not None:
-                multi_manager.device_watcher.report_message(
-                    device1.id,
-                    f"Messages for merging of {higher_bak.name}({higher_bak.source}) and {lower_bak.name}({lower_bak.source}):",
-                    XTDeviceWatcherCategory.CLOUD_FIX,
-                )
-                for msg in msg_queue:
-                    multi_manager.device_watcher.report_message(device1.id, msg, XTDeviceWatcherCategory.CLOUD_FIX)
-            else:
-                LOGGER.warning(
-                    f"Messages for merging of {higher_bak.name}({higher_bak.source}) and {lower_bak.name}({lower_bak.source}):"
-                )
-                for msg in msg_queue:
-                    LOGGER.warning(msg)
+            if higher_bak is not None and lower_bak is not None:
+                if multi_manager is not None:
+                    multi_manager.device_watcher.report_message(
+                        device1.id,
+                        f"Messages for merging of {higher_bak.name}({higher_bak.source}) and {lower_bak.name}({lower_bak.source}):",
+                        XTDeviceWatcherCategory.CLOUD_FIX,
+                    )
+                    for msg in msg_queue:
+                        multi_manager.device_watcher.report_message(device1.id, msg, XTDeviceWatcherCategory.CLOUD_FIX)
+                else:
+                    LOGGER.warning(
+                        f"Messages for merging of {higher_bak.name}({higher_bak.source}) and {lower_bak.name}({lower_bak.source}):"
+                    )
+                    for msg in msg_queue:
+                        LOGGER.warning(msg)
 
         # Now link the references so that they point to the same structure in memory
         lower_priority.status_range = higher_priority.status_range
@@ -99,12 +110,13 @@ class XTMergingManager:
         # if multi_manager:
         #    multi_manager.device_watcher.report_message(device1.id, f"Merged into {device1}", device1)
 
-        if lower_bak.force_compatibility:
-            XTMergingManager._enforce_compatibility(higher_priority, lower_bak)
-            higher_priority.force_compatibility = True
-        if higher_bak.force_compatibility:
-            XTMergingManager._enforce_compatibility(lower_priority, higher_bak)
-            lower_bak.force_compatibility = True
+        if higher_bak is not None and lower_bak is not None:
+            if lower_bak.force_compatibility:
+                XTMergingManager._enforce_compatibility(higher_priority, lower_bak)
+                higher_priority.force_compatibility = True
+            if higher_bak.force_compatibility:
+                XTMergingManager._enforce_compatibility(lower_priority, higher_bak)
+                lower_bak.force_compatibility = True
 
     @staticmethod
     def _enforce_compatibility(

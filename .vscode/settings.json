@@ -11,5 +11,7 @@
         "**/node_modules",
         "**/__pycache__",
         "**/.*"
-    ]
+    ],
+    "python.analysis.logTypeEvaluationTime": true,
+    "python.analysis.typeEvaluationTimeThreshold": 500
 }

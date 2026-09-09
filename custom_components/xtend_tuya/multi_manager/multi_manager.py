@@ -461,7 +461,7 @@ class MultiManager(TuyaManager):
         if not dev_id:
             return
 
-        new_message = self._convert_message_for_all_accounts(msg)
+        new_message = self._convert_message_for_all_accounts(msg, source)
         # self.device_watcher.report_message(
         #     dev_id,
         #     f"on_message ({source}) => {msg} <=> {new_message}",
@@ -508,7 +508,7 @@ class MultiManager(TuyaManager):
             return data["status"]
         return None
 
-    def _convert_message_for_all_accounts(self, msg: dict) -> dict:
+    def _convert_message_for_all_accounts(self, msg: dict, source: str | None) -> dict:
         protocol = msg.get("protocol", 0)
         data = msg.get("data", {})
         if protocol == PROTOCOL_DEVICE_REPORT:
@@ -520,6 +520,8 @@ class MultiManager(TuyaManager):
                 if bizData := data.get("bizData", None):
                     if dev_id := bizData.get("devId", None):
                         data["devId"] = dev_id
+        else:
+            LOGGER.warning(f"Received MQTT from {source} with protocol {protocol}: {msg=}")
         return msg
 
     def query_scenes(self) -> list:

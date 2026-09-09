@@ -161,7 +161,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
             device.id
         )
         identifiers: set[tuple[str, str]] = set()
-        if device_registry.async_get_device({(DOMAIN_ORIG, device.id)}) is not None:
+        if device_registry.async_get_devices(identifiers={(DOMAIN_ORIG, device.id)}):
             identifiers.add((DOMAIN_ORIG, device.id))
 
         for domain_identifier in domain_identifiers:
@@ -274,7 +274,7 @@ async def cleanup_duplicated_devices(
     device_registry = dr.async_get(hass)
     entity_registry = er.async_get(hass)
     duplicate_check_table: dict[str, list] = {}
-    for hass_dev_id, device_entry in list(device_registry.devices.items()):
+    for device_entry in device_registry.devices:
         for item in device_entry.identifiers:
             if len(item) > 1:
                 domain = item[0]
@@ -282,8 +282,8 @@ async def cleanup_duplicated_devices(
                 if domain in [DOMAIN, DOMAIN_ORIG]:
                     if device_id not in duplicate_check_table:
                         duplicate_check_table[device_id] = []
-                    if hass_dev_id not in duplicate_check_table[device_id]:
-                        duplicate_check_table[device_id].append(hass_dev_id)
+                    if device_entry.id not in duplicate_check_table[device_id]:
+                        duplicate_check_table[device_id].append(device_entry.id)
                     break
     for device_id in duplicate_check_table:
         remaining_devices = len(duplicate_check_table[device_id])
@@ -320,18 +320,22 @@ async def cleanup_device_registry(
     while not are_all_domain_config_loaded(hass, DOMAIN, current_entry):
         await asyncio.sleep(0.1)
     device_registry = dr.async_get(hass)
-    for dev_id, device_entry in list(device_registry.devices.items()):
+    remove_queue: list[str] = []
+    for device_entry in device_registry.devices:
         for item in device_entry.identifiers:
             if not is_device_in_domain_device_maps(
                 hass, [DOMAIN_ORIG, DOMAIN], item, None, True
             ):
-                try:
-                    device_registry.async_remove_device(dev_id)
-                except Exception as e:
-                    LOGGER.warning(
-                        f"Failed to remove device {dev_id} from registry: {e}"
-                    )
+                if device_entry.id not in remove_queue:
+                    remove_queue.append(device_entry.id)
                 break
+    for device_id in remove_queue:
+        try:
+            device_registry.async_remove_device(device_id)
+        except Exception as e:
+            LOGGER.warning(
+                f"Failed to remove device {device_id} from registry: {e}"
+            )
 
 
 def are_all_domain_config_loaded(

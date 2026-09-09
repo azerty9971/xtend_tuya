@@ -22,13 +22,31 @@ from .....shared.threading import (
 )
 from ......const import (
     XTDeviceWatcherCategory,
+    XTDeviceWatcherSpecialDevice,
+    XTWebRTCStreamQuality,
 )
 
 ENDLINE = "\r\n"
 
 
+class XTIOTWebRTCConfig(dict):
+    def __init__(self, webrtc_manager: XTIOTWebRTCManager, *args, ttl: int = 300, **kwargs):
+        super(XTIOTWebRTCConfig, self).__init__(*args, **kwargs)
+        self.valid_until = datetime.now() + timedelta(seconds=ttl)
+        self.webrtc_manager = webrtc_manager
+
+    def get_protocol_version(self) -> str:
+        return self.get("protocol_version", "2.2")
+
+    def is_webrtc_config_valid(self) -> bool:
+        current_time = datetime.now()
+        if self.valid_until < current_time:
+            return False
+        return True
+
+
 class XTIOTWebRTCSession:
-    webrtc_config: dict[str, Any] | None
+    webrtc_config: XTIOTWebRTCConfig | None
     original_offer: str | None
     offer: str | None
     answer: dict
@@ -83,6 +101,17 @@ class XTIOTWebRTCManager:
     def __init__(self, ipc_manager: ipc_man.XTIOTIPCManager) -> None:
         self.sdp_exchange: dict[str, XTIOTWebRTCSession] = {}
         self.ipc_manager = ipc_manager
+        self.multi_manager = ipc_manager.multi_manager
+
+    def report_message(
+        self, msg: str, device_id: str = XTDeviceWatcherSpecialDevice.NOT_LINKED_TO_A_DEVICE, category = XTDeviceWatcherCategory.WEBRTC, print_stack: bool = False
+    ) -> None:
+        self.multi_manager.device_watcher.report_message(
+            dev_id=device_id,
+            message=msg,
+            category=category,
+            print_stack=print_stack,
+        )
 
     def get_webrtc_session(self, session_id: str | None) -> XTIOTWebRTCSession | None:
         if session_id is None:
@@ -106,6 +135,7 @@ class XTIOTWebRTCManager:
             return
         self._create_session_if_necessary(session_id)
         self.sdp_exchange[session_id].answer = answer
+        self.report_message(f"Got SDP answer for {session_id=} {answer=}")
         if callback := self.sdp_exchange[session_id].message_callback:
             sdp_answer = answer.get("sdp", "")
             sdp_answer = self.fix_answer(sdp_answer, session_id)
@@ -117,6 +147,7 @@ class XTIOTWebRTCManager:
         self._create_session_if_necessary(session_id)
         self.sdp_exchange[session_id].answer_candidates.append(candidate)
         candidate_str = cast(str, candidate.get("candidate", ""))
+        self.report_message(f"Got SDP answer candidate for {session_id=} {candidate_str=}")
         if candidate_str == "":
             self.sdp_exchange[session_id].has_all_candidates = True
         if callback := self.sdp_exchange[session_id].message_callback:
@@ -126,12 +157,13 @@ class XTIOTWebRTCManager:
             )
 
     def set_resolution(
-        self, session_id: str, resolution: int, device: XTDevice
+        self, session_id: str, resolution: XTWebRTCStreamQuality, device: XTDevice
     ) -> None:
+        self.report_message(f"{self.sdp_exchange[session_id]}")
         resolution_payload = self.format_resolution(session_id, resolution, device)
         self.send_to_ipc_mqtt(session_id, device, json.dumps(resolution_payload))
 
-    def set_config(self, session_id: str, config: dict[str, Any]):
+    def set_config(self, session_id: str, config: XTIOTWebRTCConfig):
         self._create_session_if_necessary(session_id)
 
         # Format ICE Servers so that they can be used by GO2RTC
@@ -146,6 +178,7 @@ class XTIOTWebRTCManager:
         self.sdp_exchange[session_id].offer_codec_manager = XTIOTWebRTCCodecManager(
             offer
         )
+        self.report_message(f"Got SDP offer for {session_id=}")
 
     def set_original_sdp_offer(self, session_id: str, offer: str) -> None:
         self._create_session_if_necessary(session_id)
@@ -157,57 +190,64 @@ class XTIOTWebRTCManager:
             self.sdp_exchange[session_id] = XTIOTWebRTCSession()
 
     async def async_get_config(
-        self, device_id: str, session_id: str | None, hass: HomeAssistant | None = None
-    ) -> dict | None:
-        local_hass = hass
+        self,
+        device_id: str,
+        session_id: str | None,
+    ) -> XTIOTWebRTCConfig | None:
         if current_exchange := self.get_webrtc_session(session_id):
             if current_exchange.webrtc_config is not None:
                 return current_exchange.webrtc_config
-            if current_exchange.hass is not None:
-                local_hass = hass
-        if local_hass is not None:
-            return await XTEventLoopProtector.execute_out_of_event_loop_and_return(
-                self._get_config_from_cloud, device_id, session_id
-            )
-        else:
-            return self._get_config_from_cloud(device_id, session_id)
+        return await XTEventLoopProtector.execute_out_of_event_loop_and_return(
+            self.get_config, device_id, session_id
+        )
 
-    def get_config(self, device_id: str, session_id: str | None) -> dict | None:
+    def get_config(
+        self, device_id: str, session_id: str | None
+    ) -> XTIOTWebRTCConfig | None:
         if current_exchange := self.get_webrtc_session(session_id):
-            if current_exchange.webrtc_config is not None:
+            if (
+                current_exchange.webrtc_config is not None
+                and current_exchange.webrtc_config.is_webrtc_config_valid()
+            ):
                 return current_exchange.webrtc_config
-        elif session_id is not None:
+        if session_id is not None:
             if current_exchange := self.get_webrtc_session(device_id):
-                if current_exchange.webrtc_config is not None:
+                if (
+                    current_exchange.webrtc_config is not None
+                    and current_exchange.webrtc_config.is_webrtc_config_valid()
+                ):
                     self.set_config(session_id, current_exchange.webrtc_config)
+                    return current_exchange.webrtc_config
         return self._get_config_from_cloud(device_id, session_id)
 
     def _get_config_from_cloud(
         self, device_id: str, session_id: str | None
-    ) -> dict | None:
+    ) -> XTIOTWebRTCConfig | None:
         webrtc_config = self.ipc_manager.api.get(
             f"/v1.0/devices/{device_id}/webrtc-configs"
         )
-        self.ipc_manager.multi_manager.device_watcher.report_message(
-            device_id,
-            f"webrtc_config {webrtc_config}",
-            XTDeviceWatcherCategory.IOT_API | XTDeviceWatcherCategory.PLATFORM_CAMERA,
-            None,
+        if webrtc_config.get("success", False) is False:
+            webrtc_config = self.ipc_manager.non_user_api.get(
+                f"/v1.0/devices/{device_id}/webrtc-configs"
+            )
+        self.report_message(
+            msg=f"webrtc_config {webrtc_config}",
+            device_id=device_id,
+            category=XTDeviceWatcherCategory.IOT_API | XTDeviceWatcherCategory.PLATFORM_CAMERA,
             print_stack=True,
         )
         if webrtc_config.get("success", False):
-            result = webrtc_config.get("result", {})
+            result = XTIOTWebRTCConfig(self, webrtc_config.get("result", {}))
             if session_id is not None:
                 self.set_config(session_id, result)
-            else:
-                self.set_config(device_id, result)
+            self.set_config(device_id, result)
             return result
         return None
 
     async def async_get_ice_servers(
         self, device_id: str, session_id: str | None, format: str, hass: HomeAssistant
     ) -> str | None:
-        if config := await self.async_get_config(device_id, session_id, hass):
+        if config := await self.async_get_config(device_id, session_id):
             p2p_config: dict = config.get("p2p_config", {})
             ice_str = p2p_config.get("ices", "{}")
             match format:
@@ -274,12 +314,12 @@ class XTIOTWebRTCManager:
         return None
 
     def _get_stream_type(
-        self, device_id: str, session_id: str, requested_channel: str
+        self, device_id: str, session_id: str, requested_quality: XTWebRTCStreamQuality
     ) -> int:
-        Any_stream_type = 1
-        highest_res_stream_type = Any_stream_type
+        any_stream_type = 1
+        highest_res_stream_type = any_stream_type
         cur_highest = 0
-        lowest_res_stream_type = Any_stream_type
+        lowest_res_stream_type = any_stream_type
         cur_lowest = 0
         if webrtc_config := self.get_config(device_id, session_id):
             if skill := webrtc_config.get("skill"):
@@ -293,7 +333,7 @@ class XTIOTWebRTCManager:
                                 and "width" in video_details
                                 and "height" in video_details
                             ):
-                                Any_stream_type = video_details["streamType"]
+                                any_stream_type = video_details["streamType"]
                                 width = int(video_details["width"])
                                 height = int(video_details["height"])
                                 cur_value = width * height
@@ -305,22 +345,26 @@ class XTIOTWebRTCManager:
                                 if cur_lowest == 0 or cur_lowest > cur_value:
                                     cur_lowest = cur_value
                                     lowest_res_stream_type = video_details["streamType"]
-                    if requested_channel == "high":
+                    if requested_quality == XTWebRTCStreamQuality.HIGH_QUALITY:
+                        self.report_message(f"Chosen stream_type: {highest_res_stream_type}")
                         return highest_res_stream_type
-                    elif requested_channel == "low":
-                        return lowest_res_stream_type
                     else:
-                        return int(requested_channel)
+                        self.report_message(f"Chosen stream_type: {lowest_res_stream_type}")
+                        return lowest_res_stream_type
                 except Exception:
-                    return Any_stream_type
-        return Any_stream_type
+                    self.report_message(f"Chosen stream_type (EXCEPTION): {any_stream_type}")
+                    return any_stream_type
+        self.report_message(f"Chosen stream_type (END): {any_stream_type}")
+        return any_stream_type
+        # self.report_message(f"Chosen stream_type: {int(requested_quality)}")
+        # return int(requested_quality)
 
     def get_sdp_answer(
         self,
         device_id: str,
         session_id: str,
         sdp_offer: str,
-        channel: str,
+        requested_quality: XTWebRTCStreamQuality,
         wait_for_answers: int = 5,
     ) -> str | None:
         sleep_step = 0.01
@@ -355,7 +399,7 @@ class XTIOTWebRTCManager:
                     topic = topic.replace("moto_id", moto_id)
                     payload = {
                         "protocol": 302,
-                        "pv": "2.2",
+                        "pv": webrtc_config.get_protocol_version(),
                         "t": int(time.time()),
                         "data": {
                             "header": {
@@ -372,7 +416,7 @@ class XTIOTWebRTCManager:
                                 "auth": f"{auth_token}",
                                 "mode": "webrtc",
                                 "stream_type": self._get_stream_type(
-                                    device_id, session_id, channel
+                                    device_id, session_id, requested_quality
                                 ),
                             },
                         },
@@ -382,7 +426,7 @@ class XTIOTWebRTCManager:
                         for candidate in offer_candidates:
                             payload = {
                                 "protocol": 302,
-                                "pv": "2.2",
+                                "pv": webrtc_config.get_protocol_version(),
                                 "t": int(time.time()),
                                 "data": {
                                     "header": {
@@ -408,7 +452,7 @@ class XTIOTWebRTCManager:
                     if offer_candidates:
                         payload = {
                             "protocol": 302,
-                            "pv": "2.2",
+                            "pv": webrtc_config.get_protocol_version(),
                             "t": int(time.time()),
                             "data": {
                                 "header": {
@@ -445,7 +489,7 @@ class XTIOTWebRTCManager:
             moto_id = webrtc_config.get("moto_id")
             payload = {
                 "protocol": 302,
-                "pv": "2.2",
+                "pv": webrtc_config.get_protocol_version(),
                 "t": int(time.time()),
                 "data": {
                     "header": {
@@ -475,7 +519,7 @@ class XTIOTWebRTCManager:
             moto_id = webrtc_config.get("moto_id")
             payload = {
                 "protocol": 302,
-                "pv": "2.2",
+                "pv": webrtc_config.get_protocol_version(),
                 "t": int(time.time()),
                 "data": {
                     "header": {
@@ -505,6 +549,7 @@ class XTIOTWebRTCManager:
         send_message: WebRTCSendMessage,
         device: XTDevice,
         hass: HomeAssistant,
+        stream_quality: XTWebRTCStreamQuality,
     ) -> None:
         self._create_session_if_necessary(session_id)
         session_data = self.get_webrtc_session(session_id)
@@ -512,16 +557,17 @@ class XTIOTWebRTCManager:
             return None
         session_data.message_callback = send_message
         session_data.hass = hass
-        await self.async_get_config(device.id, session_id, hass)
+        await self.async_get_config(device.id, session_id)
         self.set_original_sdp_offer(session_id, offer_sdp)
         offer_changed = self.get_candidates_from_offer(session_id, offer_sdp)
         offer_changed = self.fix_offer(offer_changed, session_id)
         self.set_sdp_offer(session_id, offer_changed)
         sdp_offer_payload = (
             await XTEventLoopProtector.execute_out_of_event_loop_and_return(
-                self.format_offer_payload, session_id, offer_changed, device
+                self.format_offer_payload, session_id, offer_changed, device, stream_quality
             )
         )
+        self.report_message(f"Sending offer payload: {sdp_offer_payload}")
         await XTEventLoopProtector.execute_out_of_event_loop_and_return(
             self.send_to_ipc_mqtt,
             session_id,
@@ -721,12 +767,12 @@ class XTIOTWebRTCManager:
         return answer_sdp
 
     def format_offer_payload(
-        self, session_id: str, offer_sdp: str, device: XTDevice, channel: str = "high"
+        self, session_id: str, offer_sdp: str, device: XTDevice, requested_quality: XTWebRTCStreamQuality
     ) -> dict[str, Any] | None:
         if webrtc_config := self.get_config(device.id, session_id):
             return {
                 "protocol": 302,
-                "pv": "2.2",
+                "pv": webrtc_config.get_protocol_version(),
                 "t": int(time.time()),
                 "data": {
                     "header": {
@@ -742,7 +788,7 @@ class XTIOTWebRTCManager:
                         "mode": "webrtc",
                         "sdp": f"{offer_sdp}",
                         "stream_type": self._get_stream_type(
-                            device.id, session_id, channel
+                            device.id, session_id, requested_quality
                         ),
                         "auth": f"{webrtc_config.get('auth', '!!!AUTH_NOT_FOUND!!!')}",
                     },
@@ -757,7 +803,7 @@ class XTIOTWebRTCManager:
             moto_id = webrtc_config.get("moto_id", "!!!MOTO_ID_NOT_FOUND!!!")
             return {
                 "protocol": 302,
-                "pv": "2.2",
+                "pv": webrtc_config.get_protocol_version(),
                 "t": int(time.time()),
                 "data": {
                     "header": {
@@ -775,14 +821,14 @@ class XTIOTWebRTCManager:
         return None
 
     def format_resolution(
-        self, session_id: str, resolution: int, device: XTDevice
+        self, session_id: str, resolution: XTWebRTCStreamQuality, device: XTDevice
     ) -> dict[str, Any] | None:
         # resolution 0 if HD, 1 is SD
         if webrtc_config := self.get_config(device.id, session_id):
             moto_id = webrtc_config.get("moto_id", "!!!MOTO_ID_NOT_FOUND!!!")
             return {
                 "protocol": 312,
-                "pv": "2.2",
+                "pv": webrtc_config.get_protocol_version(),
                 "t": int(time.time()),
                 "data": {
                     "header": {
@@ -794,7 +840,7 @@ class XTIOTWebRTCManager:
                         "moto_id": f"{moto_id}",
                         "tid": "",
                     },
-                    "msg": {"mode": "webrtc", "cmdValue": resolution},
+                    "msg": {"mode": "webrtc", "cmdValue": int(resolution)},
                 },
             }
         return None
@@ -806,7 +852,7 @@ class XTIOTWebRTCManager:
             moto_id = webrtc_config.get("moto_id", "!!!MOTO_ID_NOT_FOUND!!!")
             return {
                 "protocol": 302,
-                "pv": "2.2",
+                "pv": webrtc_config.get_protocol_version(),
                 "t": int(time.time()),
                 "data": {
                     "header": {

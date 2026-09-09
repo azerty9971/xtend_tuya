@@ -13,13 +13,14 @@ import custom_components.xtend_tuya.multi_manager.managers.tuya_iot.ipc.webrtc.x
 
 
 class XTIOTIPCManager:  # noqa: F811
-    def __init__(self, api: XTIOTOpenAPI, multi_manager: MultiManager) -> None:
+    def __init__(self, api: XTIOTOpenAPI, non_user_api: XTIOTOpenAPI, multi_manager: MultiManager) -> None:
         self.multi_manager = multi_manager
         self.mq: XTIOTOpenMQIPC = XTIOTOpenMQIPC(api, self)
         self.ipc_listener: ipc.XTIOTIPCListener = ipc.XTIOTIPCListener(self)
         self.mq.start()
         self.mq.add_message_listener(self.ipc_listener.handle_message)
         self.api = api
+        self.non_user_api = non_user_api
         self.webrtc_manager = webrtc_man.XTIOTWebRTCManager(self)
 
     def get_from(self) -> str | None:
