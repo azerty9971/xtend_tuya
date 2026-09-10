@@ -3366,7 +3366,7 @@
             "message": "Missing required parameters: device and password_id are required."
         },
         "device_not_found": {
-            "message": "Device '{device_id}' not found in Xtend Tuya integration."
+            "message": "Device {device_id} not found in Xtend Tuya integration."
         },
         "no_tuya_account": {
             "message": "No valid Tuya account found for device {device}."

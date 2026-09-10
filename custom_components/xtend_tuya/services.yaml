@@ -69,7 +69,6 @@ create_temporary_password:
   description: "Creates a time-restricted temporary passcode for a Tuya smart lock."
   target:
     device:
-      integration: xtend_tuya
   fields:
     password:
       required: true
@@ -105,21 +104,18 @@ get_dynamic_passcode:
   description: "Fetches a new 5-minute dynamic passcode for a Tuya smart lock on demand and updates the entity."
   target:
     device:
-      integration: xtend_tuya
 
 get_temporary_passwords:
   name: "Get Temporary Passwords"
   description: "Fetches all active temporary passcodes created for a Tuya smart lock."
   target:
     device:
-      integration: xtend_tuya
 
 delete_temporary_password:
   name: "Delete Temporary Password"
   description: "Deletes a temporary passcode from a Tuya smart lock by password ID."
   target:
     device:
-      integration: xtend_tuya
   fields:
     password_id:
       required: true

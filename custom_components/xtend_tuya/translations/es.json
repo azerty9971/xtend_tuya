@@ -3259,7 +3259,7 @@
       "message": "Faltan parámetros requeridos: dispositivo y password_id son obligatorios."
     },
     "device_not_found": {
-      "message": "Dispositivo '{device_id}' no encontrado en la integración Xtend Tuya."
+      "message": "Dispositivo {device_id} no encontrado en la integración Xtend Tuya."
     },
     "no_tuya_account": {
       "message": "No se encontró una cuenta Tuya válida para el dispositivo {device}."
