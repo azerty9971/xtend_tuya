@@ -67,9 +67,14 @@ webrtc_debug:
 create_temporary_password:
   name: "Create Temporary Password"
   description: "Creates a time-restricted temporary passcode for a Tuya smart lock."
-  target:
-    device:
   fields:
+    device_id:
+      required: true
+      name: "Device"
+      description: "The Tuya smart lock device."
+      selector:
+        device:
+          integration: xtend_tuya
     password:
       required: true
       name: "Password / PIN"
@@ -102,21 +107,38 @@ create_temporary_password:
 get_dynamic_passcode:
   name: "Get Dynamic Passcode"
   description: "Fetches a new 5-minute dynamic passcode for a Tuya smart lock on demand and updates the entity."
-  target:
-    device:
+  fields:
+    device_id:
+      required: true
+      name: "Device"
+      description: "The Tuya smart lock device."
+      selector:
+        device:
+          integration: xtend_tuya
 
 get_temporary_passwords:
   name: "Get Temporary Passwords"
   description: "Fetches all active temporary passcodes created for a Tuya smart lock."
-  target:
-    device:
+  fields:
+    device_id:
+      required: true
+      name: "Device"
+      description: "The Tuya smart lock device."
+      selector:
+        device:
+          integration: xtend_tuya
 
 delete_temporary_password:
   name: "Delete Temporary Password"
   description: "Deletes a temporary passcode from a Tuya smart lock by password ID."
-  target:
-    device:
   fields:
+    device_id:
+      required: true
+      name: "Device"
+      description: "The Tuya smart lock device."
+      selector:
+        device:
+          integration: xtend_tuya
     password_id:
       required: true
       name: "Password ID"
