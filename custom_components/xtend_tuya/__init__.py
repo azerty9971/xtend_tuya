@@ -373,9 +373,18 @@ async def async_unload_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
             if tuya.manager.mq is not None:
                 tuya.manager.mq.stop()
             tuya.manager.remove_device_listeners()
-            await XTEventLoopProtector.execute_out_of_event_loop_and_return(
-                tuya.manager.unload
-            )
+            # Intentionally NOT calling tuya.manager.unload() here.
+            # Manager.unload() -> UserRepository.unload() POSTs to Tuya's
+            # "/v1.0/m/token/terminal/expire" endpoint, which revokes this
+            # terminal's session server-side. That is correct when the
+            # config entry is actually being removed (see
+            # async_remove_entry below, which still calls it), but
+            # async_unload_entry also fires on every plain reload (options
+            # change, HA restart, manual "Reload"). Calling the same
+            # server-side logout there invalidates the stored
+            # refresh_token, and a handful of reloads in a row leave the
+            # account requiring a brand new QR login to recover
+            # ("Authentication failed. Please re-authenticate.").
     return unload_ok
 
 
