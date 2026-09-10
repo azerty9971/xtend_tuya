@@ -63,3 +63,74 @@ webrtc_debug:
       required: false
       example: "tuya_iot"
       default: "tuya_iot"
+
+fdm5kw_set_timer:
+  fields:
+    device_id:
+      required: true
+      example: "bfbc9ae1e1ad6d3135vxmj"
+    slot:
+      required: true
+      example: 0
+    hour:
+      required: true
+      example: 7
+    minute:
+      required: true
+      example: 0
+    mode:
+      required: true
+      example: "duration"
+    value:
+      required: true
+      example: 1200
+    days:
+      required: false
+      example: "[Mon, Wed, Fri]"
+    enabled:
+      required: false
+      default: true
+
+fdm5kw_delete_timer:
+  fields:
+    device_id:
+      required: true
+      example: "bfbc9ae1e1ad6d3135vxmj"
+    slot:
+      required: true
+      example: 0
+    hour:
+      required: false
+      example: 7
+    minute:
+      required: false
+      example: 0
+    days:
+      required: false
+      example: "[Mon, Wed, Fri]"
+
+fdm5kw_start_watering:
+  fields:
+    device_id:
+      required: true
+      example: "bfbc9ae1e1ad6d3135vxmj"
+    mode:
+      required: true
+      example: "duration"
+    value:
+      required: true
+      example: 60
+
+fdm5kw_stop_watering:
+  fields:
+    device_id:
+      required: true
+      example: "bfbc9ae1e1ad6d3135vxmj"
+
+fdm5kw_clear_quota_lockout:
+
+fdm5kw_resync_timers:
+  fields:
+    device_id:
+      required: true
+      example: "bfbc9ae1e1ad6d3135vxmj"
