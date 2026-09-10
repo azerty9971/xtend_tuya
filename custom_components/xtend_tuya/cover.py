@@ -155,10 +155,19 @@ COVERS: dict[str, tuple[XTCoverEntityDescription, ...]] = {
             control_back_mode=XTDPCode.CONTROL_BACK_MODE,
         ),
     ),
+    "mc": (
+        XTCoverEntityDescription(
+            key=XTDPCode.WD_CONTROL,
+            translation_key="window_opener",
+            current_position=XTDPCode.WD_PERCENT_CONTROL,
+            set_position=XTDPCode.WD_PERCENT_CONTROL,
+            device_class=CoverDeviceClass.WINDOW,
+        ),
+    ),
 }
 
 COVERS["clkg"] = COVERS["cl"]
-COVERS["qt"]   = COVERS["cl"]
+COVERS["qt"] = COVERS["cl"]
 
 
 def get_default_definition(
@@ -466,7 +475,12 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
             self._remap_helper = RemapHelper(
                 source_min=0, source_max=100, target_min=0, target_max=100
             )
-        device_cover_entities: dict[str, XTCoverEntity] = cast(dict[str, XTCoverEntity], self.device.get_preference(f"{XTDevice.XTDevicePreference.COVER_DEVICE_ENTITIES}", {}))
+        device_cover_entities: dict[str, XTCoverEntity] = cast(
+            dict[str, XTCoverEntity],
+            self.device.get_preference(
+                f"{XTDevice.XTDevicePreference.COVER_DEVICE_ENTITIES}", {}
+            ),
+        )
         device_cover_entities[self.get_configurable_properties_dpcode()] = self
         self.device.set_preference(
             f"{XTDevice.XTDevicePreference.COVER_DEVICE_ENTITIES}",
@@ -564,7 +578,9 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
         if self.virtual_operation_handler is not None:
             self.virtual_operation_handler.stop()
 
-    async def _async_open_cover(self, skip_virtual_position: bool = False, **kwargs: Any) -> None:
+    async def _async_open_cover(
+        self, skip_virtual_position: bool = False, **kwargs: Any
+    ) -> None:
         """Open the cover."""
         if self._set_position is not None:
             await self._async_send_commands(
@@ -591,14 +607,22 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
                 )
                 self.virtual_operation_handler.start()
 
-    async def async_open_cover(self, skip_virtual_position: bool = False, **kwargs: Any) -> None:
+    async def async_open_cover(
+        self, skip_virtual_position: bool = False, **kwargs: Any
+    ) -> None:
         """Open the cover."""
         if self.is_cover_control_inverted:
-            await self._async_close_cover(skip_virtual_position=skip_virtual_position, **kwargs)
+            await self._async_close_cover(
+                skip_virtual_position=skip_virtual_position, **kwargs
+            )
         else:
-            await self._async_open_cover(skip_virtual_position=skip_virtual_position, **kwargs)
+            await self._async_open_cover(
+                skip_virtual_position=skip_virtual_position, **kwargs
+            )
 
-    async def _async_close_cover(self, skip_virtual_position: bool = False, **kwargs: Any) -> None:
+    async def _async_close_cover(
+        self, skip_virtual_position: bool = False, **kwargs: Any
+    ) -> None:
         """Close cover."""
         if self._set_position is not None:
             await self._async_send_commands(
@@ -625,11 +649,17 @@ class XTCoverEntity(XTEntity, TuyaCoverEntity):
                 )
                 self.virtual_operation_handler.start()
 
-    async def async_close_cover(self, skip_virtual_position: bool = False, **kwargs: Any) -> None:
+    async def async_close_cover(
+        self, skip_virtual_position: bool = False, **kwargs: Any
+    ) -> None:
         if self.is_cover_control_inverted:
-            await self._async_open_cover(skip_virtual_position=skip_virtual_position, **kwargs)
+            await self._async_open_cover(
+                skip_virtual_position=skip_virtual_position, **kwargs
+            )
         else:
-            await self._async_close_cover(skip_virtual_position=skip_virtual_position, **kwargs)
+            await self._async_close_cover(
+                skip_virtual_position=skip_virtual_position, **kwargs
+            )
 
     async def async_set_cover_position(self, **kwargs: Any) -> None:
         """Move the cover to a specific position."""

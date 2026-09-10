@@ -87,7 +87,7 @@ def get_config_entry_runtime_data(
     # while xtend_tuya's own entries store `manager` on their runtime data.
     device_manager = None
     if hasattr(runtime_data, "device_manager"):
-        device_manager = runtime_data.device_manager
+        device_manager = runtime_data.device_manager # type: ignore
     if hasattr(runtime_data, "manager"):
         device_manager = runtime_data.manager
     if device_manager is None:
@@ -275,7 +275,7 @@ def delete_all_device_entities(
     entity_registry = er.async_get(hass)
     hass_devices: list[DeviceEntry] = []
     for device_id in device_ids:
-        if hass_device := device_registry.async_get_device(
+        for hass_device in device_registry.async_get_devices(
             identifiers={(DOMAIN, device_id), (DOMAIN_ORIG, device_id)}
         ):
             hass_devices.append(hass_device)

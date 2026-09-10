@@ -18,8 +18,8 @@ TUYA_ERROR_CODE_TOKEN_INVALID = 1010
 TUYA_ERROR_SIGN_INVALID = 1004
 TUYA_ERROR_SIGN_INVALID2 = -9999999
 
-TO_C_CUSTOM_REFRESH_TOKEN_API = "/v1.0/iot-03/users/token/"
-TO_C_SMART_HOME_REFRESH_TOKEN_API = "/v1.0/token/"
+TO_C_CUSTOM_REFRESH_TOKEN_API = "/v1.0/iot-03/users/token"
+TO_C_SMART_HOME_REFRESH_TOKEN_API = "/v1.0/token"
 
 TO_C_CUSTOM_TOKEN_API = "/v1.0/iot-03/users/login"
 TO_C_SMART_HOME_TOKEN_API = "/v1.0/iot-01/associated-users/actions/authorized-login"
@@ -269,21 +269,24 @@ class TuyaOpenAPI:
 
     def connect_non_user_specific(self) -> dict[str, Any]:
         if self.auth_type == AuthType.CUSTOM:
+            url = TO_C_CUSTOM_REFRESH_TOKEN_API
             response = self.get(
-                TO_C_CUSTOM_REFRESH_TOKEN_API,
+                url,
                 {
                     "grant_type": 1,
                 },
             )
         else:
+            url = TO_C_SMART_HOME_REFRESH_TOKEN_API
             response = self.get(
-                TO_C_SMART_HOME_REFRESH_TOKEN_API,
+                url,
                 {
                     "grant_type": 1,
                 },
             )
+        logger.debug(f"connect_non_user_specific: url={self.endpoint + url} {response=}")
         if response.get("success", False) is False:
-            raise Exception(f"[IOT API] connect_non_user_specific error: {response=}")
+            raise Exception(f"[IOT API] connect_non_user_specific error: {response=} url={self.endpoint + url}")
 
         # Cache token info.
         self.token_info.update_token(response)
@@ -436,21 +439,21 @@ class TuyaOpenAPI:
         if first_pass is False:
             self.report_message(
                 "debug",
-                f"[IOT API][{time_taken}]SECOND PASS Request: {method} {path} PARAMS: {json.dumps(params, ensure_ascii=False, indent=2) if params is not None else ''} BODY: {json.dumps(body, ensure_ascii=False, indent=2) if body is not None else ''}, first_pass={first_pass}, access_token={access_token}",
+                f"[IOT API][{time_taken}][USER:{self.non_user_specific_api is False}]SECOND PASS Request: {method} {path} PARAMS: {json.dumps(params, ensure_ascii=False, indent=2) if params is not None else ''} BODY: {json.dumps(body, ensure_ascii=False, indent=2) if body is not None else ''}, first_pass={first_pass}, access_token={access_token}",
             )
             self.report_message(
                 "debug",
-                f"[IOT API][{time_taken}]SECOND PASS Response: {json.dumps(result, ensure_ascii=False, indent=2)}",
+                f"[IOT API][{time_taken}][USER:{self.non_user_specific_api is False}]SECOND PASS Response: {json.dumps(result, ensure_ascii=False, indent=2)}",
                 stack_info=True,
             )
         else:
             self.report_message(
                 "debug",
-                f"[IOT API][{time_taken}]Request: {method} {path} PARAMS: {json.dumps(params, ensure_ascii=False, indent=2) if params is not None else ''} BODY: {json.dumps(body, ensure_ascii=False, indent=2) if body is not None else ''}",
+                f"[IOT API][{time_taken}][USER:{self.non_user_specific_api is False}]Request: {method} {path} PARAMS: {json.dumps(params, ensure_ascii=False, indent=2) if params is not None else ''} BODY: {json.dumps(body, ensure_ascii=False, indent=2) if body is not None else ''}",
             )
             self.report_message(
                 "debug",
-                f"[IOT API][{time_taken}]Response: {json.dumps(result, ensure_ascii=False, indent=2)}",
+                f"[IOT API][{time_taken}][USER:{self.non_user_specific_api is False}]Response: {json.dumps(result, ensure_ascii=False, indent=2)}",
             )
             pass
 
