@@ -288,6 +288,60 @@
         "reload": {
             "name": "[%key:common::action::reload%]",
             "description": "Reloads the automation configuration."
+        },
+        "create_temporary_password": {
+            "name": "Create Temporary Password",
+            "description": "Creates a time-restricted temporary passcode for a Tuya smart lock.",
+            "fields": {
+                "device_id": {
+                    "name": "Device",
+                    "description": "The Tuya smart lock device."
+                },
+                "password": {
+                    "name": "Password / PIN",
+                    "description": "The 6-8 digit numeric passcode to create (e.g. 1266455)."
+                },
+                "name": {
+                    "name": "Name / Alias",
+                    "description": "An optional name or label for the temporary passcode."
+                },
+                "effective_time": {
+                    "name": "Effective Date & Time",
+                    "description": "Start date and time (defaults to now)."
+                },
+                "invalid_time": {
+                    "name": "Expiration Date & Time",
+                    "description": "Expiration date and time (defaults to 24h from now)."
+                }
+            }
+        },
+        "get_dynamic_passcode": {
+            "name": "Get Dynamic Passcode",
+            "description": "Fetches a new 5-minute dynamic passcode for a Tuya smart lock on demand."
+        },
+        "get_temporary_passwords": {
+            "name": "Get Temporary Passwords",
+            "description": "Fetches all active temporary passcodes created for a Tuya smart lock.",
+            "fields": {
+                "device_id": {
+                    "name": "Device",
+                    "description": "The Tuya smart lock device."
+                }
+            }
+        },
+        "delete_temporary_password": {
+            "name": "Delete Temporary Password",
+            "description": "Deletes a temporary passcode from a Tuya smart lock by password ID.",
+            "fields": {
+                "device_id": {
+                    "name": "Device",
+                    "description": "The Tuya smart lock device."
+                },
+                "password_id": {
+                    "name": "Password ID",
+                    "description": "The numeric ID of the temporary password to delete."
+                }
+            }
         }
     },
     "entity": {
@@ -414,6 +468,9 @@
             }
         },
         "button": {
+            "generate_dynamic_passcode": {
+                "name": "Generate Dynamic Passcode"
+            },
             "change_litter_bag": {
                 "name": "Change litter bag"
             },
@@ -1429,9 +1486,9 @@
             "horizontal_fan_angle": {
                 "name": "Horizontal swing flap angle",
                 "state": {
-                    "30": "30\u00b0",
-                    "60": "60\u00b0",
-                    "90": "90\u00b0"
+                    "30": "30°",
+                    "60": "60°",
+                    "90": "90°"
                 }
             },
             "humidifier_level": {
@@ -1612,9 +1669,9 @@
             "vertical_fan_angle": {
                 "name": "Vertical swing flap angle",
                 "state": {
-                    "30": "30\u00b0",
-                    "60": "60\u00b0",
-                    "90": "90\u00b0"
+                    "30": "30°",
+                    "60": "60°",
+                    "90": "90°"
                 }
             },
             "volume": {
@@ -3294,5 +3351,44 @@
             "title": "Tuya OpenAPI MQTT Not authorized",
             "description": "The integration \"{name}\" (`{config_entry_id}`) could not connect to the Tuya OpenAPI MQTT queue, something is wrong in your configuration\n\nTo fix this error please follow the guide at the URL by clicking the button below, then restart Home Assistant."
         }
+    },
+    "exceptions": {
+        "invalid_pin": {
+            "message": "The PIN must be purely numeric and contain between 6 and 8 digits."
+        },
+        "missing_device_param": {
+            "message": "Missing required parameter: device."
+        },
+        "missing_password_param": {
+            "message": "Missing required parameter: password."
+        },
+        "missing_device_and_password": {
+            "message": "Missing required parameters: device and password are required."
+        },
+        "missing_device_and_password_id": {
+            "message": "Missing required parameters: device and password_id are required."
+        },
+        "device_not_found": {
+            "message": "Device {device_id} not found in Xtend Tuya integration."
+        },
+        "no_tuya_account": {
+            "message": "No valid Tuya account found for device {device}."
+        },
+        "lock_requires_7_digits": {
+            "message": "Tuya API Error for device {device}: Incorrect passcode length (code {code}). This lock requires a numeric PIN of exactly 7 digits (you entered {length} digits)."
+        },
+        "smart_lock_service_unauthorized": {
+            "message": "Tuya API Error for device {device}: No permissions (code {code}). Missing 'Smart Lock Service' authorization in iot.tuya.com (Cloud > Development > Your Project > Service API)."
+        },
+        "invalid_lock_parameters": {
+            "message": "Tuya API Error for device {device}: Invalid parameters (code {code}). Verify that the PIN and dates are valid for this lock."
+        },
+        "tuya_api_error": {
+            "message": "Tuya API Error for device {device}: {msg} (code {code})."
+        },
+        "action_error": {
+            "message": "Error performing {action}: {error}."
+        }
     }
 }
+

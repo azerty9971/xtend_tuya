@@ -5,8 +5,10 @@ from typing import cast, Any, Self
 from dataclasses import dataclass
 from homeassistant.const import EntityCategory, Platform
 from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers.dispatcher import async_dispatcher_connect
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.dispatcher import (
+    async_dispatcher_connect,
+    async_dispatcher_send,
+)
 
 from tuya_device_handlers.definition.button import (
     ButtonDefinition,
@@ -210,6 +212,23 @@ class XTIRActionDPCodeWrapper(TuyaDPCodeWrapper):
         elif self.button_press_handler is not None:
             self.button_press_handler.fire_event()
         return []
+
+
+class XTLockPasscodeActionDPCodeWrapper(TuyaDPCodeWrapper):
+    """Wrapper for Lock Generate Dynamic Passcode virtual button."""
+
+    def __init__(self, hass: HomeAssistant) -> None:
+        super().__init__("generate_dynamic_passcode")
+        self.hass = hass
+
+    def _convert_value_to_raw_value(self, device: TuyaCustomerDevice, value: bool) -> Any:
+        return True
+
+    def get_update_commands(self, device: XTDevice, value: Any) -> list[dict[str, Any]]:
+        LOGGER.info(f"[Tuya Lock Button] Generate Dynamic Passcode pressed for device {device.id}")
+        async_dispatcher_send(self.hass, f"xtend_tuya_update_passcode_{device.id}")
+        return []
+
 
 
 @dataclass(frozen=True)
@@ -484,6 +503,26 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
+                is_lock = device.category in ("ms", "jtmspro", "videolock", "jtmsbh") or any(
+                    dp in device.status for dp in ("lock_motor_state", "unlock_password", "unlock_method_create", "accessory_lock", "open_close")
+                )
+                if is_lock and restrict_dpcode is None:
+                    desc = XTButtonEntityDescription(
+                        key="generate_dynamic_passcode",
+                        translation_key="generate_dynamic_passcode",
+                        name="Generate Dynamic Passcode",
+                        icon="mdi:shield-key-outline",
+                    )
+                    wrapper = XTLockPasscodeActionDPCodeWrapper(hass_data.manager.hass)
+                    entities.append(
+                        XTButtonEntity(
+                            device=device,
+                            device_manager=hass_data.manager,
+                            description=desc,
+                            definition=ButtonDefinition(button_wrapper=wrapper),
+                        )
+                    )
+
                 if device.category in IR_HUB_CATEGORY_LIST:
                     hass_data.manager.set_general_property(
                         XTMultiManagerProperties.IR_DEVICE_ID, device.id
@@ -668,3 +707,5 @@ class XTButtonEntity(XTEntity, TuyaButtonEntity):
             description=XTButtonEntityDescription(**description.__dict__),
             definition=definition,
         )
+
+
