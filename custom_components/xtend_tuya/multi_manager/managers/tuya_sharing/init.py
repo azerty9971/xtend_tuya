@@ -265,10 +265,13 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
             or self.sharing_account.device_manager.terminal_id is None
         ):
             return None
-        if not self.multi_manager.get_account_by_name(MESSAGE_SOURCE_TUYA_IOT):
-            self.sharing_account.device_manager.user_repository.unload(
-                self.sharing_account.device_manager.terminal_id
-            )
+
+        #This logic has been removed because it could cause issues for no particular benefit...
+        
+        # if not self.multi_manager.get_account_by_name(MESSAGE_SOURCE_TUYA_IOT):
+        #     self.sharing_account.device_manager.user_repository.unload(
+        #         self.sharing_account.device_manager.terminal_id
+        #     )
 
     def on_message(self, msg: dict):
         if self.sharing_account is None:
