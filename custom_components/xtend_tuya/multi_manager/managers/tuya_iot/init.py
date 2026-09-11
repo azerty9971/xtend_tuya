@@ -161,6 +161,10 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
             non_user_specific_api=False,
         )
         # self.multi_manager.add_post_setup_callback(XTMultiManagerPostSetupCallbackPriority.PRIORITY999, api.print_request_log)
+        self.multi_manager.add_post_setup_callback(
+            XTMultiManagerPostSetupCallbackPriority.PRIORITY999,
+            self.multi_manager.storage_manager.save_store,
+        )
         api.set_dev_channel("hass")
         try:
             connect_non_user_api = (
@@ -719,13 +723,20 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
         return None
 
     def get_webrtc_sdp_answer(
-        self, device_id: str, session_id: str, sdp_offer: str, requested_quality: XTWebRTCStreamQuality
+        self,
+        device_id: str,
+        session_id: str,
+        sdp_offer: str,
+        requested_quality: XTWebRTCStreamQuality,
     ) -> str | None:
         if self.iot_account is None:
             return None
         return (
             self.iot_account.device_manager.ipc_manager.webrtc_manager.get_sdp_answer(
-                device_id, session_id, sdp_offer, requested_quality,
+                device_id,
+                session_id,
+                sdp_offer,
+                requested_quality,
             )
         )
 

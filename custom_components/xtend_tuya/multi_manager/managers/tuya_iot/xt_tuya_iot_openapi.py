@@ -112,9 +112,6 @@ class XTIOTOpenAPI(TuyaOpenAPI):
             prop_name=prop_name,
             prop_value=json.dumps(payload),
         )
-        XTEventLoopProtector.execute_out_of_event_loop(
-            self.multi_manager.storage_manager.save_store
-        )
 
     def get_request_log(self) -> list[str]:
         return self.request_log
