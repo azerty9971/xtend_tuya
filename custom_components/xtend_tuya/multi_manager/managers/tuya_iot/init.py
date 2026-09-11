@@ -70,7 +70,7 @@ from ....const import (
     XTDeviceWatcherCategory,
     XTDeviceWatcherSpecialDevice,
     XTWebRTCStreamQuality,
-    XTMultiManagerPostSetupCallbackPriority,
+    XTMultiManagerPostSetupCallbackPriority,  # noqa: F401
 )
 
 

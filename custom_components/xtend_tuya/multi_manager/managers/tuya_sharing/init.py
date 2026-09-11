@@ -67,7 +67,7 @@ from ...shared.threading import (
 from ....const import (
     DOMAIN,
     MESSAGE_SOURCE_TUYA_SHARING,
-    MESSAGE_SOURCE_TUYA_IOT,
+    MESSAGE_SOURCE_TUYA_IOT,  # noqa: F401
     TUYA_DISCOVERY_NEW,
     TUYA_DISCOVERY_NEW_ORIG,
     TUYA_HA_SIGNAL_UPDATE_ENTITY,
@@ -267,7 +267,7 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
             return None
 
         #This logic has been removed because it could cause issues for no particular benefit...
-        
+
         # if not self.multi_manager.get_account_by_name(MESSAGE_SOURCE_TUYA_IOT):
         #     self.sharing_account.device_manager.user_repository.unload(
         #         self.sharing_account.device_manager.terminal_id
