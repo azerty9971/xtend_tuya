@@ -685,11 +685,33 @@ class XTDeviceMap(UserDict[str, XTDevice]):
         for device_map in XTDeviceMap.master_device_map:
             device_map.set_device_key_value(device_id, key, value)
 
+    # The four DP dicts a device carries. A mirrored write must never shrink
+    # one of these by half or more: the copies of one device differ in how
+    # much they know (a sharing-account copy has 2 DPs, an OpenAPI copy ~30),
+    # and syncing the poorer copy onto the richer one strips the entities
+    # of every DP the poorer source can't see. Sizes below 4 are too small
+    # to judge, and a richer copy still upgrades a poorer one.
+    _DP_DICT_ATTRS = ("function", "status_range", "status", "local_strategy")
+    _DP_COLLAPSE_MIN_SIZE = 4
+
+    @staticmethod
+    def is_dp_collapse(old: Any, new: Any) -> bool:
+        """Mirrored in tests/test_multimap_mirror_guard.py — keep in sync."""
+        if not isinstance(old, dict) or not isinstance(new, dict):
+            return False
+        if len(old) < XTDeviceMap._DP_COLLAPSE_MIN_SIZE:
+            return False
+        return len(new) * 2 <= len(old)
+
     def set_device_key_value(self, device_id: str, key: str, value: Any):
         if key in XTDevice.FIELDS_TO_EXCLUDE_FROM_SYNC:
             return None
         if device := self.get(device_id):
             if hasattr(device, key) and getattr(device, key) != value:
+                if key in XTDeviceMap._DP_DICT_ATTRS and XTDeviceMap.is_dp_collapse(
+                    getattr(device, key), value
+                ):
+                    return None
                 setattr(device, key, value)
 
 
