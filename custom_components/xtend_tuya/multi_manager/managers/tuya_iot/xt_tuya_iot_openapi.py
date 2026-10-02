@@ -18,9 +18,6 @@ from ....const import (
     LOGGER,
     MESSAGE_SOURCE_TUYA_IOT,
 )
-from ...shared.threading import (
-    XTEventLoopProtector,
-)
 
 if TYPE_CHECKING:
     from ...multi_manager import (

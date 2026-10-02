@@ -3,7 +3,7 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from typing import cast, Callable
-from homeassistant.components.binary_sensor import (
+from homeassistant.components.binary_sensor.const import (
     BinarySensorDeviceClass,
 )
 from homeassistant.const import EntityCategory, Platform

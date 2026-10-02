@@ -6,7 +6,7 @@ from typing import Any, cast
 from enum import StrEnum
 from tuya_sharing import LoginControl
 from .lib.tuya_iot import AuthType
-import voluptuous as vol
+import probatio as vol
 from homeassistant.core import callback, HomeAssistant
 from homeassistant.config_entries import (
     ConfigEntry,

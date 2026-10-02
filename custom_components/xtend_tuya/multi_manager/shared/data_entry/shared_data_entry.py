@@ -1,7 +1,7 @@
 from __future__ import annotations
 import uuid
 from abc import ABC, abstractmethod
-import voluptuous as vol
+import probatio
 from dataclasses import dataclass
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.config_entries import (
@@ -96,7 +96,7 @@ class XTDataEntryManager(ABC):
         self,
         *,
         config_flow: ConfigFlow,
-        data_schema: vol.Schema | None = None,
+        data_schema: probatio.Schema | None = None,
         errors: dict[str, str] | None = None,
         last_step: bool | None = None,
         preview: str | None = None,
