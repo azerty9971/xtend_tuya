@@ -92,7 +92,7 @@ class DeviceWatcher:
         device: XTDevice | None = None,
         print_stack: bool = False,
         category_parameter: str | None = None,
-        method: str = "warning"
+        method: str = "debug"
     ):
         method_call = getattr(LOGGER, method, None)
         if method_call is None or callable(method_call) is False:
