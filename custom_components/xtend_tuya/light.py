@@ -38,7 +38,6 @@ from .const import (
     TUYA_DISCOVERY_NEW,
     XTDPCode,
     XTMultiManagerPostSetupCallbackPriority,
-    LOGGER,
 )
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaLightEntity,
@@ -186,7 +185,6 @@ def _get_color_data_wrapper(
     color_data_dpcode: str | tuple[str, ...] | None,
     fallback_color_data_mode: FallbackColorDataMode,
 ) -> ColorDataWrapper | None:
-    LOGGER.warning(f"Trying to find color data wrapper for {color_data_dpcode=}")
     color_data_wrapper = ColorDataJsonWrapper.find_dpcode(
             device,
             color_data_dpcode,
