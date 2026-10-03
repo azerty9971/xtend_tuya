@@ -1208,6 +1208,7 @@ UOM_MAPPING_DICT: dict[str, str | None] = {
     "小时": "h",
     "Hour": "h",
     "hour": "h",
+    "hor": "h",
     "秒": "s",
     "S": "s",
     "day": "d",
@@ -1225,6 +1226,7 @@ UOM_MAPPING_DICT: dict[str, str | None] = {
     "times": None,
     "0.1s": None,
     "x": None,
+    "元": None,
 }
 
 DPCODE_PREFERED_DEVICE_CLASS: dict[str, str | None] = {
