@@ -11,10 +11,6 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from homeassistant.components.vacuum import (
-    StateVacuumEntityDescription,
-)
-
 from .multi_manager.multi_manager import (
     MultiManager,
     XTConfigEntry,
@@ -27,6 +23,7 @@ from .entity import (
 )
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaVacuumEntity,
+    TuyaVacuumEntityDescription,
 )
 
 CHARGE_DPCODE = (XTDPCode.SWITCH_CHARGE,)
@@ -38,7 +35,7 @@ STATUS_DPCODE = (XTDPCode.STATUS,)
 SWITCH_DPCODE = (XTDPCode.POWER_GO,)
 
 
-class XTVacuumEntityDescription(StateVacuumEntityDescription, frozen_or_thawed=True):
+class XTVacuumEntityDescription(TuyaVacuumEntityDescription, frozen_or_thawed=True):
     def get_entity_instance(
         self,
         device: XTDevice,

@@ -15,6 +15,8 @@ try:
     from custom_components.xtend_tuya.multi_manager.shared.shared_classes import (
         XTDevice,
         XTDeviceMap,
+        XTDeviceStatusRange,
+        TuyaDPType,
     )
 except ImportError as exc:
     print(f"SKIP: needs an env with homeassistant installed ({exc})")
@@ -27,7 +29,7 @@ def make_device(i):
     d.name = f"Valve {i}"
     d.status = {f"dp_{n}": n for n in range(20)}
     d.status_range = {
-        f"dp_{n}": {"code": f"dp_{n}", "type": "Integer", "values": '{"min":0,"max":100}'}
+        f"dp_{n}": XTDeviceStatusRange(code=f"dp_{n}", type=TuyaDPType.INTEGER, values='{"min":0,"max":100}')
         for n in range(20)
     }
     d.local_strategy = {

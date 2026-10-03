@@ -222,7 +222,8 @@ class XTMultiManagerPostSetupCallbackPriority(IntEnum):
     PRIORITY1 = 1
     PRIORITY2 = 2
     PRIORITY3 = 3
-    PRIORITY_LAST = 999
+    PRIORITY900 = 900
+    PRIORITY999 = 999
 
 
 # Defines the priority of the sources for the merging process
@@ -1207,6 +1208,7 @@ UOM_MAPPING_DICT: dict[str, str | None] = {
     "小时": "h",
     "Hour": "h",
     "hour": "h",
+    "hor": "h",
     "秒": "s",
     "S": "s",
     "day": "d",
@@ -1224,6 +1226,7 @@ UOM_MAPPING_DICT: dict[str, str | None] = {
     "times": None,
     "0.1s": None,
     "x": None,
+    "元": None,
 }
 
 DPCODE_PREFERED_DEVICE_CLASS: dict[str, str | None] = {
