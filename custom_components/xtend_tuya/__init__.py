@@ -289,7 +289,7 @@ async def cleanup_duplicated_devices(
         remaining_devices = len(duplicate_check_table[device_id])
         if remaining_devices > 1:
             for hass_dev_id in duplicate_check_table[device_id]:
-                if hass_dev_id not in device_registry.devices:
+                if device_registry.async_get(hass_dev_id) is None:
                     continue
                 if remaining_devices > 1:
                     hass_entities = er.async_entries_for_device(
