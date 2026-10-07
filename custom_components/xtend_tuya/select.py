@@ -94,7 +94,7 @@ class XTEnumWithFixedValuesTypeInformation(TuyaEnumTypeInformation):
                         return type_information
         return None
 
-class XTDPCodeEnumWrapperWithFixedOptions[T = str](TuyaDPCodeTypeInformationWrapper[XTEnumWithFixedValuesTypeInformation, str, T]):
+class XTDPCodeEnumWrapperWithFixedOptions[T = str](TuyaDPCodeTypeInformationWrapper[XTEnumWithFixedValuesTypeInformation, T]):
     _DPTYPE = XTEnumWithFixedValuesTypeInformation
     options: list[str]
     
