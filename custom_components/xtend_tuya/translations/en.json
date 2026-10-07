@@ -288,6 +288,112 @@
         "reload": {
             "name": "[%key:common::action::reload%]",
             "description": "Reloads the automation configuration."
+        },
+        "fdm5kw_set_timer": {
+            "name": "Set fdm5kw irrigation timer",
+            "description": "Write a scheduled irrigation timer into one slot of a QT-08W valve.",
+            "fields": {
+                "device_id": {
+                    "name": "Device ID",
+                    "description": "Tuya device ID of the valve."
+                },
+                "slot": {
+                    "name": "Slot",
+                    "description": "Timer slot index to write (0-based)."
+                },
+                "hour": {
+                    "name": "Hour",
+                    "description": "Start hour, 0-23, in the Home Assistant time zone."
+                },
+                "minute": {
+                    "name": "Minute",
+                    "description": "Start minute, 0-59."
+                },
+                "mode": {
+                    "name": "Mode",
+                    "description": "Stop condition: 'duration' for seconds, or 'volume' for liters."
+                },
+                "value": {
+                    "name": "Value",
+                    "description": "Duration in seconds, or volume in liters, depending on mode."
+                },
+                "days": {
+                    "name": "Days",
+                    "description": "Weekdays the timer repeats on, e.g. [Mon, Wed, Fri]. Omit for a daily timer."
+                },
+                "enabled": {
+                    "name": "Enabled",
+                    "description": "Whether the timer is active. Defaults to true."
+                }
+            }
+        },
+        "fdm5kw_delete_timer": {
+            "name": "Delete fdm5kw irrigation timer",
+            "description": "Remove a scheduled irrigation timer from a QT-08W valve.",
+            "fields": {
+                "device_id": {
+                    "name": "Device ID",
+                    "description": "Tuya device ID of the valve."
+                },
+                "slot": {
+                    "name": "Slot",
+                    "description": "Timer slot index to clear (0-based)."
+                },
+                "hour": {
+                    "name": "Hour",
+                    "description": "Optional start hour, used to confirm the slot matches before deleting."
+                },
+                "minute": {
+                    "name": "Minute",
+                    "description": "Optional start minute, used to confirm the slot matches before deleting."
+                },
+                "days": {
+                    "name": "Days",
+                    "description": "Optional weekday list, used to confirm the slot matches before deleting."
+                }
+            }
+        },
+        "fdm5kw_start_watering": {
+            "name": "Start fdm5kw watering",
+            "description": "Open a QT-08W valve for a single run, stopping after a duration or a volume.",
+            "fields": {
+                "device_id": {
+                    "name": "Device ID",
+                    "description": "Tuya device ID of the valve."
+                },
+                "mode": {
+                    "name": "Mode",
+                    "description": "Stop condition: 'duration' for seconds, or 'volume' for liters."
+                },
+                "value": {
+                    "name": "Value",
+                    "description": "Duration in seconds, or volume in liters, depending on mode."
+                }
+            }
+        },
+        "fdm5kw_stop_watering": {
+            "name": "Stop fdm5kw watering",
+            "description": "Close a QT-08W valve and end the current run.",
+            "fields": {
+                "device_id": {
+                    "name": "Device ID",
+                    "description": "Tuya device ID of the valve."
+                }
+            }
+        },
+        "fdm5kw_clear_quota_lockout": {
+            "name": "Clear fdm5kw cloud-timer quota lockout",
+            "description": "Reset the circuit breaker that suppresses Tuya cloud-timer writes after a 60001001 'controllable device pool quota insufficient' error. Call this after upgrading the IoT Core plan or removing devices so the next timer change retries the cloud write. Writes that go straight to the device were never affected by the lockout."
+        },
+        "fdm5kw_resync_timers": {
+            "name": "Resync fdm5kw timers from cloud",
+            "description": "Reconcile the Home Assistant timer registry for one valve against the Tuya cloud and drop slots the cloud no longer knows about. Disabled leftovers are dropped without a device write; an enabled orphan slot, which would otherwise water unattended, is cleared with a device write that costs one controllable-device unit. Returns the reconcile counts.",
+            "fields": {
+                "device_id": {
+                    "name": "Device ID",
+                    "description": "Tuya device ID of the valve."
+                }
+            }
         }
     },
     "entity": {
