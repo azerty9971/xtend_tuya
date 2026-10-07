@@ -60,12 +60,12 @@ def _async_get_diagnostics(
             tuya_device_id = next(iter(device.identifiers))[1]
             if tuya_device_id in hass_data.manager.device_map:
                 data |= _async_device_as_dict(
-                    hass, hass_data.manager.device_map[tuya_device_id]
+                    hass, hass_data.manager.device_map[tuya_device_id], entry,
                 )
         else:
             data.update(
                 devices=[
-                    _async_device_as_dict(hass, device)
+                    _async_device_as_dict(hass, device, entry,)
                     for device in hass_data.manager.device_map.values()
                 ]
             )
@@ -74,7 +74,7 @@ def _async_get_diagnostics(
 
 
 @callback
-def _async_device_as_dict(hass: HomeAssistant, device: XTDevice) -> dict[str, Any]:
+def _async_device_as_dict(hass: HomeAssistant, device: XTDevice, config_entry: XTConfigEntry) -> dict[str, Any]:
     """Represent a Tuya device as a dictionary."""
 
     # Base device information, without sensitive information.
@@ -177,10 +177,12 @@ def _async_device_as_dict(hass: HomeAssistant, device: XTDevice) -> dict[str, An
     # Gather information how this Tuya device is represented in Home Assistant
     device_registry = dr.async_get(hass)
     entity_registry = er.async_get(hass)
-    hass_device = device_registry.async_get_device(
-        identifiers={(DOMAIN, device.id), (DOMAIN_ORIG, device.id)}
+    hass_devices = device_registry.async_get_devices(
+        identifiers={(DOMAIN, device.id), (DOMAIN_ORIG, device.id)},
+        config_entry_id=config_entry.entry_id,
     )
-    if hass_device:
+    if hass_devices:
+        hass_device = hass_devices[0]
         data["home_assistant"] = {
             "name": hass_device.name,
             "name_by_user": hass_device.name_by_user,

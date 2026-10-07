@@ -10,9 +10,6 @@ from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.components.fan import (
-    FanEntityDescription,
-)
 from .multi_manager.multi_manager import (
     XTConfigEntry,
     MultiManager,
@@ -21,14 +18,15 @@ from .multi_manager.multi_manager import (
 from .const import TUYA_DISCOVERY_NEW, XTDeviceCategory
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaFanEntity,
+    TuyaFanEntityDescription,
 )
 from .entity import (
     XTEntity,
     XTEntityDescriptorManager,
 )
 
-FANS: dict[str, FanEntityDescription] = {
-    XTDeviceCategory.XFJ: FanEntityDescription(key=""),
+FANS: dict[str, TuyaFanEntityDescription] = {
+    XTDeviceCategory.XFJ: TuyaFanEntityDescription(key=""),
 }
 
 
@@ -43,9 +41,9 @@ async def async_setup_entry(
         return
 
     supported_descriptors, externally_managed_descriptors = cast(
-        tuple[dict[str, FanEntityDescription], dict[str, FanEntityDescription]],
+        tuple[dict[str, TuyaFanEntityDescription], dict[str, TuyaFanEntityDescription]],
         XTEntityDescriptorManager.get_platform_descriptors(
-            FANS, entry.runtime_data.multi_manager, FanEntityDescription, this_platform
+            FANS, entry.runtime_data.multi_manager, TuyaFanEntityDescription, this_platform
         ),
     )
 
@@ -89,7 +87,7 @@ class XTFanEntity(XTEntity, TuyaFanEntity):
         self,
         device: XTDevice,
         device_manager: MultiManager,
-        description: FanEntityDescription,
+        description: TuyaFanEntityDescription,
         definition: FanDefinition,
     ) -> None:
         """Init XT Fan Device."""
