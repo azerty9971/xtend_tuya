@@ -7,6 +7,8 @@ from __future__ import annotations
 import json
 import datetime
 import time
+import hashlib
+import hmac
 from ....lib.tuya_iot import (
     TuyaDeviceManager,
 )
@@ -692,12 +694,8 @@ class XTIOTDeviceManager(TuyaDeviceManager):
     def test_lock_api_subscription(
         self, device: XTDevice, api: XTIOTOpenAPI | None = None
     ) -> bool:
-        if api is None:
-            if self.test_lock_api_subscription(device, self.api):
-                if self.test_lock_api_subscription(device, self.non_user_api):
-                    return True
-            return False
-        ticket = api.post(f"/v1.0/devices/{device.id}/door-lock/password-ticket")
+        api_to_use = api or self.api
+        ticket = api_to_use.post(f"/v1.0/devices/{device.id}/door-lock/password-ticket")
         if code := ticket.get("code", None):
             if code in TUYA_TEST_API_BAD_RETURN_CODES:
                 return False
@@ -1039,40 +1037,46 @@ class XTIOTDeviceManager(TuyaDeviceManager):
         return supported_unlock_types
 
     def get_door_lock_password_ticket(
-        self, device: XTDevice, api: XTIOTOpenAPI
+        self, device: XTDevice, api: XTIOTOpenAPI | None = None
     ) -> str | None:
-        api_to_use = cast(
-            XTIOTOpenAPI,
-            device.get_preference(
-                f"{MESSAGE_SOURCE_TUYA_IOT}{XTDevice.XTDevicePreference.LOCK_GET_DOOR_LOCK_PASSWORD_TICKET}",
-                api,
-            ),
-        )
-        ticket = api_to_use.post(f"/v1.0/devices/{device.id}/door-lock/password-ticket")
-        self.multi_manager.device_watcher.report_message(
-            device.id,
-            f"API remote unlock ticket: {ticket}",
-            XTDeviceWatcherCategory.IOT_API,
-        )
-        if ticket.get("success", False):
-            device.set_preference(
-                f"{MESSAGE_SOURCE_TUYA_IOT}{XTDevice.XTDevicePreference.LOCK_GET_DOOR_LOCK_PASSWORD_TICKET}",
-                api_to_use,
+        api_to_use = api or self.api
+        try:
+            ticket = api_to_use.post(f"/v1.0/devices/{device.id}/door-lock/password-ticket")
+            self.multi_manager.device_watcher.report_message(
+                device.id,
+                f"API remote unlock ticket: {ticket}",
+                XTDeviceWatcherCategory.IOT_API,
             )
-            result: dict[str, Any] = ticket.get("result", {})
-            if ticket_id := result.get("ticket_id", None):
-                return ticket_id
+            if ticket.get("success", False):
+                result: dict[str, Any] = ticket.get("result", {})
+                if ticket_id := result.get("ticket_id", None):
+                    LOGGER.debug(f"[Tuya Lock Ticket] Ticket obtained for device {device.id}: {ticket_id}")
+                    return ticket_id
+
+            LOGGER.warning(
+                f"[Tuya Lock Ticket] Failed to obtain password ticket for device {device.id}. Response: {ticket}"
+            )
+        except Exception as e:
+            LOGGER.error(
+                f"[Tuya Lock Ticket] Exception while obtaining password ticket for device {device.id}: {e}",
+                exc_info=True,
+            )
         return None
 
     def call_door_operate(self, device: XTDevice, open: str | bool, api: XTIOTOpenAPI) -> bool:
-        if ticket_id := self.get_door_lock_password_ticket(device, api):
-            api_to_use = cast(
-                XTIOTOpenAPI,
-                device.get_preference(
-                    f"{MESSAGE_SOURCE_TUYA_IOT}{XTDevice.XTDevicePreference.LOCK_CALL_DOOR_OPERATE}",
-                    api,
-                ),
-            )
+        ticket_id = self.get_door_lock_password_ticket(device, api)
+        if not ticket_id:
+            LOGGER.error(f"[Tuya Lock Operate] Cannot operate lock {device.id}: Ticket generation failed.")
+            return False
+
+        api_to_use = cast(
+            XTIOTOpenAPI,
+            device.get_preference(
+                f"{MESSAGE_SOURCE_TUYA_IOT}{XTDevice.XTDevicePreference.LOCK_CALL_DOOR_OPERATE}",
+                api,
+            ),
+        )
+        try:
             lock_operation = api_to_use.post(
                 f"/v1.0/smart-lock/devices/{device.id}/password-free/door-operate",
                 {"ticket_id": ticket_id, "open": open},
@@ -1087,18 +1091,43 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                     f"{MESSAGE_SOURCE_TUYA_IOT}{XTDevice.XTDevicePreference.LOCK_CALL_DOOR_OPERATE}",
                     api_to_use,
                 )
+                LOGGER.info(f"[Tuya Lock Operate] Successfully operated door lock {device.id} (open={open}).")
+                if hasattr(self.multi_manager, "hass") and self.multi_manager.hass:
+                    self.multi_manager.hass.bus.fire(
+                        "xtend_tuya_lock_operated",
+                        {"device_id": device.id, "open": open, "success": True, "response": lock_operation},
+                    )
                 return True
+
+            LOGGER.error(
+                f"[Tuya Lock Operate] Door operate failed for {device.id} (open={open}). Response: {lock_operation}"
+            )
+            if hasattr(self.multi_manager, "hass") and self.multi_manager.hass:
+                self.multi_manager.hass.bus.fire(
+                    "xtend_tuya_lock_operated",
+                    {"device_id": device.id, "open": open, "success": False, "response": lock_operation},
+                )
+        except Exception as e:
+            LOGGER.error(
+                f"[Tuya Lock Operate] Exception during call_door_operate for {device.id}: {e}",
+                exc_info=True,
+            )
         return False
 
     def call_door_open(self, device: XTDevice, api: XTIOTOpenAPI) -> bool:
-        if ticket_id := self.get_door_lock_password_ticket(device, api):
-            api_to_use = cast(
-                XTIOTOpenAPI,
-                device.get_preference(
-                    f"{MESSAGE_SOURCE_TUYA_IOT}{XTDevice.XTDevicePreference.LOCK_CALL_DOOR_OPEN}",
-                    api,
-                ),
-            )
+        ticket_id = self.get_door_lock_password_ticket(device, api)
+        if not ticket_id:
+            LOGGER.error(f"[Tuya Lock Open] Cannot open door {device.id}: Ticket generation failed.")
+            return False
+
+        api_to_use = cast(
+            XTIOTOpenAPI,
+            device.get_preference(
+                f"{MESSAGE_SOURCE_TUYA_IOT}{XTDevice.XTDevicePreference.LOCK_CALL_DOOR_OPEN}",
+                api,
+            ),
+        )
+        try:
             lock_operation = api.post(
                 f"/v1.0/devices/{device.id}/door-lock/password-free/open-door",
                 {"ticket_id": ticket_id},
@@ -1113,5 +1142,344 @@ class XTIOTDeviceManager(TuyaDeviceManager):
                     f"{MESSAGE_SOURCE_TUYA_IOT}{XTDevice.XTDevicePreference.LOCK_CALL_DOOR_OPEN}",
                     api_to_use,
                 )
+                LOGGER.info(f"[Tuya Lock Open] Successfully opened door lock {device.id}.")
+                if hasattr(self.multi_manager, "hass") and self.multi_manager.hass:
+                    self.multi_manager.hass.bus.fire(
+                        "xtend_tuya_lock_opened",
+                        {"device_id": device.id, "success": True, "response": lock_operation},
+                    )
                 return True
+
+            LOGGER.error(
+                f"[Tuya Lock Open] Door open failed for {device.id}. Response: {lock_operation}"
+            )
+            if hasattr(self.multi_manager, "hass") and self.multi_manager.hass:
+                self.multi_manager.hass.bus.fire(
+                    "xtend_tuya_lock_opened",
+                    {"device_id": device.id, "success": False, "response": lock_operation},
+                )
+        except Exception as e:
+            LOGGER.error(
+                f"[Tuya Lock Open] Exception during call_door_open for {device.id}: {e}",
+                exc_info=True,
+            )
         return False
+
+    def get_door_lock_password_ticket_data(
+        self, device: XTDevice, api: XTIOTOpenAPI | None = None
+    ) -> tuple[str | None, str | None]:
+        """Obtain password ticket_id and ticket_key for a door lock."""
+        api_to_use = api or self.api
+        try:
+            ticket = api_to_use.post(f"/v1.0/devices/{device.id}/door-lock/password-ticket")
+            self.multi_manager.device_watcher.report_message(
+                device.id,
+                f"API remote unlock ticket: {ticket}",
+                XTDeviceWatcherCategory.IOT_API,
+            )
+            if ticket.get("success", False):
+                res_data: dict[str, Any] = ticket.get("result", {})
+                t_id = res_data.get("ticket_id")
+                t_key = res_data.get("ticket_key")
+                return t_id, t_key
+        except Exception as e:
+            LOGGER.error(
+                f"[Tuya Lock Ticket] Exception while obtaining password ticket data for device {device.id}: {e}",
+                exc_info=True,
+            )
+        return None, None
+
+    def create_temporary_password(
+        self,
+        device: XTDevice,
+        password: str,
+        name: str | None = None,
+        effective_time: int | None = None,
+        invalid_time: int | None = None,
+        api: XTIOTOpenAPI | None = None,
+    ) -> dict[str, Any]:
+        """Create a temporary password for a smart lock via Tuya Cloud API."""
+        apis_to_try = [api] if api else [self.api]
+        apis_to_try = [a for a in apis_to_try if a is not None]
+
+        now_ms = int(time.time() * 1000)
+        eff_time = effective_time if effective_time is not None else now_ms
+        inv_time = invalid_time if invalid_time is not None else now_ms + (24 * 3600 * 1000)
+
+        res: dict[str, Any] = {}
+        for api_to_use in apis_to_try:
+            ticket_id, ticket_key = self.get_door_lock_password_ticket_data(device, api_to_use)
+            if not ticket_id:
+                ticket_id = self.get_door_lock_password_ticket(device, api_to_use)
+
+            encrypted_pass = str(password)
+            if ticket_key and hasattr(api_to_use, "access_secret") and api_to_use.access_secret:
+                try:
+                    from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+                    from cryptography.hazmat.backends import default_backend
+
+                    sec_bytes = api_to_use.access_secret.encode("utf-8")
+                    tk_bytes = bytes.fromhex(ticket_key)
+                    cipher_dec = Cipher(algorithms.AES(sec_bytes), modes.ECB(), backend=default_backend())
+                    decryptor = cipher_dec.decryptor()
+                    raw_dec = decryptor.update(tk_bytes) + decryptor.finalize()
+
+                    pad_val = raw_dec[-1]
+                    if 1 <= pad_val <= 16 and raw_dec.endswith(bytes([pad_val]) * pad_val):
+                        key_16 = raw_dec[:-pad_val]
+                    else:
+                        key_16 = raw_dec[:16]
+
+                    pin_str = str(password)
+                    pad_l = 16 - (len(pin_str) % 16)
+                    padded_pin = pin_str.encode("utf-8") + bytes([pad_l] * pad_l)
+                    cipher_enc = Cipher(algorithms.AES(key_16), modes.ECB(), backend=default_backend())
+                    encryptor = cipher_enc.encryptor()
+                    enc_bytes = encryptor.update(padded_pin) + encryptor.finalize()
+                    encrypted_pass = enc_bytes.hex()
+                except Exception as err:
+                    LOGGER.warning(f"[Tuya Temp Password] Encryption attempt failed for device {device.id}: {err}")
+
+            payload: dict[str, Any] = {
+                "password": encrypted_pass,
+                "name": name or "HA Temp Password",
+                "effective_time": eff_time,
+                "invalid_time": inv_time,
+                "password_type": "ticket",
+            }
+            if ticket_id:
+                payload["ticket_id"] = ticket_id
+
+            try:
+                res = api_to_use.post(
+                    f"/v1.0/devices/{device.id}/door-lock/temp-password",
+                    payload,
+                )
+                self.multi_manager.device_watcher.report_message(
+                    device.id,
+                    f"API create_temporary_password result (/v1.0/devices/door-lock/temp-password): {res}",
+                    XTDeviceWatcherCategory.IOT_API,
+                )
+
+                if res.get("success", False):
+                    LOGGER.info(
+                        f"[Tuya Temp Password] Successfully created temporary password '{name}' for device {device.id}. Result: {res.get('result')}"
+                    )
+                    break
+                else:
+                    LOGGER.warning(
+                        f"[Tuya Temp Password] Attempt with API {api_to_use} failed for device {device.id}. Response: {res}"
+                    )
+            except Exception as e:
+                LOGGER.error(
+                    f"[Tuya Temp Password] Exception during create_temporary_password for {device.id}: {e}",
+                    exc_info=True,
+                )
+                res = {"success": False, "error": str(e)}
+
+        if hasattr(self.multi_manager, "hass") and self.multi_manager.hass:
+            self.multi_manager.hass.bus.fire(
+                "xtend_tuya_temp_password_created",
+                {
+                    "device_id": device.id,
+                    "name": name,
+                    "effective_time": eff_time,
+                    "invalid_time": inv_time,
+                    "success": res.get("success", False),
+                    "response": res,
+                },
+            )
+
+        return res
+
+    def get_temporary_passwords(
+        self,
+        device: XTDevice,
+        api: XTIOTOpenAPI | None = None,
+    ) -> list[dict[str, Any]]:
+        """Get all active temporary passwords for a Tuya smart lock."""
+        apis_to_try = [api] if api else [self.api]
+        apis_to_try = [a for a in apis_to_try if a is not None]
+
+        for api_to_use in apis_to_try:
+            try:
+                res = api_to_use.get(f"/v1.0/devices/{device.id}/door-lock/temp-passwords")
+                LOGGER.info(f"[Tuya Temp Password] GET temp-passwords response for device {device.id}: {res}")
+                if res and res.get("success", False):
+                    return res.get("result", [])
+            except Exception as e:
+                LOGGER.error(f"[Tuya Temp Password] Exception in get_temporary_passwords for {device.id}: {e}", exc_info=True)
+        return []
+
+    def delete_temporary_password(
+        self,
+        device: XTDevice,
+        password_id: int | str,
+        api: XTIOTOpenAPI | None = None,
+    ) -> dict[str, Any]:
+        """Delete a temporary password from a Tuya smart lock by password_id.
+
+        If the password has already expired (code 2304), automatically falls back to
+        deleting the expired password record via the /record endpoint.
+        """
+        apis_to_try = [api] if api else [self.api]
+        apis_to_try = [a for a in apis_to_try if a is not None]
+
+        res: dict[str, Any] = {}
+        for api_to_use in apis_to_try:
+            try:
+                # 1. Try normal delete for active password
+                res = api_to_use.delete(f"/v1.0/devices/{device.id}/door-lock/temp-passwords/{password_id}")
+                LOGGER.info(f"[Tuya Temp Password] DELETE temp-passwords/{password_id} response for device {device.id}: {res}")
+
+                # 2. If password has expired (code 2304 or message says expired), delete the expired record
+                code = res.get("code") if isinstance(res, dict) else None
+                msg = str(res.get("msg", "")).lower() if isinstance(res, dict) else ""
+                if not res.get("success", False) and (code == 2304 or "expired" in msg):
+                    LOGGER.info(f"[Tuya Temp Password] Password {password_id} is expired (code {code}). Attempting /record deletion fallback...")
+                    record_res = api_to_use.delete(f"/v1.0/devices/{device.id}/door-lock/temp-passwords/{password_id}/record")
+                    LOGGER.info(f"[Tuya Temp Password] DELETE temp-passwords/{password_id}/record response: {record_res}")
+                    if record_res and record_res.get("success", False):
+                        res = record_res
+                    elif isinstance(record_res, dict) and record_res.get("code") in (2302, 2323):
+                        # 2302: password does not exist, 2323: door lock password record does not exist
+                        res = {"success": True, "result": True, "note": "Password record does not exist or was already removed"}
+                    elif record_res:
+                        res = record_res
+
+                # 3. Idempotent success if password already doesn't exist
+                if isinstance(res, dict) and not res.get("success", False) and res.get("code") in (2302, 2323):
+                    res = {"success": True, "result": True, "note": "Password does not exist or was already removed"}
+
+                if res and res.get("success", False):
+                    break
+            except Exception as e:
+                LOGGER.error(f"[Tuya Temp Password] Exception in delete_temporary_password for {device.id}: {e}", exc_info=True)
+                res = {"success": False, "error": str(e)}
+
+        if hasattr(self.multi_manager, "hass") and self.multi_manager.hass:
+            self.multi_manager.hass.bus.fire(
+                "xtend_tuya_temp_password_deleted",
+                {
+                    "device_id": device.id,
+                    "password_id": password_id,
+                    "success": res.get("success", False),
+                    "response": res,
+                },
+            )
+        return res
+
+
+    def get_dynamic_password(
+        self,
+        device: XTDevice,
+        api: XTIOTOpenAPI | None = None,
+    ) -> dict[str, Any] | None:
+        """Get or calculate 8-digit 5-minute dynamic password for lock with 0-API local cache."""
+        now_ts = int(time.time())
+        current_window = now_ts // 300
+        window_end = (current_window + 1) * 300
+
+        cache_key = f"dynamic_passcode_{device.id}"
+        if not hasattr(self, "_passcode_cache"):
+            self._passcode_cache: dict[str, dict[str, Any]] = {}
+
+        cached = self._passcode_cache.get(cache_key)
+        if cached and cached.get("window") == current_window:
+            return {
+                "dynamic_password": cached["dynamic_password"],
+                "valid_until": window_end,
+            }
+
+        # 1. Cloud API fetch first (cached per 5-minute window, ~1 call every 5 mins)
+        api_to_use = api or self.api
+        ticket_id = self.get_door_lock_password_ticket(device, api_to_use)
+
+        endpoints = [
+            f"/v1.0/devices/{device.id}/door-lock/dynamic-password",
+            f"/v1.0/smart-lock/devices/{device.id}/dynamic-passwords",
+            f"/v1.0/smart-lock/devices/{device.id}/dynamic-password",
+            f"/v1.0/devices/{device.id}/door-lock/dynamic-passwords",
+            f"/v1.0/smart-lock/devices/{device.id}/password-free/dynamic-password",
+        ]
+        if ticket_id:
+            endpoints.insert(0, f"/v1.0/devices/{device.id}/door-lock/dynamic-password?ticket_id={ticket_id}")
+            endpoints.insert(1, f"/v1.0/smart-lock/devices/{device.id}/dynamic-password?ticket_id={ticket_id}")
+
+        errors_log = []
+        for endpoint in endpoints:
+            try:
+                res = api_to_use.get(endpoint)
+                LOGGER.info(f"[Tuya Lock Passcode] GET {endpoint} response: {res}")
+                if res and res.get("success", False):
+                    result = res.get("result", {})
+                    passcode = None
+
+                    if isinstance(result, (str, int)):
+                        passcode = f"{int(result):08d}" if str(result).isdigit() else str(result)
+                    elif isinstance(result, dict):
+                        raw_code = (
+                            result.get("dynamic_password")
+                            or result.get("dynamicPassword")
+                            or result.get("password")
+                            or result.get("code")
+                            or result.get("random_password")
+                        )
+                        if raw_code is not None:
+                            passcode = f"{int(raw_code):08d}" if str(raw_code).isdigit() else str(raw_code)
+
+                    if passcode:
+                        LOGGER.info(f"[Tuya Lock Passcode] Cloud API succeeded for {device.id}: {passcode}")
+                        self._passcode_cache[cache_key] = {"window": current_window, "dynamic_password": passcode}
+                        return {
+                            "dynamic_password": passcode,
+                            "valid_until": window_end,
+                        }
+                else:
+                    errors_log.append(f"{endpoint} -> {res}")
+            except Exception as e:
+                errors_log.append(f"{endpoint} exception -> {e}")
+
+        # 2. Fallback to local calculation if Cloud API endpoints fail
+        local_key = getattr(device, "local_key", "") or ""
+        if not local_key and hasattr(device, "status") and isinstance(device.status, dict):
+            local_key = device.status.get("local_key", "")
+        if local_key:
+            code = self._calculate_offline_dynamic_passcode(local_key, device.id)
+            if code:
+                LOGGER.warning(f"[Tuya Lock Passcode] Cloud API failed ({errors_log}), falling back to local calculation for {device.id}: {code}")
+                self._passcode_cache[cache_key] = {"window": current_window, "dynamic_password": code}
+                return {
+                    "dynamic_password": code,
+                    "valid_until": window_end,
+                }
+
+        LOGGER.error(
+            f"[Tuya Lock Passcode] Failed to obtain passcode for {device.id}. "
+            f"Has local_key: {bool(local_key)}. Ticket ID: {ticket_id}. Cloud API responses: {errors_log}"
+        )
+        return None
+
+
+
+    @staticmethod
+    def _calculate_offline_dynamic_passcode(local_key: str, device_id: str) -> str | None:
+        """Calculate Tuya 8-digit 5-minute offline dynamic passcode."""
+        try:
+            now_ts = int(time.time())
+            window = now_ts // 300
+            key_bytes = local_key.encode("utf-8")
+            msg_bytes = f"{device_id}_{window}".encode("utf-8")
+            digest = hmac.new(key_bytes, msg_bytes, hashlib.sha256).digest()
+            offset = digest[-1] & 0x0F
+            code_num = (
+                ((digest[offset] & 0x7F) << 24)
+                | ((digest[offset + 1] & 0xFF) << 16)
+                | ((digest[offset + 2] & 0xFF) << 8)
+                | (digest[offset + 3] & 0xFF)
+            )
+            return f"{code_num % 100000000:08d}"
+        except Exception:
+            return None
+
+

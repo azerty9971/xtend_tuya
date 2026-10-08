@@ -58,3 +58,35 @@ fits your device based on how it behaves in the official Tuya / Smart Life app:
   command (datapoint) directly to the device.
   * *When to use:* Best for custom relays, DIY smart locks, or non-standard
   controllers that behave like a switch rather than an official lock.
+
+## Smart Lock Passcode Management (Temporary & Dynamic Passcodes)
+
+Xtend Tuya allows creating, listing, and deleting temporary passcodes as well as fetching dynamic 5-minute passcodes for supported Tuya smart locks directly from Home Assistant.
+
+### Available Actions
+
+1. **Create Temporary Password (`xtend_tuya.create_temporary_password`)**
+   * *Purpose:* Generates a time-restricted temporary passcode for a smart lock.
+   * *Parameters:*
+     * `device`: Select your target Tuya smart lock device.
+     * `password`: The numeric passcode (6 to 8 digits, e.g. 7 digits for category `ms`).
+     * `name` *(optional)*: Label or guest name for the passcode.
+     * `effective_time` *(optional)*: Start date/time (defaults to current time).
+     * `invalid_time` *(optional)*: Expiration date/time (defaults to 24 hours from creation).
+
+2. **Get Temporary Passwords (`xtend_tuya.get_temporary_passwords`)**
+   * *Purpose:* Retrieves a list of all active temporary passcodes registered on the lock.
+   * *Parameters:*
+     * `device`: Select your target Tuya smart lock device.
+
+3. **Delete Temporary Password (`xtend_tuya.delete_temporary_password`)**
+   * *Purpose:* Deletes a temporary passcode from the lock using its `password_id`.
+   * *Parameters:*
+     * `device`: Select your target Tuya smart lock device.
+     * `password_id`: The ID of the temporary password to delete (retrieved via `get_temporary_passwords`).
+
+4. **Get Dynamic Passcode (`xtend_tuya.get_dynamic_passcode`)**
+   * *Purpose:* Fetches or calculates the 8-digit offline dynamic passcode valid for the current 5-minute window.
+   * *Parameters:*
+     * `device`: Select your target Tuya smart lock device.
+
