@@ -15,6 +15,9 @@ from tuya_device_handlers.device_wrapper.light import (
     DEFAULT_H_TYPE_V2,
     DEFAULT_S_TYPE_V2,
     DEFAULT_V_TYPE_V2,
+    ColorDataJsonWrapper,
+    ColorDataStringWrapper,
+
 )
 from tuya_device_handlers.utils import (
     RemapHelper,
@@ -102,6 +105,7 @@ LIGHTS: dict[str, tuple[XTLightEntityDescription, ...]] = {
     ),
 }
 
+
 def xt_get_default_definition(
     device: XTDevice,
     *,
@@ -161,19 +165,15 @@ def _get_brightness_wrapper(
         device, brightness_max_dpcode, prefer_function=True
     ):
         brightness_wrapper.brightness_max = brightness_max
-        brightness_wrapper.brightness_max_remap = (
-            RemapHelper.from_type_information(
-                brightness_max.type_information, 0, 255
-            )
+        brightness_wrapper.brightness_max_remap = RemapHelper.from_type_information(
+            brightness_max.type_information, 0, 255
         )
     if brightness_min := TuyaDPCodeIntegerWrapper.find_dpcode(
         device, brightness_min_dpcode, prefer_function=True
     ):
         brightness_wrapper.brightness_min = brightness_min
-        brightness_wrapper.brightness_min_remap = (
-            RemapHelper.from_type_information(
-                brightness_min.type_information, 0, 255
-            )
+        brightness_wrapper.brightness_min_remap = RemapHelper.from_type_information(
+            brightness_min.type_information, 0, 255
         )
     return brightness_wrapper
 
@@ -185,17 +185,23 @@ def _get_color_data_wrapper(
     color_data_dpcode: str | tuple[str, ...] | None,
     fallback_color_data_mode: FallbackColorDataMode,
 ) -> ColorDataWrapper | None:
-    if (
-        color_data_wrapper := ColorDataWrapper.find_dpcode(
-            device, color_data_dpcode, prefer_function=True
+    color_data_wrapper = ColorDataJsonWrapper.find_dpcode(
+            device,
+            color_data_dpcode,
+            prefer_function=True,
         )
-    ) is None:
+    if color_data_wrapper is None:
+        color_data_wrapper = ColorDataStringWrapper.find_dpcode(
+            device,
+            color_data_dpcode,
+            prefer_function=True,
+        )
+    
+    if color_data_wrapper is None:
         return None
 
     # Fetch color data type information
-    if function_data := json.loads(
-        color_data_wrapper.type_information.type_data
-    ):
+    if function_data := json.loads(color_data_wrapper.type_information.type_data):
         if "h" not in function_data:
             function_data["h"] = {"min": 0, "max": 360}
         if "s" not in function_data:
@@ -221,6 +227,7 @@ def _get_color_data_wrapper(
         color_data_wrapper.v_type = DEFAULT_V_TYPE_V2
 
     return color_data_wrapper
+
 
 async def async_setup_entry(
     hass: HomeAssistant, entry: XTConfigEntry, async_add_entities: AddEntitiesCallback
@@ -377,7 +384,7 @@ async def async_setup_entry(
         async_add_entities(entities)
         if restrict_dpcode is None:
             hass_data.manager.add_post_setup_callback(
-                XTMultiManagerPostSetupCallbackPriority.PRIORITY_LAST,
+                XTMultiManagerPostSetupCallbackPriority.PRIORITY900,
                 async_add_generic_entities,
                 device_map,
             )

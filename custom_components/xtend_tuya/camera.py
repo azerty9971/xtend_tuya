@@ -17,9 +17,6 @@ from homeassistant.core import HomeAssistant, callback, HassJob, HassJobType
 from homeassistant.helpers.event import async_call_later
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.components.camera import (
-    CameraEntityDescription,
-)
 from homeassistant.components.camera.const import (
     StreamType,
 )
@@ -45,6 +42,7 @@ from .const import (
 )
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaCameraEntity,
+    TuyaCameraEntityDescription,
 )
 from .entity import (
     XTEntity,
@@ -57,11 +55,11 @@ from .multi_manager.shared.threading import (
 
 # All descriptions can be found here:
 # https://developer.tuya.com/en/docs/iot/standarddescription?id=K9i5ql6waswzq
-CAMERAS: dict[str, CameraEntityDescription] = {
-    "jtmspro": CameraEntityDescription(key=""),
-    "videolock": CameraEntityDescription(key=""),
-    "sp": CameraEntityDescription(key=""),
-    "sp_wnq": CameraEntityDescription(key=""),
+CAMERAS: dict[str, TuyaCameraEntityDescription] = {
+    "jtmspro": TuyaCameraEntityDescription(key=""),
+    "videolock": TuyaCameraEntityDescription(key=""),
+    "sp": TuyaCameraEntityDescription(key=""),
+    "sp_wnq": TuyaCameraEntityDescription(key=""),
 }
 
 
@@ -82,11 +80,11 @@ async def async_setup_entry(
         return
 
     supported_descriptors, externally_managed_descriptors = cast(
-        tuple[dict[str, CameraEntityDescription], dict[str, CameraEntityDescription]],
+        tuple[dict[str, TuyaCameraEntityDescription], dict[str, TuyaCameraEntityDescription]],
         XTEntityDescriptorManager.get_platform_descriptors(
             CAMERAS,
             entry.runtime_data.multi_manager,
-            CameraEntityDescription,
+            TuyaCameraEntityDescription,
             this_platform,
         ),
     )
@@ -104,7 +102,7 @@ async def async_setup_entry(
                 )
                 description = supported_descriptors.get(device.category)
                 if description is None and should_be_added is True:
-                    description = CameraEntityDescription(key="")
+                    description = TuyaCameraEntityDescription(key="")
                 if should_be_added is True and description is not None:
                     entity = XTCameraEntity(
                         device=device,
@@ -149,7 +147,7 @@ async def async_setup_entry(
         if restrict_dpcode is not None:
             return None
         hass_data.manager.add_post_setup_callback(
-            XTMultiManagerPostSetupCallbackPriority.PRIORITY_LAST,
+            XTMultiManagerPostSetupCallbackPriority.PRIORITY900,
             add_camera_devices,
             device_map,
         )
@@ -168,7 +166,7 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         self,
         device: XTDevice,
         device_manager: MultiManager,
-        description: CameraEntityDescription,
+        description: TuyaCameraEntityDescription,
         definition: CameraDefinition,
         hass: HomeAssistant,
         webrtc_config: WebRTCClientConfiguration | None = None,
@@ -219,7 +217,7 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         hass: HomeAssistant,
         device: XTDevice,
         multi_manager: MultiManager,
-        merged_categories: dict[str, CameraEntityDescription],
+        merged_categories: dict[str, TuyaCameraEntityDescription],
     ) -> bool:
         camera_status: list[XTDPCode] = [
             XTDPCode.RECORD_MODE,

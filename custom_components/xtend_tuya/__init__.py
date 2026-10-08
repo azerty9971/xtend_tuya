@@ -255,6 +255,23 @@ async def async_setup_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
         None,
         False,
     )
+
+    # Build the fdm5kw valve home/room map for this hub up front, decoupled
+    # from entity spawn. Doing it lazily from a timer-registry entity meant
+    # that any hub whose valves fell back to the bare "Valve" entity never
+    # triggered the walk, leaving that whole hub without home/room names.
+    # Each hub's token_info.uid is its own linked SmartLife account, so
+    # walking per hub unions every account's homes into the shared
+    # LOCATION_MAP. Fire-and-forget and fully guarded: fetching locations
+    # must never block or break setup.
+    try:
+        from .entity_parser.fdm5kw import location_service as _fdm5kw_location
+
+        hass.async_create_task(
+            _fdm5kw_location.async_ensure_scheduled(hass, multi_manager)
+        )
+    except Exception:  # noqa: BLE001
+        LOGGER.debug("fdm5kw: location bootstrap scheduling failed", exc_info=True)
     multi_manager.device_watcher.report_message(
         XTDeviceWatcherSpecialDevice.NOT_LINKED_TO_A_DEVICE,
         f"Xtended Tuya {entry.title} loaded in {datetime.now() - start_time}",
@@ -289,7 +306,7 @@ async def cleanup_duplicated_devices(
         remaining_devices = len(duplicate_check_table[device_id])
         if remaining_devices > 1:
             for hass_dev_id in duplicate_check_table[device_id]:
-                if hass_dev_id not in device_registry.devices:
+                if device_registry.async_get(hass_dev_id) is None:
                     continue
                 if remaining_devices > 1:
                     hass_entities = er.async_entries_for_device(
@@ -373,9 +390,18 @@ async def async_unload_entry(hass: HomeAssistant, entry: XTConfigEntry) -> bool:
             if tuya.manager.mq is not None:
                 tuya.manager.mq.stop()
             tuya.manager.remove_device_listeners()
-            await XTEventLoopProtector.execute_out_of_event_loop_and_return(
-                tuya.manager.unload
-            )
+            # Intentionally NOT calling tuya.manager.unload() here.
+            # Manager.unload() -> UserRepository.unload() POSTs to Tuya's
+            # "/v1.0/m/token/terminal/expire" endpoint, which revokes this
+            # terminal's session server-side. That is correct when the
+            # config entry is actually being removed (see
+            # async_remove_entry below, which still calls it), but
+            # async_unload_entry also fires on every plain reload (options
+            # change, HA restart, manual "Reload"). Calling the same
+            # server-side logout there invalidates the stored
+            # refresh_token, and a handful of reloads in a row leave the
+            # account requiring a brand new QR login to recover
+            # ("Authentication failed. Please re-authenticate.").
     return unload_ok
 
 

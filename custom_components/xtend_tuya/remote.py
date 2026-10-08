@@ -6,6 +6,8 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.components.remote import (
     RemoteEntity,
     RemoteEntityDescription,
+)
+from homeassistant.components.remote.const import (
     RemoteEntityFeature,
     ATTR_TIMEOUT,
 )

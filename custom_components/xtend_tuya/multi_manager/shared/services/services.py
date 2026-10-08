@@ -28,6 +28,7 @@ from homeassistant.core import SupportsResponse
 from homeassistant.const import (
     CONF_DEVICE_ID,
 )
+from homeassistant.core import SupportsResponse
 
 CONF_SOURCE = "source"
 CONF_STREAM_TYPE = "stream_type"
@@ -159,6 +160,58 @@ def parse_time_to_millis(val: Any) -> int | None:
     return None
 
 
+SERVICE_FDM5KW_SET_TIMER = "fdm5kw_set_timer"
+SERVICE_FDM5KW_SET_TIMER_SCHEMA = vol.Schema(
+    {
+        vol.Required(CONF_DEVICE_ID): cv.string,
+        vol.Required("slot"): vol.All(cv.positive_int, vol.Range(min=0, max=6)),
+        vol.Required("hour"): vol.All(cv.positive_int, vol.Range(min=0, max=23)),
+        vol.Required("minute"): vol.All(cv.positive_int, vol.Range(min=0, max=59)),
+        vol.Required("mode"): vol.In(["duration", "volume"]),
+        vol.Required("value"): cv.positive_int,
+        vol.Optional("days"): vol.Any([cv.string], cv.positive_int),
+        vol.Optional("enabled", default=True): cv.boolean,
+    }
+)
+
+SERVICE_FDM5KW_DELETE_TIMER = "fdm5kw_delete_timer"
+SERVICE_FDM5KW_DELETE_TIMER_SCHEMA = vol.Schema(
+    {
+        vol.Required(CONF_DEVICE_ID): cv.string,
+        vol.Required("slot"): vol.All(cv.positive_int, vol.Range(min=0, max=6)),
+        vol.Optional("hour"): vol.All(cv.positive_int, vol.Range(min=0, max=23)),
+        vol.Optional("minute"): vol.All(cv.positive_int, vol.Range(min=0, max=59)),
+        vol.Optional("days"): vol.Any([cv.string], cv.positive_int),
+    }
+)
+
+SERVICE_FDM5KW_START_WATERING = "fdm5kw_start_watering"
+SERVICE_FDM5KW_START_WATERING_SCHEMA = vol.Schema(
+    {
+        vol.Required(CONF_DEVICE_ID): cv.string,
+        vol.Required("mode"): vol.In(["duration", "volume"]),
+        vol.Required("value"): cv.positive_int,
+    }
+)
+
+SERVICE_FDM5KW_STOP_WATERING = "fdm5kw_stop_watering"
+SERVICE_FDM5KW_STOP_WATERING_SCHEMA = vol.Schema(
+    {
+        vol.Required(CONF_DEVICE_ID): cv.string,
+    }
+)
+
+SERVICE_FDM5KW_CLEAR_QUOTA_LOCKOUT = "fdm5kw_clear_quota_lockout"
+SERVICE_FDM5KW_CLEAR_QUOTA_LOCKOUT_SCHEMA = vol.Schema({})
+
+SERVICE_FDM5KW_RESYNC_TIMERS = "fdm5kw_resync_timers"
+SERVICE_FDM5KW_RESYNC_TIMERS_SCHEMA = vol.Schema(
+    {
+        vol.Required(CONF_DEVICE_ID): cv.string,
+    }
+)
+
+
 class ServiceManager:
     def __init__(self, multi_manager: mm.MultiManager) -> None:
         self.multi_manager = multi_manager
@@ -247,6 +300,62 @@ class ServiceManager:
             True,
             True,
             False,
+        )
+        self._register_service(
+            DOMAIN,
+            SERVICE_FDM5KW_SET_TIMER,
+            self._handle_fdm5kw_set_timer,
+            SERVICE_FDM5KW_SET_TIMER_SCHEMA,
+            True,
+            True,
+            False,
+        )
+        self._register_service(
+            DOMAIN,
+            SERVICE_FDM5KW_DELETE_TIMER,
+            self._handle_fdm5kw_delete_timer,
+            SERVICE_FDM5KW_DELETE_TIMER_SCHEMA,
+            True,
+            True,
+            False,
+        )
+        self._register_service(
+            DOMAIN,
+            SERVICE_FDM5KW_START_WATERING,
+            self._handle_fdm5kw_start_watering,
+            SERVICE_FDM5KW_START_WATERING_SCHEMA,
+            True,
+            True,
+            False,
+        )
+        self._register_service(
+            DOMAIN,
+            SERVICE_FDM5KW_STOP_WATERING,
+            self._handle_fdm5kw_stop_watering,
+            SERVICE_FDM5KW_STOP_WATERING_SCHEMA,
+            True,
+            True,
+            False,
+        )
+        self._register_service(
+            DOMAIN,
+            SERVICE_FDM5KW_CLEAR_QUOTA_LOCKOUT,
+            self._handle_fdm5kw_clear_quota_lockout,
+            SERVICE_FDM5KW_CLEAR_QUOTA_LOCKOUT_SCHEMA,
+            True,
+            True,
+            False,
+        )
+        self._register_service(
+            DOMAIN,
+            SERVICE_FDM5KW_RESYNC_TIMERS,
+            self._handle_fdm5kw_resync_timers,
+            SERVICE_FDM5KW_RESYNC_TIMERS_SCHEMA,
+            True,
+            True,
+            False,
+            # Returns per-valve reconcile counts so the dashboard button can
+            # report "cleared N / all clean" instead of a blind fire.
             supports_response=SupportsResponse.OPTIONAL,
         )
 
@@ -259,12 +368,11 @@ class ServiceManager:
         requires_auth: bool = True,
         allow_from_api: bool = True,
         use_cache: bool = True,
-        supports_response: SupportsResponse | None = None,
+        supports_response: SupportsResponse = SupportsResponse.NONE,
     ):
-        kwargs = {"schema": schema}
-        if supports_response is not None:
-            kwargs["supports_response"] = supports_response
-        self.hass.services.async_register(domain, name, callback, **kwargs)
+        self.hass.services.async_register(
+            domain, name, callback, schema=schema, supports_response=supports_response
+        )
         if allow_from_api:
             self.hass.http.register_view(
                 XTGeneralView(name, callback, requires_auth, use_cache)
@@ -823,4 +931,49 @@ class ServiceManager:
                 translation_placeholders={"action": "delete_temporary_password", "error": str(e)},
             ) from e
 
+    async def _handle_fdm5kw_set_timer(
+        self, event: XTEventData
+    ) -> dict[str, Any] | None:
+        from ....entity_parser.fdm5kw.timer_service import set_timer
 
+        ok = await set_timer(self.hass, event.data)
+        return {"success": ok}
+
+    async def _handle_fdm5kw_delete_timer(
+        self, event: XTEventData
+    ) -> dict[str, Any] | None:
+        from ....entity_parser.fdm5kw.timer_service import delete_timer
+
+        ok = await delete_timer(self.hass, event.data)
+        return {"success": ok}
+
+    async def _handle_fdm5kw_start_watering(
+        self, event: XTEventData
+    ) -> dict[str, Any] | None:
+        from ....entity_parser.fdm5kw.control_service import start_watering
+
+        ok = await start_watering(self.hass, event.data)
+        return {"success": ok}
+
+    async def _handle_fdm5kw_stop_watering(
+        self, event: XTEventData
+    ) -> dict[str, Any] | None:
+        from ....entity_parser.fdm5kw.control_service import stop_watering
+
+        ok = await stop_watering(self.hass, event.data)
+        return {"success": ok}
+
+    async def _handle_fdm5kw_clear_quota_lockout(
+        self, event: XTEventData
+    ) -> dict[str, Any] | None:
+        from ....entity_parser.fdm5kw.timer_service import clear_quota_lockout
+
+        clear_quota_lockout()
+        return {"success": True}
+
+    async def _handle_fdm5kw_resync_timers(
+        self, event: XTEventData
+    ) -> dict[str, Any] | None:
+        from ....entity_parser.fdm5kw.timer_service import resync_from_cloud
+
+        return await resync_from_cloud(self.hass, event.data)
