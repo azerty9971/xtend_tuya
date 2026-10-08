@@ -2131,14 +2131,14 @@ async def async_setup_entry(
         return
 
     # Hub-level controllable-device quota sensor (OpenAPI hubs only).
-    _mm = entry.runtime_data.multi_manager
-    if getattr(_mm, "controllable_quota", None) is not None:
+    multi_manager = entry.runtime_data.multi_manager or hass_data.manager
+    if multi_manager.controllable_quota is not None:
         from .multi_manager.shared.quota import XTControllableQuotaSensor
 
         async_add_entities(
             [
                 XTControllableQuotaSensor(
-                    _mm.controllable_quota, entry.title or _mm.controllable_quota.hub_id
+                    multi_manager.controllable_quota, entry.title or multi_manager.controllable_quota.hub_id
                 )
             ]
         )
@@ -2150,7 +2150,7 @@ async def async_setup_entry(
         ],
         XTEntityDescriptorManager.get_platform_descriptors(
             SENSORS,
-            entry.runtime_data.multi_manager,
+            multi_manager,
             XTSensorEntityDescription,
             this_platform,
             COMPOUND_KEY,

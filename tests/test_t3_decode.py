@@ -93,14 +93,14 @@ def demo():
                  "minute": 6, "days_mask": 0x02, "enabled": True}, b
     # Volume timer (idx1, 33 L, 05:07, all days)
     v = time_task(d("AAEBAQAAACEFB38B"))
-    assert v["mode"] == "volume" and v["value"] == 33 and v["slot"] == 1, v
+    assert v["mode"] == "volume" and v["value"] == 33 and v["slot"] == 1, v # type: ignore
     # All-zero payload = empty slot
     assert time_task(bytes(12)) is None
     # builder round-trips through the decoder (write -> read parity)
     assert time_task(build_t3(1, 0, 360, 6, 6, 0x02, True)) == {
         "slot": 1, "mode": "duration", "value": 360, "hour": 6,
         "minute": 6, "days_mask": 0x02, "enabled": True}
-    assert time_task(build_t3(2, 1, 33, 5, 7, 0x7F, True))["mode"] == "volume"
+    assert time_task(build_t3(2, 1, 33, 5, 7, 0x7F, True))["mode"] == "volume" # type: ignore
     # delete payload (all-zero at index) decodes as empty slot
     assert time_task(bytes([0, 3] + [0] * 10)) is None
     # cyc_control_0 single-run builder matches the live 706 capture

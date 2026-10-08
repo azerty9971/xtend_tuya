@@ -32,6 +32,7 @@ from ...sensor import (
     XTSensorEntityDescription,
 )
 from . import location_service
+from .const import DAYS_OF_WEEK, DEVICE_CATEGORY
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -52,14 +53,12 @@ SANE_CUR_CAP_MAX = 9000
 # per running valve. 10s was chosen as the practical floor in testing.
 FLOW_RATE_REFRESH = timedelta(seconds=10)
 
-from .const import DAYS_OF_WEEK, DEVICE_CATEGORY
-
 # ---------------------------------------------------------------------------
 # Raw DP Wrappers
 # ---------------------------------------------------------------------------
 
 
-class XTDPCodeRawStatusWrapper(TuyaDPCodeRawWrapper):
+class XTDPCodeRawStatusWrapper[T = bytes](TuyaDPCodeRawWrapper[T]):
     """Raw DP wrapper that also binds on status presence.
 
     tuya-device-handlers 0.0.22 changed ``DPCodeWrapper.find_dpcode`` to bind
@@ -106,11 +105,11 @@ class XTDPCodeRawStatusWrapper(TuyaDPCodeRawWrapper):
         return None
 
 
-class DPCodeTimestampWrapper(XTDPCodeRawStatusWrapper):
+class DPCodeTimestampWrapper(XTDPCodeRawStatusWrapper[str]):
     """Decodes start_time / close_time: 6 bytes [year_offset, month, day, hour, minute, second]."""
 
     def read_device_status(self, device: TuyaCustomerDevice) -> str | None:
-        if (decoded := super().read_device_status(device)) and len(decoded) == 6:
+        if (decoded := super()._read_dpcode_value(device)) and len(decoded) == 6:
             y, mo, d, h, mi, s = struct.unpack("BBBBBB", decoded)
             # 0xFF bytes = no data / unset
             if y == 255 or mo == 0 or mo > 12 or d == 0 or d > 31:
@@ -119,7 +118,7 @@ class DPCodeTimestampWrapper(XTDPCodeRawStatusWrapper):
         return None
 
 
-class DPCodeOneControlWrapper(XTDPCodeRawStatusWrapper):
+class DPCodeOneControlWrapper[T = str](XTDPCodeRawStatusWrapper[T]):
     """Decodes one_control: 6 bytes [mode, param_hi, param_mid_hi, param_mid_lo, param_lo, ?]."""
 
     def __init__(self, dpcode: str, type_information: TuyaRawTypeInformation) -> None:
@@ -128,7 +127,7 @@ class DPCodeOneControlWrapper(XTDPCodeRawStatusWrapper):
         self.value: int | None = None
 
     def update_data(self, device: TuyaCustomerDevice) -> None:
-        if (decoded := super().read_device_status(device)) and len(decoded) >= 6:
+        if (decoded := super()._read_dpcode_value(device)) and len(decoded) >= 6:
             self.mode = decoded[0]
             self.value = int.from_bytes(decoded[1:5], byteorder="big")
 
@@ -163,7 +162,7 @@ class DPCodeOneControlModeWrapper(DPCodeOneControlWrapper):
         return f"unknown ({self.mode})"
 
 
-class DPCodeOneControlValueWrapper(DPCodeOneControlWrapper):
+class DPCodeOneControlValueWrapper(DPCodeOneControlWrapper[int]):
     """Returns the one_control parameter value (duration in sec or volume in L)."""
 
     def read_device_status(self, device: TuyaCustomerDevice) -> int | None:
@@ -171,7 +170,7 @@ class DPCodeOneControlValueWrapper(DPCodeOneControlWrapper):
         return self.value
 
 
-class DPCodeTimeTaskWrapper(XTDPCodeRawStatusWrapper):
+class DPCodeTimeTaskWrapper[T = bytes](XTDPCodeRawStatusWrapper[T]):
     """Decodes time_task: 11 bytes.
 
     Layout (corrected 2026-06-05 against live SmartLife app toggles):
@@ -198,7 +197,7 @@ class DPCodeTimeTaskWrapper(XTDPCodeRawStatusWrapper):
         self.timer: dict | None = None
 
     def update_data(self, device: TuyaCustomerDevice) -> None:
-        if decoded := super().read_device_status(device):
+        if decoded := super()._read_dpcode_value(device):
             if len(decoded) < 11:
                 return
             self.slot_index = decoded[0]
@@ -233,7 +232,7 @@ class DPCodeTimeTaskWrapper(XTDPCodeRawStatusWrapper):
             }
 
 
-class DPCodeTimeTaskSlotWrapper(DPCodeTimeTaskWrapper):
+class DPCodeTimeTaskSlotWrapper(DPCodeTimeTaskWrapper[int]):
     """Returns the slot index of the last-modified timer."""
 
     def read_device_status(self, device: TuyaCustomerDevice) -> int | None:
@@ -241,7 +240,7 @@ class DPCodeTimeTaskSlotWrapper(DPCodeTimeTaskWrapper):
         return self.slot_index if self.timer else None
 
 
-class DPCodeTimeTaskSummaryWrapper(DPCodeTimeTaskWrapper):
+class DPCodeTimeTaskSummaryWrapper(DPCodeTimeTaskWrapper[str]):
     """Returns a human-readable summary of the last-modified timer."""
 
     def read_device_status(self, device: TuyaCustomerDevice) -> str | None:
@@ -263,7 +262,7 @@ class DPCodeTimeTaskSummaryWrapper(DPCodeTimeTaskWrapper):
         )
 
 
-class DPCodeTimeTaskRegistryWrapper(DPCodeTimeTaskWrapper):
+class DPCodeTimeTaskRegistryWrapper(DPCodeTimeTaskWrapper[str]):
     """Accumulates all 7 timer slots across DP updates.
 
     The device's time_task DP is a sliding window that only shows the
@@ -287,7 +286,7 @@ class DPCodeTimeTaskRegistryWrapper(DPCodeTimeTaskWrapper):
 
     def read_device_status(self, device: TuyaCustomerDevice) -> str | None:
         """Parse DP, apply once per unique payload, return active count."""
-        raw = super().read_device_status(device)
+        raw = super()._read_dpcode_value(device)
         payload = bytes(raw) if isinstance(raw, (bytes, bytearray)) else None
         if payload is not None and payload != self._last_applied_payload:
             self.update_data(device)
@@ -356,7 +355,7 @@ class Fdm5kwTimerRegistryEntity(XTSensorEntity):
     INSTANCES: ClassVar[dict[str, Fdm5kwTimerRegistryEntity]] = {}
 
     @property
-    def extra_state_attributes(self) -> Mapping[str, Any] | None:
+    def extra_state_attributes(self) -> Mapping[str, Any] | None: # type: ignore
         wrapper = self._dpcode_wrapper
         if not isinstance(wrapper, DPCodeTimeTaskRegistryWrapper):
             return None
@@ -478,7 +477,7 @@ class Fdm5kwFlowRateEntity(XTSensorEntity):
         self._current_flow: float = 0.0
 
     @property
-    def native_unit_of_measurement(self) -> str:
+    def native_unit_of_measurement(self) -> str: # type: ignore
         # Hard-coded as a property to defeat the base XTSensorEntity's
         # unit inheritance from the `cur_cap` Tuya DP data-model, which
         # carries a Chinese-localized "升 (L)" unit string. This sensor
@@ -487,7 +486,7 @@ class Fdm5kwFlowRateEntity(XTSensorEntity):
         return str(UnitOfVolumeFlowRate.LITERS_PER_MINUTE)
 
     @property
-    def device_class(self) -> str | None:
+    def device_class(self) -> str | None: # type: ignore
         # Same reason: prevent the base class from injecting
         # SensorDeviceClass.WATER which forces a volume unit.
         return None
@@ -576,7 +575,7 @@ DP_T3_FLOW_STA = "flow_sta_0"
 DP_T3_COUNTER = "counter_custom"
 
 
-class DPCodeSat0BatteryWrapper(XTDPCodeRawStatusWrapper):
+class DPCodeSat0BatteryWrapper(XTDPCodeRawStatusWrapper[str]):
     """T3 battery %: sat_0 byte[3] low 7 bits (high bit = charge/sun flag).
 
     sat_0 = 00 01 00 [BB] 00 01 00 [Y M D H M] 00 (13 B). 706 read 0x64=100,
@@ -584,7 +583,7 @@ class DPCodeSat0BatteryWrapper(XTDPCodeRawStatusWrapper):
     """
 
     def read_device_status(self, device: TuyaCustomerDevice) -> str | None:
-        decoded = super().read_device_status(device)
+        decoded = super()._read_dpcode_value(device)
         if decoded and len(decoded) >= 4:
             # ponytail: a lone byte3=0x00 glitch was seen once (07-13); returns
             # 0% for that frame. Debounce here if it proves noisy in the field.
@@ -592,12 +591,12 @@ class DPCodeSat0BatteryWrapper(XTDPCodeRawStatusWrapper):
         return None
 
 
-class DPCodeSat0NextRunWrapper(XTDPCodeRawStatusWrapper):
+class DPCodeSat0NextRunWrapper(XTDPCodeRawStatusWrapper[str]):
     """T3 next-irrigation time from sat_0 bytes[7..11] = [Y-2000, M, D, H, M].
     0xFF year / month 0 (idle frame `..ff ff ff ff ff`) = no schedule -> None."""
 
     def read_device_status(self, device: TuyaCustomerDevice) -> str | None:
-        decoded = super().read_device_status(device)
+        decoded = super()._read_dpcode_value(device)
         if decoded and len(decoded) >= 12:
             y, mo, d, h, mi = decoded[7], decoded[8], decoded[9], decoded[10], decoded[11]
             if y == 0xFF or mo == 0 or mo > 12 or d == 0 or d > 31:
@@ -606,14 +605,14 @@ class DPCodeSat0NextRunWrapper(XTDPCodeRawStatusWrapper):
         return None
 
 
-class DPCodeFlowStaVolumeWrapper(XTDPCodeRawStatusWrapper):
+class DPCodeFlowStaVolumeWrapper(XTDPCodeRawStatusWrapper[str]):
     """T3 watering volume (L): flow_sta_0 bytes[1:5] BE. Live-cumulative during a
     run, holds the last run's final total when idle. Captured mid-run 07-14:
     climbed 80..113 L; final frame bytes[1:5]=00 00 00 71 = 113 L (=app 113 L).
     """
 
     def read_device_status(self, device: TuyaCustomerDevice) -> str | None:
-        decoded = super().read_device_status(device)
+        decoded = super()._read_dpcode_value(device)
         if decoded and len(decoded) >= 5:
             vol = int.from_bytes(decoded[1:5], "big")
             if vol > SANE_CUR_CAP_MAX:
@@ -622,7 +621,7 @@ class DPCodeFlowStaVolumeWrapper(XTDPCodeRawStatusWrapper):
         return None
 
 
-class DPCodeCounterCustomWrapper(XTDPCodeRawStatusWrapper):
+class DPCodeCounterCustomWrapper[T = bytes](XTDPCodeRawStatusWrapper[T]):
     """T3 counter_custom — a plain CSV STRING (not base64), last completed run:
     'mode,flag,duration_s,volume_L,timestamp'. e.g. '0,1,600,113,20260714161000'.
     duration 65534 (0xFFFE) = aborted/interrupted sentinel."""
@@ -640,7 +639,7 @@ class DPCodeCounterCustomWrapper(XTDPCodeRawStatusWrapper):
             return None
 
 
-class DPCodeCounterCustomVolumeWrapper(DPCodeCounterCustomWrapper):
+class DPCodeCounterCustomVolumeWrapper(DPCodeCounterCustomWrapper[str]):
     """Last completed-run volume (L). Skips the 0xFFFE aborted sentinel."""
 
     def read_device_status(self, device: TuyaCustomerDevice) -> str | None:
@@ -653,7 +652,7 @@ class DPCodeCounterCustomVolumeWrapper(DPCodeCounterCustomWrapper):
 DP_T3_TIME_TASK = "time_task_0"
 
 
-class DPCodeT3TimeTaskWrapper(DPCodeTimeTaskWrapper):
+class DPCodeT3TimeTaskWrapper[T](DPCodeTimeTaskWrapper[T]):
     """T3 time_task_0 — 12 bytes, same sliding-window + per-timer-index model as
     the old valve, but a different layout (verified live 2026-07-15):
       [00, index, b2, mode, value(4B BE), hour, minute, days_mask, enabled]
@@ -669,7 +668,7 @@ class DPCodeT3TimeTaskWrapper(DPCodeTimeTaskWrapper):
     """
 
     def update_data(self, device: TuyaCustomerDevice) -> None:
-        if decoded := super().read_device_status(device):
+        if decoded := super()._read_dpcode_value(device):
             if len(decoded) < 12:
                 return
             self.slot_index = decoded[1]
@@ -699,15 +698,15 @@ class DPCodeT3TimeTaskWrapper(DPCodeTimeTaskWrapper):
 
 # The Slot/Summary/Registry variants reuse the old read/accumulate logic and
 # only swap in the T3 decoder via MRO (T3 update_data resolves before the base).
-class DPCodeT3TimeTaskSlotWrapper(DPCodeTimeTaskSlotWrapper, DPCodeT3TimeTaskWrapper):
+class DPCodeT3TimeTaskSlotWrapper(DPCodeTimeTaskSlotWrapper, DPCodeT3TimeTaskWrapper[int]):
     pass
 
 
-class DPCodeT3TimeTaskSummaryWrapper(DPCodeTimeTaskSummaryWrapper, DPCodeT3TimeTaskWrapper):
+class DPCodeT3TimeTaskSummaryWrapper(DPCodeTimeTaskSummaryWrapper, DPCodeT3TimeTaskWrapper[str]):
     pass
 
 
-class DPCodeT3TimeTaskRegistryWrapper(DPCodeTimeTaskRegistryWrapper, DPCodeT3TimeTaskWrapper):
+class DPCodeT3TimeTaskRegistryWrapper(DPCodeTimeTaskRegistryWrapper, DPCodeT3TimeTaskWrapper[str]):
     pass
 
 
