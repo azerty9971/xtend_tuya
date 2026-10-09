@@ -626,6 +626,18 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
                 description.switch_only_hvac_mode,
             ]
 
+        # If the mode DP only holds presets (nothing maps to an HVAC mode), the
+        # device behaves as switch only: expose the switch only HVAC mode too.
+        if (
+            definition.switch_wrapper
+            and len(self._attr_hvac_modes) <= 1
+            and description.switch_only_hvac_mode not in self._attr_hvac_modes
+        ):
+            self._attr_hvac_modes = [
+                HVACMode.OFF,
+                description.switch_only_hvac_mode,
+            ]
+
         # Determine preset modes (ignore if empty options)
         if definition.preset_wrapper and definition.preset_wrapper.options:
             for option in definition.preset_wrapper.options:
@@ -770,6 +782,22 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
         if raw_value in XT_HVAC_ACTION_TO_HA:
             return XT_HVAC_ACTION_TO_HA[raw_value]
         return self._attr_hvac_action
+
+    @property
+    def hvac_mode(self) -> HVACMode | None:  # type: ignore
+        """Return hvac mode.
+
+        Fall back to the switch only mode when the device is on but the mode DP
+        does not map to any HVAC mode (the mode DP only contains presets).
+        """
+        mode = super().hvac_mode
+        if (
+            mode is None
+            and self._read_wrapper(self._switch_wrapper) is True
+            and self.entity_description.switch_only_hvac_mode in self._attr_hvac_modes
+        ):
+            return self.entity_description.switch_only_hvac_mode
+        return mode
 
     @property
     def preset_mode(self) -> str | None:
