@@ -25,7 +25,7 @@ from .const import (
     XTIRRemoteInformation,
     XTIRRemoteKeysInformation,
     LOGGER,
-    is_ir_hub_device,
+    IR_HUB_CATEGORY_LIST,
 )
 from .util import (
     restrict_descriptor_category,
@@ -99,7 +99,7 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if hub_device := hass_data.manager.device_map.get(device_id):
-                if is_ir_hub_device(hub_device):
+                if hub_device.category in IR_HUB_CATEGORY_LIST:
                     hub_information: XTIRHubInformation | None = (
                         await XTEventLoopProtector.execute_out_of_event_loop_and_return(
                             hass_data.manager.get_ir_hub_information, hub_device

@@ -105,33 +105,6 @@ IR_HUB_CATEGORY_LIST: list[str] = [
     "qt",
 ]
 
-# Some devices share an IR hub category without being an IR hub
-# (e.g. the dé EV charger uses category "qt"), they are recognized by
-# one of these DPCodes
-NOT_IR_HUB_DPCODES: list[str] = [
-    "x_work_state",
-]
-
-
-def is_ir_hub_device(device: Any) -> bool:
-    if device.category not in IR_HUB_CATEGORY_LIST:
-        return False
-    for dpcode in NOT_IR_HUB_DPCODES:
-        if dpcode in device.status:
-            return False
-    return True
-
-
-# DPCodes per category for which no generic entity should be created
-# on a given platform (because they are already handled by another platform)
-GENERIC_ENTITY_EXCLUDED_DPCODES: dict[str, dict[Platform, list[str]]] = {
-    "qt": {
-        Platform.NUMBER: [
-            "x_work_state",
-        ],
-    },
-}
-
 FULLY_OVERRIDEN_PLATFORMS = [
     Platform.CAMERA,
     Platform.CLIMATE,
@@ -1184,17 +1157,6 @@ class XTDPCode(StrEnum):
     WORK_STAT = "work_stat"
     WORK_STATE = "work_state"
     WORK_STATUS = "WorkStatus"
-    X_ALARM = "x_alarm"  # dé EV charger
-    X_CHARGE_CURRENT = "x_charge_current"  # dé EV charger
-    X_CHARGE_HISTORY = "x_charge_history"  # dé EV charger
-    X_CHARGE_MODE = "x_charge_mode"  # dé EV charger
-    X_CHARGER_INFO = "x_charger_info"  # dé EV charger
-    X_DO_CHARGE = "x_do_charge"  # dé EV charger
-    X_DO_REBOOT = "x_do_reboot"  # dé EV charger
-    X_MAX_CURRENT_CFG = "x_max_current_cfg"  # dé EV charger
-    X_METRICS = "x_metrics"  # dé EV charger
-    X_WORK_ST_DEBUG = "x_work_st_debug"  # dé EV charger
-    X_WORK_STATE = "x_work_state"  # dé EV charger
     XT_ADD_ELE = "xt_add_ele"
     XT_ADD_ELE2 = "xt_add_ele2"
     XT_ADD_ELE2_THIS_MONTH = "xt_add_ele2_this_month"
