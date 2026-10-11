@@ -264,6 +264,12 @@
             },
             "water_level": {
                 "name": "Wasserstand"
+            },
+            "qt_ev_charge_current": {
+                "name": "Ladestrom"
+            },
+            "qt_ev_max_current": {
+                "name": "Maximaler Ladestrom"
             }
         },
         "select": {
@@ -912,6 +918,141 @@
             },
             "wind_direction": {
                 "name": "Windrichtung"
+            },
+            "qt_ev_work_state": {
+                "name": "Ladestatus",
+                "state": {
+                    "offline": "Offline",
+                    "not_connected": "Kein Fahrzeug verbunden",
+                    "connected": "Fahrzeug verbunden",
+                    "charge_complete": "Laden abgeschlossen",
+                    "waiting_scheduled": "Wartet (Zeitplan)",
+                    "waiting_delayed": "Wartet (verz\u00f6gerter Start)",
+                    "paused": "Pausiert",
+                    "charging": "L\u00e4dt",
+                    "overcurrent": "\u00dcberstromschutz",
+                    "overvoltage": "\u00dcberspannungsschutz",
+                    "undervoltage": "Unterspannungsschutz",
+                    "overtemperature": "\u00dcbertemperaturschutz",
+                    "selftest_failed": "Selbsttest fehlgeschlagen",
+                    "residual_current": "Fehlerstromschutz",
+                    "relay_welded": "Relais verklebt",
+                    "residual_current_selftest_failed": "Fehlerstrom-Selbsttest fehlgeschlagen",
+                    "cp_error": "CP-Fehler",
+                    "other_error": "Sonstiger Fehler",
+                    "diode_failure": "Diodendefekt",
+                    "earth_fault": "Erdungsfehler"
+                }
+            },
+            "qt_ev_work_st_debug": {
+                "name": "Interner Zustand",
+                "state": {
+                    "sleep": "Ruhezustand",
+                    "idle": "Bereit",
+                    "idleins": "Bereit (eingesteckt)",
+                    "working": "L\u00e4dt",
+                    "wait": "Wartet",
+                    "errorpause": "Fehlerpause",
+                    "pause": "Pausiert",
+                    "stop": "Gestoppt",
+                    "empty": "Leer"
+                }
+            },
+            "qt_ev_l1_voltage": {
+                "name": "Spannung L1"
+            },
+            "qt_ev_l1_current": {
+                "name": "Strom L1"
+            },
+            "qt_ev_l1_power": {
+                "name": "Leistung L1"
+            },
+            "qt_ev_l2_voltage": {
+                "name": "Spannung L2"
+            },
+            "qt_ev_l2_current": {
+                "name": "Strom L2"
+            },
+            "qt_ev_l2_power": {
+                "name": "Leistung L2"
+            },
+            "qt_ev_l3_voltage": {
+                "name": "Spannung L3"
+            },
+            "qt_ev_l3_current": {
+                "name": "Strom L3"
+            },
+            "qt_ev_l3_power": {
+                "name": "Leistung L3"
+            },
+            "qt_ev_power": {
+                "name": "Ladeleistung"
+            },
+            "qt_ev_temperature": {
+                "name": "Temperatur"
+            },
+            "qt_ev_session_duration": {
+                "name": "Ladedauer"
+            },
+            "qt_ev_session_energy": {
+                "name": "Geladene Energie"
+            },
+            "qt_ev_total_energy": {
+                "name": "Energie gesamt"
+            },
+            "qt_ev_firmware": {
+                "name": "Firmware"
+            },
+            "qt_ev_rcd_type": {
+                "name": "Fehlerstromschutz-Typ"
+            },
+            "qt_ev_cp_voltage": {
+                "name": "CP-Spannung"
+            },
+            "qt_ev_last_session_start": {
+                "name": "Letzte Ladung Start"
+            },
+            "qt_ev_last_session_duration": {
+                "name": "Letzte Ladung Dauer"
+            },
+            "qt_ev_last_session_energy": {
+                "name": "Letzte Ladung Energie"
+            },
+            "qt_ev_last_alarm": {
+                "name": "Letzte St\u00f6rung",
+                "state": {
+                    "offline": "Offline",
+                    "not_connected": "Kein Fahrzeug verbunden",
+                    "connected": "Fahrzeug verbunden",
+                    "charge_complete": "Laden abgeschlossen",
+                    "waiting_scheduled": "Wartet (Zeitplan)",
+                    "waiting_delayed": "Wartet (verz\u00f6gerter Start)",
+                    "paused": "Pausiert",
+                    "charging": "L\u00e4dt",
+                    "overcurrent": "\u00dcberstromschutz",
+                    "overvoltage": "\u00dcberspannungsschutz",
+                    "undervoltage": "Unterspannungsschutz",
+                    "overtemperature": "\u00dcbertemperaturschutz",
+                    "selftest_failed": "Selbsttest fehlgeschlagen",
+                    "residual_current": "Fehlerstromschutz",
+                    "relay_welded": "Relais verklebt",
+                    "residual_current_selftest_failed": "Fehlerstrom-Selbsttest fehlgeschlagen",
+                    "cp_error": "CP-Fehler",
+                    "other_error": "Sonstiger Fehler",
+                    "diode_failure": "Diodendefekt",
+                    "earth_fault": "Erdungsfehler"
+                }
+            },
+            "qt_ev_last_alarm_time": {
+                "name": "Letzte St\u00f6rung Zeitpunkt"
+            },
+            "qt_ev_charge_mode": {
+                "name": "Lademodus",
+                "state": {
+                    "immediate": "Sofort",
+                    "delayed": "Verz\u00f6gerter Start",
+                    "scheduled": "Zeitplan"
+                }
             }
         },
         "switch": {
@@ -1082,6 +1223,9 @@
             },
             "wide_dynamic_range": {
                 "name": "Gro\u00dfer Dynamikbereich"
+            },
+            "qt_ev_charging": {
+                "name": "Laden"
             }
         },
         "valve": {
