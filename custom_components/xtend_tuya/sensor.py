@@ -3,6 +3,7 @@
 from __future__ import annotations
 import asyncio
 import base64
+import json
 from typing import cast, Callable, TYPE_CHECKING, Any
 from dataclasses import dataclass, field
 from datetime import datetime, UTC
@@ -26,7 +27,11 @@ from homeassistant.components.recorder.db_schema import (
     StatisticsShortTerm,
 )
 from homeassistant.const import (
+    UnitOfElectricCurrent,
+    UnitOfElectricPotential,
     UnitOfEnergy,
+    UnitOfPower,
+    UnitOfTemperature,
     UnitOfTime,
     Platform,
     PERCENTAGE,
@@ -47,6 +52,7 @@ from homeassistant.helpers.typing import (
 from homeassistant.helpers.recorder import (
     get_instance as get_recorder_instance,
 )
+from homeassistant.util import dt as dt_util
 from .util import (
     get_default_value,
     restrict_descriptor_category,
@@ -201,6 +207,179 @@ VOLTAGE_WRAPPER = (
     ElectricityVoltageJsonWrapper,
     XTElectricityVoltageStringWrapper,
 )
+
+
+class XTJsonStringFieldWrapper(TuyaDPCodeStringWrapper[Any]):
+    """Extract a single field from a String DPCode holding a JSON document.
+
+    Subclasses (see xt_json_field_wrapper) define the path to the field, an
+    optional divider and an optional mapping of the raw value.
+    """
+
+    json_path: tuple[str | int, ...] = ()
+    value_divider: float | None = None
+    value_mapping: dict[int, str] | None = None
+    is_datetime: bool = False
+
+    def read_device_status(self, device: TuyaCustomerDevice) -> Any:
+        """Read the device value for the dpcode."""
+        value = self._read_dpcode_value(device)
+        if isinstance(value, str):
+            try:
+                value = json.loads(value)
+            except ValueError:
+                return None
+        for path_element in self.json_path:
+            try:
+                value = value[path_element]  # type: ignore
+            except (KeyError, IndexError, TypeError):
+                return None
+        if value is None:
+            return None
+        try:
+            if self.value_mapping is not None:
+                return self.value_mapping.get(int(value))
+            if self.value_divider is not None:
+                return float(value) / self.value_divider
+            if self.is_datetime:
+                if (date_value := dt_util.parse_datetime(str(value))) is None:
+                    return None
+                if date_value.tzinfo is None:
+                    date_value = date_value.replace(
+                        tzinfo=dt_util.get_default_time_zone()
+                    )
+                return date_value
+        except (TypeError, ValueError):
+            return None
+        return value
+
+    def _convert_value_to_raw_value(
+        self, device: TuyaCustomerDevice, value: Any
+    ) -> Any:
+        raise NotImplementedError
+
+
+def xt_json_field_wrapper(
+    *json_path: str | int,
+    divider: float | None = None,
+    native_unit: str | None = None,
+    suggested_unit: str | None = None,
+    value_mapping: dict[int, str] | None = None,
+    is_datetime: bool = False,
+) -> tuple[type[XTJsonStringFieldWrapper], ...]:
+    """Build a wrapper class reading one field of a JSON String DPCode."""
+    wrapper = type(
+        "XTJsonStringFieldWrapper_" + "_".join(str(p) for p in json_path),
+        (XTJsonStringFieldWrapper,),
+        {
+            "json_path": json_path,
+            "value_divider": divider,
+            "native_unit": native_unit,
+            "suggested_unit": suggested_unit,
+            "value_mapping": value_mapping,
+            "is_datetime": is_datetime,
+        },
+    )
+    return (wrapper,)
+
+
+class XTMappedIntegerWrapper(TuyaDPCodeIntegerWrapper[str]):
+    """Map the value of an Integer DPCode to an enum state."""
+
+    value_mapping: dict[int, str] = {}
+
+    def read_device_status(self, device: TuyaCustomerDevice) -> str | None:  # type: ignore[override]
+        """Read the device value for the dpcode."""
+        if (value := device.status.get(self.dpcode)) is None:
+            return None
+        try:
+            return self.value_mapping.get(int(value))
+        except (TypeError, ValueError):
+            return None
+
+
+class XTLowerCaseEnumWrapper(TuyaDPCodeEnumWrapper[str]):
+    """Return the value of an Enum DPCode in lower case (for translations)."""
+
+    def read_device_status(self, device: TuyaCustomerDevice) -> str | None:  # type: ignore[override]
+        """Read the device value for the dpcode."""
+        if (value := super().read_device_status(device)) is None:
+            return None
+        return str(value).lower()
+
+
+# dé EV charger (category "qt", vendor specific "x_" DPCodes)
+QT_EV_WORK_STATES: dict[int, str] = {
+    100: "offline",
+    101: "not_connected",
+    200: "connected",
+    201: "charge_complete",
+    202: "waiting_scheduled",
+    203: "waiting_delayed",
+    204: "paused",
+    300: "charging",
+    400: "overcurrent",
+    401: "overvoltage",
+    402: "undervoltage",
+    403: "overtemperature",
+    500: "selftest_failed",
+    501: "residual_current",
+    502: "relay_welded",
+    503: "residual_current_selftest_failed",
+    504: "cp_error",
+    505: "other_error",
+    506: "diode_failure",
+    507: "earth_fault",
+}
+QT_EV_CHARGE_MODES: dict[int, str] = {
+    0: "immediate",
+    1: "delayed",
+    2: "scheduled",
+}
+
+
+class XTQTEVWorkStateWrapper(XTMappedIntegerWrapper):
+    value_mapping = QT_EV_WORK_STATES
+
+
+def _qt_ev_phase_sensors(phase: str) -> tuple[XTSensorEntityDescription, ...]:
+    """Build the voltage/current/power sensors of one phase of x_metrics."""
+    lower_phase = phase.lower()
+    return (
+        XTSensorEntityDescription(
+            key=f"{XTDPCode.X_METRICS}_{lower_phase}_voltage",
+            dpcode=XTDPCode.X_METRICS,
+            translation_key=f"qt_ev_{lower_phase}_voltage",
+            device_class=SensorDeviceClass.VOLTAGE,
+            state_class=SensorStateClass.MEASUREMENT,
+            suggested_display_precision=1,
+            wrapper_class=xt_json_field_wrapper(
+                phase, 0, divider=10, native_unit=UnitOfElectricPotential.VOLT
+            ),
+        ),
+        XTSensorEntityDescription(
+            key=f"{XTDPCode.X_METRICS}_{lower_phase}_current",
+            dpcode=XTDPCode.X_METRICS,
+            translation_key=f"qt_ev_{lower_phase}_current",
+            device_class=SensorDeviceClass.CURRENT,
+            state_class=SensorStateClass.MEASUREMENT,
+            suggested_display_precision=1,
+            wrapper_class=xt_json_field_wrapper(
+                phase, 1, divider=10, native_unit=UnitOfElectricCurrent.AMPERE
+            ),
+        ),
+        XTSensorEntityDescription(
+            key=f"{XTDPCode.X_METRICS}_{lower_phase}_power",
+            dpcode=XTDPCode.X_METRICS,
+            translation_key=f"qt_ev_{lower_phase}_power",
+            device_class=SensorDeviceClass.POWER,
+            state_class=SensorStateClass.MEASUREMENT,
+            suggested_display_precision=1,
+            wrapper_class=xt_json_field_wrapper(
+                phase, 2, divider=10, native_unit=UnitOfPower.KILO_WATT
+            ),
+        ),
+    )
 
 
 def xt_get_generic_dpcode_wrapper(
@@ -2119,6 +2298,185 @@ SENSORS["zndb"] = SENSORS["kg"]
 # Lock duplicates
 SENSORS["videolock"] = SENSORS["jtmspro"]
 SENSORS["jtmsbh"] = SENSORS["jtmspro"]
+
+# dé EV charger (vendor specific "x_" DPCodes), the descriptors only match
+# devices reporting these DPCodes
+SENSORS["qt"] = (
+    XTSensorEntityDescription(
+        key=XTDPCode.X_WORK_STATE,
+        translation_key="qt_ev_work_state",
+        device_class=SensorDeviceClass.ENUM,
+        options=list(QT_EV_WORK_STATES.values()),
+        wrapper_class=(XTQTEVWorkStateWrapper,),
+        entity_registry_enabled_default=True,
+    ),
+    XTSensorEntityDescription(
+        key=XTDPCode.X_WORK_ST_DEBUG,
+        translation_key="qt_ev_work_st_debug",
+        device_class=SensorDeviceClass.ENUM,
+        options=[
+            "sleep",
+            "idle",
+            "idleins",
+            "working",
+            "wait",
+            "errorpause",
+            "pause",
+            "stop",
+            "empty",
+        ],
+        entity_category=EntityCategory.DIAGNOSTIC,
+        wrapper_class=(XTLowerCaseEnumWrapper,),
+        entity_registry_enabled_default=False,
+    ),
+    *_qt_ev_phase_sensors("L1"),
+    *_qt_ev_phase_sensors("L2"),
+    *_qt_ev_phase_sensors("L3"),
+    XTSensorEntityDescription(
+        key=f"{XTDPCode.X_METRICS}_power",
+        dpcode=XTDPCode.X_METRICS,
+        translation_key="qt_ev_power",
+        device_class=SensorDeviceClass.POWER,
+        state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=1,
+        wrapper_class=xt_json_field_wrapper(
+            "p", divider=10, native_unit=UnitOfPower.KILO_WATT
+        ),
+    ),
+    XTSensorEntityDescription(
+        key=f"{XTDPCode.X_METRICS}_temperature",
+        dpcode=XTDPCode.X_METRICS,
+        translation_key="qt_ev_temperature",
+        device_class=SensorDeviceClass.TEMPERATURE,
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        suggested_display_precision=1,
+        wrapper_class=xt_json_field_wrapper(
+            "t", divider=10, native_unit=UnitOfTemperature.CELSIUS
+        ),
+    ),
+    XTSensorEntityDescription(
+        key=f"{XTDPCode.X_METRICS}_session_duration",
+        dpcode=XTDPCode.X_METRICS,
+        translation_key="qt_ev_session_duration",
+        device_class=SensorDeviceClass.DURATION,
+        state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=0,
+        wrapper_class=xt_json_field_wrapper(
+            "d",
+            divider=10,
+            native_unit=UnitOfTime.SECONDS,
+            suggested_unit=UnitOfTime.MINUTES,
+        ),
+    ),
+    XTSensorEntityDescription(
+        key=f"{XTDPCode.X_METRICS}_session_energy",
+        dpcode=XTDPCode.X_METRICS,
+        translation_key="qt_ev_session_energy",
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        suggested_display_precision=1,
+        wrapper_class=xt_json_field_wrapper(
+            "e", divider=10, native_unit=UnitOfEnergy.KILO_WATT_HOUR
+        ),
+    ),
+    XTSensorEntityDescription(
+        key=f"{XTDPCode.X_CHARGER_INFO}_total_energy",
+        dpcode=XTDPCode.X_CHARGER_INFO,
+        translation_key="qt_ev_total_energy",
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        suggested_display_precision=1,
+        wrapper_class=xt_json_field_wrapper(
+            "e", divider=10, native_unit=UnitOfEnergy.KILO_WATT_HOUR
+        ),
+    ),
+    XTSensorEntityDescription(
+        key=f"{XTDPCode.X_CHARGER_INFO}_firmware",
+        dpcode=XTDPCode.X_CHARGER_INFO,
+        translation_key="qt_ev_firmware",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        wrapper_class=xt_json_field_wrapper("fv"),
+    ),
+    XTSensorEntityDescription(
+        key=f"{XTDPCode.X_CHARGER_INFO}_rcd_type",
+        dpcode=XTDPCode.X_CHARGER_INFO,
+        translation_key="qt_ev_rcd_type",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+        wrapper_class=xt_json_field_wrapper("r"),
+    ),
+    XTSensorEntityDescription(
+        key=f"{XTDPCode.X_CHARGER_INFO}_cp_voltage",
+        dpcode=XTDPCode.X_CHARGER_INFO,
+        translation_key="qt_ev_cp_voltage",
+        device_class=SensorDeviceClass.VOLTAGE,
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+        suggested_display_precision=1,
+        wrapper_class=xt_json_field_wrapper(
+            "cp", divider=1, native_unit=UnitOfElectricPotential.VOLT
+        ),
+    ),
+    XTSensorEntityDescription(
+        key=f"{XTDPCode.X_CHARGE_HISTORY}_start",
+        dpcode=XTDPCode.X_CHARGE_HISTORY,
+        translation_key="qt_ev_last_session_start",
+        device_class=SensorDeviceClass.TIMESTAMP,
+        wrapper_class=xt_json_field_wrapper("t", is_datetime=True),
+        skip_uom_validation=True,
+    ),
+    XTSensorEntityDescription(
+        key=f"{XTDPCode.X_CHARGE_HISTORY}_duration",
+        dpcode=XTDPCode.X_CHARGE_HISTORY,
+        translation_key="qt_ev_last_session_duration",
+        device_class=SensorDeviceClass.DURATION,
+        suggested_display_precision=0,
+        wrapper_class=xt_json_field_wrapper(
+            "d",
+            divider=1,
+            native_unit=UnitOfTime.SECONDS,
+            suggested_unit=UnitOfTime.MINUTES,
+        ),
+    ),
+    XTSensorEntityDescription(
+        key=f"{XTDPCode.X_CHARGE_HISTORY}_energy",
+        dpcode=XTDPCode.X_CHARGE_HISTORY,
+        translation_key="qt_ev_last_session_energy",
+        device_class=SensorDeviceClass.ENERGY,
+        suggested_display_precision=1,
+        wrapper_class=xt_json_field_wrapper(
+            "c", divider=10, native_unit=UnitOfEnergy.KILO_WATT_HOUR
+        ),
+    ),
+    XTSensorEntityDescription(
+        key=f"{XTDPCode.X_ALARM}_code",
+        dpcode=XTDPCode.X_ALARM,
+        translation_key="qt_ev_last_alarm",
+        device_class=SensorDeviceClass.ENUM,
+        options=list(QT_EV_WORK_STATES.values()),
+        entity_category=EntityCategory.DIAGNOSTIC,
+        wrapper_class=xt_json_field_wrapper("v", value_mapping=QT_EV_WORK_STATES),
+    ),
+    XTSensorEntityDescription(
+        key=f"{XTDPCode.X_ALARM}_time",
+        dpcode=XTDPCode.X_ALARM,
+        translation_key="qt_ev_last_alarm_time",
+        device_class=SensorDeviceClass.TIMESTAMP,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        wrapper_class=xt_json_field_wrapper("t", is_datetime=True),
+        skip_uom_validation=True,
+    ),
+    XTSensorEntityDescription(
+        key=f"{XTDPCode.X_CHARGE_MODE}_mode",
+        dpcode=XTDPCode.X_CHARGE_MODE,
+        translation_key="qt_ev_charge_mode",
+        device_class=SensorDeviceClass.ENUM,
+        options=list(QT_EV_CHARGE_MODES.values()),
+        wrapper_class=xt_json_field_wrapper("m", value_mapping=QT_EV_CHARGE_MODES),
+    ),
+)
 
 
 async def async_setup_entry(

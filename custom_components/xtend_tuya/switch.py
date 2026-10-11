@@ -28,11 +28,45 @@ from .const import (
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaSwitchEntity,
     TuyaSwitchEntityDescription,
+    TuyaDPCodeBooleanWrapper,
+    TuyaCustomerDevice,
 )
 from .entity import (
     XTEntity,
     XTEntityDescriptorManager,
 )
+
+
+class XTEVChargingSwitchWrapper(TuyaDPCodeBooleanWrapper):
+    """Start/stop charging DPCode, the state is read from the work state.
+
+    The start/stop DPCode is write only, the switch is on while the charger
+    reports that it is charging.
+    """
+
+    work_state_dpcode: str = XTDPCode.X_WORK_STATE
+    charging_states: tuple[int, ...] = (300,)
+
+    def read_device_status(self, device: TuyaCustomerDevice) -> bool | None:
+        """Read the device value for the dpcode."""
+        if (work_state := device.status.get(self.work_state_dpcode)) is None:
+            return None
+        try:
+            return int(work_state) in self.charging_states
+        except (TypeError, ValueError):
+            return None
+
+    def skip_update(
+        self,
+        device: TuyaCustomerDevice,
+        updated_status_properties: list[str],
+        dp_timestamps: dict[str, int] | None = None,
+    ) -> bool:
+        """Update when the start/stop or the work state DPCode changes."""
+        return (
+            self.dpcode not in updated_status_properties
+            and self.work_state_dpcode not in updated_status_properties
+        )
 
 
 @dataclass(frozen=True)
@@ -42,6 +76,9 @@ class XTSwitchEntityDescription(TuyaSwitchEntityDescription, frozen_or_thawed=Tr
 
     # duplicate the entity if handled by another integration
     ignore_other_dp_code_handler: bool = False
+
+    # Custom DPCode wrappers (the first one matching the DPCode is used)
+    wrapper_class: tuple[type[TuyaDPCodeBooleanWrapper], ...] | None = None
 
     def get_entity_instance(
         self,
@@ -434,6 +471,26 @@ SWITCHES: dict[str, tuple[XTSwitchEntityDescription, ...]] = {
 SWITCHES["videolock"] = SWITCHES["jtmspro"]
 SWITCHES["jtmsbh"] = SWITCHES["jtmspro"]
 
+# dé EV charger (vendor specific "x_" DPCodes)
+SWITCHES["qt"] = (
+    XTSwitchEntityDescription(
+        key=XTDPCode.X_DO_CHARGE,
+        translation_key="qt_ev_charging",
+        wrapper_class=(XTEVChargingSwitchWrapper,),
+    ),
+)
+
+
+def xt_get_default_definition(
+    device: XTDevice, description: TuyaSwitchEntityDescription
+) -> SwitchDefinition | None:
+    if wrapper_class := getattr(description, "wrapper_class", None):
+        for cls in wrapper_class:
+            if wrapper := cls.find_dpcode(device, description.key, prefer_function=True):
+                return SwitchDefinition(switch_wrapper=wrapper)
+        return None
+    return get_default_definition(device, description.key)
+
 
 async def async_setup_entry(
     hass: HomeAssistant, entry: XTConfigEntry, async_add_entities: AddEntitiesCallback
@@ -531,8 +588,8 @@ async def async_setup_entry(
                                 externally_managed_dpcodes,
                             )
                             and (
-                                definition := get_default_definition(
-                                    device, description.key
+                                definition := xt_get_default_definition(
+                                    device, description
                                 )
                             )
                         )
@@ -554,8 +611,8 @@ async def async_setup_entry(
                                 externally_managed_dpcodes,
                             )
                             and (
-                                definition := get_default_definition(
-                                    device, description.key
+                                definition := xt_get_default_definition(
+                                    device, description
                                 )
                             )
                         )

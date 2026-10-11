@@ -3,6 +3,7 @@
 from __future__ import annotations
 from typing import cast, Any, Self
 from dataclasses import dataclass
+from homeassistant.components.button import ButtonDeviceClass
 from homeassistant.const import EntityCategory, Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
@@ -36,7 +37,7 @@ from .const import (
     XTMultiManagerProperties,
     XTDiscoverySource,
     LOGGER,  # noqa: F401
-    IR_HUB_CATEGORY_LIST,
+    is_ir_hub_device,
 )
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaButtonEntity,
@@ -323,6 +324,15 @@ BUTTONS: dict[str, tuple[XTButtonEntityDescription, ...]] = {
     ),
 }
 
+# dé EV charger (vendor specific "x_" DPCodes)
+BUTTONS["qt"] = (
+    XTButtonEntityDescription(
+        key=XTDPCode.X_DO_REBOOT,
+        device_class=ButtonDeviceClass.RESTART,
+        entity_category=EntityCategory.CONFIG,
+    ),
+)
+
 BUTTONS["cz"] = BUTTONS["kg"]
 BUTTONS["wkcz"] = BUTTONS["kg"]
 BUTTONS["dlq"] = BUTTONS["kg"]
@@ -376,7 +386,7 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if hub_device := hass_data.manager.device_map.get(device_id):
-                if hub_device.category in IR_HUB_CATEGORY_LIST:
+                if is_ir_hub_device(hub_device):
                     hub_information: XTIRHubInformation | None = (
                         await XTEventLoopProtector.execute_out_of_event_loop_and_return(
                             hass_data.manager.get_ir_hub_information, hub_device
@@ -484,7 +494,7 @@ async def async_setup_entry(
         device_ids = [*device_map]
         for device_id in device_ids:
             if device := hass_data.manager.device_map.get(device_id):
-                if device.category in IR_HUB_CATEGORY_LIST:
+                if is_ir_hub_device(device):
                     hass_data.manager.set_general_property(
                         XTMultiManagerProperties.IR_DEVICE_ID, device.id
                     )

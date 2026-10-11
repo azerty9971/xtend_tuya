@@ -9,7 +9,7 @@ from tuya_device_handlers.definition.number import (
 from homeassistant.components.number import (
     NumberDeviceClass,
 )
-from homeassistant.const import EntityCategory, Platform
+from homeassistant.const import EntityCategory, Platform, UnitOfElectricCurrent
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -696,6 +696,25 @@ NUMBERS: dict[str, tuple[XTNumberEntityDescription, ...]] = {
 # Lock duplicates
 NUMBERS["videolock"] = NUMBERS["jtmspro"]
 NUMBERS["jtmsbh"] = NUMBERS["jtmspro"]
+
+# dé EV charger (vendor specific "x_" DPCodes)
+NUMBERS["qt"] = (
+    XTNumberEntityDescription(
+        key=XTDPCode.X_CHARGE_CURRENT,
+        translation_key="qt_ev_charge_current",
+        device_class=NumberDeviceClass.CURRENT,
+        native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
+    ),
+    # Maximum current of the installation, changing it is rarely needed
+    XTNumberEntityDescription(
+        key=XTDPCode.X_MAX_CURRENT_CFG,
+        translation_key="qt_ev_max_current",
+        device_class=NumberDeviceClass.CURRENT,
+        native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
+        entity_category=EntityCategory.CONFIG,
+        entity_registry_enabled_default=False,
+    ),
+)
 
 
 async def async_setup_entry(

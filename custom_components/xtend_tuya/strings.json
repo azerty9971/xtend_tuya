@@ -1123,6 +1123,12 @@
             },
             "water_level": {
                 "name": "Water level"
+            },
+            "qt_ev_charge_current": {
+                "name": "Charging current"
+            },
+            "qt_ev_max_current": {
+                "name": "Maximum current"
             }
         },
         "remote": {
@@ -2904,6 +2910,141 @@
                     "ticket_flow": "Ticket flow",
                     "dpcode_command": "DPcode command"
                 }
+            },
+            "qt_ev_work_state": {
+                "name": "Charging status",
+                "state": {
+                    "offline": "Offline",
+                    "not_connected": "No vehicle connected",
+                    "connected": "Vehicle connected",
+                    "charge_complete": "Charging complete",
+                    "waiting_scheduled": "Waiting (scheduled)",
+                    "waiting_delayed": "Waiting (delayed start)",
+                    "paused": "Paused",
+                    "charging": "Charging",
+                    "overcurrent": "Overcurrent protection",
+                    "overvoltage": "Overvoltage protection",
+                    "undervoltage": "Undervoltage protection",
+                    "overtemperature": "Overtemperature protection",
+                    "selftest_failed": "Self-test failed",
+                    "residual_current": "Residual current protection",
+                    "relay_welded": "Relay welded",
+                    "residual_current_selftest_failed": "Residual current self-test failed",
+                    "cp_error": "CP error",
+                    "other_error": "Other error",
+                    "diode_failure": "Diode failure",
+                    "earth_fault": "Earth fault"
+                }
+            },
+            "qt_ev_work_st_debug": {
+                "name": "Internal state",
+                "state": {
+                    "sleep": "Sleep",
+                    "idle": "Idle",
+                    "idleins": "Idle (plugged in)",
+                    "working": "Working",
+                    "wait": "Waiting",
+                    "errorpause": "Error pause",
+                    "pause": "Paused",
+                    "stop": "Stopped",
+                    "empty": "Empty"
+                }
+            },
+            "qt_ev_l1_voltage": {
+                "name": "Voltage L1"
+            },
+            "qt_ev_l1_current": {
+                "name": "Current L1"
+            },
+            "qt_ev_l1_power": {
+                "name": "Power L1"
+            },
+            "qt_ev_l2_voltage": {
+                "name": "Voltage L2"
+            },
+            "qt_ev_l2_current": {
+                "name": "Current L2"
+            },
+            "qt_ev_l2_power": {
+                "name": "Power L2"
+            },
+            "qt_ev_l3_voltage": {
+                "name": "Voltage L3"
+            },
+            "qt_ev_l3_current": {
+                "name": "Current L3"
+            },
+            "qt_ev_l3_power": {
+                "name": "Power L3"
+            },
+            "qt_ev_power": {
+                "name": "Charging power"
+            },
+            "qt_ev_temperature": {
+                "name": "Charger temperature"
+            },
+            "qt_ev_session_duration": {
+                "name": "Session duration"
+            },
+            "qt_ev_session_energy": {
+                "name": "Session energy"
+            },
+            "qt_ev_total_energy": {
+                "name": "Total energy"
+            },
+            "qt_ev_firmware": {
+                "name": "Firmware"
+            },
+            "qt_ev_rcd_type": {
+                "name": "Residual current device"
+            },
+            "qt_ev_cp_voltage": {
+                "name": "CP voltage"
+            },
+            "qt_ev_last_session_start": {
+                "name": "Last session start"
+            },
+            "qt_ev_last_session_duration": {
+                "name": "Last session duration"
+            },
+            "qt_ev_last_session_energy": {
+                "name": "Last session energy"
+            },
+            "qt_ev_last_alarm": {
+                "name": "Last alarm",
+                "state": {
+                    "offline": "Offline",
+                    "not_connected": "No vehicle connected",
+                    "connected": "Vehicle connected",
+                    "charge_complete": "Charging complete",
+                    "waiting_scheduled": "Waiting (scheduled)",
+                    "waiting_delayed": "Waiting (delayed start)",
+                    "paused": "Paused",
+                    "charging": "Charging",
+                    "overcurrent": "Overcurrent protection",
+                    "overvoltage": "Overvoltage protection",
+                    "undervoltage": "Undervoltage protection",
+                    "overtemperature": "Overtemperature protection",
+                    "selftest_failed": "Self-test failed",
+                    "residual_current": "Residual current protection",
+                    "relay_welded": "Relay welded",
+                    "residual_current_selftest_failed": "Residual current self-test failed",
+                    "cp_error": "CP error",
+                    "other_error": "Other error",
+                    "diode_failure": "Diode failure",
+                    "earth_fault": "Earth fault"
+                }
+            },
+            "qt_ev_last_alarm_time": {
+                "name": "Last alarm time"
+            },
+            "qt_ev_charge_mode": {
+                "name": "Charge mode",
+                "state": {
+                    "immediate": "Immediate",
+                    "delayed": "Delayed start",
+                    "scheduled": "Scheduled"
+                }
             }
         },
         "switch": {
@@ -3308,6 +3449,9 @@
             },
             "wide_dynamic_range": {
                 "name": "Wide dynamic range"
+            },
+            "qt_ev_charging": {
+                "name": "Charging"
             }
         },
         "time": {

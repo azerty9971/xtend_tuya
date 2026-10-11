@@ -16,6 +16,7 @@ from .const import (
     DOMAIN_ORIG,
     FULLY_OVERRIDEN_PLATFORMS,
     DPCODE_PREFERED_DEVICE_CLASS,
+    GENERIC_ENTITY_EXCLUDED_DPCODES,
 )
 import custom_components.xtend_tuya.multi_manager.shared.shared_classes as sc
 import custom_components.xtend_tuya.multi_manager.multi_manager as mm
@@ -748,9 +749,16 @@ class XTEntity(TuyaEntity):
         device: sc.XTDevice, platform: Platform
     ) -> list[str]:
         return_list: list[str] = []
+        excluded_dpcodes = GENERIC_ENTITY_EXCLUDED_DPCODES.get(
+            device.category, {}
+        ).get(platform, [])
         for dpcode in device.status:
             # Don't add already handled DPCodes
             if XTEntity.is_dpcode_handled(device, platform, dpcode) is True:
+                continue
+
+            # Don't add DPCodes explicitly excluded for this platform
+            if dpcode in excluded_dpcodes:
                 continue
 
             # Filter DPCodes that are not for the current platform
