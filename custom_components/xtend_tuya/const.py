@@ -1307,6 +1307,8 @@ DPCODE_PREFERED_DEVICE_CLASS: dict[str, str | None] = {
     "maxtemp_set": "temperature",
     "minitemp_set": "temperature",
     "set_temp": "temperature",
+    "set_temp_max": "temperature",
+    "set_temp_min": "temperature",
     "temperature_c": "temperature",
     "temp_current": "temperature",
     "temp_current_f": "temperature",
