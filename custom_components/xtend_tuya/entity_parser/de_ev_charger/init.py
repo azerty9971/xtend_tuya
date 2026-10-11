@@ -11,7 +11,6 @@ from homeassistant.const import (
 from ..entity_parser import (
     XTCustomEntityParser,
 )
-from .button import DE_EV_CHARGER_BUTTONS
 from .number import DE_EV_CHARGER_NUMBERS
 from .sensor import DE_EV_CHARGER_SENSORS
 from .switch import DE_EV_CHARGER_SWITCHES
@@ -30,6 +29,4 @@ class DeEVChargerEntityParser(XTCustomEntityParser):
                 return DE_EV_CHARGER_SWITCHES
             case Platform.NUMBER:
                 return DE_EV_CHARGER_NUMBERS
-            case Platform.BUTTON:
-                return DE_EV_CHARGER_BUTTONS
         return None

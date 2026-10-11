@@ -15,7 +15,6 @@ class DeEVChargerDPCode(StrEnum):
     X_CHARGE_MODE = "x_charge_mode"  # {"m": 0, "dt": 0, "ss": "00:00", "se": "08:00"}
     X_CHARGER_INFO = "x_charger_info"  # {"r": ..., "fv": "1.0.2", "cp": "12.8", "t": "340", "e": "10595"}
     X_DO_CHARGE = "x_do_charge"
-    X_DO_REBOOT = "x_do_reboot"
     X_MAX_CURRENT_CFG = "x_max_current_cfg"
     X_METRICS = "x_metrics"  # {"L1": [V, A, kW], "L2": [...], "L3": [...], "t": ..., "p": ..., "d": ..., "e": ...}
     X_WORK_ST_DEBUG = "x_work_st_debug"
