@@ -646,6 +646,23 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
                         if ha_mode_replace_heat_cool_with not in self._attr_hvac_modes:
                             self._attr_hvac_modes.append(ha_mode_replace_heat_cool_with)
 
+        # Some devices expose a mode DP whose options cannot be mapped to any
+        # HA HVACMode (they are surfaced as presets instead). For those, the
+        # loop above only produces [HVACMode.OFF] and the switch_wrapper branch
+        # is never reached, so switch_only_hvac_mode is lost: the entity ends up
+        # with a single mode and reports "unknown" because the parent cannot
+        # translate the raw mode value. Fall back to switch-only behaviour.
+        self._xt_switch_wrapper = definition.switch_wrapper
+        self._xt_switch_only_fallback = bool(
+            definition.switch_wrapper is not None
+            and not [m for m in self._attr_hvac_modes if m != HVACMode.OFF]
+        )
+        if self._xt_switch_only_fallback:
+            self._attr_hvac_modes = [
+                HVACMode.OFF,
+                description.switch_only_hvac_mode,
+            ]
+
     def get_configurable_properties_type(self) -> type[Any] | None:
         return XTClimateConfigurableProperties
 
@@ -762,6 +779,23 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
         if ATTR_TEMPERATURE in kwargs and self.configurable_properties is not None and self.configurable_properties.target_temperature_value_multiplicator is not None:
             kwargs[ATTR_TEMPERATURE] = kwargs[ATTR_TEMPERATURE] / self.configurable_properties.target_temperature_value_multiplicator
         await super().async_set_temperature(**kwargs)
+
+    @property
+    def hvac_mode(self) -> HVACMode | None:  # type: ignore
+        """Return hvac mode.
+
+        When the device falls back to switch-only operation (see __init__),
+        the mode DP value is not translatable, so derive the mode from the
+        power switch instead of letting the parent return None.
+        """
+        if getattr(self, "_xt_switch_only_fallback", False):
+            value = self._read_wrapper(self._xt_switch_wrapper)
+            if value is None:
+                return None
+            if value:
+                return self.entity_description.switch_only_hvac_mode
+            return HVACMode.OFF
+        return super().hvac_mode
 
     @property
     def hvac_action(self) -> HVACAction | None:  # type: ignore
