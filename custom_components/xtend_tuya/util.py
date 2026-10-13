@@ -292,7 +292,8 @@ def delete_all_device_entities(
 
 # Decodes a b64-encoded timestamp
 def b64todatetime(value):
-    if value is None:
+    # Devices report an empty string when no time is set (e.g. no watering cycle)
+    if not value:
         return None
     
     try:
