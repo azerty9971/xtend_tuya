@@ -234,7 +234,7 @@ class XTDeviceManagerMultiManagerManagementInterface(ABC):
         pass
 
     @abstractmethod
-    def get_device_registry_identifiers(self) -> list:
+    def get_device_registry_identifiers(self) -> list[str]:
         return []
 
     def on_post_setup(self):

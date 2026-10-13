@@ -294,7 +294,7 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
                 device_id, stream_type
             )
 
-    def get_device_registry_identifiers(self) -> list:
+    def get_device_registry_identifiers(self) -> list[str]:
         if self.sharing_account is None:
             return []
         if self.sharing_account.device_manager.reuse_config:
