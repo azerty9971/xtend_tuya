@@ -608,9 +608,8 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
         )
 
         # Re-Determine HVAC modes
-        self._attr_hvac_modes = []
+        self._attr_hvac_modes = [HVACMode.OFF]
         if definition.hvac_mode_wrapper:
-            self._attr_hvac_modes = [HVACMode.OFF]
             for tuya_mode in cast(
                 list[TuyaClimateHVACMode], definition.hvac_mode_wrapper.options
             ):
@@ -620,11 +619,14 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
                     # OFF is always added first
                     self._attr_hvac_modes.append(ha_mode)
 
-        elif definition.switch_wrapper:
+        if definition.switch_wrapper and len(self._attr_hvac_modes) <= 1:
             self._attr_hvac_modes = [
                 HVACMode.OFF,
                 description.switch_only_hvac_mode,
             ]
+            
+            # HVAC mide wrapper didn't map to any usable HVAC mode, disable its usage
+            self._hvac_mode_wrapper = None
 
         # Determine preset modes (ignore if empty options)
         if definition.preset_wrapper and definition.preset_wrapper.options:
