@@ -420,22 +420,22 @@
                 "name": "Error"
             },
             "error_flow_meter": {
-                "name": "Error: Flow meter"
+                "name": "Flow meter error"
             },
             "error_other": {
-                "name": "Error: Other"
+                "name": "Other error"
             },
             "error_sensor_offline": {
-                "name": "Error: Sensor offline"
+                "name": "Sensor offline"
             },
             "error_sensor_low_battery": {
-                "name": "Error: Sensor low battery"
+                "name": "Sensor low battery"
             },
             "error_valve_low_battery": {
-                "name": "Error: Valve low battery"
+                "name": "Valve low battery"
             },
             "error_water_shortage": {
-                "name": "Error: Water shortage"
+                "name": "Water shortage"
             },
             "litter_occupied": {
                 "name": "Litter box occupied"
@@ -517,6 +517,9 @@
             },
             "wet": {
                 "name": "Wet"
+            },
+            "rain_snow": {
+                "name": "Rain/snow"
             }
         },
         "button": {
@@ -582,6 +585,9 @@
             },
             "snooze": {
                 "name": "Snooze"
+            },
+            "watering_volume_reset": {
+                "name": "Watering volume reset"
             }
         },
         "climate": {
@@ -1123,6 +1129,9 @@
             },
             "water_level": {
                 "name": "Water level"
+            },
+            "watering_volume": {
+                "name": "Watering volume"
             }
         },
         "remote": {
@@ -2904,6 +2913,9 @@
                     "ticket_flow": "Ticket flow",
                     "dpcode_command": "DPcode command"
                 }
+            },
+            "watering_volume_total": {
+                "name": "Total watering volume"
             }
         },
         "switch": {
@@ -3308,6 +3320,9 @@
             },
             "wide_dynamic_range": {
                 "name": "Wide dynamic range"
+            },
+            "rain_snow_sensing": {
+                "name": "Rain/snow sensing"
             }
         },
         "time": {
