@@ -75,7 +75,7 @@
         "default": "mdi:timer-outline"
       },
       "rain_snow_delay": {
-        "default": "mdi:weather-rainy"
+        "default": "mdi:weather-snowy-rainy"
       },
       "heat_preservation_time": {
         "default": "mdi:timer"
@@ -459,6 +459,9 @@
       },
       "sterilization": {
         "default": "mdi:minus-circle-outline"
+      },
+      "rain_snow_sensing": {
+        "default": "mdi:weather-snowy-rainy"
       }
     }
   }
