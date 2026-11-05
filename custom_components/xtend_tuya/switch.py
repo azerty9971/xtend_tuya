@@ -387,11 +387,21 @@ SWITCHES: dict[str, tuple[XTSwitchEntityDescription, ...]] = {
             entity_category=EntityCategory.CONFIG,
         ),
     ),
-    # QT-08W Solar Intelligent Water Valve
+    # Smart water valve
     "sfkzq": (
         XTSwitchEntityDescription(
             key=XTDPCode.SWITCH,
             translation_key="valve",
+        ),
+        XTSwitchEntityDescription(
+            key=XTDPCode.SWITCH_1,
+            translation_key="valve",
+            translation_placeholders={},
+        ),
+        XTSwitchEntityDescription(
+            key=XTDPCode.RAIN_SENSOR_SWITCH,
+            translation_key="rain_snow_sensing",
+            entity_category=EntityCategory.CONFIG,
         ),
         XTSwitchEntityDescription(
             key=XTDPCode.WORK_MODE,
