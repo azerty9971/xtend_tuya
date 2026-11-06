@@ -645,10 +645,6 @@ class XTSwitchEntity(XTEntity, TuyaSwitchEntity):
                 description=description,
                 definition=definition,
             )
-        LOGGER.warning(XTSwitchEntityDescription.__mro__)
-        LOGGER.warning(inspect.signature(TuyaEntityDescription))
-        LOGGER.warning(inspect.signature(TuyaSwitchEntityDescription))
-        LOGGER.warning(inspect.signature(XTSwitchEntityDescription))
         return XTSwitchEntity(
             device=device,
             device_manager=device_manager,

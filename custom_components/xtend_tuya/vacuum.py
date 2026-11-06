@@ -35,7 +35,7 @@ STATUS_DPCODE = (XTDPCode.STATUS,)
 SWITCH_DPCODE = (XTDPCode.POWER_GO,)
 
 
-class XTVacuumEntityDescription(TuyaVacuumEntityDescription, frozen_or_thawed=True):
+class XTVacuumEntityDescription(TuyaVacuumEntityDescription):
     def get_entity_instance(
         self,
         device: XTDevice,
