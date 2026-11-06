@@ -660,9 +660,9 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
         )
 
     @property
-    def native_current_temperature(self) -> float | None:
+    def current_temperature(self) -> float | None:
         """Return the current temperature."""
-        current_temperature = super().native_current_temperature
+        current_temperature = super().current_temperature
         if (
             current_temperature is not None
             and self.configurable_properties is not None
@@ -691,9 +691,9 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
         return current_humidity
 
     @property
-    def native_target_temperature(self) -> float | None:
+    def target_temperature(self) -> float | None:
         """Return the temperature currently set to be reached."""
-        target_temperature = super().native_target_temperature
+        target_temperature = super().target_temperature
         if (
             target_temperature is not None
             and self.configurable_properties is not None
