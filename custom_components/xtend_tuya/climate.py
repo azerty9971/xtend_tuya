@@ -27,7 +27,6 @@ from tuya_device_handlers.device_wrapper.climate import (
     SwingModeCompositeWrapper,
     _DEFAULT_DEVICE_MODE_TO_HVACMODE as TuyaClimateHVACToHA,
 )
-from homeassistant.components.climate import ClimateEntity
 from homeassistant.components.climate.const import (
     HVACMode,
     HVACAction,
@@ -688,39 +687,19 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
             )
         return target_temperature
 
-    # HA 2026.11 deprecated current_temperature/target_temperature in favor of
-    # native_current_temperature/native_target_temperature
-    if hasattr(ClimateEntity, "native_current_temperature"):
+    @property
+    def native_current_temperature(self) -> float | None:
+        """Return the current temperature."""
+        return self._apply_current_temperature_multiplicator(
+            super().native_current_temperature
+        )
 
-        @property
-        def native_current_temperature(self) -> float | None:
-            """Return the current temperature."""
-            return self._apply_current_temperature_multiplicator(
-                super().native_current_temperature
-            )
-
-        @property
-        def native_target_temperature(self) -> float | None:
-            """Return the temperature currently set to be reached."""
-            return self._apply_target_temperature_multiplicator(
-                super().native_target_temperature
-            )
-
-    else:
-
-        @property
-        def current_temperature(self) -> float | None:
-            """Return the current temperature."""
-            return self._apply_current_temperature_multiplicator(
-                super().current_temperature
-            )
-
-        @property
-        def target_temperature(self) -> float | None:
-            """Return the temperature currently set to be reached."""
-            return self._apply_target_temperature_multiplicator(
-                super().target_temperature
-            )
+    @property
+    def native_target_temperature(self) -> float | None:
+        """Return the temperature currently set to be reached."""
+        return self._apply_target_temperature_multiplicator(
+            super().native_target_temperature
+        )
 
     @property
     def current_humidity(self) -> int | None:

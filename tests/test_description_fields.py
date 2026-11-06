@@ -75,20 +75,20 @@ def test_convert_all_core_switches():
     convert = XTSwitchEntity.get_entity_instance
     module = sys.modules[XTSwitchEntity.__module__]
     original = module.XTSwitchEntity
-    module.XTSwitchEntity = _Recorder
+    module.XTSwitchEntity = _Recorder # type: ignore
     try:
         for description in _all(SWITCHES):
             entity = convert(
-                device=None,
-                device_manager=None,
-                description=description,
-                definition=None,
+                device=None, # type: ignore
+                device_manager=None, # type: ignore
+                description=description, # type: ignore
+                definition=None, # type: ignore
             )
             assert isinstance(entity.description, XTSwitchEntityDescription)
             assert entity.description.key == description.key
             assert entity.description.channel_index == description.channel_index
     finally:
-        module.XTSwitchEntity = original
+        module.XTSwitchEntity = original # type: ignore
 
 
 if __name__ == "__main__":
