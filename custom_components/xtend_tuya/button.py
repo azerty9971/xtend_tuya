@@ -314,6 +314,14 @@ BUTTONS: dict[str, tuple[XTButtonEntityDescription, ...]] = {
             entity_category=EntityCategory.CONFIG,
         ),
     ),
+    # Smart water valve
+    "sfkzq": (
+        XTButtonEntityDescription(
+            key=XTDPCode.WATER_VOLUME_RESET,
+            translation_key="watering_volume_reset",
+            entity_category=EntityCategory.CONFIG,
+        ),
+    ),
     "xfj": (
         XTButtonEntityDescription(
             key=XTDPCode.FILTER_RESET,

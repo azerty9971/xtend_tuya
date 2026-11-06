@@ -191,7 +191,7 @@ BINARY_SENSORS: dict[str, tuple[XTBinarySensorEntityDescription, ...]] = {
             entity_registry_enabled_default=False,
         ),
     ),
-    # QT-08W Solar Intelligent Water Valve
+    # Smart water valve
     "sfkzq": (
         XTBinarySensorEntityDescription(
             key=XTDPCode.MALFUNCTION,
@@ -241,6 +241,13 @@ BINARY_SENSORS: dict[str, tuple[XTBinarySensorEntityDescription, ...]] = {
             is_on=lambda x: None if x is None else (x >> 4) & 1,
         ),
         XTBinarySensorEntityDescription(
+            key=XTDPCode.WATER_STATE,
+            translation_key="error_water_shortage",
+            device_class=BinarySensorDeviceClass.PROBLEM,
+            entity_category=EntityCategory.DIAGNOSTIC,
+            is_on=lambda x: None if x is None else x == "alarm",
+        ),
+        XTBinarySensorEntityDescription(
             key=f"{XTDPCode.MALFUNCTION}_5",
             dpcode=XTDPCode.MALFUNCTION,
             translation_key="error_other",
@@ -254,6 +261,18 @@ BINARY_SENSORS: dict[str, tuple[XTBinarySensorEntityDescription, ...]] = {
             device_class=BinarySensorDeviceClass.BATTERY_CHARGING,
             entity_category=EntityCategory.DIAGNOSTIC,
             is_on=lambda x: None if x is None else x > 127,
+        ),
+        XTBinarySensorEntityDescription(
+            key=XTDPCode.CHARGING,
+            translation_key="battery_charging",
+            device_class=BinarySensorDeviceClass.BATTERY_CHARGING,
+            entity_category=EntityCategory.DIAGNOSTIC,
+        ),
+        XTBinarySensorEntityDescription(
+            key=XTDPCode.RAIN_SENSOR_STATE,
+            translation_key="rain_snow",
+            device_class=BinarySensorDeviceClass.MOISTURE,
+            is_on=lambda x: None if x is None else x == "rain",
         ),
     ),
     "smd": (
