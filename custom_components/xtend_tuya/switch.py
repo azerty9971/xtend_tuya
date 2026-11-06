@@ -39,7 +39,7 @@ import inspect
 
 
 @dataclass(frozen=True)
-class XTSwitchEntityDescription(TuyaSwitchEntityDescription, frozen_or_thawed=True):
+class XTSwitchEntityDescription(TuyaSwitchEntityDescription):
     override_tuya: bool = False
     dont_send_to_cloud: bool = False
 
