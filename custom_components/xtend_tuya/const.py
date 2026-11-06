@@ -1152,6 +1152,7 @@ class XTDPCode(StrEnum):
     WATER_ONCE = "water_once"
     WATER_STATE = "water_state"
     WATER_TOTAL = "water_total"
+    WATER_TOTAL_1 = "water_total_1"
     WATER_USE_DATA = "water_use_data"
     WATER_VOLUME_RESET = "water_volume_reset"
     WATER_VOLUME_SETTING = "water_volume_setting"

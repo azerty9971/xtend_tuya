@@ -1144,6 +1144,7 @@
             },
             "qt_ev_max_current": {
                 "name": "Maximum current"
+            },
             "watering_volume": {
                 "name": "Watering volume"
             }
@@ -3062,6 +3063,7 @@
                     "delayed": "Delayed start",
                     "scheduled": "Scheduled"
                 }
+            },
             "watering_volume_total": {
                 "name": "Total watering volume"
             }
@@ -3471,6 +3473,7 @@
             },
             "qt_ev_charging": {
                 "name": "Charging"
+            },
             "rain_snow_sensing": {
                 "name": "Rain/snow sensing"
             }
