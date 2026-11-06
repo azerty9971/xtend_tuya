@@ -1,6 +1,7 @@
 """Support for Tuya Vacuums."""
 
 from __future__ import annotations
+from dataclasses import dataclass
 from typing import cast
 from tuya_device_handlers.definition.vacuum import (
     VacuumDefinition,
@@ -35,6 +36,7 @@ STATUS_DPCODE = (XTDPCode.STATUS,)
 SWITCH_DPCODE = (XTDPCode.POWER_GO,)
 
 
+@dataclass(frozen=True)
 class XTVacuumEntityDescription(TuyaVacuumEntityDescription):
     def get_entity_instance(
         self,

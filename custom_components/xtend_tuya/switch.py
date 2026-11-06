@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 from typing import cast, Any
-from dataclasses import dataclass
+from dataclasses import dataclass, fields
 from tuya_device_handlers.definition.switch import (
     SwitchDefinition,
     get_default_definition,
@@ -53,9 +53,23 @@ class XTSwitchEntityDescription(TuyaSwitchEntityDescription):
         return XTSwitchEntity(
             device=device,
             device_manager=device_manager,
-            description=XTSwitchEntityDescription(**description.__dict__),
+            description=XTSwitchEntityDescription(
+                **{
+                    key: value
+                    for key, value in description.__dict__.items()
+                    if key in _XT_SWITCH_FIELDS
+                }
+            ),
             definition=definition,
         )
+
+
+# Core subclasses such as TuyaDeprecatedSwitchEntityDescription carry extra
+# fields (deprecated, breaks_in_ha_version) that XTSwitchEntityDescription
+# does not have, so only copy the fields it knows.
+_XT_SWITCH_FIELDS: frozenset[str] = frozenset(
+    field.name for field in fields(XTSwitchEntityDescription)
+)
 
 
 # All descriptions can be found here. Mostly the Boolean data types in the
@@ -645,6 +659,12 @@ class XTSwitchEntity(XTEntity, TuyaSwitchEntity):
         return XTSwitchEntity(
             device=device,
             device_manager=device_manager,
-            description=XTSwitchEntityDescription(**description.__dict__),
+            description=XTSwitchEntityDescription(
+                **{
+                    key: value
+                    for key, value in description.__dict__.items()
+                    if key in _XT_SWITCH_FIELDS
+                }
+            ),
             definition=definition,
         )
