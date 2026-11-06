@@ -21,8 +21,10 @@ MODULE = (
     / "xt_tuya_sharing_mq_watchdog.py"
 )
 spec = importlib.util.spec_from_file_location("xt_mq_watchdog", MODULE)
-wd = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(wd)
+if spec is not None and spec.loader is not None:
+    wd = importlib.util.module_from_spec(spec)
+    if wd is not None:
+        spec.loader.exec_module(wd)
 
 EXPIRE = 7200
 
@@ -47,8 +49,8 @@ class FakeMQ:
         self._stop_event = threading.Event()
         self.ident = 1 if started else None
         self.alive = alive
-        self.mq_config = FakeConfig()
-        self.client = FakeClient()
+        self.mq_config: FakeConfig | None = FakeConfig()
+        self.client: FakeClient | None = FakeClient()
 
     def is_alive(self):
         return self.alive
@@ -116,10 +118,12 @@ def test_long_disconnect_is_flagged_short_one_is_not():
     mq = FakeMQ()
     health = wd.XTSharingMQHealth(disconnect_grace_s=300)
     assert health.check(mq, 0) is None
-    mq.client.connected = False
+    if mq.client is not None:
+        mq.client.connected = False
     assert health.check(mq, 60) is None
     assert health.check(mq, 300) is None
-    mq.client.connected = True  # recovered within the grace period
+    if mq.client is not None:
+        mq.client.connected = True  # recovered within the grace period
     assert health.check(mq, 330) is None
     mq.client = None
     assert health.check(mq, 400) is None

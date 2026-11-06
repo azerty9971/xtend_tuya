@@ -27,7 +27,6 @@ from tuya_device_handlers.device_wrapper.climate import (
     SwingModeCompositeWrapper,
     _DEFAULT_DEVICE_MODE_TO_HVACMODE as TuyaClimateHVACToHA,
 )
-from homeassistant.components.climate import ClimateEntity
 from homeassistant.components.climate.const import (
     HVACMode,
     HVACAction,
