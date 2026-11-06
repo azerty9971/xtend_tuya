@@ -9,7 +9,7 @@ from tuya_device_handlers.definition.number import (
 from homeassistant.components.number import (
     NumberDeviceClass,
 )
-from homeassistant.const import EntityCategory, Platform
+from homeassistant.const import EntityCategory, Platform, UnitOfTime
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -639,7 +639,7 @@ NUMBERS: dict[str, tuple[XTNumberEntityDescription, ...]] = {
             device_class=NumberDeviceClass.DURATION,
             entity_category=EntityCategory.CONFIG,
             native_max_value=3,
-            native_unit_of_measurement="days",
+            native_unit_of_measurement=UnitOfTime.DAYS,
         ),
     ),
     "wk": (

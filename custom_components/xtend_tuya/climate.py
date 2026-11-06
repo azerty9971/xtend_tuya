@@ -608,9 +608,8 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
         )
 
         # Re-Determine HVAC modes
-        self._attr_hvac_modes = []
+        self._attr_hvac_modes = [HVACMode.OFF]
         if definition.hvac_mode_wrapper:
-            self._attr_hvac_modes = [HVACMode.OFF]
             for tuya_mode in cast(
                 list[TuyaClimateHVACMode], definition.hvac_mode_wrapper.options
             ):
@@ -620,11 +619,14 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
                     # OFF is always added first
                     self._attr_hvac_modes.append(ha_mode)
 
-        elif definition.switch_wrapper:
+        if definition.switch_wrapper and len(self._attr_hvac_modes) <= 1:
             self._attr_hvac_modes = [
                 HVACMode.OFF,
                 description.switch_only_hvac_mode,
             ]
+
+            # HVAC mode wrapper didn't map to any usable HVAC mode, disable its usage
+            self._hvac_mode_wrapper = None
 
         # Determine preset modes (ignore if empty options)
         if definition.preset_wrapper and definition.preset_wrapper.options:
@@ -657,10 +659,9 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
             XTClimateConfigurableProperties, self.get_configurable_properties()
         )
 
-    @property
-    def current_temperature(self) -> float | None:
-        """Return the current temperature."""
-        current_temperature = super().current_temperature
+    def _apply_current_temperature_multiplicator(
+        self, current_temperature: float | None
+    ) -> float | None:
         if (
             current_temperature is not None
             and self.configurable_properties is not None
@@ -671,6 +672,34 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
                 self.configurable_properties.current_temperature_value_multiplicator
             )
         return current_temperature
+
+    def _apply_target_temperature_multiplicator(
+        self, target_temperature: float | None
+    ) -> float | None:
+        if (
+            target_temperature is not None
+            and self.configurable_properties is not None
+            and self.configurable_properties.target_temperature_value_multiplicator
+            is not None
+        ):
+            target_temperature *= (
+                self.configurable_properties.target_temperature_value_multiplicator
+            )
+        return target_temperature
+
+    @property
+    def native_current_temperature(self) -> float | None:
+        """Return the current temperature."""
+        return self._apply_current_temperature_multiplicator(
+            super().native_current_temperature
+        )
+
+    @property
+    def native_target_temperature(self) -> float | None:
+        """Return the temperature currently set to be reached."""
+        return self._apply_target_temperature_multiplicator(
+            super().native_target_temperature
+        )
 
     @property
     def current_humidity(self) -> int | None:
@@ -687,21 +716,6 @@ class XTClimateEntity(XTEntity, TuyaClimateEntity):
                 * self.configurable_properties.current_humidity_value_multiplicator
             )
         return current_humidity
-
-    @property
-    def target_temperature(self) -> float | None:
-        """Return the temperature currently set to be reached."""
-        target_temperature = super().target_temperature
-        if (
-            target_temperature is not None
-            and self.configurable_properties is not None
-            and self.configurable_properties.target_temperature_value_multiplicator
-            is not None
-        ):
-            target_temperature *= (
-                self.configurable_properties.target_temperature_value_multiplicator
-            )
-        return target_temperature
 
     @property
     def target_humidity(self) -> int | None:

@@ -33,7 +33,7 @@ from .ha_tuya_integration.tuya_integration_imports import (
 
 
 @dataclass(frozen=True)
-class XTSirenEntityDescription(TuyaSirenEntityDescription, frozen_or_thawed=True):
+class XTSirenEntityDescription(TuyaSirenEntityDescription):
     # duplicate the entity if handled by another integration
     ignore_other_dp_code_handler: bool = False
 

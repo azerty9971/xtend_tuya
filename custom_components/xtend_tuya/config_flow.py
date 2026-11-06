@@ -358,9 +358,12 @@ class TuyaOptionFlow(OptionsFlow):
         self.selected_device_id: str | None = None
         self.selected_device_next_step_id: str | None = None
         self._device_options: dict[str, str] = {}
+        # runtime_data only exists while the entry is loaded; opening the
+        # options flow on an entry in error / not-loaded state (or mid-removal)
+        # otherwise raises AttributeError and the whole flow 500s.
         runtime_data = getattr(config_entry, "runtime_data", None)
-        self.multi_manager: mm.MultiManager | None = getattr(
-            runtime_data, "multi_manager", None
+        self.multi_manager: mm.MultiManager | None = (
+            getattr(runtime_data, "multi_manager", None) if runtime_data else None
         )
         if config_entry.options is not None:
             self.options = config_entry.options
