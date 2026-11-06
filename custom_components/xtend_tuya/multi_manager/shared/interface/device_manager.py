@@ -15,8 +15,6 @@ from ..shared_classes import (
 import custom_components.xtend_tuya.multi_manager.multi_manager as mm
 import custom_components.xtend_tuya.multi_manager.shared.shared_classes as shared
 from ....const import (
-    DOMAIN,
-    LOGGER,
     XTDeviceSourcePriority,
     XTIRHubInformation,
     XTIRRemoteInformation,
@@ -234,7 +232,7 @@ class XTDeviceManagerMultiManagerManagementInterface(ABC):
         pass
 
     @abstractmethod
-    def get_device_registry_identifiers(self) -> list:
+    def get_device_registry_identifiers(self) -> list[str]:
         return []
 
     def on_post_setup(self):

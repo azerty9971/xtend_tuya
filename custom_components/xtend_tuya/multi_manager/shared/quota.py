@@ -21,8 +21,8 @@ import logging
 from typing import Any
 
 from homeassistant.components.sensor import SensorEntity, SensorStateClass
+from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.storage import Store
 
 _LOGGER = logging.getLogger(__name__)
@@ -159,11 +159,11 @@ class XTControllableQuotaSensor(SensorEntity):
         self._tracker.remove_listener(self.async_write_ha_state)
 
     @property
-    def native_value(self) -> int:
+    def native_value(self) -> int: # type: ignore
         return self._tracker.used
 
     @property
-    def extra_state_attributes(self) -> dict[str, Any]:
+    def extra_state_attributes(self) -> dict[str, Any]: # type: ignore
         return {
             "limit": self._tracker.limit,
             "remaining": self._tracker.remaining,

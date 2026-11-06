@@ -641,7 +641,7 @@ async def resync_from_cloud(hass, data: dict) -> dict:
         _LOGGER.warning("resync: no timer registry entity loaded for %s", device_id)
         return {"success": False, "error": "no_registry_entity"}
     wrapper = entity._dpcode_wrapper
-    slots: dict = getattr(wrapper, "slots", None)
+    slots: dict | None = getattr(wrapper, "slots", None)
     if slots is None:
         return {"success": False, "error": "no_registry_slots"}
 

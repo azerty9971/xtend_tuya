@@ -17,6 +17,9 @@ from tuya_sharing.user import (
 from .xt_tuya_sharing_manager import (
     XTSharingDeviceManager,
 )
+from .xt_tuya_sharing_mq_watchdog import (
+    XTSharingMQWatchdog,
+)
 from ...shared.interface.device_manager import (
     XTDeviceManagerInterface,
 )
@@ -90,6 +93,7 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
         self.hass: HomeAssistant | None = None
         self.tuya_manager_decorator: list[XTDecorator] = []
         self.tuya_integration_decorator: list[XTDecorator] = []
+        self.mq_watchdog: XTSharingMQWatchdog | None = None
 
     def get_type_name(self) -> str:
         return MESSAGE_SOURCE_TUYA_SHARING
@@ -255,6 +259,7 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
         )
 
     def unload(self):
+        self._stop_mq_watchdog()
         for decorator in self.tuya_integration_decorator:
             decorator.unwrap()
         for decorator in self.tuya_manager_decorator:
@@ -294,7 +299,7 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
                 device_id, stream_type
             )
 
-    def get_device_registry_identifiers(self) -> list:
+    def get_device_registry_identifiers(self) -> list[str]:
         if self.sharing_account is None:
             return []
         if self.sharing_account.device_manager.reuse_config:
@@ -335,6 +340,7 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
         self.sharing_account.device_manager.add_device_by_id(device_id)
 
     def on_mqtt_stop(self):
+        self._stop_mq_watchdog()
         if (
             self.sharing_account is not None
             and self.sharing_account.device_manager.mq
@@ -359,6 +365,30 @@ class XTTuyaSharingDeviceManagerInterface(XTDeviceManagerInterface):
             self.multi_manager.multi_device_listener.trigger_device_discovery(
                 device, [TUYA_DISCOVERY_NEW_ORIG]
             )
+
+        self._start_mq_watchdog()
+
+    def _get_active_mq(self) -> Any:
+        if self.sharing_account is None:
+            return None
+        device_manager = self.sharing_account.device_manager
+        # In override mode the official Tuya manager owns the MQ client.
+        if other_manager := device_manager.get_overriden_device_manager():
+            return other_manager.mq
+        return device_manager.mq
+
+    def _start_mq_watchdog(self) -> None:
+        self._stop_mq_watchdog()
+        self.mq_watchdog = XTSharingMQWatchdog(
+            get_mq=self._get_active_mq,
+            restart_mq=self.refresh_mq,
+        )
+        self.mq_watchdog.start()
+
+    def _stop_mq_watchdog(self) -> None:
+        if self.mq_watchdog is not None:
+            self.mq_watchdog.stop()
+            self.mq_watchdog = None
 
     def get_platform_descriptors_to_merge(self, platform: Platform) -> Any:
         if self.sharing_account is None:
