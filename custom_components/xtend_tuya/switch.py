@@ -24,6 +24,7 @@ from .const import (
     XTDPCode,
     CROSS_CATEGORY_DEVICE_DESCRIPTOR,
     XTMultiManagerPostSetupCallbackPriority,
+    LOGGER,
 )
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaSwitchEntity,
@@ -644,10 +645,10 @@ class XTSwitchEntity(XTEntity, TuyaSwitchEntity):
                 description=description,
                 definition=definition,
             )
-        print(XTSwitchEntityDescription.__mro__)
-        print(inspect.signature(TuyaEntityDescription))
-        print(inspect.signature(TuyaSwitchEntityDescription))
-        print(inspect.signature(XTSwitchEntityDescription))
+        LOGGER.warning(XTSwitchEntityDescription.__mro__)
+        LOGGER.warning(inspect.signature(TuyaEntityDescription))
+        LOGGER.warning(inspect.signature(TuyaSwitchEntityDescription))
+        LOGGER.warning(inspect.signature(XTSwitchEntityDescription))
         return XTSwitchEntity(
             device=device,
             device_manager=device_manager,
