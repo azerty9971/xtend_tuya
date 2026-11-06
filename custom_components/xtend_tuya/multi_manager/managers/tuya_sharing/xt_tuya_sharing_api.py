@@ -7,6 +7,7 @@ import time
 # from datetime import datetime
 import json
 from tuya_sharing import SharingTokenListener
+from tuya_sharing.const import DEFAULT_TIMEOUT
 from tuya_sharing.customerapi import (
     CustomerApi,
     CustomerTokenInfo,
@@ -162,12 +163,17 @@ class XTSharingAPI(CustomerApi):
         sign = _restful_sign(hash_key, query_encdata, body_encdata, headers)
         headers["X-sign"] = sign
 
+        # Without a timeout a half-open connection blocks forever. The MQ
+        # credential renewal runs through here, so a hang silently freezes the
+        # MQTT push feed until Home Assistant restarts. Same value as the
+        # stock tuya_sharing CustomerApi.
         response = self.session.request(
             method,
             self.endpoint + path,
             params=params_enc,
             json=body_encrypted,
             headers=headers,
+            timeout=DEFAULT_TIMEOUT,
         )
 
         if response.ok is False:

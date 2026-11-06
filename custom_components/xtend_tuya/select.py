@@ -94,7 +94,7 @@ class XTEnumWithFixedValuesTypeInformation(TuyaEnumTypeInformation):
                         return type_information
         return None
 
-class XTDPCodeEnumWrapperWithFixedOptions[T = str](TuyaDPCodeTypeInformationWrapper[XTEnumWithFixedValuesTypeInformation, T]):
+class XTDPCodeEnumWrapperWithFixedOptions[T = str](TuyaDPCodeTypeInformationWrapper[XTEnumWithFixedValuesTypeInformation, T, T]):
     _DPTYPE = XTEnumWithFixedValuesTypeInformation
     options: list[str]
     
@@ -312,7 +312,7 @@ SELECTS: dict[str, tuple[XTSelectEntityDescription, ...]] = {
             entity_category=EntityCategory.CONFIG,
         ),
     ),
-    # QT-08W Solar Intelligent Water Valve
+    # Smart water valve
     "sfkzq": (
         XTSelectEntityDescription(
             key=XTDPCode.WORK_STATE,

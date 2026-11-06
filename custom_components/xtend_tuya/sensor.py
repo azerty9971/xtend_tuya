@@ -1890,7 +1890,7 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
         *TIMER_SENSORS,
     ),
     "rs": (*TEMPERATURE_SENSORS,),
-    # QT-08W Solar Intelligent Water Valve
+    # Smart water valve
     "sfkzq": (
         XTSensorEntityDescription(
             key=XTDPCode.WATER_ONCE,
@@ -1905,12 +1905,27 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
             entity_registry_enabled_default=True,
         ),
         XTSensorEntityDescription(
+            key=XTDPCode.WATER_TOTAL_1,
+            translation_key="watering_volume_total",
+            device_class=SensorDeviceClass.WATER,
+            state_class=SensorStateClass.TOTAL_INCREASING,
+            suggested_display_precision=0,
+        ),
+        XTSensorEntityDescription(
             key=XTDPCode.VBAT_STATE,
             translation_key="battery_level",
             device_class=SensorDeviceClass.BATTERY,
             state_class=SensorStateClass.MEASUREMENT,
             entity_category=EntityCategory.DIAGNOSTIC,
             native_value=lambda x: int(x) & 0x7F,
+        ),
+        XTSensorEntityDescription(
+            key=XTDPCode.BATTERY_PERCENTAGE,
+            translation_key="battery_level",
+            device_class=SensorDeviceClass.BATTERY,
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_category=EntityCategory.DIAGNOSTIC,
+            suggested_display_precision=0,
         ),
         XTSensorEntityDescription(
             key=XTDPCode.CUR_CAP,
@@ -1933,6 +1948,13 @@ SENSORS: dict[str, tuple[XTSensorEntityDescription, ...]] = {
             # state-restored orphan (state=unavailable, restored=True). Set
             # on both descriptors so iteration order doesn't matter.
             ignore_other_dp_code_handler=True,
+        ),
+        XTSensorEntityDescription(
+            key=XTDPCode.SINGLE_WATER_VOLUME,    
+            translation_key="watering_volume",
+            device_class=SensorDeviceClass.WATER,
+            state_class=SensorStateClass.TOTAL_INCREASING,
+            suggested_display_precision=0,
         ),
         XTSensorEntityDescription(
             key=XTDPCode.CYC_NUM,
@@ -2131,14 +2153,14 @@ async def async_setup_entry(
         return
 
     # Hub-level controllable-device quota sensor (OpenAPI hubs only).
-    _mm = entry.runtime_data.multi_manager
-    if getattr(_mm, "controllable_quota", None) is not None:
+    multi_manager = entry.runtime_data.multi_manager or hass_data.manager
+    if multi_manager.controllable_quota is not None:
         from .multi_manager.shared.quota import XTControllableQuotaSensor
 
         async_add_entities(
             [
                 XTControllableQuotaSensor(
-                    _mm.controllable_quota, entry.title or _mm.controllable_quota.hub_id
+                    multi_manager.controllable_quota, entry.title or multi_manager.controllable_quota.hub_id
                 )
             ]
         )
@@ -2150,7 +2172,7 @@ async def async_setup_entry(
         ],
         XTEntityDescriptorManager.get_platform_descriptors(
             SENSORS,
-            entry.runtime_data.multi_manager,
+            multi_manager,
             XTSensorEntityDescription,
             this_platform,
             COMPOUND_KEY,

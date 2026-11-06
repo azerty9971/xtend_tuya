@@ -9,7 +9,7 @@ from tuya_device_handlers.definition.number import (
 from homeassistant.components.number import (
     NumberDeviceClass,
 )
-from homeassistant.const import EntityCategory, Platform
+from homeassistant.const import EntityCategory, Platform, UnitOfTime
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -625,7 +625,7 @@ NUMBERS: dict[str, tuple[XTNumberEntityDescription, ...]] = {
         ),
         *TIMER_SENSORS,
     ),
-    # QT-08W Solar Intelligent Water Valve
+    # Smart water valve
     "sfkzq": (
         XTNumberEntityDescription(
             key=XTDPCode.COUNTDOWN,
@@ -634,12 +634,24 @@ NUMBERS: dict[str, tuple[XTNumberEntityDescription, ...]] = {
             entity_category=EntityCategory.CONFIG,
         ),
         XTNumberEntityDescription(
+            key=XTDPCode.COUNTDOWN_1,
+            translation_key="watering_duration",
+            translation_placeholders={},
+            device_class=NumberDeviceClass.DURATION,
+            native_unit_of_measurement="min",
+        ),
+        XTNumberEntityDescription(
+            key=XTDPCode.WATER_VOLUME_SETTING,
+            translation_key="watering_volume",
+            device_class=NumberDeviceClass.WATER,
+        ),
+        XTNumberEntityDescription(
             key=XTDPCode.DELAY_TASK,
             translation_key="rain_snow_delay",
             device_class=NumberDeviceClass.DURATION,
             entity_category=EntityCategory.CONFIG,
             native_max_value=3,
-            native_unit_of_measurement="days",
+            native_unit_of_measurement=UnitOfTime.DAYS,
         ),
     ),
     "wk": (
