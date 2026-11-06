@@ -28,11 +28,13 @@ from .const import (
 from .ha_tuya_integration.tuya_integration_imports import (
     TuyaSwitchEntity,
     TuyaSwitchEntityDescription,
+    TuyaEntityDescription,
 )
 from .entity import (
     XTEntity,
     XTEntityDescriptorManager,
 )
+import inspect
 
 
 @dataclass(frozen=True)
@@ -642,6 +644,10 @@ class XTSwitchEntity(XTEntity, TuyaSwitchEntity):
                 description=description,
                 definition=definition,
             )
+        print(XTSwitchEntityDescription.__mro__)
+        print(inspect.signature(TuyaEntityDescription))
+        print(inspect.signature(TuyaSwitchEntityDescription))
+        print(inspect.signature(XTSwitchEntityDescription))
         return XTSwitchEntity(
             device=device,
             device_manager=device_manager,
