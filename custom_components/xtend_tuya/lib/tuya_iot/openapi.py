@@ -255,17 +255,17 @@ class TuyaOpenAPI:
         schema: str = "",
     ) -> dict[str, Any]:
         self.token_info.set_reconnecting(is_connecting=True)
-        if self.non_user_specific_api:
-            return_value = self.connect_non_user_specific()
-        else:
-            return_value = self.connect_user_specific(
+        try:
+            if self.non_user_specific_api:
+                return self.connect_non_user_specific()
+            return self.connect_user_specific(
                 username=username,
                 password=password,
                 country_code=country_code,
                 schema=schema,
             )
-        self.token_info.set_reconnecting(is_connecting=False)
-        return return_value
+        finally:
+            self.token_info.set_reconnecting(is_connecting=False)
 
     def connect_non_user_specific(self) -> dict[str, Any]:
         if self.auth_type == AuthType.CUSTOM:
