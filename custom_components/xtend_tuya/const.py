@@ -767,6 +767,7 @@ class XTDPCode(StrEnum):
     ADD_ELE_THIS_YEAR = "add_ele_this_year"
     ADD_ELE_TODAY = "add_ele_today"
     ALARM_LOCK = "alarm_lock"
+    ALARM_REMINDER = "alarm_reminder"
     AUTOMATIC_LOCK = "automatic_lock"
     AUTO_DEORDRIZER = "auto_deordrizer"
     AUTO_LOCK_TIME = "auto_lock_time"
@@ -800,6 +801,7 @@ class XTDPCode(StrEnum):
     CHARGE_CUR_SET = "charge_cur_set"
     CHARGE_ENERGY = "charge_energy"
     CHARGE_ENERGY_ONCE = "charge_energy_once"
+    CHARGING = "charging"
     CHARGINGOPERATION = "ChargingOperation"
     CHOOSE_CAT_LITTER = "choose_cat_litter"
     # Channel data points for multi-sensor devices
@@ -960,6 +962,7 @@ class XTDPCode(StrEnum):
     OFF_BED_TIME = "off_bed_time"
     ONLINE_STATE = "online_state"
     OPEN_CLOSE = "open_close"
+    OPEN_INSIDE = "open_inside"
     PASSWORD_UNLOCK_USER = "password_unlock_user"
     PEDAL_ANGLE = "pedal_angle"
     PHASEFLAG = "PhaseFlag"
@@ -1001,6 +1004,8 @@ class XTDPCode(StrEnum):
     QUIET_TIME_END = "quiet_time_end"
     QUIET_TIME_START = "quiet_time_start"
     QUIET_TIMING_ON = "quiet_timing_on"
+    RAIN_SENSOR_STATE = "rain_sensor_state"
+    RAIN_SENSOR_SWITCH = "rain_sensor_switch"
     REACTIVEPOWER = "ReactivePower"
     REACTIVEPOWERA = "ReactivePowerA"
     REACTIVEPOWERB = "ReactivePowerB"
@@ -1037,6 +1042,7 @@ class XTDPCode(StrEnum):
     SETDELAYTIME = "SetDelayTime"
     SETTIME = "SetTime"
     SIGLE_PHASE_POWER = "sigle_phase_power"
+    SINGLE_WATER_VOLUME = "single_water_volume"
     SLEEPING = "sleeping"
     SLEEP_END_TIME = "sleep_end_time"
     SLEEP_NEW = "sleep_new"  # sleep mode switch (dp120)
@@ -1144,8 +1150,11 @@ class XTDPCode(StrEnum):
     WAKEUP = "wakeup"
     WATER_CONTROL = "water_control"
     WATER_ONCE = "water_once"
+    WATER_STATE = "water_state"
     WATER_TOTAL = "water_total"
     WATER_USE_DATA = "water_use_data"
+    WATER_VOLUME_RESET = "water_volume_reset"
+    WATER_VOLUME_SETTING = "water_volume_setting"
     WD_CONTROL = "wd_control"
     WD_DETECTION = "wd_detection"
     WD_PERCENT_CONTROL = "wd_percent_control"
@@ -1310,6 +1319,8 @@ DPCODE_PREFERED_DEVICE_CLASS: dict[str, str | None] = {
     "maxtemp_set": "temperature",
     "minitemp_set": "temperature",
     "set_temp": "temperature",
+    "set_temp_max": "temperature",
+    "set_temp_min": "temperature",
     "temperature_c": "temperature",
     "temp_current": "temperature",
     "temp_current_f": "temperature",

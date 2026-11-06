@@ -239,6 +239,24 @@ EVENTS: dict[str, tuple[XTEventEntityDescription, ...]] = {
             wrapper_class=XTDoorbellBooleanEventWrapper,
         ),
         XTEventEntityDescription(
+            key=XTDPCode.LOCK_RECORD,
+            translation_key="lock_record",
+            device_class=None,
+            wrapper_class=XTStringEventWrapper,
+        ),
+        XTEventEntityDescription(
+            key=XTDPCode.OPEN_INSIDE,
+            translation_key="open_inside",
+            device_class=None,
+            wrapper_class=XTBooleanEventWrapper,
+        ),
+        XTEventEntityDescription(
+            key=XTDPCode.ALARM_REMINDER,
+            translation_key="lockout_alarm",
+            device_class=None,
+            wrapper_class=XTIntegerEventWrapper,
+        ),
+        XTEventEntityDescription(
             key=XTDPCode.FACE_UNLOCK_USER,
             translation_key="unlock_user",
             translation_placeholders={"user_type": "Face"},
