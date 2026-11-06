@@ -30,7 +30,9 @@ class MultiDeviceListener:
             signal_list = util.append_lists(
                 signal_list, account.on_update_device(device)
             )
-        self.trigger_device_discovery(device, signal_list, updated_status_properties, dp_timestamps)
+        self.trigger_device_discovery(
+            device, signal_list, updated_status_properties, dp_timestamps
+        )
 
     def trigger_device_discovery(
         self,
@@ -42,7 +44,10 @@ class MultiDeviceListener:
         for signal in signal_list:
             try:
                 dispatcher_send(
-                    self.hass, f"{signal}_{device.id}", updated_status_properties, dp_timestamps
+                    self.hass,
+                    f"{signal}_{device.id}",
+                    updated_status_properties,
+                    dp_timestamps,
                 )
             except Exception as e:  # noqa: F841
                 # Could happen upon restart of HA
@@ -96,23 +101,36 @@ class MultiDeviceListener:
 
     def remove_device(self, device_id: str):
         device_registry = dr.async_get(self.hass)
-        identifiers: set = set()
-        account_identifiers: set = set()
+        identifiers: set[tuple[str, str]] = set()
+        account_identifiers: set[str] = set()
+        device_entry: dr.DeviceEntry | None = None
         for account in self.multi_manager.accounts.values():
             for account_identifier in account.get_device_registry_identifiers():
                 if account_identifier not in account_identifiers:
                     identifiers.add((account_identifier, device_id))
                     account_identifiers.add(account_identifier)
-        device_entry = device_registry.async_get_device(identifiers=identifiers)
-        if device_entry is not None:
-            self.hass.add_job(device_registry.async_remove_device, device_entry.id)
+        device_entries = device_registry.async_get_devices(
+            identifiers=identifiers,
+            config_entry_id=self.multi_manager.config_entry.entry_id,
+        )
+        if device_entries is not None:
+            already_processed_devices: list[str] = []
+            for device_entry in device_entries:
+                if device_entry.id not in already_processed_devices:
+                    self.hass.add_job(device_registry.async_remove_device, device_entry.id)
+                    already_processed_devices.append(device_entry.id)
 
     @callback
     def async_remove_device(self, device_id: str) -> None:
         """Remove device from Home Assistant."""
         device_registry = dr.async_get(self.hass)
-        device_entry = device_registry.async_get_device(
-            identifiers={(DOMAIN_ORIG, device_id), (DOMAIN, device_id)}
+        device_entries = device_registry.async_get_devices(
+            identifiers={(DOMAIN_ORIG, device_id), (DOMAIN, device_id)},
+            config_entry_id=self.multi_manager.config_entry.entry_id,
         )
-        if device_entry is not None:
-            self.hass.add_job(device_registry.async_remove_device, device_entry.id)
+        if device_entries is not None:
+            already_processed_devices: list[str] = []
+            for device_entry in device_entries:
+                if device_entry.id not in already_processed_devices:
+                    self.hass.add_job(device_registry.async_remove_device, device_entry.id)
+                    already_processed_devices.append(device_entry.id)

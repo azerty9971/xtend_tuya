@@ -113,6 +113,7 @@ from homeassistant.components.tuya.const import (
 )
 from homeassistant.components.tuya.entity import (
     TuyaEntity as TuyaEntity,
+    TuyaEntityDescription as TuyaEntityDescription,
 )
 
 from tuya_device_handlers.const import (

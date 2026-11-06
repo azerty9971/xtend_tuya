@@ -292,7 +292,7 @@ class XTTuyaIOTDeviceManagerInterface(XTDeviceManagerInterface):
                 device_id, stream_type
             )
 
-    def get_device_registry_identifiers(self) -> list:
+    def get_device_registry_identifiers(self) -> list[str]:
         return [DOMAIN]
 
     def get_domain_identifiers_of_device(self, device_id: str) -> list:
