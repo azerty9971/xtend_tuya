@@ -10,7 +10,7 @@ from typing import Any, cast
 
 import requests
 
-from .openlogging import logger
+from .openlogging import filter_logger, logger
 from .tuya_enums import AuthType
 from .version import VERSION
 
@@ -284,9 +284,9 @@ class TuyaOpenAPI:
                     "grant_type": 1,
                 },
             )
-        logger.debug(f"connect_non_user_specific: url={self.endpoint + url} {response=}")
+        logger.debug(f"connect_non_user_specific: url={self.endpoint + url} response={filter_logger(response)}")
         if response.get("success", False) is False:
-            raise Exception(f"[IOT API] connect_non_user_specific error: {response=} url={self.endpoint + url}")
+            raise Exception(f"[IOT API] connect_non_user_specific error: response={filter_logger(response)} url={self.endpoint + url}")
 
         # Cache token info.
         self.token_info.update_token(response)
@@ -439,21 +439,21 @@ class TuyaOpenAPI:
         if first_pass is False:
             self.report_message(
                 "debug",
-                f"[IOT API][{time_taken}][USER:{self.non_user_specific_api is False}]SECOND PASS Request: {method} {path} PARAMS: {json.dumps(params, ensure_ascii=False, indent=2) if params is not None else ''} BODY: {json.dumps(body, ensure_ascii=False, indent=2) if body is not None else ''}, first_pass={first_pass}, access_token={access_token}",
+                f"[IOT API][{time_taken}][USER:{self.non_user_specific_api is False}]SECOND PASS Request: {method} {path} PARAMS: {json.dumps(filter_logger(params), ensure_ascii=False, indent=2) if params is not None else ''} BODY: {json.dumps(filter_logger(body), ensure_ascii=False, indent=2) if body is not None else ''}, first_pass={first_pass}",
             )
             self.report_message(
                 "debug",
-                f"[IOT API][{time_taken}][USER:{self.non_user_specific_api is False}]SECOND PASS Response: {json.dumps(result, ensure_ascii=False, indent=2)}",
+                f"[IOT API][{time_taken}][USER:{self.non_user_specific_api is False}]SECOND PASS Response: {json.dumps(filter_logger(result), ensure_ascii=False, indent=2)}",
                 stack_info=True,
             )
         else:
             self.report_message(
                 "debug",
-                f"[IOT API][{time_taken}][USER:{self.non_user_specific_api is False}]Request: {method} {path} PARAMS: {json.dumps(params, ensure_ascii=False, indent=2) if params is not None else ''} BODY: {json.dumps(body, ensure_ascii=False, indent=2) if body is not None else ''}",
+                f"[IOT API][{time_taken}][USER:{self.non_user_specific_api is False}]Request: {method} {path} PARAMS: {json.dumps(filter_logger(params), ensure_ascii=False, indent=2) if params is not None else ''} BODY: {json.dumps(filter_logger(body), ensure_ascii=False, indent=2) if body is not None else ''}",
             )
             self.report_message(
                 "debug",
-                f"[IOT API][{time_taken}][USER:{self.non_user_specific_api is False}]Response: {json.dumps(result, ensure_ascii=False, indent=2)}",
+                f"[IOT API][{time_taken}][USER:{self.non_user_specific_api is False}]Response: {json.dumps(filter_logger(result), ensure_ascii=False, indent=2)}",
             )
             pass
 

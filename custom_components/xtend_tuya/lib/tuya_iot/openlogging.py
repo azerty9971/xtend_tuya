@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import copy
 import logging  # noqa: F401
 from typing import Any
 from ...const import LOGGER as logger
@@ -33,24 +32,25 @@ FILTER_LIST = [
 STAR = "***"
 
 
+def _mask(value: Any) -> Any:
+    """Return a copy of value with every FILTER_LIST key masked, at any depth."""
+    if isinstance(value, dict):
+        return {
+            key: STAR if key in FILTER_LIST else _mask(item)
+            for key, item in value.items()
+        }
+    if isinstance(value, (list, tuple)):
+        return [_mask(item) for item in value]
+    return value
+
+
 def filter_logger(result_info: dict[str, Any] | None):
-    """Filter log, hide sensitive info."""
+    """Filter log, hide sensitive info.
+
+    Works on a copy, masks sensitive keys at any depth (including inside
+    lists and next to "result"), and never raises on unexpected shapes,
+    since it runs on every logged request/response.
+    """
     if result_info is None:
         return result_info
-    filter_info_original = copy.deepcopy(result_info)
-    if "result" in filter_info_original:
-        filter_info = filter_info_original["result"]
-    else:
-        filter_info = filter_info_original
-    if isinstance(filter_info, list):
-        for item in filter_info:
-            for filter_key in FILTER_LIST:
-                if filter_key in item:
-                    item[filter_key] = STAR
-
-    elif isinstance(filter_info, dict):
-        for filter_key in FILTER_LIST:
-            if filter_key in filter_info:
-                filter_info[filter_key] = STAR
-
-    return filter_info_original
+    return _mask(result_info)
