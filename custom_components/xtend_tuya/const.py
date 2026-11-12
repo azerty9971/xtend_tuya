@@ -819,6 +819,7 @@ class XTDPCode(StrEnum):
     CH_PARA = "ch_para"  # Channel parameters
     CLCT_TIME = "clct_time"
     CLEAN = "clean"
+    CLEAN_2 = "Clean"
     CLEANING = "cleaning"
     CLEANING_NUM = "cleaning_num"
     CLEAN_NOTICE = "Clean_notice"

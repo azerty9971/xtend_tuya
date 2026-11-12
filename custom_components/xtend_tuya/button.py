@@ -273,6 +273,11 @@ BUTTONS: dict[str, tuple[XTButtonEntityDescription, ...]] = {
             key=XTDPCode.CLEAN,
             translation_key="manual_clean",
         ),
+        # smart cat litter box 01C ZY: case-sensitive "Clean" (DP 101)
+        XTButtonEntityDescription(
+            key=XTDPCode.CLEAN_2,
+            translation_key="manual_clean",
+        ),
         # One-click cleanup action (momentary trigger)
         XTButtonEntityDescription(
             key=XTDPCode.CLEANING,
