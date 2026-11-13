@@ -14,6 +14,10 @@ from .openlogging import logger
 from .tuya_enums import AuthType
 from .version import VERSION
 
+# Match Tuya Sharing's 60s timeout without coupling this library to its SDK.
+# Requests applies this to connect/read inactivity, not a total deadline.
+DEFAULT_TIMEOUT = 60
+
 TUYA_ERROR_CODE_TOKEN_INVALID = 1010
 TUYA_ERROR_SIGN_INVALID = 1004
 TUYA_ERROR_SIGN_INVALID2 = -9999999
@@ -415,6 +419,7 @@ class TuyaOpenAPI:
             params=params,
             json=body,
             headers=headers,
+            timeout=DEFAULT_TIMEOUT,
         )
 
         try:
