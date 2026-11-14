@@ -211,6 +211,10 @@ class TuyaOpenMQ(threading.Thread):
 
     def _run_mqtt(self, first_pass=True):
         with self._client_lock:
+            # Don't do anything if stop() ran while we were waiting for the lock
+            if self._stop_event.is_set():
+                return
+
             # Don't do anything if already connected
             if self.client and self.client.is_connected() and self.mq_config.is_valid():
                 return
