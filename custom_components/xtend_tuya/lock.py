@@ -80,6 +80,9 @@ LOCK_LOCKED_UNLOCKED_STATUS_DPCODES: list[XTDPCode] = [
 LOCK_MANUAL_COMMAND_DPCODES: list[XTDPCode] = [
     XTDPCode.ACCESSORY_LOCK,
     XTDPCode.BLUETOOTH_UNLOCK,
+    # dp47: standard lock motor DP — videolock-style locks (LEZN-D12, ...)
+    # unlock on a raw DP write while not exposing the cloud door-lock API
+    XTDPCode.LOCK_MOTOR_STATE,
     XTDPCode.REPLY_UNLOCK_REQUEST,
 ]
 

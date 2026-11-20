@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import Any, cast
 from datetime import datetime, timedelta
+import asyncio
 import time
 import json
 from webrtc_models import (
@@ -12,6 +13,7 @@ from homeassistant.components.camera.webrtc import (
     WebRTCSendMessage,
     WebRTCCandidate,
     WebRTCAnswer,
+    WebRTCError,
 )
 import custom_components.xtend_tuya.multi_manager.managers.tuya_iot.ipc.xt_tuya_iot_ipc_manager as ipc_man
 from .....shared.shared_classes import (
@@ -57,6 +59,7 @@ class XTIOTWebRTCSession:
     offer_candidate: list[str]
     hass: HomeAssistant | None
     offer_sent: bool = False
+    answer_received: bool = False
     modes: dict[str, str]
     offer_codec_manager: XTIOTWebRTCCodecManager | None = None
     answer_codec_manager: XTIOTWebRTCCodecManager | None = None
@@ -76,6 +79,7 @@ class XTIOTWebRTCSession:
         self.modes = {}
         self.offer_codec_manager = None
         self.answer_codec_manager = None
+        self.answer_received = False
 
     def __repr__(self) -> str:
         answer = ""
@@ -102,15 +106,22 @@ class XTIOTWebRTCManager:
         self.sdp_exchange: dict[str, XTIOTWebRTCSession] = {}
         self.ipc_manager = ipc_manager
         self.multi_manager = ipc_manager.multi_manager
+        # device_id -> (session_id, webrtc_config) of the last opened session.
+        # Kept independently of the expiring sdp_exchange cache: the device keeps
+        # its stream session (keyed by the config's moto_id) until it is told to
+        # disconnect, so the original config must be available even after the
+        # session cache entry expires.
+        self.open_device_sessions: dict[str, tuple[str, XTIOTWebRTCConfig]] = {}
 
     def report_message(
-        self, msg: str, device_id: str = XTDeviceWatcherSpecialDevice.NOT_LINKED_TO_A_DEVICE, category = XTDeviceWatcherCategory.WEBRTC, print_stack: bool = False
+        self, msg: str, device_id: str = XTDeviceWatcherSpecialDevice.NOT_LINKED_TO_A_DEVICE, category = XTDeviceWatcherCategory.WEBRTC, print_stack: bool = False, method: str = "debug"
     ) -> None:
         self.multi_manager.device_watcher.report_message(
             dev_id=device_id,
             message=msg,
             category=category,
             print_stack=print_stack,
+            method=method,
         )
 
     def get_webrtc_session(self, session_id: str | None) -> XTIOTWebRTCSession | None:
@@ -135,6 +146,7 @@ class XTIOTWebRTCManager:
             return
         self._create_session_if_necessary(session_id)
         self.sdp_exchange[session_id].answer = answer
+        self.sdp_exchange[session_id].answer_received = True
         self.report_message(f"Got SDP answer for {session_id=} {answer=}")
         if callback := self.sdp_exchange[session_id].message_callback:
             sdp_answer = answer.get("sdp", "")
@@ -196,10 +208,29 @@ class XTIOTWebRTCManager:
     ) -> XTIOTWebRTCConfig | None:
         if current_exchange := self.get_webrtc_session(session_id):
             if current_exchange.webrtc_config is not None:
-                return current_exchange.webrtc_config
+                if current_exchange.webrtc_config.is_webrtc_config_valid():
+                    return current_exchange.webrtc_config
         return await XTEventLoopProtector.execute_out_of_event_loop_and_return(
             self.get_config, device_id, session_id
         )
+
+    def _resolve_session_config(
+        self, session_id: str, device_id: str
+    ) -> XTIOTWebRTCConfig | None:
+        """Resolve the WebRTC config to use for a session.
+
+        Prefers the config that was actually used when the session was opened.
+        The device keys its stream session by that config's moto_id, so a newer
+        config fetched from the cloud would refer to a different (nonexistent)
+        session and messages would be rejected or published to the wrong topic.
+        """
+        if session := self.get_webrtc_session(session_id):
+            if session.webrtc_config is not None:
+                return session.webrtc_config
+        if open_session := self.open_device_sessions.get(device_id):
+            if open_session[0] == session_id:
+                return open_session[1]
+        return self.get_config(device_id, session_id)
 
     def get_config(
         self, device_id: str, session_id: str | None
@@ -223,13 +254,14 @@ class XTIOTWebRTCManager:
     def _get_config_from_cloud(
         self, device_id: str, session_id: str | None
     ) -> XTIOTWebRTCConfig | None:
-        webrtc_config = self.ipc_manager.api.get(
-            f"/v1.0/devices/{device_id}/webrtc-configs"
-        )
+        uid = self.ipc_manager.api.token_info.uid
+        if uid:
+            path = f"/v1.0/users/{uid}/devices/{device_id}/webrtc-configs"
+        else:
+            path = f"/v1.0/devices/{device_id}/webrtc-configs"
+        webrtc_config = self.ipc_manager.api.get(path)
         if webrtc_config.get("success", False) is False:
-            webrtc_config = self.ipc_manager.non_user_api.get(
-                f"/v1.0/devices/{device_id}/webrtc-configs"
-            )
+            webrtc_config = self.ipc_manager.non_user_api.get(path)
         self.report_message(
             msg=f"webrtc_config {webrtc_config}",
             device_id=device_id,
@@ -557,7 +589,14 @@ class XTIOTWebRTCManager:
             return None
         session_data.message_callback = send_message
         session_data.hass = hass
-        await self.async_get_config(device.id, session_id)
+        # The device supports a single concurrent stream session: if the previous
+        # one was not closed properly (HA restart, closed browser tab, missed
+        # close event), release it before starting a new one, otherwise the
+        # device will ignore the new offer.
+        self.close_stale_session(device)
+        webrtc_config = await self.async_get_config(device.id, session_id)
+        if webrtc_config is not None:
+            self.open_device_sessions[device.id] = (session_id, webrtc_config)
         self.set_original_sdp_offer(session_id, offer_sdp)
         offer_changed = self.get_candidates_from_offer(session_id, offer_sdp)
         offer_changed = self.fix_offer(offer_changed, session_id)
@@ -567,7 +606,14 @@ class XTIOTWebRTCManager:
                 self.format_offer_payload, session_id, offer_changed, device, stream_quality
             )
         )
-        self.report_message(f"Sending offer payload: {sdp_offer_payload}")
+        if sdp_offer_payload is None:
+            self.report_message(
+                f"Offer payload is None for {session_id=} (no WebRTC config available), cannot start stream",
+                device_id=device.id,
+                method="warning",
+            )
+            return
+        self.report_message(f"Sending offer payload: {sdp_offer_payload}", device_id=device.id)
         await XTEventLoopProtector.execute_out_of_event_loop_and_return(
             self.send_to_ipc_mqtt,
             session_id,
@@ -583,6 +629,54 @@ class XTIOTWebRTCManager:
                 device,
             ):
                 self.send_to_ipc_mqtt(session_id, device, json.dumps(candidate_payload))
+        # If the device does not answer, let the frontend know instead of
+        # waiting forever for an answer that will never come
+        hass.async_create_task(
+            self._wait_for_answer(session_id, send_message, device.id)
+        )
+
+    async def _wait_for_answer(
+        self,
+        session_id: str,
+        send_message: WebRTCSendMessage,
+        device_id: str,
+        timeout: int = 20,
+    ) -> None:
+        deadline = time.monotonic() + timeout
+        while time.monotonic() < deadline:
+            await asyncio.sleep(1)
+            session = self.get_webrtc_session(session_id)
+            if session is None or session.answer_received:
+                return
+        session = self.get_webrtc_session(session_id)
+        if session is not None and not session.answer_received:
+            self.report_message(
+                f"WebRTC answer timeout ({timeout}s) for {session_id=} device={device_id}: the device did not respond to the offer",
+                device_id=device_id,
+                method="warning",
+            )
+            try:
+                send_message(
+                    WebRTCError(
+                        code="webrtc_answer_timeout",
+                        message="The device did not answer the WebRTC offer",
+                    )
+                )
+            except Exception:
+                pass
+
+    def close_stale_session(self, device: XTDevice) -> None:
+        open_session = self.open_device_sessions.get(device.id)
+        if open_session is None:
+            return
+        old_session_id, _ = open_session
+        self.report_message(
+            f"Closing stale WebRTC session {old_session_id=} before a new offer (device supports a single stream session)",
+            device_id=device.id,
+        )
+        if payload := self.format_close_session(old_session_id, device):
+            self.send_to_ipc_mqtt(old_session_id, device, json.dumps(payload))
+        self.open_device_sessions.pop(device.id, None)
 
     async def async_on_webrtc_candidate(
         self, session_id: str, candidate: RTCIceCandidateInit, device: XTDevice
@@ -607,11 +701,23 @@ class XTIOTWebRTCManager:
                 self.send_to_ipc_mqtt(session_id, device, json.dumps(payload))
 
     def on_webrtc_close_session(self, session_id: str, device: XTDevice) -> None:
-        session_data = self.get_webrtc_session(session_id)
-        if session_data is None:
-            return None
+        self.report_message(
+            f"Close WebRTC session requested: {session_id=} device={device.id}",
+            device_id=device.id,
+        )
+        was_open = False
+        if open_session := self.open_device_sessions.get(device.id):
+            was_open = open_session[0] == session_id
         if payload := self.format_close_session(session_id, device):
             self.send_to_ipc_mqtt(session_id, device, json.dumps(payload))
+        else:
+            self.report_message(
+                f"Close WebRTC session: no disconnect sent for {session_id=} (no config available)",
+                device_id=device.id,
+                method="warning",
+            )
+        if was_open:
+            self.open_device_sessions.pop(device.id, None)
         return None
 
     def get_candidates_from_offer(self, session_id: str, offer_sdp: str) -> str:
@@ -848,7 +954,7 @@ class XTIOTWebRTCManager:
     def format_close_session(
         self, session_id: str, device: XTDevice
     ) -> dict[str, Any] | None:
-        if webrtc_config := self.get_config(device.id, session_id):
+        if webrtc_config := self._resolve_session_config(session_id, device.id):
             moto_id = webrtc_config.get("moto_id", "!!!MOTO_ID_NOT_FOUND!!!")
             return {
                 "protocol": 302,
@@ -870,19 +976,24 @@ class XTIOTWebRTCManager:
         return None
 
     def send_to_ipc_mqtt(self, session_id: str, device: XTDevice, payload: str):
-        webrtc_config = self.get_config(device.id, session_id)
+        webrtc_config = self._resolve_session_config(session_id, device.id)
         if (
             self.ipc_manager.mq.mq_config is None
             or self.ipc_manager.mq.mq_config.sink_topic is None
             or webrtc_config is None
         ):
+            self.report_message(
+                f"send_to_ipc_mqtt skipped for {session_id=}: mq_config_present={self.ipc_manager.mq.mq_config is not None} sink_topic_present={self.ipc_manager.mq.mq_config.sink_topic is not None if self.ipc_manager.mq.mq_config is not None else False} webrtc_config_present={webrtc_config is not None}",
+                device_id=device.id,
+                method="warning",
+            )
             return None
         for topic in self.ipc_manager.mq.mq_config.sink_topic.values():
             topic = topic.replace("{device_id}", device.id)
             topic = topic.replace(
                 "moto_id", webrtc_config.get("moto_id", "!!!MOTO_ID_NOT_FOUND!!!")
             )
-            self.ipc_manager.publish_to_ipc_mqtt(topic, payload)
+            self.ipc_manager.publish_to_ipc_mqtt(topic, payload, device_id=device.id)
 
 
 class XTIOTWebRTCCodecManager:

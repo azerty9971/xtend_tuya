@@ -3,7 +3,7 @@
 from __future__ import annotations
 import json
 import functools
-from typing import Any, cast
+from typing import Any, Callable, cast
 from webrtc_models import (
     RTCIceCandidateInit,
     RTCIceServer,
@@ -24,6 +24,7 @@ from homeassistant.components.camera.webrtc import (
     WebRTCSendMessage,
     WebRTCClientConfiguration,
 )
+from homeassistant.components.stream import Stream
 from .multi_manager.multi_manager import (
     XTConfigEntry,
     MultiManager,
@@ -159,6 +160,15 @@ async def async_setup_entry(
     )
 
 
+# The cloud RTSPS token embedded in stream_source() expires after a few
+# minutes while HA caches the source inside the Stream object, so reconnecting
+# to an idle stream keeps retrying the dead URL in a 404 loop. A fresh source
+# is allocated when a viewer reconnects to an idle stream and whenever a
+# stream with active viewers becomes unavailable; a healthy stream is never
+# touched, so battery cameras are not polled while idle.
+STREAM_SOURCE_REFRESH_INTERVAL = 30
+
+
 class XTCameraEntity(XTEntity, TuyaCameraEntity):
     """XT Camera Entity."""
 
@@ -197,6 +207,9 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         self.hass = hass
         self.webrtc_configuration: WebRTCClientConfiguration | None = webrtc_config
         self.wait_for_candidates = None
+        self.wait_for_candidates_session: str | None = None
+        self.wait_for_resolution = None
+        self.wait_for_resolution_session: str | None = None
         self.supports_2way_audio: bool = False
         self.has_multiple_streams: bool = False
         self.stream_quality = stream_quality
@@ -211,6 +224,10 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
             XTMultiManagerProperties.CAMERA_DEVICE_ID, device.id
         )
         self.read_raw_webrtc_config()
+        # session ids handled by the Tuya IOT manager (everything else is
+        # routed to a registered provider, e.g. go2rtc)
+        self._tuya_sessions: set[str] = set()
+        self._stream_refresh_unsub: Callable[[], None] | None = None
 
     @staticmethod
     def should_entity_be_added(
@@ -304,7 +321,9 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
     async def async_handle_async_webrtc_offer(
         self, offer_sdp: str, session_id: str, send_message: WebRTCSendMessage
     ) -> None:
-        if self.iot_manager is None:
+        if self.iot_manager is None or self.webrtc_configuration is None:
+            # No Tuya WebRTC config (e.g. a videolock): delegate to a
+            # registered provider (go2rtc) that can stream the RTSP source.
             return await super().async_handle_async_webrtc_offer(
                 offer_sdp, session_id, send_message
             )
@@ -319,8 +338,11 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
                 cancel_on_shutdown=True,
             ),
         )
+        self.wait_for_candidates_session = session_id
         if self.has_multiple_streams:
-            self.wait_for_candidates = async_call_later(
+            if self.wait_for_resolution:
+                self.wait_for_resolution()
+            self.wait_for_resolution = async_call_later(
                 self._hass,
                 5,
                 HassJob(
@@ -334,6 +356,8 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
                     cancel_on_shutdown=True,
                 ),
             )
+            self.wait_for_resolution_session = session_id
+        self._tuya_sessions.add(session_id)
         return await self.iot_manager.async_handle_async_webrtc_offer(
             offer_sdp,
             session_id,
@@ -346,9 +370,27 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
     @callback
     def close_webrtc_session(self, session_id: str) -> None:
         """Close the session."""
-        if self.iot_manager is None:
+        if (
+            self.wait_for_candidates
+            and self.wait_for_candidates_session == session_id
+        ):
+            self.wait_for_candidates()
+            self.wait_for_candidates = None
+            self.wait_for_candidates_session = None
+        if (
+            self.wait_for_resolution
+            and self.wait_for_resolution_session == session_id
+        ):
+            self.wait_for_resolution()
+            self.wait_for_resolution = None
+            self.wait_for_resolution_session = None
+        if session_id in self._tuya_sessions:
+            self._tuya_sessions.discard(session_id)
+            if self.iot_manager is None:
+                return None
+            self.iot_manager.on_webrtc_close_session(session_id, self.device)
             return None
-        self.iot_manager.on_webrtc_close_session(session_id, self.device)
+        return super().close_webrtc_session(session_id)
 
     def send_closing_candidate(
         self, session_id: str, device: XTDevice, *_: Any
@@ -370,11 +412,11 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
         self, session_id: str, candidate: RTCIceCandidateInit
     ) -> None:
         """Handle a WebRTC candidate."""
-        if self.iot_manager is None:
-            return await super().async_on_webrtc_candidate(session_id, candidate)
-        return await XTEventLoopProtector.execute_out_of_event_loop_and_return(self.iot_manager.async_on_webrtc_candidate, 
-            session_id, candidate, self.device, report_non_sense=False
-        )
+        if self.iot_manager is not None and session_id in self._tuya_sessions:
+            return await XTEventLoopProtector.execute_out_of_event_loop_and_return(self.iot_manager.async_on_webrtc_candidate, 
+                session_id, candidate, self.device, report_non_sense=False
+            )
+        return await super().async_on_webrtc_candidate(session_id, candidate)
 
     @callback
     def _async_get_webrtc_client_configuration(self) -> WebRTCClientConfiguration:
@@ -403,3 +445,53 @@ class XTCameraEntity(XTEntity, TuyaCameraEntity):
                 True,
             )
             return None
+
+    async def async_create_stream(self) -> Stream | None:
+        """Create the stream and refresh its source when a viewer reconnects.
+
+        The cloud RTSPS token in stream_source() expires after a few minutes
+        while HA caches the source inside the Stream object, so reconnecting
+        to an idle stream would keep retrying the dead URL.
+        """
+        had_stream = self.stream is not None
+        stream = await super().async_create_stream()
+        if stream is None:
+            return None
+        if self._stream_refresh_unsub is None:
+            self._schedule_stream_source_refresh()
+        if had_stream and not stream.outputs():
+            await self._refresh_stream_source(force=True)
+        return stream
+
+    def _schedule_stream_source_refresh(self) -> None:
+        if self._stream_refresh_unsub is None:
+            self._stream_refresh_unsub = async_call_later(
+                self._hass,
+                STREAM_SOURCE_REFRESH_INTERVAL,
+                HassJob(self._refresh_stream_source, cancel_on_shutdown=True),
+            )
+
+    async def _refresh_stream_source(self, force: bool = False) -> None:
+        self._stream_refresh_unsub = None
+        stream = self.stream
+        if stream is not None and (
+            force or (stream.outputs() and not stream.available)
+        ):
+            source = await self.stream_source()
+            if source and source != stream.source:
+                self.device_manager.device_watcher.report_message(
+                    self.device.id,
+                    f"Refreshing stream source for device {self.device.id}",
+                    XTDeviceWatcherCategory.PLATFORM_CAMERA,
+                    self.device,
+                )
+                stream.update_source(source)
+        self._schedule_stream_source_refresh()
+
+    @callback
+    async def async_will_remove_from_hass(self) -> None:
+        if self._stream_refresh_unsub is not None:
+            self._stream_refresh_unsub()
+            self._stream_refresh_unsub = None
+        self._tuya_sessions.clear()
+        await super().async_will_remove_from_hass()

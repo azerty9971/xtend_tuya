@@ -1,5 +1,8 @@
 from __future__ import annotations
 import custom_components.xtend_tuya.multi_manager.managers.tuya_iot.ipc.xt_tuya_iot_ipc_manager as ipc_man
+from .....const import (
+    XTDeviceWatcherCategory,
+)
 
 
 class XTIOTIPCListener:
@@ -13,6 +16,13 @@ class XTIOTIPCListener:
         match protocol:
             case 302:  # SDP offer/answer/candidate
                 data: dict = msg.get("data", {})
+                if not isinstance(data, dict):
+                    self.ipc_manager.report_message(
+                        f"IPC message 302 with unexpected data type: {msg}",
+                        category=XTDeviceWatcherCategory.WEBRTC,
+                        method="warning",
+                    )
+                    return
                 header: dict = data.get("header", {})
                 sdp_type = header.get("type")
                 session_id = header.get("sessionid")
@@ -26,3 +36,9 @@ class XTIOTIPCListener:
                         self.ipc_manager.webrtc_manager.add_sdp_answer_candidate(
                             session_id, msg_content
                         )
+            case _:
+                self.ipc_manager.report_message(
+                    f"IPC message with unhandled protocol received: {msg}",
+                    category=XTDeviceWatcherCategory.WEBRTC,
+                    method="warning",
+                )

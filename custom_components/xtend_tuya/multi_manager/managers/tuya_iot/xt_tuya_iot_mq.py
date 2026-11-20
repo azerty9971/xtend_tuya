@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import time
 from typing import Any
 from paho.mqtt import client as mqtt
 from paho.mqtt.reasoncodes import (
@@ -87,3 +88,30 @@ class XTIOTOpenMQ(TuyaOpenMQ):
                 )
         else:
             LOGGER.error(f"[{self.class_id} MQTT] connect failed with rc={rc}")
+
+    def run(self):
+        """Keep reconnecting forever.
+
+        The base implementation gives up after 10 failed attempts and kills the
+        MQTT thread; once it is dead, no MQTT traffic (offers, answers, session
+        disconnects) gets through until Home Assistant is restarted.
+        """
+        backoff_seconds = 1
+        retry_amount = 0
+        while not self._stop_event.is_set():
+            try:
+                self._run_mqtt()
+                if retry_amount > 0:
+                    LOGGER.warning(
+                        f"[{self.class_id} MQTT] reconnected after {retry_amount} failed attempt(s)"
+                    )
+                backoff_seconds = 1
+                retry_amount = 0
+                time.sleep(1)
+            except Exception as e:
+                retry_amount += 1
+                LOGGER.warning(
+                    f"[{self.class_id} MQTT] connection attempt failed (retry {retry_amount}, next in {backoff_seconds}s): {e}"
+                )
+                time.sleep(backoff_seconds)
+                backoff_seconds = min(backoff_seconds * 2, 60)
