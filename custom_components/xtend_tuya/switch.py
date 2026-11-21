@@ -630,7 +630,52 @@ class XTSwitchEntity(XTEntity, TuyaSwitchEntity):
         self.device_manager = device_manager
         self.entity_description = description  # type: ignore
 
+    def _uses_raw_breaker_control(self) -> bool:
+        """Return True for the CHLIUYI global breaker switch."""
+        return (
+            getattr(self.device, "product_id", None) == "4tpaetqac6lap6mv"
+            and self.entity_description.key == XTDPCode.SWITCH_1
+        )
+
+    @property
+    def is_on(self) -> bool | None:
+        """Read global L0 state from DP103 for the CHLIUYI breaker."""
+        if not self._uses_raw_breaker_control():
+            return super().is_on
+
+        status = self.device.status.get("switch_status")
+        if status is None:
+            return None
+
+        try:
+            return bool(int(status) & 0x01)
+        except (TypeError, ValueError):
+            return None
+
+    async def _process_device_update(
+        self,
+        updated_status_properties: list[str] | None,
+        dp_timestamps: dict[str, int] | None,
+    ) -> bool:
+        """Update the CHLIUYI entity when its DP103 state changes."""
+        if self._uses_raw_breaker_control():
+            return (
+                updated_status_properties is None
+                or "switch_status" in updated_status_properties
+            )
+
+        return await super()._process_device_update(
+            updated_status_properties,
+            dp_timestamps,
+        )
+
     async def async_turn_on(self, **kwargs: Any) -> None:
+        if self._uses_raw_breaker_control():
+            await self._async_send_commands(
+                [{"code": "switch_on", "value": "AAE="}]
+            )
+            return
+
         if self.entity_description.dont_send_to_cloud:
             if self.entity_description.key in self.device.status:
                 self.device.status[self.entity_description.key] = True
@@ -641,6 +686,12 @@ class XTSwitchEntity(XTEntity, TuyaSwitchEntity):
         await super().async_turn_on(**kwargs)
 
     async def async_turn_off(self, **kwargs: Any) -> None:
+        if self._uses_raw_breaker_control():
+            await self._async_send_commands(
+                [{"code": "switch_off", "value": "AAE="}]
+            )
+            return
+
         if self.entity_description.dont_send_to_cloud:
             if self.entity_description.key in self.device.status:
                 self.device.status[self.entity_description.key] = False
