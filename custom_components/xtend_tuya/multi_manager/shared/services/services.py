@@ -156,6 +156,8 @@ class ServiceManager:
             True,
             True,
             True,
+            # Lets scripts/automations read the Tuya API result via response_variable
+            supports_response=SupportsResponse.OPTIONAL,
         )
         self._register_service(
             DOMAIN,
