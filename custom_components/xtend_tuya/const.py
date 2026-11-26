@@ -134,6 +134,7 @@ PLATFORMS = [
     Platform.SENSOR,
     Platform.SIREN,
     Platform.SWITCH,
+    Platform.TEXT,
     Platform.TIME,
     Platform.VACUUM,
 ]
@@ -736,6 +737,13 @@ class XTDPCode(StrEnum):
     WATER_TIME = "water_time"  # Water usage duration
     WATERSENSOR_STATE = "watersensor_state"
     WEATHER_DELAY = "weather_delay"
+    WEEK_PROGRAM_13_1 = "week_program_13_1"
+    WEEK_PROGRAM_13_2 = "week_program_13_2"
+    WEEK_PROGRAM_13_3 = "week_program_13_3"
+    WEEK_PROGRAM_13_4 = "week_program_13_4"
+    WEEK_PROGRAM_13_5 = "week_program_13_5"
+    WEEK_PROGRAM_13_6 = "week_program_13_6"
+    WEEK_PROGRAM_13_7 = "week_program_13_7"
     WET = "wet"  # Humidification
     WINDOW_CHECK = "window_check"
     WINDOW_STATE = "window_state"
