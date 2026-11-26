@@ -3478,6 +3478,29 @@
                 "name": "Rain/snow sensing"
             }
         },
+        "text": {
+            "week_program_monday": {
+                "name": "Week program Monday"
+            },
+            "week_program_tuesday": {
+                "name": "Week program Tuesday"
+            },
+            "week_program_wednesday": {
+                "name": "Week program Wednesday"
+            },
+            "week_program_thursday": {
+                "name": "Week program Thursday"
+            },
+            "week_program_friday": {
+                "name": "Week program Friday"
+            },
+            "week_program_saturday": {
+                "name": "Week program Saturday"
+            },
+            "week_program_sunday": {
+                "name": "Week program Sunday"
+            }
+        },
         "time": {
             "countdown_1": {
                 "name": "Countdown 1"

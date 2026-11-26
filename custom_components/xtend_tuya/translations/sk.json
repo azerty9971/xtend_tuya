@@ -1084,6 +1084,29 @@
                 "name": "\u0160irok\u00fd dynamick\u00fd rozsah"
             }
         },
+        "text": {
+            "week_program_monday": {
+                "name": "T\u00fd\u017edenn\u00fd program \u2013 pondelok"
+            },
+            "week_program_tuesday": {
+                "name": "T\u00fd\u017edenn\u00fd program \u2013 utorok"
+            },
+            "week_program_wednesday": {
+                "name": "T\u00fd\u017edenn\u00fd program \u2013 streda"
+            },
+            "week_program_thursday": {
+                "name": "T\u00fd\u017edenn\u00fd program \u2013 \u0161tvrtok"
+            },
+            "week_program_friday": {
+                "name": "T\u00fd\u017edenn\u00fd program \u2013 piatok"
+            },
+            "week_program_saturday": {
+                "name": "T\u00fd\u017edenn\u00fd program \u2013 sobota"
+            },
+            "week_program_sunday": {
+                "name": "T\u00fd\u017edenn\u00fd program \u2013 nede\u013ea"
+            }
+        },
         "valve": {
             "indexed_valve": {
                 "name": "Ventil {index}"
